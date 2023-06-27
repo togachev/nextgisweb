@@ -1,0 +1,10 @@
+.starting-extent {
+    border-bottom: 0.005em solid var(--divider-color);
+    padding: 0px 0px 10px 0;
+    margin: 0 0 10px 0;
+}
+
+.starting-layer-extent {
+    display: table;
+    margin: 0 0 5px 0;
+}

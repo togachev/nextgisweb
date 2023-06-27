@@ -14,7 +14,10 @@ define([
     "dijit/form/NumberTextBox",
     "dijit/form/CheckBox",
     "dojox/layout/TableContainer",
-    "ngw-resource/ResourceBox"
+    "ngw-resource/ResourceBox",
+
+    //css
+    "xstyle/css!./template/resources/ExtentWidget.css"
 ], function (
     declare,
     lang,
@@ -31,8 +34,10 @@ define([
         title: i18n.gettext("Extent and bookmarks"),
         templateString: i18n.renderTemplate(template),
         serializePrefix: "webmap",
+        
+        ConstrainingExtent: undefined,
 
-       postCreate: function () {
+        postCreate: function () {
             this.inherited(arguments);
 
             // Layer selection and get its extent
@@ -40,10 +45,11 @@ define([
                 lang.hitch(this, function () {
                     this.layerPicker.pick().then(lang.hitch(this,
                         function (itm) {
-                            xhr(route.layer.extent({id: itm.id}), {
+                            xhr(route.layer.extent({ id: itm.id }), {
                                 method: "GET",
                                 handleAs: "json"
                             }).then(lang.hitch(this, function (data) {
+                                this.ConstrainingExtent = false
                                 var extent = data.extent;
                                 this.wExtentLeft.set("value", extent.minLon);
                                 this.wExtentRight.set("value", extent.maxLon);
@@ -54,17 +60,37 @@ define([
                     ));
                 })
             );
+
+            this.btnSetConstrainingExtent.on("click",
+                lang.hitch(this, function () {
+                    this.layerPicker.pick().then(lang.hitch(this,
+                        function (itm) {
+                            xhr(route.layer.extent({ id: itm.id }), {
+                                method: "GET",
+                                handleAs: "json"
+                            }).then(lang.hitch(this, function (data) {
+                                this.ConstrainingExtent = true
+                                var extent = data.extent;
+                                this.wExtentLeft.set("value", extent.minLon);
+                                this.wExtentRight.set("value", extent.maxLon);
+                                this.wExtentTop.set("value", extent.maxLat);
+                                this.wExtentBottom.set("value", extent.minLat);
+                            }));
+                        }
+                    ));
+                })
+            );
+
         },
 
         serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }
             var value = data.webmap;
-
             value.extent_left = this.wExtentLeft.get("value");
             value.extent_right = this.wExtentRight.get("value");
             value.extent_top = this.wExtentTop.get("value");
             value.extent_bottom = this.wExtentBottom.get("value");
-            value.extent_constrained = this.wExtentConstrained.get("checked");
+            value.extent_constrained = this.ConstrainingExtent
         },
 
         deserializeInMixin: function (data) {
@@ -73,7 +99,6 @@ define([
             this.wExtentRight.set("value", value.extent_right);
             this.wExtentTop.set("value", value.extent_top);
             this.wExtentBottom.set("value", value.extent_bottom);
-            this.wExtentConstrained.set("checked", value.extent_constrained);
         }
     });
 });
