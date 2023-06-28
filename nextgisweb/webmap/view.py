@@ -209,6 +209,7 @@ def display(obj, request):
 
     display_config = dict(
         extent=tmp["extent"],
+        extent_const=tmp["extent_const"],
         extent_constrained=tmp["extent_constrained"],
         rootItem=traverse(obj.root_item),
         itemsStates=items_states,

@@ -1,10 +1,30 @@
-.starting-extent {
-    border-bottom: 0.005em solid var(--divider-color);
-    padding: 0px 0px 10px 0;
-    margin: 0 0 10px 0;
+.settings-extent-layer-labelCell {
+    display: inline-block !important;
+    width: 100% !important;
 }
 
-.starting-layer-extent {
-    display: table;
+.settings-extent-layer-table {
+    margin: 0 0 16px 0;
+}
+
+.settings-extent-layer-table-horiz tr {
+    border-bottom: 0.05em dashed var(--divider-color);
+    vertical-align: baseline;
+    height: 40px;
+}
+
+.settings-extent-layer-table-horiz td, .settings-extent-layer-labelCell td {
+    vertical-align: sub;
+}
+.settings-extent-layer-valueCell, .settings-extent-valueCell-2 {
+    text-align: right;
+}
+
+.label-settings {
+    font-weight: 600;
+    width: 100%;
+    display: block;
+    padding: 0 0 5px 0;
     margin: 0 0 5px 0;
+    border-bottom: 0.05em dotted var(--divider-primary-color);
 }

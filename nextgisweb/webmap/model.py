@@ -62,6 +62,13 @@ class WebMap(Base, Resource):
     extent_right = db.Column(db.Float, default=+180)
     extent_bottom = db.Column(db.Float, default=-90)
     extent_top = db.Column(db.Float, default=+90)
+    layer_extent_id = db.Column(db.Integer, nullable=True)
+
+    extent_left_const = db.Column(db.Float, default=-180)
+    extent_right_const = db.Column(db.Float, default=+180)
+    extent_bottom_const = db.Column(db.Float, default=-90)
+    extent_top_const = db.Column(db.Float, default=+90)
+    layer_extent_const_id = db.Column(db.Integer, nullable=True)
     extent_constrained = db.Column(db.Boolean, default=False)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
@@ -99,7 +106,15 @@ class WebMap(Base, Resource):
                 self.extent_right if self.extent_right is not None else +180,
                 self.extent_top if self.extent_top is not None else +90,
             ),
+            extent_const=(
+                self.extent_left_const if self.extent_left_const is not None else -180,
+                self.extent_bottom_const if self.extent_bottom_const is not None else -90,
+                self.extent_right_const if self.extent_right_const is not None else +180,
+                self.extent_top_const if self.extent_top_const is not None else +90,
+            ),
             extent_constrained=self.extent_constrained,
+            layer_extent_id=self.layer_extent_id,
+            layer_extent_const_id=self.layer_extent_const_id,
         )
 
     def from_dict(self, data):
@@ -116,6 +131,11 @@ class WebMap(Base, Resource):
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
                 self.extent_right, self.extent_top = data['extent']
+
+        if 'extent_const' in data:
+            self.extent_left_const, self.extent_bottom_const, \
+                self.extent_right_const, self.extent_top_const = data['extent_const']
+
 
         if 'extent_constrained' in data:
             self.extent_constrained = data['extent_constrained']
@@ -278,6 +298,13 @@ class WebMapSerializer(Serializer):
     extent_right = SP(**_mdargs)
     extent_bottom = SP(**_mdargs)
     extent_top = SP(**_mdargs)
+    layer_extent_id = SP(**_mdargs)
+
+    extent_left_const = SP(**_mdargs)
+    extent_right_const = SP(**_mdargs)
+    extent_bottom_const = SP(**_mdargs)
+    extent_top_const = SP(**_mdargs)
+    layer_extent_const_id = SP(**_mdargs)
     extent_constrained = SP(**_mdargs)
 
     draw_order_enabled = SP(**_mdargs)
