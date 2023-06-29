@@ -1,8 +1,8 @@
-#: adapter.py:24
+#: adapter.py:25
 msgid "Tiles"
 msgstr "Тайлы"
 
-#: adapter.py:33
+#: adapter.py:34
 msgid "Image"
 msgstr "Изображение"
 
@@ -10,23 +10,23 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:31 model.py:50 view.py:308 view.py:339
+#: model.py:33 model.py:52 view.py:309 view.py:340
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:33 view.py:313
+#: model.py:35 view.py:314
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:34
+#: model.py:36
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:35
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:37
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: model.py:36
+#: model.py:38
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
@@ -34,28 +34,28 @@ msgstr "Администрировать аннотации"
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:262
+#: view.py:263
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:271
+#: view.py:272
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:319
+#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:320
 msgid "Clone"
 msgstr "Клонировать"
 
-#: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1134
+#: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1140
 #: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:235 amd/ngw-webmap/Display.js:375
+#: amd/ngw-webmap/Display.js:235 amd/ngw-webmap/Display.js:381
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:241 amd/ngw-webmap/Display.js:466
+#: amd/ngw-webmap/Display.js:241 amd/ngw-webmap/Display.js:472
 msgid "Share"
 msgstr "Поделиться"
 
@@ -63,53 +63,53 @@ msgstr "Поделиться"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:397 amd/ngw-webmap/Display.js:408
+#: amd/ngw-webmap/Display.js:403 amd/ngw-webmap/Display.js:414
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:431 amd/ngw-webmap/plugin/LayerInfo.js:43
+#: amd/ngw-webmap/Display.js:437 amd/ngw-webmap/plugin/LayerInfo.js:50
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:573 amd/ngw-webmap/Display.js:594
+#: amd/ngw-webmap/Display.js:579 amd/ngw-webmap/Display.js:600
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:778 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:784 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:488
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:779 amd/ngw-webmap/tool/Zoom.js:23
+#: amd/ngw-webmap/Display.js:785 amd/ngw-webmap/tool/Zoom.js:23
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:489
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:783 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
+#: amd/ngw-webmap/Display.js:789 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:799
+#: amd/ngw-webmap/Display.js:805
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:804
+#: amd/ngw-webmap/Display.js:810
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:807 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
+#: amd/ngw-webmap/Display.js:813 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1331 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
+#: amd/ngw-webmap/Display.js:1337 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1332 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
+#: amd/ngw-webmap/Display.js:1338 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/ExtentWidget.js:31
+#: amd/ngw-webmap/ExtentWidget.js:35
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
@@ -238,39 +238,62 @@ msgstr "С сообщениями"
 msgid "Map"
 msgstr "Карта"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+#: amd/ngw-webmap/template/ExtentWidget.hbs:4
+msgid "Starting extent"
+msgstr "Начальный экстент"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:6
+#: amd/ngw-webmap/template/ExtentWidget.hbs:40
 msgid "Left, deg."
 msgstr "Лево, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+#: amd/ngw-webmap/template/ExtentWidget.hbs:44
 msgid "Top, deg."
 msgstr "Верх, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+#: amd/ngw-webmap/template/ExtentWidget.hbs:14
+#: amd/ngw-webmap/template/ExtentWidget.hbs:48
 msgid "Right, deg."
 msgstr "Право, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+#: amd/ngw-webmap/template/ExtentWidget.hbs:18
+#: amd/ngw-webmap/template/ExtentWidget.hbs:52
 msgid "Bottom, deg."
 msgstr "Низ, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:34
-msgid "Set extent from layer"
-msgstr "Охват по слою"
+#: amd/ngw-webmap/template/ExtentWidget.hbs:24
+msgid "Set starting extent from layer"
+msgstr "Установить начальный экстент из слоя"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+#: amd/ngw-webmap/template/ExtentWidget.hbs:26
+#: amd/ngw-webmap/template/ExtentWidget.hbs:61
 msgid "Select layer"
 msgstr "Выберите слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:46
-msgid "Constrain to extent"
-msgstr "Фиксировать охват"
+#: amd/ngw-webmap/template/ExtentWidget.hbs:30
+#: amd/ngw-webmap/template/ExtentWidget.hbs:65
+msgid "Resource layer"
+msgstr "Ресурс слоя"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:49
+#: amd/ngw-webmap/template/ExtentWidget.hbs:33
+#: amd/ngw-webmap/template/ExtentWidget.hbs:68
+msgid "Clear extent"
+msgstr "Очистить экстент"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+msgid "Fixed extent by layer"
+msgstr "Фиксированный экстент по слою"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:59
+msgid "Set constraining extent"
+msgstr "Фиксировать охват по слою"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:73
 msgid "Select vector layer"
 msgstr "Выберите векторный слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:51
+#: amd/ngw-webmap/template/ExtentWidget.hbs:74
 msgid "Bookmark resource"
 msgstr "Ресурс закладок"
 
@@ -604,11 +627,6 @@ msgstr "Выберите масштаб"
 msgid "Use Shift+drag for box zooming"
 msgstr "Используйте Shift+мышь для увеличения рамкой"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:6
-#: nodepkg/search-panel/SearchPanel.js:345
-msgid "Search on the map"
-msgstr "Поиск по карте"
-
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:520
 msgid "Open full map"
 msgstr "Открыть карту целиком"
@@ -641,13 +659,17 @@ msgstr "Показывать охват"
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
-#: nodepkg/search-panel/SearchPanel.js:297
+#: nodepkg/search-panel/SearchPanel.js:296
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/search-panel/SearchPanel.js:303
+#: nodepkg/search-panel/SearchPanel.js:302
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
+
+#: nodepkg/search-panel/SearchPanel.js:344
+msgid "Enter at least 2 characters"
+msgstr ""
 
 #: nodepkg/settings/Settings.js:56
 msgid "Settings saved"
@@ -921,26 +943,12 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:5
-msgid "Starting extent"
-msgstr "Начальный экстент"
+#~ msgid "Set extent from layer"
+#~ msgstr "Охват по слою"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:26
-msgid "Set starting extent from layer"
-msgstr "Установить начальный экстент из слоя"
+#~ msgid "Constrain to extent"
+#~ msgstr "Фиксировать охват"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:37
-msgid "Set constraining extent"
-msgstr "Фиксировать охват по слою"
+#~ msgid "Search on the map"
+#~ msgstr "Поиск по карте"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:37
-msgid "Clear extent"
-msgstr "Очистить экстент"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:37
-msgid "Resource layer"
-msgstr "Ресурс слоя"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:37
-msgid "Fixed extent by layer"
-msgstr "Фиксированный экстент по слою"
