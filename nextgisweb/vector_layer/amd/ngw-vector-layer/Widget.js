@@ -5,6 +5,8 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/vector_layer/change-type-geom",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/gui/error",
@@ -26,6 +28,8 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ContentPane,
+    reactApp,
+    ChangeTypeGeomComp,
     api,
     i18n,
     error,
@@ -40,7 +44,7 @@ define([
         delete: "delete",
         geom: "geom",
     };
-    var danger_modes = [Modes.file, Modes.delete, Modes.geom];
+    var danger_modes = [Modes.file, Modes.delete];
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Vector layer"),
@@ -66,12 +70,27 @@ define([
         },
 
         postCreate: function () {
+
+            this.wChangeTypeGeomComp = document.createElement("span");
+            this.wChangeTypeGeomComp.style.margin = "5px";
+            this.domNode.appendChild(this.wChangeTypeGeomComp);
+
             if (this.composite.operation === "create") {
                 this.confirm_section.style.display = "none";
             }
             this.modeSwitcher.watch("value", function(attr, oldval, newval) {
                 this.empty_layer_section.style.display = 
-                    [Modes.empty, Modes.geom].includes(newval) ? "" : "none";
+                    [Modes.empty].includes(newval) ? "flex" : "none";
+
+                if ([Modes.geom].includes(newval)) {
+                    reactApp.default(
+                        ChangeTypeGeomComp.default,
+                        {
+                            operation: "update",
+                        },
+                        this.wChangeTypeGeomComp
+                    );
+                }
                 this.file_section.style.display = newval === Modes.file ? "" : "none";
                 if (this.composite.operation === "update") {
                     this.confirm_section.style.display = 
@@ -87,7 +106,7 @@ define([
                     { value: Modes.keep, label: i18n.gettext("Keep existing layer features"), selected: true },
                     { value: Modes.file, label: i18n.gettext("Replace layer features from file") },
                     { value: Modes.delete, label: i18n.gettext("Delete all features from layer") },
-                    // { value: Modes.geom, label: i18n.gettext("Change geometry type") },
+                    { value: Modes.geom, label: i18n.gettext("Change geometry type") },
                 ]
             );
 
@@ -150,10 +169,10 @@ define([
             switch (this.modeSwitcher.get("value")) {
                 case Modes.empty:
                     setObject("fields", []);
-                case Modes.geom:
-                    setObject("geometry_type", this.wGeometryType.get("value"));
-                    break;
 
+                case Modes.geom:
+                    alert("update type geom");
+                    break;
                 case Modes.file:
                     setObject("source", this.wSourceFile.get("value"));
                     if (this.wSourceLayer.get("options").length > 1) {
