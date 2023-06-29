@@ -932,3 +932,15 @@ msgstr "Установить начальный экстент из слоя"
 #: amd/ngw-webmap/template/ExtentWidget.hbs:37
 msgid "Set constraining extent"
 msgstr "Фиксировать охват по слою"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:37
+msgid "Clear extent"
+msgstr "Очистить экстент"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:37
+msgid "Resource layer"
+msgstr "Ресурс слоя"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:37
+msgid "Fixed extent by layer"
+msgstr "Фиксированный экстент по слою"
