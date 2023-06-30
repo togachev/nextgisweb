@@ -51,6 +51,8 @@ define([
         activateOn: { create: true },
         prefix: "vector_layer",
 
+        testOperation: {},
+
         constructor: function() {
             this.wSrs = SRSSelect({allSrs: null});
         },
@@ -86,7 +88,8 @@ define([
                     reactApp.default(
                         ChangeTypeGeomComp.default,
                         {
-                            operation: "update",
+                            testFunc: this.testFunc,
+                            testOperation: this.testOperation,
                         },
                         this.wChangeTypeGeomComp
                     );
@@ -155,6 +158,10 @@ define([
             }.bind(this));
         },
 
+        testFunc: function(e){
+            alert(e);
+        },
+
         serialize: function(data, lunkwill) {
             this.inherited(arguments);
             lunkwill.suggest(this.composite.operation === "create");
@@ -171,7 +178,7 @@ define([
                     setObject("fields", []);
 
                 case Modes.geom:
-                    alert("update type geom");
+                    alert(this.testOperation.key);
                     break;
                 case Modes.file:
                     setObject("source", this.wSourceFile.get("value"));

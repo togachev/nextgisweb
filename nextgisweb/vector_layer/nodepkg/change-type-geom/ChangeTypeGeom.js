@@ -4,10 +4,11 @@ import {Button} from "@nextgisweb/gui/antd";
 import "./ChangeTypeGeom.less";
 import MouseIcon from "@material-icons/svg/mouse";
 
-export function ChangeTypeGeom({operation}) {
-
+export function ChangeTypeGeom({testFunc, testOperation}) {
+    const operation = "ALTER TABLE table ALTER COLUMN geom TYPE geometry(<MULTI*>,3857) USING ST_Multi(geom);"
     const changeGeomType = (e) => {
-        console.log(e);
+        testFunc(e);
+        testOperation.key = "update"
     }
 
     return (
@@ -25,5 +26,6 @@ export function ChangeTypeGeom({operation}) {
 }
 
 ChangeTypeGeom.propTypes = {
-    operation: PropTypes.string
+    testFunc: PropTypes.func,
+    testOperation: PropTypes.object
 };
