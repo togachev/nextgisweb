@@ -119,7 +119,12 @@ define([
             value.extent_constrained = this.wExtentLeftConst.get("value") === null &&
                                             this.wExtentRightConst.get("value") === null &&
                                                 this.wExtentTopConst.get("value") === null &&
-                                                    this.wExtentBottomConst.get("value") === null ? false : true
+                                                    this.wExtentBottomConst.get("value") === null &&
+                                        this.wExtentLeftConst.get("value") === '' &&
+                                            this.wExtentRightConst.get("value") === '' &&
+                                                this.wExtentTopConst.get("value") === '' &&
+                                                    this.wExtentBottomConst.get("value") === '' 
+                                        ? false : true
                 
             value.extent_left = this.wExtentLeft.get("value");
             value.extent_right = this.wExtentRight.get("value");
