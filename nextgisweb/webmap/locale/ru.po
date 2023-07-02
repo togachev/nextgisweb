@@ -109,7 +109,7 @@ msgstr "Объект не найден"
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/ExtentWidget.js:31
+#: amd/ngw-webmap/ExtentWidget.js:33
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
@@ -238,39 +238,52 @@ msgstr "С сообщениями"
 msgid "Map"
 msgstr "Карта"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+#: amd/ngw-webmap/template/ExtentWidget.hbs:4
+msgid "Starting extent"
+msgstr "Начальный экстент"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:6
+#: amd/ngw-webmap/template/ExtentWidget.hbs:34
 msgid "Left, deg."
 msgstr "Лево, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
 msgid "Top, deg."
 msgstr "Верх, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+#: amd/ngw-webmap/template/ExtentWidget.hbs:14
+#: amd/ngw-webmap/template/ExtentWidget.hbs:42
 msgid "Right, deg."
 msgstr "Право, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+#: amd/ngw-webmap/template/ExtentWidget.hbs:18
+#: amd/ngw-webmap/template/ExtentWidget.hbs:46
 msgid "Bottom, deg."
 msgstr "Низ, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:34
-msgid "Set extent from layer"
-msgstr "Охват по слою"
+#: amd/ngw-webmap/template/ExtentWidget.hbs:24
+msgid "Set starting extent from layer"
+msgstr "Установить начальный экстент из слоя"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+#: amd/ngw-webmap/template/ExtentWidget.hbs:26
+#: amd/ngw-webmap/template/ExtentWidget.hbs:55
 msgid "Select layer"
 msgstr "Выберите слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:46
-msgid "Constrain to extent"
-msgstr "Фиксировать охват"
+#: amd/ngw-webmap/template/ExtentWidget.hbs:32
+msgid "Fixed extent by layer"
+msgstr "Фиксированный экстент по слою"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:49
+#: amd/ngw-webmap/template/ExtentWidget.hbs:53
+msgid "Set constraining extent { }"
+msgstr "Установить фиксированный экстент"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:61
 msgid "Select vector layer"
 msgstr "Выберите векторный слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:51
+#: amd/ngw-webmap/template/ExtentWidget.hbs:62
 msgid "Bookmark resource"
 msgstr "Ресурс закладок"
 
@@ -939,4 +952,10 @@ msgid "To generate a preview, go back to the web map page and click \"Preview\".
 msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
+
+#~ msgid "Set extent from layer"
+#~ msgstr "Охват по слою"
+
+#~ msgid "Constrain to extent"
+#~ msgstr "Фиксировать охват"
 
