@@ -340,6 +340,12 @@ define([
                 this.displayProjection
             );
 
+            this._extent_const = ol.proj.transformExtent(
+                this.config.extent_const,
+                this.lonlatProjection,
+                this.displayProjection
+            );
+
             // Layers panel
             widget._layersPanelSetup();
 
@@ -760,7 +766,7 @@ define([
                     minZoom: 3,
                     constrainResolution: true,
                     extent: this.config.extent_constrained
-                        ? this._extent
+                        ? this._extent_const
                         : undefined,
                 }),
             });

@@ -81,7 +81,7 @@ define([
         serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }
             var value = data.webmap;
-            console.log(value);
+
             value.extent_constrained = 
                 this.wExtentLeftConst.get("value") === null &&
                     this.wExtentRightConst.get("value") === null &&
@@ -106,7 +106,7 @@ define([
 
         deserializeInMixin: function (data) {
             var value = data.webmap;
-            console.log(value);
+
             this.wExtentLeft.set("value", value.extent_left);
             this.wExtentRight.set("value", value.extent_right);
             this.wExtentTop.set("value", value.extent_top);
