@@ -65,6 +65,11 @@ class WebMap(Base, Resource):
     extent_top = db.Column(db.Float, default=+90)
     extent_constrained = db.Column(db.Boolean, default=False)
 
+    extent_left_const = db.Column(db.Float, default=-180)
+    extent_right_const = db.Column(db.Float, default=+180)
+    extent_bottom_const = db.Column(db.Float, default=-90)
+    extent_top_const = db.Column(db.Float, default=+90)
+
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
@@ -105,6 +110,12 @@ class WebMap(Base, Resource):
                 self.extent_right if self.extent_right is not None else +180,
                 self.extent_top if self.extent_top is not None else +90,
             ),
+            extent_const=(
+                self.extent_left_const if self.extent_left_const is not None else -180,
+                self.extent_bottom_const if self.extent_bottom_const is not None else -90,
+                self.extent_right_const if self.extent_right_const is not None else +180,
+                self.extent_top_const if self.extent_top_const is not None else +90,
+            ),
             extent_constrained=self.extent_constrained,
         )
 
@@ -122,6 +133,9 @@ class WebMap(Base, Resource):
             self.extent_left, self.extent_bottom, \
                 self.extent_right, self.extent_top = data['extent']
 
+        if 'extent_const' in data:
+            self.extent_left_const, self.extent_bottom_const, \
+                self.extent_right_const, self.extent_top_const = data['extent_const']
 
 class WebMapItem(Base):
     __tablename__ = 'webmap_item'
@@ -303,6 +317,11 @@ class WebMapSerializer(Serializer):
     extent_bottom = SP(**_mdargs)
     extent_top = SP(**_mdargs)
     extent_constrained = SP(**_mdargs)
+
+    extent_left_const = SP(**_mdargs)
+    extent_right_const = SP(**_mdargs)
+    extent_bottom_const = SP(**_mdargs)
+    extent_top_const = SP(**_mdargs)
 
     draw_order_enabled = SP(**_mdargs)
     editable = SP(**_mdargs)
