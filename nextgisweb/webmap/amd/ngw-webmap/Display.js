@@ -765,9 +765,9 @@ define([
                 view: new ol.View({
                     minZoom: 3,
                     constrainResolution: true,
-                    extent: this.config.extent_const.some(el => el !== null)
-                    ? this._extent_const
-                    : undefined,
+                    extent: !this.config.extent_const.includes(null)
+                        ? this._extent_const
+                        : undefined,
                 }),
             });
 
