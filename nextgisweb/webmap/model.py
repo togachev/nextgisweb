@@ -63,7 +63,6 @@ class WebMap(Base, Resource):
     extent_right = db.Column(db.Float, default=+180)
     extent_bottom = db.Column(db.Float, default=-90)
     extent_top = db.Column(db.Float, default=+90)
-    extent_constrained = db.Column(db.Boolean, default=False)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
@@ -105,12 +104,11 @@ class WebMap(Base, Resource):
                 self.extent_right if self.extent_right is not None else +180,
                 self.extent_top if self.extent_top is not None else +90,
             ),
-            extent_constrained=self.extent_constrained,
         )
 
     def from_dict(self, data):
         for k in (
-            'display_name', 'bookmark_resource_id', 'extent_constrained', 'editable',
+            'display_name', 'bookmark_resource_id', 'editable',
         ):
             if k in data:
                 setattr(self, k, data[k])
@@ -302,7 +300,6 @@ class WebMapSerializer(Serializer):
     extent_right = SP(**_mdargs)
     extent_bottom = SP(**_mdargs)
     extent_top = SP(**_mdargs)
-    extent_constrained = SP(**_mdargs)
 
     draw_order_enabled = SP(**_mdargs)
     editable = SP(**_mdargs)

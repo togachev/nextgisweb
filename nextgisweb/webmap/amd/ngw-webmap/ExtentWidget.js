@@ -64,7 +64,6 @@ define([
             value.extent_right = this.wExtentRight.get("value");
             value.extent_top = this.wExtentTop.get("value");
             value.extent_bottom = this.wExtentBottom.get("value");
-            value.extent_constrained = this.wExtentConstrained.get("checked");
         },
 
         deserializeInMixin: function (data) {
@@ -73,7 +72,6 @@ define([
             this.wExtentRight.set("value", value.extent_right);
             this.wExtentTop.set("value", value.extent_top);
             this.wExtentBottom.set("value", value.extent_bottom);
-            this.wExtentConstrained.set("checked", value.extent_constrained);
         }
     });
 });
