@@ -3,12 +3,8 @@ from datetime import timedelta
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
 
-from .model import Base
-
 
 class NogeomComponent(Component):
-    identity = 'nogeom'
-    metadata = Base.metadata
 
     def initialize(self):
         super().initialize()

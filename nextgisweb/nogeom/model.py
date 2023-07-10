@@ -8,7 +8,7 @@ from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
-from nextgisweb.env import _, declarative_base, env
+from nextgisweb.env import Base, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.logging import logger
 
@@ -45,7 +45,7 @@ from nextgisweb.resource import SerializedResourceRelationship as SRR
 
 from .exception import ExternalDatabaseError
 
-Base = declarative_base(dependencies=('resource', 'feature_layer'))
+Base.depends_on('resource', 'feature_layer')
 
 PC_READ = ConnectionScope.read
 PC_WRITE = ConnectionScope.write
