@@ -1,0 +1,268 @@
+#: api.py:57
+#, python-format
+msgid "Table (%s) not found in schema (%s)."
+msgstr "Таблица (%s) не найдена в схеме (%s)."
+
+#: api.py:75
+msgid "NoGeom layer {} not found!"
+msgstr "Слой NoGeom {} не найден!"
+
+#: api.py:91
+msgid "NoGeom connection {} not found!"
+msgstr "Соединение NoGeom {} не найдено!"
+
+#: diagnostics.py:100
+msgid "Got an unexpected error."
+msgstr "Возникла неожиданная ошибка."
+
+#: diagnostics.py:147
+msgid "PostgreSQL connection"
+msgstr "Подключение к PostgreSQL"
+
+#: diagnostics.py:153
+msgid "Host name resolution failed: {}."
+msgstr "Не удалось выполнить разрешение имени: {}."
+
+#: diagnostics.py:167
+msgid "Failed to connect to the database."
+msgstr "Не удалось подключиться к базе данных."
+
+#: diagnostics.py:171
+msgid "Connected to the database."
+msgstr "Подключение к базе данных выполнено."
+
+#: diagnostics.py:174
+msgid "Executed {} query."
+msgstr "Выполнен запрос {}."
+
+#: diagnostics.py:177
+msgid "PostgreSQL version {}."
+msgstr "Версия PostgreSQL {}."
+
+#: diagnostics.py:218
+msgid "Layer table"
+msgstr "Таблица слоя"
+
+#: diagnostics.py:224
+msgid "Table not found."
+msgstr "Таблица не найдена."
+
+#: diagnostics.py:226
+msgid "Table found, table type is {}."
+msgstr "Таблица найдена, тип таблицы {}."
+
+#: diagnostics.py:239
+msgid "{} privilege is present."
+msgstr "Привилегия {} присутствует."
+
+#: diagnostics.py:241 diagnostics.py:243
+msgid "{} privilege is absent."
+msgstr "Привилегия {} отсутствует."
+
+#: diagnostics.py:246
+msgid "Number of records: {}."
+msgstr "Количество записей: {}."
+
+#: diagnostics.py:249
+msgid "ID isn't set."
+msgstr ""
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:28 diagnostics.py:256
+msgid "ID column"
+msgstr "Поле ID"
+
+#: diagnostics.py:261
+msgid "Column not found."
+msgstr "Колонка не найдена."
+
+#: diagnostics.py:266
+msgid "Column found, but has non-integer type - {}."
+msgstr "Колонка найдена, но имеет не целочисленный тип - {}."
+
+#: diagnostics.py:268
+msgid "Column found, type is {}."
+msgstr "Колонка найдена, тип {}."
+
+#: diagnostics.py:273
+msgid "Column is the primary key."
+msgstr "Колонка является первичным ключем."
+
+#: diagnostics.py:276
+msgid "Column is not the primary key."
+msgstr "Колонка не является первичным ключем."
+
+#: diagnostics.py:285
+msgid "Column can be NULL."
+msgstr "Колонка может быть NULL."
+
+#: diagnostics.py:290
+msgid "NULL values in the column."
+msgstr "В колонке найдены значения NULL."
+
+#: diagnostics.py:292
+msgid "No NULL values in the column."
+msgstr "Значений NULL в колонке не найдено."
+
+#: diagnostics.py:294
+msgid "Column cannot be NULL."
+msgstr "Колонка не может быть NULL."
+
+#: diagnostics.py:298
+msgid "Unique index not found."
+msgstr "Уникальный индекс не найден."
+
+#: diagnostics.py:300
+msgid "Unique index found."
+msgstr "Уникальный индекс найден."
+
+#: diagnostics.py:313
+msgid "Non-unique values in the column."
+msgstr "В колонке есть не уникальные значения."
+
+#: diagnostics.py:315
+msgid "All values are unique."
+msgstr "Все значения уникальны."
+
+#: diagnostics.py:320
+msgid "Column is auto-incrementable."
+msgstr "Колонка авто-инкрементируемая."
+
+#: diagnostics.py:322
+msgid "Column isn't auto-incrementable."
+msgstr "Колонка не авто-инкрементируемая."
+
+#: diagnostics.py:326
+msgid "Field columns"
+msgstr "Колонки полей"
+
+#: diagnostics.py:332
+msgid "Column of field '{}' not found."
+msgstr "Колонка поля '{}' не найдена."
+
+#: diagnostics.py:340
+msgid "Column of field '{}' found, but has an incompatible type - {}."
+msgstr "Колонка поля '{}' найдена, но имеет несовместимый тип - {}."
+
+#: diagnostics.py:344
+msgid "Column of field '{}' found, type is {}."
+msgstr "Колонка поля '{}' найдена, тип {}."
+
+#: exception.py:9
+msgid "External database error"
+msgstr "Ошибка внешней базы данных"
+
+#: amd/ngw-nogeom/ConnectionWidget.js:25 model.py:56
+msgid "NoGeom connection"
+msgstr "Соединение NoGeom"
+
+#: model.py:129
+msgid "Cannot connect to the database!"
+msgstr "Невозможно подключиться к базе данных!"
+
+#: amd/ngw-nogeom/LayerWidget.js:37 model.py:163
+msgid "NoGeom layer"
+msgstr "Слой NoGeom"
+
+#: model.py:211
+#, python-format
+msgid "Table '%(table)s' not found!"
+msgstr "Таблица '%(table)s' не найдена!"
+
+#: model.py:219
+msgid "To use column as ID it should have integer type!"
+msgstr ""
+"Для использования поля в качестве идентификатора оно должно иметь "
+"целочисленный тип!"
+
+#: model.py:254
+#, python-format
+msgid "Column '%(column)s' not found!"
+msgstr "Поле '%(column)s' не найдено!"
+
+#: view.py:35
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+#: view.py:58
+msgid "NoGeom diagnostics"
+msgstr "Диагностика NoGeom"
+
+#: amd/ngw-nogeom/template/ConnectionWidget.hbs:9
+msgid "Host"
+msgstr "Сервер"
+
+#: amd/ngw-nogeom/template/ConnectionWidget.hbs:14
+msgid "Port"
+msgstr "Порт"
+
+#: amd/ngw-nogeom/template/ConnectionWidget.hbs:19
+msgid "Database"
+msgstr "База данных"
+
+#: amd/ngw-nogeom/template/ConnectionWidget.hbs:24
+msgid "User"
+msgstr "Пользователь"
+
+#: amd/ngw-nogeom/template/ConnectionWidget.hbs:29
+msgid "Password"
+msgstr "Пароль"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:8
+msgid "Select NoGeom connection"
+msgstr "Выберите соединение NoGeom"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:10
+msgid "Connection"
+msgstr "Соединение"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:16
+msgid "Schema"
+msgstr "Схема"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:22
+msgid "Table"
+msgstr "Таблица"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:34
+msgid "Attribute definitions"
+msgstr "Описания атрибутов"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:37
+msgid "Keep"
+msgstr "Оставить"
+
+#: amd/ngw-nogeom/template/LayerWidget.hbs:38
+msgid "Reload"
+msgstr "Загрузить"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:13
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:14
+msgid "Success"
+msgstr "Успех"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:15
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:16
+msgid "Error"
+msgstr "Ошибка"
+
+#~ msgid "NoGeom extension"
+#~ msgstr "Расширение NoGeom"
+
+#~ msgid "NoGeom extension not found."
+#~ msgstr "Расширение NoGeom не найдено."
+
+#~ msgid "NoGeom extension version {}."
+#~ msgstr "Версия расширения NoGeom {}."
+
+#~ msgid "Column found, but has an incompatible type - {}."
+#~ msgstr "Колонка найдена, но имеет несовместимый тип - {}."
+
+#~ msgid "Autodetect"
+#~ msgstr "Автоматически"
+

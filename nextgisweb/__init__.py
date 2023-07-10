@@ -44,6 +44,7 @@ def pkginfo():
         'file_upload',
         'audit',
         'basemap',
+        'nogeom'
     )
 
     return dict(components={comp: dict(

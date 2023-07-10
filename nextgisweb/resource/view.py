@@ -322,12 +322,12 @@ def setup_pyramid(comp, config):
                 # Workaround SAWarning: Object of type ... not in session,
                 # add operation along 'Resource.children' will not proceed
                 child.parent = None
-
-                yield Link(
-                    'create/%s' % ident,
-                    cls.cls_display_name,
-                    self._url(ident),
-                    icon=f"rescls-{cls.identity}")
+                if args.obj.cls != 'nogeom_layer':
+                    yield Link(
+                        'create/%s' % ident,
+                        cls.cls_display_name,
+                        self._url(ident),
+                        icon=f"rescls-{cls.identity}")
 
             if PERM_UPDATE in permissions:
                 yield Link(

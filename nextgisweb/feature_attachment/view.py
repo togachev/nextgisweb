@@ -37,11 +37,12 @@ def setup_pyramid(comp, config):
         def build(self, args):
             if IFeatureLayer.providedBy(args.obj):
                 if args.obj.has_export_permission(args.request.user):
-                    yield dm.Link(
-                        'feature_layer/feature_attachment', _("Manage attachments"),
-                        lambda args: args.request.route_url(
-                            "feature_attachment.page",
-                            id=args.obj.id),
-                        icon='material-attach_file')
+                    if args.obj.cls != 'nogeom_layer':
+                        yield dm.Link(
+                            'feature_layer/feature_attachment', _("Manage attachments"),
+                            lambda args: args.request.route_url(
+                                "feature_attachment.page",
+                                id=args.obj.id),
+                            icon='material-attach_file')
 
     Resource.__dynmenu__.add(LayerMenuExt())

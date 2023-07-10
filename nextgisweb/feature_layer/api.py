@@ -574,12 +574,13 @@ def iget(resource, request) -> JSONType:
     )
 
     query = resource.feature_query()
-    if not geom_skip:
-        if srs is not None:
-            query.srs(SRS.filter_by(id=int(srs)).one())
-        query.geom()
-        if srlz_params['geom_format'] == 'wkt':
-            query.geom_format('WKT')
+    if resource.cls != 'nogeom_layer':
+        if not geom_skip:
+            if srs is not None:
+                query.srs(SRS.filter_by(id=int(srs)).one())
+            query.geom()
+            if srlz_params['geom_format'] == 'wkt':
+                query.geom_format('WKT')
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
@@ -666,7 +667,8 @@ def iput(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
 
     query = resource.feature_query()
-    query.geom()
+    if resource.cls != 'nogeom_layer':
+        query.geom()
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
@@ -675,11 +677,12 @@ def iput(resource, request) -> JSONType:
         dt_format=request.GET.get('dt_format', 'obj')
     )
 
-    srs = request.GET.get('srs')
+    if resource.cls != 'nogeom_layer':
+        srs = request.GET.get('srs')
 
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
+        if srs is not None:
+            srs_from = SRS.filter_by(id=int(srs)).one()
+            dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     deserialize(feature, request.json_body, **dsrlz_params)
     if IWritableFeatureLayer.providedBy(resource):
@@ -795,12 +798,13 @@ def cget(resource, request) -> JSONType:
         srlz_params['keys'] = fields
         query.fields(*fields)
 
-    if not geom_skip:
-        if srs is not None:
-            query.srs(SRS.filter_by(id=int(srs)).one())
-        query.geom()
-        if srlz_params['geom_format'] == 'wkt':
-            query.geom_format('WKT')
+    if resource.cls != 'nogeom_layer':
+        if not geom_skip:
+            if srs is not None:
+                query.srs(SRS.filter_by(id=int(srs)).one())
+            query.geom()
+            if srlz_params['geom_format'] == 'wkt':
+                query.geom_format('WKT')
 
     result = [
         serialize(feature, **srlz_params)
@@ -817,12 +821,12 @@ def cpost(resource, request) -> JSONType:
         geom_format=request.GET.get('geom_format', 'wkt').lower(),
         dt_format=request.GET.get('dt_format', 'obj')
     )
+    if resource.cls != 'nogeom_layer':
+        srs = request.GET.get('srs')
 
-    srs = request.GET.get('srs')
-
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
+        if srs is not None:
+            srs_from = SRS.filter_by(id=int(srs)).one()
+            dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     feature = Feature(layer=resource)
     deserialize(feature, request.json_body, **dsrlz_params)
@@ -839,12 +843,12 @@ def cpatch(resource, request) -> JSONType:
         geom_format=request.GET.get('geom_format', 'wkt').lower(),
         dt_format=request.GET.get('dt_format', 'obj')
     )
+    if resource.cls != 'nogeom_layer':
+        srs = request.GET.get('srs')
 
-    srs = request.GET.get('srs')
-
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
+        if srs is not None:
+            srs_from = SRS.filter_by(id=int(srs)).one()
+            dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     for fdata in request.json_body:
         if 'id' not in fdata:
