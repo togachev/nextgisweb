@@ -401,7 +401,7 @@ def resource_export_put(request) -> JSONType:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 def tbl_res(request):
-    clsItems = ['postgis_layer', 'vector_layer'];
+    clsItems = ['nogeom_layer','postgis_layer', 'vector_layer'];
     query = DBSession.query(Resource).filter(Resource.cls.in_(clsItems)).all()
     result = list()
     for resource in query:
