@@ -1,5 +1,9 @@
 {
     "name": "@nextgisweb/resource",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "react-bootstrap": "^2.7.0",
+        "react-select": "^5.7.0"
+    }
 }

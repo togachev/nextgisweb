@@ -210,6 +210,41 @@ def resource_export(request):
 
 resource_sections = PageSections('resource_section')
 
+@viewargs(renderer='react')
+def resource_constraint(request):
+    request.resource_permission(PERM_UPDATE)
+
+    if (request.context.column_key):
+        res = Resource.filter_by(id=request.context.column_key).one()
+        display_name_const = res.display_name
+    else:
+        display_name_const = None
+
+    if (request.context.cls == 'postgis_layer' or request.context.cls == 'nogeom_layer'):
+        connection_id = request.context.connection.id
+        schema = request.context.schema
+        table_name = request.context.table
+    else:
+        connection_id = None
+        schema = None
+        table_name = None
+    return dict(
+        entrypoint='@nextgisweb/resource/resource-constraint',
+        props=dict(
+            id=request.context.id,
+            display_name=request.context.display_name,
+            display_name_const=display_name_const,
+            column_from_const=request.context.column_from_const,
+            column_key=request.context.column_key,
+            column_constraint=request.context.column_constraint,
+            connection_id=connection_id,
+            schema=schema,
+            table_name=table_name,
+            cls=request.context.cls,
+        ),
+        title=_("Settings Resource Constraint"),
+        obj=request.context,
+    )
 
 def setup_pyramid(comp, config):
 
@@ -336,6 +371,15 @@ def setup_pyramid(comp, config):
                         'resource.update', id=args.obj.id),
                     important=True, icon='material-edit')
 
+            if args.obj.cls in ['vector_layer', 'postgis_layer']:
+                if isinstance(args.obj, Resource):
+                    if PERM_UPDATE in permissions:
+                        yield Link(
+                            'operation/0-resource_constraint', _("Settings Resource Constraint"),
+                            lambda args: args.request.route_url(
+                                'resource.resource_constraint', id=args.obj.id),
+                            icon='material-schema')
+
             if PERM_DELETE in permissions and args.obj.id != 0 and \
                     args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user):
                 yield Link(
@@ -378,3 +422,10 @@ def setup_pyramid(comp, config):
         'resource.control_panel.resource_export',
         '/control-panel/resource-export'
     ).add_view(resource_export)
+
+    config.add_route(
+        'resource.resource_constraint',
+        '/res_const/{id:\d+}/settings',
+        factory=resource_factory,
+        client=('id',)
+        ).add_view(resource_constraint)

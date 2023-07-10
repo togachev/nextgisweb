@@ -400,6 +400,24 @@ def resource_export_put(request) -> JSONType:
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
+def tbl_res(request):
+    clsItems = ['postgis_layer', 'vector_layer'];
+    query = DBSession.query(Resource).filter(Resource.cls.in_(clsItems)).all()
+    result = list()
+    for resource in query:
+        if resource.has_permission(PERM_READ, request.user):
+            fields=list()
+            for idx in resource.fields:
+                fields.append({'value':idx.display_name, 'label':idx.display_name})
+            result.append(dict(
+                id=resource.id,
+                name=resource.display_name,
+                column_key=resource.column_key,
+                column_constraint=resource.column_constraint,
+                column_from_const=resource.column_from_const,
+                fields=fields
+            ))
+    return result
 
 def setup_pyramid(comp, config):
 
@@ -454,3 +472,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.file_download', r'/api/resource/{id:\d+}/file/{name:.*}',
         factory=resource_factory)
+
+    config.add_route(
+        'resource.tbl_res', '/api/resource/tblres/') \
+        .add_view(tbl_res, request_method='GET', renderer='json')

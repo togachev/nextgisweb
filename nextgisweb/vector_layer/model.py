@@ -102,6 +102,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     tbl_uuid = db.Column(db.Unicode(32), nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
+    column_from_const = db.Column(db.Unicode, nullable=True)
+    column_key = db.Column(db.Integer, nullable=True)
+    column_constraint = db.Column(db.Unicode, nullable=True)
 
     __field_class__ = VectorLayerField
 
@@ -549,6 +552,9 @@ class VectorLayerSerializer(Serializer):
     source = _source_attr(write=P_DS_WRITE)
 
     geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
+    column_from_const = SP(read=P_DSS_READ, write=P_DSS_WRITE)
+    column_key = SP(read=P_DSS_READ, write=P_DSS_WRITE)
+    column_constraint = SP(read=P_DSS_READ, write=P_DSS_WRITE)
     fields = _fields_attr(write=P_DS_WRITE)
 
     delete_all_features = _delete_all_features_attr(write=P_DS_WRITE)

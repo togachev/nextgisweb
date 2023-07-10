@@ -2,6 +2,7 @@
     from types import SimpleNamespace
     from nextgisweb.lib import dynmenu as dm
     from nextgisweb.resource import ResourceScope
+    from nextgisweb.resource.model import Resource
 %>
 
 <div id="childrenSection"></div>
@@ -9,12 +10,23 @@
 <%
     data = list()
     for item in obj.children:
+        if (getattr(item, 'column_key', None)):
+            res = Resource.filter_by(id=item.column_key).one()
+            column_key = item.column_key
+            update_link_const = request.route_url('resource.resource_constraint', id=item.id)
+            display_name_const = res.display_name
+        else:
+            column_key = None
+            update_link_const = None
+            display_name_const = None
         if ResourceScope.read not in item.permissions(request.user):
             continue
         idata = dict(
             id=item.id, displayName=item.display_name, link=request.route_url('resource.show', id=item.id),
             cls=item.cls, clsDisplayName=tr(item.cls_display_name), creationDate=item.creation_date,
-            ownerUserDisplayName=item.owner_user.display_name)
+            ownerUserDisplayName=item.owner_user.display_name, 
+            column_key=column_key, update_link_const=update_link_const,
+            display_name_const=display_name_const)
         
         iacts = idata["actions"] = list()
         args = SimpleNamespace(obj=item, request=request)

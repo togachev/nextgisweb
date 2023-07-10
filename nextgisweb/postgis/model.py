@@ -227,6 +227,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     schema = db.Column(db.Unicode, default='public', nullable=False)
     table = db.Column(db.Unicode, nullable=False)
     column_id = db.Column(db.Unicode, nullable=False)
+    column_from_const = db.Column(db.Unicode, nullable=True)
+    column_key = db.Column(db.Integer, nullable=True)
+    column_constraint = db.Column(db.Unicode, nullable=True)
     column_geom = db.Column(db.Unicode, nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
     geometry_srid = db.Column(db.Integer, nullable=False)
@@ -249,6 +252,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             schema=self.schema,
             table=self.table,
             column_id=self.column_id,
+            column_from_const=self.column_from_const,
+            column_key=self.column_key,
+            column_constraint=self.column_constraint,
             column_geom=self.column_geom,
             geometry_type=self.geometry_type)
         )
@@ -512,6 +518,9 @@ class PostgisLayerSerializer(Serializer):
     schema = SP(**__defaults)
     table = SP(**__defaults)
     column_id = SP(**__defaults)
+    column_from_const = SP(**__defaults)
+    column_key = SP(**__defaults)
+    column_constraint = SP(**__defaults)
     column_geom = SP(**__defaults)
 
     geometry_type = SP(**__defaults)
