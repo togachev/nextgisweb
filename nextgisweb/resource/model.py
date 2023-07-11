@@ -71,21 +71,21 @@ class ResourceMeta(db.DeclarativeMeta):
         resource_registry.register(cls)
 
 class ResourceWebMapGroup(Base):
-    __tablename__ = 'resource_webmap_group'
+    __tablename__ = 'resource_wmg'
 
-    identity = 'resource_webmap_group'
+    identity = 'resource_wmg'
     
     id = db.Column(db.Integer, primary_key=True)
     webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
     action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
 
 class WebMapGroupResource(Base):
-    __tablename__ = 'webmap_group_resource'
+    __tablename__ = 'wmg_resource'
 
-    identity = 'webmap_group_resource'
+    identity = 'wmg_resource'
 
-    tab_webmap_group_resource = db.Table(
-        'webmap_group_resource', Base.metadata,
+    tab_wmg_resource = db.Table(
+        'wmg_resource', Base.metadata,
         db.Column(
             'resource_id', db.Integer,
             db.ForeignKey('resource.id'),
@@ -93,7 +93,7 @@ class WebMapGroupResource(Base):
         ),
         db.Column(
             'webmap_group_id', db.Integer,
-            db.ForeignKey('resource_webmap_group.id'),
+            db.ForeignKey('resource_wmg.id'),
             primary_key=True
         )
     )

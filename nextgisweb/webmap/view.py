@@ -286,11 +286,11 @@ def wmg_settings(request):
 
     result_rwg = list() # список групп
     result_wgr = list() # установленные группы для цифровых карт
-    for resource_webmap_group in rwg:
-        result_rwg.append(dict(id=resource_webmap_group.id, webmap_group_name=resource_webmap_group.webmap_group_name, action_map=resource_webmap_group.action_map))
+    for resource_wmg in rwg:
+        result_rwg.append(dict(id=resource_wmg.id, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map))
 
-    for webmap_group_resource in wgr:
-        result_wgr.append(dict(id=webmap_group_resource.webmap_group_id))
+    for wmg_resource in wgr:
+        result_wgr.append(dict(id=wmg_resource.webmap_group_id))
 
     return dict(
         entrypoint='@nextgisweb/webmap/wmg-settings',

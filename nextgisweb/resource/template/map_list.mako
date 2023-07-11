@@ -19,13 +19,13 @@
 
 
     result = list()
-    for resource, resource_webmap_group, resource_social in query:
-        action_map = resource_webmap_group.action_map
-        if resource_webmap_group.id != 0:
+    for resource, resource_wmg, resource_social in query:
+        action_map = resource_wmg.action_map
+        if resource_wmg.id != 0:
             if resource.has_permission(PERM_READ, request.user):
-                result.append(OrderedDict(id=resource.id, owner=True, display_name=resource.display_name, webmap_group_name=resource_webmap_group.webmap_group_name, action_map=resource_webmap_group.action_map, preview_fileobj_id=resource_social.preview_fileobj_id, preview_description=resource_social.preview_description))
+                result.append(OrderedDict(id=resource.id, owner=True, display_name=resource.display_name, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map, preview_fileobj_id=resource_social.preview_fileobj_id, preview_description=resource_social.preview_description))
             if not resource.has_permission(PERM_READ, request.user) and action_map == True:
-                result.append(OrderedDict(id=resource.id, owner=False, display_name=resource.display_name, webmap_group_name=resource_webmap_group.webmap_group_name,  action_map=resource_webmap_group.action_map, preview_fileobj_id=resource_social.preview_fileobj_id, preview_description=resource_social.preview_description))
+                result.append(OrderedDict(id=resource.id, owner=False, display_name=resource.display_name, webmap_group_name=resource_wmg.webmap_group_name,  action_map=resource_wmg.action_map, preview_fileobj_id=resource_social.preview_fileobj_id, preview_description=resource_social.preview_description))
     user = request.user.is_administrator
 %>
 

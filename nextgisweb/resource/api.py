@@ -409,8 +409,8 @@ def getWebmapGroup(request):
     query = DBSession.query(ResourceWebMapGroup)
 
     result = list()
-    for resource_webmap_group in query:
-        result.append(dict(id=resource_webmap_group.id, webmap_group_name=resource_webmap_group.webmap_group_name, action_map=resource_webmap_group.action_map))
+    for resource_wmg in query:
+        result.append(dict(id=resource_wmg.id, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map))
                     
     return result
 
@@ -425,7 +425,7 @@ def wmgroup_delete(request):
             DBSession.flush()
             
         except IntegrityError as exc:
-            raise ExternalDatabaseError(message="ОШИБКА:  UPDATE или DELETE в таблице 'resource_webmap_group' нарушает ограничение внешнего ключа 'webmap_group_id_fkey' таблицы 'resource' DETAIL:  На ключ (id)=(%s) всё ещё есть ссылки в таблице 'resource'." % wmg_id, sa_error=exc)
+            raise ExternalDatabaseError(message="ОШИБКА:  UPDATE или DELETE в таблице 'resource_wmg' нарушает ограничение внешнего ключа 'webmap_group_id_fkey' таблицы 'resource' DETAIL:  На ключ (id)=(%s) всё ещё есть ссылки в таблице 'resource'." % wmg_id, sa_error=exc)
 
     if wmg_id == 0:
         raise ResourceError(_("Root resource could not be deleted."))
@@ -444,9 +444,9 @@ def wmgroup_update(request):
     if wmg_value and wmg_value != '':
         def update(wmg_id, wmg_value, action_map_value):
             if wmg_id != 0:
-                resource_webmap_group = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == wmg_id).one()
-                resource_webmap_group.webmap_group_name = wmg_value
-                resource_webmap_group.action_map = eval(action_map_value.lower().capitalize())
+                resource_wmg = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == wmg_id).one()
+                resource_wmg.webmap_group_name = wmg_value
+                resource_wmg.action_map = eval(action_map_value.lower().capitalize())
             else:
                 raise ResourceError("Имя корневой группы с идентификатором %s изменять запрещено." % wmg_id)
         with DBSession.no_autoflush:
