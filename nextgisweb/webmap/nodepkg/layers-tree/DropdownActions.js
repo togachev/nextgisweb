@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Dropdown, Divider, Space } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import MoreVertIcon from "@material-icons/svg/more_vert/outline";
+import { ControlOutlined } from '@ant-design/icons';
 
 import "./DropdownActions.less";
 
@@ -22,12 +22,13 @@ export function DropdownActions({
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
+                title="Дополнительные инструменты"
                 className="more"
                 onClick={() => {
                     setMoreClickId(id);
                 }}
             >
-                <MoreVertIcon />
+                <ControlOutlined />
             </span>
         );
     }
@@ -60,7 +61,7 @@ export function DropdownActions({
                     onClick: onClick_,
                     label: (
                         <>
-                            <span>
+                            <span className="iconSize">
                                 {typeof icon === "string" ? (
                                     <SvgIcon icon={icon} fill="currentColor" />
                                 ) : (
@@ -95,7 +96,7 @@ export function DropdownActions({
             open
             placement="bottomRight"
             dropdownRender={(menu) => (
-                <div className="dropdown-content">
+                <div className="dropdown-content customStyle">
                     {menu}
                     {customMenuItems.length ? (
                         <>
@@ -116,7 +117,7 @@ export function DropdownActions({
             )}
         >
             <span className="more">
-                <MoreVertIcon />
+                <ControlOutlined />
             </span>
         </Dropdown>
     );

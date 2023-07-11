@@ -1243,6 +1243,7 @@ define([
                     onSelect: handleSelect,
                     setLayerZIndex: setLayerZIndex,
                     getWebmapPlugins: () => Object.assign({}, widget._plugins),
+                    zoomToNgwExtent: (extent) => widget.map.zoomToNgwExtent(extent)
                 },
                 widget.layersPanel.contentWidget.layerTreePane.domNode
             );

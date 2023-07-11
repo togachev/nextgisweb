@@ -2,12 +2,15 @@ import { useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Row, Col, Tree } from "@nextgisweb/gui/antd";
+
+import FolderClosedIcon from "./icons/folder.svg";
+import FolderOpenIcon from "./icons/folder_open.svg";
 import EditIcon from "@material-icons/svg/edit/outline";
 
 import { DropdownActions } from "./DropdownActions";
-import { LegendAction, Legend } from "./Legend.js";
-import PropTypes from "prop-types";
+import { DropdownIcon } from "./DropdownIcon";
 
+import PropTypes from "prop-types";
 import "./LayersTree.less";
 
 const forItemInTree = (data, key, callback) => {
@@ -33,32 +36,14 @@ const forEachInTree = (data, callback) => {
 };
 
 const handleWebMapItem = (webMapItem) => {
-    if (webMapItem.type === "layer") {
+    if (webMapItem.type === "root" || webMapItem.type === "group") {
+        webMapItem.icon = ({ expanded }) =>
+            expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
+    } else if (webMapItem.type === "layer") {
         webMapItem.isLeaf = true;
-
-        if (webMapItem.legendInfo) {
-            const { legendInfo } = webMapItem;
-            if (legendInfo.visible && legendInfo.single) {
-                webMapItem.legendIcon = (
-                    <img
-                        width={20}
-                        height={20}
-                        src={
-                            "data:image/png;base64," +
-                            legendInfo.symbols[0].icon.data
-                        }
-                    />
-                );
-            }
-        }
-
         webMapItem.icon = (item) => {
             if (item.editable && item.editable === true) {
                 return <EditIcon />;
-            } else {
-                if (webMapItem.legendIcon) {
-                    return webMapItem.legendIcon;
-                }
             }
         };
     }
@@ -68,32 +53,25 @@ const handleWebMapItem = (webMapItem) => {
     }
 };
 
-const prepareWebMapItems = (webMapItems) => {
-    webMapItems.forEach(handleWebMapItem);
-    return webMapItems;
-};
-
 export const LayersTree = observer(
-    ({ store, onSelect, setLayerZIndex, getWebmapPlugins }) => {
+    ({ store, onSelect, setLayerZIndex, getWebmapPlugins, zoomToNgwExtent }) => {
         const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
-        const [moreClickId, setMoreClickId] = useState(undefined);
         const [update, setUpdate] = useState(false);
+
+        const [moreClickId, setMoreClickId] = useState(undefined);
+        const [legendClickId, setIconLegendClickId] = useState(undefined);
+
+        const prepareWebMapItems = (webMapItems) => {
+            webMapItems.forEach(handleWebMapItem);
+            return webMapItems;
+        };
 
         const treeItems = useMemo(
             () => prepareWebMapItems(store.webmapItems),
             [store.webmapItems]
         );
-
-        const hasGroups = useMemo(() => {
-            for (const itm of store.webmapItems) {
-                if (itm.type === "group") {
-                    return true;
-                }
-            }
-            return false;
-        }, [store.webmapItems]);
 
         const onExpand = (expandedKeysValue) => {
             store.setExpanded(expandedKeysValue);
@@ -111,29 +89,37 @@ export const LayersTree = observer(
 
         const titleRender = (nodeData) => {
             const { title } = nodeData;
+
             return (
-                <>
-                    <Row wrap={false}>
-                        <Col flex="auto" className="tree-item-title">
-                            {title}
-                        </Col>
-                        <Col flex="50px" className="tree-item-action">
-                            <LegendAction
-                                nodeData={nodeData}
-                                onClick={() => setUpdate(!update)}
-                            />
-                            <DropdownActions
-                                nodeData={nodeData}
-                                getWebmapPlugins={getWebmapPlugins}
-                                setMoreClickId={setMoreClickId}
-                                moreClickId={moreClickId}
-                                update={update}
-                                setUpdate={setUpdate}
-                            />
-                        </Col>
-                    </Row>
-                    <Legend nodeData={nodeData} />
-                </>
+                <Row wrap={false}>
+                    <Col flex="none">
+                        {
+                            nodeData.type == 'layer'
+                                ?
+                                (<DropdownIcon
+                                    nodeData={nodeData}
+                                    setIconLegendClickId={setIconLegendClickId}
+                                    legendClickId={legendClickId}
+                                    zoomToNgwExtent={zoomToNgwExtent}
+                                />)
+                                :
+                                null
+                        }
+                    </Col>
+                    <Col flex="auto" className="tree-item-title">
+                        {title}
+                    </Col>
+                    <Col flex="none" className="iconCustom">
+                        <DropdownActions
+                            nodeData={nodeData}
+                            getWebmapPlugins={getWebmapPlugins}
+                            setMoreClickId={setMoreClickId}
+                            moreClickId={moreClickId}
+                            update={update}
+                            setUpdate={setUpdate}
+                        />
+                    </Col>
+                </Row>
             );
         };
 
@@ -195,39 +181,41 @@ export const LayersTree = observer(
         };
 
         return (
-            <Tree
-                className={
-                    "ngw-webmap-layers-tree" + (!hasGroups ? " flat" : "")
-                }
-                virtual={false}
-                motion={false}
-                checkable
-                showIcon
-                showLine={hasGroups}
-                onExpand={onExpand}
-                expandedKeys={store.expanded}
-                autoExpandParent={autoExpandParent}
-                onCheck={onCheck}
-                checkedKeys={store.checked}
-                onSelect={_onSelect}
-                selectedKeys={selectedKeys}
-                treeData={treeItems}
-                titleRender={titleRender}
-                allowDrop={(e) => {
-                    return e.dropNode.isLeaf ? e.dropPosition : true;
-                }}
-                draggable={draggable && { icon: false }}
-                onDrop={onDrop}
-                blockNode
-            />
+            <>
+                <Tree
+                    className="ngw-webmap-layers-tree"
+                    virtual={false}
+                    motion={false}
+                    checkable
+                    showIcon
+                    onExpand={onExpand}
+                    expandedKeys={store.expanded}
+                    autoExpandParent={autoExpandParent}
+                    onCheck={onCheck}
+                    checkedKeys={store.checked}
+                    onSelect={_onSelect}
+                    selectedKeys={selectedKeys}
+                    treeData={treeItems}
+                    titleRender={titleRender}
+                    allowDrop={(e) => {
+                        return e.dropNode.isLeaf ? e.dropPosition : true;
+                    }}
+                    draggable={draggable && { icon: false }}
+                    onDrop={onDrop}
+                    blockNode
+                // onClick={(e) => {
+                //     e.stopPropagation();
+                // }}
+                />
+            </>
         );
     }
 );
 
 LayersTree.propTypes = {
     store: PropTypes.object,
-    webMapItems: PropTypes.array,
     onSelect: PropTypes.func,
     getWebmapPlugins: PropTypes.func,
     setLayerZIndex: PropTypes.func,
+    zoomToNgwExtent: PropTypes.func,
 };
