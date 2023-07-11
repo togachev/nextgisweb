@@ -173,7 +173,6 @@ export function ResourceConstraint(props) {
             </div>
             <SaveButton
                 onClick={save}
-                // disabled={disabled}
                 loading={saving}
             >
                 {i18n.gettext("Save")}

@@ -210,6 +210,32 @@ def resource_export(request):
 
 resource_sections = PageSections('resource_section')
 
+@viewargs(renderer='map_list.mako')
+def map_list(request):
+    return dict(
+        title=_("List of maps React JS"),
+    )
+
+@viewargs(renderer='react')
+def webmap_group_data(request):
+    request.require_administrator()
+    result = dict(
+        entrypoint='@nextgisweb/resource/webmap-group-widget',
+        title=_("Webmap Group Resource"),
+        dynmenu=request.env.pyramid.control_panel)
+    return result
+
+@viewargs(renderer='react')
+def webmap_group_item(request):
+    request.require_administrator()
+    id = int(request.matchdict['id'])
+
+    return dict(
+        entrypoint='@nextgisweb/resource/webmap-group-item',
+        props=dict(id=id),
+        title=_("Webmap Group Resource Item"),
+    )
+
 @viewargs(renderer='react')
 def resource_constraint(request):
     request.resource_permission(PERM_UPDATE)
@@ -247,6 +273,8 @@ def resource_constraint(request):
     )
 
 def setup_pyramid(comp, config):
+
+
 
     def resource_permission(request, permission, resource=None):
 
@@ -416,7 +444,10 @@ def setup_pyramid(comp, config):
 
     comp.env.pyramid.control_panel.add(
         Link('settings/resource_export', _("Resource export"), lambda args: (
-            args.request.route_url('resource.control_panel.resource_export'))))
+            args.request.route_url('resource.control_panel.resource_export'))),
+        Link('settings/webmap_group', _("Webmap Group Resource"), lambda args: (
+            args.request.route_url('resource.webmap_group')))
+        )
 
     config.add_route(
         'resource.control_panel.resource_export',
@@ -424,8 +455,19 @@ def setup_pyramid(comp, config):
     ).add_view(resource_export)
 
     config.add_route(
-        'resource.resource_constraint',
-        '/res_const/{id:\d+}/settings',
-        factory=resource_factory,
-        client=('id',)
+        'resource.resource_constraint', '/res_const/{id:\d+}/settings',
+        factory=resource_factory, client=('id',)
         ).add_view(resource_constraint)
+
+    config.add_route(
+        'resource.webmap_group', '/wmgroup',
+        client=True
+        ).add_view(webmap_group_data)
+
+    config.add_route(
+        'resource.webmap_group_item', '/wmgroup/{id:\d+}',
+        client=True
+        ).add_view(webmap_group_item)
+    
+    config.add_route('map_list', '/map-list') \
+        .add_view(map_list)

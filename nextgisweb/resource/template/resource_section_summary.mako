@@ -1,6 +1,16 @@
 <%page args="section"/>
 <% section.content_box = False %>
+<%
+    from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
+    from nextgisweb.models import DBSession
+    from collections import OrderedDict
 
+    query = DBSession.query(ResourceWebMapGroup, WebMapGroupResource) \
+        .join(WebMapGroupResource, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id).filter(WebMapGroupResource.resource_id == request.context.id)
+    group = list()
+    for resource_webmap_group, webmap_group_resource in query:
+        group.append(resource_webmap_group.webmap_group_name)
+%>
 <table class="meta-info table-keyvalue pure-table">
     <tbody>
         <tr>
@@ -49,5 +59,15 @@
                 <span class="table-keyvalue__value__inner">${obj.owner_user}</span>
             </td>
         </tr>
+        %if len(group):
+            <tr>
+                <th class="table-keyvalue__key">
+                    <span class="table-keyvalue__key__inner">${tr(_("Webmap Group"))}</span>
+                </th>
+                <td class="table-keyvalue__value">
+                    <span class="table-keyvalue__value__inner">${', '.join(group)}</span>
+                </td>
+            </tr>
+        %endif
     </tbody>
 </table>

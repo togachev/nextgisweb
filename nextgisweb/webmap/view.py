@@ -18,6 +18,8 @@ from .model import LegendSymbolsEnum, WebMap, WebMapScope
 from .plugin import WebmapLayerPlugin, WebmapPlugin
 from .util import webmap_items_to_tms_ids_list
 
+from nextgisweb.env import DBSession
+from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
 
 class ExtentWidget(Widget):
     resource = WebMap
@@ -255,7 +257,7 @@ def display_tiny(obj, request):
 
 @viewargs(renderer='react')
 def clone(request):
-    request.resource_permission(ResourceScope.read)
+    request.resource_permission(ResourceScope.update)
     return dict(
         entrypoint='@nextgisweb/webmap/clone-webmap',
         props=dict(id=request.context.id),
@@ -276,6 +278,25 @@ def preview_embedded(request):
         limit_width=False,
     )
 
+@viewargs(renderer='react')
+def wmg_settings(request):
+    request.resource_permission(ResourceScope.update)
+    rwg = DBSession.query(ResourceWebMapGroup)
+    wgr = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.resource_id == request.context.id)
+
+    result_rwg = list() # список групп
+    result_wgr = list() # установленные группы для цифровых карт
+    for resource_webmap_group in rwg:
+        result_rwg.append(dict(id=resource_webmap_group.id, webmap_group_name=resource_webmap_group.webmap_group_name, action_map=resource_webmap_group.action_map))
+
+    for webmap_group_resource in wgr:
+        result_wgr.append(dict(id=webmap_group_resource.webmap_group_id))
+
+    return dict(
+        entrypoint='@nextgisweb/webmap/wmg-settings',
+        props=dict(id=request.context.id, wmgroup=result_rwg, group=result_wgr),
+        obj=request.context,
+        title=_("Settings_webmap_group"))
 
 class WebMapTMSLink(TMSLink):
     resource = WebMap
@@ -315,14 +336,20 @@ def setup_pyramid(comp, config):
                 if args.obj.has_permission(WebMapScope.display, args.request.user):
                     yield Link(
                         'webmap/display', _("Display"), self._display_url(),
-                        important=True, target='_blank',
+                        important=True, target='_self',
                         icon='webmap-display')
 
-                if args.obj.has_permission(ResourceScope.read, args.request.user):
+                if args.obj.has_permission(ResourceScope.update, args.request.user):
                     yield Link(
                         'webmap/clone', _("Clone"), self._clone_url(),
                         important=False, target='_self',
                         icon='material-content_copy')
+
+                if args.obj.has_permission(ResourceScope.update, args.request.user):
+                    yield Link(
+                        'wmgroup/settings', _("Settings_group"), self._get_wmg_settings_url(),
+                        important=False, target='_self',
+                        icon='material-edit')
 
         def _display_url(self):
             return lambda args: args.request.route_url(
@@ -331,6 +358,10 @@ def setup_pyramid(comp, config):
         def _clone_url(self):
             return lambda args: args.request.route_url(
                 'webmap.clone', id=args.obj.id)
+
+        def _get_wmg_settings_url(self):
+            return lambda args: args.request.route_url(
+                'wmgroup.settings', id=args.obj.id)
 
     WebMap.__dynmenu__.add(DisplayMenu())
 
@@ -342,3 +373,8 @@ def setup_pyramid(comp, config):
     comp.env.pyramid.control_panel.add(
         Link('settings.webmap', _("Web map"), lambda args: (
             args.request.route_url('webmap.control_panel.settings'))))
+
+    config.add_route(
+        'wmgroup.settings', r'/wmgroup/{id:\d+}/settings',
+        factory=resource_factory, client=('id',)
+    ).add_view(wmg_settings, context=WebMap)
