@@ -45,6 +45,7 @@ div.content__container
   src: url('@{node_modules}/@fontsource/roboto/files/roboto-all-400-normal.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -52,6 +53,7 @@ div.content__container
   src: url('@{node_modules}/@fontsource/roboto/files/roboto-all-700-normal.woff') format('woff');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -61,6 +63,7 @@ div.content__container
     url('@{node_modules}/lato-font/fonts/lato-normal/lato-normal.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -70,6 +73,7 @@ div.content__container
     url('@{node_modules}/lato-font/fonts/lato-bold/lato-bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 
@@ -160,13 +164,15 @@ a[class*=" icon-"]:hover:before {
 
 /* -- LAYOUT STYLES -- */
 .layout {
-  position: relative;
-  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100% - 30px);
   min-width: @min-width;
+  position: relative;
 }
 
 .title {
-  padding: 40px 0 24px;
+  padding: 40px 0 10px;
 
   h1, h2, h3 {
     margin: 0;
@@ -196,29 +202,25 @@ a[class*=" icon-"]:hover:before {
 /* -- Header --*/
 
 .header {
+  background-color: #106a90;
+  color: #fff;
+  height: 40px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   position: relative;
-  box-sizing: border-box;
-  padding: 12px 12px 12px 0;
-  background-color: var(--header-bg);
   z-index: 10;
-  line-height: 1.5;
-  font-size: 15px;
-  font-family: var(--heading-font-family), 'lato_local', sans-serif;
-  color: var(--on-header-text);
-
-  &::after{
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: currentColor;
-    opacity: var(--divider-opacity);
-  }
+  padding: 12px 12px 12px 0;
+  // &::after{
+  //   content: '';
+  //   position: absolute;
+  //   bottom: 0;
+  //   left: 0;
+  //   right: 0;
+  //   height: 1px;
+  //   background-color: currentColor;
+  //   opacity: var(--divider-opacity);
+  // }
 
   a {
     text-decoration: none;
@@ -240,7 +242,7 @@ a[class*=" icon-"]:hover:before {
 }
 
 .header-nav {
-  margin: -9px 0;
+  margin: 0 0;
   list-style-type: none;
   padding: 0;
   font-weight: var(--heading-font-weight);
@@ -251,8 +253,8 @@ a[class*=" icon-"]:hover:before {
     vertical-align: middle;
     margin-left: 12px;
     margin-top: auto;
-    height: 34px;
-    line-height: 34px;
+    // height: 34px;
+    // line-height: 34px;
     margin-bottom: auto;
     white-space: normal;
 
@@ -262,7 +264,7 @@ a[class*=" icon-"]:hover:before {
 
     .header-resources-filter {
       width: 180px;
-      margin-top: 1px;
+      margin-top: 0;
 
       @media (min-width: 992px) {
         width: 290px;
@@ -286,10 +288,10 @@ a[class*=" icon-"]:hover:before {
 }
 
 .header__title-logo {
-  position: relative;
-  min-width: 50px;
-  padding: 6px 12px;
   box-sizing: border-box;
+  min-width: 40px;
+  padding: 4px;
+  position: relative;
 
   &:after{
     content: '';
@@ -297,8 +299,8 @@ a[class*=" icon-"]:hover:before {
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: currentColor;
-    opacity: var(--divider-opacity);
+    // background-color: currentColor;
+    // opacity: var(--divider-opacity);
     width: 1px;
     height: 100%;
     min-height: 34px;
@@ -314,14 +316,23 @@ a[class*=" icon-"]:hover:before {
 
 .logo__pic {
   display: block;
-  margin: -6px auto;
+  width: 32px;
+  height: 32px;
 }
 
 .header__title__inner {
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  line-height: 1.4;
+  margin: 0;
+  overflow: hidden;
+  padding-bottom: 4px;
   padding-left: 16px;
   padding-top: 4px;
-  padding-bottom: 4px;
-  line-height: 1.2;
+  font-size: 15px;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
+  color: white;
 }
 
 
@@ -385,10 +396,9 @@ a[class*=" icon-"]:hover:before {
 
 /* -- CONTENT STYLES -- */
 .content {
+  margin-top: 0;
+  padding: 0;
   display: flex;
-  flex-flow: row wrap;
-  align-content: flex-start;
-  padding-bottom: 30px;
 
   & > .content__inner {
     display: inline-block;
@@ -420,9 +430,9 @@ a[class*=" icon-"]:hover:before {
 }
 
 .content__container {
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 100%;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
 .maxwidth .content__container {
@@ -521,6 +531,10 @@ a[class*=" icon-"]:hover:before {
   margin-bottom: 24px;
 }
 
+.content-box img {
+  max-width: 100%;
+}
+
 /* Sidebar */
 
 .sidebar {
@@ -616,8 +630,8 @@ a[class*=" icon-"]:hover:before {
 
 /*-- Breadcrumbs --*/
 .path {
-  margin-bottom: 5px;
-  margin-top: -25px;
+  margin-bottom: 15px;
+  margin-top: -15px;
 }
 
 .path__item {
@@ -674,3 +688,52 @@ a[class*=" icon-"]:hover:before {
 @import (css) "@{node_modules}/dgrid/css/skins/claro.css";
 
 @import "override-claro";
+
+.maplist_link {
+  transition: background-color 0.5s;
+}
+
+.maplist_link:hover {
+  background-color: var(--secondary);
+}
+
+
+
+.footer {
+  align-items: center;
+  background-color: #106a90;
+  bottom: 0;
+  color: #fff;
+  display: flex;
+  font-size: 14px;
+  // font-weight: 600;
+  height: 30px;
+  justify-content: center;
+  margin-top: 0;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 0;
+}
+
+.parentDescClass {
+  overflow: auto !important;
+}
+div.descClass img {
+  max-width: 100%;
+}
+
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTab {
+  top: 0;
+  border-top: 1px solid transparent;
+  margin-bottom: 0;
+  font-size: 13px;
+  height: 26px;
+  line-height: 24px;
+  font-variant: unset;
+}
+
+.claro .dijitTabListContainer-top .tabStripButton {
+  margin-top: 1px !important;
+  padding: 4px 3px;
+}
