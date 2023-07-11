@@ -74,7 +74,7 @@ const prepareWebMapItems = (webMapItems) => {
 };
 
 export const LayersTree = observer(
-    ({ store, onSelect, setLayerZIndex, getWebmapPlugins }) => {
+    ({ store, onSelect, setLayerZIndex, getWebmapPlugins, zoomToNgwExtent }) => {
         const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -136,7 +136,7 @@ export const LayersTree = observer(
                             />
                         </Col>
                     </Row>
-                    <Legend nodeData={nodeData} />
+                    <Legend nodeData={nodeData} zoomToNgwExtent={zoomToNgwExtent}/>
                 </>
             );
         };
@@ -234,4 +234,5 @@ LayersTree.propTypes = {
     onSelect: PropTypes.func,
     getWebmapPlugins: PropTypes.func,
     setLayerZIndex: PropTypes.func,
+    zoomToNgwExtent: PropTypes.func,
 };
