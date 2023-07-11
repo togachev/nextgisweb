@@ -11,7 +11,6 @@ export function DropdownIcon({
     zoomToNgwExtent
 }) {
     const { id, layerCls, legendInfo } = nodeData;
-
     const iconRes = <svg className="icon"><use xlinkHref={`#icon-rescls-${layerCls}`} /></svg>
 
     if (legendClickId === undefined || legendClickId !== id) {
