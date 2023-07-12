@@ -1,14 +1,14 @@
 import { useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
-
 import { Row, Col, Tree } from "@nextgisweb/gui/antd";
 import EditIcon from "@material-icons/svg/edit/outline";
-
+import { route } from "@nextgisweb/pyramid/api";
 import { DropdownActions } from "./DropdownActions";
+import { DropdownFile } from "./DropdownFile";
 import { LegendAction, Legend } from "./Legend.js";
 import { IconItem } from "./IconItem.js";
 import PropTypes from "prop-types";
-
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import "./LayersTree.less";
 
 const forItemInTree = (data, key, callback) => {
@@ -39,10 +39,12 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState(undefined);
+        const [fileClickId, setFileClickId] = useState(undefined);
         const [update, setUpdate] = useState(false);
-
+        
         const handleWebMapItem = (webMapItem) => {
             if (webMapItem.type === "layer") {
+                console.log(route("file_resource.show", webMapItem.layerId).get().then(result => result));
                 webMapItem.isLeaf = true;
 
                 if (webMapItem.legendInfo) {
@@ -119,6 +121,7 @@ export const LayersTree = observer(
 
         const titleRender = (nodeData) => {
             const { title } = nodeData;
+
             return (
                 <>
                     <Row wrap={false}>
@@ -132,6 +135,19 @@ export const LayersTree = observer(
                             {title}
                         </Col>
                         <Col className="tree-item-action">
+                            {/* {
+                                fileStatus
+                                    ?
+                                    (<div className="more">
+                                        <DropdownFile
+                                            nodeData={nodeData}
+                                            setFileClickId={setFileClickId}
+                                            fileClickId={fileClickId}
+                                        />
+                                    </div>)
+                                    :
+                                    null
+                            } */}
                             <DropdownActions
                                 nodeData={nodeData}
                                 getWebmapPlugins={getWebmapPlugins}

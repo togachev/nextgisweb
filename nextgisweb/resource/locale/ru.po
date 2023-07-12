@@ -251,8 +251,8 @@ msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
 #: view.py:409
-msgid "Edit Attached Files"
-msgstr "Изменить прикрепленные файлы"
+msgid "Add/remove public files"
+msgstr "Добавить/удалить публичные файлы"
 
 #: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
 #: view.py:451

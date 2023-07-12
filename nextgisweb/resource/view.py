@@ -406,7 +406,7 @@ def setup_pyramid(comp, config):
                         route_intr = args.request.registry.introspector.get('routes', 'file_resource.settings')
                         if route_intr:
                             yield Link(
-                                'operation/0-file_resource', _("Edit Attached Files"),
+                                'operation/0-file_resource', _("Add/remove public files"),
                                 lambda args: args.request.route_url(
                                     'file_resource.settings', id=args.obj.id),
                                 icon='material-attach_file')
