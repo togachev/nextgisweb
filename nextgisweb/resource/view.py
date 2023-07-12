@@ -402,6 +402,18 @@ def setup_pyramid(comp, config):
             if args.obj.cls in ['vector_layer', 'postgis_layer']:
                 if isinstance(args.obj, Resource):
                     if PERM_UPDATE in permissions:
+                        # проверка наличия маршрута-route
+                        route_intr = args.request.registry.introspector.get('routes', 'file_resource.settings')
+                        if route_intr:
+                            yield Link(
+                                'operation/0-file_resource', _("Edit Attached Files"),
+                                lambda args: args.request.route_url(
+                                    'file_resource.settings', id=args.obj.id),
+                                icon='material-attach_file')
+
+            if args.obj.cls in ['vector_layer', 'postgis_layer']:
+                if isinstance(args.obj, Resource):
+                    if PERM_UPDATE in permissions:
                         yield Link(
                             'operation/0-resource_constraint', _("Settings Resource Constraint"),
                             lambda args: args.request.route_url(

@@ -6,15 +6,15 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: component.py:29
+#: component.py:27
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:33 model.py:52 view.py:312 view.py:343
+#: model.py:33 model.py:52 view.py:366 view.py:407
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:35 view.py:317
+#: model.py:35 view.py:371
 msgid "Display"
 msgstr "Открыть"
 
@@ -22,8 +22,7 @@ msgstr "Открыть"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:172 model.py:37
-#: nodepkg/annotations-panel/AnnotationsPanel.js:72
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:37
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
@@ -31,21 +30,29 @@ msgstr "Редактировать аннотации"
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
-#: view.py:45
+#: view.py:47
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:263
+#: view.py:298
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:275
+#: view.py:310
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:323
+#: view.py:332
+msgid "Settings_webmap_group"
+msgstr ""
+
+#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:377
 msgid "Clone"
 msgstr "Клонировать"
+
+#: view.py:383
+msgid "Settings_group"
+msgstr ""
 
 #: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1140
 #: amd/ngw-webmap/ItemWidget.js:247
@@ -102,15 +109,15 @@ msgstr "Определить мое местоположение"
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1337 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
+#: amd/ngw-webmap/Display.js:1338 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1338 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
+#: amd/ngw-webmap/Display.js:1339 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/ExtentWidget.js:35
+#: amd/ngw-webmap/ExtentWidget.js:34
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
@@ -196,11 +203,10 @@ msgid "Stop editing"
 msgstr "Завершить редактирование"
 
 #: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/annotations-panel/AnnotationsPanel.js:63
 msgid "Edit"
 msgstr "Редактировать"
 
-#: amd/ngw-webmap/plugin/ZoomToLayer.js:32
+#: amd/ngw-webmap/plugin/ZoomToLayer.js:32 nodepkg/layers-tree/IconItem.js:24
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
@@ -218,25 +224,21 @@ msgstr "Разрешить аннотирование"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:52
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:16
-#: nodepkg/annotations-panel/AnnotationsPanel.js:145
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:54
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:17
-#: nodepkg/annotations-panel/AnnotationsPanel.js:154
 msgid "No"
 msgstr "Нет"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:18
-#: nodepkg/annotations-panel/AnnotationsPanel.js:155
 msgid "Yes"
 msgstr "Да"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:56
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
-#: nodepkg/annotations-panel/AnnotationsPanel.js:156
 msgid "With messages"
 msgstr "С сообщениями"
 
@@ -465,54 +467,44 @@ msgid "Invalid width: should be from 1 to 100 px"
 msgstr "Значение должно быть от 1 до 100 пикс."
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:7
-#: nodepkg/annotations-panel/AnnotationsPanel.js:141
 msgid "Annotations layer"
 msgstr "Слой аннотаций"
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:25
-#: nodepkg/annotations-panel/AnnotationsPanel.js:165
 msgid "Private annotations"
 msgstr "Приватные аннотации"
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:35
-#: nodepkg/annotations-panel/AnnotationsPanel.js:174
 msgid "Show annotation types"
 msgstr "Показать типы аннотаций"
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:41
-#: nodepkg/annotations-panel/AnnotationsPanel.js:184
 msgid "Public annotations"
 msgstr "Публичные аннотации"
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:47
-#: nodepkg/annotations-panel/AnnotationsPanel.js:194
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:181
-#: nodepkg/annotations-panel/AnnotationsPanel.js:77
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:179
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:184
-#: nodepkg/annotations-panel/AnnotationsPanel.js:86
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:182
 #: nodepkg/utils/geometry-types.js:6
 msgid "Point"
 msgstr "Точка"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:185
-#: nodepkg/annotations-panel/AnnotationsPanel.js:87
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:183
 msgid "Line"
 msgstr "Линия"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:186
-#: nodepkg/annotations-panel/AnnotationsPanel.js:88
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:184
 #: nodepkg/utils/geometry-types.js:15
 msgid "Polygon"
 msgstr "Полигон"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:223
-#: nodepkg/annotations-panel/AnnotationsPanel.js:105
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:221
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
@@ -650,11 +642,19 @@ msgstr "Непрозрачность"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/layers-tree/Legend.js:10
+#: nodepkg/layers-tree/DropdownActions.js:10
+msgid "Additional tools"
+msgstr ""
+
+#: nodepkg/layers-tree/IconItem.js:25
+msgid "Zoom to feature layer"
+msgstr ""
+
+#: nodepkg/layers-tree/Legend.js:9
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/Legend.js:11
+#: nodepkg/layers-tree/Legend.js:10
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 

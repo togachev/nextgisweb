@@ -167,7 +167,7 @@ def display(obj, request):
                     .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
                     .filter(FileResource.id == style.parent_id)
                 for fr, fbf, res in query:
-                    result.append(OrderedDict(
+                    result.append(dict(
                         resource_id = fr.id,
                         file_resource_id = fr.file_resource_id,
                         id = fbf.id,
