@@ -6,7 +6,7 @@ import EditIcon from "@material-icons/svg/edit/outline";
 
 import { DropdownActions } from "./DropdownActions";
 import { LegendAction, Legend } from "./Legend.js";
-import { IconItem } from "./IconItem";
+import { IconItem } from "./IconItem.js";
 import PropTypes from "prop-types";
 
 import "./LayersTree.less";
@@ -44,17 +44,19 @@ export const LayersTree = observer(
         const handleWebMapItem = (webMapItem) => {
             if (webMapItem.type === "layer") {
                 webMapItem.isLeaf = true;
-        
+
                 if (webMapItem.legendInfo) {
                     const { legendInfo } = webMapItem;
-                    console.log(legendInfo.visible, webMapItem.layerCls, webMapItem);
                     if (legendInfo.visible && legendInfo.single) {
                         webMapItem.legendIcon = (
-                            <IconItem
-                                single={legendInfo.single}
-                                item={webMapItem}
-                                zoomToNgwExtent={zoomToNgwExtent}
-                            />
+                            <div className="colSingleIconLegend">
+                                <IconItem
+                                    single={legendInfo.single}
+                                    item={webMapItem}
+                                    zoomToNgwExtent={zoomToNgwExtent}
+                                />
+                            </div>
+
                         );
                     }
                     if (legendInfo.visible === 'disable' || !legendInfo.has_legend) {
@@ -65,7 +67,7 @@ export const LayersTree = observer(
                         );
                     }
                 }
-        
+
                 webMapItem.icon = (item) => {
                     if (item.editable && item.editable === true) {
                         return <EditIcon />;
@@ -76,12 +78,12 @@ export const LayersTree = observer(
                     }
                 };
             }
-        
+
             if (webMapItem.children) {
                 webMapItem.children.forEach(handleWebMapItem);
             }
         };
-        
+
         const prepareWebMapItems = (webMapItems) => {
             webMapItems.forEach(handleWebMapItem);
             return webMapItems;
@@ -140,7 +142,7 @@ export const LayersTree = observer(
                             />
                         </Col>
                     </Row>
-                    <Legend nodeData={nodeData} zoomToNgwExtent={zoomToNgwExtent}/>
+                    <Legend nodeData={nodeData} zoomToNgwExtent={zoomToNgwExtent} />
                 </>
             );
         };

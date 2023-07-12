@@ -1,9 +1,8 @@
 import PropTypes from "prop-types";
-import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import ViewListIcon from "@material-icons/svg/view_list/outline";
-import ExpandLessIcon from "@material-icons/svg/expand_less/outline";
+import LegendToggle from "@material-icons/svg/legend_toggle/outline";
+import KeyboardArrowDown from "@material-icons/svg/keyboard_arrow_down/outline";
 import { IconItem } from "./IconItem";
 import "./Legend.less";
 
@@ -20,7 +19,7 @@ export function LegendAction({ nodeData, onClick }) {
     }
 
     const { open } = nodeData.legendInfo;
-    const icon = open ? <ExpandLessIcon /> : <ViewListIcon />;
+    const icon = open ? <KeyboardArrowDown /> : <LegendToggle />;
 
     const click = () => {
         const { id } = nodeData;
@@ -30,13 +29,16 @@ export function LegendAction({ nodeData, onClick }) {
     };
 
     return (
-        <span
-            className="legend"
-            onClick={click}
-            title={open ? hideLegendMessage : showLegendMessage}
-        >
-            {icon}
-        </span>
+        <div className="legend-list">
+            <span
+                className="legend legend-toggle"
+                onClick={click}
+                title={open ? hideLegendMessage : showLegendMessage}
+            >
+                {icon}
+            </span>
+        </div>
+
     );
 }
 

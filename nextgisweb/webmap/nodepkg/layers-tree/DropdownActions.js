@@ -1,11 +1,13 @@
 import PropTypes from "prop-types";
-
+import i18n from "@nextgisweb/pyramid/i18n";
 import { Dropdown, Divider, Space } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
 import { ControlOutlined } from '@ant-design/icons';
 
 import "./DropdownActions.less";
+
+const AdditionalTools = i18n.gettext("Additional tools");
 
 export function DropdownActions({
     nodeData,
@@ -22,7 +24,7 @@ export function DropdownActions({
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
-                title="Дополнительные инструменты"
+                title={AdditionalTools}
                 className="more"
                 onClick={() => {
                     setMoreClickId(id);

@@ -18,16 +18,16 @@
     }
 
     .ant-tree-switcher-line-icon {
-        vertical-align: -0.3em;
+        vertical-align: -0.55em;
     }
 
     .ant-tree-checkbox {
-        margin: 6px 6px 0px 0px;
+        margin: 8px 6px 0px 0px;
     }
 
     .ant-tree-node-content-wrapper {
         display: flex;
-        align-items: start;
+        align-items: center;
         column-gap: 6px;
         width: 100%;
         min-width: 0;
@@ -37,11 +37,12 @@
         &:hover {
             background: none;
         }
-        
+
         .ant-row {
             margin: 0;
             display: flex;
             align-items: center;
+            line-height: 32px;
         }
 
         &.ant-tree-node-selected {
@@ -77,6 +78,14 @@
                 justify-content: end;
             }
 
+            .legend-list {
+                margin: 0 6px 0 0;
+            }
+
+            .legend-toggle {
+                font-size: 24px !important;
+            }
+
             .more,
             .legend {
                 font-size: 18px;
@@ -88,6 +97,7 @@
                 justify-content: center;
                 align-items: center;
                 flex: 0 0 auto;
+
                 &:hover {
                     background: #ececec;
                     border-radius: 3px;
@@ -120,18 +130,28 @@
     cursor: auto;
 }
 
-.colIconLegend {
-    // font-size: 18px;
-    // width: 24px;
-    // height: 24px;
-    // display: flex;
-    // justify-items: center;
-    // justify-content: center;
-    // align-items: center;
-    margin: 0;
-  
+.colSingleIconLegend {
+    margin: 0 2px;
+
     &:hover {
-      background: #1d405e34;
-      border-radius: 3px;
+        background: #ececec;
+        border-radius: 3px;
     }
-  }
+}
+
+.colIconLegend {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
+    margin: 0;
+
+    &:hover {
+        background: #e4e4e477;
+        border-radius: 3px;
+    }
+}
+
+.icon-list {
+    margin: 0 5px 0 0;
+}
