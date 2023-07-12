@@ -6,6 +6,7 @@ import EditIcon from "@material-icons/svg/edit/outline";
 
 import { DropdownActions } from "./DropdownActions";
 import { LegendAction, Legend } from "./Legend.js";
+import { IconItem } from "./IconItem";
 import PropTypes from "prop-types";
 
 import "./LayersTree.less";
@@ -32,47 +33,6 @@ const forEachInTree = (data, callback) => {
     }
 };
 
-const handleWebMapItem = (webMapItem) => {
-    if (webMapItem.type === "layer") {
-        webMapItem.isLeaf = true;
-
-        if (webMapItem.legendInfo) {
-            const { legendInfo } = webMapItem;
-            if (legendInfo.visible && legendInfo.single) {
-                webMapItem.legendIcon = (
-                    <img
-                        width={20}
-                        height={20}
-                        src={
-                            "data:image/png;base64," +
-                            legendInfo.symbols[0].icon.data
-                        }
-                    />
-                );
-            }
-        }
-
-        webMapItem.icon = (item) => {
-            if (item.editable && item.editable === true) {
-                return <EditIcon />;
-            } else {
-                if (webMapItem.legendIcon) {
-                    return webMapItem.legendIcon;
-                }
-            }
-        };
-    }
-
-    if (webMapItem.children) {
-        webMapItem.children.forEach(handleWebMapItem);
-    }
-};
-
-const prepareWebMapItems = (webMapItems) => {
-    webMapItems.forEach(handleWebMapItem);
-    return webMapItems;
-};
-
 export const LayersTree = observer(
     ({ store, onSelect, setLayerZIndex, getWebmapPlugins, zoomToNgwExtent }) => {
         const [draggable] = useState(true);
@@ -80,6 +40,52 @@ export const LayersTree = observer(
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState(undefined);
         const [update, setUpdate] = useState(false);
+
+        const handleWebMapItem = (webMapItem) => {
+            if (webMapItem.type === "layer") {
+                webMapItem.isLeaf = true;
+        
+                if (webMapItem.legendInfo) {
+                    const { legendInfo } = webMapItem;
+                    console.log(legendInfo.visible, webMapItem.layerCls, webMapItem);
+                    if (legendInfo.visible && legendInfo.single) {
+                        webMapItem.legendIcon = (
+                            <IconItem
+                                single={legendInfo.single}
+                                item={webMapItem}
+                                zoomToNgwExtent={zoomToNgwExtent}
+                            />
+                        );
+                    }
+                    if (legendInfo.visible === 'disable' || !legendInfo.has_legend) {
+                        webMapItem.legendIcon = (
+                            <span title="" className="colNot" >
+                                <svg className="icon"><use xlinkHref={`#icon-rescls-${webMapItem.layerCls}`} /></svg>
+                            </span>
+                        );
+                    }
+                }
+        
+                webMapItem.icon = (item) => {
+                    if (item.editable && item.editable === true) {
+                        return <EditIcon />;
+                    } else {
+                        if (webMapItem.legendIcon) {
+                            return webMapItem.legendIcon;
+                        }
+                    }
+                };
+            }
+        
+            if (webMapItem.children) {
+                webMapItem.children.forEach(handleWebMapItem);
+            }
+        };
+        
+        const prepareWebMapItems = (webMapItems) => {
+            webMapItems.forEach(handleWebMapItem);
+            return webMapItems;
+        };
 
         const treeItems = useMemo(
             () => prepareWebMapItems(store.webmapItems),
@@ -111,7 +117,6 @@ export const LayersTree = observer(
 
         const titleRender = (nodeData) => {
             const { title } = nodeData;
-            console.log(nodeData);
             return (
                 <>
                     <Row wrap={false}>
@@ -125,7 +130,6 @@ export const LayersTree = observer(
                             {title}
                         </Col>
                         <Col className="tree-item-action">
-
                             <DropdownActions
                                 nodeData={nodeData}
                                 getWebmapPlugins={getWebmapPlugins}

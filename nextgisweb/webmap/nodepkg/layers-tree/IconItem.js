@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { route } from "@nextgisweb/pyramid/api";
 
-export const IconItem = ({ item, zoomToNgwExtent }) => {
+export const IconItem = ({ item, single, zoomToNgwExtent }) => {
     const asyncFunc = async (id, name) => {
         if (name) {
             const query = { ilike: name }
@@ -24,15 +24,12 @@ export const IconItem = ({ item, zoomToNgwExtent }) => {
         <div
             key={idx}
             title={s.display_name ? s.display_name : item.title}
-            className="legend-symbol"
+            className="colIconLegend"
             onClick={() => asyncFunc(item.layerId, s.display_name ? s.display_name : item.title) }
         >
-            <img width={18} height={18} src={"data:image/webp;base64," + s.icon.data}/>
-            <span className="titleName">{s.display_name ? s.display_name : item.title}</span>
-            
+            <img width={20} height={20} src={"data:image/webp;base64," + s.icon.data}/>
+            { single ? null : <span className="titleName">{s.display_name ? s.display_name : item.title}</span> }
         </div>
-
-
     ));   
 
 };
