@@ -9,7 +9,7 @@ import LockOpen from "@material-icons/svg/lock_open";
 import getSelectStyle from "./selectStyle";
 import "./map_list.less";
 import "./details.less";
-import { CaretDownOutlined } from '@ant-design/icons';
+import ArrowScrollTo from "./icons/arrow_scroll_to.svg";
 import { BackTop } from "@nextgisweb/gui/antd";
 import Select from 'react-select';
 
@@ -152,7 +152,7 @@ export function map_list(props) {
                 </div>
             </div>
             <BackTop>
-                <div className="scrollTop"><CaretDownOutlined /></div>
+                <div className="scrollTop"><ArrowScrollTo /></div>
             </BackTop>
         </>
     );

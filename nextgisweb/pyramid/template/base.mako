@@ -27,9 +27,11 @@
 <head>
     <title>${head_title}</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="theme-color" content="#106a90"/>
 
     <%include file="nextgisweb:social/template/meta.mako" args="title=head_title"/>
-
+    <link rel="apple-touch-icon" href="${request.route_url('pyramid.favicon')}">
     <link href="${request.route_url('pyramid.favicon')}" rel="shortcut icon" type="image/x-icon" />
     <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
 
@@ -140,6 +142,7 @@
                 %endif
             </div> <!--/.content-wrapper -->
         </div> <!--/.layout -->
+        <%include file="nextgisweb:pyramid/template/footer.mako" />
     %else:
 
         ${next.body()}

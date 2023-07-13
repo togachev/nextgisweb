@@ -219,6 +219,12 @@ def display(obj, request):
         extent_const=tmp["extent_const"],
         rootItem=traverse(obj.root_item),
         itemsStates=items_states,
+        infomap=dict(
+            resource=request.route_url('resource.show', id=0),
+            link=request.route_url('resource.show', id=obj.id),
+            update=request.route_url('resource.update', id=obj.id),
+            scope=obj.has_permission(ResourceScope.update, request.user)
+        ),
         mid=dict(
             adapter=tuple(display.mid.adapter),
             basemap=tuple(display.mid.basemap),

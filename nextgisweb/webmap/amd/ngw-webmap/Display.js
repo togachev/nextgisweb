@@ -1102,13 +1102,28 @@ define([
         },
 
         _navigationMenuSetup: function () {
-            var widget = this;
+            var widget = this,
+            infomap = this.config.infomap;
 
             this.navigationMenu = new NavigationMenu({
                 value: this.activeLeftPanel,
                 items: this.navigationMenuItems,
                 region: "left",
             }).placeAt(this.navigationMenuPane);
+
+            if (infomap.scope) {
+                let link = document.createElement("div");
+                link.className = "infoblock customlink infoMap";
+                link.innerHTML = `<a href='${infomap.link}'>${icon.html({glyph: "info"})}</a>`;
+                link.title = i18n.gettext("Info map");
+                this.navigationMenuPane.append(link);
+
+                let linkUpdate = document.createElement("div");
+                linkUpdate.className = "updateblock customlink infoMap";
+                linkUpdate.innerHTML = `<a target="_blank" href='${infomap.update}'>${icon.html({glyph: "settings"})}</a>`;
+                linkUpdate.title = i18n.gettext("Settings map");
+                this.navigationMenuPane.append(linkUpdate);
+            }
 
             this.navigationMenu.watch(
                 "value",

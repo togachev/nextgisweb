@@ -2,6 +2,13 @@
 
 <% return_url = request.GET['return'] if 'return' in request.GET else False %>
 
+<%
+    if request.is_authenticated:
+        scope = True
+    else:
+        scope = False
+%>
+
 <div id="header" class="header">
     <div class="header__left">
         <div class="header__title">
@@ -19,6 +26,7 @@
                     <img class="logo__pic" src="${logo_url}"/>
                 %endif
             </a>
+            <div id="link-resource"></div>
             <div class="header__title__inner">
                 ${title}
             </div>
@@ -27,7 +35,7 @@
     <ul class="header-nav header__right">
         %if not hide_resource_filter:
             <li class="header-nav__item">
-                <div class="header-resources-filter" id="resourcesFilter"></div>
+                <div class="header-resources-filter inputFilter" id="resourcesFilter"></div>
             </li>
         %endif
         <li id="avatar" class="header-nav__item"></li>
@@ -61,5 +69,19 @@
             }
         }, document.getElementById("resourcesFilter"));
         %endif
+    });
+</script>
+
+<script type="text/javascript">
+    require([
+        "@nextgisweb/pyramid/link-resource",
+        "@nextgisweb/gui/react-app",
+    ], function (comp, reactApp) { 
+        var props = ${json_js(dict(scope=scope))};  
+        reactApp.default(
+            comp.default,
+            props,
+            document.getElementById('link-resource')
+        );
     });
 </script>
