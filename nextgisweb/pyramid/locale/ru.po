@@ -500,6 +500,10 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
+#: nodepkg/footer/footer.js:8
+msgid "Yugorsky research Institute of information technologies"
+msgstr "АУ «Югорский НИИ информационных технологий»"
+
 #~ msgid "Browser default"
 #~ msgstr "По умолчанию в браузере"
 
