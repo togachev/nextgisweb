@@ -19,7 +19,7 @@ export function DropdownFile({
         let isSubscribed = true;
         const getData = async () => {
             if (nodeData.type === 'layer') {
-                const fileRes = await route("file_resource.show", nodeData.layerId).get();
+                const fileRes = await route("file_resource.show", nodeData.styleId).get();
                 if (isSubscribed) {
                     setValue(fileRes);
                 }

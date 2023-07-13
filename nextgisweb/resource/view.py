@@ -397,7 +397,7 @@ def setup_pyramid(comp, config):
                         'resource.update', id=args.obj.id),
                     important=True, icon='material-edit')
 
-            if args.obj.cls in ['vector_layer', 'postgis_layer', 'raster_layer', 'wmsclient_layer', 'tmsclient_layer']:
+            if args.obj.cls in ['mapserver_style', 'qgis_vector_style', 'qgis_raster_style', 'wmsclient_layer', 'tmsclient_layer']:
                 if isinstance(args.obj, Resource):
                     if PERM_UPDATE in permissions:
                         # проверка наличия маршрута-route
