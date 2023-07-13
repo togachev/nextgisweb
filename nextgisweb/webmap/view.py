@@ -159,38 +159,12 @@ def display(obj, request):
                 items_states.get('checked').append(item.id)
 
             # Main element parameters
-            # result = list()
-            # try:
-            #     from nextgisweb_file_bucket.model import FileBucket, FileBucketFile, FileResource
-            #     query = DBSession.query(FileResource, FileBucketFile, Resource) \
-            #         .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
-            #         .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
-            #         .filter(FileResource.id == style.parent_id)
-            #     for fr, fbf, res in query:
-            #         result.append(dict(
-            #             resource_id = fr.id,
-            #             file_resource_id = fr.file_resource_id,
-            #             id = fbf.id,
-            #             file_bucket_id = fbf.file_bucket_id,
-            #             fileobj_id = fbf.fileobj_id,
-            #             name=fbf.name,
-            #             mime_type = fbf.mime_type,
-            #             size = fbf.size,
-            #             link = request.route_url('file_bucket.file_download', id=fbf.file_bucket_id, name=fbf.name),
-            #             res_name = res.display_name,
-            #         ))
-            #     status = len(result) > 0 if True else False
-            # except:
-            #     result = None
-            #     status = False
             data.update(
                 layerId=style.parent_id,
                 styleId=style.id,
                 cls=style.cls, # для создания легенды (фильтрация ресурсов)
                 layerCls=layer.cls, # для создания легенды (фильтрация ресурсов)
                 description=style.description, # для создания легенды (доп. описание)
-                # fileStatus=status,
-                # fileData=result, # список доступных файлов
                 legend_symbols = request.route_url('render.legend_symbols', id=style.id),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,

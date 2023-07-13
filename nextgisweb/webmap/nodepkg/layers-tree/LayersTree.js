@@ -41,10 +41,10 @@ export const LayersTree = observer(
         const [moreClickId, setMoreClickId] = useState(undefined);
         const [fileClickId, setFileClickId] = useState(undefined);
         const [update, setUpdate] = useState(false);
-        
+
         const handleWebMapItem = (webMapItem) => {
             if (webMapItem.type === "layer") {
-                console.log(route("file_resource.show", webMapItem.layerId).get().then(result => result));
+                // console.log(route("file_resource.show", webMapItem.layerId).get().then(result => result));
                 webMapItem.isLeaf = true;
 
                 if (webMapItem.legendInfo) {
@@ -135,19 +135,11 @@ export const LayersTree = observer(
                             {title}
                         </Col>
                         <Col className="tree-item-action">
-                            {/* {
-                                fileStatus
-                                    ?
-                                    (<div className="more">
-                                        <DropdownFile
-                                            nodeData={nodeData}
-                                            setFileClickId={setFileClickId}
-                                            fileClickId={fileClickId}
-                                        />
-                                    </div>)
-                                    :
-                                    null
-                            } */}
+                            <DropdownFile
+                                nodeData={nodeData}
+                                setFileClickId={setFileClickId}
+                                fileClickId={fileClickId}
+                            />
                             <DropdownActions
                                 nodeData={nodeData}
                                 getWebmapPlugins={getWebmapPlugins}

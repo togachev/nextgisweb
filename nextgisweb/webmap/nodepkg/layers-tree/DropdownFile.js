@@ -3,16 +3,35 @@ import { Dropdown } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { PaperClipOutlined } from '@ant-design/icons';
 import "./DropdownFile.less";
-
+import { route } from "@nextgisweb/pyramid/api";
 const DownloadAttachedFiles = i18n.gettext("Download attached files");
+import { useState, useEffect } from "react";
 
 export function DropdownFile({
     nodeData,
     fileClickId,
     setFileClickId,
 }) {
-    const { id, fileData } = nodeData;
+    const { id, type } = nodeData;
+    const [value, setValue] = useState({});
 
+    useEffect(() => {
+        let isSubscribed = true;
+        const getData = async () => {
+            if (nodeData.type === 'layer') {
+                const fileRes = await route("file_resource.show", nodeData.layerId).get();
+                if (isSubscribed) {
+                    setValue(fileRes);
+                }
+            }
+        }
+        getData().catch(console.error);
+        return () => isSubscribed = false;
+    }, []);
+
+    if (type === "root" || type === "group" || !value.status) {
+        return <></>;
+    }
     if (fileClickId === undefined || fileClickId !== id) {
         return (
             <span
@@ -26,7 +45,7 @@ export function DropdownFile({
     }
 
     const menuItems = [];
-    fileData?.map((i) => {
+    value.result?.map((i) => {
         menuItems.push({
             key: i.id,
             label: (
@@ -51,27 +70,31 @@ export function DropdownFile({
     };
 
     return (
-
-        <Dropdown
-            menu={menuProps}
-            onOpenChange={onOpenChange}
-            trigger={["click"]}
-            open
-            dropdownRender={(menu) => (
-                <div className="dropdown-content customFile" onClick={(e) => { e.stopPropagation(); }}>
-                    {menu}
-                </div>
-            )}
-        >
-            <span
-                title={DownloadAttachedFiles}
-                className="more"
-                onClick={(e) => { e.stopPropagation(); }}
-            >
-                <PaperClipOutlined />
-            </span>
-        </Dropdown>
-
+        <>
+            {
+                value.status ?
+                    <Dropdown
+                        menu={menuProps}
+                        onOpenChange={onOpenChange}
+                        trigger={["click"]}
+                        open
+                        dropdownRender={(menu) => (
+                            <div className="dropdown-content customFile" onClick={(e) => { e.stopPropagation(); }}>
+                                {menu}
+                            </div>
+                        )}
+                    >
+                        <span
+                            title={DownloadAttachedFiles}
+                            className="more"
+                            onClick={(e) => { e.stopPropagation(); }}
+                        >
+                            <PaperClipOutlined />
+                        </span>
+                    </Dropdown>
+                    : null
+            }
+        </>
     );
 }
 
