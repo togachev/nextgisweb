@@ -15,9 +15,9 @@
         top:0;
         left:0;
         width: 100%;
-        height: 32px;
+        height: 40px;
         padding: 0 16px;
-        line-height: 32px;
+        line-height: 40px;
         border-bottom: 1px solid rgba(0,0,0,.12);
         box-sizing: border-box;
         font-family: 'lato_local', 'Roboto', sans-serif;
@@ -27,7 +27,7 @@
 
     .dynamic-panel__content{
         position: absolute;
-        top: 32px;
+        top: 40px;
         bottom:0;
         left:0;
         width: 100%;
@@ -37,8 +37,7 @@
 
     .dynamic-panel__closer{
         position: absolute;
-        right: 4px;
-        top: -2px;
+        right: 8px;
         z-index: 10;
         cursor: pointer;
     }
@@ -50,7 +49,7 @@
     .dynamic-panel__loader{
         display: none;
         position: absolute;
-        top: 32px;
+        top: 40px;
         bottom:0;
         width: 100%;
         background-color: rgba(255,255,255,.68);
@@ -60,7 +59,7 @@
         width: 48px;
         height: 48px;
         position: absolute;
-        top:55px;
+        top:0;
         bottom:0;
         left: 0;
         right: 0;
@@ -68,9 +67,9 @@
     }
 
 .dynamic-panel--notitle > .dynamic-panel__title{
-    display: block;
+    display: none;
 }
 
-/* .dynamic-panel--notitle .dynamic-panel__content{
-    top:0px;
-} */
+.dynamic-panel--notitle .dynamic-panel__content{
+    top:0;
+}
