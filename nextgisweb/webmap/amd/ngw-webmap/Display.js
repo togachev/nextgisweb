@@ -350,7 +350,11 @@ define([
             widget._layersPanelSetup();
 
             // Print panel
-            all([widget._layersDeferred, widget._postCreateDeferred])
+            all([
+                this._layersDeferred,
+                this._mapDeferred,
+                this._postCreateDeferred
+            ])
                 .then(function () {
                     widget.printMapPanel = new PrintMapPanel({
                         region: "left",
@@ -584,14 +588,14 @@ define([
             });
 
             const annotUrlParam = this._urlParams.annot;
-            let annotVisibleState;
+            let initialAnnotVisible;
             if (
                 annotUrlParam &&
                 (annotUrlParam === "no" ||
                     annotUrlParam === "yes" ||
                     annotUrlParam === "messages")
             ) {
-                annotVisibleState = annotUrlParam;
+                initialAnnotVisible = annotUrlParam;
             }
 
             var buildAnnotationsPanel = function (widget) {
@@ -603,7 +607,7 @@ define([
                     gutters: false,
                     withCloser: true,
                     display: widget,
-                    annotVisibleState,
+                    initialAnnotVisible,
                 });
 
                 if (widget.activeLeftPanel === "annotationPanel")
