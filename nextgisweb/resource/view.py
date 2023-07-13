@@ -213,7 +213,7 @@ resource_sections = PageSections('resource_section')
 @viewargs(renderer='map_list.mako')
 def map_list(request):
     return dict(
-        title=_("List of maps React JS"),
+        title=_("List of maps"),
     )
 
 @viewargs(renderer='react')
@@ -221,7 +221,7 @@ def webmap_group_data(request):
     request.require_administrator()
     result = dict(
         entrypoint='@nextgisweb/resource/webmap-group-widget',
-        title=_("Webmap Group Resource"),
+        title=_("Groups of digital web maps"),
         dynmenu=request.env.pyramid.control_panel)
     return result
 
@@ -233,7 +233,7 @@ def webmap_group_item(request):
     return dict(
         entrypoint='@nextgisweb/resource/webmap-group-item',
         props=dict(id=id),
-        title=_("Webmap Group Resource Item"),
+        title=_("Digital web map group"),
     )
 
 @viewargs(renderer='react')
@@ -268,13 +268,11 @@ def resource_constraint(request):
             table_name=table_name,
             cls=request.context.cls,
         ),
-        title=_("Settings Resource Constraint"),
+        title=_("Setting up a connection between resources"),
         obj=request.context,
     )
 
 def setup_pyramid(comp, config):
-
-
 
     def resource_permission(request, permission, resource=None):
 
@@ -415,7 +413,7 @@ def setup_pyramid(comp, config):
                 if isinstance(args.obj, Resource):
                     if PERM_UPDATE in permissions:
                         yield Link(
-                            'operation/0-resource_constraint', _("Settings Resource Constraint"),
+                            'operation/0-resource_constraint', _("Setting up a connection between resources"),
                             lambda args: args.request.route_url(
                                 'resource.resource_constraint', id=args.obj.id),
                             icon='material-schema')
@@ -457,7 +455,7 @@ def setup_pyramid(comp, config):
     comp.env.pyramid.control_panel.add(
         Link('settings/resource_export', _("Resource export"), lambda args: (
             args.request.route_url('resource.control_panel.resource_export'))),
-        Link('settings/webmap_group', _("Webmap Group Resource"), lambda args: (
+        Link('settings/webmap_group', _("Groups of digital web maps"), lambda args: (
             args.request.route_url('resource.webmap_group')))
         )
 

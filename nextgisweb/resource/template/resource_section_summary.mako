@@ -62,7 +62,7 @@
         %if len(group):
             <tr>
                 <th class="table-keyvalue__key">
-                    <span class="table-keyvalue__key__inner">${tr(_("Webmap Group"))}</span>
+                    <span class="table-keyvalue__key__inner">${tr(_("Web map group"))}</span>
                 </th>
                 <td class="table-keyvalue__value">
                     <span class="table-keyvalue__value__inner">${', '.join(group)}</span>

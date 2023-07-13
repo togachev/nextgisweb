@@ -25,6 +25,7 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
     const zoomToFeatureLayer = i18n.gettext("Zoom to feature layer");
 
     return item?.legendInfo.symbols.map((s, idx) => (
+        
         <div
             key={idx}
             title={single ? item.title : s.display_name } 
@@ -36,6 +37,7 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
                 width={20} height={20} src={"data:image/png;base64," + s.icon.data} />
             {single ? null : <span className="titleName">{s.display_name ? s.display_name : item.title}</span>}
         </div>
+
     ));
 
 };

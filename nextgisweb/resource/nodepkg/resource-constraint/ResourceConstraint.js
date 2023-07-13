@@ -133,7 +133,7 @@ export function ResourceConstraint(props) {
         <>
             <div className="block">
                 <span>
-                    <div>{i18n.gettext("Column from constraint")}</div>
+                    <div>{i18n.gettext("Foreign Key")}</div>
                     <Select
                         key={fields}
                         options={fields}
@@ -146,7 +146,7 @@ export function ResourceConstraint(props) {
                     />                
                 </span>
                 <span>
-                    <div>{i18n.gettext("ID column key")}</div>
+                    <div>{i18n.gettext("Primary key resource name")}</div>
                     <Select
                         key={items}
                         options={items}
@@ -158,7 +158,7 @@ export function ResourceConstraint(props) {
                     />
                 </span>
                 <span>
-                    <div>{i18n.gettext("Column constraint resource")}</div>
+                    <div>{i18n.gettext("Primary key")}</div>
                     <Select
                         key={fieldsConst}
                         options={fieldsConst}

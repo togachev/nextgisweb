@@ -230,20 +230,20 @@ msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
 #: view.py:216
-msgid "List of maps React JS"
-msgstr ""
+msgid "List of maps"
+msgstr "Список карт"
 
-#: view.py:224 view.py:460
-msgid "Webmap Group Resource"
-msgstr ""
+#: view.py:224
+msgid "Groups of digital web maps"
+msgstr "Группы цифровых веб карт"
 
 #: view.py:236
-msgid "Webmap Group Resource Item"
-msgstr ""
+msgid "Digital web map group"
+msgstr "Группа цифровой веб карты"
 
 #: view.py:271 view.py:418
-msgid "Settings Resource Constraint"
-msgstr ""
+msgid "Setting up a connection between resources"
+msgstr "Настройка связи между ресурсами"
 
 #: view.py:294
 #, python-format
@@ -262,6 +262,10 @@ msgstr "Действие"
 #: view.py:452
 msgid "Extra"
 msgstr "Дополнительно"
+
+#: view.py:460
+msgid "Webmap Group Resource"
+msgstr ""
 
 #: amd/ngw-resource/CompositeWidget.js:49
 msgid "Please wait. Processing request..."
@@ -450,11 +454,11 @@ msgstr "Показать дату создания ресурса"
 
 #: nodepkg/children-section/ChildrenSection.js:285
 msgid "Hide relationship with a resource"
-msgstr ""
+msgstr "Скрыть связь с ресурсом"
 
 #: nodepkg/children-section/ChildrenSection.js:286
 msgid "Show relationship with a resource"
-msgstr ""
+msgstr "Показать связь с ресурсом"
 
 #: nodepkg/children-section/ChildrenSection.js:308
 msgid "Not all of the selected can be deleted."
@@ -478,7 +482,7 @@ msgstr "Размер"
 
 #: nodepkg/children-section/ChildrenSection.js:470
 msgid "Relationship with a resource"
-msgstr ""
+msgstr "Связь с ресурсом"
 
 #: nodepkg/children-section/util/forEachSelected.js:5
 msgid "Operation in progress"
@@ -530,16 +534,16 @@ msgid "Read more"
 msgstr "Подробнее"
 
 #: nodepkg/resource-constraint/ResourceConstraint.js:136
-msgid "Column from constraint"
-msgstr ""
+msgid "Foreign Key"
+msgstr "Внешний ключ"
 
 #: nodepkg/resource-constraint/ResourceConstraint.js:149
-msgid "ID column key"
-msgstr ""
+msgid "Primary key resource name"
+msgstr "Имя ресурса первичного ключа"
 
 #: nodepkg/resource-constraint/ResourceConstraint.js:161
-msgid "Column constraint resource"
-msgstr ""
+msgid "Primary key"
+msgstr "Первичный ключ"
 
 #: nodepkg/resource-picker/resource-picker-modal/ResourcePickerModalFooter.js:15
 msgid "Create group"
@@ -586,6 +590,5 @@ msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
 #: template/resource_section_summary.mako:65
-msgid "Webmap Group"
-msgstr ""
-
+msgid "Web map group"
+msgstr "Группа веб-карты"

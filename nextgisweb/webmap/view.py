@@ -300,7 +300,7 @@ def wmg_settings(request):
         entrypoint='@nextgisweb/webmap/wmg-settings',
         props=dict(id=request.context.id, wmgroup=result_rwg, group=result_wgr),
         obj=request.context,
-        title=_("Settings_webmap_group"))
+        title=_("Setting up a web map group"))
 
 class WebMapTMSLink(TMSLink):
     resource = WebMap
@@ -351,7 +351,7 @@ def setup_pyramid(comp, config):
 
                 if args.obj.has_permission(ResourceScope.update, args.request.user):
                     yield Link(
-                        'wmgroup/settings', _("Settings_group"), self._get_wmg_settings_url(),
+                        'wmgroup/settings', _("Group setting"), self._get_wmg_settings_url(),
                         important=False, target='_self',
                         icon='material-edit')
 

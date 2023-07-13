@@ -7,7 +7,7 @@
   width: 350px;
   margin: 0;
   padding: 0;
-  border-right: 1px #b5bcc7 solid;
+  /* border-right: 1px #b5bcc7 solid; */
   border-left: none;
   border-top: none;
   border-bottom: none;
@@ -19,12 +19,13 @@
 
 .printMap-panel .close {
   position: absolute;
-  right: 4px;
-  top: 8px;
+  right: 5px;
+  top: 4px;
 }
 
 .close svg.icon {
   color: var(--icon-color);
+  font-size: 24px;
 }
 
 .printMap-panel .print-panel-content {
@@ -120,7 +121,7 @@ div.print-map-export-wrapper {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: white;
+  background: #ffffffa6;
   color: black;
   font-size: 14px;
   overflow: hidden;

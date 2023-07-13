@@ -140,18 +140,38 @@
 }
 
 .colIconLegend {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    white-space: nowrap;
+    display: flex;
+    justify-items: center;
+    margin: 0;
+    align-items: center;
     margin: 0;
 
     &:hover {
         background: #e4e4e477;
         border-radius: 3px;
     }
+
+    .titleName {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .icon-list {
     margin: 0 5px 0 0;
+}
+
+.ant-tree .ant-tree-treenode-leaf-last .ant-tree-switcher-leaf-line:before {
+    bottom: auto!important;
+    height: 17px!important;
+    top: auto!important;
+}
+
+.ant-tree-switcher-leaf-line:after {
+    border-bottom: 1px solid #d9d9d9;
+    content: " ";
+    height: 17px;
+    position: absolute;
+    width: 10px;
 }
