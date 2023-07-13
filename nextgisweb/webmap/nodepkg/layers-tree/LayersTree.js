@@ -2,13 +2,12 @@ import { useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Row, Col, Tree } from "@nextgisweb/gui/antd";
 import EditIcon from "@material-icons/svg/edit/outline";
-import { route } from "@nextgisweb/pyramid/api";
 import { DropdownActions } from "./DropdownActions";
 import { DropdownFile } from "./DropdownFile";
+import { Desc } from "./Desc";
 import { LegendAction, Legend } from "./Legend.js";
 import { IconItem } from "./IconItem.js";
 import PropTypes from "prop-types";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import "./LayersTree.less";
 
 const forItemInTree = (data, key, callback) => {
@@ -40,6 +39,7 @@ export const LayersTree = observer(
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState(undefined);
         const [fileClickId, setFileClickId] = useState(undefined);
+        const [descClickId, setDescClickId] = useState(undefined);
         const [update, setUpdate] = useState(false);
 
         const handleWebMapItem = (webMapItem) => {
@@ -121,7 +121,8 @@ export const LayersTree = observer(
 
         const titleRender = (nodeData) => {
             const { title } = nodeData;
-
+            const descStyle = nodeData.description ? true : false
+            const descLayer = nodeData.plugin ? (nodeData.plugin['ngw-webmap/plugin/LayerInfo'].description ? true : false) : false
             return (
                 <>
                     <Row wrap={false}>
@@ -140,6 +141,13 @@ export const LayersTree = observer(
                                 setFileClickId={setFileClickId}
                                 fileClickId={fileClickId}
                             />
+                            {descStyle || descLayer ?
+                                (<Desc
+                                    nodeData={nodeData}
+                                    setDescClickId={setDescClickId}
+                                    descClickId={descClickId}
+                                />) :
+                                null}
                             <DropdownActions
                                 nodeData={nodeData}
                                 getWebmapPlugins={getWebmapPlugins}

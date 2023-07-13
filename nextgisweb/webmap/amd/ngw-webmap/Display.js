@@ -444,6 +444,7 @@ define([
                     widget.infoPanel = new InfoPanel({
                         region: "left",
                         class: "info-panel dynamic-panel--fullwidth",
+                        title: i18n.gettext("Description"),
                         withTitle: false,
                         isOpen: widget.activeLeftPanel === "infoPanel",
                         gutters: false,

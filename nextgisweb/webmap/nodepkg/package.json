@@ -1,5 +1,12 @@
 {
     "name": "@nextgisweb/webmap",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "react-dom": "^17.0.2",
+        "react-draggable": "^4.4.5",
+        "dompurify": "^3.0.2",
+        "react-custom-scrollbars-2": "^4.5.0",
+        "html-react-parser": "^4.0.0"
+    }
 }

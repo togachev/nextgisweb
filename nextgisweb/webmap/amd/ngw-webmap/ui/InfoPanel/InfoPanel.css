@@ -1,0 +1,16 @@
+.info-panel__description{
+    padding: 5px;
+}
+
+.info-panel__description img {
+    max-width: 100%;
+}
+
+.info-panel__description, a {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+}
+
+/* .info-panel__description, a:hover {
+    color: #106a90;
+} */
