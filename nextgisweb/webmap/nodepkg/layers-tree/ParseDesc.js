@@ -4,8 +4,10 @@ import PropTypes from "prop-types";
 import "./ParseDesc.less";
 const ParseDesc = ({ item }) => {
 
-    const descStyle = item.description;
-    const descLayer = item.plugin['ngw-webmap/plugin/LayerInfo'].description;
+    const descLayer = item.description.desc;
+    const descStyle = item.plugin['ngw-webmap/plugin/LayerInfo'].description;
+    const titleStyle = <span className="styleTitle">{item.label}</span>;
+    console.log(item);
     const interval = '<p style="margin: 20px"></p>'
     const desc = descStyle && descLayer ? descStyle + interval + descLayer :    // Описание существует в стиле и слое
         descStyle && !descLayer ? descStyle :   // Описание существует только в стиле

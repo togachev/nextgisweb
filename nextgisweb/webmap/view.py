@@ -164,7 +164,7 @@ def display(obj, request):
                 styleId=style.id,
                 cls=style.cls, # для создания легенды (фильтрация ресурсов)
                 layerCls=layer.cls, # для создания легенды (фильтрация ресурсов)
-                description=style.description, # для создания легенды (доп. описание)
+                description=dict(labelLayer=item.display_name, labelStyle=style.display_name, desc=layer.description), # для создания легенды (доп. описание)
                 legend_symbols = request.route_url('render.legend_symbols', id=style.id),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
