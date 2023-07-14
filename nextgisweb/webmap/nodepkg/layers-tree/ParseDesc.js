@@ -9,10 +9,10 @@ const decsTitleLayer = i18n.gettext("Layer resource description");
 
 const ParseDesc = ({ item }) => {
     const descStyle = item.descStyle;
-    const descStyleLabel = '<span className="tileDesc">' + decsTitleStyle + ': ' + item.label + '</span>'
+    const descStyleLabel = '<span className="titleDesc">' + decsTitleStyle + ': ' + item.label + '</span>'
 
     const descLayer = item.descLayer;
-    const descLayerLabel = '<span className="tileDesc">' + decsTitleLayer + ': ' + item.labelLayer + '</span>'
+    const descLayerLabel = '<span className="titleDesc">' + decsTitleLayer + ': ' + item.labelLayer + '</span>'
 
     const desc = descStyle && descLayer ? descStyleLabel + descStyle + descLayerLabel + descLayer :    // Описание существует в стиле и слое
         descStyle && !descLayer ? descStyleLabel + descStyle :   // Описание существует только в стиле
