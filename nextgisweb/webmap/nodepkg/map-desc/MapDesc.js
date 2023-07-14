@@ -30,7 +30,7 @@ const MapDesc = ({description, upath_info, widget}) => {
     return (
         <>
             {/* test */}
-            <div className="descItem">{data}</div>
+            <div className="descItemMap">{data}</div>
         </>
     )
 }

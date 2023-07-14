@@ -328,7 +328,7 @@ define([
                     var addItem = function (naming) {
                         this.itemStore.newItem({
                                 "item_type": "layer",
-                                "display_name": naming.display_name,
+                                "display_name": itm.display_name,
                                 "layer_style_id": resourceId,
                                 "layer_enabled": true,
                                 "layer_identifiable": true,

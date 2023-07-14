@@ -2,16 +2,21 @@ import { Image } from "@nextgisweb/gui/antd";
 import parse, { Element } from 'html-react-parser';
 import PropTypes from "prop-types";
 import "./ParseDesc.less";
-const ParseDesc = ({ item }) => {
+import i18n from "@nextgisweb/pyramid/i18n";
 
-    const descLayer = item.description.desc;
-    const descStyle = item.plugin['ngw-webmap/plugin/LayerInfo'].description;
-    const titleStyle = <span className="styleTitle">{item.label}</span>;
-    console.log(item);
-    const interval = '<p style="margin: 20px"></p>'
-    const desc = descStyle && descLayer ? descStyle + interval + descLayer :    // Описание существует в стиле и слое
-        descStyle && !descLayer ? descStyle :   // Описание существует только в стиле
-            !descStyle && descLayer ? descLayer :   // Описание существует только в слое
+const decsTitleStyle = i18n.gettext("Style Description");
+const decsTitleLayer = i18n.gettext("Layer resource description");
+
+const ParseDesc = ({ item }) => {
+    const descStyle = item.descStyle;
+    const descStyleLabel = '<span className="tileDesc">' + decsTitleStyle + ': ' + item.label + '</span>'
+
+    const descLayer = item.descLayer;
+    const descLayerLabel = '<span className="tileDesc">' + decsTitleLayer + ': ' + item.labelLayer + '</span>'
+
+    const desc = descStyle && descLayer ? descStyleLabel + descStyle + descLayerLabel + descLayer :    // Описание существует в стиле и слое
+        descStyle && !descLayer ? descStyleLabel + descStyle :   // Описание существует только в стиле
+            !descStyle && descLayer ? descLayerLabel + descLayer :   // Описание существует только в слое
                 null    // Описание отсутсвует
 
     const options = {

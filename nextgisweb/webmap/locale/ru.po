@@ -974,3 +974,10 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
+#: nodepkg/layers-tree/ParseDesc.js:7
+msgid "Style Description"
+msgstr "Описание слоя"
+
+#: nodepkg/layers-tree/ParseDesc.js:8
+msgid "Layer resource description"
+msgstr "Описание ресурса слоя"
