@@ -44,7 +44,6 @@ export const LayersTree = observer(
 
         const handleWebMapItem = (webMapItem) => {
             if (webMapItem.type === "layer") {
-                // console.log(route("file_resource.show", webMapItem.layerId).get().then(result => result));
                 webMapItem.isLeaf = true;
 
                 if (webMapItem.legendInfo) {

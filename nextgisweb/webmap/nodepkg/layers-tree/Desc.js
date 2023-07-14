@@ -9,9 +9,7 @@ export function Desc({
     descClickId,
     setDescClickId
 }) {
-
     const { id } = nodeData;
-
 
     if (descClickId === undefined || descClickId !== id) {
         return (
