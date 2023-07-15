@@ -24,7 +24,6 @@ export function Desc({
             key: nodeData.id,
             label: (
                 <Card
-                    title={nodeData.label}
                     bordered={false}
                     style={{
                         width: 350,

@@ -1,12 +1,9 @@
-import { useState } from "react";
 import { Image } from "@nextgisweb/gui/antd";
 import parse, { Element } from 'html-react-parser';
 import PropTypes from "prop-types";
 import "./ParseDesc.less";
 import i18n from "@nextgisweb/pyramid/i18n";
-
-import { Collapse } from 'antd';
-const { Panel } = Collapse;
+import { Tabs } from 'antd';
 
 const decsTitleStyle = i18n.gettext("Style Description");
 const decsTitleLayer = i18n.gettext("Layer resource description");
@@ -20,32 +17,34 @@ const ParseDesc = ({ item }) => {
         }
     };
 
-    const descStyleLabel = '<span className="titleDesc">' + decsTitleStyle + ': ' + item.label + '</span>';
-    const descStyle = item.descStyle;
-    const ds = { key: 1, label: descStyleLabel, children: parse(descStyle, options) }
+    const TitleDesc = ({title}) => { return (<span className="titleDesc">{title}</span>)}
 
-    const descLayerLabel = '<span className="titleDesc">' + decsTitleLayer + ': ' + item.labelLayer + '</span>';
+    const descStyle = item.descStyle;
+    const ds = {
+        label: <TitleDesc title={decsTitleStyle} />,
+        children: descStyle ? parse(descStyle, options) : null,
+    }
+
     const descLayer = item.descLayer;
-    const dl = { key: 2, label: descLayerLabel, children: parse(descLayer, options) }
+    const dl = {
+        label: <TitleDesc title={decsTitleLayer} />,
+        children: descLayer ? parse(descLayer, options) : null,
+    }
 
     const arrayDesc = []
 
-    const newArray = descStyle && descLayer ? [...arrayDesc, ds, dl] :    // Описание существует в стиле и слое
-        descStyle && !descLayer ? [...arrayDesc, ds] :   // Описание существует только в стиле
-            !descStyle && descLayer ? [...arrayDesc, dl] :   // Описание существует только в слое
+    const items = descStyle && descLayer ? [...arrayDesc, Object.assign(ds, {key: 1}), Object.assign(dl, {key: 2})] :    // Описание существует в стиле и слое
+        descStyle && !descLayer ? [...arrayDesc, Object.assign(ds, {key: 1})] :   // Описание существует только в стиле
+            !descStyle && descLayer ? [...arrayDesc, Object.assign(dl, {key: 1})] :   // Описание существует только в слое
                 null    // Описание отсутсвует
 
-    console.log(newArray);
-
-    // const onChange = (key) => {
-    //     console.log(key);
-    // };
-    // return <Collapse items={newArray} onChange={onChange} />;
+    return (
+        <Tabs type="card" items={items} />
+    )
 };
 
 export default ParseDesc;
 
 ParseDesc.propTypes = {
-    item: PropTypes.object,
-    setOpen: PropTypes.func,
+    item: PropTypes.object
 };
