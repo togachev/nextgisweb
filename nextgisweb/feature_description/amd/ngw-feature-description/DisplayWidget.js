@@ -3,13 +3,13 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     "@nextgisweb/gui/react-app",
-    "@nextgisweb/feature_description/feature-desc",
+    "@nextgisweb/webmap/map-desc",
 ], function (
     declare,
     i18n,
     DisplayWidget,
     reactApp,
-    FeatureDescComp
+    MapDescComp
 ) {
     return declare(DisplayWidget, {
         title: i18n.gettext("Description"),
@@ -17,11 +17,12 @@ define([
         renderValue: function (value) {
             if (!value) {return !!value;}
             reactApp.default(
-                FeatureDescComp.default,
+                MapDescComp.default,
                 {
                     description: value,
+                    display: this.display,
                 },
-                this.domNode
+            this.domNode
             );
         }
     });

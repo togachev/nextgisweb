@@ -240,7 +240,7 @@ define([
                     array.forEach(Object.keys(widget.extWidgetClasses), function (key) {
                         var cls = widget.extWidgetClasses[key],
                             ewidget = new cls({
-                                resourceId: lid, featureId: fid,
+                                resourceId: lid, featureId: fid, display: widget.tool.display,
                                 compact: true
                             });
 
