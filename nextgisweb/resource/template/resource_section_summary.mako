@@ -2,8 +2,7 @@
 <% section.content_box = False %>
 <%
     from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
-    from nextgisweb.models import DBSession
-    from collections import OrderedDict
+    from nextgisweb.env import DBSession
 
     query = DBSession.query(ResourceWebMapGroup, WebMapGroupResource) \
         .join(WebMapGroupResource, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id).filter(WebMapGroupResource.resource_id == request.context.id)
