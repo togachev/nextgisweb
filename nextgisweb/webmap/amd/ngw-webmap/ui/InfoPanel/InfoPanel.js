@@ -11,15 +11,14 @@ define([
 ) {
     return declare([DynamicPanel, BorderContainer], {
 
-        constructor: function () {
-            declare.safeMixin(this);
-
-            this.makeComp = (contentNode) => {
+        constructor: function (options) {
+            declare.safeMixin(this, options);
+            this.makeComp = (contentNode, options) => {
                 reactApp.default(
                     MapDescComp.default,
                     {
+                        display: options.display,
                         description: this.description,
-                        widget: this,
                     },
                     contentNode
                 );
@@ -28,15 +27,6 @@ define([
         
         postCreate: function(){
             this.inherited(arguments);
-        },
-
-        zoomToFeature: function (resid, fid) {
-            this.display
-                .featureHighlighter
-                .highlightFeatureById(fid, resid)
-                .then(lang.hitch(this, function (feature) {
-                    this.display.map.zoomToFeature(feature);
-                }));
         }
     });
 });
