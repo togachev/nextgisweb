@@ -2,8 +2,9 @@ import { PropTypes } from "prop-types";
 
 import "./GeomLoading.less";
 
-export const GeomLoading = ({ }) => {
+export const GeomLoading = ({ display }) => {
     
+    console.log(display);
 
     return (
         <div className="">
@@ -12,4 +13,6 @@ export const GeomLoading = ({ }) => {
     );
 };
 
-GeomLoading.propTypes = {};
+GeomLoading.propTypes = {
+    display: PropTypes.object,
+};
