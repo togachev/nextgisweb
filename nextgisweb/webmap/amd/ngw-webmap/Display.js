@@ -55,6 +55,7 @@ define([
     "ngw-webmap/ui/BookmarkPanel/BookmarkPanel",
     "ngw-webmap/ui/SharePanel/SharePanel",
     "ngw-webmap/ui/InfoPanel/InfoPanel",
+    "ngw-webmap/ui/GeomLoadingPanel/GeomLoadingPanel",
     "ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel",
     "./tool/Swipe",
     "ngw-webmap/MapStatesObserver",
@@ -129,6 +130,7 @@ define([
     BookmarkPanel,
     SharePanel,
     InfoPanel,
+    GeomLoadingPanel,
     AnnotationsPanel,
     ToolSwipe,
     MapStatesObserver,
@@ -230,6 +232,12 @@ define([
                 icon: "material-layers",
                 name: "layers",
                 value: "layersPanel",
+            },
+            {
+                title: i18n.gettext('GeomLoading'),
+                icon: 'material-upload',
+                name: 'upload',
+                value: 'geomLoadingPanel'
             },
             {
                 title: i18n.gettext("Search"),
@@ -465,6 +473,29 @@ define([
                     });
                 }, 0);
             }
+
+            // GeomLoading panel
+            all([widget._layersDeferred, widget._postCreateDeferred]).then(
+                function () {
+                    widget.geomLoadingPanel = new GeomLoadingPanel({
+                        region: 'left',
+                        class: "dynamic-panel--fullwidth",
+                        title: i18n.gettext("GeomLoading"),
+                        isOpen: widget.activeLeftPanel === "geomLoadingPanel",
+                        gutters: false,
+                        withCloser: true,
+                        display: widget
+                    });
+
+                    if (widget.activeLeftPanel === "geomLoadingPanel") {
+                        widget.activatePanel(widget.geomLoadingPanel);
+                    }
+
+                    widget.geomLoadingPanel.on("closed", function(){
+                        widget.navigationMenu.reset();
+                    });
+                }
+            ).then(undefined, function (err) { console.error(err); });
 
             this._buildAnnotationsPanel();
 

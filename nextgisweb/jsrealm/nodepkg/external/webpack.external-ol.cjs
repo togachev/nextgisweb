@@ -18,7 +18,7 @@ const EXCLUDE = [
     "ol/format/GML3",
     "ol/format/GML32",
     "ol/format/GMLBase",
-    "ol/format/GPX",
+    // "ol/format/GPX",
     "ol/format/IGC",
     "ol/format/IIIFInfo",
     "ol/format/KML",
