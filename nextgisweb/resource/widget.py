@@ -53,22 +53,16 @@ class CompositeWidget(WidgetBase):
 class ResourceWidget(Widget):
     resource = Resource
     operation = ('create', 'update')
-    amdmod = 'ngw-resource/Widget'
+    amdmod = '@nextgisweb/resource/editor-widget'
 
 
 class ResourcePermissionWidget(Widget):
     resource = Resource
     operation = ('update', )
-    amdmod = 'ngw-resource/PermissionWidget'
+    amdmod = '@nextgisweb/resource/permissions-widget'
 
 
 class ResourceDescriptionWiget(Widget):
     resource = Resource
     operation = ('create', 'update')
     amdmod = '@nextgisweb/resource/description-editor'
-
-
-class ResourceDeleteWidget(Widget):
-    resource = Resource
-    operation = ('delete', )
-    amdmod = 'ngw-resource/DeleteWidget'

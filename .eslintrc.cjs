@@ -2,9 +2,11 @@ const babelConfigPath = require.resolve('@nextgisweb/jsrealm/babelrc.cjs');
 
 module.exports = {
     root: true,
+    parser: '@typescript-eslint/parser',
     plugins: ["requirejs", "react"],
     extends: [
         "eslint:recommended",
+        'plugin:@typescript-eslint/recommended',
         "plugin:requirejs/recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
@@ -25,31 +27,8 @@ module.exports = {
             "error",
             { allowExtraDependencies: true },
         ],
-        "requirejs/no-restricted-amd-modules": [
-            "error",
-            {
-                name: "ngw/route",
-                message: "Use '@nextgisweb/pyramid/api' instead!",
-            },
-            {
-                name: "ngw/load-json",
-                message: "Use '@nextgisweb/pyramid/api/load' instead!",
-            },
-            {
-                name: "ngw-pyramid/i18n",
-                message: "Use '@nextgisweb/pyramid/i18n' instead!",
-            },
-            {
-                name: "ngw-pyramid/hbs-i18n",
-                message: "Use '@nextgisweb/pyramid/i18n' instead!",
-            },
-            {
-                name: "ngw/settings",
-                message: "Use '@nextgisweb/pyramid/settings' instead!",
-            },
-        ],
     },
-    ignorePatterns: ["*/amd_packages/contrib/", "doc/"],
+    ignorePatterns: ["doc/"],
     overrides: [
         {
             files: "*.cjs",
