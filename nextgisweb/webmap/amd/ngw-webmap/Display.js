@@ -1,9 +1,5 @@
 define([
     "dojo/_base/declare",
-    "dojox/validate/regexp", // geom loading
-    "dojo/query", // geom loading
-    "dojo/on", // geom loading
-    "dojo/touch", // geom loading
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -81,10 +77,6 @@ define([
     "xstyle/css!./template/resources/Display.css",
 ], function (
     declare,
-    regexp, // geom loading
-    query, // geom loading
-    on, // geom loading
-    touch, // geom loading
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -210,19 +202,8 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
 
-        /*geom loading*/
         _source: null,
-        _sourceTRKPT: null,
         _overlay: null,
-        _overlayTRKPT: null,
-        _trkptType: null,
-        _wkt: new ol.format.WKT(),
-        _zIndex: 1000,
-        CustomLayerPanel: undefined,
-        featureOne: undefined,
-        containerCoords: undefined,
-        _marker: undefined,
-        /*------------*/
 
         // AMD module loading: adapter, basemap, plugin
         _midDeferred: undefined,
@@ -255,16 +236,12 @@ define([
                 name: "layers",
                 value: "layersPanel",
             },
-
-            /*geom loading*/
             {
                 title: i18n.gettext('GeomLoading'),
                 icon: 'material-upload',
                 name: 'upload',
                 value: 'geomLoadingPanel'
             },
-            /*------------*/
-
             {
                 title: i18n.gettext("Search"),
                 icon: "material-search",
@@ -499,7 +476,7 @@ define([
                     });
                 }, 0);
             }
-            /*geom loading*/
+
             // GeomLoading panel
             all([widget._layersDeferred, widget._postCreateDeferred]).then(
                 function () {
@@ -522,7 +499,6 @@ define([
                     });
                 }
             ).then(undefined, function (err) { console.error(err); });
-            /*------------*/
 
             this._buildAnnotationsPanel();
 
@@ -929,18 +905,6 @@ define([
             companyLogo(this.mapNode);
 
             this._setMapExtent();
-
-            /*geom loading*/
-            this._setMapExtent();
-            this._AddVectorLayer();
-            this._AddPoints();
-
-            this._ClearCustomLayer();
-            this._ClearCustomLayerTRKPT();
-            this._ClearCustomLayerPoint();
-
-            this._MapOn();
-            /*------------*/
 
             this._mapDeferred.resolve();
         },
@@ -1494,383 +1458,5 @@ define([
                 panel.hide();
             }
         },
-
-        /*geom loading*/
-
-        _AddVectorLayer: function(){
-            var styleCustom = this._getDefaultStyle()
-            this._overlay = new Vector('CustomLayer', {
-                style: (features) => {
-                    return styleCustom;
-                }
-            });
-            this._overlay.olLayer.setZIndex(this._zIndex);
-            this._source = this._overlay.olLayer.getSource();
-            this.map.addLayer(this._overlay);
-        },
-
-        _AddPoints: function () {
-            var styleCustom = this._getTRKTPStyle()
-            this._overlayTRKPT = new Vector('CustomLayerTRKPT', {
-                style: (features) => {
-                    return styleCustom;
-                }
-            });
-            this._overlayTRKPT.olLayer.declutter_ = true;
-            this._overlayTRKPT.olLayer.setZIndex(this._zIndex);
-            this._sourceTRKPT = this._overlayTRKPT.olLayer.getSource();
-            this.map.addLayer(this._overlayTRKPT);
-        },
-
-        // _AddMarker: function(point){
-        //     this.containerCoords = domConstruct.create("div", {
-        //         class: "ngwPopup dijitTooltipBelow"
-        //     });
-            
-        //     this._connectorDiv = domConstruct.create("div", {
-        //         class: "dijitTooltipConnector ol-control__icon",
-        //         innerHTML: `<span class='SearchCoordPoint '>${icon.html({glyph: "location_on"})}</span>`,
-        //     }, this.containerCoords, 'first');
-            
-        //     this._marker = new ol.Overlay({
-        //         position: point,
-        //         positioning: 'bottom-center',
-        //         element: this.containerCoords,
-        //         autoPan: true,
-        //         offset: [0, -8],
-        //         autoPanAnimation: {
-        //             duration: 250
-        //         }
-        //     });
-        //     this.map.olMap.addOverlay(this._marker);
-        // },
-
-        _ClearCustomLayer: function () {
-            this._source.clear();
-        },
-
-        _ClearCustomLayerTRKPT: function () {
-            this._sourceTRKPT.clear();
-        },
-
-        _ClearCustomLayerPoint: function () {
-            domConstruct.destroy(this.containerCoords);
-        },
-
-        _ZoomCoords: function (click) {
-            if (this._marker.getPosition()) {
-                this.map.olMap.getView().setCenter(this._marker.getPosition());
-                if (click == 1) {
-                    let x = this._marker.getPosition()[0];
-                    let y = this._marker.getPosition()[1];
-                    const cExt = 500.0;
-                    this.map.olMap.getView().fit([x - cExt, y - cExt, x + cExt, y + cExt]);
-                    array.forEach(this._layer_order, function (id) {
-                        if (this._layers[id]._visibility == true) {
-                            this._layers[id].olSource.image_.resolution = Infinity;
-                        }
-                    }, this);
-                }
-            } 
-            else {
-                var ext = this._extent;
-                this.map.olMap.getView().fit(ext);
-            }
-        },
-
-        _ZoomToExtentCustomFile: function(){
-            var maps = this.map.olMap;
-            if (this._source && this._source.url_ !== undefined) {
-                if (this._source.getFeatures().length > 0) {
-                    maps.getView().fit(this._source.getExtent(), maps.getSize());
-                    array.forEach(this._layer_order, function (id) {
-                        if (this._layers[id]._visibility == true) {
-                            this._layers[id].olSource.image_.resolution = Infinity;
-                        }
-                    }, this);
-                }
-            }
-        },
-
-        _GeneratePoint: function(linestring){
-            linestring.getCoordinates().forEach((item) => {
-                var time = new Date();
-                time.setTime(item[3]*1000);
-                var elevation = item[2];
-                var feature = new ol.Feature({
-                    geometry: new ol.geom.Point(item),
-                    text: 'Дата и время: ' + time.toLocaleString('ru-RU', { timeZone: 'UTC' }) + ',\n Высота :' +  elevation
-                })
-                this._sourceTRKPT.addFeature(feature);
-            });
-        },
-
-        _GeometryLoading: function(file, size, name){
-            var sizeLimit = 16777216;
-            if (sizeLimit >= size) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    this._source.clear();
-                    this._sourceTRKPT.clear();
-                    let arrayBuffer = reader.result
-                    let arr = (new Uint8Array(reader.result)).subarray(0, 4);
-                    let fileSignature = "";
-                    for (let i = 0; i < arr.length; i++) {
-                        fileSignature += arr[i].toString(16);
-                    };
-
-                    let blob;
-                    switch (fileSignature) {
-                        case '3c3f786d':
-                            this._format = new ol.format.GPX({featureProjection: this.displayProjection});
-                            blob = new Blob([arrayBuffer], {type: 'application/gpx+xml'});
-                            break;
-                        case '7ba2274':
-                            this._format = new ol.format.GeoJSON({featureProjection: this.displayProjection});
-                            blob = new Blob([arrayBuffer], {type: 'application/geo+json'});
-                            break;
-                        case '7ba2020':
-                            this._format = new ol.format.GeoJSON({featureProjection: this.displayProjection});
-                            blob = new Blob([arrayBuffer], {type: 'application/geo+json'});
-                            break;
-                        default:
-                            return;
-                    }
-                    this._src = window.URL.createObjectURL(blob);
-                    this._source = new ol.source.Vector({
-                        url: this._src,
-                        format: this._format
-                    });
- 
-                    this._overlay.olLayer.setSource(this._source);
-
-                    this._source.on('addfeature', (e) => {
-                        this._trkptType = document.querySelector('#trkptType');
-                        if (this._trkptType.checked === true) {
-                            this._ZoomToExtentCustomFile();
-                            if (e.feature.getGeometry().getType() == 'LineString' && fileSignature == '3c3f786d') {
-                                this._GeneratePoint(e.feature.getGeometry());
-                            } else if (e.feature.getGeometry().getType() == 'MultiLineString' && fileSignature == '3c3f786d') {
-                                e.feature.getGeometry().getLineStrings().forEach((linestring) => {
-                                    this._GeneratePoint(linestring);
-                                });
-                            }
-                        }
-                        else {
-                            this._ZoomToExtentCustomFile();
-                        }
-                    });
-
-                    domConstruct.destroy("CustomLayerPanel");
-
-                    this.CustomLayerPanel = domConstruct.create("div", {
-                            id: "CustomLayerPanel",
-                            innerHTML: `<div class="BlockCustomFileName">
-                            <div class="customFileName">${name}</div>
-                            <label><span title="Удалить слой" class="ClearCustomFileName ImportFileButton ol-control__icon">${icon.html({glyph: "delete"})}</span><label></div>`,
-                            onclick: () => {
-                                this._ZoomToExtentCustomFile();
-                            }
-                        }, query('.fieldsetF')[0], 'after');
-
-                    on(this.CustomLayerPanel, [touch.press, 'change'], (e) => {
-                        e.stopPropagation();
-                    });
-
-                    on(query(".ClearCustomFileName")[0], [touch.press, 'change'], (e) => {
-                        this._source.clear();
-                        this._sourceTRKPT.clear();
-                        document.getElementById('fileselect').value = '';
-                        domConstruct.destroy("CustomLayerPanel");
-                        this._zoomToInitialExtent();
-                    });
-                };
-                reader.readAsArrayBuffer(file);
-            }
-            else if (sizeLimit < size) {
-                domConstruct.destroy("CustomLayerPanel");
-                document.getElementById('fileselect').value = '';
-                this.CustomInfo = domConstruct.create("div", {
-                    id: "CustomLayerPanel",
-                    innerHTML: '<div class="ErrorCuctom">Файл больше: <span style="font-weight: bold;">' + sizeLimit/(1024*1024) + 'мб</span></div>',
-                }, query('.fieldsetF')[0], 'after');
-                on(this.CustomInfo, [touch.press, 'change'], (e) => {
-                    e.stopPropagation();
-                });
-            }
-            else {
-                return;
-            }
-        },
-
-        _MapOn: function () {
-            var map = this.map.olMap;
-            map.on('singleclick', (evt) => {
-                domConstruct.destroy("CustomObjectInfo");
-                if (query('#fileselect')[0] !== undefined) {
-                    this._selectionFeatureInfo(evt);
-                }
-            });
-        },
-
-        urlRE: new RegExp("^(?:" + regexp.url({scheme: true}) + "|(?:mailto:|tel:|e1c://)[^\\s]+)$"),
-        emailRE: new RegExp("^" + regexp.emailAddress() + "$"),
-
-
-        _selectionFeatureInfo: function (evt) {
-            var features = this.map.olMap.getFeaturesAtPixel(evt.pixel, {hitTolerance: 10});
-            var attr = '';
-            var zoomToObj = '';
-            if (features) {
-                features.forEach((item, index) => {
-                    attr += '<div class="attr_popup">';
-                    zoomToObj = `<div class="index_popup" id="featureOne${index}">Объект#${index}</div>`;
-                    attr += zoomToObj;
-
-                    attr += '<table class="popup-text-all popup-text">'
-
-                    const obj = item.values_;
-                    var attribute = '';
-                    const {geometry, ...rest} = obj;
-                    const newObj = Object.assign({}, {...rest});
-                    for(let key in newObj) {
-                        let val = newObj[key];
-                        if (typeof val == 'string') {
-                            if (val.length > 0 && !this.urlRE.test(val) && !this.emailRE.test(val)) {
-                                attribute += '<tr><td>' + key + '</td><td>' + val + '</td>';
-                            }
-                            if (this.urlRE.test(val)) {
-                                attribute += '<tr><td>' + key + '</td><td><a href="' + val + '" target="_blank">' + val + '</a></td>';
-                            }
-                            if (this.emailRE.test(val)) {
-                                attribute += '<tr><td>' + key + '</td><td><a href="mailto:' + val + '">' + val + '</a></td>';
-                            }
-                        }
-                        else if (typeof val === 'number') {
-                            attribute += '<tr><td>' + key + '</td><td>' + val + '</td>';
-                        }
-                    }
-                    attr += attribute;
-                    attr += '</table></div>';
-                });
-            }
-            else {
-                domConstruct.destroy("CustomLayerPanel");
-            }
-
-            this.CustomObjectInfo = domConstruct.create("div", {
-                id: "CustomObjectInfo",
-                innerHTML: attr,
-                onclick: (e) => {
-                    e.stopPropagation();
-                }
-            }, query('#CustomLayerPanel')[0]);
-
-            features.forEach((item, index) => {
-                const zoomCustomFeature = document.querySelector('#featureOne'+index);
-                if (zoomCustomFeature){
-                    on(zoomCustomFeature, [touch.press, 'change'], (e) => {
-                        const aExt = item.values_.geometry.extent_;
-                        const cExt_length = 100.0;
-                        const bufferedExtent = new ol.extent.buffer(aExt, cExt_length);
-                        this.map.olMap.getView().fit(bufferedExtent);
-                        array.forEach(this._layer_order, function (id) {
-                            if (this._layers[id]._visibility == true) {
-                                this._layers[id].olSource.image_.resolution = Infinity;
-                            }
-                        }, this);
-                    });
-                }
-            });
-        },
-
-        _getTRKTPStyle: function () {
-            var dataStyle = new ol.style.Style({
-                image: new ol.style.Circle({
-                    anchor: [0.5, 46],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'pixels',
-                    stroke: new ol.style.Stroke({
-                        width: 0.5,
-                        color: 'rgba(0,0,0,0.8)'
-                    }),
-                    radius: 2,
-                    fill: new ol.style.Stroke({
-                        width: 1,
-                        color: 'rgba(255,255,0,1)'
-                    }),
-                }),
-                text: new ol.style.Text({
-                    textAlign: 'center',
-                    textBaseline: "bottom",
-                    font: '12px Calibri,sans-serif',
-
-                    fill: new ol.style.Fill({
-                        color: '#000'
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: '#fff',
-                        width: 2
-                    }),
-                    offsetY: -10,
-                    offsetX: 15,
-                    placement: "point",
-                    maxAngle: 0,
-                    overflow: true,
-                    rotation: 0,
-                })
-            });
-
-            return dataStyle;
-        },
-
-        _getDefaultStyle: function () {
-            var dataStyle = new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    width: 2,
-                    color: 'rgba(239,41,41,1)'
-                }),
-                image: new ol.style.Circle({
-                    anchor: [0.5, 46],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'pixels',
-                    stroke: new ol.style.Stroke({
-                        width: 1,
-                        color: 'rgba(0,0,0,0.8)'
-                    }),
-                    radius: 5,
-                    fill: new ol.style.Stroke({
-                        width: 1,
-                        color: 'rgba(0,0,160,0.25)'
-                    }),
-                }),
-                fill: new ol.style.Fill({
-                    color: 'rgba(0, 0, 255, 0.5)',
-                  }),
-                text: new ol.style.Text({
-                    textAlign: 'center',
-                    textBaseline: "bottom",
-                    font: '12px Calibri,sans-serif',
-
-                    fill: new ol.style.Fill({
-                        color: '#000'
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: '#fff',
-                        width: 2
-                    }),
-                    offsetY: -10,
-                    offsetX: 15,
-                    placement: "point",
-                    maxAngle: 0,
-                    overflow: true,
-                    rotation: 0,
-                })
-            });
-
-            return dataStyle;
-        },
-
-        /*------------*/
     });
 });
