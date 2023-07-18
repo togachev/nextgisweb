@@ -1,13 +1,14 @@
 import { PropTypes } from "prop-types";
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { message, Upload } from "@nextgisweb/gui/antd";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
 
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GPX from 'ol/format/GPX';
+import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 
 const validTypeMesssage = i18n.gettext("This file type is not supported");
@@ -17,18 +18,6 @@ const getBase64 = (img, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
     reader.readAsDataURL(img);
-};
-
-const beforeUpload = (file) => {
-    const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
-    if (!isValidType) {
-        message.error(validTypeMesssage);
-    }
-    const isLimitVolume = file.size / 1024 / 1024 < 16;
-    if (!isLimitVolume) {
-        message.error(validVolumeMessage);
-    }
-    return isValidType && isLimitVolume;
 };
 
 const getDefaultStyle = () => {
@@ -62,6 +51,9 @@ const getDefaultStyle = () => {
 export const GeomLoading = ({ display }) => {
     const [loading, setLoading] = useState(false);
     const [dataUrl, setDataUrl] = useState();
+    const [typeFile, setTypeFile] = useState();
+    const [source, setSource] = useState();
+
     const handleChange = (info) => {
         if (info.file.status === 'uploading') {
             setLoading(true);
@@ -77,34 +69,50 @@ export const GeomLoading = ({ display }) => {
     const uploadButton = (
         <div>
             {loading ? <LoadingOutlined /> : <PlusOutlined />}
-            <div
-                style={{
-                    marginTop: 8,
-                }}
-            >
+            <div>
                 Upload
             </div>
         </div>
     );
 
+    const beforeUpload = (file) => {
+        setTypeFile(file.type)
+        const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
+        if (!isValidType) {
+            message.error(validTypeMesssage);
+        }
+        const isLimitVolume = file.size / 1024 / 1024 < 16;
+        if (!isLimitVolume) {
+            message.error(validVolumeMessage);
+        }
+        return isValidType && isLimitVolume && file.type;
+    };
+
+    useEffect(() => {
+        switch (typeFile) {
+            case 'application/gpx+xml':
+                setSource(new VectorSource({url: dataUrl, format: new GPX() }))
+                break;
+            case 'application/geo+json':
+                setSource(new VectorSource({url: dataUrl, format: new GeoJSON() }))
+                break;
+            default:
+                return;
+        }
+    }, [typeFile, dataUrl]);
+
     const { map } = display;
 
-    const styleCustom = getDefaultStyle();
-
     const _overlay = new VectorLayer({
-        style: (features) => {
-            return styleCustom;
-        },
-        source: new VectorSource({
-            url: dataUrl,
-            format: new GPX(),
-        })
+        style: features => getDefaultStyle(),
+        source: source
     });
 
     map.olMap.addLayer(_overlay);
 
     return (
         <Upload
+            multiple={false}
             name="avatar"
             listType="picture-card"
             className="avatar-uploader"
@@ -112,13 +120,9 @@ export const GeomLoading = ({ display }) => {
             beforeUpload={beforeUpload}
             onChange={handleChange}
         >
-            {dataUrl ?
-                (
-                    <span>Слой загружен!!!</span>
-                )
-                : (
-                    uploadButton
-                )}
+            {
+                dataUrl ? <span>Слой загружен!!!</span> : uploadButton
+            }
         </Upload>
     );
 };
