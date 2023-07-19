@@ -1,5 +1,5 @@
 import { PropTypes } from "prop-types";
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import { message, Upload } from "@nextgisweb/gui/antd";
 import { useState, useEffect } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
@@ -13,7 +13,9 @@ import { Circle, Fill, Stroke, Style } from 'ol/style';
 
 const validTypeMesssage = i18n.gettext("This file type is not supported");
 const validVolumeMessage = i18n.gettext("Exceeding the volume of 16mb");
+const areaUpload = i18n.gettext("Click or drag file to this area to upload");
 
+const { Dragger } = Upload;
 const getBase64 = (img, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
@@ -49,10 +51,12 @@ const getDefaultStyle = () => {
 }
 
 export const GeomLoading = ({ display }) => {
+    const map = display.map.olMap;
+
     const [loading, setLoading] = useState(false);
     const [dataUrl, setDataUrl] = useState();
     const [typeFile, setTypeFile] = useState();
-    const [source, setSource] = useState();
+    const [source, setSource] = useState(null);
 
     const handleChange = (info) => {
         if (info.file.status === 'uploading') {
@@ -66,14 +70,6 @@ export const GeomLoading = ({ display }) => {
             });
         }
     };
-    const uploadButton = (
-        <div>
-            {loading ? <LoadingOutlined /> : <PlusOutlined />}
-            <div>
-                Upload
-            </div>
-        </div>
-    );
 
     const beforeUpload = (file) => {
         setTypeFile(file.type)
@@ -91,39 +87,47 @@ export const GeomLoading = ({ display }) => {
     useEffect(() => {
         switch (typeFile) {
             case 'application/gpx+xml':
-                setSource(new VectorSource({url: dataUrl, format: new GPX() }))
+                setSource(new VectorSource({url: dataUrl, format: new GPX()}))
                 break;
             case 'application/geo+json':
-                setSource(new VectorSource({url: dataUrl, format: new GeoJSON() }))
+                setSource(new VectorSource({url: dataUrl, format: new GeoJSON()}))
                 break;
             default:
                 return;
         }
-    }, [typeFile, dataUrl]);
+    }, [dataUrl]);
 
-    const { map } = display;
+    
 
     const _overlay = new VectorLayer({
         style: features => getDefaultStyle(),
         source: source
     });
 
-    map.olMap.addLayer(_overlay);
+    map.addLayer(_overlay);
+
+    useEffect(() => {
+        if (source && source.url_ !== undefined) {
+            if (source.getFeatures().length) {
+                map.getView().fit(source.getExtent(), map.getSize());
+            }
+        }
+    }, [loading, source]);
 
     return (
-        <Upload
+        <Dragger
             multiple={false}
-            name="avatar"
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={false}
+            name="file"
+            listType="text"
+            showUploadList={true}
             beforeUpload={beforeUpload}
             onChange={handleChange}
         >
-            {
-                dataUrl ? <span>Слой загружен!!!</span> : uploadButton
-            }
-        </Upload>
+            <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">{areaUpload}</p>
+        </Dragger>
     );
 };
 
