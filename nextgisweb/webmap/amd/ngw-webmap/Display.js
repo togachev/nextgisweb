@@ -769,7 +769,9 @@ define([
                 view: new ol.View({
                     minZoom: 3,
                     constrainResolution: true,
-                    extent: !this.config.extent_const.includes(null) ? this._extent_const : undefined,
+                    showFullExtent: true,
+                    extent: !this.config.extent_const.includes(null) ?
+                        this._extent_const : undefined,
                 }),
             });
 
@@ -1310,40 +1312,20 @@ define([
             return true;
         },
 
-        _getViewFit: function (extent) {
-            this.map.olMap.getView().fit(extent)
+        _defaultExtent: function () {
+            if (this.config.extent_const.includes(null)) {
+                return this._extent
+            } else {
+                if (this.config.extent.toString() === [-180, -82, 180, 82].toString()) {
+                    return this._extent_const
+                } else {
+                    return this._extent
+                }
+            }
         },
 
         _zoomToInitialExtent: function () {
-            /* Расчет суммы, по умолчанию 0, если не задан начальный охват */
-            const ext = this.config.extent.reduce((i, a) => i + a, 0)
-
-            /* Проверка, true если задан ограничивающий охват */
-            const extConst = !this.config.extent_const.includes(null)
-
-            /* Площади начального и ограничивающего охватов */
-            const eArea = ol.extent.getArea(this._extent), eConstArea = ol.extent.getArea(this._extent_const);
-            
-            /* Начальный и ограничивающий охват не задан, охват по умолчанию*/
-            ext === 0 & !extConst ?  
-                this._getViewFit(this._extent) :
-
-            /* Начальный охват задан, ограничивающий охват задан,
-            площадь начального меньше ограничивающего, охват по умолчанию начальный */
-            ext !== 0 & extConst & (eArea <= eConstArea) ?  
-                this._getViewFit(this._extent) :
-
-            /* Начальный охват задан, ограничивающий охват задан,
-            площадь начального больше ограничивающего, охват по умолчанию ограничивающий */
-            ext !== 0 & extConst & (eArea > eConstArea) ? 
-                this._getViewFit(this._extent_const) :
-
-            /* Начальный охват задан, ограничивающий охват не задан, охват по умолчанию начальный */
-            ext !== 0 & !extConst ? 
-                this._getViewFit(this._extent) : 
-
-                // Иначе охват по ограничивающему 
-                this._getViewFit(this._extent_const) 
+            this.map.olMap.getView().fit(this._defaultExtent());
         },
 
         _identifyFeatureByAttrValue: function () {
