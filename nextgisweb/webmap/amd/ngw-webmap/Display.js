@@ -769,7 +769,6 @@ define([
                 view: new ol.View({
                     minZoom: 3,
                     constrainResolution: true,
-                    showFullExtent: true,
                     extent: !this.config.extent_const.includes(null) ?
                         this._extent_const : undefined,
                 }),
@@ -827,6 +826,7 @@ define([
             // Resize OpenLayers Map on container resize
             aspect.after(this.mapPane, "resize", function () {
                 widget.map.olMap.updateSize();
+                widget.map.olMap.getView().fit(widget._defaultExtent());
             });
 
             // Basemaps initialization
