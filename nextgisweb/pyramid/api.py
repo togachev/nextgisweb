@@ -217,6 +217,26 @@ def home_path_put(request) -> JSONType:
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
+def metric_get(request) -> JSONType:
+    request.require_administrator()
+    try:
+        metric = env.core.settings_get('pyramid', 'metric')
+    except KeyError:
+        metric = None
+    return dict(metric=metric)
+
+def metric_put(request) -> JSONType:
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.items():
+        if k == 'metric':
+            if v:
+                env.core.settings_set('pyramid', 'metric', v)
+            else:
+                env.core.settings_delete('pyramid', 'metric')
+        else:
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 def settings(request) -> JSONType:
     identity = request.GET.get('component')
@@ -539,3 +559,7 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.home_path', '/api/component/pyramid/home_path') \
         .add_view(home_path_get, request_method='GET') \
         .add_view(home_path_put, request_method='PUT')
+
+    config.add_route('pyramid.metric', '/api/component/pyramid/metric') \
+        .add_view(metric_get, request_method='GET') \
+        .add_view(metric_put, request_method='PUT')
