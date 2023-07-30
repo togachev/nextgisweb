@@ -217,24 +217,45 @@ def home_path_put(request) -> JSONType:
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
-def metric_get(request) -> JSONType:
+def metric_ya_get(request) -> JSONType:
     request.require_administrator()
     try:
-        metric = env.core.settings_get('pyramid', 'metric')
+        metric_ya = env.core.settings_get('pyramid', 'metric_ya')
     except KeyError:
-        metric = None
-    return dict(metric=metric)
+        metric_ya = None
+    return dict(metric_ya=metric_ya)
 
-def metric_put(request) -> JSONType:
+def metric_ya_put(request) -> JSONType:
     request.require_administrator()
 
     body = request.json_body
     for k, v in body.items():
-        if k == 'metric':
+        if k == 'metric_ya':
             if v:
-                env.core.settings_set('pyramid', 'metric', v)
+                env.core.settings_set('pyramid', 'metric_ya', v)
             else:
-                env.core.settings_delete('pyramid', 'metric')
+                env.core.settings_delete('pyramid', 'metric_ya')
+        else:
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
+
+def metric_gl_get(request) -> JSONType:
+    request.require_administrator()
+    try:
+        metric_gl = env.core.settings_get('pyramid', 'metric_gl')
+    except KeyError:
+        metric_gl = None
+    return dict(metric_gl=metric_gl)
+
+def metric_gl_put(request) -> JSONType:
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.items():
+        if k == 'metric_gl':
+            if v:
+                env.core.settings_set('pyramid', 'metric_gl', v)
+            else:
+                env.core.settings_delete('pyramid', 'metric_gl')
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
@@ -560,6 +581,10 @@ def setup_pyramid(comp, config):
         .add_view(home_path_get, request_method='GET') \
         .add_view(home_path_put, request_method='PUT')
 
-    config.add_route('pyramid.metric', '/api/component/pyramid/metric') \
-        .add_view(metric_get, request_method='GET') \
-        .add_view(metric_put, request_method='PUT')
+    config.add_route('pyramid.metric_ya', '/api/component/pyramid/metric_ya') \
+        .add_view(metric_ya_get, request_method='GET') \
+        .add_view(metric_ya_put, request_method='PUT')
+
+    config.add_route('pyramid.metric_gl', '/api/component/pyramid/metric_gl') \
+        .add_view(metric_gl_get, request_method='GET') \
+        .add_view(metric_gl_put, request_method='PUT')
