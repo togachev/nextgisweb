@@ -508,3 +508,22 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
+#: nodepkg/metric/MetricAnalytics.js:74
+msgid "webvisor"
+msgstr "Вебвизор"
+
+#: nodepkg/metric/MetricAnalytics.js:74
+msgid "clickmap"
+msgstr "Карта кликов"
+
+#: nodepkg/metric/MetricAnalytics.js:74
+msgid "trackLinks"
+msgstr "Управление отслеживанием перехода по внешним ссылкам"
+
+#: nodepkg/metric/MetricAnalytics.js:74
+msgid "accurateTrackBounce"
+msgstr "Точный показатель отказов"
+
+#: nodepkg/metric/MetricAnalytics.js:74
+msgid "Check all"
+msgstr "Отметить все"

@@ -60,7 +60,7 @@ const MetricCheckbox = (props) => {
             <Col flex="auto">
                 <Checkbox indeterminate={indeterminate}
                     onChange={onChange} checked={checked}>
-                    Check all
+                    {i18n.gettext("Check all")}
                 </Checkbox>
             </Col>
         </Row>
@@ -69,10 +69,14 @@ const MetricCheckbox = (props) => {
 
 const MetricCheckboxGroup = (props) => {
     const { options, value, onChange } = props;
+    const obj = []
+    options.forEach((element) => {
+        obj.push({label: i18n.gettext(element), value: element});
+    });
     return (
         <Row>
             <Col flex="auto">
-                <CheckboxGroup options={options}
+                <CheckboxGroup options={obj}
                     value={value} onChange={onChange} />
             </Col>
         </Row>
