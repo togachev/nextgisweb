@@ -30,7 +30,10 @@ const params = {
     },
     gl: {
         metric: glLabel,
-        tag: []
+        tag: [
+            // 'tag_gl_1', // Add your tags
+            // 'tag_gl_2'
+        ]
     }
 };
 
@@ -93,7 +96,7 @@ export function MetricAnalytics() {
     const { data } = useRouteGet({ name: model });
 
     useEffect(() => {
-        if (data !== undefined && data[metricName] !== null ) {
+        if (data !== undefined && data[metricName] !== null) {
             const val = metricName ? data[metricName] : data;
             setMetricId(val.id);
             setCheckedList(val.tags);
@@ -164,9 +167,9 @@ export function MetricAnalytics() {
                 <>
                     <MetricId value={metricId} onChange={setMetricId} />
                     {
-                        key == 'ya' ? (
+                        params[opMetric].tag.length > 0 ?
                             <>
-                            <Divider />
+                                <Divider />
                                 <MetricCheckbox
                                     indeterminate={indeterminate}
                                     onChange={onCheckAllChange}
@@ -178,7 +181,7 @@ export function MetricAnalytics() {
                                     onChange={onChangeCheckbox}
                                 />
                             </>
-                        ) : <></>
+                            : <></>
                     }
                     <Divider />
                     <SaveButton loading={status === "saving"} onClick={save} />
