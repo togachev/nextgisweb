@@ -125,7 +125,6 @@ export function MetricAnalytics() {
             const json = metricName
                 ? { [metricName]: valueMetric || null }
                 : valueMetric || null;
-            console.log(json);
             await route(model).put({
                 json,
             });
