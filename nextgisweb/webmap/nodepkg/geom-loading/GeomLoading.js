@@ -57,31 +57,41 @@ export const GeomLoading = ({ display }) => {
     const [typeFile, setTypeFile] = useState();
 
     const map = display.map.olMap;
-    
+
     const handleChange = (info) => {
         if (info.file.status === 'uploading') {
             setNameLayer(info.file.uid)
             return;
-        }        
+        }
         if (info.file.status === 'done') {
             getBase64(info.file.originFileObj, (url) => {
                 setDataUrl(url);
             });
         }
         if (info.file.status === 'removed') {
-            var layersToRemove = [];
-            map.getLayers().forEach(function (layer) {
+            var layers = [];
+            map.getLayers().forEach((layer) => {
                 if (layer.get('name') != undefined && layer.get('name') === info.file.uid) {
-                    layersToRemove.push(layer);
+                    layers.push(layer);
                 }
             });
-            
-            var len = layersToRemove.length;
-            for(var i = 0; i < len; i++) {
-                map.removeLayer(layersToRemove[i]);
+
+            var len = layers.length;
+            for (var i = 0; i < len; i++) {
+                map.removeLayer(layers[i]);
             }
             return;
         }
+    };
+
+    const onPreview = (file) => {
+        console.log(file);
+        map.getLayers().forEach((layer) => {
+            if (layer.get('name') === file.uid) {
+                let extent = layer.getSource().getExtent();
+                map.getView().fit(extent, map.getSize());
+            }
+        })
     };
 
     const beforeUpload = (file) => {
@@ -106,8 +116,8 @@ export const GeomLoading = ({ display }) => {
         customLayer.set("name", nameLayer);
         map.addLayer(customLayer);
 
-        source.once('change',function(e){
-            if(source.getState() === 'ready') {
+        source.once('change', function (e) {
+            if (source.getState() === 'ready') {
                 map.getView().fit(source.getExtent(), map.getSize());
             }
         });
@@ -116,15 +126,21 @@ export const GeomLoading = ({ display }) => {
     useEffect(() => {
         switch (typeFile) {
             case 'application/gpx+xml':
-                addLayerMap(new VectorSource({url: dataUrl, format: new GPX()}))
+                addLayerMap(new VectorSource({ url: dataUrl, format: new GPX() }))
                 break;
             case 'application/geo+json':
-                addLayerMap(new VectorSource({url: dataUrl, format: new GeoJSON()}))
+                addLayerMap(new VectorSource({ url: dataUrl, format: new GeoJSON() }))
                 break;
             default:
                 return;
         }
     }, [dataUrl]);
+
+    const TestName = () => {
+        return (
+            <span>test</span>
+        )
+    }
 
     return (
         <Dragger
@@ -134,6 +150,8 @@ export const GeomLoading = ({ display }) => {
             showUploadList={true}
             beforeUpload={beforeUpload}
             onChange={handleChange}
+            onPreview={onPreview}
+            maxCount={10} // maximum number of uploaded files
         >
             <p className="ant-upload-drag-icon">
                 <InboxOutlined />
