@@ -51,23 +51,36 @@ const getDefaultStyle = () => {
 }
 
 export const GeomLoading = ({ display }) => {
-    const map = display.map.olMap;
 
-    const [loading, setLoading] = useState(false);
     const [dataUrl, setDataUrl] = useState();
+    const [nameLayer, setNameLayer] = useState();
     const [typeFile, setTypeFile] = useState();
-    const [source, setSource] = useState(null);
 
+    const map = display.map.olMap;
+    
     const handleChange = (info) => {
         if (info.file.status === 'uploading') {
-            setLoading(true);
+            setNameLayer(info.file.uid)
             return;
-        }
+        }        
         if (info.file.status === 'done') {
             getBase64(info.file.originFileObj, (url) => {
-                setLoading(false);
                 setDataUrl(url);
             });
+        }
+        if (info.file.status === 'removed') {
+            var layersToRemove = [];
+            map.getLayers().forEach(function (layer) {
+                if (layer.get('name') != undefined && layer.get('name') === info.file.uid) {
+                    layersToRemove.push(layer);
+                }
+            });
+            
+            var len = layersToRemove.length;
+            for(var i = 0; i < len; i++) {
+                map.removeLayer(layersToRemove[i]);
+            }
+            return;
         }
     };
 
@@ -84,35 +97,34 @@ export const GeomLoading = ({ display }) => {
         return isValidType && isLimitVolume && file.type;
     };
 
+    const addLayerMap = (source) => {
+        const customLayer = new VectorLayer({
+            style: features => getDefaultStyle(),
+            source: source
+        })
+
+        customLayer.set("name", nameLayer);
+        map.addLayer(customLayer);
+
+        source.once('change',function(e){
+            if(source.getState() === 'ready') {
+                map.getView().fit(source.getExtent(), map.getSize());
+            }
+        });
+    }
+
     useEffect(() => {
         switch (typeFile) {
             case 'application/gpx+xml':
-                setSource(new VectorSource({url: dataUrl, format: new GPX()}))
+                addLayerMap(new VectorSource({url: dataUrl, format: new GPX()}))
                 break;
             case 'application/geo+json':
-                setSource(new VectorSource({url: dataUrl, format: new GeoJSON()}))
+                addLayerMap(new VectorSource({url: dataUrl, format: new GeoJSON()}))
                 break;
             default:
                 return;
         }
     }, [dataUrl]);
-
-    
-
-    const _overlay = new VectorLayer({
-        style: features => getDefaultStyle(),
-        source: source
-    });
-
-    map.addLayer(_overlay);
-
-    useEffect(() => {
-        if (source && source.url_ !== undefined) {
-            if (source.getFeatures().length) {
-                map.getView().fit(source.getExtent(), map.getSize());
-            }
-        }
-    }, [loading, source]);
 
     return (
         <Dragger

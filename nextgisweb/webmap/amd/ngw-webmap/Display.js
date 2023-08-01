@@ -30,6 +30,7 @@ define([
     "dojo/topic",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/webmap/layers-tree",
+    "@nextgisweb/webmap/geom-loading",
     "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/basemap-selector",
     "@nextgisweb/pyramid/icon",
@@ -107,6 +108,7 @@ define([
     topic,
     reactApp,
     LayersTreeComp,
+    GeomLoadingComp,
     WebmapStore,
     BasemapSelectorComp,
     icon,
@@ -360,6 +362,9 @@ define([
             // Layers panel
             widget._layersPanelSetup();
 
+            // Layers panel
+            widget._geomLoadingPanelSetup();
+
             // Print panel
             all([
                 this._layersDeferred,
@@ -477,29 +482,6 @@ define([
                 }, 0);
             }
 
-            // GeomLoading panel
-            all([widget._layersDeferred, widget._postCreateDeferred]).then(
-                function () {
-                    widget.geomLoadingPanel = new GeomLoadingPanel({
-                        region: 'left',
-                        class: "dynamic-panel--fullwidth",
-                        title: i18n.gettext("GeomLoading"),
-                        isOpen: widget.activeLeftPanel === "geomLoadingPanel",
-                        gutters: false,
-                        withCloser: true,
-                        display: widget
-                    });
-
-                    if (widget.activeLeftPanel === "geomLoadingPanel") {
-                        widget.activatePanel(widget.geomLoadingPanel);
-                    }
-
-                    widget.geomLoadingPanel.on("closed", function(){
-                        widget.navigationMenu.reset();
-                    });
-                }
-            ).then(undefined, function (err) { console.error(err); });
-
             this._buildAnnotationsPanel();
 
             // Share panel
@@ -582,6 +564,7 @@ define([
                     widget._toolsSetup();
                     widget._pluginsSetup();
                     widget._buildLayersTree();
+                    widget._buildGeomLoading();
                     widget._identifyFeatureByAttrValue();
                 })
                 .then(undefined, function (err) {
@@ -1234,6 +1217,32 @@ define([
                 });
         },
 
+        _geomLoadingPanelSetup: function () {
+            var widget = this;
+
+            all([widget._layersDeferred, widget._postCreateDeferred])
+                .then(function () {
+                    widget.geomLoadingPanel = new GeomLoadingPanel({
+                        region: "left",
+                        class: "dynamic-panel--fullwidth",
+                        title: i18n.gettext("GeomLoading"),
+                        isOpen: widget.activeLeftPanel === "geomLoadingPanel",
+                        gutters: false,
+                        withCloser: true,
+                    });
+
+                    if (widget.activeLeftPanel === "geomLoadingPanel")
+                        widget.activatePanel(widget.geomLoadingPanel);
+
+                    widget.geomLoadingPanel.on("closed", function () {
+                        widget.navigationMenu.reset();
+                    });
+                })
+                .then(undefined, function (err) {
+                    console.error(err);
+                });
+        },
+
         _switchBasemap: function (basemapLayerKey) {
             if (!(basemapLayerKey in this.map.layers)) {
                 return false;
@@ -1300,6 +1309,17 @@ define([
                     zoomToNgwExtent: (extent) => widget.map.zoomToNgwExtent(extent)
                 },
                 widget.layersPanel.contentWidget.layerTreePane.domNode
+            );
+        },
+
+        _buildGeomLoading: function () {
+            const widget = this;
+            this.component = reactApp.default(
+                GeomLoadingComp.default,
+                {
+                    display: widget,
+                },
+                widget.geomLoadingPanel.contentWidget.geomLoadingPane.domNode
             );
         },
 

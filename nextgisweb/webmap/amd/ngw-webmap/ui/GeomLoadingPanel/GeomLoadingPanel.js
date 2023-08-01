@@ -1,31 +1,31 @@
 define([
-    'dojo/_base/declare', 'ngw-pyramid/dynamic-panel/DynamicPanel',
+    'dojo/_base/declare',
+    '@nextgisweb/pyramid/i18n!',
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    'ngw-pyramid/dynamic-panel/DynamicPanel',
     'dijit/layout/BorderContainer',
-    "@nextgisweb/gui/react-app",
-    "@nextgisweb/webmap/geom-loading",
+    "dojo/text!./GeomLoadingPanel.hbs",
+    "xstyle/css!./GeomLoadingPanel.css"
 ], function (
-    declare, DynamicPanel,
+    declare,
+    i18n,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
+    DynamicPanel,
     BorderContainer,
-    reactApp,
-    GeomLoadingComp
+    template
 ) {
     return declare([DynamicPanel, BorderContainer], {
 
         constructor: function (options) {
-            declare.safeMixin(this, options);
-            this.makeComp = (contentNode, options) => {
-                reactApp.default(
-                    GeomLoadingComp.default,
-                    {
-                        display: options.display,
-                    },
-                    contentNode
-                );
-            };
-        },
-        
-        postCreate: function(){
-            this.inherited(arguments);
+            declare.safeMixin(this,options);
+
+            this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
+                templateString: i18n.renderTemplate(template),
+                region: 'top',
+                gutters: false
+            }));
         }
     });
 });
