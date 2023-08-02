@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
-import { LoadingOutlined, PlusOutlined, InboxOutlined } from '@ant-design/icons';
-import { message, Upload } from "@nextgisweb/gui/antd";
+import { InboxOutlined } from '@ant-design/icons';
+import { message, Upload, List } from "@nextgisweb/gui/antd";
 import { useState, useEffect } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
@@ -55,7 +55,7 @@ export const GeomLoading = ({ display }) => {
     const [dataUrl, setDataUrl] = useState();
     const [nameLayer, setNameLayer] = useState();
     const [typeFile, setTypeFile] = useState();
-
+    const [list, setList] = useState([])
     const map = display.map.olMap;
 
     const handleChange = (info) => {
@@ -75,17 +75,16 @@ export const GeomLoading = ({ display }) => {
                     layers.push(layer);
                 }
             });
-
             var len = layers.length;
             for (var i = 0; i < len; i++) {
                 map.removeLayer(layers[i]);
             }
+            list.splice(list.findIndex(a => a.uid === info.file.uid), 1)
             return;
         }
     };
 
     const onPreview = (file) => {
-        console.log(file);
         map.getLayers().forEach((layer) => {
             if (layer.get('name') === file.uid) {
                 let extent = layer.getSource().getExtent();
@@ -96,6 +95,7 @@ export const GeomLoading = ({ display }) => {
 
     const beforeUpload = (file) => {
         setTypeFile(file.type)
+
         const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
         if (!isValidType) {
             message.error(validTypeMesssage);
@@ -104,6 +104,9 @@ export const GeomLoading = ({ display }) => {
         if (!isLimitVolume) {
             message.error(validVolumeMessage);
         }
+
+        setList(prev => [...prev, file])
+
         return isValidType && isLimitVolume && file.type;
     };
 
@@ -136,28 +139,40 @@ export const GeomLoading = ({ display }) => {
         }
     }, [dataUrl]);
 
-    const TestName = () => {
-        return (
-            <span>test</span>
-        )
-    }
+    const ListLayerName = (props) => (
+        <List
+            itemLayout="horizontal"
+            dataSource={props.list}
+            renderItem={(item) => (
+                <List.Item>
+                    <List.Item.Meta
+                        title={item.name}
+                        description={item.uid}
+                    />
+                </List.Item>
+            )}
+        />
+    )
 
     return (
-        <Dragger
-            multiple={false}
-            name="file"
-            listType="text"
-            showUploadList={true}
-            beforeUpload={beforeUpload}
-            onChange={handleChange}
-            onPreview={onPreview}
-            maxCount={10} // maximum number of uploaded files
-        >
-            <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">{areaUpload}</p>
-        </Dragger>
+        <>
+            <Dragger
+                multiple={true}
+                name="file"
+                listType="text"
+                showUploadList={false} // built-in file list show/hide
+                beforeUpload={beforeUpload}
+                onChange={handleChange}
+                onPreview={onPreview}
+                maxCount={10} // maximum number of uploaded files
+            >
+                <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">{areaUpload}</p>
+            </Dragger>
+            <ListLayerName list={list} />
+        </>
     );
 };
 
