@@ -1,7 +1,7 @@
 import { PropTypes } from "prop-types";
-import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
-import { message, Upload, List, Button } from "@nextgisweb/gui/antd";
-import { useState, useEffect } from 'react';
+import { InboxOutlined } from '@ant-design/icons';
+import { message, Upload, List } from "@nextgisweb/gui/antd";
+import { useState } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
 
@@ -97,11 +97,6 @@ export const GeomLoading = ({ display }) => {
             });
             setFileList(newFileList);
 
-            if (info.file.status === 'uploading') {
-                setNameLayer(info.file.uid)
-                return;
-            }
-
             if (info.file.status === 'done') {
                 getBase64(info.file.originFileObj, (url) => {
                     olLayerMap(url, info)
@@ -126,8 +121,6 @@ export const GeomLoading = ({ display }) => {
         },
         multiple: true,
         beforeUpload: (file) => {
-            setTypeFile(file.type)
-    
             const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
             if (!isValidType) {
                 message.error(validTypeMesssage);
@@ -136,7 +129,6 @@ export const GeomLoading = ({ display }) => {
             if (!isLimitVolume) {
                 message.error(validVolumeMessage);
             }
-    
             return isValidType && isLimitVolume && file.type;
         },
         onPreview: (file) => {
