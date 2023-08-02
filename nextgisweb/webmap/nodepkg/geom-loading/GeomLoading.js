@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
-import { InboxOutlined } from '@ant-design/icons';
-import { message, Upload, List } from "@nextgisweb/gui/antd";
+import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
+import { message, Upload, List, Button } from "@nextgisweb/gui/antd";
 import { useState, useEffect } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
@@ -16,10 +16,10 @@ const validVolumeMessage = i18n.gettext("Exceeding the volume of 16mb");
 const areaUpload = i18n.gettext("Click or drag file to this area to upload");
 
 const { Dragger } = Upload;
-const getBase64 = (img, callback) => {
+const getBase64 = (file, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
+    reader.readAsDataURL(file);
 };
 
 const getDefaultStyle = () => {
@@ -52,92 +52,109 @@ const getDefaultStyle = () => {
 
 export const GeomLoading = ({ display }) => {
 
-    const [dataUrl, setDataUrl] = useState();
-    const [nameLayer, setNameLayer] = useState();
-    const [typeFile, setTypeFile] = useState();
-    const [list, setList] = useState([])
     const map = display.map.olMap;
 
-    const handleChange = (info) => {
-        if (info.file.status === 'uploading') {
-            setNameLayer(info.file.uid)
-            return;
-        }
-        if (info.file.status === 'done') {
-            getBase64(info.file.originFileObj, (url) => {
-                setDataUrl(url);
-            });
-        }
-        if (info.file.status === 'removed') {
-            var layers = [];
-            map.getLayers().forEach((layer) => {
-                if (layer.get('name') != undefined && layer.get('name') === info.file.uid) {
-                    layers.push(layer);
-                }
-            });
-            var len = layers.length;
-            for (var i = 0; i < len; i++) {
-                map.removeLayer(layers[i]);
-            }
-            list.splice(list.findIndex(a => a.uid === info.file.uid), 1)
-            return;
-        }
-    };
+    const [fileList, setFileList] = useState([]);
+    const [typeFile, setTypeFile] = useState();
+    const [dataUrl, setDataUrl] = useState();
+    const [nameLayer, setNameLayer] = useState();
 
-    const onPreview = (file) => {
-        map.getLayers().forEach((layer) => {
-            if (layer.get('name') === file.uid) {
-                let extent = layer.getSource().getExtent();
-                map.getView().fit(extent, map.getSize());
-            }
-        })
-    };
-
-    const beforeUpload = (file) => {
-        setTypeFile(file.type)
-
-        const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
-        if (!isValidType) {
-            message.error(validTypeMesssage);
-        }
-        const isLimitVolume = file.size / 1024 / 1024 < 16;
-        if (!isLimitVolume) {
-            message.error(validVolumeMessage);
-        }
-
-        setList(prev => [...prev, file])
-
-        return isValidType && isLimitVolume && file.type;
-    };
-
-    const addLayerMap = (source) => {
+    const addLayerMap = (props) => {
+        const customSource = new VectorSource({ url: props.url, format: props.format })
         const customLayer = new VectorLayer({
             style: features => getDefaultStyle(),
-            source: source
+            source: customSource
         })
-
-        customLayer.set("name", nameLayer);
+        customLayer.set("name", props.info.file.uid);
         map.addLayer(customLayer);
-
-        source.once('change', function (e) {
-            if (source.getState() === 'ready') {
-                map.getView().fit(source.getExtent(), map.getSize());
+        customSource.once('change', function (e) {
+            if (customSource.getState() === 'ready') {
+                map.getView().fit(customSource.getExtent(), map.getSize());
             }
         });
     }
 
-    useEffect(() => {
-        switch (typeFile) {
+    const olLayerMap = (url, info) => {
+        switch (info.file.type) {
             case 'application/gpx+xml':
-                addLayerMap(new VectorSource({ url: dataUrl, format: new GPX() }))
+                addLayerMap({info: info, url: url, format: new GPX()})
                 break;
             case 'application/geo+json':
-                addLayerMap(new VectorSource({ url: dataUrl, format: new GeoJSON() }))
+                addLayerMap({info: info, url: url, format: new GeoJSON()})
                 break;
             default:
                 return;
         }
-    }, [dataUrl]);
+    }
+
+    const props = {
+        onChange: (info) => {
+            let newFileList = [...info.fileList];
+    
+            newFileList = newFileList.map((file) => {
+
+                if (file.response) {
+                    file.url = file.response.url;
+                }
+                return file;
+            });
+            setFileList(newFileList);
+
+            if (info.file.status === 'uploading') {
+                setNameLayer(info.file.uid)
+                return;
+            }
+
+            if (info.file.status === 'done') {
+                getBase64(info.file.originFileObj, (url) => {
+                    olLayerMap(url, info)
+                });
+            }
+
+            if (info.file.status === 'removed') {
+                var layers = [];
+                map.getLayers().forEach((layer) => {
+                    if (layer.get('name') != undefined && layer.get('name') === info.file.uid) {
+                        layers.push(layer);
+                    }
+                });
+                var len = layers.length;
+                for (var i = 0; i < len; i++) {
+                    map.removeLayer(layers[i]);
+                }
+                fileList.splice(fileList.findIndex(a => a.uid === info.file.uid), 1)
+                return;
+            }
+
+        },
+        multiple: true,
+        beforeUpload: (file) => {
+            setTypeFile(file.type)
+    
+            const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
+            if (!isValidType) {
+                message.error(validTypeMesssage);
+            }
+            const isLimitVolume = file.size / 1024 / 1024 < 16;
+            if (!isLimitVolume) {
+                message.error(validVolumeMessage);
+            }
+    
+            return isValidType && isLimitVolume && file.type;
+        },
+        onPreview: (file) => {
+            map.getLayers().forEach((layer) => {
+                if (layer.get('name') === file.uid) {
+                    let extent = layer.getSource().getExtent();
+                    map.getView().fit(extent, map.getSize());
+                }
+            })
+        },
+        // maxCount: 10,
+        showUploadList: true,
+        listType: "text",
+        name: "file"
+    };
 
     const ListLayerName = (props) => (
         <List
@@ -155,24 +172,12 @@ export const GeomLoading = ({ display }) => {
     )
 
     return (
-        <>
-            <Dragger
-                multiple={true}
-                name="file"
-                listType="text"
-                showUploadList={false} // built-in file list show/hide
-                beforeUpload={beforeUpload}
-                onChange={handleChange}
-                onPreview={onPreview}
-                maxCount={10} // maximum number of uploaded files
-            >
-                <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                </p>
-                <p className="ant-upload-text">{areaUpload}</p>
-            </Dragger>
-            <ListLayerName list={list} />
-        </>
+        <Dragger {...props} fileList={fileList}>
+            <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">{areaUpload}</p>
+        </Dragger>
     );
 };
 
