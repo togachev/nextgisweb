@@ -55,9 +55,6 @@ export const GeomLoading = ({ display }) => {
     const map = display.map.olMap;
 
     const [fileList, setFileList] = useState([]);
-    const [typeFile, setTypeFile] = useState();
-    const [dataUrl, setDataUrl] = useState();
-    const [nameLayer, setNameLayer] = useState();
 
     const addLayerMap = (props) => {
         const customSource = new VectorSource({ url: props.url, format: props.format })
