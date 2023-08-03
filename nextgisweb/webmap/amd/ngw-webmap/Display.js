@@ -528,6 +528,7 @@ define([
                 .then(function () {
                     widget._pluginsSetup(true);
                     widget._mapSetup();
+                    widget._setExtentConst();
                 })
                 .then(undefined, function (err) {
                     console.error(err);
@@ -787,9 +788,6 @@ define([
                 view: new ol.View({
                     minZoom: 3,
                     constrainResolution: true,
-                    showFullExtent: true,
-                    extent: !this.config.extent_const.includes(null) ?
-                        this._extent_const : undefined,
                 }),
             });
 
@@ -892,6 +890,20 @@ define([
             this._setMapExtent();
 
             this._mapDeferred.resolve();
+        },
+
+        _setExtentConst: function () {
+            if (!this.config.extent_const.includes(null)) {
+                this.map.olMap.setView(
+                    new ol.View({
+                        minZoom: 3,
+                        constrainResolution: true,
+                        extent: this._extent_const,
+                    })
+                )
+                this._setMapExtent();
+                this._mapDeferred.resolve();
+            }
         },
 
         _mapAddControls: function (controls) {
@@ -1156,6 +1168,9 @@ define([
 
                     if (widget[value]) {
                         widget.activatePanel(widget[value]);
+                        if (widget[value] !== "printMapPanel" && widget.map.position) {
+                            widget.map.olMap.getView().setZoom(widget.map.position.zoom)
+                        }
                     }
 
                     widget.activeLeftPanel = value;

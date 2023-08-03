@@ -203,38 +203,38 @@ export const GeomLoading = ({ display }) => {
         </Button>
     );
 
-    const displayFeatureInfo = function (pixel) {
-        const features = [];
-        map.forEachFeatureAtPixel(pixel, function (feature) {
-            features.push(feature);
-        },
-        {hitTolerance: 10});
-        if (features.length > 0) {
-            const info = [];
-            let i, ii;
-            for (i = 0, ii = features.length; i < ii; ++i) {
-                const description =
-                    features[i].get('description') ||
-                    features[i].get('name') ||
-                    features[i].get('_name') ||
-                    features[i].get('layer');
-                if (description) {
-                    info.push(description);
-                }
-            }
-            document.getElementById('info').innerHTML = info.join('<br/>') || '&nbsp';
-        } else {
-            document.getElementById('info').innerHTML = '&nbsp;';
-        }
-    };
+    // const displayFeatureInfo = function (pixel) {
+    //     const features = [];
+    //     map.forEachFeatureAtPixel(pixel, function (feature) {
+    //         features.push(feature);
+    //     },
+    //     {hitTolerance: 10});
+    //     if (features.length > 0) {
+    //         const info = [];
+    //         let i, ii;
+    //         for (i = 0, ii = features.length; i < ii; ++i) {
+    //             const description =
+    //                 features[i].get('description') ||
+    //                 features[i].get('name') ||
+    //                 features[i].get('_name') ||
+    //                 features[i].get('layer');
+    //             if (description) {
+    //                 info.push(description);
+    //             }
+    //         }
+    //         document.getElementById('info').innerHTML = info.join('<br/>') || '&nbsp';
+    //     } else {
+    //         document.getElementById('info').innerHTML = '&nbsp;';
+    //     }
+    // };
 
-    map.on('pointermove', function (evt) {
-        if (evt.dragging) {
-            return;
-        }
-        const pixel = map.getEventPixel(evt.originalEvent);
-        displayFeatureInfo(pixel);
-    });
+    // map.on('pointermove', function (evt) {
+    //     if (evt.dragging) {
+    //         return;
+    //     }
+    //     const pixel = map.getEventPixel(evt.originalEvent);
+    //     displayFeatureInfo(pixel);
+    // });
 
     return (
         <>
