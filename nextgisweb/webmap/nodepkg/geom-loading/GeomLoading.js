@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
 import { ZoomInOutlined, DeleteOutlined } from '@ant-design/icons';
-import { message, Upload, Button, Row, Col } from "@nextgisweb/gui/antd";
+import { message, Upload, Button, Row, Col, Card } from "@nextgisweb/gui/antd";
 import { useState } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
@@ -9,11 +9,15 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GPX from 'ol/format/GPX';
 import GeoJSON from "ol/format/GeoJSON";
-import { Circle, Fill, Stroke, Style } from 'ol/style';
+import { Circle, Fill, Stroke, Style, Text } from 'ol/style';
 
 const validTypeMesssage = i18n.gettext("This file type is not supported");
 const validVolumeMessage = i18n.gettext("Exceeding the volume of 16mb");
 const areaUpload = i18n.gettext("Click or drag file to this area to upload");
+const allDeleteItems = i18n.gettext("Delete all layers");
+const customLayers = i18n.gettext("Custom Layers");
+const ZoomtoLayer = i18n.gettext("Zoom to Layer");
+const DeleteLayer = i18n.gettext("Delete Layer");
 
 const { Dragger } = Upload;
 const getBase64 = (file, callback) => {
@@ -25,8 +29,8 @@ const getBase64 = (file, callback) => {
 const getDefaultStyle = () => {
     var dataStyle = new Style({
         stroke: new Stroke({
-            width: 2,
-            color: 'rgba(239,41,41,1)'
+            width: 1.66,
+            color: '#FF8B00'
         }),
         image: new Circle({
             anchor: [0.5, 46],
@@ -36,15 +40,34 @@ const getDefaultStyle = () => {
                 width: 1,
                 color: 'rgba(0,0,0,0.8)'
             }),
-            radius: 5,
+            radius: 4,
             fill: new Stroke({
                 width: 1,
-                color: 'rgba(0,0,160,0.25)'
+                color: 'rgba(16,106,144,0.5)'
             }),
         }),
         fill: new Fill({
             color: 'rgba(0, 0, 255, 0.5)',
         }),
+        text: new Text({
+            textAlign: 'center',
+            textBaseline: "bottom",
+            font: '12px Calibri,sans-serif',
+
+            fill: new Fill({
+                color: '#000'
+            }),
+            stroke: new Stroke({
+                color: '#fff',
+                width: 2
+            }),
+            offsetY: -10,
+            offsetX: 15,
+            placement: "point",
+            maxAngle: 0,
+            overflow: true,
+            rotation: 0,
+        })
     });
 
     return dataStyle;
@@ -115,7 +138,6 @@ export const GeomLoading = ({ display }) => {
             }
             return isValidType && isLimitVolume && file.type;
         },
-
         // maxCount: 10,
         showUploadList: false,
         listType: "text",
@@ -145,26 +167,58 @@ export const GeomLoading = ({ display }) => {
         }
     }
 
+
     const LayerList = ({ list, onRemove, zoomToLayer }) => (
         list.map(item => {
             return (
                 <Row className wrap={false} key={item.uid}>
                     <Col className="layer-item-title" title={item.name}>{item.name}</Col>
                     <Col className="custom-button">
-                        <ZoomInOutlined className="icon-symbol" onClick={() => zoomToLayer(item.uid)} />
-                        <DeleteOutlined className="icon-symbol" onClick={() => onRemove(item.uid)} />
+                        <ZoomInOutlined title={ZoomtoLayer} className="icon-symbol" onClick={() => zoomToLayer(item.uid)} />
+                        <DeleteOutlined title={DeleteLayer} className="icon-symbol" onClick={() => onRemove(item.uid)} />
                     </Col>
                 </Row>
             )
         })
     );
 
+    const removeItems = (items) => {
+        let nameLayer = items.map(e => e.uid)
+        map.getLayers().getArray().slice(0).forEach(function (layer) {
+            if (nameLayer.includes(layer.get('name'))) {
+                map.removeLayer(layer);
+            }
+        });
+        map.getView().fit(display._defaultExtent());
+        setFileList([]);
+    }
+
+    const DeleteItems = ({ list, onRemove }) => (
+        <Button type="primary" ghost={true} shape="round" icon={<DeleteOutlined />} size="small" onClick={() => onRemove(list)}>
+            {allDeleteItems}
+        </Button>
+    );
+
     return (
         <>
-            <Dragger {...props} fileList={fileList}>
-                <span className="">{areaUpload}</span>
-            </Dragger>
-            <LayerList list={fileList} onRemove={removeItem} zoomToLayer={zoomToLayer} />
+            <Dragger {...props} fileList={fileList}>{areaUpload}</Dragger>
+            {
+                fileList.length > 0 &&
+                <>
+                    <Card
+                        size="small"
+                        title={customLayers}
+                        extra={<Row>
+                            <Col>
+                                <DeleteItems list={fileList} onRemove={removeItems} />
+                            </Col>
+                        </Row>}
+                    >
+                        <LayerList list={fileList} onRemove={removeItem} zoomToLayer={zoomToLayer} />
+                    </Card>
+
+                </>
+            }
         </>
     );
 };
