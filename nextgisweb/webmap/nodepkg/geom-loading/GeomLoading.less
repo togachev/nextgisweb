@@ -1,5 +1,8 @@
 .ant-upload.ant-upload-drag {
-    height: 60px;
+    min-height: 40px;
+    display: flex;
+    height: fit-content;
+    align-items: center;
 }
 
 .ant-upload.ant-upload-drag p.ant-upload-drag-icon .anticon {
@@ -29,4 +32,39 @@
 
 .ant-upload.ant-upload-drag .ant-upload {
     padding: 0;
+}
+
+.layer-item-title {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ant-row, .ant-row:after, .ant-row:before {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px;
+}
+
+.custom-button {
+    display: flex;
+    .icon-symbol {
+        font-size: 18px;
+        color: #106a90;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        justify-items: center;
+        justify-content: center;
+        align-items: center;
+        flex: 0 0 auto;
+
+        &:hover {
+            background: #ececec;
+            border-radius: 3px;
+            color: #000000;
+        }
+    }    
 }

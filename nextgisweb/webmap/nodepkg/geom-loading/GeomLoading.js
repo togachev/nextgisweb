@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
-import { InboxOutlined } from '@ant-design/icons';
-import { message, Upload, List } from "@nextgisweb/gui/antd";
+import { ZoomInOutlined, DeleteOutlined } from '@ant-design/icons';
+import { message, Upload, Button, Row, Col } from "@nextgisweb/gui/antd";
 import { useState } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
@@ -74,10 +74,10 @@ export const GeomLoading = ({ display }) => {
     const olLayerMap = (url, info) => {
         switch (info.file.type) {
             case 'application/gpx+xml':
-                addLayerMap({info: info, url: url, format: new GPX()})
+                addLayerMap({ info: info, url: url, format: new GPX() })
                 break;
             case 'application/geo+json':
-                addLayerMap({info: info, url: url, format: new GeoJSON()})
+                addLayerMap({ info: info, url: url, format: new GeoJSON() })
                 break;
             default:
                 return;
@@ -87,7 +87,7 @@ export const GeomLoading = ({ display }) => {
     const props = {
         onChange: (info) => {
             let newFileList = [...info.fileList];
-    
+
             newFileList = newFileList.map((file) => {
 
                 if (file.response) {
@@ -102,22 +102,6 @@ export const GeomLoading = ({ display }) => {
                     olLayerMap(url, info)
                 });
             }
-
-            if (info.file.status === 'removed') {
-                var layers = [];
-                map.getLayers().forEach((layer) => {
-                    if (layer.get('name') != undefined && layer.get('name') === info.file.uid) {
-                        layers.push(layer);
-                    }
-                });
-                var len = layers.length;
-                for (var i = 0; i < len; i++) {
-                    map.removeLayer(layers[i]);
-                }
-                fileList.splice(fileList.findIndex(a => a.uid === info.file.uid), 1)
-                return;
-            }
-
         },
         multiple: true,
         beforeUpload: (file) => {
@@ -131,42 +115,57 @@ export const GeomLoading = ({ display }) => {
             }
             return isValidType && isLimitVolume && file.type;
         },
-        onPreview: (file) => {
-            map.getLayers().forEach((layer) => {
-                if (layer.get('name') === file.uid) {
-                    let extent = layer.getSource().getExtent();
-                    map.getView().fit(extent, map.getSize());
-                }
-            })
-        },
+
         // maxCount: 10,
-        showUploadList: true,
+        showUploadList: false,
         listType: "text",
         name: "file"
     };
 
-    const ListLayerName = (props) => (
-        <List
-            itemLayout="horizontal"
-            dataSource={props.list}
-            renderItem={(item) => (
-                <List.Item>
-                    <List.Item.Meta
-                        title={item.name}
-                        description={item.uid}
-                    />
-                </List.Item>
-            )}
-        />
-    )
+    const zoomToLayer = (uid) => {
+        map.getLayers().forEach((layer) => {
+            if (layer.get('name') === uid) {
+                let extent = layer.getSource().getExtent();
+                map.getView().fit(extent, map.getSize());
+            }
+        })
+    }
+
+    const removeItem = (uid) => {
+        setFileList(fileList.filter((item) => item.uid !== uid));
+        var layers = [];
+        map.getLayers().forEach((layer) => {
+            if (layer.get('name') != undefined && layer.get('name') === uid) {
+                layers.push(layer);
+            }
+        });
+        var len = layers.length;
+        for (var i = 0; i < len; i++) {
+            map.removeLayer(layers[i]);
+        }
+    }
+
+    const LayerList = ({ list, onRemove, zoomToLayer }) => (
+        list.map(item => {
+            return (
+                <Row className wrap={false} key={item.uid}>
+                    <Col className="layer-item-title" title={item.name}>{item.name}</Col>
+                    <Col className="custom-button">
+                        <ZoomInOutlined className="icon-symbol" onClick={() => zoomToLayer(item.uid)} />
+                        <DeleteOutlined className="icon-symbol" onClick={() => onRemove(item.uid)} />
+                    </Col>
+                </Row>
+            )
+        })
+    );
 
     return (
-        <Dragger {...props} fileList={fileList}>
-            <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">{areaUpload}</p>
-        </Dragger>
+        <>
+            <Dragger {...props} fileList={fileList}>
+                <span className="">{areaUpload}</span>
+            </Dragger>
+            <LayerList list={fileList} onRemove={removeItem} zoomToLayer={zoomToLayer} />
+        </>
     );
 };
 
