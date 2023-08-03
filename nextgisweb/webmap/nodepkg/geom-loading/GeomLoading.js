@@ -207,7 +207,8 @@ export const GeomLoading = ({ display }) => {
         const features = [];
         map.forEachFeatureAtPixel(pixel, function (feature) {
             features.push(feature);
-        });
+        },
+        {hitTolerance: 10});
         if (features.length > 0) {
             const info = [];
             let i, ii;
