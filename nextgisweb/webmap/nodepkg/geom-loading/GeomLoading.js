@@ -88,6 +88,7 @@ export const GeomLoading = ({ display }) => {
         })
         customLayer.set("name", props.info.file.uid);
         map.addLayer(customLayer);
+        props.info.fileList.length <= 1 &&
         customSource.once('change', function (e) {
             if (customSource.getState() === 'ready') {
                 map.getView().fit(customSource.getExtent(), map.getSize());
@@ -111,9 +112,7 @@ export const GeomLoading = ({ display }) => {
     const props = {
         onChange: (info) => {
             let newFileList = [...info.fileList];
-
             newFileList = newFileList.map((file) => {
-
                 if (file.response) {
                     file.url = file.response.url;
                 }
@@ -123,7 +122,7 @@ export const GeomLoading = ({ display }) => {
 
             if (info.file.status === 'done') {
                 getBase64(info.file.originFileObj, (url) => {
-                    olLayerMap(url, info)
+                    olLayerMap(url, info);
                 });
             }
         },
@@ -166,8 +165,8 @@ export const GeomLoading = ({ display }) => {
         for (var i = 0; i < len; i++) {
             map.removeLayer(layers[i]);
         }
+        map.getView().fit(display._defaultExtent());
     }
-
 
     const LayerList = ({ list, onRemove, zoomToLayer }) => (
         list.map(item => {
@@ -210,7 +209,7 @@ export const GeomLoading = ({ display }) => {
                     <Card
                         size="small"
                         title={customLayers}
-                        extra={<Row>
+                        extra={fileList.length > 1 && <Row>
                             <Col>
                                 <DeleteItems list={fileList} onRemove={removeItems} />
                             </Col>
