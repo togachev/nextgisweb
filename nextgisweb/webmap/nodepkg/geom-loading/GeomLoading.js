@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
 import { ZoomInOutlined, DeleteOutlined } from '@ant-design/icons';
-import { message, Upload, Button, Row, Col, Card } from "@nextgisweb/gui/antd";
+import { message, Upload, Button, Row, Col, Card, Empty } from "@nextgisweb/gui/antd";
 import { useState } from 'react';
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./GeomLoading.less";
@@ -18,6 +18,7 @@ const allDeleteItems = i18n.gettext("Delete all layers");
 const customLayers = i18n.gettext("Custom Layers");
 const ZoomtoLayer = i18n.gettext("Zoom to Layer");
 const DeleteLayer = i18n.gettext("Delete Layer");
+const supportLayer = i18n.gettext("Supported layers for import: GPX, GeoJSON");
 
 const { Dragger } = Upload;
 const getBase64 = (file, callback) => {
@@ -171,7 +172,7 @@ export const GeomLoading = ({ display }) => {
     const LayerList = ({ list, onRemove, zoomToLayer }) => (
         list.map(item => {
             return (
-                <Row className wrap={false} key={item.uid}>
+                <Row wrap={false} key={item.uid}>
                     <Col className="layer-item-title" title={item.name}>{item.name}</Col>
                     <Col className="custom-button">
                         <ZoomInOutlined title={ZoomtoLayer} className="icon-symbol" onClick={() => zoomToLayer(item.uid)} />
@@ -194,17 +195,18 @@ export const GeomLoading = ({ display }) => {
     }
 
     const DeleteItems = ({ list, onRemove }) => (
-        <Button type="primary" ghost={true} shape="round" icon={<DeleteOutlined />} size="small" onClick={() => onRemove(list)}>
+        <Button type="primary" ghost={true} icon={<DeleteOutlined />} size="small" onClick={() => onRemove(list)} block>
             {allDeleteItems}
         </Button>
     );
 
     return (
         <>
-            <Dragger {...props} fileList={fileList}>{areaUpload}</Dragger>
+            <Dragger {...props} fileList={fileList}>
+                {areaUpload}
+            </Dragger>
             {
-                fileList.length > 0 &&
-                <>
+                fileList.length > 0 ?
                     <Card
                         size="small"
                         title={customLayers}
@@ -215,9 +217,7 @@ export const GeomLoading = ({ display }) => {
                         </Row>}
                     >
                         <LayerList list={fileList} onRemove={removeItem} zoomToLayer={zoomToLayer} />
-                    </Card>
-
-                </>
+                    </Card> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
             }
         </>
     );
