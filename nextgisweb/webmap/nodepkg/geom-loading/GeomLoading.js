@@ -8,6 +8,7 @@ import "./GeomLoading.less";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GPX from 'ol/format/GPX';
+import KML from 'ol/format/KML';
 import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style, Text } from 'ol/style';
 
@@ -18,7 +19,7 @@ const allDeleteItems = i18n.gettext("Delete all layers");
 const customLayers = i18n.gettext("Custom Layers");
 const ZoomtoLayer = i18n.gettext("Zoom to Layer");
 const DeleteLayer = i18n.gettext("Delete Layer");
-const supportLayer = i18n.gettext("Supported layers for import: GPX, GeoJSON");
+const supportLayer = i18n.gettext("Supported layers for import: GPX, GeoJSON, KML");
 
 const { Dragger } = Upload;
 const getBase64 = (file, callback) => {
@@ -89,11 +90,11 @@ export const GeomLoading = ({ display }) => {
         customLayer.set("name", props.info.file.uid);
         map.addLayer(customLayer);
         props.info.fileList.length <= 1 &&
-        customSource.once('change', function (e) {
-            if (customSource.getState() === 'ready') {
-                map.getView().fit(customSource.getExtent(), map.getSize());
-            }
-        });
+            customSource.once('change', function (e) {
+                if (customSource.getState() === 'ready') {
+                    map.getView().fit(customSource.getExtent(), map.getSize());
+                }
+            });
     }
 
     const olLayerMap = (url, info) => {
@@ -103,6 +104,9 @@ export const GeomLoading = ({ display }) => {
                 break;
             case 'application/geo+json':
                 addLayerMap({ info: info, url: url, format: new GeoJSON() })
+                break;
+            case 'application/vnd.google-earth.kml+xml':
+                addLayerMap({ info: info, url: url, format: new KML() })
                 break;
             default:
                 return;
@@ -128,7 +132,7 @@ export const GeomLoading = ({ display }) => {
         },
         multiple: true,
         beforeUpload: (file) => {
-            const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json';
+            const isValidType = file.type === 'application/gpx+xml' || file.type === 'application/geo+json' || file.type === 'application/vnd.google-earth.kml+xml';
             if (!isValidType) {
                 message.error(validTypeMesssage);
             }
@@ -199,6 +203,38 @@ export const GeomLoading = ({ display }) => {
         </Button>
     );
 
+    const displayFeatureInfo = function (pixel) {
+        const features = [];
+        map.forEachFeatureAtPixel(pixel, function (feature) {
+            features.push(feature);
+        });
+        if (features.length > 0) {
+            const info = [];
+            let i, ii;
+            for (i = 0, ii = features.length; i < ii; ++i) {
+                const description =
+                    features[i].get('description') ||
+                    features[i].get('name') ||
+                    features[i].get('_name') ||
+                    features[i].get('layer');
+                if (description) {
+                    info.push(description);
+                }
+            }
+            document.getElementById('info').innerHTML = info.join('<br/>') || '&nbsp';
+        } else {
+            document.getElementById('info').innerHTML = '&nbsp;';
+        }
+    };
+
+    map.on('pointermove', function (evt) {
+        if (evt.dragging) {
+            return;
+        }
+        const pixel = map.getEventPixel(evt.originalEvent);
+        displayFeatureInfo(pixel);
+    });
+
     return (
         <>
             <Dragger {...props} fileList={fileList}>
@@ -218,6 +254,7 @@ export const GeomLoading = ({ display }) => {
                         <LayerList list={fileList} onRemove={removeItem} zoomToLayer={zoomToLayer} />
                     </Card> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
             }
+            <div id="info">&nbsp;</div>
         </>
     );
 };
