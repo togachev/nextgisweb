@@ -847,13 +847,21 @@ define([
             this._mapDeferred.resolve();
         },
 
+        _extConst: function () {
+            if (this.config.extent.toString() === [-180, -82, 180, 82].toString()) {
+                return this._extent_const
+            } else {
+                return this._intersectExtent()
+            }
+        },
+
         _setExtentConst: function () {
             if (!this.config.extent_const.includes(null)) {
                 this.map.olMap.setView(
                     new ol.View({
                         minZoom: 3,
                         constrainResolution: true,
-                        extent: this._extent_const,
+                        extent: this._extConst(),
                     })
                 )
                 this._setMapExtent();
@@ -1300,6 +1308,19 @@ define([
             return true;
         },
 
+        _intersectExtent: function () {
+            if (ol.extent.intersects(this.config.extent,this.config.extent_const)) {
+                var extent = ol.proj.transformExtent(
+                    ol.extent.getIntersection(this.config.extent,this.config.extent_const),
+                    this.lonlatProjection,
+                    this.displayProjection
+                );
+                return extent;
+            } else {
+                return this._extent_const
+            }
+        },
+
         _defaultExtent: function () {
             if (this.config.extent_const.includes(null)) {
                 return this._extent
@@ -1307,7 +1328,7 @@ define([
                 if (this.config.extent.toString() === [-180, -82, 180, 82].toString()) {
                     return this._extent_const
                 } else {
-                    return this._extent
+                    return this._intersectExtent()
                 }
             }
         },
