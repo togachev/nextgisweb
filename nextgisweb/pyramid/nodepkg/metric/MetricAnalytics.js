@@ -1,5 +1,5 @@
 import i18n from "@nextgisweb/pyramid/i18n";
-import { Input, Checkbox, Divider, Col, Row, message, Tabs } from "@nextgisweb/gui/antd";
+import { Select, Input, Checkbox, Divider, Col, Row, message } from "@nextgisweb/gui/antd";
 import { useEffect, useState } from "react";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
@@ -8,112 +8,63 @@ import { route } from "@nextgisweb/pyramid/api";
 
 import "./MetricAnalytics.less";
 
-const inputIdtext = i18n.gettext("Enter ID");
+const inputIdtext = i18n.gettext("Counter");
 const yaLabel = i18n.gettext("Yandex.Metrica");
 const glLabel = i18n.gettext("Google Analytics");
+const select_a_counter = i18n.gettext("Select a counter");
 
 
 const saveSuccesText = i18n.gettext("The setting is saved.");
-const saveSuccesReloadText = i18n.gettext("Reload the page to get them applied.");
+const saveSuccesReloadText = i18n.gettext(
+    "Reload the page to get them applied."
+);
 
 const CheckboxGroup = Checkbox.Group;
 
 const params = {
-    ya: {
-        metric: yaLabel,
-        tag: [
-            'clickmap',
-            'trackLinks',
-            'accurateTrackBounce',
-            'webvisor'
-        ]
-    },
-    gl: {
-        metric: glLabel,
-        tag: [
-            // 'tag_gl_1', // Add your tags
-            // 'tag_gl_2'
-        ]
-    }
+    ya: ['webvisor'],
+    gl: []
 };
-
 const MetricId = (props) => {
     const { onChange } = props;
     const handleChange = (e) => {
         const { value: inputValue } = e.target;
         onChange(inputValue);
     };
+
     return (
         <Input
-            {...props}
-            onChange={handleChange}
-            placeholder={inputIdtext}
-            maxLength={50}
+          {...props}
+          onChange={handleChange}
+          placeholder={inputIdtext}
+          maxLength={50}
         />
     );
-};
-
-const MetricCheckbox = (props) => {
-    const { indeterminate, onChange, checked } = props;
-    return (
-        <Row>
-            <Col flex="auto">
-                <Checkbox indeterminate={indeterminate}
-                    onChange={onChange} checked={checked}>
-                    {i18n.gettext("Check all")}
-                </Checkbox>
-            </Col>
-        </Row>
-    );
-};
-
-const MetricCheckboxGroup = (props) => {
-    const { options, value, onChange } = props;
-    const obj = []
-    options.forEach((element) => {
-        obj.push({label: i18n.gettext(element), value: element});
-    });
-    return (
-        <Row>
-            <Col flex="auto">
-                <CheckboxGroup options={obj}
-                    value={value} onChange={onChange} />
-            </Col>
-        </Row>
-    );
-};
+  };
 
 export function MetricAnalytics() {
 
-    const [metricId, setMetricId] = useState();
+    const [checkedList, setCheckedList] = useState([]);
+
+    const [opMetric, setOpMetric] = useState();
+    const [metricId, setMetricId] = useState(null);
     const [valueMetric, setValueMetric] = useState([]);
     const [status, setStatus] = useState("loading");
+
     const [metricName, setMetricName] = useState('metric_ya');
-
-    const [checkedList, setCheckedList] = useState();
-    const [indeterminate, setIndeterminate] = useState(true);
-    const [checkAll, setCheckAll] = useState(false);
-
-    const [opMetric, setOpMetric] = useState('ya');
-
-    const model = 'pyramid.' + metricName
-    const { data } = useRouteGet({ name: model });
-
-    useEffect(() => {
-        if (data !== undefined && data[metricName] !== null) {
-            const val = metricName ? data[metricName] : data;
-            setMetricId(val.id);
-            setCheckedList(val.tags);
-            setStatus(null);
-        }
-    }, [data]);
 
     const onChange = (value) => {
         setOpMetric(value);
-        setCheckedList([])
         setMetricId(null)
         setMetricName('metric_' + value);
     };
+
+    const onChangeCheckbox = (list) => {
+        setCheckedList(list);
+    };
+
+    const model = 'pyramid.' + metricName
+    const { data } = useRouteGet({ name: model });
 
     useEffect(() => {
         const obj = { id: metricId }
@@ -122,7 +73,16 @@ export function MetricAnalytics() {
         setValueMetric(Object.assign(obj, { tags: tagList }));
         setStatus(null);
     }, [metricId, metricName, checkedList]);
-
+    
+    useEffect(() => {
+        if (data !== undefined && data[metricName] !== null) {
+            const val = metricName ? data[metricName] : data;
+            setMetricId(val.id);
+            setCheckedList(val.tags);
+            setStatus(null);
+        }
+    }, [data]);
+    
     const save = async () => {
         setStatus("saving");
         try {
@@ -150,57 +110,48 @@ export function MetricAnalytics() {
         return <LoadingWrapper rows={1} />;
     }
 
-    const onChangeCheckbox = (list) => {
-        setCheckedList(list);
-        setIndeterminate(!!list.length && list.length < params[opMetric].tag.length);
-        setCheckAll(list.length === params[opMetric].tag.length);
-    };
-    const onCheckAllChange = (e) => {
-        setCheckedList(e.target.checked ? params[opMetric].tag : []);
-        setIndeterminate(false);
-        setCheckAll(e.target.checked);
-    };
-
-    const items = []
-    Object.entries(params).forEach(([key, value]) => {
-        const item = {
-            label: value.metric,
-            key: key,
-            children: (
-                <>
-                    <MetricId value={metricId} onChange={setMetricId} />
-                    {
-                        params[opMetric].tag.length > 0 ?
-                            <>
-                                <Divider />
-                                <MetricCheckbox
-                                    indeterminate={indeterminate}
-                                    onChange={onCheckAllChange}
-                                    checked={checkAll}
-                                />
-                                <MetricCheckboxGroup
-                                    options={params[opMetric].tag}
-                                    value={checkedList}
-                                    onChange={onChangeCheckbox}
-                                />
-                            </>
-                            : <></>
-                    }
-                    <Divider />
-                    <SaveButton loading={status === "saving"} onClick={save} />
-                </>
-            ),
-        }
-        items.push(item);
-    });
-
     return (
         <>
-            <Tabs
-                defaultActiveKey="ya"
+            <Select
+                placeholder={select_a_counter}
                 onChange={onChange}
-                items={items}
+                style={{
+                    width: '100%',
+                }}
+                options={[
+                    {
+                        value: 'ya',
+                        label: yaLabel,
+                    },
+                    {
+                        value: 'gl',
+                        label: glLabel,
+                    }
+                ]}
             />
+
+            {
+                opMetric ?
+                    (<>
+                        <Divider />
+                        {
+                            opMetric == 'ya' ?
+                                (<>
+                                    <MetricId value={metricId} onChange={setMetricId}/>
+                                    <Row>
+                                        <Col flex="auto">
+                                            <CheckboxGroup options={params[opMetric]} value={checkedList} onChange={onChangeCheckbox} />
+                                        </Col>
+                                    </Row>
+                                </>) :
+                                <MetricId value={metricId} onChange={setMetricId}/>
+                        }
+                        <Divider />
+                        <Col flex="none">
+                            <SaveButton loading={status === "saving"} onClick={save} />
+                        </Col>
+                    </>) : <></>
+            }
         </>
     );
 }

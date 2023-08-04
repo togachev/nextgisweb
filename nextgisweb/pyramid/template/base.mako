@@ -22,22 +22,11 @@
 
     system_name = request.env.core.system_full_name()
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
-    
-    metric_ya = request.env.core.settings_get('pyramid', 'metric_ya')
-    yaId = metric_ya['id']
-    metric_gl = request.env.core.settings_get('pyramid', 'metric_gl')
-    glId = metric_gl['id']
 %>
 <html>
 <head>
 
-    %if not (yaId is None) and not (yaId == ''):
-        <%include file="nextgisweb:pyramid/template/metric_ya.mako"/>
-    %endif
-
-    %if not (glId is None) and not (glId == ''):
-        <%include file="nextgisweb:pyramid/template/metric_gl.mako"/>
-    %endif
+    <%include file="nextgisweb:pyramid/template/metric.mako"/>
 
     <title>${head_title}</title>
     <meta charset="utf-8">
