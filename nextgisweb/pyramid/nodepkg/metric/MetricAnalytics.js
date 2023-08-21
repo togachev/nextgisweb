@@ -17,8 +17,8 @@ const descEmpty = i18n.gettext("Add one or more counters to your page");
 import { MetricForm } from "./metric-form";
 
 const params = [
-    { metric: 'metric_ya', key: 'ya', label: yaLabel, tags: ['webvisor'] },
-    { metric: 'metric_gl', key: 'gl', label: glLabel, tags: [] },
+    { key: 'ya', label: yaLabel, tags: ['webvisor'] },
+    { key: 'gl', label: glLabel, tags: [] },
 ];
 
 export const MetricAnalytics = () => {
