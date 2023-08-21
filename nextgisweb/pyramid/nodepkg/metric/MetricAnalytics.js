@@ -1,7 +1,7 @@
 import "./MetricAnalytics.less";
 import { Dropdown, Button, Tabs, Empty } from '@nextgisweb/gui/antd';
-import React, { useState, useEffect } from 'react';
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { useEffect, useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
 import i18n from "@nextgisweb/pyramid/i18n";
@@ -17,14 +17,15 @@ const descEmpty = i18n.gettext("Add one or more counters to your page");
 import { MetricForm } from "./metric-form";
 
 const params = [
-    { key: 'ya', label: yaLabel, tags: ['webvisor'] },
-    { key: 'gl', label: glLabel, tags: [] },
+    { metric: 'metric_ya', key: 'ya', label: yaLabel, tags: ['webvisor'] },
+    { metric: 'metric_gl', key: 'gl', label: glLabel, tags: [] },
 ];
 
 export const MetricAnalytics = () => {
     const [activeKey, setActiveKey] = useState();
     const [itemsTabs, setItemsTabs] = useState([]);
-    
+    const [value, setValue] = useState([]);
+
     const model = 'pyramid.metric';
     const metric = 'metric_';
 
@@ -38,6 +39,29 @@ export const MetricAnalytics = () => {
             checkboxProps={{ tags: tags }}
         />
     )
+
+    params.map(item => {
+        const { data } = useRouteGet({ name: model }, { key: item.key });
+        if (data && data[Object.keys(data)]) {
+            const tab = value.find(e => {
+                return e.key === item.key ? true : false
+            });
+            if (!tab) {
+                setValue([
+                    ...value,
+                    {
+                        label: item.label,
+                        key: item.key,
+                        children: <ContentTab tags={item.tags} keyMetric={item.key} />
+                    },
+                ]);
+            }
+        }
+    })
+
+    useEffect(() => {
+        setItemsTabs(value);
+    }, [value])
 
     const propsMenu = {
         items: params,
