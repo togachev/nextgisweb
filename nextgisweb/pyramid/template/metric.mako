@@ -1,26 +1,24 @@
 <%
+    counterYa = ""
+    tagsYa = ""
+    counterGl = ""
+
     try:
         metric_ya=request.env.core.settings_get('pyramid', 'metric_ya' )
+        if "counterId" in metric_ya:
+            counterYa = metric_ya['counterId']
+        if "tags" in metric_ya:
+            tagsYa = metric_ya['tags']
     except KeyError:
         metric_ya=""
     
     try:
         metric_gl=request.env.core.settings_get('pyramid', 'metric_gl' )
+        if "counterId" in metric_gl:
+            counterGl = metric_gl['counterId']
     except KeyError:
         metric_gl=""
-
-    counterYa = ""
-    tagsYa = ""
-    if "id" in metric_ya:
-        counterYa = metric_ya['id']
-    if "tags" in metric_ya:
-        tagsYa = metric_ya['tags']
-
-    counterGl = ""
-    if "id" in metric_gl:
-        counterGl = metric_gl['id']
 %>
-
 
 %if not (counterYa is None) and not (counterYa == ''):
     <script type="text/javascript">
@@ -30,19 +28,16 @@
             for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
             k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
         })
-            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
         const tags = ${ json_js(tagsYa)}
-        
         const obj = {
             clickmap: true,
             trackLinks: true,
             accurateTrackBounce: true,
         }
-
-        tags?.map(item => {
-            obj[item] = true
-        })
-
+        if (tags) {
+            tags.map(item => {obj[item] = true})
+        }
         ym(${ counterYa }, "init", obj);
     </script>
     <noscript>
