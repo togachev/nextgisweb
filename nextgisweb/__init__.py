@@ -50,6 +50,7 @@ def pkginfo():
         'audit',
         'tileset',
         'basemap',
+        'nogeom'
     )
 
     return dict(components={comp: dict(

@@ -128,7 +128,8 @@ class MVTLink(ExternalAccessLink):
 
     @classmethod
     def is_applicable(cls, obj, request) -> bool:
-        return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
+        if obj.cls != 'nogeom_layer':
+            return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
 
     @classmethod
     def url_factory(cls, obj, request) -> str:
@@ -194,12 +195,13 @@ def setup_pyramid(comp, config):
                             important=True, icon='mdi-table-large')
 
                 if args.obj.has_export_permission(args.request.user):
-                    yield dm.Link(
-                        'feature_layer/export', _("Save as"),
-                        lambda args: args.request.route_url(
-                            "resource.export.page",
-                            id=args.obj.id),
-                        icon='material-save_alt')
+                    if args.obj.cls != 'nogeom_layer':
+                        yield dm.Link(
+                            'feature_layer/export', _("Save as"),
+                            lambda args: args.request.route_url(
+                                "resource.export.page",
+                                id=args.obj.id),
+                            icon='material-save_alt')
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

@@ -58,11 +58,12 @@ def setup_pyramid(comp, config):
             ) and (
                 args.obj.has_permission(DataScope.read, args.request.user)
             ):
-                yield Link(
-                    "extra/preview", _("Preview"),
-                    lambda args: args.request.route_url(
-                        "layer_preview.map", id=args.obj.id
-                    ),
-                    important=True, icon='material-preview')
+                if args.obj.cls != 'nogeom_layer':
+                    yield Link(
+                        "extra/preview", _("Preview"),
+                        lambda args: args.request.route_url(
+                            "layer_preview.map", id=args.obj.id
+                        ),
+                        important=True, icon='material-preview')
 
     Resource.__dynmenu__.add(LayerMenuExt())

@@ -11,7 +11,7 @@ from nextgisweb.lib import db
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
-from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid import JSONType, viewargs
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
@@ -454,6 +454,131 @@ def resource_export_put(request) -> JSONType:
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
+@viewargs(renderer='json')
+def getWebmapGroup(request):
+    request.require_administrator()
+
+    query = DBSession.query(ResourceWebMapGroup)
+
+    result = list()
+    for resource_wmg in query:
+        result.append(dict(id=resource_wmg.id, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map))
+                    
+    return result
+
+@viewargs(renderer='json')
+def wmgroup_delete(request):
+    request.require_administrator()
+    wmg_id = int(request.matchdict['id'])
+    def delete(wmg_id):
+        try:
+            query = ResourceWebMapGroup.filter_by(id=wmg_id).one()
+            DBSession.delete(query)
+            DBSession.flush()
+            
+        except IntegrityError as exc:
+            raise ExternalDatabaseError(message="ОШИБКА:  UPDATE или DELETE в таблице 'resource_wmg' нарушает ограничение внешнего ключа 'webmap_group_id_fkey' таблицы 'resource' DETAIL:  На ключ (id)=(%s) всё ещё есть ссылки в таблице 'resource'." % wmg_id, sa_error=exc)
+
+    if wmg_id == 0:
+        raise ResourceError(_("Root resource could not be deleted."))
+
+    with DBSession.no_autoflush:
+        delete(wmg_id)
+    
+    return dict(id=wmg_id)
+
+@viewargs(renderer='json')
+def wmgroup_update(request):
+    request.require_administrator()
+    wmg_id = int(request.matchdict['id'])
+    wmg_value = str(request.matchdict['wmg']).strip()
+    action_map_value = request.matchdict['action']
+    if wmg_value and wmg_value != '':
+        def update(wmg_id, wmg_value, action_map_value):
+            if wmg_id != 0:
+                resource_wmg = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == wmg_id).one()
+                resource_wmg.webmap_group_name = wmg_value
+                resource_wmg.action_map = eval(action_map_value.lower().capitalize())
+            else:
+                raise ResourceError("Имя корневой группы с идентификатором %s изменять запрещено." % wmg_id)
+        with DBSession.no_autoflush:
+            update(wmg_id, wmg_value, action_map_value)
+        DBSession.flush()
+        return dict(webmap_group_name=wmg_value, action_map=action_map_value)
+    else:
+        raise ResourceError("Введено некорректное имя группы")
+
+@viewargs(renderer='json')
+def wmgroup_create(request):
+    request.require_administrator()
+    webmap_group_name = request.json['webmap_group_name'].strip()
+    action_map = request.json['action_map']
+    if webmap_group_name:
+        try:
+            query = ResourceWebMapGroup(webmap_group_name=webmap_group_name, action_map=action_map)
+            DBSession.add(query)   
+            DBSession.flush()
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(message=_("ERROR: duplicate key violates unique constraint."), sa_error=exc)
+
+@viewargs(renderer='json')
+def wmg_item_create(request):
+    request.resource_permission(PERM_UPDATE)
+    resource_id = int(request.matchdict['id'])
+    webmap_group_id = int(request.matchdict['webmap_group_id'])
+
+    try:
+        query = WebMapGroupResource(resource_id=resource_id, webmap_group_id=webmap_group_id)
+        DBSession.add(query)   
+        DBSession.flush()
+    except SQLAlchemyError as exc:
+        raise ExternalDatabaseError(message=_("ERROR: Error not create."), sa_error=exc)
+        
+@viewargs(renderer='json')
+def wmg_item_delete(request):
+    request.resource_permission(PERM_UPDATE)
+    resource_id = int(request.matchdict['id'])
+    webmap_group_id = int(request.matchdict['webmap_group_id'])
+
+    def delete(resource_id, webmap_group_id):
+        try:
+            query = WebMapGroupResource.filter_by(resource_id=resource_id, webmap_group_id=webmap_group_id).one()
+            DBSession.delete(query)
+            DBSession.flush()
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(message=_("ERROR: Error not delete."), sa_error=exc)
+
+    with DBSession.no_autoflush:
+        delete(resource_id, webmap_group_id)
+    
+    return dict(resource_id=resource_id, webmap_group_id=webmap_group_id)
+
+@viewargs(renderer='json')
+def wmg_item_delete_all(request):
+    request.resource_permission(PERM_UPDATE)
+    DBSession.query(WebMapGroupResource).filter_by(resource_id=request.context.id).delete()
+    DBSession.flush()
+    return None
+
+@viewargs(renderer='json')
+def tbl_res(request):
+    clsItems = ['nogeom_layer','postgis_layer', 'vector_layer'];
+    query = DBSession.query(Resource).filter(Resource.cls.in_(clsItems)).all()
+    result = list()
+    for resource in query:
+        if resource.has_permission(PERM_READ, request.user):
+            fields=list()
+            for idx in resource.fields:
+                fields.append({'value':idx.display_name, 'label':idx.display_name})
+            result.append(dict(
+                id=resource.id,
+                name=resource.display_name,
+                column_key=resource.column_key,
+                column_constraint=resource.column_constraint,
+                column_from_const=resource.column_from_const,
+                fields=fields
+            ))
+    return result
 
 def setup_pyramid(comp, config):
 

@@ -590,12 +590,13 @@ def iget(resource, request) -> JSONType:
     )
 
     query = resource.feature_query()
-    if not geom_skip:
-        if srs is not None:
-            query.srs(SRS.filter_by(id=int(srs)).one())
-        query.geom()
-        if srlz_params['geom_format'] == 'wkt':
-            query.geom_format('WKT')
+    if resource.cls != 'nogeom_layer':
+        if not geom_skip:
+            if srs is not None:
+                query.srs(SRS.filter_by(id=int(srs)).one())
+            query.geom()
+            if srlz_params['geom_format'] == 'wkt':
+                query.geom_format('WKT')
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
@@ -682,7 +683,8 @@ def iput(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
 
     query = resource.feature_query()
-    query.geom()
+    if resource.cls != 'nogeom_layer':
+        query.geom()
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
@@ -691,7 +693,8 @@ def iput(resource, request) -> JSONType:
         dt_format=request.GET.get('dt_format', 'obj')
     )
 
-    srs = request.GET.get('srs')
+    if resource.cls != 'nogeom_layer':
+        srs = request.GET.get('srs')
 
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
@@ -811,12 +814,13 @@ def cget(resource, request) -> JSONType:
         srlz_params['keys'] = fields
         query.fields(*fields)
 
-    if not geom_skip:
-        if srs is not None:
-            query.srs(SRS.filter_by(id=int(srs)).one())
-        query.geom()
-        if srlz_params['geom_format'] == 'wkt':
-            query.geom_format('WKT')
+    if resource.cls != 'nogeom_layer':
+        if not geom_skip:
+            if srs is not None:
+                query.srs(SRS.filter_by(id=int(srs)).one())
+            query.geom()
+            if srlz_params['geom_format'] == 'wkt':
+                query.geom_format('WKT')
 
     result = [
         serialize(feature, **srlz_params)
@@ -833,8 +837,8 @@ def cpost(resource, request) -> JSONType:
         geom_format=request.GET.get('geom_format', 'wkt').lower(),
         dt_format=request.GET.get('dt_format', 'obj')
     )
-
-    srs = request.GET.get('srs')
+    if resource.cls != 'nogeom_layer':
+        srs = request.GET.get('srs')
 
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
@@ -855,7 +859,8 @@ def cpatch(resource, request) -> JSONType:
         dt_format=request.GET.get('dt_format', 'obj')
     )
 
-    srs = request.GET.get('srs')
+    if resource.cls != 'nogeom_layer':
+        srs = request.GET.get('srs')
 
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
@@ -1003,9 +1008,9 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        'feature_layer.export', '/api/component/feature_layer/export'
-    ).add_view(export_multi, request_method=('POST', 'GET'))
-
+        'feature_layer.export', '/api/component/feature_layer/export',
+        get=export_multi,
+        put=export_multi)
     config.add_route(
         'feature_layer.mvt',
         '/api/component/feature_layer/mvt',

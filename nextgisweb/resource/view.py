@@ -214,6 +214,67 @@ def resource_export(request):
 
 resource_sections = PageSections('resource_section')
 
+@viewargs(renderer='map_list.mako')
+def map_list(request):
+    return dict(
+        title=_("List of maps"),
+    )
+
+@viewargs(renderer='react')
+def webmap_group_data(request):
+    request.require_administrator()
+    result = dict(
+        entrypoint='@nextgisweb/resource/webmap-group-widget',
+        title=_("Groups of digital web maps"),
+        dynmenu=request.env.pyramid.control_panel)
+    return result
+
+@viewargs(renderer='react')
+def webmap_group_item(request):
+    request.require_administrator()
+    id = int(request.matchdict['id'])
+
+    return dict(
+        entrypoint='@nextgisweb/resource/webmap-group-item',
+        props=dict(id=id),
+        title=_("Digital web map group"),
+    )
+
+@viewargs(renderer='react')
+def resource_constraint(request):
+    request.resource_permission(PERM_UPDATE)
+
+    if (request.context.column_key):
+        res = Resource.filter_by(id=request.context.column_key).one()
+        display_name_const = res.display_name
+    else:
+        display_name_const = None
+
+    if (request.context.cls == 'postgis_layer' or request.context.cls == 'nogeom_layer'):
+        connection_id = request.context.connection.id
+        schema = request.context.schema
+        table_name = request.context.table
+    else:
+        connection_id = None
+        schema = None
+        table_name = None
+    return dict(
+        entrypoint='@nextgisweb/resource/resource-constraint',
+        props=dict(
+            id=request.context.id,
+            display_name=request.context.display_name,
+            display_name_const=display_name_const,
+            column_from_const=request.context.column_from_const,
+            column_key=request.context.column_key,
+            column_constraint=request.context.column_constraint,
+            connection_id=connection_id,
+            schema=schema,
+            table_name=table_name,
+            cls=request.context.cls,
+        ),
+        title=_("Setting up a connection between resources"),
+        obj=request.context,
+    )
 
 def setup_pyramid(comp, config):
 
@@ -324,12 +385,12 @@ def setup_pyramid(comp, config):
                 # Workaround SAWarning: Object of type ... not in session,
                 # add operation along 'Resource.children' will not proceed
                 child.parent = None
-
-                yield Link(
-                    'create/%s' % ident,
-                    cls.cls_display_name,
-                    self._url(ident),
-                    icon=f"rescls-{cls.identity}")
+                if args.obj.cls != 'nogeom_layer':
+                    yield Link(
+                        'create/%s' % ident,
+                        cls.cls_display_name,
+                        self._url(ident),
+                        icon=f"rescls-{cls.identity}")
 
             if PERM_UPDATE in permissions:
                 yield Link(
