@@ -1,161 +1,89 @@
 /* -- TABLES -- */
 
 table {
-  font-size: inherit;
+    font-size: inherit;
 }
-
-table.data tr th { background-color: #eee; font-weight: bold; }
-table.data tr th, table.data tr td { padding: 0.2ex 0.5ex; }
 
 /* redefine pure css style */
 .pure-table {
-  border: 0;
+    border: 0;
 
-  thead {
-    background: none;
-
-    &:first-child th {
-      padding-top: 0;
+    thead {
+        background: none;
     }
-  }
 
-  th {
-    font-weight: 600;
-    color: var(--text-base);
-  }
-
-  td, th {
-    border-bottom: 1px solid var(--divider-color);
-    .transition(background-color .4s);
-    vertical-align: middle;
-    border-left: 0;
-    padding: .8em 1em;
-    line-height: 1.285;
-
-    &.fit-content {
-      width: 1%;
-      white-space: nowrap;
-    }
-  }
-
-  tbody {
     th {
-      text-transform: none;
-      color: var(--text-base);
-      font-weight: bold;
-      text-align: left;
+        font-weight: 600;
+        color: var(--text-base);
     }
 
-    tr {
-      &:hover td,
-      &:hover th {
-        background-color: #fbfbfb;
-      }
-    }
+    td,
+    th {
+        border-bottom: 1px solid var(--divider-color);
+        vertical-align: middle;
+        border-left: 0;
+        padding: 0.8em 1em;
+        line-height: 1.285;
 
-    & + thead {
-      tr {
-        th, td {
-          padding-top: 20px;
+        &.fit-content {
+            width: 1%;
+            white-space: nowrap;
         }
-      }
     }
-  }
 
-  &.pure-table-horizontal tbody > tr:last-child > td,
-  &.pure-table-horizontal tbody > tr:last-child > th {
-    border-bottom-width: 1px;
-  }
+    tbody {
+        th {
+            text-transform: none;
+            color: var(--text-base);
+            font-weight: bold;
+            text-align: left;
+        }
 
-  &.pure-table-horizontal tbody:last-child > tr:last-child > td,
-  &.pure-table-horizontal tbody:last-child > tr:last-child > th {
-    border-bottom: 0;
-  }
+        tr {
+            &:hover td,
+            &:hover th {
+                background-color: #fbfbfb;
+            }
+        }
 
-  & + & {
-    margin-top: 20px;
-  }
+        & + thead {
+            tr {
+                th,
+                td {
+                    padding-top: 20px;
+                }
+            }
+        }
+    }
+
+    &.pure-table-horizontal tbody > tr:last-child > td,
+    &.pure-table-horizontal tbody > tr:last-child > th {
+        border-bottom-width: 1px;
+    }
+
+    &.pure-table-horizontal tbody:last-child > tr:last-child > td,
+    &.pure-table-horizontal tbody:last-child > tr:last-child > th {
+        border-bottom: 0;
+    }
+
+    & + & {
+        margin-top: 20px;
+    }
 }
 
 .table--layout-fixed {
-  table-layout: fixed;
+    table-layout: fixed;
 
-  td, th {
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
+    td,
+    th {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 
 .pure-table-horizontal--s {
-  td, th {
-    padding: 8px 6px;
-  }
-}
-
-.table-keyvalue {
-  margin-bottom: 30px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  td, th {
-    padding-top: .615em;
-    padding-bottom: 0;
-    border-bottom-color: transparent;
-    padding-left: 0;
-    vertical-align: bottom;
-
-    &:last-child {
-      padding-right: 0;
+    td,
+    th {
+        padding: 8px 6px;
     }
-
-    &.table-keyvalue__key {
-      border-bottom-color: var(--divider-color);
-      font-weight: normal;
-      color: var(--text-secondary);
-      letter-spacing: 0;
-    }
-
-    &.table-keyvalue__value {
-      padding-left: 3px;
-    }
-  }
-
-  th {
-    min-width: 160px;
-    max-width: 300px;
-  }
-
-  tbody tr {
-    &:first-child {
-      td, th {
-        padding-top: 0;
-      }
-    }
-
-    &:hover {
-      td, th {
-        background-color: transparent;
-      }
-    }
-  }
-}
-
-.table-keyvalue__key__inner,
-.table-keyvalue__value__inner {
-  position: relative;
-  top: 4px;
-  background-color: var(--bg-base);
-}
-
-.content-box {
-  .table-keyvalue__key__inner,
-  .table-keyvalue__value__inner {
-    background-color: @white;
-  }
-}
-
-.table-keyvalue__key__inner {
-  padding-right: 3px;
 }

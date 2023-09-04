@@ -5,7 +5,10 @@
     from nextgisweb.resource.model import Resource
 %>
 
-<div id="childrenSection"></div>
+<%page args="section" />
+<% section.content_box = False %>
+
+<div id="childrenSection" class="ngw-resource-section ngw-card"></div>
 
 <%
     data = list()

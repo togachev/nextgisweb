@@ -2,6 +2,12 @@
     cursor: pointer;
     user-select: none;
 
+    > a {
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
     &-label {
         display: inline-block;
         vertical-align: middle;
@@ -9,15 +15,13 @@
         height: 24px;
         line-height: 24px;
         border-radius: 2px;
-        color: #106a90;
-        background-color: #ffffff;
+        color: var(--on-primary-text);
+        background: var(--primary);
+        font-size: 20px;
         text-align: center;
     }
 }
 
-.ngw-pyramid-avatar-authenticated {
-    line-height: 1;
-}
 
 .ngw-pyramid-avatar-danger {
     .ngw-pyramid-avatar-label {
@@ -26,11 +30,6 @@
     }
 }
 
-.ngw-pyramid-avatar-active {
-    .ngw-pyramid-avatar-icon {
-        transform: rotate(180deg);
-    }
-}
 
 .ngw-pyramid-avatar-popover {
     .ant-popover-title {

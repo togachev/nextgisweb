@@ -17,6 +17,8 @@ const token: Theme["token"] = {
     colorPrimary: cvar("primary"),
     colorSuccess: cvar("success"),
     colorWarning: cvar("warning"),
+    fontFamily: cvar("ngw-text-font-family-list"),
+    fontWeightStrong: 500,
     motion: false,
 };
 

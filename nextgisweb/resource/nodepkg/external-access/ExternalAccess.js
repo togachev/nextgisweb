@@ -7,7 +7,9 @@ import HelpOutlineIcon from "@nextgisweb/icon/material/help_outline";
 
 import "./ExternalAccess.less";
 
-const READ_MORE = gettext("Read more");
+// prettier-ignore
+const msgUsage = gettext("Use these links to plug data into external applications.");
+const msgReadMore = gettext("Read more");
 
 const Help = ({ help, docsUrl }) => (
     <>
@@ -16,7 +18,7 @@ const Help = ({ help, docsUrl }) => (
             <>
                 {" "}
                 <a target="_blank" href={url("docs:" + docsUrl)}>
-                    {READ_MORE}
+                    {msgReadMore}
                 </a>
             </>
         )}
@@ -25,7 +27,7 @@ const Help = ({ help, docsUrl }) => (
 
 const Link = ({ title, help, docsUrl, url }) => (
     <>
-        <div className="row-title">
+        <div className="label">
             {title}{" "}
             <Popover
                 overlayClassName="ngw-resource-external-access-popover"
@@ -35,12 +37,11 @@ const Link = ({ title, help, docsUrl, url }) => (
                 <HelpOutlineIcon />
             </Popover>
         </div>
-        <div className="row-input-info">
+        <div className="url">
             <div className="url-text">{url}</div>
             <CopyToClipboardButton
                 type="link"
                 getTextToCopy={() => url}
-                messageInfo={gettext("The link copied to clipboard.")}
                 iconOnly
             />
         </div>
@@ -50,6 +51,7 @@ const Link = ({ title, help, docsUrl, url }) => (
 export function ExternalAccess({ links }) {
     return (
         <div className="ngw-resource-external-access">
+            <div className="text">{msgUsage}</div>
             {links.map((link, idx) => (
                 <Link key={idx} {...link} />
             ))}

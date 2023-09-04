@@ -1,16 +1,9 @@
 .ngw-resource-children-section {
-    margin: -16px;  // TODO: Remove content-box hack!
-
     svg.icon {
         margin: 0 2px;
     }
 
     .ant-table {
-        .ant-table-thead > tr > th {
-            background-color: white;
-            font-weight: bold;
-        }
-
         .displayName {
             width: 100%;
             text-align: left !important;
@@ -35,20 +28,8 @@
             }
         }
 
-        .iconColumnKeyTitle{
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .columnKey {
-            display: flex;
-            justify-content: center;
-            .iconColumnKey {
-                font-size: 18px;
-            }
-        }
-
-        .actions, .volume {
+        .actions,
+        .volume {
             text-align: right !important;
         }
 
@@ -68,7 +49,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
     }
 }
 

@@ -13,12 +13,7 @@
     ) for link in links]
 %>
 
-<div class="content-box__description">${tr(_("Use these links to plug data into external applications."))}</div>
-
-<div class="content-box">
-    <div id="externalAccessSection"></div>
-</div>
-
+<div id="externalAccessSection"></div>
 
 <script type="text/javascript">
     require([
