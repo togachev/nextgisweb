@@ -552,3 +552,39 @@ msgstr "Изменить"
 #: view.py:370
 msgid "Extra"
 msgstr "Дополнительно"
+
+#: view.py:216
+msgid "List of maps"
+msgstr "Список карт"
+
+#: view.py:224
+msgid "Groups of digital web maps"
+msgstr "Группы цифровых веб карт"
+
+#: view.py:236
+msgid "Digital web map group"
+msgstr "Группа цифровой веб карты"
+
+#: view.py:271 view.py:418
+msgid "Setting up a connection between resources"
+msgstr "Настройка связи между ресурсами"
+
+#: nodepkg/children-section/ChildrenSection.js:285
+msgid "Hide relationship with a resource"
+msgstr "Скрыть связь с ресурсом"
+
+#: nodepkg/children-section/ChildrenSection.js:286
+msgid "Show relationship with a resource"
+msgstr "Показать связь с ресурсом"
+
+#: view.py:460
+msgid "Webmap Group Resource"
+msgstr ""
+
+#: nodepkg/children-section/ChildrenSection.js:470
+msgid "Relationship with a resource"
+msgstr "Связь с ресурсом"
+
+#: template/resource_section_summary.mako:65
+msgid "Web map group"
+msgstr "Группа веб-карты"

@@ -399,6 +399,27 @@ def setup_pyramid(comp, config):
                         'resource.update', id=args.obj.id),
                     important=True, icon='material-edit')
 
+            if args.obj.cls in ['mapserver_style', 'qgis_vector_style', 'qgis_raster_style', 'wmsclient_layer', 'tmsclient_layer']:
+                if isinstance(args.obj, Resource):
+                    if PERM_UPDATE in permissions:
+                        # проверка наличия маршрута-route
+                        route_intr = args.request.registry.introspector.get('routes', 'file_resource.settings')
+                        if route_intr:
+                            yield Link(
+                                'operation/0-file_resource', _("Add/remove public files"),
+                                lambda args: args.request.route_url(
+                                    'file_resource.settings', id=args.obj.id),
+                                icon='material-attach_file')
+
+            if args.obj.cls in ['vector_layer', 'postgis_layer', 'raster_layer', 'wmsclient_layer', 'tmsclient_layer']:
+                if isinstance(args.obj, Resource):
+                    if PERM_UPDATE in permissions:
+                        yield Link(
+                            'operation/0-resource_constraint', _("Setting up a connection between resources"),
+                            lambda args: args.request.route_url(
+                                'resource.resource_constraint', id=args.obj.id),
+                            icon='material-schema')
+
             if PERM_DELETE in permissions and args.obj.id != 0 and \
                     args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user):
                 yield Link(
@@ -435,9 +456,33 @@ def setup_pyramid(comp, config):
 
     comp.env.pyramid.control_panel.add(
         Link('settings/resource_export', _("Resource export"), lambda args: (
-            args.request.route_url('resource.control_panel.resource_export'))))
+            args.request.route_url('resource.control_panel.resource_export'))),
+        Link('settings/webmap_group', _("Groups of digital web maps"), lambda args: (
+            args.request.route_url('resource.webmap_group')))
+        )
 
     config.add_route(
         'resource.control_panel.resource_export',
-        '/control-panel/resource-export'
+        '/control-panel/resource-export',
     ).add_view(resource_export)
+
+    config.add_route(
+        'resource.resource_constraint',
+        '/res_const/{id:uint}/settings',
+        factory=resource_factory,
+        ).add_view(resource_constraint)
+
+    config.add_route(
+        'resource.webmap_group',
+        '/wmgroup',
+        get=webmap_group_data)
+
+    config.add_route(
+        'resource.webmap_group_item',
+        '/wmgroup/{id:uint}',
+        ).add_view(webmap_group_item)
+
+    config.add_route(
+        'map_list',
+        '/map-list') \
+        .add_view(map_list)

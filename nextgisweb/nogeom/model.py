@@ -30,7 +30,7 @@ from nextgisweb.feature_layer import (
     LayerField,
     LayerFieldsMixin,
 )
-from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import (
     ConnectionScope,
     DataScope,
@@ -158,7 +158,7 @@ class NogeomLayerField(Base, LayerField):
 
 
 @implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
-class NogeomLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+class NogeomLayer(Base, Resource, LayerFieldsMixin):
     identity = 'nogeom_layer'
     cls_display_name = _("NoGEOM layer")
 

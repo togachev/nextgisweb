@@ -1,63 +1,27 @@
-.ngw-webmap-layers-tree.ant-tree {
-    .ant-tree-treenode {
-        padding: 0;
-    }
-
-    &:not(.ant-tree-show-line) .ant-tree-switcher-noop {
-        width: 6px;
-    }
-
-    &.ant-tree-show-line {
-        .ant-tree-indent-unit {
-            width: 18px;
-
-            &::before {
-                right: 6px;
-            }
-        }
-    }
-
-    .ant-tree-switcher-line-icon {
-        vertical-align: -0.3em;
-    }
-
+.ngw-webmap-layers-tree {
     .ant-tree-checkbox {
-        margin-top: 6px;
-        margin-right: 6px;
-        align-self: start;
-        scale: 0.75;
+        margin: 0px 0 0px 0;
+        display: flex;
+        align-items: center;
     }
 
     .ant-tree-node-content-wrapper {
         display: flex;
-        align-items: start;
-        column-gap: 6px;
         width: 100%;
         min-width: 0;
-        padding-left: 0;
-        line-height: 28px;
-
-        .ant-row {
-            margin: 0;
-        }
+        align-items: center;
 
         &.ant-tree-node-selected {
-            background-color: transparent;
+            background-color: #ffffff00;
         }
 
-        .ant-tree-iconEle.ant-tree-icon__customize {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 28px;
-            width: auto;
+        &:hover {
+            background: #ffffff00;
+        }
 
-            &:empty {
-                display: none;
-            }
-
+        .ant-tree-icon__customize {
             img {
-                display: block;
+                vertical-align: text-top;
             }
         }
 
@@ -78,20 +42,111 @@
                 justify-content: end;
             }
 
-            .more,
-            .legend {
-                width: 24px;
-                height: 24px;
-                display: flex;
-                justify-items: center;
-                justify-content: center;
-                align-items: center;
-                border-radius: 50%;
-
-                &:hover {
-                    background: #076dbf21;
-                }
-            }
         }
     }
+}
+
+.tree-item-menu {
+    .ant-dropdown-menu-title-content {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 5px;
+        align-items: center;
+    }
+}
+
+
+
+.ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle {
+    font-size: 24px;
+    color: #106a90;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    margin: 0 6px;
+}
+
+
+.icon-not-active {
+    background-color: #00000000 !important;
+    cursor: auto;
+}
+
+.titleName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
+    padding: 2px;
+    font-size: small;
+    &:hover {
+        background: rgba(247, 247, 247, 1);
+        padding: 2px;
+        border-radius: 3px;
+    }
+}
+
+.ant-tree .ant-tree-treenode {
+    align-items: center;
+    display: flex;
+    outline: none;
+    padding: 0;
+    margin: 5px 0;
+}
+
+.iconCustom {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.more,
+.legend {
+    font-size: 18px;
+    color: #106a90;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    &:hover {
+        background: #ececec;
+        border-radius: 3px;
+        color: #000000;
+    }
+}
+
+.colSingleIconLegend {
+    margin: 0;
+
+    &:hover {
+        color: #106a90;
+        border: #106a90 solid 1px;
+        border-radius: 3px;
+        margin: -1px;
+    }
+}
+
+.ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle, .ant-tree .ant-tree-checkbox+span .ant-tree-iconEle {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    vertical-align: top;
+    align-items: center;
+}
+
+.iconSingle{
+    display: flex;
+}
+
+.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected, .ant-tree .ant-tree-checkbox+span.ant-tree-node-selected {
+    background-color: #ffffff00;
 }

@@ -921,3 +921,22 @@ msgstr "Просмотр встроенной веб-карты"
 msgid "Display"
 msgstr "Открыть"
 
+#: view.py:303
+msgid "Setting up a web map group"
+msgstr "Настройка группы веб карты"
+
+#: view.py:354
+msgid "Group setting"
+msgstr "Настройка группы"
+
+#: nodepkg/layers-tree/DropdownActions.js:10
+msgid "Additional tools"
+msgstr "Дополнительные инструменты"
+
+#: nodepkg/layers-tree/DropdownFile.js:7
+msgid "Download attached files"
+msgstr "Скачать прикрепленные файлы"
+
+#: nodepkg/layers-tree/IconItem.js:25
+msgid "Zoom to feature layer"
+msgstr "Увеличить до объекта слоя"

@@ -226,9 +226,9 @@ div.dijitContentPane.leftPanelPane {
 
 .leftPanelPane--fullwidth {
     box-sizing: border-box;
-    width: calc(100% - 50px) !important;
+    width: calc(100% - 40px) !important;
 }
 
 .navigation {
-    width: 50px;
+    width: 40px;
 }

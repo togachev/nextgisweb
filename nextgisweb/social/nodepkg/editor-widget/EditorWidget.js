@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { ImageUploader } from "@nextgisweb/file-upload/image-uploader";
 import { Input } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./EditorWidget.less";
 
@@ -9,8 +9,8 @@ const { TextArea } = Input;
 
 // prettier-ignore
 const imageUploaderMessages = {
-    uploadText: i18n.gettext("Select a preview image"),
-    helpText: i18n.gettext("The image will be converted to PNG format and downscaled to 1600x630 pixels if it's bigger."),
+    uploadText: gettext("Select a preview image"),
+    helpText: gettext("The image will be converted to PNG format and downscaled to 1600x630 pixels if it's bigger."),
 }
 
 export const EditorWidget = observer(({ store }) => {
@@ -28,12 +28,12 @@ export const EditorWidget = observer(({ store }) => {
                 onChange={(e) => {
                     store.update({ description: e.target.value });
                 }}
-                placeholder={i18n.gettext("Preview description")}
+                placeholder={gettext("Preview description")}
                 autoSize
             />
         </div>
     );
 });
 
-EditorWidget.title = i18n.gettext("Social");
+EditorWidget.title = gettext("Social");
 EditorWidget.order = 90;

@@ -164,7 +164,7 @@ class WebMapItem(Base):
 
     parent = db.relationship(
         'WebMapItem', remote_side=id, backref=db.backref(
-            'children', order_by=position, cascade='all, delete-orphan',
+            'children', order_by=position, cascade='all, delete-orphan', cascade_backrefs=False,
             collection_class=ordering_list('position')))
 
     style = db.relationship(

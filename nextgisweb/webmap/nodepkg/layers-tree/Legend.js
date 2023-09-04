@@ -1,8 +1,8 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import ExpandLessIcon from "@nextgisweb/icon/material/expand_less/outline";
-import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
-
+import LegendToggle from "@nextgisweb/icon/material/legend_toggle/outline";
+import KeyboardArrowDown from "@nextgisweb/icon/material/keyboard_arrow_down/outline";
+import { IconItem } from "./IconItem";
 import "./Legend.less";
 
 const showLegendMessage = gettext("Show legend");
@@ -18,7 +18,7 @@ export function LegendAction({ nodeData, onClick }) {
     }
 
     const { open } = nodeData.legendInfo;
-    const icon = open ? <ExpandLessIcon /> : <ViewListIcon />;
+    const icon = open ? <KeyboardArrowDown /> : <LegendToggle />;
 
     const click = () => {
         const { id } = nodeData;
@@ -28,13 +28,15 @@ export function LegendAction({ nodeData, onClick }) {
     };
 
     return (
-        <span
-            className="legend"
-            onClick={click}
-            title={open ? hideLegendMessage : showLegendMessage}
-        >
-            {icon}
-        </span>
+        <div className="legend-list">
+            <span
+                className="legend legend-toggle"
+                onClick={click}
+                title={open ? hideLegendMessage : showLegendMessage}
+            >
+                {icon}
+            </span>
+        </div>
     );
 }
 
@@ -45,16 +47,11 @@ export function Legend({ nodeData }) {
 
     return (
         <div className="legend-block">
-            {nodeData.legendInfo.symbols.map((s, idx) => (
-                <div key={idx} className="legend-symbol" title={s.display_name}>
-                    <img
-                        width={20}
-                        height={20}
-                        src={"data:image/png;base64," + s.icon.data}
-                    />
-                    <div className="legend-title">{s.display_name}</div>
-                </div>
-            ))}
+            <IconItem
+                single={false}
+                item={nodeData}
+                zoomToNgwExtent={zoomToNgwExtent}
+            />
         </div>
     );
 }

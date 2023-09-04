@@ -1,9 +1,11 @@
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 
 import "./DropdownActions.less";
+const AdditionalTools = gettext("Additional tools");
 
 export function DropdownActions({
     nodeData,
@@ -20,6 +22,7 @@ export function DropdownActions({
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
+                title={AdditionalTools}
                 className="more"
                 onClick={() => {
                     setMoreClickId(id);

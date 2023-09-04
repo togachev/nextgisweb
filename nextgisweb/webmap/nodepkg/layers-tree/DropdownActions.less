@@ -1,8 +1,81 @@
-.dropdown-content {
-    background: #fff;
-    box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%),
-      0 9px 28px 8px rgb(0 0 0 / 5%);
+.linkFile {
+  clear: both;
+  color: #106a90;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 22px;
+  margin: 0px;
+  padding: 2px 5px;
+  transition: all 0.3s;
+
+  a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+      width: 100%;
   }
-  .dropdown-content .ant-dropdown-menu {
-    box-shadow: none;
+  &:hover {
+    background-color: #F5F5F5;
+    border-radius: 3px;
   }
+}
+
+
+.fileTitle {
+  display: flex;
+  clear: both;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 12px;
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  color: rgba(0,0,0,.45);
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  white-space: nowrap;
+}
+
+.colFile {
+  font-size: 18px;
+  color: #106a90;
+  width: 21px;
+  height: 21px;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
+  &:hover {
+    background: #106a90;
+    border-radius: 3px;
+    color: #ffffff;
+  }
+}
+
+.customFile {
+  max-height: 350px;
+  overflow: overlay;
+  .ant-dropdown-menu-title-content {
+    flex: auto;
+    max-width: 350px;
+  }
+  .ant-dropdown-menu-item, .ant-dropdown-menu-submenu-title {
+    padding: 2px 6px;
+  }
+  .ant-dropdown-menu {
+    padding: 0;
+  }
+
+  .ant-dropdown-menu-title-content {
+    overflow: hidden;
+  }
+
+}

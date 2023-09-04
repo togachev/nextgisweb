@@ -70,6 +70,35 @@ class ResourceMeta(db.DeclarativeMeta):
 
         resource_registry.register(cls)
 
+class ResourceWebMapGroup(Base):
+    __tablename__ = 'resource_wmg'
+
+    identity = 'resource_wmg'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
+    action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
+
+    webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
+        backref="resource_wmg")
+class WebMapGroupResource(Base):
+    __tablename__ = 'wmg_resource'
+
+    identity = 'wmg_resource'
+
+    tab_wmg_resource = db.Table(
+        'wmg_resource', Base.metadata,
+        db.Column(
+            'resource_id', db.Integer,
+            db.ForeignKey('resource.id'),
+            primary_key=True
+        ),
+        db.Column(
+            'webmap_group_id', db.Integer,
+            db.ForeignKey('resource_wmg.id'),
+            primary_key=True
+        )
+    )
 
 class Resource(Base, metaclass=ResourceMeta):
     registry = resource_registry

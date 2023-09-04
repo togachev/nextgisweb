@@ -5,6 +5,8 @@ from msgspec import Struct
 from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
@@ -15,7 +17,8 @@ from nextgisweb.pyramid import JSONType, viewargs
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
-from .model import Resource, ResourceSerializer
+from .model import Resource, ResourceSerializer, ResourceWebMapGroup, WebMapGroupResource
+from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .scope import ResourceScope, Scope
 from .serialize import CompositeSerializer
@@ -25,7 +28,7 @@ PERM_READ = ResourceScope.read
 PERM_DELETE = ResourceScope.delete
 PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
-
+PERM_UPDATE = ResourceScope.update
 
 class BlueprintResponse(Struct):
 
@@ -462,9 +465,38 @@ def getWebmapGroup(request):
 
     result = list()
     for resource_wmg in query:
-        result.append(dict(id=resource_wmg.id, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map))
+        result.append(dict(
+            id=resource_wmg.id,
+            webmap_group_name=resource_wmg.webmap_group_name,
+            action_map=resource_wmg.action_map))
                     
     return result
+
+@viewargs(renderer='json')
+def getMaplist(request):
+
+    query = DBSession.query(Resource, ResourceWebMapGroup, ResourceSocial) \
+        .join(WebMapGroupResource, Resource.id == WebMapGroupResource.resource_id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for res, res_wmg, res_social in query:
+        action_map = res_wmg.action_map
+        if res_wmg.id != 0:
+            if res.has_permission(PERM_READ, request.user):
+                result.append(dict(id=res.id, owner=True, display_name=res.display_name,
+                webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+                preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+                preview_description=None if res_social == None else res_social.preview_description))
+            if not res.has_permission(PERM_READ, request.user) and action_map == True:
+                result.append(dict(id=res.id, owner=False, display_name=res.display_name,
+                webmap_group_name=res_wmg.webmap_group_name,  action_map=res_wmg.action_map,
+                preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+                preview_description=None if res_social == None else res_social.preview_description))
+    is_adm = request.user.is_administrator
+
+    return dict(scope=is_adm, result=result)
 
 @viewargs(renderer='json')
 def wmgroup_delete(request):
@@ -652,3 +684,51 @@ def setup_pyramid(comp, config):
         '/api/resource/{id:uint}/file/{name:any}',
         factory=resource_factory,
         overloaded=True)
+
+    config.add_route(
+        'resource.tbl_res',
+        '/api/resource/tblres/',
+        get=tbl_res)
+
+    config.add_route(
+        'wmgroup.create',
+        '/api/wmg/create/{id:uint}/{webmap_group_id:uint}/',
+        factory=resource_factory,
+        get=wmg_item_create)
+
+    config.add_route(
+        'wmgroup.delete',
+        '/api/wmg/delete/{id:uint}/{webmap_group_id:uint}/',
+        factory=resource_factory,
+        get=wmg_item_delete)
+
+    config.add_route(
+        'wmgroup.delete_all',
+        '/api/wmg/delete_all/{id:uint}',
+        factory=resource_factory,
+        get=wmg_item_delete_all)
+
+    config.add_route(
+        'resource.wmgroup.update',
+        '/api/wmgroup/update/{id:uint}/{wmg:str}/{action:str}/',
+        get=wmgroup_update)
+
+    config.add_route(
+        'resource.wmgroup.delete',
+        r'/api/wmgroup/delete/{id:uint}/',
+        get=wmgroup_delete)
+
+    config.add_route(
+        'resource.wmgroup_create',
+        '/api/wmgroup/create',
+        put=wmgroup_create)
+
+    config.add_route(
+        'resource.mapgroup',
+        '/api/resource/mapgroup/',
+        get=getWebmapGroup)
+
+    config.add_route(
+        'resource.maplist',
+        '/api/resource/maplist/',
+        get=getMaplist)

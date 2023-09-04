@@ -26,6 +26,7 @@ export function LayersPanel({ title, close, display, ...props }) {
                     onSelect: display.handleSelect.bind(display),
                     setLayerZIndex: display.setLayerZIndex.bind(display),
                     getWebmapPlugins: () => ({ ...display._plugins }),
+                    zoomToNgwExtent: (extent) => display.map.zoomToNgwExtent(extent),
                     ...props,
                 }}
             />

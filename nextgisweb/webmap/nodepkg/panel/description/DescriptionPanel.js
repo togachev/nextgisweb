@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef } from "react";
-
+import parse, { Element, domToReact } from 'html-react-parser';
 import { CloseButton } from "../header/CloseButton";
+import { Image } from "@nextgisweb/gui/antd";
 
 import "./DescriptionPanel.less";
 
@@ -12,50 +13,43 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export function DescriptionPanel({ display, close, content }) {
-    const nodeRef = useRef();
+export function DescriptionPanel({ display, close, content, upath_info }) {
 
-    const contentDiv = useMemo(() => {
-        return (
-            <div
-                className="content"
-                ref={nodeRef}
-                dangerouslySetInnerHTML={{
-                    __html:
-                        content === undefined
-                            ? display.config.webmapDescription
-                            : content,
-                }}
-            />
-        );
-    }, [content]);
-
-    useEffect(() => {
-        if (!nodeRef || !nodeRef.current) {
-            console.warn("InfoPanel: nodeRef | nodeRef.current are empty");
-            return;
-        }
-
-        nodeRef.current.querySelectorAll("a, span").forEach((el) => {
-            const tagName = el.tagName.toLowerCase();
-            const linkText = el.getAttribute(
-                tagName === "a" ? "href" : "data-target"
-            );
-            if (/^\d+:\d+$/.test(linkText)) {
-                el.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const [resourceId, featureId] = linkText.split(":");
-                    zoomToFeature(display, resourceId, featureId);
-                });
+    const options = {
+        replace: item => {
+            if (item instanceof Element && item.attribs && item.name == 'img') {
+                return <Image src={item.attribs.src}>item</Image>;
             }
-        });
-    }, []);
+            if (item instanceof Element && item.name == 'a' && !upath_info) {
+                if (/^\d+:\d+$/.test(item.attribs.href)) {
+                    return (<a onClick={
+                        () => {
+                            const [resId, fid] = item.attribs.href.split(":");
+                            zoomToFeature(display, resId, fid);
+                        }
+                    }>{domToReact(item.children, options)}</a>);
+                }
+            }
+            /*
+                Если открыты свойства ресурса, ссылка на объект удаляется, остается заголовок.
+                Можно оставить ссылку, и добавить переход к объекту в таблице ресурса или к объекту на карте.
+            */ 
+            if (item instanceof Element && item.name == 'a' && upath_info) {
+                if (/^\d+:\d+$/.test(item.attribs.href)) {
+                    return (<>{domToReact(item.children, options)}</>);
+                }
+            }
+        }
+    };
+    const data = parse(
+        content === undefined
+        ? display.config.webmapDescription
+        : content, options);
 
     return (
         <div className="ngw-webmap-description-panel">
             <CloseButton {...{ close }} />
-            {contentDiv}
+            {data}
         </div>
-    );
+    )
 }

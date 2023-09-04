@@ -15,8 +15,9 @@ import { createResourceTableItemOptions } from "./util/createResourceTableItemOp
 import { forEachSelected } from "./util/forEachSelected";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
+import Info from "@nextgisweb/icon/material/info";
 import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
-
+import Schema from "@nextgisweb/icon/material/schema";
 import "./ChildrenSection.less";
 
 const { Column } = Table;
@@ -85,7 +86,10 @@ function renderActions(actions, id, setTableItems) {
     };
 
     return actions.map((action) => {
-        const { target, href, icon, title } = action;
+        const href = action.key[0] == "webmap" ? action.href.replace('/display', '') : action.href,
+            target = action.key[0] == "webmap" ? '_self' : action.target,
+            icon = action.key[0] == "webmap" ? 'material-info' : action.icon,
+            title = action.key[0] == "webmap" ? 'Свойства' : action.title;
 
         const createActionBtn = (props_) => (
             <Tooltip key={title} title={title}>
@@ -118,6 +122,7 @@ async function loadVolumes(data, setState) {
 export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
     const [creationDateVisible, setCreationDateVisible] = useState(false);
+    const [relationVisible, setRelationVisible] = useState(false);
     const [batchDeletingInProgress, setBatchDeletingInProgress] =
         useState(false);
 
@@ -280,6 +285,14 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 setCreationDateVisible(!creationDateVisible);
             },
         });
+        menuItems_.push({
+            label: relationVisible
+                ? gettext("Hide relationship with a resource")
+                : gettext("Show relationship with a resource"),
+            onClick: () => {
+                setRelationVisible(!relationVisible);
+            },
+        });
         if (allowBatch) {
             // Batch delete
             const checkNotAllForDelete =
@@ -371,6 +384,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         moveSelectedTo,
         deleteSelected,
         storageEnabled,
+        relationVisible,
         creationDateVisible,
         selectedAllowedForDelete,
         selectedAllowedForFeatureExport,
@@ -401,7 +415,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                     sorter={sorterFactory("displayName")}
                     render={(value, record) => (
                         <SvgIconLink
-                            href={record.link}
+                            href={record.cls === "webmap" ? record.link + '/display' : record.link}
                             icon={`rescls-${record.cls}`}
                         >
                             {value}
@@ -455,6 +469,27 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                                 return "";
                             }
                         }}
+                    />
+                )}
+                {relationVisible && (
+                    <Column
+                        title={ () =>
+                            <div className="iconColumnKey" >
+                                <Tooltip key={gettext("Relationship with a resource")} title={gettext("Relationship with a resource")}>
+                                    <Schema />
+                                </Tooltip>
+                            </div>
+                        }
+                        responsive={["md"]}
+                        render={(value, record) => (
+                            record.column_key ? (
+                                <div className="columnKey">
+                                    <span title={record.display_name_const}>
+                                        <a href={record.update_link_const} ><div className="iconColumnKey" ><Schema /></div></a>
+                                    </span>
+                                </div>
+                            ) : null
+                        )}
                     />
                 )}
                 <Column

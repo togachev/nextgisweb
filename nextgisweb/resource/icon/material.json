@@ -3,6 +3,8 @@
     "delete_forever",
     "edit",
     "key",
-    "search"
+    "search",
+    "schema",
+    "info"
 ]
  
