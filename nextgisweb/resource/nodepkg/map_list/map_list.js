@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import InfoIcon from "@material-icons/svg/info";
-import MapIcon from "@material-icons/svg/map";
-import Edit from "@material-icons/svg/edit";
-import Lock from "@material-icons/svg/lock";
-import Block from "@material-icons/svg/block";
-import LockOpen from "@material-icons/svg/lock_open";
+import InfoIcon from "@nextgisweb/icon/material/info";
+import MapIcon from "@nextgisweb/icon/material/map";
+import Edit from "@nextgisweb/icon/material/edit";
+import Lock from "@nextgisweb/icon/material/lock";
+import Block from "@nextgisweb/icon/material/block";
+import LockOpen from "@nextgisweb/icon/material/lock_open";
 import getSelectStyle from "./selectStyle";
 import "./map_list.less";
 import "./details.less";
 import ArrowScrollTo from "./icons/arrow_scroll_to.svg";
-import { BackTop } from "@nextgisweb/gui/antd";
+import { BackTop, Row, Col } from "@nextgisweb/gui/antd";
 import Select from 'react-select';
 
 export function map_list(props) {
@@ -32,17 +32,9 @@ export function map_list(props) {
         return () => isSubscribed = false;
     }, [])
 
-    const [editGroup, setEditGroup] = useState([]);
-    const BlockGroup = <div className="blockGroup" title="Закрытая группа"><Block style={{color: '#F44336'}}/></div>;
-    const lockMap = <Lock style={{color: '#F44336'}}/>;
-    const openMap = <LockOpen style={{color: '#00C775'}}/>;
-
-    useEffect(async () => {
-        const WmgUrl = routeURL("resource.webmap_group");
-        if (scope === true) {
-            setEditGroup(<a className="edit_wmg" href={WmgUrl}><Edit/></a>);
-        } 
-    }, [])
+    const BlockGroup = <div className="blockGroup" title="Закрытая группа"><Block style={{ color: '#F44336' }} /></div>;
+    const lockMap = <Lock style={{ color: '#F44336' }} />;
+    const openMap = <LockOpen style={{ color: '#00C775' }} />;
 
     var groupBy = (items, key) => {
         return items.reduce((result, item) => {
@@ -75,7 +67,7 @@ export function map_list(props) {
     var itemsGroup = groupBy(outPut, 'webmap_group_name');
 
     const [isOpen, setIsOpen] = useState('');
-    
+
     useEffect(async () => {
         setIsOpen(true);
     }, [])
@@ -87,7 +79,7 @@ export function map_list(props) {
                 getOptionLabel={(item) => `${item.display_name}: ${item.webmap_group_name}`}
                 getOptionValue={item => item.id}
                 options={items}
-                onChange={e => {setValue(e);}}
+                onChange={e => { setValue(e); }}
                 isMulti
                 className="filterName stylesSelect"
                 styles={getSelectStyle()}
@@ -95,9 +87,9 @@ export function map_list(props) {
             />
             <div className="_group">
                 <div className="block_webmap_group">
-                    {   
-                        Object.keys(itemsGroup).sort((x,y) => { 
-                            return x == firstValueSort ? -1 : y == firstValueSort ? 1 : 0; 
+                    {
+                        Object.keys(itemsGroup).sort((x, y) => {
+                            return x == firstValueSort ? -1 : y == firstValueSort ? 1 : 0;
                         }).map((key, value) => {
                             var items = itemsGroup[key];
 
@@ -110,9 +102,23 @@ export function map_list(props) {
                             return (
                                 <details key={value} open={isOpen}>
                                     <summary>
-                                        {GroupObj.action ? true : BlockGroup} {/* Если группа закрытая, появится иконка */}
-                                        {GroupObj.name} {/* Имя группы */}
-                                        {editGroup} {/* Если администратор, то появится кнопка для редактирования */}
+                                        <Row className="mapsTitle">
+                                            <Col>
+                                                {GroupObj.action ? true : BlockGroup} {/* Если группа закрытая, появится иконка */}
+                                            </Col>
+                                            <Row className="mapsTitle-child">
+                                                <Col>
+                                                    {GroupObj.name} {/* Имя группы */}
+                                                </Col>
+                                                <Col>
+                                                    {/* Если администратор, то появится кнопка для редактирования */}
+                                                    {scope ?
+                                                        <a className="edit_wmg" href={routeURL("resource.webmap_group")}><Edit /></a> :
+                                                        null
+                                                    }
+                                                </Col>
+                                            </Row>
+                                        </Row>
                                     </summary>
                                     <div className="webmap_group" key={value}>
                                         <div className="content_webmap_group" >
@@ -129,7 +135,7 @@ export function map_list(props) {
 
                                                     <div key={idx}>text</div>
                                                     return (
-                                                        <div className="itemLink_res"  key={idx} title={item.display_name}>
+                                                        <div className="itemLink_res" key={idx} title={item.display_name}>
                                                             <div className="map_img" >
                                                                 <a target="_blank" href={'/resource/' + item.id + '/display?panel=layers'}>
                                                                     {ImageSocial}

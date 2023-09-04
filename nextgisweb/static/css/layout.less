@@ -33,7 +33,7 @@ body {
     font-size: 14px;
     line-height: 1.55;
     color: var(--text-base);
-    min-width: 680px;
+    min-width: 580px;
 }
 
 *:focus {
@@ -61,7 +61,7 @@ a[class*=" icon-"]:hover:before {
 
 .middle-text {
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .label-text {
@@ -73,7 +73,7 @@ a[class*=" icon-"]:hover:before {
 .ngw-pyramid-layout {
     position: relative;
     min-height: 100%;
-    min-width: 680px;
+    min-width: 580px;
     display: flex;
     flex-direction: column;
 
@@ -93,6 +93,7 @@ a[class*=" icon-"]:hover:before {
                 flex-grow: 1;
                 max-width: initial;
                 padding: 32px;
+                margin: 0 32px 0px 32px;
                 display: flex;
                 gap: 6px;
                 flex-direction: column;
@@ -204,7 +205,7 @@ a[class*=" icon-"]:hover:before {
 
     > div.container {
         display: flex;
-        gap: 6px;
+        gap: 16px;
         align-items: center;
         min-width: 0;
         min-height: 32px;
@@ -300,7 +301,7 @@ a[class*=" icon-"]:hover:before {
 
         &.selected {
             color: var(--primary);
-            font-weight: bold;
+            font-weight: 500;
         }
 
         > a {

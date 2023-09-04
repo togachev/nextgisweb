@@ -13,7 +13,6 @@ const zoomToFeature = (display, resourceId, featureId) => {
 };
 
 export const MapDesc = ({description, display, upath_info}) => {
-    console.log(description);
     const options = {
         replace: item => {
             if (item instanceof Element && item.attribs && item.name == 'img') {
