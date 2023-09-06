@@ -220,6 +220,13 @@ def map_list(request):
         title=_("List of maps"),
     )
 
+@viewargs(renderer='webgis.mako')
+def webgis(request):
+    return dict(
+        title=_("Webgis"),
+        custom_layout=True
+    )
+
 @viewargs(renderer='react')
 def webmap_group_data(request):
     request.require_administrator()
@@ -486,3 +493,8 @@ def setup_pyramid(comp, config):
         'map_list',
         '/map-list') \
         .add_view(map_list)
+
+    config.add_route(
+        'webgis',
+        '/webgis') \
+        .add_view(webgis)
