@@ -111,7 +111,14 @@ def favicon(request):
             content_type='image/x-icon')
     else:
         raise HTTPNotFound()
-
+def header_image(request):
+    fn_header_image = request.env.pyramid.options['header_image']
+    if os.path.isfile(fn_header_image):
+        return FileResponse(
+            fn_header_image, request=request,
+            content_type='image/png')
+    else:
+        raise HTTPNotFound()
 
 def locale(request):
     request.session['pyramid.locale'] = request.matchdict['locale']
@@ -415,6 +422,11 @@ def setup_pyramid(comp, config):
     ).add_view(favicon)
 
     config.add_route(
+        'pyramid.header_image',
+        '/header_image.png',
+    ).add_view(header_image)
+
+    config.add_route(
         'pyramid.control_panel.sysinfo',
         '/control-panel/sysinfo',
     ).add_view(sysinfo)
@@ -575,7 +587,7 @@ def _setup_pyramid_debugtoolbar(comp, config):
     settings = config.registry.settings
     if hosts := dt_opt.get('hosts', '0.0.0.0/0' if comp.env.core.debug else None):
         settings['debugtoolbar.hosts'] = hosts
-    settings['debugtoolbar.exclude_prefixes'] = ['/static/', '/favicon.ico']
+    settings['debugtoolbar.exclude_prefixes'] = ['/static/', '/favicon.ico', '/header_image.png']
     config.include(pyramid_debugtoolbar)
 
     config.add_static_path(
@@ -591,6 +603,7 @@ def _setup_pyramid_tm(comp, config):
     skip_tm_path_info = (
         '/static/',
         '/favicon.ico',
+        '/header_image.png',
         '/api/component/pyramid/route',
         '/_debug_toolbar/')
 

@@ -475,23 +475,23 @@ def getWebmapGroup(request):
 @viewargs(renderer='json')
 def getMaplist(request):
 
-    query = DBSession.query(Resource, ResourceWebMapGroup, ResourceSocial) \
+    query = DBSession.query(Resource, ResourceWebMapGroup, WebMapGroupResource, ResourceSocial) \
         .join(WebMapGroupResource, Resource.id == WebMapGroupResource.resource_id) \
         .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
         .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
 
     result = list()
-    for res, res_wmg, res_social in query:
+    for res, res_wmg, wmg, res_social in query:
         action_map = res_wmg.action_map
         if res_wmg.id != 0:
             if res.has_permission(PERM_READ, request.user):
-                result.append(dict(id=res.id, owner=True, display_name=res.display_name,
-                webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+                result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
+                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id, action_map=res_wmg.action_map,
                 preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
                 preview_description=None if res_social == None else res_social.preview_description))
             if not res.has_permission(PERM_READ, request.user) and action_map == True:
-                result.append(dict(id=res.id, owner=False, display_name=res.display_name,
-                webmap_group_name=res_wmg.webmap_group_name,  action_map=res_wmg.action_map,
+                result.append(dict(id=res.id, value=res.id, owner=False, display_name=res.display_name, label=res.display_name,
+                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id, action_map=res_wmg.action_map,
                 preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
                 preview_description=None if res_social == None else res_social.preview_description))
     is_adm = request.user.is_administrator
@@ -610,6 +610,58 @@ def tbl_res(request):
                 column_from_const=resource.column_from_const,
                 fields=fields
             ))
+    return result
+
+@viewargs(renderer='json')
+def webmap_group_item(request):
+    id = int(request.matchdict['id'])
+
+    query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(webmap_group_id=id) \
+        .join(Resource, WebMapGroupResource.resource_id == Resource.id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for wmg, res, res_wmg, res_social in query:
+        action_map = res_wmg.action_map
+        if res.has_permission(PERM_READ, request.user):
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=True, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
+        if not res.has_permission(PERM_READ, request.user) and action_map == True:
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=False, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
+    return result
+
+@viewargs(renderer='json')
+def webmap_item(request):
+    id = int(request.matchdict['id'])
+
+    query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(resource_id=id) \
+        .join(Resource, WebMapGroupResource.resource_id == Resource.id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for wmg, res, res_wmg, res_social in query:
+        action_map = res_wmg.action_map
+        if res.has_permission(PERM_READ, request.user):
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=True, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
+        if not res.has_permission(PERM_READ, request.user) and action_map == True:
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=False, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
     return result
 
 def setup_pyramid(comp, config):
@@ -732,3 +784,13 @@ def setup_pyramid(comp, config):
         'resource.maplist',
         '/api/resource/maplist/',
         get=getMaplist)
+
+    config.add_route(
+        'resource.webmap_group_item',
+        '/wmgroup/{id:uint}',
+        get=webmap_group_item)
+
+    config.add_route(
+        'resource.webmap_item',
+        '/webmap/{id:uint}',
+        get=webmap_item)

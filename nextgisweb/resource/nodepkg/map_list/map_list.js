@@ -13,7 +13,7 @@ import ArrowScrollTo from "./icons/arrow_scroll_to.svg";
 import { BackTop, Row, Col } from "@nextgisweb/gui/antd";
 import Select from 'react-select';
 
-export function map_list(props) {
+export function map_list() {
 
     const [items, setItem] = useState([]);
     const [scope, setScope] = useState(false);

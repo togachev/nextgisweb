@@ -237,17 +237,6 @@ def webmap_group_data(request):
     return result
 
 @viewargs(renderer='react')
-def webmap_group_item(request):
-    request.require_administrator()
-    id = int(request.matchdict['id'])
-
-    return dict(
-        entrypoint='@nextgisweb/resource/webmap-group-item',
-        props=dict(id=id),
-        title=_("Digital web map group"),
-    )
-
-@viewargs(renderer='react')
 def resource_constraint(request):
     request.resource_permission(PERM_UPDATE)
 
@@ -483,11 +472,6 @@ def setup_pyramid(comp, config):
         'resource.webmap_group',
         '/wmgroup',
         get=webmap_group_data)
-
-    config.add_route(
-        'resource.webmap_group_item',
-        '/wmgroup/{id:uint}',
-        ).add_view(webmap_group_item)
 
     config.add_route(
         'map_list',
