@@ -1,6 +1,9 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<%def name="sidebar()">
+<%def name="has_sidebar()"><% return selected is not None %></%def>
+<%def name="sidebar()">${dynmenu()}</%def>
+
+<%def name="dynmenu()">
     <ul class="ngw-pyramid-dynmenu">
     <% cgroup = None %>
     %for te in testentries:
@@ -22,16 +25,21 @@
     </ul>
 </%def>
 
-<div id="teTarget">
-    %if selected:
-        <script type="text/javascript">
-            require([
-                "@nextgisweb/jsrealm/plugin!jsrealm.testentry/" + ${testentries[selected]['type'] | json_js},
-                ${selected | json_js},
-                "dojo/domReady!"
-            ], (runner, {default: module}) => {
-                runner(module, document.getElementById('teTarget'));
+%if not selected:
+    ${dynmenu()}
+%else:
+    <script type="text/javascript">
+        (function () {
+            const element = document.createElement("div");
+            const current = document.currentScript;
+            current.parentNode.insertBefore(element, current.nextSibling);
+
+            require(["@nextgisweb/jsrealm/testentry/driver"], ({ registry }) => {
+                const teType = ${testentries[selected]['type'] | json_js};
+                registry.load({identity: teType}).then((runner) => {
+                    runner(${json_js(selected)}, element);
+                });
             })
-        </script>
-    %endif
-</div>
+        })();
+    </script>
+%endif

@@ -3,16 +3,11 @@
 @import (css) "@{node_modules}/@fontsource/roboto/400.css";
 @import (css) "@{node_modules}/@fontsource/roboto/500.css";
 
-@import "blocks/_decorations.less";
 @import "blocks/_icons.less";
 @import "blocks/_links.less";
 @import "blocks/_list.less";
 @import "blocks/_tables.less";
 @import "blocks/_typography.less";
-
-@import "ngw-ui/_ngw-buttons.less";
-@import "ngw-ui/_ngw-date-picker.less";
-@import "ngw-ui/_ngw-toolbar.less";
 
 // Antd 5 doesn't set box-sizing: border-box as Antd 4, but we rely on it.
 div.dijitTabPane,
@@ -132,7 +127,9 @@ a[class*=" icon-"]:hover:before {
                 > h1.ngw-pyramid-layout-title {
                     margin: 0 0 6px 0;
                     display: flex;
-                    justify-content: space-between;
+                    align-items: center;
+                    gap: 8px;
+                    min-height: 32px;
                 }
             }
         }
@@ -357,6 +354,10 @@ dl.ngw-pyramid-kv {
             background-repeat: repeat-x;
         }
     }
+}
+
+.padding-block {
+    padding: 8px;
 }
 
 .overlay {

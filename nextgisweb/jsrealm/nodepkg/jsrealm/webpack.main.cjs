@@ -2,7 +2,6 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
-const { DefinePlugin } = require("webpack");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
@@ -58,21 +57,10 @@ function scanForEntries() {
 }
 
 let isDynamicEntry;
-
-let plugins, testentries;
+let testentries, plRegistries, plFileScope;
 
 const dynamicEntries = () => {
     const entrypoints = scanForEntries();
-
-    plugins = {};
-
-    entrypoints
-        .filter((ep) => ep.type === "plugin")
-        .forEach(({ plugin, entry }) => {
-            const [cat, id] = plugin.split(/\s+/, 2);
-            if (plugins[cat] === undefined) plugins[cat] = {};
-            plugins[cat][id] = entry;
-        });
 
     testentries = Object.fromEntries(
         entrypoints
@@ -80,14 +68,86 @@ const dynamicEntries = () => {
             .map(({ entry, testentry: type }) => [entry, { type }])
     );
 
+    plRegistries = [];
+    plFileScope = {};
+
+    const plScopeFiles = {};
+
+    entrypoints
+        .filter(({ type }) => type === "plugin")
+        .forEach(({ plugin, fullname }) => {
+            if (plScopeFiles[plugin] === undefined) plScopeFiles[plugin] = [];
+            plFileScope[fullname] = plugin;
+            plScopeFiles[plugin].push(fullname);
+        });
+
+    entrypoints
+        .filter(({ type }) => type === "registry")
+        .forEach(({ entry, fullname, registry }) => {
+            plRegistries.push({
+                scope: registry,
+                fullname,
+                entry,
+                component: config.pathToComponent(fullname),
+            });
+        });
+
     const webpackEntries = Object.fromEntries(
-        entrypoints.map(({ entry, fullname }) => [
-            entry,
-            {
-                import: injectCode(fullname, withChunks(entry)),
-                library: { type: "amd", name: entry },
-            },
-        ])
+        entrypoints
+            .filter(({ type }) => type !== "plugin")
+            .map(({ type, entry, fullname, registry }) => {
+                if (type === "registry") {
+                    const wrapper = fullname.replace(
+                        /\.[tj]?sx?$/,
+                        "-wrapper.js"
+                    );
+
+                    const code = [
+                        withChunks(entry),
+                        `import entrypoint from "@nextgisweb/jsrealm/entrypoint";`,
+                        `import { registry } from "${fullname}";`,
+                        ...(plScopeFiles[registry] || []).map(
+                            (fn) => `import "${fn}";`
+                        ),
+                    ];
+
+                    if (registry === "jsrealm/plugin/meta") {
+                        for (const itm of plRegistries) {
+                            // Do not include meta registry itself
+                            if (itm.scope === "jsrealm/plugin/meta") continue;
+                            code.push(
+                                `registry.register({`,
+                                `    component: "${itm.component}", `,
+                                `    identity: "${itm.scope}",`,
+                                `    import: () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry }))`,
+                                `});`
+                            );
+                        }
+                    }
+
+                    code.push(
+                        `export * from "${fullname}";`,
+                        `if (!registry) throw new Error("Registry '${registry}' is not defined");`,
+                        "registry.seal();"
+                    );
+
+                    return [
+                        entry,
+                        {
+                            import: virtualImport(wrapper, code.join("\n")),
+                            library: { type: "amd", name: entry },
+                        },
+                    ];
+                } else {
+                    return [
+                        entry,
+                        {
+                            import: injectCode(fullname, withChunks(entry)),
+                            library: { type: "amd", name: entry },
+                        },
+                    ];
+                }
+            })
     );
 
     isDynamicEntry = (m) => webpackEntries[m] !== undefined;
@@ -236,6 +296,12 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
     },
 });
 
+/* Does the path belongs to NGW component with JS package? */ /* prettier-ignore */
+const ngwCompRegExp = new RegExp("/(?:nextgisweb(?:_\\w+)?/)(\\w+)/nodepkg(?:$|/)");
+
+/* Does the module name belongs to an external or legacy AMD? */ /* prettier-ignore */
+const extOrLegacyRegExp = new RegExp(`^(((${config.externals.join("|")})(/|$))|ngw-)`);
+
 /** @type {import("webpack").Configuration} */
 const webpackConfig = defaults("main", (env) => ({
     entry: () => ({ ...staticEntries, ...dynamicEntries() }),
@@ -305,12 +371,6 @@ const webpackConfig = defaults("main", (env) => ({
         plugins: [new iconUtil.IconResolverPlugin()],
     },
     plugins: [
-        new DefinePlugin({
-            JSREALM_PLUGIN_REGISTRY: DefinePlugin.runtimeValue(
-                () => JSON.stringify(plugins),
-                true
-            ),
-        }),
         new CopyPlugin({
             // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
             // to the dist directly. It is written in ES5-compatible way as AMD
@@ -342,40 +402,58 @@ const webpackConfig = defaults("main", (env) => ({
         chunkFilename: "chunk/[id].js",
     },
     externals: [
-        function ({ context, request }, callback) {
+        function ({ context, request, contextInfo }, callback) {
             // Use AMD loader for with-chunks!some-entrypoint-name imports.
             if (request.startsWith("@nextgisweb/jsrealm/with-chunks!")) {
                 return callback(null, `amd ${request}`);
             }
 
-            // Use AMD loader for all entrypoints.
-            const requestModule = request.replace(/!.*$/, "");
-            if (isDynamicEntry(requestModule)) {
-                if (["@nextgisweb/pyramid/i18n"].includes(requestModule)) {
-                    const loader = /(!.*|)$/.exec(request)[1];
-                    if (loader === "" || loader === "!") {
-                        const re = /(?:\/nextgisweb_|\/)(\w+)\/nodepkg(?:$|\/)/;
-                        const compId = re.exec(context)[1];
-                        const newRequest = `${requestModule}!${compId}`;
-                        logger.debug(
-                            `"${request}" replaced with "${newRequest}"`
-                        );
-                        request = newRequest;
+            if (extOrLegacyRegExp.test(request)) {
+                return callback(null, `amd ${request}`);
+            }
+
+            const swith = (w) => request.startsWith(w);
+            const rtype = swith(".") ? "rel" : swith("/") ? "abs" : null;
+
+            let rpkg = null;
+            if (swith("@nextgisweb/")) {
+                rpkg = request;
+            } else if (
+                ngwCompRegExp.test(context) &&
+                !/^[a-z][0-9a-z-_]*:/i.test(context) &&
+                rtype
+            ) {
+                if (rtype === "rel") {
+                    const contextPkg = config.pathToModule(context);
+                    rpkg = path.join(contextPkg, request);
+                    if (rpkg.startsWith(".")) rpkg = null;
+                } else if (rtype === "abs") {
+                    rpkg = config.pathToModule(request);
+                }
+            }
+
+            if (rpkg) {
+                let [rmod, rarg] = rpkg.split("!", 2);
+                if (isDynamicEntry(rmod)) {
+                    if (rmod === "@nextgisweb/pyramid/i18n" && !rarg) {
+                        rarg = config.pathToComponent(context);
                     }
-                }
-                return callback(null, `amd ${request}`);
-            }
 
-            // External packages
-            for (const external of config.externals) {
-                if (request.startsWith(external + "/")) {
-                    return callback(null, `amd ${request}`);
-                }
-            }
+                    // If it's a plugin for some registry, we must import an
+                    // unwrapped registry module. Plugins must import registries
+                    // from modules with @registry.
+                    const iscope = plFileScope[contextInfo.issuer];
+                    if (iscope) {
+                        for (const { scope, entry } of plRegistries) {
+                            if (iscope === scope && rmod === entry) {
+                                return callback();
+                            }
+                        }
+                    }
 
-            // Legacy component AMD modules
-            if (request.startsWith("ngw-")) {
-                return callback(null, `amd ${request}`);
+                    const mod = rmod + (rarg !== undefined ? "!" + rarg : "");
+                    return callback(null, `amd ${mod}`);
+                }
             }
 
             callback();

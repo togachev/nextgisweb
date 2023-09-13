@@ -120,6 +120,13 @@ def header_image(request):
     else:
         raise HTTPNotFound()
 
+@viewargs(renderer='webgis.mako')
+def webgis(request):
+    return dict(
+        title=_("Webgis"),
+        custom_layout=True
+    )
+
 def locale(request):
     request.session['pyramid.locale'] = request.matchdict['locale']
     return HTTPFound(location=request.GET.get('next', request.application_url))
@@ -205,6 +212,13 @@ def home_path(request):
         title=_("Home path"),
         dynmenu=request.env.pyramid.control_panel)
 
+@viewargs(renderer='react')
+def metrics(request):
+    request.require_administrator()
+    return dict(
+        entrypoint='@nextgisweb/pyramid/metrics',
+        title=_("Metrics and analytics"),
+        dynmenu=request.env.pyramid.control_panel)
 
 def test_request(request):
     comp = request.env.pyramid
@@ -472,6 +486,16 @@ def setup_pyramid(comp, config):
         '/control-panel/home-path'
     ).add_view(home_path)
 
+    config.add_route(
+        'pyramid.control_panel.metrics',
+        '/control-panel/metrics',
+    ).add_view(metrics)
+
+    config.add_route(
+        'webgis',
+        '/webgis') \
+        .add_view(webgis)
+
     config.add_route('pyramid.locale', '/locale/{locale:str}').add_view(locale)
 
     comp.test_request_handler = None
@@ -503,6 +527,8 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.logo'))),
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
+        dm.Link('settings/metrics', _("Metrics and analytics"), lambda args: (
+            args.request.route_url('pyramid.control_panel.metrics'))),
     )
 
     if env.core.options['storage.enabled']:
@@ -588,6 +614,8 @@ def _setup_pyramid_debugtoolbar(comp, config):
     if hosts := dt_opt.get('hosts', '0.0.0.0/0' if comp.env.core.debug else None):
         settings['debugtoolbar.hosts'] = hosts
     settings['debugtoolbar.exclude_prefixes'] = ['/static/', '/favicon.ico', '/header_image.png']
+    settings['debugtoolbar.show_on_exc_only'] = True
+    settings['debugtoolbar.max_visible_requests'] = 25
     config.include(pyramid_debugtoolbar)
 
     config.add_static_path(

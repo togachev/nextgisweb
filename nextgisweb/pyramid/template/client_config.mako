@@ -29,6 +29,7 @@
         invitation_session = False
 
     ngwConfig = {
+        "components": list(request.env.components.keys()),
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
         "amdUrl": request.static_url(),
@@ -62,6 +63,7 @@
         "baseUrl": request.static_url('dojo'),
         "locale": request.locale_name,
         "aliases": [
+            ['mocha', 'mocha/mocha'],
             ['openlayers/ol', 'external-ol/ol'],
         ],
     }

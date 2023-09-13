@@ -63,6 +63,7 @@
         ]);
     </script>
 
+    <%include file="nextgisweb:pyramid/template/metrics.mako"/>
     <%
         try:
             include_head = request.env.core.settings_get('pyramid', 'include_head')
@@ -103,7 +104,7 @@
 
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
-                    <div class="ngw-pyramid-layout-main">
+                    <div id="main" class="ngw-pyramid-layout-main">
                         %if len(bcpath) > 0:
                             <div class="ngw-pyramid-layout-bcrumb">
                                 %for idx, bc in enumerate(bcpath):
@@ -121,7 +122,7 @@
                             </div>
                         %endif
 
-                        <h1 class="ngw-pyramid-layout-title">
+                        <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
                             %if hasattr(next, 'title_ext'):
                                 <div class="ext">${next.title_ext()}</div>
@@ -135,7 +136,13 @@
                         %endif
                     </div>
                 </div>
-                %if sidebar := getattr(next, 'sidebar', None):
+                <% 
+                    sidebar = getattr(next, 'sidebar', None)
+                    has_sidebar = getattr(next, 'has_sidebar', lambda: True)()
+                %>
+                %if not has_sidebar:
+                    <% pass %>
+                %elif sidebar := getattr(next, 'sidebar', None):
                     <div class="ngw-pyramid-layout-sidebar">${sidebar()}</div>
                 %elif has_dynmenu:
                     <div class="ngw-pyramid-layout-sidebar">

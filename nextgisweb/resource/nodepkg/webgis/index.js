@@ -1,4 +1,4 @@
 /** @entrypoint */
-import { WebgisHome } from "./WebgisHome";
+import { WebgisHome } from "./webgis";
 
 export default WebgisHome;
