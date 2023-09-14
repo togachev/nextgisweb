@@ -1,6 +1,4 @@
-import "./footer-webgis.less";
-
-export default function FooterWebgis() {
+export const FooterWebgis = () => {
 
     return (
         <div className="footer-webgis">

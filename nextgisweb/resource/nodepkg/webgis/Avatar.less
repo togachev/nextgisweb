@@ -1,0 +1,77 @@
+.ngw-pyramid-avatar {
+    cursor: pointer;
+    user-select: none;
+
+    > a {
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    &-label {
+        display: inline-block;
+        vertical-align: middle;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        border-radius: 2px;
+        color: var(--on-primary-text);
+        background: var(--primary);
+        font-size: 20px;
+        text-align: center;
+    }
+}
+
+
+.ngw-pyramid-avatar-danger {
+    .ngw-pyramid-avatar-label {
+        color: var(--on-primary);
+        background-color: var(--surface-bg-danger);
+    }
+}
+
+
+.ngw-pyramid-avatar-popover {
+    .ant-popover-title {
+        padding: 6px 12px;
+        font-weight: 500;
+    }
+
+    .ant-popover-inner-content {
+        padding: 0px;
+
+        div.warning {
+            display: block;
+            padding: 6px 12px;
+            background-color: var(--surface-bg-danger);
+        }
+
+        a {
+            display: block;
+            padding: 6px 12px;
+            text-decoration: none;
+            color: var(--text-base);
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.04);
+            }
+        }
+    }
+}
+
+.button-login{
+    display: flex;
+    align-items: center;
+}
+
+.text-login {
+    padding: 0;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.icon-login {
+    padding: 0px 5px 0px 10px;
+    font-size: 18px;
+}

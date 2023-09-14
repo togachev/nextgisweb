@@ -9,8 +9,7 @@ import LockOpen from "@nextgisweb/icon/material/lock_open";
 import getSelectStyle from "./selectStyle";
 import "./map_list.less";
 import "./details.less";
-import ArrowScrollTo from "./icons/arrow_scroll_to.svg";
-import { BackTop, Row, Col } from "@nextgisweb/gui/antd";
+import { FloatButton, Row, Col } from "@nextgisweb/gui/antd";
 import Select from 'react-select';
 
 export function map_list() {
@@ -166,9 +165,7 @@ export function map_list() {
                     }
                 </div>
             </div>
-            <BackTop>
-                <div className="scrollTop"><ArrowScrollTo /></div>
-            </BackTop>
+            <FloatButton.BackTop />
         </>
     );
 }

@@ -6,41 +6,25 @@
 </div>
 
 
-<script type="text/javascript">
-    require([
-        "@nextgisweb/resource/header-webgis",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {       
-        reactApp.default(
-            comp.default,
-            {},
-            document.getElementById('header-webgis')
-        );
-    });
-</script>
+<div class="header-menu">
+    <div class="link-menu" id="link-menu"></div>
+    <div class="webgis-avatar" id="avatar"></div>
+</div>
 
-<script type="text/javascript">
+<script>
     require([
+        "@nextgisweb/gui/react-app",
         "@nextgisweb/resource/webgis",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
+    ], function (reactApp, webgis) {
         reactApp.default(
-            comp.default,
-            {},
-            document.getElementById('content-main')
+            webgis.HeaderWebgis, {}, document.getElementById('header-webgis')
         );
-    });
-</script>
-
-<script type="text/javascript">
-    require([
-        "@nextgisweb/resource/footer-webgis",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {       
+        reactApp.default(webgis.Avatar, {}, document.getElementById("avatar"));
         reactApp.default(
-            comp.default,
-            {},
-            document.getElementById('footer-webgis')
+            webgis.WebgisHome, {}, document.getElementById('content-main')
+        );
+        reactApp.default(
+            webgis.FooterWebgis, {}, document.getElementById('footer-webgis')
         );
     });
 </script>

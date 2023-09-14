@@ -4,7 +4,7 @@ export {
     AutoComplete,
     Alert,
     Avatar,
-    BackTop,
+    FloatButton,
     Badge,
     Breadcrumb,
     Button,

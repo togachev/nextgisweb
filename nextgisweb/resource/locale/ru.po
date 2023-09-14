@@ -588,3 +588,19 @@ msgstr "Связь с ресурсом"
 #: template/resource_section_summary.mako:65
 msgid "Web map group"
 msgstr "Группа веб-карты"
+
+#: nodepkg/webgis/Avatar.js:12
+msgid "Sign in"
+msgstr "Войти"
+
+#: nodepkg/webgis/Avatar.js:21
+msgid "Invitation session"
+msgstr "Пригласительная сессия"
+
+#: nodepkg/webgis/Avatar.js:24 view.py:495
+msgid "Settings"
+msgstr "Настройки"
+
+#: nodepkg/webgis/Avatar.js:26
+msgid "Sign out"
+msgstr "Выйти"

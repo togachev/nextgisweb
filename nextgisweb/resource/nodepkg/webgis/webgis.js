@@ -1,40 +1,58 @@
-import { useEffect, useState, useMemo } from "react";
-import { route } from "@nextgisweb/pyramid/api";
+import { useState, useMemo } from "react";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import './webgis.less';
-import { Select, Menu } from "@nextgisweb/gui/antd";
+import { Empty, Select, Menu, Typography, Card, FloatButton } from "@nextgisweb/gui/antd";
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-import { Avatar, Card } from 'antd';
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import MapIcon from "@nextgisweb/icon/material/map";
+
+const openMap = gettext("открыть карту");
+
 const { Meta } = Card;
+const { Text, Link } = Typography;
+
+const MapTile = (props) => {
+    const { id, display_name, preview_fileobj_id } = props.item;
+    const preview = routeURL('resource.preview', id)
+    return (
+        <Card
+            // title={display_name} //add tooltip
+            style={{
+                width: 300,
+                margin: 20,
+                height: 320
+            }}
+            hoverable
+            cover={preview_fileobj_id ?
+                <div className="img_preview"
+
+                    style={{ background: `url(${preview}) center center / cover no-repeat` }}
+                ></div>
+                :
+                <div className="img_preview_none">
+                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                </div>
+            }
+        >
+            <Meta
+                style={{
+                    fontWeight: 500,
+                    height: 125
+                }}
+                title={display_name}
+                description={
+                    <Link href={routeURL('webmap.display', id)} target="_blank">
+                        <Text className="open-map" underline>{openMap}</Text>
+                        <span className="icon-open-map"><MapIcon /></span>
+                    </Link>
+                }
+            />
+        </Card>
+    )
+}
 
 
-const MapTile = ({name}) => (
-    <Card
-    style={{
-      width: 300,
-    }}
-    cover={
-      <img
-        alt="example"
-        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-      />
-    }
-    actions={[
-      <SettingOutlined key="setting" />,
-      <EditOutlined key="edit" />,
-      <EllipsisOutlined key="ellipsis" />,
-    ]}
-  >
-    <Meta
-      avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel" />}
-      title={name}
-      description="This is the description"
-    />
-  </Card>
-)
-
-
-export function WebgisHome() {
+export const WebgisHome = () => {
     const [mapsSearch, setMapsSearch] = useState(); // выбрана карта при поиске
     const [loading, setLoading] = useState(true);
 
@@ -51,7 +69,6 @@ export function WebgisHome() {
         setMapsSearch(value);
     };
 
-    console.log(itemsMaps);
     const onSearch = (value) => {
         setMapsSearch(value);
         setClickMenu(null)
@@ -114,7 +131,7 @@ export function WebgisHome() {
                         open={open}
                         onDropdownVisibleChange={(o) => setOpen(o)}
                         suffixIcon={suffixIcon}
-                        style={{ width: '50%' }}
+                        style={{ width: '50%', maxWidth: '550px' }}
                         value={clickMenu}
                         autoClearSearchValue={true}
                         onFocus={() => setClickMenu(undefined)}
@@ -132,6 +149,7 @@ export function WebgisHome() {
                 <div className="menu-maps">
                     <div>
                         <Menu
+                            selectable={false}
                             mode="inline"
                             theme="light"
                             items={groupMaps}
@@ -141,19 +159,22 @@ export function WebgisHome() {
                         />
                     </div>
                     <div className="content-maps-grid">
-                        {itemsMaps.map((item, index) => {
-                            return (
-                                <MapTile key={index} name={item.display_name} />
-                            )
-                        })}
-                        {itemsSearch.map((item, index) => {
-                            return (
-                                <MapTile key={index} name={item.display_name} />
-                            )
-                        })}
+                        <div className="content_group">
+                            {itemsMaps.map((item, index) => {
+                                return (
+                                    <MapTile key={index} item={item} />
+                                )
+                            })}
+                            {itemsSearch.map((item, index) => {
+                                return (
+                                    <MapTile key={index} item={item} />
+                                )
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
+            <FloatButton.BackTop />
         </div>
     )
 }
