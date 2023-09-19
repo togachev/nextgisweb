@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import './webgis.less';
-import { Empty, Select, Menu, Typography, Card, FloatButton } from "@nextgisweb/gui/antd";
+import { Empty, Select, Menu, Typography, Card, FloatButton, Tooltip, Button } from "@nextgisweb/gui/antd";
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import MapIcon from "@nextgisweb/icon/material/map";
@@ -14,9 +14,9 @@ const { Text, Link } = Typography;
 const MapTile = (props) => {
     const { id, display_name, preview_fileobj_id } = props.item;
     const preview = routeURL('resource.preview', id)
+
     return (
         <Card
-            // title={display_name} //add tooltip
             style={{
                 width: 300,
                 margin: 20,
@@ -39,7 +39,12 @@ const MapTile = (props) => {
                     fontWeight: 500,
                     height: 125
                 }}
-                title={display_name}
+                title={
+                    <Tooltip placement="top" title={display_name} >
+                        {display_name}
+                    </Tooltip>
+                }
+
                 description={
                     <Link href={routeURL('webmap.display', id)} target="_blank">
                         <Text className="open-map" underline>{openMap}</Text>
@@ -149,13 +154,11 @@ export const WebgisHome = () => {
                 <div className="menu-maps">
                     <div>
                         <Menu
-                            selectable={false}
                             mode="inline"
                             theme="light"
                             items={groupMaps}
                             onClick={onClickGroupMaps}
                             defaultOpenKeys={['sub1']}
-                            defaultSelectedKeys={['1']}
                         />
                     </div>
                     <div className="content-maps-grid">
