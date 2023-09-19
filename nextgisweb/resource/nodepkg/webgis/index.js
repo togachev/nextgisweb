@@ -1,4 +1,4 @@
 /** @entrypoint */
-export { WebgisHome } from "./webgis";
-export { FooterWebgis } from "./footer-webgis";
+export { Content } from "./webgis";
+export { Footer } from "./footer-webgis";
 export { Header } from "./Header";

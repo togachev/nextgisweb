@@ -8,7 +8,7 @@ const LogoUriitComp = () => (
     </span>
 )
 
-export const FooterWebgis = () => {
+export const Footer = () => {
     return (
         <div className="footer-webgis">
             <div className="footer-info">

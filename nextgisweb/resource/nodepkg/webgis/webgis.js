@@ -57,7 +57,7 @@ const MapTile = (props) => {
 }
 
 
-export const WebgisHome = () => {
+export const Content = () => {
     const [mapsSearch, setMapsSearch] = useState(); // выбрана карта при поиске
     const [loading, setLoading] = useState(true);
 
