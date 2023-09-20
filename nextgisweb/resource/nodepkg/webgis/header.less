@@ -94,10 +94,11 @@
 }
 
 .menu-avatar {
-	width: 80px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
 
 	>a {
 		font-size: 14px;
@@ -106,15 +107,18 @@
 	}
 
 	&-label {
-		display: inline-block;
+		display: flex;
 		vertical-align: middle;
 		width: 24px;
 		height: 24px;
 		line-height: 24px;
 		border-radius: 2px;
 		color: var(--on-primary-text);
-		font-size: 20px;
+		font-size: 14px;
 		text-align: center;
+		cursor: pointer;
+		background: rgb(42 56 140 / 75%);
+		justify-content: center;
 	}
 
 	.ant-btn-icon {
@@ -169,4 +173,61 @@
 			}
 		}
 	}
+}
+
+.ant-btn-primary {
+	background-color: #2a388c;
+
+	&:hover {
+		background-color: #212020 !important;
+		border-color: #212020 !important;
+	}
+}
+
+.ngw-auth-login-form {
+	h1, h2, h3 {
+		letter-spacing: normal;
+		color: #2a388c;
+	}
+}
+
+.ant-modal .ant-modal-content {
+	position: relative;
+	background-color: #ffffff;
+	background-clip: padding-box;
+	border: 0;
+	border-radius: 3px;
+	box-shadow: none;
+	pointer-events: auto;
+	padding: 18px;
+}
+
+.ant-modal .ant-modal-close {
+    position: absolute;
+    top: 10px;
+    inset-inline-end: 10px;
+    z-index: 1010;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.45);
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    background: transparent;
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    transition: color 0s,background-color 0s;
+}
+
+.ant-modal .ant-modal-close-x {
+    display: flex;
+    font-size: 21px;
+    font-style: normal;
+    line-height: 22px;
+    justify-content: center;
+    text-transform: none;
+    text-rendering: auto;
 }
