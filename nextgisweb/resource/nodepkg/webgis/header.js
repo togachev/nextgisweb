@@ -7,7 +7,8 @@ import i18n from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import { LoginOutlined } from '@ant-design/icons';
 
-import './Header.less';
+import './header.less';
+
 const { Title } = Typography;
 const signInText = i18n.gettext("Sign in");
 

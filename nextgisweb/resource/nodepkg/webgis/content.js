@@ -1,9 +1,15 @@
 import React, { useState, useMemo } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import './webgis.less';
-import { Empty, Select, Menu, Typography, Card, FloatButton, Tooltip, Button } from "@nextgisweb/gui/antd";
+
+import { Empty, Select, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import { Header } from "./header";
+import { Footer } from "./footer";
+
+import './content.less';
+
 import MapIcon from "@nextgisweb/icon/material/map";
 
 const openMap = gettext("открыть карту");
@@ -59,7 +65,6 @@ const MapTile = (props) => {
 
 export const Content = () => {
     const [mapsSearch, setMapsSearch] = useState(); // выбрана карта при поиске
-    const [loading, setLoading] = useState(true);
 
     const [listMaps, setListMaps] = useState([]); // список карт
     const [listMapsSearch, setListMapsSearch] = useState([]); // список карт
@@ -129,55 +134,68 @@ export const Content = () => {
     }
 
     return (
-        <div className="main">
-            <div className="content">
-                <div className="content-select">
-                    <Select
-                        open={open}
-                        onDropdownVisibleChange={(o) => setOpen(o)}
-                        suffixIcon={suffixIcon}
-                        style={{ width: '50%', maxWidth: '550px' }}
-                        value={clickMenu}
-                        autoClearSearchValue={true}
-                        onFocus={() => setClickMenu(undefined)}
-                        maxTagPlaceholder={10}
-                        allowClear={true}
-                        showSearch
-                        placeholder="Введите название карты"
-                        optionFilterProp="children"
-                        onChange={onChange}
-                        onSearch={onSearch}
-                        filterOption={filterOption}
-                        options={filteredOptions}
-                    />
-                </div>
-                <div className="menu-maps">
-                    <div>
-                        <Menu
-                            mode="inline"
-                            theme="light"
-                            items={groupMaps}
-                            onClick={onClickGroupMaps}
-                            defaultOpenKeys={['sub1']}
+        <>
+            <Header />
+            <div className="main">
+                <div className="content">
+                    <ConfigProvider
+                        theme={{
+                            token: {
+                                controlItemBgActive: '#2a398c0d',
+                            },
+                        }}
+                    >
+                        <Select
+                            open={open}
+                            onDropdownVisibleChange={(o) => setOpen(o)}
+                            suffixIcon={suffixIcon}
+                            style={{ width: '50%', maxWidth: '550px' }}
+                            value={clickMenu}
+                            autoClearSearchValue={true}
+                            onFocus={() => setClickMenu(undefined)}
+                            maxTagPlaceholder={10}
+                            allowClear={true}
+                            showSearch
+                            placeholder="Введите название карты"
+                            optionFilterProp="children"
+                            onChange={onChange}
+                            onSearch={onSearch}
+                            filterOption={filterOption}
+                            options={listMapsSearch}
+                            props={{ optionSelectedBg: "#e6f4ff" }}
                         />
-                    </div>
-                    <div className="content-maps-grid">
-                        <div className="content_group">
-                            {itemsMaps.map((item, index) => {
-                                return (
-                                    <MapTile key={index} item={item} />
-                                )
-                            })}
-                            {itemsSearch.map((item, index) => {
-                                return (
-                                    <MapTile key={index} item={item} />
-                                )
-                            })}
+                    </ConfigProvider>
+                    <div className="menu-maps">
+                        <div>
+                            <Menu
+                                mode="inline"
+                                theme="light"
+                                items={groupMaps}
+                                onClick={onClickGroupMaps}
+                                defaultOpenKeys={['sub1']}
+                            />
+                        </div>
+                        <div className="content-maps-grid">
+                            <div className="content_group">
+                                {itemsMaps.map((item, index) => {
+                                    return (
+                                        <MapTile key={index} item={item} />
+                                    )
+                                })}
+                                {itemsSearch.map((item, index) => {
+                                    return (
+                                        <MapTile key={index} item={item} />
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
+                <FloatButton.BackTop />
             </div>
-            <FloatButton.BackTop />
-        </div>
+            <Footer />
+
+        </>
+
     )
 }
