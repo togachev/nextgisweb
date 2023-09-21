@@ -1,6 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <div id="content" class="wrapper-webgis"></div>
-
 <script>
     require([
         "@nextgisweb/gui/react-app",

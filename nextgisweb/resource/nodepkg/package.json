@@ -4,6 +4,7 @@
     "type": "module",
     "dependencies": {
         "react-bootstrap": "^2.7.0",
-        "react-select": "^5.7.0"
+        "react-select": "^5.7.0",
+        "@fontsource/montserrat": "^5.0.8"
     }
 }

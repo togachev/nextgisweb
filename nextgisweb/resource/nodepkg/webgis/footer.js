@@ -1,10 +1,10 @@
-import { Typography, Divider, Row, Col } from "@nextgisweb/gui/antd";
+import { Typography, Divider } from "@nextgisweb/gui/antd";
 import LogoUriit from "./icons/uriit_logo.svg";
 import { RightOutlined } from '@ant-design/icons';
 import i18n from "@nextgisweb/pyramid/i18n";
 import './footer.less';
 
-const { Text } = Typography;
+const { Text, Link } = Typography;
 
 const LogoUriitComp = () => (
     <span className="uriit-logo">
@@ -21,9 +21,18 @@ const info = [
     {
         key: "services", label: "", value: i18n.gettext("Услуги Центра космических услуг"),
         list: [
-            { key: "office", label: "", value: i18n.gettext("Разработка цифровой карты рыбоводного участках") },
-            { key: "fax", label: "", value: i18n.gettext("Космический мониторинг лесных ресурсов") },
-            { key: "email", label: "", value: i18n.gettext("Геологическое моделирование трещинных систем нефтяных и газовых месторождений") },
+            {
+                key: "office", label: i18n.gettext("Разработка цифровой карты рыбоводного участках"),
+                value: 'https://uriit.ru/services/infospace-technologies/kosmicheskiy-monitoring-vodnykh-obektov/'
+            },
+            {
+                key: "fax", label: i18n.gettext("Космический мониторинг лесных ресурсов"),
+                value: 'https://uriit.ru/services/infospace-technologies/kosmicheskiy-monitoring-lesnogo-fonda/'
+            },
+            {
+                key: "email", label: i18n.gettext("Геологическое моделирование трещинных систем нефтяных и газовых месторождений"),
+                value: 'https://uriit.ru/services/geological-modelling/'
+            },
         ]
     },
 ]
@@ -34,27 +43,27 @@ export const Footer = () => {
             <div className="footer-info">
                 <LogoUriitComp />
                 <div className="block-info">
-                    <Row className="content-services">
-                        <Col className="services-a">{info.find((e) => e.key == 'services').value}</Col>
-                        <Col>{info.find((e) => e.key == 'services').list.map(item => {
+                    <div className="content-services">
+                        <div className="services-a">{info.find((e) => e.key == 'services').value}</div>
+                        <div className="services-b">{info.find((e) => e.key == 'services').list.map(item => {
                             return (
-                                <Row key={item.key}><RightOutlined /><Col className="services-b">{item.value}</Col></Row>
+                                <span key={item.key}><Link href={item.value} target="_blank"><RightOutlined />{item.label}</Link></span>
                             )
-                        })}</Col>
-                    </Row>
+                        })}</div>
+                    </div>
                     <Divider />
-                    <Row className="content-info">
-                        <Col className="info-a">{info.find((e) => e.key == 'address').value}</Col>
-                        <Col className="info-b">{info.filter((e) => e.key !== 'address' && e.key !== 'services').map(item => {
+                    <div className="content-info">
+                        <div className="info-a">{info.find((e) => e.key == 'address').value}</div>
+                        <div className="info-b">{info.filter((e) => e.key !== 'address' && e.key !== 'services').map(item => {
                             return (
-                                <Row key={item.key} className="info-b-item">
-                                    <Col className="item-c">{item.label}</Col>
-                                    <Col className="item-d">{item.value}</Col>
-                                </Row>
+                                <div key={item.key} className="info-b-item">
+                                    <div className="item-c">{item.label}</div>
+                                    <div className="item-d">{item.value}</div>
+                                </div>
                             )
-                        })}</Col>
+                        })}</div>
 
-                    </Row>
+                    </div>
                 </div>
             </div>
             <Text className="uriit-footer-name">© 2002-{new Date().getFullYear()} АУ «Югорский НИИ информационных технологий»</Text>

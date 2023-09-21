@@ -89,8 +89,8 @@ export const Header = observer(() => {
                 </div>
             </div>
             <div className="name-site">
-                <Title level={1} >Геопортал Центра космических услуг</Title>
-                <Title level={5} >цифровые карты Ханты-мансийского автономного округа - Югры</Title>
+                <Title className="name-site-a" level={1} >Геопортал Центра космических услуг</Title>
+                <Title className="name-site-b" level={5} >цифровые карты Ханты-мансийского автономного округа - Югры</Title>
             </div>
         </div>
     );

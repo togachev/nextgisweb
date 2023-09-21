@@ -1,10 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-
 import { Empty, Select, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import { Header } from "./header";
 import { Footer } from "./footer";
 
@@ -99,8 +97,6 @@ export const Content = () => {
     const filterOption = (input, option) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
-    const filteredOptions = listMapsSearch.filter((o) => !itemsSearch.includes(o));
-
     useMemo(() => {
         (async () => {
             try {
@@ -135,16 +131,18 @@ export const Content = () => {
 
     return (
         <>
-            <Header />
-            <div className="main">
-                <div className="content">
-                    <ConfigProvider
-                        theme={{
-                            token: {
-                                controlItemBgActive: '#2a398c0d',
-                            },
-                        }}
-                    >
+            <ConfigProvider
+                theme={{
+                    token: {
+                        controlItemBgActive: '#2a398c0d',
+                        fontFamily: 'Montserrat',
+                    },
+                }}
+            >
+                <Header />
+                <div className="main">
+                    <div className="content">
+
                         <Select
                             open={open}
                             onDropdownVisibleChange={(o) => setOpen(o)}
@@ -164,37 +162,37 @@ export const Content = () => {
                             options={listMapsSearch}
                             props={{ optionSelectedBg: "#e6f4ff" }}
                         />
-                    </ConfigProvider>
-                    <div className="menu-maps">
-                        <div>
-                            <Menu
-                                mode="inline"
-                                theme="light"
-                                items={groupMaps}
-                                onClick={onClickGroupMaps}
-                                defaultOpenKeys={['sub1']}
-                            />
-                        </div>
-                        <div className="content-maps-grid">
-                            <div className="content_group">
-                                {itemsMaps.map((item, index) => {
-                                    return (
-                                        <MapTile key={index} item={item} />
-                                    )
-                                })}
-                                {itemsSearch.map((item, index) => {
-                                    return (
-                                        <MapTile key={index} item={item} />
-                                    )
-                                })}
+
+                        <div className="menu-maps">
+                            <div>
+                                <Menu
+                                    mode="inline"
+                                    theme="light"
+                                    items={groupMaps}
+                                    onClick={onClickGroupMaps}
+                                    defaultOpenKeys={['sub1']}
+                                />
+                            </div>
+                            <div className="content-maps-grid">
+                                <div className="content_group">
+                                    {itemsMaps.map((item, index) => {
+                                        return (
+                                            <MapTile key={index} item={item} />
+                                        )
+                                    })}
+                                    {itemsSearch.map((item, index) => {
+                                        return (
+                                            <MapTile key={index} item={item} />
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <FloatButton.BackTop />
                 </div>
-                <FloatButton.BackTop />
-            </div>
-            <Footer />
-
+                <Footer />
+            </ConfigProvider>
         </>
 
     )
