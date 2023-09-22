@@ -19,8 +19,8 @@
 
 .printMap-panel .close {
     position: absolute;
-    top: 8px;
-    right: 4px;
+    top: 7px;
+    right: 11px;
 }
 
 .close svg.icon {
@@ -29,7 +29,7 @@
 
 .printMap-panel .print-panel-content {
     position: absolute;
-    top: 40px;
+    top: 37px;
     bottom: 0;
     left: 0;
     box-sizing: border-box;

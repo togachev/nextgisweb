@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { SearchOutlined } from '@ant-design/icons';
+import debounce from "lodash/debounce";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { Empty, Select, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
-import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Input, AutoComplete, Empty, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { Header } from "./header";
 import { Footer } from "./footer";
+
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
 import './content.less';
 
@@ -60,49 +64,105 @@ const MapTile = (props) => {
     )
 }
 
+const resourcesToOptions = (resourcesInfo) => {
+    return resourcesInfo.map((resInfo) => {
+        const { resource } = resInfo;
+        const resourceUrl = routeURL("resource.show", {
+            id: resource.id,
+        });
 
-export const Content = () => {
-    const [mapsSearch, setMapsSearch] = useState(); // выбрана карта при поиске
+        return {
+            value: `${resource.display_name}`,
+            key: `${resource.id}`,
+            url: resourceUrl + '/display',
+            target: '_self',
+            label: (
+                <div
+                    className="item"
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                    }}
+                >
+                    <svg className="icon">
+                        <use xlinkHref={`#icon-rescls-${resource.cls}`} />
+                    </svg>
+                    <span className="title" title={resource.display_name}>
+                        {resource.display_name}
+                    </span>
+                </div>
+            ),
+        };
+    });
+};
+
+export const Content = ({onChanges,  ...rest}) => {
 
     const [listMaps, setListMaps] = useState([]); // список карт
-    const [listMapsSearch, setListMapsSearch] = useState([]); // список карт
     const [groupMaps, setGroupMaps] = useState([]); // группы карт
     const [itemsMaps, setItemsMaps] = useState([]); // вывод карт при выборе конкретной группы
 
     const [itemsSearch, setItemsSearch] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [clickMenu, setClickMenu] = useState(undefined);
 
-    const onChange = (value) => {
-        setMapsSearch(value);
-    };
+    const { makeSignal, abort } = useAbortController();
+    const [options, setOptions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
+    const [acStatus, setAcSatus] = useState("");
 
-    const onSearch = (value) => {
-        setMapsSearch(value);
-        setClickMenu(null)
-        setItemsMaps([])
+    const makeQuery = useMemo(() => {
+        if (search && search.length > 2) {
+            const q = "";
+            if (search) {console.log(search);
+                const query = {
+                    display_name__ilike: `%${search}%`, cls: 'webmap'
+                };
+                return query;
+            }
+            return q;
+        }
+        return null;
+    }, [search]);
+
+    const makeSearchRequest = useRef(
+        async ({ query: q }) => {
+            try {
+                abort();
+                const resources = await route("resource.search").get({ query: q, signal: makeSignal() })
+                const options = resourcesToOptions(resources);
+                console.log(options);
+                setOptions(options);
+                setAcSatus("");
+            } catch (er) {
+                setAcSatus("error");
+            }
+        }
+    );
+
+    useEffect(() => {
+        if (makeQuery) {
+            makeSearchRequest.current({ query: makeQuery });
+        } else {
+            setOptions([]);
+        }
+    }, [makeQuery]);
+
+    const onSelect = (v, opt) => {
+        if (onChanges) {
+            onChanges(v, opt);
+        }
     };
 
     const onClickGroupMaps = (e) => {
         setItemsSearch([])
-        setClickMenu(null)
         setItemsMaps(listMaps.filter(item => item.webmap_group_id === parseInt(e.key)))
     }
-
-    useMemo(() => {
-        setItemsMaps([])
-        setItemsSearch(listMapsSearch.filter(item => item.id === mapsSearch))
-    }, [mapsSearch])
-
-    const filterOption = (input, option) =>
-        (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
     useMemo(() => {
         (async () => {
             try {
                 const maplist = await route('resource.maplist').get(); // список карт
                 setListMaps(maplist.result);
-                setListMapsSearch([...new Map(maplist.result.map(item => [item['id'], item])).values()]);
 
                 const data = [...new Map(maplist.result.map(item =>
                     [item.webmap_group_id, item])).values()]; // группы карт
@@ -122,13 +182,6 @@ export const Content = () => {
         })();
     }, [])
 
-    let suffixIcon;
-    if (open) {
-        suffixIcon = <LoadingOutlined />;
-    } else {
-        suffixIcon = <SearchOutlined className="search-icon" />;
-    }
-
     return (
         <>
             <ConfigProvider
@@ -142,26 +195,26 @@ export const Content = () => {
                 <Header />
                 <div className="main">
                     <div className="content">
-
-                        <Select
-                            open={open}
-                            onDropdownVisibleChange={(o) => setOpen(o)}
-                            suffixIcon={suffixIcon}
-                            style={{ width: '50%', maxWidth: '550px' }}
-                            value={clickMenu}
-                            autoClearSearchValue={true}
-                            onFocus={() => setClickMenu(undefined)}
-                            maxTagPlaceholder={10}
-                            allowClear={true}
-                            showSearch
-                            placeholder="Введите название карты"
-                            optionFilterProp="children"
-                            onChange={onChange}
-                            onSearch={onSearch}
-                            filterOption={filterOption}
-                            options={listMapsSearch}
-                            props={{ optionSelectedBg: "#e6f4ff" }}
-                        />
+                        <div className="search-block">
+                            <AutoComplete
+                                popupClassName="webgis-map-filter-dropdown"
+                                // popupMatchSelectWidth={290}
+                                style={{ width: "100%" }}
+                                onSelect={onSelect}
+                                options={options}
+                                status={acStatus}
+                                {...rest}
+                            >
+                                <Input
+                                    prefix={<SearchOutlined />}
+                                    size="middle"
+                                    placeholder={i18n.gettext("Search maps")}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    allowClear
+                                />
+                            </AutoComplete>
+                        </div>
 
                         <div className="menu-maps">
                             <div>

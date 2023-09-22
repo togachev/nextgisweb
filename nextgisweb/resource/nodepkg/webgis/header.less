@@ -13,11 +13,10 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
-		background: rgba(255, 255, 255, 0.03);
 		border-radius: 3px;
 		z-index: 0;
 		font-weight: 500;
-		letter-spacing: 1.6px;
+		letter-spacing: normal;
 
 		.menu-component {
 			display: flex;
@@ -25,12 +24,13 @@
 
 			.button-link {
 				button {
-					font-weight: 500;
+					font-weight: 400;
 					color: #fff;
-					text-transform: uppercase;
 					display: flex;
 					flex-direction: row-reverse;
 					align-items: center;
+					font-size: 12px;
+					text-transform: capitalize;
 
 					&:hover {
 						color: #fff;
@@ -40,7 +40,6 @@
 
 				a:hover {
 					color: #ffffff !important;
-					background: rgba(42, 57, 141, 0.3);
 				}
 
 				a {
@@ -63,9 +62,10 @@
 		width: 100%;
 		position: relative;
 		display: flex;
-		letter-spacing: 1.6px;
+		letter-spacing: normal;
 		flex-direction: column;
 		text-align: center;
+		user-select: none;
 
 		.ant-typography {
 			color: #fff;
@@ -94,11 +94,14 @@
 }
 
 .menu-avatar {
-	width: 80px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin: 0 0 0 16px;
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 0 16px;
+    border-radius: 4px;
+    height: 20px;
+    border: 1px solid white;
 
 	>a {
 		font-size: 14px;
@@ -109,30 +112,28 @@
 	&-label {
 		display: flex;
 		vertical-align: middle;
-		width: 24px;
-		height: 24px;
-		line-height: 24px;
+		width: 22px;
+		height: 22px;
+		line-height: 22px;
 		border-radius: 2px;
 		color: #fff;
-		font-size: 16px;
+		font-size: 12px;
 		text-align: center;
 		cursor: pointer;
-		background: rgba(255, 255, 255, 0.1);
 		justify-content: center;
-		font-weight: 500;
-	}
-
-	&-label:hover {
-		background: rgba(42, 57, 141, 0.3);
+		font-weight: 400;
+		text-transform: capitalize;
 	}
 
 	.ant-btn-icon {
-		margin-inline-start: 8px;
+		margin-inline-start: 8px !important;
+		margin-inline-end: 2px !important;
 	}
 }
 
 .menu-avatar-authenticated {
 	line-height: 1;
+	padding: 0 6px;
 }
 
 

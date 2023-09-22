@@ -8,119 +8,66 @@ body {
 	background-color: rgba(255, 255, 255, 0);
 	width: 100%;
 	height: 100%;
-	letter-spacing: 1px;
+	letter-spacing: normal;
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
+
 	.wrapper-webgis {
 		min-height: 100vh;
 		display: grid;
 		grid-template-rows: auto 1fr auto;
-	
+
 		.ant-typography {
 			color: rgb(255, 255, 255);
 			word-break: break-word;
 			line-height: 1.5714285714285714;
 		}
-	
+
 		a:hover {
 			color: #2A388C !important;
 		}
-	
-		a:where(.css-dev-only-do-not-override-150do6x).ant-typography, :where(.css-dev-only-do-not-override-150do6x).ant-typography a {
-			color: #ffffff;
-		}
-	
+
 		.main {
 			margin: 0 10%;
-	
+
 			.content {
 				display: flex;
 				flex-direction: column;
 				padding: 24px 0 0px 0;
-	
-	
-				.ant-select {
-					box-sizing: border-box;
-					margin: 0;
-					padding: 0;
-					color: rgba(0, 0, 0, 0.88);
-					font-size: 14px;
-					line-height: 1.57142857;
-					list-style: none;
-					position: relative;
-					display: inline-block;
-					cursor: pointer;
-					border-bottom: 1px solid #2a388c;
-					border-image: linear-gradient(0.25turn, #2A388C, #2A388C, #2a388c00);
-					border-image-slice: 1;
+
+				.search-block{
+					max-width: 500px;
 				}
-	
-				.ant-select-selector {
-					border: 0px solid #ffffff00 !important;
-					box-shadow: 0 0 0 0 #ffffff00 !important;
-				}
-	
-				.ant-select-arrow {
-					inset-inline-start: 0;
-					inset-inline-end: auto;
-					color: #2a388c;
-				}
-	
-				.ant-select-selection-placeholder {
-					color: rgba(42, 57, 140, 0.5) !important;
-	
-				}
-	
-	
-	
-				.ant-select-selection-placeholder,
-				.ant-select-selection-item {
-					padding-inline-end: 24px !important;
-					padding-inline-start: 18px !important;
-					max-width: calc(100%);
-				}
-	
-				.search-icon {
-					font-size: 16px;
-					padding: 0px 0px 0px 5px;
-				}
-	
-				.ant-select-selection-search-input {
-					margin: 0 0 0 18px !important;
-				}
-	
-				.ant-menu-item-selected {
-					color: #2a388c;
-					background-color: #2a398c0d;
-				}
-	
+
 				.menu-maps {
 					margin-top: 24px;
 					display: flex;
-	
+
 					.ant-menu-inline {
 						border-inline-end: 0px solid #ffffff00 !important;
+						user-select: none;
 					}
-	
+
 					.content-maps-grid {
 						text-align: center;
 						color: #000;
 						background-color: #ffffff00;
 						padding: 0px;
 						width: 100%;
-	
+
 						.ant-card-cover {
 							margin: 0;
 							border-bottom: 0.005em solid rgb(42 56 140 / 50%);
+							user-select: none;
 						}
-	
+
 						.ant-card-body {
 							padding: 0;
 							border-radius: 0;
 							background: #FFFAFA;
 						}
-	
+
 						.ant-card-meta-detail {
 							overflow: hidden;
 							display: flex;
@@ -128,14 +75,14 @@ body {
 							flex-direction: column;
 							justify-content: space-around;
 						}
-	
+
 						.ant-layout .ant-layout-sider {
 							position: relative;
 							min-width: 0px;
 							background: #ffffff;
 							transition: all 0s, background 0s;
 						}
-	
+
 						.img_preview {
 							height: 200px;
 							margin: 0;
@@ -144,20 +91,20 @@ body {
 							border-top-right-radius: 2px;
 							border-top-left-radius: 2px;
 						}
-	
+
 						.img_preview_none {
 							height: 168px;
 						}
-	
+
 						.ant-card {
 							border-radius: 2px;
 						}
-	
+
 						.content_group {
 							display: grid;
 							grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 							justify-items: center;
-	
+
 							.icon-open-map {
 								margin: 0px 0px 0px 10px;
 								color: #2a388c;
@@ -166,7 +113,7 @@ body {
 								border-radius: 2px;
 								line-height: 1;
 							}
-	
+
 							a {
 								color: #2a388c;
 								display: flex;
@@ -174,23 +121,23 @@ body {
 								font-size: 24px;
 								padding: 5px 16px;
 							}
-	
+
 							.open-map {
 								color: #2a388c;
 								text-transform: uppercase;
 							}
-	
+
 							svg {
 								color: #2a388c;
 							}
-	
+
 							.ant-card-meta {
 								margin: 0;
 								display: flex;
 								font-weight: 500 !important;
 								height: 117px !important;
 							}
-	
+
 							.ant-card-meta-title {
 								margin: 5px 16px;
 								color: #000000;
@@ -201,23 +148,23 @@ body {
 								text-overflow: ellipsis;
 								line-height: 20.7px;
 								text-align: left;
-								letter-spacing: 1.1px;
+								letter-spacing: normal;
 								-webkit-line-clamp: 3;
 								display: -webkit-box;
 								-webkit-box-orient: vertical;
 							}
-	
+
 							.ant-card-meta-detail>div:not(:last-child) {
 								margin-bottom: 5px;
 							}
-	
+
 							.ant-card-bordered {
 								border: 0px solid #ffffff00;
 								display: flex;
 								flex-direction: column;
 								justify-content: space-between;
 							}
-	
+
 							.ant-card-hoverable {
 								cursor: auto;
 								transition: box-shadow 0s, border-color 0s;
@@ -232,5 +179,30 @@ body {
 
 }
 
+.webgis-map-filter-dropdown {
+	.ant-select-item {
+		padding: 2px !important;
+	}
+
+	.ant-select-dropdown .ant-select-item-option-content {
+		display: flex;
+		align-items: center;
+	}
 
 
+	.title {
+		margin: 0;
+		padding: 0 4px;
+
+		text-overflow: ellipsis; 
+		overflow: hidden;
+		max-width: 470px;
+		white-space: nowrap;
+	
+	}
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: rgba(42, 57, 140, 0.65) !important;
+}

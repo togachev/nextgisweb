@@ -73,8 +73,9 @@ export const Header = observer(() => {
                                 >
                                     <div className="menu-avatar-label">
                                         {userDisplayName
-                                            .replace(/(.)[^\s]+(?: (.).*)?/, "$1$2")
-                                            .toUpperCase()}
+                                            // .replace(/(.)[^\s]+(?: (.).*)?/, "$1$2")
+                                            // .toLowerCase()
+                                            }
                                     </div>
                                 </Popover>
                             ) : authStore.showLoginModal ? (

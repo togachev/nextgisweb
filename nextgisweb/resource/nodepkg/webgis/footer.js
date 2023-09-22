@@ -22,16 +22,16 @@ const info = [
         key: "services", label: "", value: i18n.gettext("Услуги Центра космических услуг"),
         list: [
             {
-                key: "office", label: i18n.gettext("Разработка цифровой карты рыбоводного участках"),
-                value: 'https://uriit.ru/services/infospace-technologies/kosmicheskiy-monitoring-vodnykh-obektov/'
-            },
-            {
-                key: "fax", label: i18n.gettext("Космический мониторинг лесных ресурсов"),
+                key: "office", label: i18n.gettext("Материалы ДЗ для отчета об использовании лесов"),
                 value: 'https://uriit.ru/services/infospace-technologies/kosmicheskiy-monitoring-lesnogo-fonda/'
             },
             {
-                key: "email", label: i18n.gettext("Геологическое моделирование трещинных систем нефтяных и газовых месторождений"),
-                value: 'https://uriit.ru/services/geological-modelling/'
+                key: "fax", label: i18n.gettext("Космический мониторинг водных объектов"),
+                value: 'https://uriit.ru/services/infospace-technologies/kosmicheskiy-monitoring-vodnykh-obektov/'
+            },
+            {
+                key: "email", label: i18n.gettext("Геоинформационный портал"),
+                value: 'https://uriit.ru/services/infospace-technologies/geoinformatsionnyy-portal/'
             },
         ]
     },

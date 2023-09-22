@@ -6,7 +6,11 @@
         "@nextgisweb/resource/webgis",
     ], function (reactApp, webgis) {
         reactApp.default(
-            webgis.Content, {}, document.getElementById('content')
+            webgis.Content, {
+                onChanges: function(v, opt) {
+                    window.location.href = opt.url
+                }
+            }, document.getElementById('content')
         );
     });
 </script>
