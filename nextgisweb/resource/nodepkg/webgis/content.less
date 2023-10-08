@@ -36,8 +36,39 @@ body {
 				flex-direction: column;
 				padding: 24px 0 0px 0;
 
-				.search-block{
+				.search-block {
 					max-width: 500px;
+
+					:where(.css-dev-only-do-not-override-1eo065b).ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover {
+						border-color: #ffffff00;
+						z-index: 1;
+					}
+
+					:where(.css-dev-only-do-not-override-1eo065b).ant-input-affix-wrapper:hover {
+						border-right-color: #ffffff00 !important;
+						border-left-color: #ffffff00 !important;
+						border-top-color: #ffffff00 !important;
+						border-bottom-color: #2a388c !important;
+					}
+
+
+					:where(.css-dev-only-do-not-override-1eo065b).ant-input-affix-wrapper:focus,
+					:where(.css-dev-only-do-not-override-1eo065b).ant-input-affix-wrapper-focused {
+						border-right-color: #ffffff00 !important;
+						border-left-color: #ffffff00 !important;
+						border-top-color: #ffffff00 !important;
+						border-bottom-color: #2a388c !important;
+						box-shadow: 0 0 0 0 #ffffff00;
+						outline: 0;
+					}
+
+					:where(.css-dev-only-do-not-override-1eo065b).ant-input-affix-wrapper {
+						border-bottom-color: #2a388c;
+						border-radius: 0;
+						border-right-color: #ffffff00;
+						border-left-color: #ffffff00;
+						border-top-color: #ffffff00;
+					}
 				}
 
 				.menu-maps {
@@ -194,15 +225,15 @@ body {
 		margin: 0;
 		padding: 0 4px;
 
-		text-overflow: ellipsis; 
+		text-overflow: ellipsis;
 		overflow: hidden;
 		max-width: 470px;
 		white-space: nowrap;
-	
+
 	}
 }
 
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
-  color: rgba(42, 57, 140, 0.65) !important;
+	color: rgba(42, 57, 140, 0.65) !important;
 }
