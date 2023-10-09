@@ -1,3 +1,4 @@
 /** @entrypoint */
-import { BookmarksPanel } from "./BookmarksPanel.js";
+import { BookmarksPanel } from "./BookmarksPanel";
+
 export default BookmarksPanel;

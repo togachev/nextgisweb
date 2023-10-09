@@ -2,15 +2,16 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
-import EditIcon from "@nextgisweb/icon/material/edit";
 import FolderClosedIcon from "./icons/folder.svg";
 import FolderOpenIcon from "./icons/folder_open.svg";
 
 import { DropdownActions } from "./DropdownActions";
+import { Legend, LegendAction } from "./Legend";
 import { DropdownFile } from "./DropdownFile";
 import { Desc } from "./Desc";
-import { Legend, LegendAction } from "./Legend.js";
 import { IconItem } from "./IconItem.js";
+import EditIcon from "@nextgisweb/icon/material/edit/outline";
+
 import "./LayersTree.less";
 
 const forItemInTree = (data, key, callback) => {

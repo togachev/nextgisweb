@@ -28,15 +28,6 @@ const config = {
             { args: "after-used", destructuredArrayIgnorePattern: "^_" },
         ],
         "no-use-before-define": "warn",
-        "prettier/prettier": "warn",
-        "react/prop-types": "off", // Use TypeScript instead
-        "react/jsx-no-target-blank": "off", // Unsupported browsers
-        "requirejs/no-object-define": "error",
-        "requirejs/amd-function-arity": [
-            "error",
-            { allowExtraDependencies: true },
-        ],
-
         "no-restricted-imports": [
             "error",
             {
@@ -44,6 +35,10 @@ const config = {
                     {
                         "name": "lodash",
                         "message": "Use 'lodash-es' instead 'lodash'.",
+                    },
+                    {
+                        "name": "prop-types",
+                        "message": "Use TypeScript for typing",
                     },
                 ],
                 "patterns": [
@@ -55,28 +50,55 @@ const config = {
                 ],
             },
         ],
+        "sort-imports": ["warn", { "ignoreDeclarationSort": true }],
+        "@typescript-eslint/consistent-type-imports": "warn",
+        "import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
+        "import/first": "warn",
+        "import/newline-after-import": "warn",
+        "import/order": [
+            "warn",
+            {
+                "groups": [
+                    "builtin",
+                    "external",
+                    "internal",
+                    "parent",
+                    "sibling",
+                    "index",
+                ],
+                "pathGroups": [
+                    { pattern: "glob", group: "builtin" },
+                    { pattern: "@nextgisweb/icon/**", group: "index" },
+                    { pattern: "@ant-design/icons", group: "index" },
+                ],
+                "alphabetize": { order: "asc", orderImportKind: "desc" },
+                "newlines-between": "always",
+                "distinctGroup": false,
+                "pathGroupsExcludedImportTypes": ["builtin"],
+            },
+        ],
+        "prettier/prettier": "warn",
+        "react/prop-types": "off", // Use TypeScript instead
+        "react/jsx-no-target-blank": "off", // Unsupported browsers
+        "requirejs/no-object-define": "error",
+        "requirejs/amd-function-arity": [
+            "error",
+            { allowExtraDependencies: true },
+        ],
     },
     ignorePatterns: ["doc/", "contrib/", "dist/", "node_modules/", "env/lib/"],
     overrides: [
         {
             files: "*.cjs",
-            env: {
-                node: true,
-                es2020: true,
-            },
+            env: { node: true, es2020: true },
         },
         {
             files: "*.js",
-            env: {
-                browser: true,
-            },
+            env: { browser: true },
         },
         {
             files: expcomp("nodepkg/**/*.js"),
-            env: {
-                browser: true,
-                es2020: true,
-            },
+            env: { browser: true, es2020: true },
             parser: "@babel/eslint-parser",
             parserOptions: {
                 sourceType: "module",
@@ -107,29 +129,22 @@ const config = {
             parserOptions: {
                 sourceType: "module",
                 jsx: true,
-                babelOptions: {
-                    configFile: babelConfigPath,
-                },
+                babelOptions: { configFile: babelConfigPath },
             },
         },
         {
             files: expcomp("amd/**/*.js"),
             plugins: ["requirejs"],
             extends: ["eslint:recommended", "plugin:requirejs/recommended"],
-            env: {
-                browser: true,
-                amd: true,
-                es2015: true,
-            },
+            env: { browser: true, amd: true, es2015: true },
             rules: {
                 "eqeqeq": "warn",
             },
         },
     ],
     settings: {
-        react: {
-            version: "18",
-        },
+        "react": { version: "18" },
+        "import/internal-regex": "^(@nextgisweb/|ngw-)",
     },
 };
 

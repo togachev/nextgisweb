@@ -404,11 +404,11 @@ msgstr "Закрыть"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: component.py:27
+#: component.py:26
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:34 model.py:53 view.py:338 view.py:379
+#: model.py:34 model.py:53 view.py:307 view.py:345
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -498,7 +498,7 @@ msgstr "Другие приватные аннотации"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:183 view.py:349
+#: nodepkg/clone-webmap/CloneWebmap.js:183 view.py:323
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -891,7 +891,7 @@ msgstr "Перейти"
 
 #: nodepkg/webmap-tabs/WebMapTabs.tsx:17
 msgid "Loading"
-msgstr ""
+msgstr "Загрузка"
 
 #: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.tsx:22
 msgid "Zoom to filtered features"
@@ -929,19 +929,15 @@ msgstr ""
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:270
+#: view.py:257
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:282
+#: view.py:270
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:304
-msgid "Setting up a web map group"
-msgstr "Настройка группы веб карты"
-
-#: view.py:343
+#: view.py:313
 msgid "Display"
 msgstr "Открыть"
 

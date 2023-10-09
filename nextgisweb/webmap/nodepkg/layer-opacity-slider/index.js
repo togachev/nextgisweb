@@ -1,3 +1,4 @@
 /** @entrypoint */
-import { LayerOpacitySlider } from "./LayerOpacitySlider.js";
+import { LayerOpacitySlider } from "./LayerOpacitySlider";
+
 export default LayerOpacitySlider;

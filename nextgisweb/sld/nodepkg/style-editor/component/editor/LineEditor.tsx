@@ -6,13 +6,14 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
+import { hexWithOpacity } from "../../util/hexWithOpacity";
 
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import type { LineSymbolizer } from "geostyler-style";
 import type { EditorProps } from "../../type";
 
-const fillColorLabel = gettext("Fill color");
-const widthLabel = gettext("Width");
+const msgFillColor = gettext("Fill color");
+const msgWidth = gettext("Width");
 
 export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
     const onSymbolizer = (v: LineSymbolizer) => {
@@ -35,12 +36,12 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
     const fields = useMemo<FormField<keyof LineSymbolizer>[]>(
         () => [
             {
-                label: fillColorLabel,
+                label: msgFillColor,
                 name: "color",
                 widget: ColorField,
             },
             {
-                label: widthLabel,
+                label: msgWidth,
                 name: "width",
                 widget: "number",
                 inputProps: {
@@ -51,8 +52,10 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
         []
     );
 
-    const initialValue = {
+    const { color, opacity } = value;
+    const initialValue: LineSymbolizer = {
         ...value,
+        color: hexWithOpacity(color, opacity),
     };
 
     return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 
 import {
     Badge,
@@ -23,7 +23,55 @@ import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
 import EditIcon from "@nextgisweb/icon/material/edit";
 import SearchIcon from "@nextgisweb/icon/material/search";
 
-export function ModelBrowse({
+import type { RequestOptions, RouteName } from "@nextgisweb/pyramid/api/type";
+import type { FC } from "react";
+import type { ApiError } from "../error/type";
+import type { ParamsOf } from "../type";
+
+type TableProps = ParamsOf<typeof Table>;
+
+export interface ModalBrowseData {
+    id: number;
+}
+
+interface Model {
+    item: RouteName;
+    collection: RouteName;
+    edit: RouteName;
+    browse: RouteName;
+    create: RouteName;
+}
+
+export interface ControlProps<Data extends ModalBrowseData = ModalBrowseData> {
+    disable?: boolean;
+    selected: number[];
+    rows: Data[];
+    setRows: React.Dispatch<React.SetStateAction<Data[]>>;
+}
+
+interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
+    extends TableProps {
+    model: string | Model;
+    messages?: {
+        deleteConfirm?: string;
+        deleteSuccess?: string;
+        deleteBatchSuccess?: string;
+    };
+    callbacks?: {
+        deleteModelItem?: () => void;
+        deleteSelected?: () => void;
+    };
+    itemProps?: {
+        canDelete?: (args: { item: Data }) => boolean;
+    };
+    createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+    headerControls?: FC<ControlProps<Data>>[];
+    selectedControls?: FC<ControlProps<Data>>[];
+    collectionOptions?: RequestOptions;
+    collectionFilter?: (item: Data) => boolean;
+}
+
+export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     model: m,
     columns,
     messages,
@@ -32,19 +80,19 @@ export function ModelBrowse({
     createProps = {},
     headerControls = [],
     selectedControls = [],
-    collectionOptions,
     collectionFilter,
+    collectionOptions,
     ...tableProps
-}) {
-    const model =
+}: ModelBrowseProps<Data>) {
+    const model: Model =
         typeof m === "string"
-            ? {
+            ? ({
                   item: m + ".item",
                   collection: m + ".collection",
                   edit: m + ".edit",
                   browse: m + ".browse",
                   create: m + ".create",
-              }
+              } as Model)
             : m;
 
     const msg = messages || {};
@@ -53,15 +101,15 @@ export function ModelBrowse({
     const deleteBatchSuccess =
         msg.deleteBatchSuccess || gettext("Items deleted");
 
-    const { data, isLoading } = useRouteGet({
+    const { data, isLoading } = useRouteGet<Data[]>({
         name: model.collection,
         options: collectionOptions,
     });
 
-    const [rows, setRows] = useState([]);
+    const [rows, setRows] = useState<Data[]>([]);
     const [isDeleting, setIsDeleting] = useState(false);
     const [search, setSearch] = useState("");
-    const [selected, setSelected] = useState([]);
+    const [selected, setSelected] = useState<number[]>([]);
 
     useEffect(() => {
         if (data) {
@@ -85,29 +133,31 @@ export function ModelBrowse({
         return rows;
     }, [rows, search]);
 
-    const onEditClick = (id) => {
+    const onEditClick = (id: number) => {
         const url = routeURL(model.edit, id);
         window.open(url, "_self");
     };
 
-    const deleteModelItem = async (id) => {
+    const deleteModelItem = async (id: number) => {
         try {
             await route(model.item, id).delete();
             const newRows = rows.filter((row) => row.id !== id);
+            const newSelectedRows = selected.filter((row) => row !== id);
             setRows(newRows);
+            setSelected(newSelectedRows);
             message.success(deleteSuccess);
             if (callbacks && callbacks.deleteModelItem) {
                 callbacks.deleteModelItem();
             }
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         }
     };
 
     const deleteSelected = async () => {
         setIsDeleting(true);
         try {
-            const deleted = [];
+            const deleted: number[] = [];
             const deleteError = [];
             for (const s of selected) {
                 try {
@@ -139,7 +189,7 @@ export function ModelBrowse({
                 callbacks.deleteSelected();
             }
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setIsDeleting(false);
         }
@@ -159,30 +209,30 @@ export function ModelBrowse({
         window.open(url, "_self");
     };
 
-    const canDelete = (item) => {
+    const canDelete = (item: Data) => {
         if (itemProps.canDelete) {
             return itemProps.canDelete({ item });
         }
         return true;
     };
 
-    const rowSelection = {
+    const rowSelection: TableProps["rowSelection"] = {
         onChange: (selectedRowKeys) => {
-            setSelected(selectedRowKeys);
+            setSelected(selectedRowKeys.map(Number));
         },
         getCheckboxProps: (record) => ({
-            disabled: !canDelete(record),
+            disabled: !canDelete(record as Data),
         }),
     };
 
-    const columns_ = [
-        ...columns,
+    const tableColumns: TableProps["columns"] = [
+        ...(columns ? columns : []),
         {
             title: "",
             key: "action",
             width: "0px",
             align: "center",
-            render: (text, record) => (
+            render: (_, record) => (
                 <div style={{ whiteSpace: "nowrap" }}>
                     <Tooltip title={gettext("Edit")}>
                         <Button
@@ -192,7 +242,7 @@ export function ModelBrowse({
                             onClick={() => onEditClick(record.id)}
                         />
                     </Tooltip>
-                    {canDelete(record) && (
+                    {canDelete(record as Data) && (
                         <Tooltip title={gettext("Delete")}>
                             <Popconfirm
                                 placement="bottom"
@@ -213,7 +263,7 @@ export function ModelBrowse({
     ];
 
     const TableControl = () => (
-        <Row type="flex" justify="space-between">
+        <Row justify="space-between">
             <Col>
                 <Input
                     placeholder={gettext("Search")}
@@ -227,16 +277,16 @@ export function ModelBrowse({
             </Col>
             <Col>
                 <Space direction="horizontal">
-                    {headerControls.map((control, idx) => (
-                        <React.Fragment key={idx}>
-                            {control({ selected, rows, setRows })}
-                        </React.Fragment>
+                    {headerControls.map((Control, idx) => (
+                        <Fragment key={idx}>
+                            <Control {...{ selected, rows, setRows }} />
+                        </Fragment>
                     ))}
                     <Button
                         icon={<AddCircleIcon />}
-                        type="primary"
                         onClick={goToCreatePage}
                         {...createProps}
+                        type="primary"
                     >
                         {gettext("Create")}
                     </Button>
@@ -247,10 +297,10 @@ export function ModelBrowse({
 
     const SelectedControl = () => (
         <Space direction="horizontal">
-            {selectedControls.map((control, idx) => (
-                <React.Fragment key={idx}>
-                    {control({ selected, rows, setRows })}
-                </React.Fragment>
+            {selectedControls.map((Control, idx) => (
+                <Fragment key={idx}>
+                    <Control {...{ selected, rows, setRows }} />
+                </Fragment>
             ))}
 
             <Badge count={selected.length} size="small">
@@ -283,7 +333,7 @@ export function ModelBrowse({
                     ...rowSelection,
                 }}
                 loading={isLoading}
-                columns={columns_}
+                columns={tableColumns}
                 dataSource={filteredRows}
                 size="middle"
                 {...tableProps}

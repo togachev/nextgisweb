@@ -208,7 +208,7 @@ export const Content = ({onChanges,  ...rest}) => {
                                 <Input
                                     prefix={<SearchOutlined />}
                                     size="middle"
-                                    placeholder={i18n.gettext("Search maps")}
+                                    placeholder={i18n.gettext("Enter card name")}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     allowClear

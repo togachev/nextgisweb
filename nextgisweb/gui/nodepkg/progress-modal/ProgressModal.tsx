@@ -1,10 +1,10 @@
-import { Button, Modal, Progress, Col, Row } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { Button, Col, Modal, Progress, Row } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { ParamsOf } from "@nextgisweb/gui/type";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 
-const defTitleMsg = i18n.gettext("Operation in progress");
-const defCancelMsg = i18n.gettext("Cancel");
+const msgInProgress = gettext("Operation in progress");
+const msgCancel = gettext("Cancel");
 
 type ProgressModal = ParamsOf<typeof Progress>;
 
@@ -26,8 +26,8 @@ export const ProgressModal = ({
     closable = false,
     okText = null,
     onCancel,
-    title = defTitleMsg,
-    cancelText = defCancelMsg,
+    title = msgInProgress,
+    cancelText = msgCancel,
     ...restProps
 }: ProgressModalProps) => {
     const modalOptions: ModalParams & Pick<ModalParams, "footer"> = {

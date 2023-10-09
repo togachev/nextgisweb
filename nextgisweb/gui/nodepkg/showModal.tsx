@@ -1,8 +1,10 @@
 import { createRoot } from "react-dom/client";
 
+import { ConfigProvider } from "@nextgisweb/gui/antd";
+
 import type { ReactElement } from "react";
-import { Modal, ConfigProvider } from "@nextgisweb/gui/antd";
-import { ParamsOf } from "@nextgisweb/gui/type";
+import type { Modal } from "@nextgisweb/gui/antd";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 
 type ModalParams = ParamsOf<typeof Modal>;
 
@@ -23,6 +25,7 @@ function handleVisibleDeprecation<T extends ShowModalOptions>(config: T): T {
         }
     }
     // Remove the 'visible' prop from the config
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { visible, ...restConfig } = config;
     return restConfig as T;
 }

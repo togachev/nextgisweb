@@ -1,6 +1,8 @@
 import { Button } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
-import i18n from "@nextgisweb/pyramid/i18n";
+
+import type { ButtonProps } from "@nextgisweb/gui/antd";
 
 const {
     enabled,
@@ -14,7 +16,7 @@ const {
 
 const isNGID = type === "nextgisid";
 
-export function makeTeamManageButton(props) {
+export function makeTeamManageButton(props: ButtonProps) {
     if (isNGID && baseUrl) {
         const url =
             baseUrl.replace(/\/$/, "") +
@@ -22,7 +24,7 @@ export function makeTeamManageButton(props) {
             ngwConfig.instanceId;
         return (
             <Button type="primary" href={url} {...props}>
-                {i18n.gettext("Manage team")}
+                {gettext("Manage team")}
             </Button>
         );
     } else {

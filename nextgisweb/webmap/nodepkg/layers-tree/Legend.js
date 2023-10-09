@@ -5,8 +5,8 @@ import KeyboardArrowDown from "@nextgisweb/icon/material/keyboard_arrow_down/out
 import { IconItem } from "./IconItem";
 import "./Legend.less";
 
-const showLegendMessage = gettext("Show legend");
-const hideLegendMessage = gettext("Hide legend");
+const msgShowLegend = gettext("Show legend");
+const msgHideLegend = gettext("Hide legend");
 
 export function LegendAction({ nodeData, onClick }) {
     if (
@@ -28,15 +28,13 @@ export function LegendAction({ nodeData, onClick }) {
     };
 
     return (
-        <div className="legend-list">
-            <span
-                className="legend legend-toggle"
-                onClick={click}
-                title={open ? hideLegendMessage : showLegendMessage}
-            >
-                {icon}
-            </span>
-        </div>
+        <span
+            className="legend"
+            onClick={click}
+            title={open ? msgHideLegend : msgShowLegend}
+        >
+            {icon}
+        </span>
     );
 }
 

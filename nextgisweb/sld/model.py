@@ -24,7 +24,7 @@ E = ElementMaker(
         "ogc": "http://www.opengis.net/ogc",
         "se": "http://www.opengis.net/se",
         "xlink": "http://www.w3.org/1999/xlink",
-    }
+    },
 )
 
 
@@ -43,13 +43,14 @@ class Stroke(Struct):
             _stroke.append(E.SvgParameter(dict(name="stroke-width"), str(self.width)))
         return _stroke
 
+
 class Fill(Struct):
     opacity: Opacity = UNSET
     color: Color = UNSET
 
     def xml(self):
         _fill = E.Fill()
-        if self.color is not None:
+        if self.color is not UNSET:
             _fill.append(E.SvgParameter(dict(name="fill"), self.color))
         if self.opacity is not UNSET:
             _fill.append(E.SvgParameter(dict(name="fill-opacity"), str(self.opacity)))
@@ -100,18 +101,14 @@ class PointSymbolizer(Struct, tag="point"):
     graphic: Graphic
 
     def xml(self):
-        return E.PointSymbolizer(
-            self.graphic.xml()
-        )
+        return E.PointSymbolizer(self.graphic.xml())
 
 
 class LineSymbolizer(Struct, tag="line"):
     stroke: Stroke
 
     def xml(self):
-        return E.LineSymbolizer(
-            self.stroke.xml()
-        )
+        return E.LineSymbolizer(self.stroke.xml())
 
 
 class PolygonSymbolizer(Struct, tag="polygon"):
@@ -147,16 +144,14 @@ class Style(Struct):
         _feature_type_style = E.FeatureTypeStyle()
         for rule in self.rules:
             _feature_type_style.append(rule.xml())
-        return E.StyledLayerDescriptor({
-                QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"): \
-                    f"{NS_SLD} StyledLayerDescriptor.xsd",
-                "version": "1.1.0"
+        return E.StyledLayerDescriptor(
+            {
+                QName(
+                    "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"
+                ): f"{NS_SLD} StyledLayerDescriptor.xsd",
+                "version": "1.1.0",
             },
-            E.NamedLayer(
-                E.UserStyle(
-                    _feature_type_style
-                )
-            )
+            E.NamedLayer(E.UserStyle(_feature_type_style)),
         )
 
 

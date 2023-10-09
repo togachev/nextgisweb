@@ -1,3 +1,1 @@
-import { FloatingLabel } from "./floating-label.js";
-
-export { FloatingLabel };
+export { FloatingLabel } from "./floating-label";

@@ -2,10 +2,12 @@ import { makeAutoObservable, runInAction } from "mobx";
 
 import { extractError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { Blueprint } from "../../../type/Blueprint";
+import { loadParents } from "../../../util/loadParents";
 
+import type { ApiError } from "@nextgisweb/gui/error/type";
+import type { Blueprint } from "../../../type/Blueprint";
 import type {
     Resource,
     ResourceClass,
@@ -13,12 +15,10 @@ import type {
     ResourceItem,
     ResourcePermission,
 } from "../../../type/Resource";
-import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 
-const mPickThis = i18n.gettext("Pick this group");
-const mPickSelected = i18n.gettext("Pick selected");
+const msgPickThis = gettext("Pick this group");
+const msgPickSelected = gettext("Pick selected");
 
 let ID = 0;
 
@@ -73,8 +73,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     createNewGroupAbortController?: AbortController;
     getSelectedParentAbortController?: AbortController;
 
-    getThisMsg = mPickThis;
-    getSelectedMsg = mPickSelected;
+    getThisMsg = msgPickThis;
+    getSelectedMsg = msgPickSelected;
 
     readonly initialParentId: number = 0;
 
