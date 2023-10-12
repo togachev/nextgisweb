@@ -173,7 +173,7 @@ export const Content = ({ onChanges, ...rest }) => {
 
                 let items = []
                 data.map((item) => {
-                    items.push({ key: item.webmap_group_id, label: item.webmap_group_name });
+                    items.push({ key: item.webmap_group_id, label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip> });
                     items.push({ type: 'divider' });
                 })
 
