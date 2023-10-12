@@ -102,14 +102,14 @@ export const LayersTree = observer(
             [store.webmapItems]
         );
 
-        // const hasGroups = useMemo(() => {
-        //     for (const itm of store.webmapItems) {
-        //         if (itm.type === "group") {
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // }, [store.webmapItems]);
+        const hasGroups = useMemo(() => {
+            for (const itm of store.webmapItems) {
+                if (itm.type === "group") {
+                    return true;
+                }
+            }
+            return false;
+        }, [store.webmapItems]);
 
         useEffect(() => {
             if (onReady) {
@@ -240,7 +240,7 @@ export const LayersTree = observer(
                 motion={false}
                 checkable
                 showIcon
-                // showLine={hasGroups}
+                showLine={hasGroups}
                 onExpand={onExpand}
                 expandedKeys={store.expanded}
                 autoExpandParent={autoExpandParent}

@@ -32,14 +32,17 @@ const MapTile = (props) => {
             }}
             hoverable
             cover={preview_fileobj_id ?
-                <div className="img_preview"
-
-                    style={{ background: `url(${preview}) center center / cover no-repeat` }}
-                ></div>
+                <Link style={{ padding: 0, display: 'contents' }} href={routeURL('webmap.display', id)} target="_blank">
+                    <div className="img_preview"
+                        style={{ background: `url(${preview}) center center / cover no-repeat` }}
+                    ></div>
+                </Link>
                 :
-                <div className="img_preview_none">
-                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                </div>
+                <Link style={{ padding: 0, display: 'contents' }} href={routeURL('webmap.display', id)} target="_blank">
+                    <div className="img_preview_none">
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    </div>
+                </Link>
             }
         >
             <Meta
@@ -96,7 +99,7 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-export const Content = ({onChanges,  ...rest}) => {
+export const Content = ({ onChanges, ...rest }) => {
 
     const [listMaps, setListMaps] = useState([]); // список карт
     const [groupMaps, setGroupMaps] = useState([]); // группы карт
@@ -113,7 +116,8 @@ export const Content = ({onChanges,  ...rest}) => {
     const makeQuery = useMemo(() => {
         if (search && search.length > 2) {
             const q = "";
-            if (search) {console.log(search);
+            if (search) {
+                console.log(search);
                 const query = {
                     display_name__ilike: `%${search}%`, cls: 'webmap'
                 };

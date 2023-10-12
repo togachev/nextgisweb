@@ -497,8 +497,8 @@ def setup_pyramid(comp, config):
         '/wmgroup',
         get=webmap_group_data)
 
-    config.add_route(
-        'map_list',
-        '/map-list') \
-        .add_view(map_list)
+    # config.add_route(
+    #     'map_list',
+    #     '/map-list') \
+    #     .add_view(map_list)
 

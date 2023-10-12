@@ -464,7 +464,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'webgis',
-        '/webgis') \
+        '/map-list') \
         .add_view(webgis)
 
     config.add_route("pyramid.control_panel.custom_css", "/control-panel/custom-css").add_view(
