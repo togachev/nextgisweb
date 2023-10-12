@@ -28,6 +28,7 @@ const config = {
             { args: "after-used", destructuredArrayIgnorePattern: "^_" },
         ],
         "no-use-before-define": "warn",
+        "no-useless-escape": "warn",
         "no-restricted-imports": [
             "error",
             {
@@ -125,6 +126,7 @@ const config = {
             ],
             rules: {
                 "prettier/prettier": "warn",
+                "@typescript-eslint/no-explicit-any": "warn",
             },
             parserOptions: {
                 sourceType: "module",
@@ -139,6 +141,7 @@ const config = {
             env: { browser: true, amd: true, es2015: true },
             rules: {
                 "eqeqeq": "warn",
+                "no-useless-escape": "warn",
             },
         },
     ],

@@ -111,7 +111,7 @@ Let's include this package into Yarn workspace root configuration:
 .. code-block:: bash
 
   $ cd ~ngw
-  $ nextgisweb jsrealm.install
+  $ nextgisweb jsrealm install
 
 And now you can add some external dependency for this package, for example:
 
@@ -267,22 +267,6 @@ machinery and also supports expressions in module names:
       // NOTE: This method doesn't support relative entrypoint names!
       const dynamic = await entrypoint("@nextgisweb/bar/some-module");
   }
-
-Code formatting
-^^^^^^^^^^^^^^^
-  
-In NextGIS Web core and extension packages the following formatting rules are
-used:
-
-1. 4 space indentation - it matches Python PEP8 indentation and is also used in
-   old-style JavaScript, Mako templates, etc.
-2. Double quotes for string literals.
-3. 80 characters column limit.
-
-.. note::
-
-  There is a planned adoption of some code formatter like Prettier. So don't
-  spend time carefully formatting the code it will be autoformatted sometime.
 
 Interoperability
 ----------------

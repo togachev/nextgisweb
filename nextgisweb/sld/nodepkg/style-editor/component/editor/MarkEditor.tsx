@@ -1,20 +1,21 @@
+import type { MarkSymbolizer as GSMarkSymbolizer } from "geostyler-style";
 import _cloneDeep from "lodash-es/cloneDeep";
 import { useMemo } from "react";
 
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
-import { wellKnownNames } from "../../util/constant";
-import { hexWithOpacity } from "../../util/hexWithOpacity";
-import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
-
-import type { FormField } from "@nextgisweb/gui/fields-form";
-import type { MarkSymbolizer } from "geostyler-style";
 import type { EditorProps } from "../../type";
+import { wellKnownNames } from "../../util/constant";
+import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
+import { hexWithOpacity } from "../../util/hexWithOpacity";
+
+type MarkSymbolizer = GSMarkSymbolizer & { size?: number };
 
 const msgShape = gettext("Shape");
-const msgRadius = gettext("Size");
+const msgSize = gettext("Size");
 const msgFillColor = gettext("Fill color");
 const msgStrokeColor = gettext("Stroke color");
 const msgStrokeWidth = gettext("Stroke width");
@@ -33,8 +34,8 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
                 symbolizerClone.opacity = opacity;
                 symbolizerClone.fillOpacity = opacity;
             }
-            if (typeof v.radius === "number") {
-                symbolizerClone.radius = v.radius / 2;
+            if (typeof v.size === "number") {
+                symbolizerClone.radius = v.size / 2;
             }
             if (typeof v.strokeColor === "string") {
                 const [strokeColor, strokeOpacity] = extractColorAndOpacity(
@@ -57,8 +58,8 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
                 choices: wellKnownNames,
             },
             {
-                label: msgRadius,
-                name: "radius",
+                label: msgSize,
+                name: "size",
                 widget: "number",
                 inputProps: {
                     min: 0,
@@ -92,8 +93,10 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
         ...value,
         color: hexWithOpacity(color, opacity || fillOpacity),
         strokeColor: hexWithOpacity(strokeColor, strokeOpacity),
-        radius:
-            typeof value.radius === "number" ? value.radius * 2 : value.radius,
+        size:
+            typeof value.radius === "number"
+                ? value.radius * 2
+                : Number(value.radius),
     };
 
     return (

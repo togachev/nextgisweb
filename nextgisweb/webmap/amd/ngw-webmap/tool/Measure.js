@@ -2,7 +2,6 @@ define([
     "dojo/_base/declare",
     "./Base",
     "dojo/request/xhr",
-    "dojo/number",
     "dijit/popup",
     "dojo/_base/lang",
     "dijit/TooltipDialog",
@@ -16,7 +15,6 @@ define([
     declare,
     Base,
     xhr,
-    number,
     popup,
     lang,
     TooltipDialog,
@@ -31,7 +29,7 @@ define([
     var GEOM_AREA_URL = route.spatial_ref_sys.geom_area;
 
     return declare(Base, {
-        constructor: function (options) {
+        constructor: function () {
             var tool = this;
 
             if (this.type == "LineString") {
@@ -197,7 +195,7 @@ define([
                 })
             );
 
-            this.interaction.on("drawend", function (evt) {
+            this.interaction.on("drawend", function () {
                 ol.Observable.unByKey(listener);
             });
 

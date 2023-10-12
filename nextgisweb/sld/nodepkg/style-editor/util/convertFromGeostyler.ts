@@ -1,5 +1,3 @@
-import { deepCleanUndefined } from "@nextgisweb/gui/util/deepCleanUndefined";
-
 import type {
     FillSymbolizer as GSFillSymbolizer,
     LineSymbolizer as GSLineSymbolizer,
@@ -7,6 +5,8 @@ import type {
     Symbolizer as GSSymbolizer,
     GeoStylerNumberFunction,
 } from "geostyler-style";
+
+import { deepCleanUndefined } from "@nextgisweb/gui/util/deepCleanUndefined";
 
 import type {
     LineSymbolizer,
@@ -39,7 +39,7 @@ function convertMarkSymbolizer(gsMark: GSMarkSymbolizer): PointSymbolizer {
                     : undefined,
             },
             opacity: setOpacity(gsMark.opacity),
-            size: gsMark.radius as number,
+            size: (gsMark.radius as number) * 2,
         },
     };
 }

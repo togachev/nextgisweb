@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import parse, { Element, domToReact } from 'html-react-parser';
 import { CloseButton } from "../header/CloseButton";
 import { Image } from "@nextgisweb/gui/antd";
