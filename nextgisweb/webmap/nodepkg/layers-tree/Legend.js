@@ -29,7 +29,7 @@ export function LegendAction({ nodeData, onClick }) {
 
     return (
         <span
-            className="legend"
+            className="legend legend-list"
             onClick={click}
             title={open ? msgHideLegend : msgShowLegend}
         >
@@ -38,7 +38,7 @@ export function LegendAction({ nodeData, onClick }) {
     );
 }
 
-export function Legend({ nodeData }) {
+export function Legend({ nodeData, zoomToNgwExtent }) {
     if (!nodeData || !nodeData.legendInfo || !nodeData.legendInfo.open) {
         return <></>;
     }

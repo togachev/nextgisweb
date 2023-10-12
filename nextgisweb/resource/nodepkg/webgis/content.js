@@ -217,7 +217,7 @@ export const Content = ({onChanges,  ...rest}) => {
                         </div>
 
                         <div className="menu-maps">
-                            <div>
+                            <div className="menu-list">
                                 <Menu
                                     mode="inline"
                                     theme="light"

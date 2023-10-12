@@ -1,12 +1,25 @@
 .ngw-webmap-layers-tree {
+
     .ant-tree-checkbox {
-        display: flex;
-        align-items: center;
         top: initial;
-        margin-inline-end: 0;
-        align-self: center;
-        margin-top: 0;
+        margin-inline-end: 0px;
+        align-self: flex-start;
+        margin-top: 4px;
     }
+
+    .ant-tree-switcher {
+        position: relative;
+        flex: none;
+        align-self: stretch;
+        width: 24px;
+        margin: 0;
+        line-height: 24px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+    }
+
+
 
     .ant-tree-node-content-wrapper {
         display: flex;
@@ -14,9 +27,7 @@
         min-width: 0;
         align-items: center;
 
-        &.ant-tree-node-selected {
-            background-color: #ffffff00;
-        }
+
 
         &:hover {
             background: #ffffff00;
@@ -45,6 +56,12 @@
                 justify-content: end;
             }
 
+            &:hover {
+                background: #ffffff00;
+                border-radius: 3px;
+                color: #000000;
+            }
+
         }
     }
 }
@@ -59,7 +76,9 @@
     }
 }
 
-
+:where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-node-content-wrapper:hover, :where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-checkbox+span:hover {
+    background-color: #ffffff00;
+}
 
 .ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle {
     font-size: 24px;
@@ -86,6 +105,7 @@
     white-space: nowrap;
     padding: 2px;
     font-size: small;
+
     &:hover {
         background: rgba(247, 247, 247, 1);
         padding: 2px;
@@ -107,6 +127,10 @@
     padding: 0 4px;
 }
 
+.legend-list {
+    margin: 0 5px 0 0;
+}
+
 .more,
 .legend {
     font-size: 18px;
@@ -118,11 +142,8 @@
     justify-content: center;
     align-items: center;
     flex: 0 0 auto;
-    &:hover {
-        background: #ececec;
-        border-radius: 3px;
-        color: #000000;
-    }
+
+
 }
 
 .colSingleIconLegend {
@@ -136,7 +157,8 @@
     }
 }
 
-.ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle, .ant-tree .ant-tree-checkbox+span .ant-tree-iconEle {
+.ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle,
+.ant-tree .ant-tree-checkbox+span .ant-tree-iconEle {
     display: flex;
     width: 24px;
     height: 24px;
@@ -146,10 +168,11 @@
     align-items: center;
 }
 
-.iconSingle{
+.iconSingle {
     display: flex;
 }
 
-.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected, .ant-tree .ant-tree-checkbox+span.ant-tree-node-selected {
+.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected,
+.ant-tree .ant-tree-checkbox+span.ant-tree-node-selected {
     background-color: #ffffff00;
 }

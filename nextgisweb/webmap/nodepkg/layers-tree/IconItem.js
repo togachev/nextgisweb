@@ -29,7 +29,7 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
         <div
             key={idx}
             title={single ? item.title : s.display_name } 
-            className={single ? "iconSingle" : "colIconLegend"}
+            className={single ? "iconSingle" : "legend-item"}
             onClick={() => asyncFunc(item.layerId, s.display_name ? s.display_name : item.title)}
         >
             <img title={single ? zoomToLayer : zoomToFeatureLayer }
