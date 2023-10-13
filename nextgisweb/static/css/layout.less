@@ -426,3 +426,40 @@ div.descClass img {
   margin-top: 1px !important;
   padding: 4px 3px;
 }
+
+.ant-image-preview-img {
+    background: #ffffff;
+    border-radius: 2px;
+}
+
+.ant-image-preview-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    pointer-events: none;
+}
+
+.ant-image-preview-close {
+    position: fixed;
+    top: 72px !important;
+    right: 32px;
+    display: flex;
+    color: #fff;
+    background-color: #106a90 !important;
+    border-radius: 50%;
+    padding: 12px;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    transition: all 0s;
+}
+
+.ant-image-preview-operations {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    background-color: #106a90 !important;
+    border-radius: 100px;
+}

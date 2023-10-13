@@ -18,7 +18,7 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
     const options = {
         replace: item => {
             if (item instanceof Element && item.attribs && item.name == 'img') {
-                return <Image src={item.attribs.src}>item</Image>;
+                return <Image className="image-background" src={item.attribs.src}>item</Image>;
             }
             if (item instanceof Element && item.name == 'a' && !upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
