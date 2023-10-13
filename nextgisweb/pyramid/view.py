@@ -121,7 +121,6 @@ def header_image(request):
 @viewargs(renderer='webgis.mako')
 def webgis(request):
     return dict(
-        title=_("Webgis"),
         custom_layout=True
     )
 
