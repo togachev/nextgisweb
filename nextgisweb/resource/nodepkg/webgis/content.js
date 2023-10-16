@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { SearchOutlined } from '@ant-design/icons';
-import debounce from "lodash/debounce";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { Input, AutoComplete, Empty, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -104,12 +103,9 @@ export const Content = ({ onChanges, ...rest }) => {
     const [listMaps, setListMaps] = useState([]); // список карт
     const [groupMaps, setGroupMaps] = useState([]); // группы карт
     const [itemsMaps, setItemsMaps] = useState([]); // вывод карт при выборе конкретной группы
-
-    const [itemsSearch, setItemsSearch] = useState([]);
-
+    
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [acStatus, setAcSatus] = useState("");
 
@@ -158,7 +154,6 @@ export const Content = ({ onChanges, ...rest }) => {
     };
 
     const onClickGroupMaps = (e) => {
-        setItemsSearch([])
         setItemsMaps(listMaps.filter(item => item.webmap_group_id === parseInt(e.key)))
     }
 
@@ -233,11 +228,6 @@ export const Content = ({ onChanges, ...rest }) => {
                             <div className="content-maps-grid">
                                 <div className="content_group">
                                     {itemsMaps.map((item, index) => {
-                                        return (
-                                            <MapTile key={index} item={item} />
-                                        )
-                                    })}
-                                    {itemsSearch.map((item, index) => {
                                         return (
                                             <MapTile key={index} item={item} />
                                         )

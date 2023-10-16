@@ -217,11 +217,36 @@ def display(obj, request):
 
     tmp = obj.to_dict()
 
+    def getConstraint(item):
+        column_from_const = ''
+        if item.item_type == 'layer':
+            style = item.style
+            if item.style.parent.cls in ('postgis_layer', 'vector_layer'):
+                column_from_const = item.style.parent.column_from_const
+
+            if not style.has_permission(DataScope.read, request.user):
+                return None
+
+        elif item.item_type in ('root', 'group'):
+            column_from_const=list(filter(
+                    None,
+                    map(getConstraint, item.children)
+                ))
+
+        return column_from_const
+
     display_config = dict(
         extent=tmp["extent"],
         extent_const=tmp["extent_const"],
         rootItem=traverse(obj.root_item),
         itemsStates=items_states,
+        constraintField=getConstraint(obj.root_item),
+        infomap=dict(
+            resource=request.route_url('resource.show', id=0),
+            link=request.route_url('resource.show', id=obj.id),
+            update=request.route_url('resource.update', id=obj.id),
+            scope=obj.has_permission(ResourceScope.update, request.user)
+        ),
         mid=dict(
             adapter=tuple(display.mid.adapter),
             basemap=tuple(display.mid.basemap),

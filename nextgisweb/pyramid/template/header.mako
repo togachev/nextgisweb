@@ -18,6 +18,7 @@
             ${svglogo}
         %endif
     </a>
+    <div id="link-resource"></div>
     <div class="text">${title}</div>
     <div class="container">
         %if not hide_resource_filter:
@@ -53,5 +54,18 @@
             }
         }, document.getElementById("resourcesFilter"));
         %endif
+    });
+</script>
+
+<script type="text/javascript">
+    require([
+        "@nextgisweb/pyramid/link-resource",
+        "@nextgisweb/gui/react-app",
+    ], function (comp, reactApp) { 
+        reactApp.default(
+            comp.default,
+            {},
+            document.getElementById('link-resource')
+        );
     });
 </script>

@@ -604,3 +604,7 @@ msgstr "Выйти"
 #: nodepkg/webgis/content.js:26
 msgid "Enter card name"
 msgstr "Введите название карты"
+
+#: nodepkg/webgis/header.js:93
+msgid "Resources"
+msgstr "Ресурсы"

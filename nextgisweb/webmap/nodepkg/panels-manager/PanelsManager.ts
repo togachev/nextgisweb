@@ -97,6 +97,7 @@ export class PanelsManager {
             NavigationMenu,
             {
                 panels: this._panels,
+                display: this._display,
             },
             this._domElements.navigation
         );

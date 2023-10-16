@@ -3,14 +3,15 @@ import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Popover, Button, Space, Divider, Typography } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import { LoginOutlined } from '@ant-design/icons';
+import ResourceGroup from "./icons/resource_group.svg";
 
 import './header.less';
 
 const { Title } = Typography;
-const signInText = i18n.gettext("Sign in");
+const signInText = gettext("Sign in");
 
 export const Header = observer(() => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
@@ -19,12 +20,12 @@ export const Header = observer(() => {
         <>
             {invitationSession && (
                 <div className="warning">
-                    {i18n.gettext("Invitation session")}
+                    {gettext("Invitation session")}
                 </div>
             )}
-            <a href={routeURL("auth.settings")}>{i18n.gettext("Settings")}</a>
+            <a href={routeURL("auth.settings")}>{gettext("Settings")}</a>
             <a href="#" onClick={() => authStore.logout()}>
-                {i18n.gettext("Sign out")}
+                {gettext("Sign out")}
             </a>
         </>
     );
@@ -43,6 +44,7 @@ export const Header = observer(() => {
     )
 
     const header_image = routeURL('pyramid.header_image')
+    const url = routeURL("resource.show", 0);
 
     return (
         <div className="header" style={{ background: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
@@ -55,6 +57,7 @@ export const Header = observer(() => {
                         <DividerMenu />
                         <Button type="link" href="https://uriit.ru/contacts/">контакты</Button>
                         <DividerMenu />
+
                         <div
                             className={
                                 "menu-avatar" +
@@ -75,7 +78,7 @@ export const Header = observer(() => {
                                         {userDisplayName
                                             // .replace(/(.)[^\s]+(?: (.).*)?/, "$1$2")
                                             // .toLowerCase()
-                                            }
+                                        }
                                     </div>
                                 </Popover>
                             ) : authStore.showLoginModal ? (
@@ -86,6 +89,13 @@ export const Header = observer(() => {
                                 <a href={ngwConfig.logoutUrl}>{signInText}</a>
                             )}
                         </div>
+                        {authenticated ?
+                            <a title={gettext("Resources")} className="link-resource" href={url}>
+                                <span className="res-link">
+                                    <ResourceGroup />
+                                </span>
+                            </a>
+                            : null}
                     </Space>
                 </div>
             </div>
@@ -93,6 +103,6 @@ export const Header = observer(() => {
                 <Title className="name-site-a" level={1} >Геопортал Центра космических услуг</Title>
                 <Title className="name-site-b" level={5} >цифровые карты Ханты-мансийского автономного округа - Югры</Title>
             </div>
-        </div>
+        </div >
     );
 });
