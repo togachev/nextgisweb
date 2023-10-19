@@ -1,8 +1,11 @@
 define([
     "dojo/_base/declare",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/webmap/panel/diagram",
     "./Base",
     "dojo/_base/lang",
     "dojo/_base/array",
+    "dojo/query",
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/json",
@@ -38,9 +41,12 @@ define([
     "@nextgisweb/feature-layer/feature-editor",
 ], function (
     declare,
+    reactApp,
+    DiagramComp,
     Base,
     lang,
     array,
+    query,
     Deferred,
     all,
     json,
@@ -85,6 +91,10 @@ define([
     Control.prototype.handleClickEvent = function (evt) {
         if (evt.type === "singleclick") {
             this.tool.execute(evt.pixel);
+            evt.preventDefault();
+        }
+        else if (evt.type == 'pointerup' & evt.originalEvent.ctrlKey === true) {
+            this.tool.executeDiagram(evt.pixel);
             evt.preventDefault();
         }
         return true;
@@ -368,6 +378,10 @@ define([
         popupWidth: webmapSettings.popup_width,
         popupHeight: webmapSettings.popup_height,
 
+        arrayResponseFeature: [],
+        arrayFeature: [],
+        uniqueArray: [],
+
         constructor: function () {
             this.map = this.display.map;
             this.control = new Control({ tool: this });
@@ -408,6 +422,250 @@ define([
             this._popup.setPosition(undefined);
         },
 
+        executeDiagram: function (pixel) {
+            this._popup.setPosition(undefined);
+            // this._popup_cursor.setPosition(undefined);
+            topic.publish("feature.unhighlight");
+
+
+
+            var request = {
+                srs: 3857,
+                geom: this._requestGeomString(pixel),
+                layers: []
+            };
+
+            this.display.getVisibleItems().then(lang.hitch(this, function (items) {
+                var mapResolution = this.display.map.get("resolution");
+                array.forEach(items, (i) => {
+                    var item = this.display._itemConfigById[
+                        this.display.itemStore.getValue(i, "id")];
+                    if (!item.identifiable || mapResolution >= item.maxResolution ||
+                        mapResolution < item.minResolution) {
+                        return;
+                    }
+                    request.layers.push(item.layerId);
+                }, this);
+            }));
+
+            const features = async () => {
+                return xhr.post(route.feature_layer.identifyConst(), {
+                    handleAs: "json",
+                    data: json.stringify(request),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((response) => {
+                    this.response = response;
+                    // фильтрация идентификатора ресурса
+                    const resourcesId = Object.keys(response)
+                        .map((item) => {
+                            return parseInt(item);
+                        })
+                        .filter((item) => !isNaN(item));
+                    // проверка, если объект слоя имеет связанный ресурс
+                    if (response.constraint === true && response.featureCount !== 0) {
+                        array.forEach(resourcesId, (item) => {
+                            array.forEach(response[item].features, (feature) => {
+                                this.arrayResponseFeature.push(feature);
+                            })
+                        })
+                        return this.arrayResponseFeature;
+                    } else if (response.constraint === true && response.featureCount === 0) {
+                        this.arrayResponseFeature.length = 0;
+                        topic.publish("feature.unhighlightDiagram");
+                        return false;
+                    }
+                });
+            }
+            features().then(value => {
+                // добавляем объекты в массив
+                this.featurePush(value);
+            });
+
+        },
+
+        featurePush: function (value) {
+            var display = this.display;
+            if (value && display.map.target.className
+                !== 'tiny-map') {
+                array.forEach(value, (item) => {
+                    this.arrayFeature.push(item);
+                }, this);
+
+                // проверка и удаление дублирующихся объектов в массиве
+                var _lookup = {};
+                this.uniqueArray = array.filter(this.arrayFeature, (item) => {
+                    var key = item.id;
+                    if (_lookup[key] !== true) {
+                        _lookup[key] = true;
+                        return true;
+                    }
+                    return false;
+                });
+                delete _lookup;
+                this.featureSelectDiagram(this.uniqueArray);
+
+                if (display.featureHighlighterDiagram._source.getFeatures().length === 0) {
+                    this.uniqueArrayHighlight(this.uniqueArray, false);
+                } else if (display.featureHighlighterDiagram._source.getFeatures().length > 0) {
+                    var arrr = [];
+                    array.forEach(display.featureHighlighterDiagram._source.getFeatures(), (e) => {
+                        arrr.push({ uniqueId: e.getProperties().uniqueId });
+                    })
+                    this.uniqueArrayHighlight(this.uniqueArray, arrr);
+                }
+            }
+
+            if (value === false) {
+                // Обнуление массивов и очистка выделенныъх объектов на карте 
+                this.arrayFeature.length = 0;
+                this.arrayResponseFeature.length = 0;
+                this.uniqueArray.length = 0;
+                topic.publish("feature.unhighlightDiagram");
+            }
+        },
+
+        featureSelectDiagram: function (value) {
+
+            const panelsObj = this.display.panelsManager._panels;
+            all()
+                .then(function () {
+                    reactApp.default(
+                        DiagramComp.default,
+                        {
+                            value: value,
+                        },
+                        panelsObj.get('diagram').domNode
+                    );
+                })
+                .then(undefined, function (err) {
+                    console.error(err);
+                });
+
+            // var diagramNode = query('#diagramData')[0];
+            // if (diagramNode) {
+            //     domConstruct.empty(diagramNode);
+            //     array.forEach(value, (item) => {
+            //         // запрос полей связанной таблицы
+            //         // xhr.get(api.routeURL("feature_layer.field", {id: item.column_key}), {
+            //         //     method: 'GET',
+            //         //     handleAs: 'json'
+            //         // }).then(lang.hitch(this, (e) => {
+            //         //     console.log(e);
+            //         // }))
+
+            //         // строим тестовый график по статически заданным полям
+            //         xhr.get(api.routeURL("resource.feature_diagram", { id: item.column_key, key_diag: item.column_constraint, val_diag: item.fields[item.column_from_const] }), {
+            //             method: 'GET',
+            //             handleAs: 'json'
+            //         }).then(lang.hitch(this, (contextFeatures) => {
+            //             contextFeatures.sort(function (a, b) {
+            //                 return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
+            //             });
+            //             var _date = [];
+            //             var _osadki = [];
+            //             var _temperatura = [];
+
+            //             array.forEach(contextFeatures.filter((e) => { return e.fields.type_id == 2 }), (contextFeature, index) => {
+            //                 var date = new Date(contextFeature.fields.date.year, contextFeature.fields.date.month, contextFeature.fields.date.day).toLocaleDateString();
+            //                 _date.push({ text: date, value: index });
+            //                 _osadki.push(contextFeature.fields.value);
+            //             });
+
+            //             array.forEach(contextFeatures.filter((e) => { return e.fields.type_id == 3 }), (contextFeature, index) => {
+            //                 var date = new Date(contextFeature.fields.date.year, contextFeature.fields.date.month, contextFeature.fields.date.day).toLocaleDateString();
+            //                 _date.push({ text: date, value: index });
+            //                 _temperatura.push(contextFeature.fields.value);
+            //             });
+
+
+            //             this.chartDiagram = domConstruct.create("div", {
+            //                 id: `chartDiagram${item.id}`,
+            //                 style: "width: auto"
+            //             }, diagramNode);
+
+            //             // Create the chart within it&#x27;s "holding" node
+            //             this.chart = new Chart(`chartDiagram${item.id}`);
+
+            //             // Set the theme
+            //             this.chart.setTheme(theme);
+
+            //             // Add the only/default plot
+            //             this.chart.addPlot("default", {
+            //                 type: LinesPlot,
+            //                 markers: true
+            //             });
+
+            //             // Add axes
+            //             this.chart.addAxis("x", {
+            //                 labels: _date, fontColor: "blue",
+            //                 majorTicks: true,
+            //                 majorTickStep: 10,
+            //                 minorTicks: false
+            //             }
+            //             );
+            //             this.chart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", microTicks: false, minorTicks: false });
+
+            //             // Add the series of data
+            //             // chart.addSeries("Monthly Sales - 2010",_date);
+            //             this.chart.addSeries(" Осадки", _osadki);
+            //             this.chart.addSeries(" Температура", _temperatura);
+
+            //             // Create the tooltip
+            //             var tip = new Tooltip(this.chart);
+
+            //             // Create the magnifier
+            //             var mag = new Magnify(this.chart, "default");
+
+            //             // Render the chart!
+            //             this.chart.render();
+
+            //             // Create the legend
+            //             this.legend = new SelectableLegend({ chart: this.chart, horizontal: false }).placeAt(this.chartDiagram, 'before');
+            //         }))
+            //     })
+            // }
+
+
+        },
+
+        uniqueArrayHighlight: function (value, disable) {
+            // если выбраны объекты после первого нажатия
+            if (disable === false) {
+                array.forEach(value, (item) => {
+                    xhr.get(route.feature_layer.feature.item({ id: item.layerId, fid: item.id }), {
+                        method: "GET",
+                        handleAs: "json"
+                    }).then(function (feature) {
+                        topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item.layerId / item.id });
+
+                    });
+                });
+            }
+            // сработает, если выбрать новые объекты
+            else {
+                const findDiff = (arr1, arr2, mapping) =>
+                    arr1.find((item, index) =>
+                        mapping.find((m) => {
+                            if (arr2[index]) {
+                                return false;
+                            } else {
+                                xhr.get(route.feature_layer.feature.item({ id: item[m[1]], fid: item[m[0]] }), {
+                                    method: "GET",
+                                    handleAs: "json"
+                                }).then(function (feature) {
+                                    topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item[m[1]] / item[m[0]] });
+
+                                });
+                            }
+                        }
+                        ));
+                findDiff(value, disable, [["id", "layerId"]]);
+            }
+
+        },
+
         execute: function (pixel) {
             var tool = this,
                 olMap = this.display.map.olMap,
@@ -427,7 +685,7 @@ define([
                         function (i) {
                             var item =
                                 this.display._itemConfigById[
-                                    this.display.itemStore.getValue(i, "id")
+                                this.display.itemStore.getValue(i, "id")
                                 ];
                             if (
                                 !item.identifiable ||

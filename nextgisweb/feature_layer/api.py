@@ -1063,6 +1063,8 @@ def setup_pyramid(comp, config):
         deprecated=True,
     ).get(store_collection, context=IFeatureLayer)
 
-    from .identify import identify
+    from .identify import identify, identifyConst
 
     config.add_route("feature_layer.identify", "/api/feature_layer/identify", post=identify)
+
+    config.add_route("feature_layer.identifyConst", "/api/feature_layer/identifyConst", post=identifyConst)

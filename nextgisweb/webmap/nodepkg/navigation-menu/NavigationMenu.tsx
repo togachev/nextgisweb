@@ -16,8 +16,6 @@ export interface NavigationMenuProps {
 const { Link } = Typography;
 
 const Links = ({ infomap }) => {
-    console.log(infomap);
-    
     return (
         <div className="infoblock">
             <Link href={infomap.link}><span className="iconLinks"><InfoCircleOutlined /></span></Link>

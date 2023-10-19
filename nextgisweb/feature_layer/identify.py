@@ -63,3 +63,61 @@ def identify(request) -> JSONType:
     result["featureCount"] = feature_count
 
     return result
+
+def identifyConst(request) -> JSONType:
+
+    data = request.json_body
+    srs = int(data['srs'])
+    geom = Geometry.from_wkt(data['geom'], srid=srs)
+    layers = map(int, data['layers'])
+
+    layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
+
+    result = dict()
+
+    # Number of features in all layers
+    feature_count = 0
+
+    constraint = None
+
+    for layer in layer_list:
+        layer_id_str = str(layer.id)
+        if not layer.has_permission(DataScope.read, request.user):
+            result[layer_id_str] = dict(error="Forbidden")
+
+        elif not IFeatureLayer.providedBy(layer):
+            result[layer_id_str] = dict(error="Not implemented")
+
+        elif layer.column_from_const:
+            query = layer.feature_query()
+            query.intersects(geom)
+
+            # Limit number of identifyable features by 10 per layer,
+            # otherwise the response might be too big.
+            query.limit(10)
+
+            features = [
+                dict(id=f.id, layerId=layer.id, column_from_const=layer.column_from_const, column_key=layer.column_key, column_constraint=layer.column_constraint, label=f.label, fields=f.fields)
+                for f in query()
+            ]
+
+            # Add name of parent resource to identification results,
+            # if there is no way to get layer name by id on the client
+            allow = layer.parent.has_permission(PR_R, request.user)
+
+            if allow:
+                for feature in features:
+                    feature['parent'] = layer.parent.display_name
+
+            result[layer_id_str] = dict(
+                features=features,
+                featureCount=len(features),
+                constraint=True
+            )
+
+            feature_count += len(features)
+            constraint=True
+
+    result['featureCount'] = feature_count
+    result['constraint'] = constraint
+    return result

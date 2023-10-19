@@ -25,6 +25,7 @@ define([
     "./controls/InfoScale",
     "./controls/MyLocation",
     "./FeatureHighlighter",
+    "./FeatureHighlighterDiagram",
     "./MapStatesObserver",
     "./ui/react-panel",
     "./ui/react-webmap-tabs",
@@ -75,6 +76,7 @@ define([
     InfoScale,
     MyLocation,
     FeatureHighlighter,
+    FeatureHighlighterDiagram,
     MapStatesObserver,
     reactPanel,
     ReactWebMapTabs,
@@ -322,6 +324,9 @@ define([
                     lang.hitch(this, function () {
                         widget._mapAddLayers();
                         widget.featureHighlighter = new FeatureHighlighter(
+                            this.map
+                        );
+                        widget.featureHighlighterDiagram = new FeatureHighlighterDiagram(
                             this.map
                         );
                     })
@@ -1020,6 +1025,24 @@ define([
                 resolve(panel);
             });
             panels.push(makeInfoPanel);
+
+            const makeDiagramPanel = new Promise((resolve) => {
+                if (this.config.constraintField.length > 0) {
+                    const panel = {
+                        cls: reactPanel("@nextgisweb/webmap/panel/diagram"),
+                        params: {
+                            title: gettext("Diagram"),
+                            name: "diagram",
+                            order: 80,
+                            menuIcon: "material-info-outline",
+                            class: "diagram-panel dynamic-panel--fullwidth",
+                            withTitle: false,
+                        },
+                    };
+                    resolve(panel);
+                }
+            });
+            panels.push(makeDiagramPanel);
 
             const makeAnnotationsPanel = new Promise((resolve) => {
                 this._buildAnnotationPanel(resolve);

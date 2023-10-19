@@ -817,3 +817,8 @@ def setup_pyramid(comp, config):
         'resource.webmap_item',
         '/webmap/{id:uint}',
         get=webmap_item)
+
+    config.add_route(
+        'resource.feature_diagram',
+        '/api/resource/{id:uint}/feature/?fld_{key_diag:any}={val_diag:any}',
+        get=search)
