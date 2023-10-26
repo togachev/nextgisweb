@@ -427,8 +427,6 @@ define([
             // this._popup_cursor.setPosition(undefined);
             topic.publish("feature.unhighlight");
 
-
-
             var request = {
                 srs: 3857,
                 geom: this._requestGeomString(pixel),
@@ -481,8 +479,8 @@ define([
             features().then(value => {
                 // добавляем объекты в массив
                 this.featurePush(value);
-                this.featureSelectDiagram(value);
-                // console.log(value);
+                // this.featureSelectDiagram(value);
+                // console.log(this);
             });
 
         },
@@ -506,7 +504,6 @@ define([
                     return false;
                 });
                 delete _lookup;
-                this.featureSelectDiagram(this.uniqueArray);
 
                 if (display.featureHighlighterDiagram._source.getFeatures().length === 0) {
                     this.uniqueArrayHighlight(this.uniqueArray, false);
@@ -526,109 +523,6 @@ define([
                 this.uniqueArray.length = 0;
                 topic.publish("feature.unhighlightDiagram");
             }
-        },
-
-        featureSelectDiagram: function (value) {
-            const panelsObj = this.display.panelsManager._panels;
-            all()
-                .then(function () {
-                    reactApp.default(
-                        DiagramComp.default,
-                        {
-                            value,
-                        },
-                        panelsObj.get('diagram').domNode
-                    );
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            // var diagramNode = query('#diagramData')[0];
-            // if (diagramNode) {
-            //     domConstruct.empty(diagramNode);
-            //     array.forEach(value, (item) => {
-            //         // запрос полей связанной таблицы
-            //         // xhr.get(api.routeURL("feature_layer.field", {id: item.column_key}), {
-            //         //     method: 'GET',
-            //         //     handleAs: 'json'
-            //         // }).then(lang.hitch(this, (e) => {
-            //         //     console.log(e);
-            //         // }))
-
-            //         // строим тестовый график по статически заданным полям
-            //         xhr.get(api.routeURL("resource.feature_diagram", { id: item.column_key, key_diag: item.column_constraint, val_diag: item.fields[item.column_from_const] }), {
-            //             method: 'GET',
-            //             handleAs: 'json'
-            //         }).then(lang.hitch(this, (contextFeatures) => {
-            //             contextFeatures.sort(function (a, b) {
-            //                 return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
-            //             });
-            //             var _date = [];
-            //             var _osadki = [];
-            //             var _temperatura = [];
-
-            //             array.forEach(contextFeatures.filter((e) => { return e.fields.type_id == 2 }), (contextFeature, index) => {
-            //                 var date = new Date(contextFeature.fields.date.year, contextFeature.fields.date.month, contextFeature.fields.date.day).toLocaleDateString();
-            //                 _date.push({ text: date, value: index });
-            //                 _osadki.push(contextFeature.fields.value);
-            //             });
-
-            //             array.forEach(contextFeatures.filter((e) => { return e.fields.type_id == 3 }), (contextFeature, index) => {
-            //                 var date = new Date(contextFeature.fields.date.year, contextFeature.fields.date.month, contextFeature.fields.date.day).toLocaleDateString();
-            //                 _date.push({ text: date, value: index });
-            //                 _temperatura.push(contextFeature.fields.value);
-            //             });
-
-
-            //             this.chartDiagram = domConstruct.create("div", {
-            //                 id: `chartDiagram${item.id}`,
-            //                 style: "width: auto"
-            //             }, diagramNode);
-
-            //             // Create the chart within it&#x27;s "holding" node
-            //             this.chart = new Chart(`chartDiagram${item.id}`);
-
-            //             // Set the theme
-            //             this.chart.setTheme(theme);
-
-            //             // Add the only/default plot
-            //             this.chart.addPlot("default", {
-            //                 type: LinesPlot,
-            //                 markers: true
-            //             });
-
-            //             // Add axes
-            //             this.chart.addAxis("x", {
-            //                 labels: _date, fontColor: "blue",
-            //                 majorTicks: true,
-            //                 majorTickStep: 10,
-            //                 minorTicks: false
-            //             }
-            //             );
-            //             this.chart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", microTicks: false, minorTicks: false });
-
-            //             // Add the series of data
-            //             // chart.addSeries("Monthly Sales - 2010",_date);
-            //             this.chart.addSeries(" Осадки", _osadki);
-            //             this.chart.addSeries(" Температура", _temperatura);
-
-            //             // Create the tooltip
-            //             var tip = new Tooltip(this.chart);
-
-            //             // Create the magnifier
-            //             var mag = new Magnify(this.chart, "default");
-
-            //             // Render the chart!
-            //             this.chart.render();
-
-            //             // Create the legend
-            //             this.legend = new SelectableLegend({ chart: this.chart, horizontal: false }).placeAt(this.chartDiagram, 'before');
-            //         }))
-            //     })
-            // }
-
-
         },
 
         uniqueArrayHighlight: function (value, disable) {

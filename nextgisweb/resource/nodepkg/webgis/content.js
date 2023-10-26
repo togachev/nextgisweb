@@ -76,7 +76,7 @@ const resourcesToOptions = (resourcesInfo) => {
         return {
             value: `${resource.display_name}`,
             key: `${resource.id}`,
-            url: resourceUrl + '/display',
+            url: resourceUrl + '/display?panel=layers',
             target: '_self',
             label: (
                 <div
@@ -130,7 +130,6 @@ export const Content = ({ onChanges, ...rest }) => {
                 abort();
                 const resources = await route("resource.search").get({ query: q, signal: makeSignal() })
                 const options = resourcesToOptions(resources);
-                console.log(options);
                 setOptions(options);
                 setAcSatus("");
             } catch (er) {
