@@ -23,5 +23,6 @@
     "share",
     "zoom_in",
     "zoom_in_map/outline",
-    "zoom_out"
+    "zoom_out",
+    "auto_graph"
 ]

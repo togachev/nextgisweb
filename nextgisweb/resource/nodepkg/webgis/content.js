@@ -161,9 +161,11 @@ export const Content = ({ onChanges, ...rest }) => {
         (async () => {
             try {
                 const maplist = await route('resource.maplist').get(); // список карт
-                setListMaps(maplist.result);
+                const maplist_action_map = maplist.result.filter(item => item.action_map === true);
 
-                const data = [...new Map(maplist.result.map(item =>
+                setListMaps(maplist_action_map);
+
+                const data = [...new Map(maplist_action_map.map(item =>
                     [item.webmap_group_id, item])).values()]; // группы карт
 
                 let items = []
@@ -172,7 +174,7 @@ export const Content = ({ onChanges, ...rest }) => {
                     items.push({ type: 'divider' });
                 })
 
-                setItemsMaps(maplist.result.filter(item => item.webmap_group_id === parseInt(items[0].key)))
+                setItemsMaps(maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)))
                 setGroupMaps(items);
 
             } catch {

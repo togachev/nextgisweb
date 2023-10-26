@@ -481,6 +481,8 @@ define([
             features().then(value => {
                 // добавляем объекты в массив
                 this.featurePush(value);
+                this.featureSelectDiagram(value);
+                // console.log(value);
             });
 
         },
@@ -527,14 +529,13 @@ define([
         },
 
         featureSelectDiagram: function (value) {
-
             const panelsObj = this.display.panelsManager._panels;
             all()
                 .then(function () {
                     reactApp.default(
                         DiagramComp.default,
                         {
-                            value: value,
+                            value,
                         },
                         panelsObj.get('diagram').domNode
                     );

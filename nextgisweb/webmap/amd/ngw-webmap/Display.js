@@ -1034,7 +1034,7 @@ define([
                             title: gettext("Diagram"),
                             name: "diagram",
                             order: 80,
-                            menuIcon: "material-info-outline",
+                            menuIcon: "material-auto_graph",
                             class: "diagram-panel dynamic-panel--fullwidth",
                             withTitle: false,
                         },
