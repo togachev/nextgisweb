@@ -67,29 +67,24 @@ export function WmgSettings(props) {
     };
 
     return (
-        
         <>
-            <div className="block">
-                <Select
-                    key={items}
-                    getOptionLabel={e => e.webmap_group_name}
-                    getOptionValue={e => e.id}
-                    defaultValue={defaultItems}
-                    options={items}
-                    onChange={onChange}
-                    isMulti
-                    className="select-block"
-                    styles={getSelectStyle()}
-                    components={animatedComponents}
-                    closeMenuOnSelect={false}
-                />
-                
-            </div>
+            <Select
+                key={items}
+                getOptionLabel={e => e.webmap_group_name}
+                getOptionValue={e => e.id}
+                defaultValue={defaultItems}
+                options={items}
+                onChange={onChange}
+                isMulti
+                styles={getSelectStyle()}
+                components={animatedComponents}
+                closeMenuOnSelect={false}
+            />
             <br></br>
             <h3>Группы цифровой карты:</h3>
             <div>
-                {   
-                    defaultItems.sort(function(a, b) {
+                {
+                    defaultItems.sort(function (a, b) {
                         return a.id - b.id;
                     }).map((item) => {
                         return (

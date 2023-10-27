@@ -13,6 +13,7 @@ import { PanelHeader } from "../header";
 
 const Create = gettext("Create");
 const GraphTitle = gettext("Graph title");
+const Clear = gettext("Clear");
 
 export const options = {
     responsive: true,
@@ -113,6 +114,14 @@ export function DiagramPanel({ display, title, close }) {
         })
     }, [data]);
 
+    const lineItems = (
+        result.map(item => {
+            return (
+                <LineItem key={item.id} item={item} />
+            )
+        })
+    )
+
     return (
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
@@ -126,10 +135,11 @@ export function DiagramPanel({ display, title, close }) {
                                 onClick={
                                     () => {
                                         setResult([]);
+                                        setData([])
                                     }
                                 }
                             >
-                                Очистить
+                                {Clear}
                             </Button>
                             :
                             <Button
@@ -137,21 +147,15 @@ export function DiagramPanel({ display, title, close }) {
                                 onClick={
                                     () => {
                                         setData(display.identify.uniqueArray);
+                                        console.log(display.identify.uniqueArray);
                                     }
                                 }
                             >
                                 {Create}
                             </Button>
                     }
-
                 </span>
-                {
-                    result.map(item => {
-                        return (
-                            <LineItem key={item.id} item={item} />
-                        )
-                    })
-                }
+                {lineItems}
             </div>
         </div>
     );

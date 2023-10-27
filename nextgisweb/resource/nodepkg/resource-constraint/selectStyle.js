@@ -1,6 +1,6 @@
 export default function getSelectStyle() {
     return {
-        control: (styles, {isFocused}) => ({
+        control: (styles, { isFocused }) => ({
             ...styles,
             backgroundColor: '#fff',
             boxShadow: 'none',
@@ -11,9 +11,9 @@ export default function getSelectStyle() {
             minHeight: '30px',
             ':hover': {
                 borderColor: '#106a90'
-            }
+            },
         }),
-        dropdownIndicator: base => ({ ...base, padding: '2px' }), 
+        dropdownIndicator: base => ({ ...base, padding: '2px' }),
         indicatorsContainer: (provided, state) => ({
             ...provided,
             padding: '0px',
@@ -25,7 +25,7 @@ export default function getSelectStyle() {
             margin: '0px',
             maxHeight: '300px',
             overflow: 'overlay',
-          }),
+        }),
         input: (provided, state) => ({
             ...provided,
             margin: '0 0 0 10px',
@@ -46,7 +46,7 @@ export default function getSelectStyle() {
             ...provided,
             padding: '0px',
             margin: '0px',
-          }),
+        }),
         clearIndicator: (base) => ({
             ...base,
             paddingTop: 0,
@@ -58,7 +58,7 @@ export default function getSelectStyle() {
             border: '0.005em solid #106a9020',
             ':hover': {
                 backgroundColor: '#F0F0F0'
-            }
+            },
         }),
         multiValueRemove: (base) => ({
             ...base,
@@ -86,8 +86,10 @@ export default function getSelectStyle() {
                     color: '#000',
                     height: '34px'
                 },
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace:'nowrap'
             };
-
         },
     };
 }
