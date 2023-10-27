@@ -117,16 +117,34 @@ export function DiagramPanel({ display, title, close }) {
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div id="diagram-content" className="results">
-                <Button
-                    type="primary"
-                    onClick={
-                        () => {
-                            setData(display.identify.uniqueArray)
-                        }
+                <span className="diagram-button">
+
+                    {
+                        result.length > 0 ?
+                            <Button
+                                type="primary"
+                                onClick={
+                                    () => {
+                                        setResult([]);
+                                    }
+                                }
+                            >
+                                Очистить
+                            </Button>
+                            :
+                            <Button
+                                type="primary"
+                                onClick={
+                                    () => {
+                                        setData(display.identify.uniqueArray);
+                                    }
+                                }
+                            >
+                                {Create}
+                            </Button>
                     }
-                >
-                    {Create}
-                </Button>
+
+                </span>
                 {
                     result.map(item => {
                         return (
