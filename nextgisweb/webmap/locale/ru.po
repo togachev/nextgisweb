@@ -329,6 +329,10 @@ msgstr "Отменить"
 msgid "Delete"
 msgstr "Удалить"
 
+#: nodepkg/panel/DiagramPanel.js:17
+msgid "To create a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Create” button."
+msgstr "Для создания графика нажать и удерживать CTRL на клавиатуре. Выбрать необходимые объекты слоя на карте, нажать кнопку «Создать»."
+
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
 msgid "Create as public"
 msgstr "Создать как публичную"

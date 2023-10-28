@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, Card } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { Line } from "react-chartjs-2";
+import { Balancer } from "react-wrap-balancer";
 
 import { Chart, Title, registerables } from 'chart.js';
 Chart.register(...registerables);
@@ -13,10 +14,17 @@ import { PanelHeader } from "../header";
 
 const Create = gettext("Create");
 const Delete = gettext("Delete");
+const CreateInfo = gettext("To create a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Create” button.");
+
+const PlaceholderCard = () => (
+    <Card size="small">
+        <Balancer ratio={0.62}>{CreateInfo}</Balancer>
+    </Card>
+);
 
 export const options = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
         legend: {
             display: true,
@@ -25,7 +33,7 @@ export const options = {
         title: {
             display: false,
             fontSize: 20,
-            position:'top',
+            position: 'top',
         },
 
     },
@@ -36,13 +44,13 @@ export const options = {
 
 const LineItem = ({ item }) => {
     return (
-        <Line
-            type="line"
-            width={160}
-            height={60}
-            options={options}
-            data={item.lineChartData}
-        />
+        <div className="diagram-content">
+            <Line
+                type="line"
+                options={options}
+                data={item.lineChartData}
+            />
+        </div>
     )
 }
 
@@ -130,7 +138,6 @@ export function DiagramPanel({ display, title, close }) {
             <PanelHeader {...{ title, close }} />
             <div id="diagram-content" className="results">
                 <span className="diagram-button">
-
                     {
                         result.length > 0 ?
                             <Button
@@ -157,6 +164,7 @@ export function DiagramPanel({ display, title, close }) {
                             </Button>
                     }
                 </span>
+                { result.length > 0 ? null : <PlaceholderCard /> }
                 {lineItems}
             </div>
         </div>
