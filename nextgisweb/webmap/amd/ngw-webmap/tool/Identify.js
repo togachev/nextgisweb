@@ -447,21 +447,24 @@ define([
             }));
 
             const features = async () => {
-                return xhr.post(route.feature_layer.identifyConst(), {
+                const url = api.routeURL("feature_layer.identifyConst");
+                const identifyConst = xhr.post(url, {
                     handleAs: "json",
                     data: json.stringify(request),
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                }).then((response) => {
+                });
+
+                return identifyConst.then((response) => {
                     this.response = response;
-                    // фильтрация идентификатора ресурса
+
                     const resourcesId = Object.keys(response)
                         .map((item) => {
                             return parseInt(item);
                         })
                         .filter((item) => !isNaN(item));
-                    // проверка, если объект слоя имеет связанный ресурс
+
                     if (response.constraint === true && response.featureCount !== 0) {
                         array.forEach(resourcesId, (item) => {
                             array.forEach(response[item].features, (feature) => {
@@ -477,10 +480,7 @@ define([
                 });
             }
             features().then(value => {
-                // добавляем объекты в массив
                 this.featurePush(value);
-                // this.featureSelectDiagram(value);
-                // console.log(this);
             });
 
         },
@@ -493,7 +493,6 @@ define([
                     this.arrayFeature.push(item);
                 }, this);
 
-                // проверка и удаление дублирующихся объектов в массиве
                 var _lookup = {};
                 this.uniqueArray = array.filter(this.arrayFeature, (item) => {
                     var key = item.id;
@@ -517,7 +516,6 @@ define([
             }
 
             if (value === false) {
-                // Обнуление массивов и очистка выделенныъх объектов на карте 
                 this.arrayFeature.length = 0;
                 this.arrayResponseFeature.length = 0;
                 this.uniqueArray.length = 0;
@@ -526,19 +524,19 @@ define([
         },
 
         uniqueArrayHighlight: function (value, disable) {
-            // если выбраны объекты после первого нажатия
             if (disable === false) {
                 array.forEach(value, (item) => {
-                    xhr.get(route.feature_layer.feature.item({ id: item.layerId, fid: item.id }), {
+                    const url = api.routeURL("feature_layer.feature.item", {id: item.layerId, fid: item.id});
+                    const featureHighlightDiagram = xhr.get(url, {
                         method: "GET",
                         handleAs: "json"
-                    }).then(function (feature) {
-                        topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item.layerId / item.id });
+                    });
 
+                    featureHighlightDiagram.then(function (feature) {
+                        topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item.layerId / item.id });
                     });
                 });
             }
-            // сработает, если выбрать новые объекты
             else {
                 const findDiff = (arr1, arr2, mapping) =>
                     arr1.find((item, index) =>
@@ -546,19 +544,20 @@ define([
                             if (arr2[index]) {
                                 return false;
                             } else {
-                                xhr.get(route.feature_layer.feature.item({ id: item[m[1]], fid: item[m[0]] }), {
+                                const url = api.routeURL("feature_layer.feature.item", { id: item[m[1]], fid: item[m[0]] });
+                                const featureHighlightDiagram = xhr.get(url, {
                                     method: "GET",
                                     handleAs: "json"
-                                }).then(function (feature) {
+                                });
+            
+                                featureHighlightDiagram.then(function (feature) {
                                     topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item[m[1]] / item[m[0]] });
-
                                 });
                             }
                         }
                         ));
                 findDiff(value, disable, [["id", "layerId"]]);
             }
-
         },
 
         execute: function (pixel) {

@@ -12,8 +12,7 @@ import "./DiagramPanel.less";
 import { PanelHeader } from "../header";
 
 const Create = gettext("Create");
-const GraphTitle = gettext("Graph title");
-const Clear = gettext("Clear");
+const Delete = gettext("Delete");
 
 export const options = {
     responsive: true,
@@ -25,8 +24,8 @@ export const options = {
         },
         title: {
             display: false,
-            text: GraphTitle,
             fontSize: 20,
+            position:'top',
         },
 
     },
@@ -34,7 +33,6 @@ export const options = {
     spanGaps: true,
     showLine: false
 };
-
 
 const LineItem = ({ item }) => {
     return (
@@ -56,8 +54,13 @@ export function DiagramPanel({ display, title, close }) {
     const [result, setResult] = useState([]);
 
     const loadData = async (item) => {
+        const features = await route("resource.feature_diagram",
+            item.column_key,
+            item.column_constraint,
+            item.fields[item.column_from_const]
+        ).get();
 
-        const features = await route("resource.feature_diagram", item.column_key, item.column_constraint, item.fields[item.column_from_const]).get();
+        options.plugins.title.text = item.fields.space_name
 
         features.sort(function (a, b) {
             return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
@@ -139,7 +142,7 @@ export function DiagramPanel({ display, title, close }) {
                                     }
                                 }
                             >
-                                {Clear}
+                                {Delete}
                             </Button>
                             :
                             <Button
@@ -147,7 +150,6 @@ export function DiagramPanel({ display, title, close }) {
                                 onClick={
                                     () => {
                                         setData(display.identify.uniqueArray);
-                                        console.log(display.identify.uniqueArray);
                                     }
                                 }
                             >

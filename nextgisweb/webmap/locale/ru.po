@@ -325,6 +325,7 @@ msgid "Cancel"
 msgstr "Отменить"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:119
+#: nodepkg/panel/DiagramPanel.js:15
 msgid "Delete"
 msgstr "Удалить"
 
@@ -337,6 +338,7 @@ msgid "Create as private"
 msgstr "Создать как приватную"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
+#: nodepkg/panel/DiagramPanel.js:14
 msgid "Create"
 msgstr "Создать"
 
