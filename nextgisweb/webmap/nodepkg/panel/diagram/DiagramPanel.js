@@ -54,12 +54,33 @@ const LineItem = ({ item }) => {
     )
 }
 
-
-export function DiagramPanel({ display, title, close }) {
-
+export function DiagramPanel({ value, close, clear }) {
+    const title = gettext("Diagram")
     const [data, setData] = useState([]);
 
     const [result, setResult] = useState([]);
+
+    // const fields = async (item) => {
+    //     const features = await route("resource.feature_diagram",
+    //         item.column_key,
+    //         item.column_constraint,
+    //         item.fields[item.column_from_const]
+    //     ).get();
+    //     features?.map((item, i) => {
+    //         if (i === 0) {
+    //             console.log(item.fields);
+    //         }
+    //     })
+
+    // }
+
+    // useEffect(() => {
+    //     data?.map((item, i) => {
+    //         if (i === 0) {
+    //             fields(item)
+    //         }
+    //     })
+    // }, [data]);
 
     const loadData = async (item) => {
         const features = await route("resource.feature_diagram",
@@ -145,7 +166,8 @@ export function DiagramPanel({ display, title, close }) {
                                 onClick={
                                     () => {
                                         setResult([]);
-                                        setData([])
+                                        setData([]);
+                                        clear();
                                     }
                                 }
                             >
@@ -156,7 +178,7 @@ export function DiagramPanel({ display, title, close }) {
                                 type="primary"
                                 onClick={
                                     () => {
-                                        setData(display.identify.uniqueArray);
+                                        setData(value);
                                     }
                                 }
                             >
@@ -164,7 +186,7 @@ export function DiagramPanel({ display, title, close }) {
                             </Button>
                     }
                 </span>
-                { result.length > 0 ? null : <PlaceholderCard /> }
+                {result.length > 0 ? null : <PlaceholderCard />}
                 {lineItems}
             </div>
         </div>

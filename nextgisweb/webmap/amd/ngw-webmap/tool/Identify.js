@@ -485,6 +485,46 @@ define([
 
         },
 
+        clear: function () {
+            this.arrayFeature.length = 0;
+            this.arrayResponseFeature.length = 0;
+            this.uniqueArray.length = 0;
+            topic.publish("feature.unhighlightDiagram");
+        },
+
+        featureSelectDiagram: function (value) {
+            var display = this.display;
+            var pm = this.display.panelsManager
+
+            var close = () => {
+                pm._closePanel(pm.getPanel(pm._activePanelKey));
+            };
+            var clear = () => {
+                this.arrayFeature.length = 0;
+                this.arrayResponseFeature.length = 0;
+                this.uniqueArray.length = 0;
+                topic.publish("feature.unhighlightDiagram");
+            };
+            var panelsObj = this.display.panelsManager._panels;
+
+            all()
+                .then(function () {
+                    reactApp.default(
+                        DiagramComp.default,
+                        {
+                            display,
+                            value,
+                            close,
+                            clear
+                        },
+                        panelsObj.get('diagram').domNode
+                    );
+                })
+                .then(undefined, function (err) {
+                    console.error(err);
+                });
+        },
+
         featurePush: function (value) {
             var display = this.display;
             if (value && display.map.target.className
@@ -506,27 +546,28 @@ define([
 
                 if (display.featureHighlighterDiagram._source.getFeatures().length === 0) {
                     this.uniqueArrayHighlight(this.uniqueArray, false);
+                    this.featureSelectDiagram(this.uniqueArray);
                 } else if (display.featureHighlighterDiagram._source.getFeatures().length > 0) {
                     var arrr = [];
                     array.forEach(display.featureHighlighterDiagram._source.getFeatures(), (e) => {
                         arrr.push({ uniqueId: e.getProperties().uniqueId });
                     })
                     this.uniqueArrayHighlight(this.uniqueArray, arrr);
+                    this.featureSelectDiagram(this.uniqueArray);
                 }
             }
 
             if (value === false) {
-                this.arrayFeature.length = 0;
-                this.arrayResponseFeature.length = 0;
-                this.uniqueArray.length = 0;
-                topic.publish("feature.unhighlightDiagram");
+                this.clear();
             }
         },
+
+
 
         uniqueArrayHighlight: function (value, disable) {
             if (disable === false) {
                 array.forEach(value, (item) => {
-                    const url = api.routeURL("feature_layer.feature.item", {id: item.layerId, fid: item.id});
+                    const url = api.routeURL("feature_layer.feature.item", { id: item.layerId, fid: item.id });
                     const featureHighlightDiagram = xhr.get(url, {
                         method: "GET",
                         handleAs: "json"
@@ -549,7 +590,7 @@ define([
                                     method: "GET",
                                     handleAs: "json"
                                 });
-            
+
                                 featureHighlightDiagram.then(function (feature) {
                                     topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item[m[1]] / item[m[0]] });
                                 });
