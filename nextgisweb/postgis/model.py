@@ -258,8 +258,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     __field_class__ = PostgisLayerField
 
     connection = db.relationship(
-        Resource, foreign_keys=connection_id, cascade="save-update, merge", cascade_backrefs=False
-    )
+        Resource, foreign_keys=connection_id, cascade="save-update, merge")
 
     @classmethod
     def check_parent(cls, parent):
@@ -654,12 +653,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             columns.append(geomexpr.label("geom"))
 
-        fieldmap = []
-        for idx, fld in enumerate(self.layer.fields, start=1):
+        selected_fields = []
+        for idx, fld in enumerate(self.layer.fields):
             if self._fields is None or fld.keyname in self._fields:
-                clabel = "f%d" % idx
-                columns.append(getattr(tab.columns, fld.column_name).label(clabel))
-                fieldmap.append((fld.keyname, clabel))
+                label = f"fld_{idx}"
+                columns.append(getattr(tab.columns, fld.column_name).label(label))
+                selected_fields.append((fld.keyname, label))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
@@ -804,7 +803,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 with self.layer.connection.get_connection() as conn:
                     result = conn.execute(query)
                     for row in result.mappings():
-                        fdict = dict((k, row[v]) for k, v in fieldmap)
+                        fdict = dict(
+                            (keyname, row[label])
+                            for keyname, label in selected_fields)
 
                         if self._geom:
                             if self._geom_format == "WKB":
