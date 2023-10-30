@@ -22,6 +22,8 @@ const MapTile = (props) => {
     const { id, display_name, preview_fileobj_id } = props.item;
     const preview = routeURL('resource.preview', id)
 
+    const urlWebmap = routeURL('webmap.display', id) + '?panel=layers'
+
     return (
         <Card
             style={{
@@ -31,13 +33,13 @@ const MapTile = (props) => {
             }}
             hoverable
             cover={preview_fileobj_id ?
-                <Link style={{ padding: 0, display: 'contents' }} href={routeURL('webmap.display', id)} target="_blank">
+                <Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
                     <div className="img_preview"
                         style={{ background: `url(${preview}) center center / cover no-repeat` }}
                     ></div>
                 </Link>
                 :
-                <Link style={{ padding: 0, display: 'contents' }} href={routeURL('webmap.display', id)} target="_blank">
+                <Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
                     <div className="img_preview_none">
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                     </div>
@@ -56,7 +58,7 @@ const MapTile = (props) => {
                 }
 
                 description={
-                    <Link href={routeURL('webmap.display', id)} target="_blank">
+                    <Link href={urlWebmap} target="_blank">
                         <Text className="open-map" underline>{openMap}</Text>
                         <span className="icon-open-map"><MapIcon /></span>
                     </Link>
