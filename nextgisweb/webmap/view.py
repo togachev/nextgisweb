@@ -387,7 +387,7 @@ def setup_pyramid(comp, config):
                         icon='material-edit')
 
         def _display_url(self):
-            return lambda args: args.request.route_url("webmap.display", id=args.obj.id)
+            return lambda args: args.request.route_url("webmap.display", id=args.obj.id) + '?panel=layers'
 
         def _clone_url(self):
             return lambda args: args.request.route_url("webmap.clone", id=args.obj.id)

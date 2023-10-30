@@ -416,7 +416,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                     sorter={sorterFactory("displayName")}
                     render={(value, record) => (
                         <SvgIconLink
-                            href={record.cls === "webmap" ? record.link + '/display' : record.link}
+                            href={record.cls === "webmap" ? record.link + '/display?panel=layers' : record.link}
                             icon={`rescls-${record.cls}`}
                         >
                             {value}
