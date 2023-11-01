@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card } from "@nextgisweb/gui/antd";
+import { Button, Card, Divider } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { Line } from "react-chartjs-2";
@@ -16,18 +16,12 @@ const title = gettext("Diagrams")
 const Build = gettext("Build");
 const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
-const CreateInfo = gettext("To create a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Create” button.");
-const RebuildInfo = gettext("To add new graphs to existing ones, select the new objects and click rebuild");
+const Info = [ gettext("To plot a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Build” button."),
+gettext("To add new graphs to existing ones, select the new objects and click rebuild")];
 
-const PlaceholderCard = () => (
+const InfoCard = () => (
     <Card size="small">
-        <Balancer ratio={0.62}>{CreateInfo}</Balancer>
-    </Card>
-);
-
-const PlaceholderCardRebuild = () => (
-    <Card size="small">
-        <Balancer ratio={0.62}>{RebuildInfo}</Balancer>
+        {Info.map((item, idx) => (<Balancer key={idx}>{item}<Divider /></Balancer>))}
     </Card>
 );
 
@@ -173,7 +167,7 @@ export function DiagramPanel({ value, close, clear }) {
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div id="diagram-content" className="results">
-                <div className={status ? "diagram-button" : null}>
+                <div className={status ? "diagram-button" : "diagram-button-none"}>
                     {
                         result.length > 0 ?
                             <div className="diagram-button-old-new">
@@ -217,7 +211,7 @@ export function DiagramPanel({ value, close, clear }) {
                                 : null
                     }
                 </div>
-                {status ? null : <><PlaceholderCard /><PlaceholderCardRebuild /></>}
+                {status ? null : <InfoCard />}
                 {lineItems}
             </div>
         </div>

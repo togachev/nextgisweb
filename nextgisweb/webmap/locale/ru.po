@@ -330,8 +330,8 @@ msgid "Delete"
 msgstr "Удалить"
 
 #: nodepkg/panel/DiagramPanel.js:19
-msgid "To create a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Create” button."
-msgstr "Для создания графика нажать и удерживать CTRL на клавиатуре. Выбрать необходимые объекты слоя на карте, нажать кнопку «Создать»."
+msgid "To plot a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Build” button."
+msgstr "Чтобы построить график, нажмите и удерживайте клавишу CTRL на клавиатуре. Выделите необходимые объекты слоя на карте и нажмите кнопку «Построить»."
 
 #: nodepkg/panel/DiagramPanel.js:20
 msgid "To add new graphs to existing ones, select the new objects and click rebuild"

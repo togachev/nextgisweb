@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import parse, { Element, domToReact } from 'html-react-parser';
-import { CloseButton } from "../header/CloseButton";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { PanelHeader } from "../header";
 import { Image } from "@nextgisweb/gui/antd";
 
 import "./DescriptionPanel.less";
+
+const title = gettext("Description");
 
 const zoomToFeature = (display, resourceId, featureId) => {
     display.featureHighlighter
@@ -48,7 +51,7 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
 
     return (
         <div className="ngw-webmap-description-panel">
-            <CloseButton {...{ close }} />
+            <PanelHeader {...{ title, close }} />
             {data}
         </div>
     )
