@@ -94,8 +94,10 @@ define([
             evt.preventDefault();
         }
         else if (evt.type == 'pointerup' & evt.originalEvent.ctrlKey === true) {
-            this.tool.executeDiagram(evt.pixel);
-            evt.preventDefault();
+            if (this.tool.display.panelsManager._activePanelKey && this.tool.display.panelsManager._activePanelKey == 'diagram') {
+                this.tool.executeDiagram(evt.pixel);
+                evt.preventDefault();
+            }
         }
         return true;
     };
@@ -250,14 +252,16 @@ define([
             var widget = this,
                 lid = featureInfo.layerId,
                 fid = featureInfo.id,
-                iurl = route.feature_layer.feature.item({ id: lid, fid: fid });
+                iurl = api.routeURL("feature_layer.feature.item", { id: lid, fid: fid });
 
             domConstruct.empty(widget.featureContainer.domNode);
 
-            xhr.get(iurl, {
+            const iurlXHR = xhr.get(iurl, {
                 method: "GET",
                 handleAs: "json",
-            }).then(function (feature) {
+            });
+
+            iurlXHR.then(function (feature) {
                 widget.extWidgetClassesDeferred.then(function () {
                     widget.extContainer = new StackContainer({
                         region: "center",
@@ -558,6 +562,7 @@ define([
             }
 
             if (value === false) {
+                this.featureSelectDiagram(undefined);
                 this.clear();
             }
         },
@@ -645,13 +650,15 @@ define([
                         this
                     );
 
-                    xhr.post(route.feature_layer.identify(), {
+                    const url = api.routeURL("feature_layer.identify");
+                    const identify = xhr.post(url, {
                         handleAs: "json",
                         data: json.stringify(request),
                         headers: {
                             "Content-Type": "application/json",
-                        },
-                    }).then(function (response) {
+                        }
+                    });
+                    identify.then(function (response) {
                         tool._responsePopup(response, point, layerLabels);
                     });
                 })

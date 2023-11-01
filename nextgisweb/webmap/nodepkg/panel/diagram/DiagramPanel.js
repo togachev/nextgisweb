@@ -12,9 +12,12 @@ Chart.register(Title);
 import "./DiagramPanel.less";
 import { PanelHeader } from "../header";
 
-const Create = gettext("Create");
+const title = gettext("Diagrams")
+const Build = gettext("Build");
+const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
 const CreateInfo = gettext("To create a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Create” button.");
+const RebuildInfo = gettext("To add new graphs to existing ones, select the new objects and click rebuild");
 
 const PlaceholderCard = () => (
     <Card size="small">
@@ -22,32 +25,64 @@ const PlaceholderCard = () => (
     </Card>
 );
 
-export const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            display: true,
-            position: 'top',
-        },
-        title: {
-            display: false,
-            fontSize: 20,
-            position: 'top',
-        },
-
-    },
-    animation: false,
-    spanGaps: true,
-    showLine: false
-};
+const PlaceholderCardRebuild = () => (
+    <Card size="small">
+        <Balancer ratio={0.62}>{RebuildInfo}</Balancer>
+    </Card>
+);
 
 const LineItem = ({ item }) => {
+    let options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    font: {
+                        size: 12
+                    },
+                    padding: 10,
+                },
+                position: "top",
+                align: 'start',
+            },
+            legendDistance: {
+                padding: 20 // dictates the space
+            },
+            title: {
+                display: true,
+                fontSize: 20,
+                position: 'top',
+                align: 'start',
+                padding: {
+                    top: 5,
+                    bottom: 5
+                },
+                text: '#ID' + item.props.id + ',  Номер тествого участка: ' + item.props.fields.tu
+            },
+        },
+        animation: false,
+        spanGaps: true,
+        showLine: false,
+    };
+
+    let plugins = [{
+        id: 'legendDistance',
+        beforeInit(chart, args, opts) {
+            const originalFit = chart.legend.fit;
+            chart.legend.fit = function fit() {
+                originalFit.bind(chart.legend)();
+                this.height += opts.padding || 0;
+            }
+        }
+    }]
+
     return (
         <div className="diagram-content">
             <Line
                 type="line"
                 options={options}
+                plugins={plugins}
                 data={item.lineChartData}
             />
         </div>
@@ -55,32 +90,10 @@ const LineItem = ({ item }) => {
 }
 
 export function DiagramPanel({ value, close, clear }) {
-    const title = gettext("Diagram")
+
+    const [status, setStatus] = useState(value);
     const [data, setData] = useState([]);
-
     const [result, setResult] = useState([]);
-
-    // const fields = async (item) => {
-    //     const features = await route("resource.feature_diagram",
-    //         item.column_key,
-    //         item.column_constraint,
-    //         item.fields[item.column_from_const]
-    //     ).get();
-    //     features?.map((item, i) => {
-    //         if (i === 0) {
-    //             console.log(item.fields);
-    //         }
-    //     })
-
-    // }
-
-    // useEffect(() => {
-    //     data?.map((item, i) => {
-    //         if (i === 0) {
-    //             fields(item)
-    //         }
-    //     })
-    // }, [data]);
 
     const loadData = async (item) => {
         const features = await route("resource.feature_diagram",
@@ -88,8 +101,6 @@ export function DiagramPanel({ value, close, clear }) {
             item.column_constraint,
             item.fields[item.column_from_const]
         ).get();
-
-        options.plugins.title.text = item.fields.space_name
 
         features.sort(function (a, b) {
             return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
@@ -116,7 +127,7 @@ export function DiagramPanel({ value, close, clear }) {
         });
 
         setResult(e => [...e, {
-            id: item.id,
+            props: item,
             lineChartData: {
                 labels: _labelTemperatura,
                 datasets: [
@@ -146,47 +157,67 @@ export function DiagramPanel({ value, close, clear }) {
         })
     }, [data]);
 
+    const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.tu, item])).values()]
     const lineItems = (
-        result.map(item => {
+        resultUniqueByKey.map(item => {
             return (
-                <LineItem key={item.id} item={item} />
+                <LineItem item={item} />
             )
         })
     )
+    useEffect(() => {
+        setStatus(value);
+    }, [value]);
 
     return (
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div id="diagram-content" className="results">
-                <span className="diagram-button">
+                <div className={status ? "diagram-button" : null}>
                     {
                         result.length > 0 ?
-                            <Button
-                                type="primary"
-                                onClick={
-                                    () => {
-                                        setResult([]);
-                                        setData([]);
-                                        clear();
+                            <div className="diagram-button-old-new">
+                                <Button
+                                    type="primary"
+                                    onClick={
+                                        () => {
+                                            setData(value);
+                                        }
                                     }
-                                }
-                            >
-                                {Delete}
-                            </Button>
+                                >
+                                    {Rebuild}
+
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    onClick={
+                                        () => {
+                                            setResult([]);
+                                            setData([]);
+                                            setStatus(undefined)
+                                            clear();
+                                        }
+                                    }
+                                >
+                                    {Delete}
+                                </Button>
+                            </div>
                             :
-                            <Button
-                                type="primary"
-                                onClick={
-                                    () => {
-                                        setData(value);
+                            status ?
+                                <Button
+                                    type="primary"
+                                    onClick={
+                                        () => {
+                                            setData(value);
+                                        }
                                     }
-                                }
-                            >
-                                {Create}
-                            </Button>
+                                >
+                                    {Build}
+                                </Button>
+                                : null
                     }
-                </span>
-                {result.length > 0 ? null : <PlaceholderCard />}
+                </div>
+                {status ? null : <><PlaceholderCard /><PlaceholderCardRebuild /></>}
                 {lineItems}
             </div>
         </div>

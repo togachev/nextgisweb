@@ -158,6 +158,8 @@ export const Content = ({ onChanges, ...rest }) => {
         setItemsMaps(listMaps.filter(item => item.webmap_group_id === parseInt(e.key)))
     }
 
+    var firstValueSort = 'Открытые данные';
+
     useMemo(() => {
         (async () => {
             try {
@@ -170,11 +172,12 @@ export const Content = ({ onChanges, ...rest }) => {
                     [item.webmap_group_id, item])).values()]; // группы карт
 
                 let items = []
-                data.map((item) => {
+                data.sort((x, y) => {
+                    return x.webmap_group_name == firstValueSort ? -1 : y.webmap_group_name == firstValueSort ? 1 : 0;
+                }).map((item) => {
                     items.push({ key: item.webmap_group_id, label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip> });
                     items.push({ type: 'divider' });
                 })
-
                 setItemsMaps(maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)))
                 setGroupMaps(items);
 

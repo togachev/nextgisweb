@@ -329,9 +329,13 @@ msgstr "Отменить"
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/panel/DiagramPanel.js:17
+#: nodepkg/panel/DiagramPanel.js:19
 msgid "To create a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Create” button."
 msgstr "Для создания графика нажать и удерживать CTRL на клавиатуре. Выбрать необходимые объекты слоя на карте, нажать кнопку «Создать»."
+
+#: nodepkg/panel/DiagramPanel.js:20
+msgid "To add new graphs to existing ones, select the new objects and click rebuild"
+msgstr "Чтобы добавить новые графики к существующим, выберите новые объекты и нажмите «Перестроить»."
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
 msgid "Create as public"
@@ -342,9 +346,20 @@ msgid "Create as private"
 msgstr "Создать как приватную"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
-#: nodepkg/panel/DiagramPanel.js:14
 msgid "Create"
 msgstr "Создать"
+
+#: nodepkg/panel/DiagramPanel.js:15
+msgid "Diagrams"
+msgstr "Диаграммы"
+
+#: nodepkg/panel/DiagramPanel.js:16
+msgid "Rebuild"
+msgstr "Перестроить"
+
+#: nodepkg/panel/DiagramPanel.js:17
+msgid "Build"
+msgstr "Построить"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:255
 msgid "Create annotation"
