@@ -167,7 +167,7 @@ export function DiagramPanel({ value, close, clear }) {
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div id="diagram-content" className="results">
-                <div className={status ? "diagram-button" : "diagram-button-none"}>
+                <div className={status ? "diagram-button" : null}>
                     {
                         result.length > 0 ?
                             <div className="diagram-button-old-new">
