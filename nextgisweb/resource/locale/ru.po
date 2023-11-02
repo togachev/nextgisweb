@@ -22,6 +22,11 @@ msgstr "Сохранить"
 msgid "Delete"
 msgstr "Удалить"
 
+#: view.py:413
+msgid "Add/remove public files"
+msgstr "Добавить/удалить общедоступные файлы"
+
+
 #: amd/ngw-resource/CompositeWidget.js:273 amd/ngw-resource/CompositeWidget.js:295
 msgid "Unexpected error"
 msgstr "Внезапная ошибка"
