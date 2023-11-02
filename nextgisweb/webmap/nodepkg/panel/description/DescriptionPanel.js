@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useRef } from "react";
 import parse, { Element, domToReact } from 'html-react-parser';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelHeader } from "../header";

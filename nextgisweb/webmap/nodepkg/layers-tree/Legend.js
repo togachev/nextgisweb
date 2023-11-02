@@ -1,7 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import LegendToggle from "@nextgisweb/icon/material/legend_toggle/outline";
-import KeyboardArrowDown from "@nextgisweb/icon/material/keyboard_arrow_down/outline";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { IconItem } from "./IconItem";
 import "./Legend.less";
 
@@ -18,7 +17,7 @@ export function LegendAction({ nodeData, onClick }) {
     }
 
     const { open } = nodeData.legendInfo;
-    const icon = open ? <KeyboardArrowDown /> : <LegendToggle />;
+    const icon = open ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />;
 
     const click = () => {
         const { id } = nodeData;
