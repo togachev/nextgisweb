@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -9,7 +8,7 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
             const getData = async () => {
                 const layer_extent = await route('layer.extent', id).get();
                 const extent = await route('feature_layer.feature.extent', id).get({ query });
-                if (extent.extent.minLon !== null) {
+                if (extent.extent.minLon !== null && !single) {
                     return extent.extent
                 } else {
                     return layer_extent.extent
@@ -40,9 +39,4 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
     
     ));
 
-};
-
-IconItem.propTypes = {
-    item: PropTypes.object,
-    zoomToNgwExtent: PropTypes.func,
 };
