@@ -66,7 +66,7 @@ define([
                     ]);
                     panel = pm.getPanel(pkey);
                 }
-                pm._changeNavigationMenu(pkey);
+                pm.activatePanel(pkey);
             }
         },
     });
