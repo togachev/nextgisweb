@@ -330,12 +330,8 @@ msgid "Delete"
 msgstr "Удалить"
 
 #: nodepkg/panel/DiagramPanel.js:19
-msgid "To plot a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Build” button."
-msgstr "Чтобы построить график, нажмите и удерживайте клавишу CTRL на клавиатуре. Выделите необходимые объекты слоя на карте и нажмите кнопку «Построить»."
-
-#: nodepkg/panel/DiagramPanel.js:20
-msgid "To add new graphs to existing ones, select the new objects and click rebuild"
-msgstr "Чтобы добавить новые графики к существующим, выберите новые объекты и нажмите «Перестроить»."
+msgid "To select objects, press and hold the CTRL key"
+msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
 msgid "Create as public"

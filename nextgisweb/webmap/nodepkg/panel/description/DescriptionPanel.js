@@ -23,6 +23,9 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
             if (item instanceof Element && item.attribs && item.name == 'img') {
                 return <Image className="image-background" src={item.attribs.src}>item</Image>;
             }
+            if (item instanceof Element && item.attribs && item.name == 'p') {
+                return <span className="p-padding">{domToReact(item.children, options)}</span>;
+            }
             if (item instanceof Element && item.name == 'a' && !upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<a onClick={

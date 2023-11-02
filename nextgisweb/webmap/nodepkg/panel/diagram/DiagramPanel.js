@@ -16,12 +16,11 @@ const title = gettext("Diagrams")
 const Build = gettext("Build");
 const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
-const Info = [ gettext("To plot a graph, press and hold CTRL on your keyboard. Select the required layer objects on the map and click the “Build” button."),
-gettext("To add new graphs to existing ones, select the new objects and click rebuild")];
+const Info = gettext("To select objects, press and hold the CTRL key");
 
 const InfoCard = () => (
     <Card size="small">
-        {Info.map((item, idx) => (<Balancer key={idx}>{item}<Divider /></Balancer>))}
+        <Balancer >{Info}</Balancer>
     </Card>
 );
 
@@ -155,7 +154,10 @@ export function DiagramPanel({ value, close, clear }) {
     const lineItems = (
         resultUniqueByKey.map(item => {
             return (
-                <LineItem item={item} />
+                <div key={item.props.id}>
+                    <LineItem item={item} />
+                    <Divider />
+                </div>
             )
         })
     )
@@ -166,7 +168,7 @@ export function DiagramPanel({ value, close, clear }) {
     return (
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
-            <div id="diagram-content" className="results">
+            <div className="results">
                 <div className={status ? "diagram-button" : null}>
                     {
                         result.length > 0 ?

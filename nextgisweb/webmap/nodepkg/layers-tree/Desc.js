@@ -46,9 +46,9 @@ export function Desc({
             trigger={["click"]}
             open
             dropdownRender={(menu) => (
-                <div className="dropdown-content descData" onClick={(e) => { e.stopPropagation(); }}>
+                <span className="dropdown-content descData" onClick={(e) => { e.stopPropagation(); }}>
                     {menu}
-                </div>
+                </span>
             )} >
             <span title="Описание" className="more"
                 onClick={(e) => { setDescClickId(id); e.stopPropagation(); }} >
