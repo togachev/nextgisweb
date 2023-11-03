@@ -37,7 +37,6 @@ define([
     "./tool/Swipe",
     // panels
     "@nextgisweb/webmap/panel/layers",
-    "./ui/PrintMapPanel/PrintMapPanel",
     // utils
     "./utils/URL",
     // settings
@@ -86,7 +85,6 @@ define([
     ToolViewerInfo,
     ToolSwipe,
     LayersPanelModule,
-    PrintMapPanel,
     URL,
     { gettext, renderTemplate },
     settings,
@@ -980,13 +978,12 @@ define([
             });
 
             panels.push({
-                cls: PrintMapPanel,
+                cls: reactPanel("@nextgisweb/webmap/panel/print"),
                 params: {
                     title: gettext("Print map"),
                     name: "print",
                     order: 70,
                     menuIcon: "material-print",
-                    splitter: false,
                 },
             });
 
