@@ -607,6 +607,7 @@ define([
         },
 
         execute: function (pixel) {
+            this.clear();
             var tool = this,
                 olMap = this.display.map.olMap,
                 point = olMap.getCoordinateFromPixel(pixel);
