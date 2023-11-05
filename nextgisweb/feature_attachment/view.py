@@ -8,7 +8,7 @@ from nextgisweb.pyramid import viewargs
 from nextgisweb.resource import DataScope, Resource, resource_factory
 
 
-@viewargs(renderer='react')
+@viewargs(renderer="react")
 def attachment(request):
     request.resource_permission(DataScope.read)
 
@@ -20,20 +20,19 @@ def attachment(request):
         title=_("Manage attachments"),
         props=dict(id=request.context.id),
         entrypoint="@nextgisweb/feature_attachment/attachment-form",
-        maxheight=True
+        maxheight=True,
     )
 
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'feature_attachment.page',
-        r'/resource/{id:uint}/attachments',
+        "feature_attachment.page",
+        r"/resource/{id:uint}/attachments",
         factory=resource_factory,
     ).add_view(attachment, context=IFeatureLayer)
 
     # Layer menu extension
     class LayerMenuExt(dm.DynItem):
-
         def build(self, args):
             if IFeatureLayer.providedBy(args.obj):
                 if args.obj.has_export_permission(args.request.user):
