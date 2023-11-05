@@ -1015,8 +1015,6 @@ define([
                         name: "info",
                         order: 40,
                         menuIcon: "material-info-outline",
-                        class: "info-panel dynamic-panel--fullwidth",
-                        withTitle: false,
                     },
                 };
                 resolve(panel);
@@ -1105,8 +1103,6 @@ define([
                     name: "annotation",
                     order: 30,
                     menuIcon: "material-message",
-                    class: "info-panel dynamic-panel--fullwidth",
-                    withTitle: false,
                 },
             };
             resolve(panel);
