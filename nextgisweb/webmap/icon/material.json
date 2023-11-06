@@ -24,5 +24,6 @@
     "zoom_in",
     "zoom_in_map/outline",
     "zoom_out",
-    "auto_graph"
+    "auto_graph",
+    "settings_suggest"
 ]

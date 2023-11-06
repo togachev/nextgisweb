@@ -2,9 +2,9 @@ define([
     "dojo/_base/declare",
     "./_PluginBase",
     "dojo/request/xhr",
-    "ngw-pyramid/route",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
-], function (declare, _PluginBase, xhr, route, i18n) {
+], function (declare, _PluginBase, xhr, api, i18n) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             return {
@@ -33,7 +33,9 @@ define([
             var plugin = this,
                 item = this.display.dumpItem();
 
-            xhr.get(route.layer.extent({ id: item.styleId }), {
+            const url = api.routeURL("layer.extent", { id: item.styleId });
+
+            xhr.get(url, {
                 handleAs: "json",
             }).then(function ({ extent }) {
                 plugin.display.map.zoomToNgwExtent(
