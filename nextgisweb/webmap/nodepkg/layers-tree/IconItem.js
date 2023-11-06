@@ -8,7 +8,7 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
             const getData = async () => {
                 const layer_extent = await route('layer.extent', id).get();
                 const extent = await route('feature_layer.feature.extent', id).get({ query });
-                if (extent.extent.minLon !== null) {
+                if (extent.extent.minLon !== null && !single) {
                     return extent.extent
                 } else {
                     return layer_extent.extent
