@@ -9,6 +9,7 @@ import { DropdownActions } from "./DropdownActions";
 import { Legend, LegendAction } from "./Legend";
 import { DropdownFile } from "./DropdownFile";
 import { Desc } from "./Desc";
+import { TimeLine } from "./TimeLine";
 import { IconItem } from "./IconItem.js";
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
 
@@ -44,12 +45,13 @@ export const LayersTree = observer(
         const [moreClickId, setMoreClickId] = useState(undefined);
         const [fileClickId, setFileClickId] = useState(undefined);
         const [descClickId, setDescClickId] = useState(undefined);
+        const [timeLineClickId, setTimeLineClickId] = useState(undefined);
         const [update, setUpdate] = useState(false);
 
         const handleWebMapItem = (webMapItem) => {
             if (webMapItem.type === "root" || webMapItem.type === "group") {
                 webMapItem.icon = ({ expanded }) =>
-                    expanded ? <FolderOpenIcon className="close-open-icon" /> : 
+                    expanded ? <FolderOpenIcon className="close-open-icon" /> :
                         <FolderClosedIcon className="close-open-icon" />;
             } else if (webMapItem.type === "layer") {
                 webMapItem.isLeaf = true;
@@ -160,6 +162,11 @@ export const LayersTree = observer(
                                     descClickId={descClickId}
                                 />) :
                                 null}
+                            <TimeLine
+                                nodeData={nodeData}
+                                setTimeLineClickId={setTimeLineClickId}
+                                timeLineClickId={timeLineClickId}
+                            />
                             <DropdownActions
                                 nodeData={nodeData}
                                 getWebmapPlugins={getWebmapPlugins}
@@ -234,8 +241,8 @@ export const LayersTree = observer(
 
         return (
             <Tree
-                className="ngw-webmap-layers-tree" 
-                
+                className="ngw-webmap-layers-tree"
+
                 virtual={false}
                 motion={false}
                 checkable
