@@ -174,8 +174,8 @@ def display(obj, request):
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
-                minScaleDenom=item.layer_min_scale_denom,
-                maxScaleDenom=item.layer_max_scale_denom,
+                minScaleDenom=style.minScale(),
+                maxScaleDenom=style.maxScale(),
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
             )

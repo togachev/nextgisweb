@@ -836,10 +836,12 @@ def cpost(resource, request) -> JSONType:
     if resource.cls != 'nogeom_layer':
         srs = request.GET.get("srs")
 
+        if srs is not None:
+            srs_from = SRS.filter_by(id=int(srs)).one()
+            dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
         dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
-
     feature = Feature(layer=resource)
     deserialize(feature, request.json_body, create=True, **dsrlz_params)
 
@@ -858,9 +860,9 @@ def cpatch(resource, request) -> JSONType:
     if resource.cls != 'nogeom_layer':
         srs = request.GET.get("srs")
 
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
+        if srs is not None:
+            srs_from = SRS.filter_by(id=int(srs)).one()
+            dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     for fdata in request.json_body:
         if "id" not in fdata:
