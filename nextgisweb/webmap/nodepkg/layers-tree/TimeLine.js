@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
+import { useEffect, useState } from "react";
+import { Dropdown, Slider } from "@nextgisweb/gui/antd";
 import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLine.less";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-const { RangePicker } = DatePicker;
-import { errorModal } from "@nextgisweb/gui/error";
+
 const msgShowTimeLime = gettext("Show time line");
 const msgHideTimeLime = gettext("Hide time line");
 
@@ -20,35 +19,27 @@ export function TimeLine({
     const [value, setValue] = useState({minDate: '', maxDate: ''});
     const [feature, setFeature] = useState({});
 
+    const startValue = async () => {
+        const query = { geom: 'no', extensions: 'no', order_by: 'data' }
+        const item = await route('feature_layer.feature.collection', layerId).get({ query });
+        setValueStart({minDate: item[0].fields.data.year + '.' + item[0].fields.data.month + '.' + item[0].fields.data.day, maxDate: item.at(-1).fields.data.year + '.' + item.at(-1).fields.data.month + '.' + item.at(-1).fields.data.day});
+    };
+
     useEffect(() => {
-        let isSubscribed = true;
-        const asyncFuncValue = async () => {
-            const query = { geom: 'no', extensions: 'no', order_by: 'data' }
-            const item = await route('feature_layer.feature.collection', layerId).get({ query });
-            if (isSubscribed) {
-                setValueStart({minDate: item[0].fields.data.year + '.' + item[0].fields.data.month + '.' + item[0].fields.data.day, maxDate: item.at(-1).fields.data.year + '.' + item.at(-1).fields.data.month + '.' + item.at(-1).fields.data.day});
-            }
-        };
-        asyncFuncValue().catch(console.error);
-        return () => isSubscribed = false;
+        startValue()
     }, []);
 
+    const asyncFunc = async () => {
+        const query = { fld_data__ge: value.minDate, fld_data__le: value.maxDate }
+        const res = await route('feature_layer.feature.collection', layerId).get({ query });
+        setFeature(res);
+    };
 
     useEffect(() => {
-        let isSubscribed = false;
-        const asyncFunc = async () => {
-            const query = { fld_data__ge: value.minDate, fld_data__le: value.maxDate }
-            const res = await route('feature_layer.feature.collection', layerId).get({ query });
-            if (isSubscribed) {
-                setFeature(res);
-            };
-        };
         if(value.minDate !== '' && value.maxDate !== ''){
             asyncFunc().catch(console.error);
         }
-        return () => isSubscribed = true;
     }, [value]);
-    console.log(feature);
 
     if (timeLineClickId === undefined || timeLineClickId !== id) {
         return (
@@ -62,6 +53,8 @@ export function TimeLine({
     const onOpenChange = () => {
         setTimeLineClickId(undefined);
     };
+
+    console.log(feature);
     
     return (
         <Dropdown

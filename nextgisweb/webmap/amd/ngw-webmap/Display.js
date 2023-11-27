@@ -978,6 +978,16 @@ define([
             });
 
             panels.push({
+                cls: reactPanel("@nextgisweb/webmap/panel/timeline"),
+                params: {
+                    title: gettext("TimeLine"),
+                    name: "timeline",
+                    order: 20,
+                    menuIcon: "material-timeline",
+                },
+            });
+
+            panels.push({
                 cls: reactPanel("@nextgisweb/webmap/panel/print"),
                 params: {
                     title: gettext("Print map"),
