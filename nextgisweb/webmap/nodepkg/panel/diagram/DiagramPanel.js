@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button, Card, Divider } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
@@ -87,6 +87,7 @@ export function DiagramPanel({ value, close, clear }) {
     const [status, setStatus] = useState(value);
     const [data, setData] = useState([]);
     const [result, setResult] = useState([]);
+    const [val, setVal] = useState([]);
 
     const loadData = async (item) => {
         const features = await route("resource.feature_diagram",
@@ -150,6 +151,19 @@ export function DiagramPanel({ value, close, clear }) {
         })
     }, [data]);
 
+    const reqData = async (item) => {
+        const result = await route("request_diagram.data", item.layerId, item.id).get();
+        console.log(item);
+    };
+
+    useEffect(() => {
+        if (val) {
+            val?.map(item => {
+                reqData(item);
+            })
+        }
+    }, [val]);
+
     const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.tu, item])).values()]
     const lineItems = (
         resultUniqueByKey.map(item => {
@@ -169,6 +183,18 @@ export function DiagramPanel({ value, close, clear }) {
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div className="results">
+                <div className="request-block">
+                    <Button
+                        type="primary"
+                        onClick={
+                            () => {
+                                setVal(value);
+                            }
+                        }
+                    >
+                        тестовый запрос
+                    </Button>
+                </div>
                 <div className={status ? "diagram-button" : null}>
                     {
                         result.length > 0 ?

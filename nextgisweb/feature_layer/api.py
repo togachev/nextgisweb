@@ -932,8 +932,20 @@ def feature_extent(resource, request) -> JSONType:
     extent = query().extent
     return dict(extent=extent)
 
+def diagram_data(resource, request) -> JSONType:
+    fid = int(request.matchdict["fid"])
+    generate_uuid = uuid.UUID(int=feature_id)
+
+    return dict(id=generate_uuid)
 
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        "request_diagram.data",
+        "/api/resource/diagram/{fid:uint}/",
+        factory=resource_factory,
+    ).get(diagram_data)
+
     geojson_route = config.add_route(
         "feature_layer.geojson",
         "/api/resource/{id:uint}/geojson",
