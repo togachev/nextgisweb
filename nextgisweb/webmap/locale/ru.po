@@ -354,6 +354,14 @@ msgid "Rebuild"
 msgstr "Перестроить"
 
 #: nodepkg/panel/DiagramPanel.js:17
+msgid "Calculate forecast"
+msgstr "Рассчитать прогноз"
+
+#: nodepkg/panel/DiagramPanel.js:17
+msgid "Count of trajectories"
+msgstr "Количество траекторий"
+
+#: nodepkg/panel/DiagramPanel.js:17
 msgid "Build"
 msgstr "Построить"
 

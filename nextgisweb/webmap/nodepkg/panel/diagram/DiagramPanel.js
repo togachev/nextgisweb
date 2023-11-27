@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
-import { Button, Card, Divider } from "@nextgisweb/gui/antd";
+import { Button, Card, Divider, InputNumber } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { Line } from "react-chartjs-2";
 import { Balancer } from "react-wrap-balancer";
-
+import { v4 as uuidv4 } from 'uuid';
 import { Chart, Title, registerables } from 'chart.js';
+
 Chart.register(...registerables);
 Chart.register(Title);
 
@@ -17,12 +18,15 @@ const Build = gettext("Build");
 const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
 const Info = gettext("To select objects, press and hold the CTRL key");
+const CalculateForecast = gettext("Calculate forecast");
+const CountOfTrajectories = gettext("Count of trajectories");
 
 const InfoCard = () => (
     <Card size="small">
         <Balancer >{Info}</Balancer>
     </Card>
 );
+
 
 const LineItem = ({ item }) => {
     let options = {
@@ -86,54 +90,78 @@ export function DiagramPanel({ value, close, clear }) {
 
     const [status, setStatus] = useState(value);
     const [data, setData] = useState([]);
+    const [dataReq, setDataReq] = useState([]);
     const [result, setResult] = useState([]);
-    const [val, setVal] = useState([]);
+    const [resultReq, setResultReq] = useState([]);
+    const [countTraectories, setCountTraectories] = useState(10000)
 
-    const loadData = async (item) => {
+    const onChangeCount = (value) => {
+        setCountTraectories(value);
+    };
+    
+
+    const resultData = async (item) => {
         const features = await route("resource.feature_diagram",
             item.column_key,
             item.column_constraint,
             item.fields[item.column_from_const]
         ).get();
-
         features.sort(function (a, b) {
             return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
         });
-        var _labelOsadki = [];
-        var _osadki = [];
 
-        var _labelTemperatura = [];
-        var _temperatura = [];
+        var _labelSquare = [];
+        var _square = [];
 
-        const osadki = features.filter((item) => item.fields.type_id == 2);
-        const temperatura = features.filter((item) => item.fields.type_id == 3);
+        var _labelPrecipitation = [];
+        var _precipitation = [];
 
-        osadki.map(item => {
+        var _labelTemperature = [];
+        var _temperature = [];
+
+        const square_ = features.filter((item) => item.fields.type_id == 1);
+        const precipitation_ = features.filter((item) => item.fields.type_id == 2);
+        const temperature_ = features.filter((item) => item.fields.type_id == 3);
+
+        square_.map(item => {
             let date = item.fields.date;
-            _labelOsadki.push(date.year);
-            _osadki.push(item.fields.value);
+            _labelSquare.push(date.year);
+            _square.push(item.fields.value);
         });
 
-        temperatura.map(item => {
+        precipitation_.map(item => {
             let date = item.fields.date;
-            _labelTemperatura.push(date.year);
-            _temperatura.push(item.fields.value);
+            _labelPrecipitation.push(date.year);
+            _precipitation.push(item.fields.value);
+        });
+
+        temperature_.map(item => {
+            let date = item.fields.date;
+            _labelTemperature.push(date.year);
+            _temperature.push(item.fields.value);
         });
 
         setResult(e => [...e, {
             props: item,
             lineChartData: {
-                labels: _labelTemperatura,
+                labels: _labelTemperature,
                 datasets: [
                     {
-                        data: _osadki,
-                        label: "Осадки",
+                        data: _square,
+                        label: "Площадь",
+                        borderColor: "#FF0060",
+                        fill: true,
+                        lineTension: 0.5
+                    },
+                    {
+                        data: _precipitation,
+                        label: "Атмосферные осадки",
                         borderColor: "#3E93FF",
                         fill: true,
                         lineTension: 0.5
                     },
                     {
-                        data: _temperatura,
+                        data: _temperature,
                         label: "Температура",
                         borderColor: "#009301",
                         fill: true,
@@ -144,25 +172,58 @@ export function DiagramPanel({ value, close, clear }) {
         }]);
     };
 
-    useEffect(() => {
-        setResult([]);
-        data?.map(item => {
-            loadData(item);
-        })
-    }, [data]);
+    const resultReqData = async (item) => {
+        const features = await route("resource.feature_diagram",
+            item.column_key,
+            item.column_constraint,
+            item.fields[item.column_from_const]
+        ).get();
+        features.sort(function (a, b) {
+            return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
+        });
 
-    const reqData = async (item) => {
-        const result = await route("request_diagram.data", item.layerId, item.id).get();
-        console.log(result);
+        const square_ = features.filter((item) => item.fields.type_id == 1);
+        const precipitation_ = features.filter((item) => item.fields.type_id == 2);
+        const temperature_ = features.filter((item) => item.fields.type_id == 3);
+
+        const temperature = Object.fromEntries(
+            temperature_.map((item, i) => [item.fields.date.year, item.fields.value])
+        )
+
+        const precipitation = Object.fromEntries(
+            precipitation_.map((item, i) => [item.fields.date.year, item.fields.value])
+        )
+
+        const square = Object.fromEntries(
+            square_.map((item, i) => [item.fields.date.year, item.fields.value])
+        )
+
+        setResultReq(e => [...e, {
+            id: uuidv4(),
+            period_type: "short",
+            count_of_trajectories: countTraectories,
+            main_param_name: "square",
+            data: {
+                temperature,
+                precipitation,
+                square,
+            },
+        }])
     };
 
     useEffect(() => {
-        if (val) {
-            val?.map(item => {
-                reqData(item);
-            })
-        }
-    }, [val]);
+        setResult([]);
+        data?.map(item => {
+            resultData(item);
+        })
+    }, [data]);
+
+    useEffect(() => {
+        setResultReq([]);
+        dataReq?.map(item => {
+            resultReqData(item);
+        })
+    }, [dataReq]);
 
     const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.tu, item])).values()]
     const lineItems = (
@@ -179,6 +240,8 @@ export function DiagramPanel({ value, close, clear }) {
         setStatus(value);
     }, [value]);
 
+    console.log(resultReq);
+
     return (
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
@@ -188,13 +251,19 @@ export function DiagramPanel({ value, close, clear }) {
                         type="primary"
                         onClick={
                             () => {
-                                setVal(value);
+                                setDataReq(value);
                             }
                         }
                     >
-                        тестовый запрос
+                        {CalculateForecast}
                     </Button>
+                    <div className="float-input-label">
+                        <label class="label float">{CountOfTrajectories}</label>
+                        <InputNumber style={{width: '100%' }} min={1000} max={100000} defaultValue={countTraectories} onChange={onChangeCount} />                        
+                    </div>
+
                 </div>
+                <Divider></Divider>
                 <div className={status ? "diagram-button" : null}>
                     {
                         result.length > 0 ?
