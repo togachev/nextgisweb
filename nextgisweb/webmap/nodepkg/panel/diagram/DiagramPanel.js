@@ -153,7 +153,7 @@ export function DiagramPanel({ value, close, clear }) {
 
     const reqData = async (item) => {
         const result = await route("request_diagram.data", item.layerId, item.id).get();
-        console.log(item);
+        console.log(result);
     };
 
     useEffect(() => {

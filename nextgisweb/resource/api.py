@@ -613,7 +613,7 @@ def tbl_res(request):
         if resource.has_permission(PERM_READ, request.user):
             fields=list()
             for idx in resource.fields:
-                fields.append({'value':idx.display_name, 'label':idx.display_name})
+                fields.append({'value':idx.keyname, 'label':idx.display_name})
             result.append(dict(
                 id=resource.id,
                 name=resource.display_name,

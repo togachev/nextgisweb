@@ -933,8 +933,10 @@ def feature_extent(resource, request) -> JSONType:
     return dict(extent=extent)
 
 def diagram_data(resource, request) -> JSONType:
+    request.resource_permission(PERM_READ)
+    id = int(request.matchdict["id"])
     fid = int(request.matchdict["fid"])
-    generate_uuid = uuid.UUID(int=feature_id)
+    generate_uuid = uuid.UUID(int=fid)
 
     return dict(id=generate_uuid)
 
@@ -942,7 +944,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "request_diagram.data",
-        "/api/resource/diagram/{fid:uint}/",
+        "/api/resource/{id:uint}/diagram/{fid:uint}/",
         factory=resource_factory,
     ).get(diagram_data)
 
