@@ -201,7 +201,7 @@ export function DiagramPanel({ value, close, clear }) {
         )
         setResultReq([])
         setResultReq(e => [...e, {
-            id: uuidv4(item.id),
+            id: uuidv4(),
             period_type: "short",
             count_of_trajectories: countTraectories,
             main_param_name: "square",
