@@ -9,6 +9,7 @@ import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 import { fetchFeatures } from "../api/fetchFeatures";
 import type { FeatureAttrs, FeatureLayerFieldCol, OrderBy } from "../type";
 import { createCacheKey } from "../util/createCacheKey";
+import { updateFeaturesValue } from "../util/updateFeaturesValue";
 
 const debouncedFn = debounce((fn) => {
     fn();
@@ -167,6 +168,12 @@ export function useFeatureTable({
                         resourceId,
                         orderBy,
                         signal,
+                    }).then((features) => {
+                        return updateFeaturesValue({
+                            resourceId: resourceId,
+                            data: features,
+                            signal,
+                        });
                     });
                 })
                 .catch((er) => {

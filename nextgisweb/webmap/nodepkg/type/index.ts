@@ -1,13 +1,15 @@
 /// <reference types="dojo/dijit" />
 
 import type Feature from "ol/Feature";
-import type Map from "ol/Map";
 
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import type WebmapStore from "../store";
 
-interface BaseLayer {
-    reload: () => void;
-}
+import type { DisplayConfig } from "./DisplayConfig";
+import type { DisplayMap } from "./DisplayMap";
+import type { WebmapLayer } from "./WebmapLayer";
+
+export * from "./DisplayConfig";
+export * from "./WebmapLayer";
 
 interface DojoDisplayIdentifyPopup {
     widget?: DojoDisplayIdentify;
@@ -37,19 +39,37 @@ export interface DojoItem extends HTMLElement {
     get: (val: string) => unknown;
 }
 
-export interface DojoMap {
-    zoomToFeature: (feature: Feature) => void;
-    zoomToNgwExtent: (ngwExtent: NgwExtent, projection?: string) => void;
-    olMap: Map;
+export type StoreItem = dojo.data.api.Item;
+
+export interface WebmapItem {
+    checked: boolean;
+    id: number;
+    identifiable: boolean;
+    label: string;
+    layerId: number;
+    position: unknown;
+    styleId: number;
+    type: string;
+    visibility: boolean;
+}
+
+export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
+    dumpItem: (item: StoreItem) => WebmapItem;
 }
 
 export interface DojoDisplay extends dijit._WidgetBase {
     identify: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
-    map: DojoMap;
+    map: DisplayMap;
     mapContainer: dijit.layout.BorderContainer;
     displayProjection: string;
-    _layers: Record<number, BaseLayer>;
+    config: DisplayConfig;
+    itemStore: CustomItemFileWriteStore;
+    webmapStore: WebmapStore;
+    /**
+     * @deprecated use webmapStore.getlayers() instead
+     */
+    _layers: Record<number, WebmapLayer>;
 }
 
 export interface PanelClsParams {
