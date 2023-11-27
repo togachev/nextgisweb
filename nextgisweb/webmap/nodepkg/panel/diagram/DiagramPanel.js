@@ -18,8 +18,10 @@ const Build = gettext("Build");
 const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
 const Info = gettext("To select objects, press and hold the CTRL key");
-const CalculateForecast = gettext("Calculate forecast");
+const Calculate = gettext("Calculate");
 const CountOfTrajectories = gettext("Count of trajectories");
+const ForecastCalculation = gettext("Forecast calculation");
+const StaticData = gettext("Graphs based on static data");
 
 const InfoCard = () => (
     <Card size="small">
@@ -98,7 +100,7 @@ export function DiagramPanel({ value, close, clear }) {
     const onChangeCount = (value) => {
         setCountTraectories(value);
     };
-    
+
 
     const resultData = async (item) => {
         const features = await route("resource.feature_diagram",
@@ -197,9 +199,9 @@ export function DiagramPanel({ value, close, clear }) {
         const square = Object.fromEntries(
             square_.map((item, i) => [item.fields.date.year, item.fields.value])
         )
-
+        setResultReq([])
         setResultReq(e => [...e, {
-            id: uuidv4(),
+            id: uuidv4(item.id),
             period_type: "short",
             count_of_trajectories: countTraectories,
             main_param_name: "square",
@@ -219,7 +221,6 @@ export function DiagramPanel({ value, close, clear }) {
     }, [data]);
 
     useEffect(() => {
-        setResultReq([]);
         dataReq?.map(item => {
             resultReqData(item);
         })
@@ -240,30 +241,35 @@ export function DiagramPanel({ value, close, clear }) {
         setStatus(value);
     }, [value]);
 
-    console.log(resultReq);
-
     return (
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div className="results">
-                <div className="request-block">
-                    <Button
-                        type="primary"
-                        onClick={
-                            () => {
-                                setDataReq(value);
+                <Divider plain>{ForecastCalculation}</Divider>
+                <div className={status ? "diagram-button" : null}>
+                {
+                    status ?
+                    <div className="request-block">
+                        <Button
+                            type="primary"
+                            onClick={
+                                () => {
+                                    setDataReq(value);
+                                }
                             }
-                        }
-                    >
-                        {CalculateForecast}
-                    </Button>
-                    <div className="float-input-label">
-                        <label class="label float">{CountOfTrajectories}</label>
-                        <InputNumber style={{width: '100%' }} min={1000} max={100000} defaultValue={countTraectories} onChange={onChangeCount} />                        
+                        >
+                            {Calculate}
+                        </Button>
+                        <div className="float-input-label">
+                            <label class="float">{CountOfTrajectories}</label>
+                            <InputNumber style={{ width: '100%' }} min={1000} max={100000} defaultValue={countTraectories} onChange={onChangeCount} />
+                        </div>
+    
                     </div>
-
+                    : null
+                }
                 </div>
-                <Divider></Divider>
+                <Divider plain>{StaticData}</Divider>
                 <div className={status ? "diagram-button" : null}>
                     {
                         result.length > 0 ?
@@ -310,6 +316,7 @@ export function DiagramPanel({ value, close, clear }) {
                 </div>
                 {status ? null : <InfoCard />}
                 {lineItems}
+                {console.log(resultReq)}
             </div>
         </div>
     );
