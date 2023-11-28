@@ -528,7 +528,42 @@ def openapi(resource, request) -> JSONType:
     return oas
 
 
+def collection_to_ogc_geojson(collection, request):
+    return dict(
+        links=[
+            {
+                "id": collection.keyname,
+                "title": collection.display_name,
+                "description": collection.resource.description,
+                "itemType": "feature",
+                "rel": "items",
+                "type": "application/geo+json",
+                "title": "items as GeoJSON",
+                "href": request.route_url(
+                    "ogcfserver.items",
+                    id=collection.service.id,
+                    collection_id=collection.keyname,
+                ),
+            },
+        ],
+    )
+
+def collections_geojson(resource, request) -> JSONType:
+    request.resource_permission(ServiceScope.connect)
+    collections = [collection_to_ogc_geojson(c, request) for c in resource.collections]
+    return dict(
+        collections=collections
+    )
+
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        "ogcfserver.collections_geojson",
+        "/api/resource/{id:uint}/ogcf/collections_geojson",
+        factory=resource_factory,
+        openapi=False,
+    ).get(collections_geojson, context=Service)
+
     config.add_route(
         "ogcfserver.landing_page",
         "/api/resource/{id:uint}/ogcf",

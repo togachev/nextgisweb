@@ -63,26 +63,29 @@ const getDefaultStyle = () => {
 
 export const TimeLinePanel = ({ display, close }) => {
 
-    const layers = display.map.layers;
+    const [value, setValue] = useState(null);
+    const map = display.map.olMap;
+    const layers = display._layers;
 
-    const layersIdx = display._layer_order
+    const getFeature = async (item) => {
+        const result = await route("ogcfserver.collections_geojson", 42).get();
+        setValue(result)
+    };
 
+    useEffect(() => {
+        Object.keys(layers).map((key, i) => {
+            getFeature(layers[key])
+        });
+    }, []);
+    console.log(value);
 
-    console.log(display.webmapStore._layers);
-    //     const customSource = new VectorSource({ url: props.url, format: props.format })
-    //     const customLayer = new VectorLayer({
-    //         style: features => getDefaultStyle(),
-    //         source: customSource
-    //     })
-    //     customLayer.set("name", props.info.file.uid);
-    //     map.addLayer(customLayer);
-    //     props.info.fileList.length <= 1 &&
-    //         customSource.once('change', function (e) {
-    //             if (customSource.getState() === 'ready') {
-    //                 map.getView().fit(customSource.getExtent(), map.getSize());
-    //             }
-    //         });
-
+    const customSource = new VectorSource({ url: 'http://127.0.0.1:8081/api/resource/42/ogcf/collections/layer_38/items', format: new GeoJSON() })
+    const customLayer = new VectorLayer({
+        style: features => getDefaultStyle(),
+        source: customSource
+    })
+    
+    map.addLayer(customLayer);
 
     // const olLayerMap = (url, info) => {
     //     switch (info.file.type) {
