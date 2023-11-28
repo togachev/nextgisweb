@@ -333,6 +333,10 @@ msgstr "Удалить"
 msgid "To select objects, press and hold the CTRL key"
 msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
 
+#: nodepkg/panel/DiagramPanel.js:19
+msgid "The calculation is performed for the last selected object"
+msgstr "Рассчет производится для последнего выделенного объекта"
+
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
 msgid "Create as public"
 msgstr "Создать как публичную"

@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import { Button, Card, Divider, InputNumber } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
@@ -17,6 +18,7 @@ const title = gettext("Diagrams")
 const Build = gettext("Build");
 const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
+const InfoForecast = gettext("The calculation is performed for the last selected object");
 const Info = gettext("To select objects, press and hold the CTRL key");
 const Calculate = gettext("Calculate");
 const CountOfTrajectories = gettext("Count of trajectories");
@@ -29,6 +31,11 @@ const InfoCard = () => (
     </Card>
 );
 
+const InfoCardForecast = () => (
+    <Card size="small">
+        <Balancer >{InfoForecast}</Balancer>
+    </Card>
+);
 
 const LineItem = ({ item }) => {
     let options = {
@@ -90,9 +97,8 @@ const LineItem = ({ item }) => {
 
 export function DiagramPanel({ value, close, clear }) {
 
-    const [status, setStatus] = useState(value);
+    const [selected, setSelected] = useState(value);
     const [data, setData] = useState([]);
-    const [dataReq, setDataReq] = useState([]);
     const [result, setResult] = useState([]);
     const [resultReq, setResultReq] = useState([]);
     const [countTraectories, setCountTraectories] = useState(10000)
@@ -100,7 +106,6 @@ export function DiagramPanel({ value, close, clear }) {
     const onChangeCount = (value) => {
         setCountTraectories(value);
     };
-
 
     const resultData = async (item) => {
         const features = await route("resource.feature_diagram",
@@ -174,7 +179,9 @@ export function DiagramPanel({ value, close, clear }) {
         }]);
     };
 
-    const resultReqData = async (item) => {
+    const forecastData = async (el) => {
+        const item = el.at(-1)
+        console.log(item);
         const features = await route("resource.feature_diagram",
             item.column_key,
             item.column_constraint,
@@ -199,7 +206,7 @@ export function DiagramPanel({ value, close, clear }) {
         const square = Object.fromEntries(
             square_.map((item, i) => [item.fields.date.year, item.fields.value])
         )
-        setResultReq([])
+
         setResultReq(e => [...e, {
             id: uuidv4(),
             period_type: "short",
@@ -221,10 +228,9 @@ export function DiagramPanel({ value, close, clear }) {
     }, [data]);
 
     useEffect(() => {
-        dataReq?.map(item => {
-            resultReqData(item);
-        })
-    }, [dataReq]);
+        setResultReq([])
+        selected ? forecastData(selected) : null
+    }, [selected]);
 
     const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.tu, item])).values()]
     const lineItems = (
@@ -238,39 +244,38 @@ export function DiagramPanel({ value, close, clear }) {
         })
     )
     useEffect(() => {
-        setStatus(value);
+        setSelected(value);
     }, [value]);
 
     return (
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div className="results">
-                <Divider plain>{ForecastCalculation}</Divider>
-                <div className={status ? "diagram-button" : null}>
-                {
-                    status ?
-                    <div className="request-block">
-                        <Button
-                            type="primary"
-                            onClick={
-                                () => {
-                                    setDataReq(value);
-                                }
-                            }
-                        >
-                            {Calculate}
-                        </Button>
-                        <div className="float-input-label">
-                            <label class="float">{CountOfTrajectories}</label>
-                            <InputNumber style={{ width: '100%' }} min={1000} max={100000} defaultValue={countTraectories} onChange={onChangeCount} />
-                        </div>
-    
-                    </div>
-                    : null
-                }
+                <Divider>{ForecastCalculation}</Divider>
+                <div className={selected ? "diagram-button" : null}>
+                    {
+                        selected ?
+                            <div className="request-block">
+                                <Button
+                                    type="primary"
+                                    onClick={
+                                        () => {
+                                            console.log(resultReq);
+                                        }
+                                    }
+                                >
+                                    {Calculate}
+                                </Button>
+                                <div className="float-input-label">
+                                    <label class="float">{CountOfTrajectories}</label>
+                                    <InputNumber style={{ width: '100%' }} min={1000} max={100000} defaultValue={countTraectories} onChange={onChangeCount} />
+                                </div>
+                            </div>
+                            : <InfoCardForecast />
+                    }
                 </div>
-                <Divider plain>{StaticData}</Divider>
-                <div className={status ? "diagram-button" : null}>
+                <Divider>{StaticData}</Divider>
+                <div className={selected ? "diagram-button" : null}>
                     {
                         result.length > 0 ?
                             <div className="diagram-button-old-new">
@@ -291,7 +296,7 @@ export function DiagramPanel({ value, close, clear }) {
                                         () => {
                                             setResult([]);
                                             setData([]);
-                                            setStatus(undefined)
+                                            setSelected(undefined)
                                             clear();
                                         }
                                     }
@@ -300,7 +305,7 @@ export function DiagramPanel({ value, close, clear }) {
                                 </Button>
                             </div>
                             :
-                            status ?
+                            selected ?
                                 <Button
                                     type="primary"
                                     onClick={
@@ -314,9 +319,8 @@ export function DiagramPanel({ value, close, clear }) {
                                 : null
                     }
                 </div>
-                {status ? null : <InfoCard />}
+                {selected ? null : <InfoCard />}
                 {lineItems}
-                {console.log(resultReq)}
             </div>
         </div>
     );
