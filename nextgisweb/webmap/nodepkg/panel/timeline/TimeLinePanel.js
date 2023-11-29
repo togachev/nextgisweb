@@ -86,8 +86,6 @@ const LayerCheckbox = observer(({ store, map }) => {
     )
 })
 
-export const LayersTree = observer
-
 export const TimeLinePanel = ({ display, close }) => {
     const map = display.map.olMap;
     const store = display.webmapStore;
