@@ -1,5 +1,6 @@
+import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
-import { Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
+import { Form, Checkbox, Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
 import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLinePanel.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -61,39 +62,62 @@ const getDefaultStyle = () => {
     return dataStyle;
 }
 
+const LayerCheckbox = observer(({ store, map }) => {
+    const items = [...store.webmapItems];
 
+    const onChange = (checkedValues) => {
+        console.log(checkedValues);
+    }
+    const options = [];
+    items.map(item => {
+        options.push({ label: item.label, value: item.label });
+    })
+    map.getLayers().forEach(function (layer) {
+        if (layer instanceof VectorLayer)
+            console.log(layer.getSource());
+    });
+
+    return (
+        <Form>
+            <Form.Item>
+                <Checkbox.Group options={options} onChange={onChange} />
+            </Form.Item>
+        </Form>
+    )
+})
+
+export const LayersTree = observer
 
 export const TimeLinePanel = ({ display, close }) => {
-
     const map = display.map.olMap;
-    const layers = display._layers;
+    const store = display.webmapStore;
+    const items = display.webmapStore._layers;
 
-    Object.keys(layers).map((key, i) => {
-        if (!layers[key].itemConfig.timeline) {
-            return
+    Object.keys(items).map((key, i) => {
+        if (items[key].itemConfig.timeline) {
+
+            const customSource = new VectorSource({
+                url: routeURL("resource.geojson", items[key].itemConfig.layerId),
+                format: new GeoJSON()
+            })
+
+            const customLayer = new VectorLayer({
+                style: function (feature) {
+                    if (feature.get('data') == '2023-10-06') {
+                        return getDefaultStyle();
+                    }
+                },
+                source: customSource
+            })
+
+            map.addLayer(customLayer);
         }
-        const customSource = new VectorSource({
-            url: routeURL("resource.geojson", layers[key].itemConfig.layerId),
-            format: new GeoJSON()
-        })
-
-        const customLayer = new VectorLayer({
-            style: function (feature) {
-                if (feature.get('data') == '2023-10-06') {
-                    return getDefaultStyle();
-                }
-              },
-            source: customSource
-        })
-
-        
-        map.addLayer(customLayer);
     });
 
     return (
         <div className="ngw-webmap-timeline-panel">
             <PanelHeader {...{ title, close }} />
-
+            <LayerCheckbox store={store} map={map} />
         </div>
     );
 }
