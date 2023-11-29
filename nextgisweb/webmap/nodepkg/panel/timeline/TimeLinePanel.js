@@ -11,11 +11,6 @@ const title = gettext("Timeline")
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 
-// import VectorTileLayer from 'ol/layer/VectorTile';
-// import VectorTileSource from 'ol/source/VectorTile';
-
-// import Feature from 'ol/Feature';
-// import MVT from 'ol/format/MVT';
 import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style, Text } from 'ol/style';
 
@@ -66,6 +61,8 @@ const getDefaultStyle = () => {
     return dataStyle;
 }
 
+
+
 export const TimeLinePanel = ({ display, close }) => {
 
     const map = display.map.olMap;
@@ -75,36 +72,23 @@ export const TimeLinePanel = ({ display, close }) => {
         if (!layers[key].itemConfig.timeline) {
             return
         }
-        const customSource = new VectorSource({ url: routeURL("resource.geojson", layers[key].itemConfig.layerId), format: new GeoJSON() })
+        const customSource = new VectorSource({
+            url: routeURL("resource.geojson", layers[key].itemConfig.layerId),
+            format: new GeoJSON()
+        })
+
         const customLayer = new VectorLayer({
-            style: features => getDefaultStyle(),
+            style: function (feature) {
+                if (feature.get('data') == '2023-10-06') {
+                    return getDefaultStyle();
+                }
+              },
             source: customSource
         })
+
+        
         map.addLayer(customLayer);
-        
-        // const customLayer = new VectorTileLayer({
-        //     declutter: true,
-        //     renderBuffer: 200,
-        //     renderOrder: null,
-        //     renderMode: 'vector',
-        //     preload: 0,
-        //     useInterimTilesOnError: false,
-        //     source: new VectorTileSource({
-        //       format: new MVT({
-        //         featureClass: Feature,
-        //       }),
-        //       url: 'http://127.0.0.1:8082/api/component/feature_layer/mvt?resource=' + layers[key].itemConfig.layerId + '&z={z}&x={x}&y={y}',
-        //     }),
-        //     style: features => getDefaultStyle(),
-        //   })
-
-
-        
     });
-     
-
-
-
 
     return (
         <div className="ngw-webmap-timeline-panel">
