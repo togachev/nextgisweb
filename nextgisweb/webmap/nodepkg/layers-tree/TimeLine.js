@@ -14,7 +14,10 @@ export function TimeLine({
     setTimeLineClickId,
     store
 }) {
-    const { id, layerId } = nodeData;
+    const { id, layerId, timeline } = nodeData;
+    if (!timeline) {
+        return
+    }
     const [valueStart, setValueStart] = useState({minDate: '', maxDate: ''});
     const [value, setValue] = useState({minDate: '', maxDate: ''});
     const [feature, setFeature] = useState({});

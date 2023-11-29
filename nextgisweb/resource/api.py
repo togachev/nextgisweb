@@ -15,6 +15,10 @@ from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType, viewargs
 
+from nextgisweb.feature_layer.api import query_feature_or_not_found, serialize
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.ogcfserver.api import feature_to_ogc
+
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
 from .model import Resource, ResourceSerializer, ResourceWebMapGroup, WebMapGroupResource
@@ -676,7 +680,46 @@ def webmap_item(request):
             preview_description=None if res_social == None else res_social.preview_description))
     return result
 
+def geojson(resource, request) -> JSONType:
+    id = request.matchdict["id"]
+
+    query = resource.feature_query()
+    query.srs(SRS.filter_by(id=4326).one())
+    query.geom()
+
+    bbox = request.GET.get("bbox")
+    if bbox is not None:
+        box_coords = map(float, bbox.split(",")[:4])
+        box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
+        query.intersects(box_geom)
+
+    features = [feature_to_ogc(feature) for feature in query()]
+
+    items = dict(
+        type="FeatureCollection",
+        features=features,
+    )
+    items["links"] = [
+        {
+            "rel": "self",
+            "type": "application/geo+json",
+            "href": request.route_url(
+                "resource.geojson",
+                id=id,
+            ),
+        },
+    ]
+    return items
+
+
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        "resource.geojson",
+        "/api/resource/{id:uint}/geojson",
+        factory=resource_factory,
+    ).get(geojson, context=Resource)
+
     config.add_route(
         "resource.blueprint",
         "/api/component/resource/blueprint",

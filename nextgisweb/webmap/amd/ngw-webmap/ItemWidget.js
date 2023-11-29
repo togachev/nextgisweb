@@ -418,6 +418,7 @@ define([
                                             "layer_style_id": resourceId,
                                             "layer_enabled": true,
                                             "layer_identifiable": true,
+                                            "layer_timeline": false,
                                             "layer_transparency": null,
                                             "layer_min_scale_denom": null,
                                             "layer_max_scale_denom": null,
@@ -494,6 +495,10 @@ define([
                                 widget.wdgtItemLayerIdentifiable.set(
                                     "checked",
                                     widget.getItemValue("layer_identifiable")
+                                );
+                                widget.wdgtItemLayerTimeline.set(
+                                    "checked",
+                                    widget.getItemValue("layer_timeline")
                                 );
                                 widget.wLayerTransparency.set(
                                     "value",
@@ -575,6 +580,13 @@ define([
                     "checked",
                     function (attr, oldValue, newValue) {
                         widget.setItemValue("layer_identifiable", newValue);
+                    }
+                );
+
+                this.wdgtItemLayerTimeline.watch(
+                    "checked",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("layer_timeline", newValue);
                     }
                 );
 
@@ -668,6 +680,10 @@ define([
                         layer_identifiable: store.getValue(
                             itm,
                             "layer_identifiable"
+                        ),
+                        layer_timeline: store.getValue(
+                            itm,
+                            "layer_timeline"
                         ),
                         layer_transparency: store.getValue(
                             itm,
