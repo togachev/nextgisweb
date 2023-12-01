@@ -4,6 +4,9 @@ import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLine.less";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
+
 import moment from 'moment';
 import dayjs from "dayjs";
 
@@ -13,41 +16,6 @@ const msgHideTimeLime = gettext("Hide time line");
 
 const datatype = "DATE"
 const dateFormat = 'YYYY-MM-DD';
-
-export function isDateType(datatype) {
-    return ["DATE", "TIME", "DATETIME"].includes(datatype);
-}
-
-export function parseNgwAttribute(
-    datatype,
-    value
-) {
-    if (value !== null && isDateType(datatype)) {
-        let dt;
-        if (typeof value === "object") {
-            if (datatype === "DATE") {
-                const { year, month, day } = value;
-                dt = new Date(year, month - 1, day);
-            } else if (datatype === "TIME") {
-                const { hour, minute, second } = value;
-                dt = new Date(0, 0, 0, hour, minute, second);
-            } else if (datatype === "DATETIME") {
-                const { year, month, day, hour, minute, second } =
-                    value;
-                dt = new Date(year, month - 1, day, hour, minute, second);
-            }
-        } else if (typeof value === "string") {
-            if (datatype !== "TIME") {
-                dt = value;
-            } else {
-                dt = `1970-00-00T${value}`;
-            }
-        }
-        return dayjs(dt);
-    }
-    return value;
-}
-
 
 export function TimeLine({
     nodeData,

@@ -1,7 +1,5 @@
-import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
-import { Tree, Form, Checkbox, Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
-import { HistoryOutlined } from '@ant-design/icons';
+import { useEffect, useState } from "react";
+import { Form, Checkbox } from "@nextgisweb/gui/antd";
 import "./TimeLinePanel.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -9,7 +7,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelHeader } from "../header";
 const title = gettext("Timeline")
 
-import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 
 import VectorImageLayer from 'ol/layer/VectorImage';

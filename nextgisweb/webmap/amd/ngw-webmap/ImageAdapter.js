@@ -7,10 +7,11 @@ define([
 ], function (declare, ioQuery, Adapter, api, Image) {
     return declare(Adapter, {
         createLayer: function (item) {
+            var geojsonUrl = item.timeline ? api.routeURL("render.geojson", item.layerId) : null
             var layer = new Image(
                 item.id,
                 {
-                    styleId: item.styleId,
+                    geojsonUrl: geojsonUrl,
                     maxResolution: item.maxResolution
                         ? item.maxResolution
                         : undefined,
