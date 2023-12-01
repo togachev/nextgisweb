@@ -106,7 +106,7 @@ export function TimeLine({
     console.log(feature);
     const customLayer = new VectorImageLayer({
         style: function (feature) {
-            if (new Date(feature.get('data')) >= new Date(value[0]) & new Date(feature.get('data')) < new Date(value[1])) {
+            if (new Date(feature.get('data')) >= new Date(value[0]) && new Date(feature.get('data')) <= new Date(value[1])) {
                 return getDefaultStyle();
             }
         },
