@@ -10,6 +10,7 @@ define([
             var layer = new Image(
                 item.id,
                 {
+                    styleId: item.styleId,
                     maxResolution: item.maxResolution
                         ? item.maxResolution
                         : undefined,

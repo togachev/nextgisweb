@@ -1,12 +1,53 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Slider } from "@nextgisweb/gui/antd";
+import { Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
 import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLine.less";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import moment from 'moment';
+import dayjs from "dayjs";
 
+const { RangePicker } = DatePicker;
 const msgShowTimeLime = gettext("Show time line");
 const msgHideTimeLime = gettext("Hide time line");
+
+const datatype = "DATE"
+const dateFormat = 'YYYY-MM-DD';
+
+export function isDateType(datatype) {
+    return ["DATE", "TIME", "DATETIME"].includes(datatype);
+}
+
+export function parseNgwAttribute(
+    datatype,
+    value
+) {
+    if (value !== null && isDateType(datatype)) {
+        let dt;
+        if (typeof value === "object") {
+            if (datatype === "DATE") {
+                const { year, month, day } = value;
+                dt = new Date(year, month - 1, day);
+            } else if (datatype === "TIME") {
+                const { hour, minute, second } = value;
+                dt = new Date(0, 0, 0, hour, minute, second);
+            } else if (datatype === "DATETIME") {
+                const { year, month, day, hour, minute, second } =
+                    value;
+                dt = new Date(year, month - 1, day, hour, minute, second);
+            }
+        } else if (typeof value === "string") {
+            if (datatype !== "TIME") {
+                dt = value;
+            } else {
+                dt = `1970-00-00T${value}`;
+            }
+        }
+        return dayjs(dt);
+    }
+    return value;
+}
+
 
 export function TimeLine({
     nodeData,
@@ -15,41 +56,64 @@ export function TimeLine({
     store
 }) {
     const { id, layerId, timeline } = nodeData;
+
+    const [valueStart, setValueStart] = useState(['', '']);
+    const [value, setValue] = useState(['', '']);
+    const [feature, setFeature] = useState({});
+    const [dateType, setDateType] = useState({ layerId: layerId, status: false });
     if (!timeline) {
         return
     }
-    const [valueStart, setValueStart] = useState({minDate: '', maxDate: ''});
-    const [value, setValue] = useState({minDate: '', maxDate: ''});
-    const [feature, setFeature] = useState({});
+    const dataTypeCheck = async () => {
+        const fields = await route('resource.item', layerId).get();
+        if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
+            setDateType({ layerId: layerId, status: true })
+        }
+    };
+
+    useEffect(() => {
+        dataTypeCheck()
+    }, []);
 
     const startValue = async () => {
-        const query = { geom: 'no', extensions: 'no', order_by: 'data' }
-        const item = await route('feature_layer.feature.collection', layerId).get({ query });
-        setValueStart({minDate: item[0].fields.data.year + '.' + item[0].fields.data.month + '.' + item[0].fields.data.day, maxDate: item.at(-1).fields.data.year + '.' + item.at(-1).fields.data.month + '.' + item.at(-1).fields.data.day});
+        const fields = await route('resource.item', layerId).get();
+        if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
+            const query = { geom: 'no', extensions: 'no', order_by: 'data' }
+            const item = await route('feature_layer.feature.collection', layerId).get({ query });
+            const date = [item[0].fields.data, item.at(-1).fields.data]
+            setValueStart([parseNgwAttribute("DATE", date[0]), parseNgwAttribute("DATE", date[1])]);
+        }
     };
 
     useEffect(() => {
         startValue()
-    }, []);
+    }, [dateType]);
 
     const asyncFunc = async () => {
-        const query = { fld_data__ge: value.minDate, fld_data__le: value.maxDate }
-        const res = await route('feature_layer.feature.collection', layerId).get({ query });
-        setFeature(res);
+        const fields = await route('resource.item', layerId).get();
+        if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
+            const query = { fld_data__ge: moment(value[0]).format(dateFormat), fld_data__le: moment(value[1]).format(dateFormat) }
+            const res = await route('feature_layer.feature.collection', layerId).get({ query });
+            setFeature(res);
+        }
     };
 
     useEffect(() => {
-        if(value.minDate !== '' && value.maxDate !== ''){
+        if (value[0] !== '' && value[1] !== '') {
             asyncFunc().catch(console.error);
         }
     }, [value]);
 
     if (timeLineClickId === undefined || timeLineClickId !== id) {
         return (
-            <span title={msgShowTimeLime} className="more"
-                onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
-                <HistoryOutlined />
-            </span>
+            <>{
+                dateType.status ?
+                    <span title={msgShowTimeLime} className="more"
+                        onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
+                        <HistoryOutlined />
+                    </span>
+                    : null
+            }</>
         );
     }
 
@@ -57,50 +121,22 @@ export function TimeLine({
         setTimeLineClickId(undefined);
     };
 
+    const onChangeRangePicker = (value, dateString) => {
+        setValue([dateString[0], dateString[1]]);
+    };
+
     console.log(feature);
-    
     return (
         <Dropdown
             onOpenChange={onOpenChange}
             trigger={["click"]}
             open
             dropdownRender={() => (
-                <span className="timeline-content" onClick={(e) => { e.stopPropagation(); }}>
-                    <Slider
-                        range={{
-                            draggableTrack: true
-                        }}
-                        min={Math.floor(new Date(valueStart.minDate).valueOf())}
-                        max={Math.floor(new Date(valueStart.maxDate).valueOf())}
-                        defaultValue={[
-                            Math.floor(new Date(valueStart.minDate).valueOf()),
-                            Math.floor(new Date(valueStart.maxDate).valueOf())
-                        ]}
-                        onChange={(item) => {
-
-                            var yyyy = [ new Date( item[0]).getFullYear().toString(), new Date( item[1]).getFullYear().toString() ];
-                            var mm = [ (new Date( item[0]).getMonth()+1).toString(), (new Date( item[1]).getMonth()+1).toString() ];
-                            var dd  = [ new Date( item[0]).getDate().toString(), new Date( item[1]).getDate().toString() ];
-
-                            let mmChars = [ mm[0].split(''), mm[1].split('') ];
-                            let ddChars = [ dd[0].split(''), dd[1].split('')];
-
-                            setValue({minDate: yyyy[0] + '.' + (mmChars[0][1]?mm[0]:"0"+mmChars[0][0]) + '.' + (ddChars[0][1]?dd[0]:"0"+ddChars[0][0]), maxDate: yyyy[1] + '.' + (mmChars[1][1]?mm[1]:"0"+mmChars[1][0]) + '.' + (ddChars[1][1]?dd[1]:"0"+ddChars[1][0])});
-                        }}
+                <span onClick={(e) => { e.stopPropagation(); }}>
+                    <RangePicker
+                        defaultValue={valueStart}
+                        onChange={onChangeRangePicker}
                     />
-                    {/* <RangePicker className="range-picker"
-                    onChange={(item) => {
-
-                            var yyyy = [ new Date( item[0]).getFullYear().toString(), new Date( item[1]).getFullYear().toString() ];
-                            var mm = [ (new Date( item[0]).getMonth()+1).toString(), (new Date( item[1]).getMonth()+1).toString() ];
-                            var dd  = [ new Date( item[0]).getDate().toString(), new Date( item[1]).getDate().toString() ];
-
-                            let mmChars = [ mm[0].split(''), mm[1].split('') ];
-                            let ddChars = [ dd[0].split(''), dd[1].split('')];
-
-                            setValue({minDate: yyyy[0] + '.' + (mmChars[0][1]?mm[0]:"0"+mmChars[0][0]) + '.' + (ddChars[0][1]?dd[0]:"0"+ddChars[0][0]), maxDate: yyyy[1] + '.' + (mmChars[1][1]?mm[1]:"0"+mmChars[1][0]) + '.' + (ddChars[1][1]?dd[1]:"0"+ddChars[1][0])});
-                        }}
-                    /> */}
                 </span>
             )} >
             <span title={msgHideTimeLime} className="more"
