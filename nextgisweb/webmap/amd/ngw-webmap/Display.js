@@ -192,6 +192,7 @@ define([
             this._startupDeferred = new LoggedDeferred("_startupDeferred");
 
             var widget = this;
+            this.mapStates = MapStatesObserver.getInstance();
 
             // AMD module loading
             this._midDeferred = {};
@@ -647,10 +648,9 @@ define([
 
                     // Turn on layers from permalink
                     var cond,
-                        layer =
-                            widget.webmapStore._layers[
-                                store.getValue(item, "id")
-                            ];
+                        layer = widget.webmapStore.getLayer(
+                            store.getValue(item, "id")
+                        );
                     if (visibleStyles) {
                         cond =
                             array.indexOf(
@@ -692,7 +692,7 @@ define([
             layer.itemId = data.id;
             layer.itemConfig = data;
 
-            this.webmapStore._layers[data.id] = layer;
+            this.webmapStore.addLayer(data.id, layer);
         },
 
         _toolsSetup: function () {
@@ -725,9 +725,9 @@ define([
             );
 
             this.identify = new Identify({ display: this });
-            var mapStates = MapStatesObserver.getInstance();
-            mapStates.addState("identifying", this.identify);
-            mapStates.setDefaultState("identifying", true);
+
+            this.mapStates.addState("identifying", this.identify);
+            this.mapStates.setDefaultState("identifying", true);
 
             topic.publish("/webmap/tools/initialized");
         },

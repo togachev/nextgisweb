@@ -38,8 +38,17 @@ const forEachInTree = (data, callback) => {
 };
 
 export const LayersTree = observer(
-    ({ store, onSelect, setLayerZIndex, getWebmapPlugins, onReady, zoomToNgwExtent }) => {
-        const [draggable] = useState(true);
+    ({
+        store,
+        onSelect,
+        setLayerZIndex,
+        getWebmapPlugins,
+        onReady,
+        zoomToNgwExtent,
+        showLegend = true,
+        showDropdown = true,
+        draggable = true,
+    }) => {
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState(undefined);
@@ -137,48 +146,76 @@ export const LayersTree = observer(
             const { title } = nodeData;
             const descStyle = nodeData.description ? true : false
             const descLayer = nodeData.plugin ? (nodeData.plugin['ngw-webmap/plugin/LayerInfo'].description ? true : false) : false
+            const shouldActions = showLegend || showDropdown;
+
+            let actions;
+            if (shouldActions) {
+                let legendAction;
+                if (showLegend) {
+                    legendAction = (
+                        <LegendAction
+                            nodeData={nodeData}
+                            onClick={() => setUpdate(!update)}
+                            zoomToNgwExtent={zoomToNgwExtent}
+                        />
+                    );
+                }
+                let dropdownAction;
+                if (showDropdown) {
+                    dropdownAction = (
+                        <DropdownActions
+                            nodeData={nodeData}
+                            getWebmapPlugins={getWebmapPlugins}
+                            setMoreClickId={setMoreClickId}
+                            moreClickId={moreClickId}
+                            update={update}
+                            setUpdate={setUpdate}
+                        />
+                    );
+                }
+                actions = (
+                    <Col
+                        className="tree-item-action"
+                        style={{ alignItems: "center" }}
+                    >
+                        {legendAction}
+                        <DropdownFile
+                            nodeData={nodeData}
+                            setFileClickId={setFileClickId}
+                            fileClickId={fileClickId}
+                        />
+                        {descStyle || descLayer ?
+                            (<Desc
+                                nodeData={nodeData}
+                                setDescClickId={setDescClickId}
+                                descClickId={descClickId}
+                            />) :
+                            null}
+                        <TimeLine
+                            nodeData={nodeData}
+                            setTimeLineClickId={setTimeLineClickId}
+                            timeLineClickId={timeLineClickId}
+                            store={store}
+                        />
+                        {dropdownAction}
+                    </Col>
+                );
+            }
+
+            let legend;
+            if (showLegend) {
+                legend = <Legend nodeData={nodeData} zoomToNgwExtent={zoomToNgwExtent} />;
+            }
+
             return (
                 <>
                     <Row wrap={false}>
-                        <Col>
-                            <LegendAction
-                                nodeData={nodeData}
-                                onClick={() => setUpdate(!update)}
-                            />
-                        </Col>
                         <Col flex="auto" className="tree-item-title">
                             {title}
                         </Col>
-                        <Col className="tree-item-action">
-                            <DropdownFile
-                                nodeData={nodeData}
-                                setFileClickId={setFileClickId}
-                                fileClickId={fileClickId}
-                            />
-                            {descStyle || descLayer ?
-                                (<Desc
-                                    nodeData={nodeData}
-                                    setDescClickId={setDescClickId}
-                                    descClickId={descClickId}
-                                />) :
-                                null}
-                            <TimeLine
-                                nodeData={nodeData}
-                                setTimeLineClickId={setTimeLineClickId}
-                                timeLineClickId={timeLineClickId}
-                                store={store}
-                            />
-                            <DropdownActions
-                                nodeData={nodeData}
-                                getWebmapPlugins={getWebmapPlugins}
-                                setMoreClickId={setMoreClickId}
-                                moreClickId={moreClickId}
-                                update={update}
-                                setUpdate={setUpdate}
-                            />
-                        </Col>
+                        {actions}
                     </Row>
-                    <Legend nodeData={nodeData} zoomToNgwExtent={zoomToNgwExtent} />
+                    {legend}
                 </>
             );
         };
