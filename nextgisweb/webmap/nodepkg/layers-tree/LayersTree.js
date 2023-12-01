@@ -45,6 +45,7 @@ export const LayersTree = observer(
         getWebmapPlugins,
         onReady,
         zoomToNgwExtent,
+        display,
         showLegend = true,
         showDropdown = true,
         draggable = true,
@@ -196,6 +197,7 @@ export const LayersTree = observer(
                             setTimeLineClickId={setTimeLineClickId}
                             timeLineClickId={timeLineClickId}
                             store={store}
+                            display={display}
                         />
                         {dropdownAction}
                     </Col>

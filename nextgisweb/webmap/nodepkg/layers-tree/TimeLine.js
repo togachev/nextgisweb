@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
 import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLine.less";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
 
 import moment from 'moment';
-import dayjs from "dayjs";
+import VectorSource from "ol/source/Vector";
+
+import VectorImageLayer from 'ol/layer/VectorImage';
+
+import GeoJSON from "ol/format/GeoJSON";
+import { Circle, Fill, Stroke, Style, Text } from 'ol/style';
 
 const { RangePicker } = DatePicker;
 const msgShowTimeLime = gettext("Show time line");
@@ -17,13 +22,65 @@ const msgHideTimeLime = gettext("Hide time line");
 const datatype = "DATE"
 const dateFormat = 'YYYY-MM-DD';
 
+const getDefaultStyle = () => {
+    var dataStyle = new Style({
+        stroke: new Stroke({
+            width: 1.66,
+            color: '#FF8B00'
+        }),
+        image: new Circle({
+            anchor: [0.5, 46],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            stroke: new Stroke({
+                width: 1,
+                color: 'rgba(0,0,0,0.8)'
+            }),
+            radius: 4,
+            fill: new Stroke({
+                width: 1,
+                color: 'rgba(16,106,144,0.5)'
+            }),
+        }),
+        fill: new Fill({
+            color: 'rgba(0, 0, 255, 0.5)',
+        }),
+        text: new Text({
+            textAlign: 'center',
+            textBaseline: "bottom",
+            font: '12px Calibri,sans-serif',
+
+            fill: new Fill({
+                color: '#000'
+            }),
+            stroke: new Stroke({
+                color: '#fff',
+                width: 2
+            }),
+            offsetY: -10,
+            offsetX: 15,
+            placement: "point",
+            maxAngle: 0,
+            overflow: true,
+            rotation: 0,
+        })
+    });
+
+    return dataStyle;
+}
+
+
+
 export function TimeLine({
     nodeData,
     timeLineClickId,
     setTimeLineClickId,
-    store
+    store,
+    display
 }) {
-    const { id, layerId, timeline } = nodeData;
+    const { id, layerId, timeline, geojsonUrl } = nodeData;
+
+    const map = display.map.olMap;
 
     const [valueStart, setValueStart] = useState(['', '']);
     const [value, setValue] = useState(['', '']);
@@ -42,6 +99,28 @@ export function TimeLine({
     useEffect(() => {
         dataTypeCheck()
     }, []);
+    const customSource = new VectorSource({
+        url: geojsonUrl,
+        format: new GeoJSON()
+    })
+    console.log(feature);
+    const customLayer = new VectorImageLayer({
+        style: function (feature) {
+            if (new Date(feature.get('data')) >= new Date(value[0]) & new Date(feature.get('data')) < new Date(value[1])) {
+                return getDefaultStyle();
+            }
+        },
+        source: customSource,
+    })
+    const initLayersMap = (item) => {
+        customLayer.setVisible(false)
+        customLayer.setProperties({ "id": item.layerId })
+    }
+
+    useEffect(() => {
+        customLayer.setVisible(true)
+        map.addLayer(customLayer);
+    }, [value]);
 
     const startValue = async () => {
         const fields = await route('resource.item', layerId).get();
@@ -91,9 +170,11 @@ export function TimeLine({
 
     const onChangeRangePicker = (value, dateString) => {
         setValue([dateString[0], dateString[1]]);
+        initLayersMap(nodeData);
     };
 
-    console.log(feature);
+    
+
     return (
         <Dropdown
             onOpenChange={onOpenChange}
