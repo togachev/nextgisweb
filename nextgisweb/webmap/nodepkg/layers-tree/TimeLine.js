@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Slider, DatePicker } from "@nextgisweb/gui/antd";
+import { Dropdown, Button, DatePicker } from "@nextgisweb/gui/antd";
 import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLine.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -78,7 +78,7 @@ export function TimeLine({
     store,
     display
 }) {
-    const { id, layerId, timeline, geojsonUrl } = nodeData;
+    const { id, layerId, timeline } = nodeData;
 
     const map = display.map.olMap;
 
@@ -100,7 +100,6 @@ export function TimeLine({
         dataTypeCheck()
     }, []);
     const customSource = new VectorSource({
-        url: geojsonUrl,
         format: new GeoJSON()
     })
     console.log(feature);
@@ -118,7 +117,11 @@ export function TimeLine({
     }
 
     useEffect(() => {
-        customLayer.setVisible(true)
+        customLayer.setVisible(true);
+        if (value[0] !== '' && value[1] !== '') {
+            customSource.setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+        }
+
         map.addLayer(customLayer);
     }, [value]);
 
@@ -173,7 +176,10 @@ export function TimeLine({
         initLayersMap(nodeData);
     };
 
-    
+    const clearData = (e) => {
+        console.log(e);
+        console.log(map.getLayers());
+    }
 
     return (
         <Dropdown
@@ -186,6 +192,9 @@ export function TimeLine({
                         defaultValue={valueStart}
                         onChange={onChangeRangePicker}
                     />
+                    <Button
+                        onClick={clearData}
+                    >x</Button>
                 </span>
             )} >
             <span title={msgHideTimeLime} className="more"

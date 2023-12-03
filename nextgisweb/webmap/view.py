@@ -160,12 +160,6 @@ def display(obj, request):
             if layer_enabled:
                 items_states.get("checked").append(item.id)
 
-            # Time line params
-            if item.layer_timeline == True:
-                geojson_from_timeline = request.route_url('resource.geojson', id=style.parent_id)
-            else:
-                geojson_from_timeline = None
-
             # Main element parameters
 
             data.update(
@@ -180,7 +174,6 @@ def display(obj, request):
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 timeline=item.layer_timeline,
-                geojsonUrl=geojson_from_timeline,
                 transparency=item.layer_transparency,
                 minScaleDenom=item.layer_min_scale_denom,
                 maxScaleDenom=item.layer_max_scale_denom,

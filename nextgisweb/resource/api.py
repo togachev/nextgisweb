@@ -18,6 +18,7 @@ from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.feature_layer.api import query_feature_or_not_found, serialize
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.ogcfserver.api import feature_to_ogc
+import datetime
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
@@ -711,8 +712,52 @@ def geojson(resource, request) -> JSONType:
     ]
     return items
 
+def geojson_filter_by_data(resource, request) -> JSONType:
+    id = request.matchdict["id"]
+    f = "%Y-%m-%d"
+    mind = request.matchdict["min_data"]
+    min_data = datetime.datetime.strptime(mind, f)
+    maxd = request.matchdict["max_data"]
+    max_data = datetime.datetime.strptime(maxd, f)
+    
+
+    query = resource.feature_query()
+    query.srs(SRS.filter_by(id=4326).one())
+    query.geom()
+
+    bbox = request.GET.get("bbox")
+    if bbox is not None:
+        box_coords = map(float, bbox.split(",")[:4])
+        box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
+        query.intersects(box_geom)
+
+    features = [feature_to_ogc(feature) for feature in query()]
+    features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data or datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
+    items = dict(
+        type="FeatureCollection",
+        features=features,
+    )
+    items["links"] = [
+        {
+            "rel": "self",
+            "type": "application/geo+json",
+            "href": request.route_url(
+                "resource.geojson",
+                id=id,
+                min_data=mind,
+                max_data=maxd,
+            ),
+        },
+    ]
+    return items
 
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        "resource.geojson_filter_by_data",
+        "/api/resource/{id:uint}/{min_data:any}/{max_data:any}/geojson",
+        factory=resource_factory,
+    ).get(geojson_filter_by_data)
 
     config.add_route(
         "resource.geojson",
