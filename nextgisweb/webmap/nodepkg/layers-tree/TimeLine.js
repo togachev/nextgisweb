@@ -7,7 +7,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
 
-import moment from 'moment';
+import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
+import DeleteObject from "@nextgisweb/icon/material/delete_forever";
 import VectorSource from "ol/source/Vector";
 
 import VectorImageLayer from 'ol/layer/VectorImage';
@@ -22,10 +23,13 @@ const msgHideTimeLime = gettext("Hide time line");
 const datatype = "DATE"
 const dateFormat = 'YYYY-MM-DD';
 
+const msgZoomToFiltered = gettext("Zoom to filtered features");
+const msgClearObject = gettext("Delete objects");
+
 const getDefaultStyle = () => {
     var dataStyle = new Style({
         stroke: new Stroke({
-            width: 1.66,
+            width: 5,
             color: '#FF8B00'
         }),
         image: new Circle({
@@ -80,15 +84,15 @@ export function TimeLine({
 }) {
     const { id, layerId, timeline } = nodeData;
 
-    const map = display.map.olMap;
-
-    const [valueStart, setValueStart] = useState(['', '']);
-    const [value, setValue] = useState(['', '']);
-    const [feature, setFeature] = useState({});
+    const [valueStart, setValueStart] = useState([null, null]);
+    const [value, setValue] = useState([null, null]);
+    const [featExtent, setFeatExtent] = useState([]);
     const [dateType, setDateType] = useState({ layerId: layerId, status: false });
+
     if (!timeline) {
         return
-    }
+    };
+
     const dataTypeCheck = async () => {
         const fields = await route('resource.item', layerId).get();
         if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
@@ -99,30 +103,27 @@ export function TimeLine({
     useEffect(() => {
         dataTypeCheck()
     }, []);
-    const customSource = new VectorSource({
-        format: new GeoJSON()
-    })
-    console.log(feature);
-    const customLayer = new VectorImageLayer({
-        style: function (feature) {
-            if (new Date(feature.get('data')) >= new Date(value[0]) && new Date(feature.get('data')) <= new Date(value[1])) {
-                return getDefaultStyle();
-            }
-        },
-        source: customSource,
-    })
-    const initLayersMap = (item) => {
-        customLayer.setVisible(false)
-        customLayer.setProperties({ "id": item.layerId })
-    }
+
+    const map = display.map.olMap;
+
+    const customLayer = display.map.layers.timelineLayer.olLayer;
 
     useEffect(() => {
-        customLayer.setVisible(true);
-        if (value[0] !== '' && value[1] !== '') {
-            customSource.setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+        if (value[0] !== null && value[1] !== null) {
+            customLayer.setStyle(getDefaultStyle);
+            customLayer.setSource(new VectorSource({
+                format: new GeoJSON()
+            }))
+            customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+            let isSubscribed = true;
+            const getFeatureExtent = async () => {
+                let ext = customLayer.getSource().getExtent();
+                // map.getView().fit(ext, map.getSize());
+                console.log(customLayer.getSource());
+            }
+            getFeatureExtent().catch(console.error);
+            return () => isSubscribed = false;
         }
-
-        map.addLayer(customLayer);
     }, [value]);
 
     const startValue = async () => {
@@ -139,21 +140,6 @@ export function TimeLine({
         startValue()
     }, [dateType]);
 
-    const asyncFunc = async () => {
-        const fields = await route('resource.item', layerId).get();
-        if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
-            const query = { fld_data__ge: moment(value[0]).format(dateFormat), fld_data__le: moment(value[1]).format(dateFormat) }
-            const res = await route('feature_layer.feature.collection', layerId).get({ query });
-            setFeature(res);
-        }
-    };
-
-    useEffect(() => {
-        if (value[0] !== '' && value[1] !== '') {
-            asyncFunc().catch(console.error);
-        }
-    }, [value]);
-
     if (timeLineClickId === undefined || timeLineClickId !== id) {
         return (
             <>{
@@ -165,21 +151,25 @@ export function TimeLine({
                     : null
             }</>
         );
-    }
+    };
 
     const onOpenChange = () => {
         setTimeLineClickId(undefined);
     };
 
-    const onChangeRangePicker = (value, dateString) => {
+    const onChangeRangePicker = (item, dateString) => {
         setValue([dateString[0], dateString[1]]);
-        initLayersMap(nodeData);
     };
 
-    const clearData = (e) => {
-        console.log(e);
-        console.log(map.getLayers());
-    }
+    const zoomToObject = () => {
+        let ext = customLayer.getSource().getExtent();
+        map.getView().fit(ext, map.getSize());
+    };
+
+    const clearObject = () => {
+        customLayer.getSource().clear();
+        display._zoomToInitialExtent()
+    };
 
     return (
         <Dropdown
@@ -193,11 +183,22 @@ export function TimeLine({
                         onChange={onChangeRangePicker}
                     />
                     <Button
-                        onClick={clearData}
-                    >x</Button>
+                        type="text"
+                        title={msgZoomToFiltered}
+                        onClick={zoomToObject}
+                        icon={<ZoomInMap />}
+                    />
+                    <Button
+                        type="text"
+                        title={msgClearObject}
+                        onClick={clearObject}
+                        icon={<DeleteObject />}
+                    />
                 </span>
             )} >
-            <span title={msgHideTimeLime} className="more"
+            <span
+                title={msgHideTimeLime}
+                className="more"
                 onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
                 <HistoryOutlined />
             </span>

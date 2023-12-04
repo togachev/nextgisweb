@@ -732,23 +732,13 @@ def geojson_filter_by_data(resource, request) -> JSONType:
         query.intersects(box_geom)
 
     features = [feature_to_ogc(feature) for feature in query()]
-    features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data or datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
+    features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data and datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
+
     items = dict(
         type="FeatureCollection",
         features=features,
     )
-    items["links"] = [
-        {
-            "rel": "self",
-            "type": "application/geo+json",
-            "href": request.route_url(
-                "resource.geojson",
-                id=id,
-                min_data=mind,
-                max_data=maxd,
-            ),
-        },
-    ]
+
     return items
 
 def setup_pyramid(comp, config):
