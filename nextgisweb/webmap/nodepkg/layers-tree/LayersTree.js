@@ -151,16 +151,7 @@ export const LayersTree = observer(
 
             let actions;
             if (shouldActions) {
-                let legendAction;
-                if (showLegend) {
-                    legendAction = (
-                        <LegendAction
-                            nodeData={nodeData}
-                            onClick={() => setUpdate(!update)}
-                            zoomToNgwExtent={zoomToNgwExtent}
-                        />
-                    );
-                }
+   
                 let dropdownAction;
                 if (showDropdown) {
                     dropdownAction = (
@@ -179,7 +170,7 @@ export const LayersTree = observer(
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
-                        {legendAction}
+                        
                         <DropdownFile
                             nodeData={nodeData}
                             setFileClickId={setFileClickId}
@@ -208,12 +199,21 @@ export const LayersTree = observer(
             if (showLegend) {
                 legend = <Legend nodeData={nodeData} zoomToNgwExtent={zoomToNgwExtent} />;
             }
-
+            let legendAction;
+            if (showLegend) {
+                legendAction = (
+                    <LegendAction
+                        nodeData={nodeData}
+                        onClick={() => setUpdate(!update)}
+                        zoomToNgwExtent={zoomToNgwExtent}
+                    />
+                );
+            }
             return (
                 <>
                     <Row wrap={false}>
                         <Col flex="auto" className="tree-item-title">
-                            {title}
+                            <div className="legend-title">{legendAction}{title}</div>
                         </Col>
                         {actions}
                     </Row>

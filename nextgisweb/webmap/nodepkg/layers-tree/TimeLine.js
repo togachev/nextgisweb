@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Button, DatePicker } from "@nextgisweb/gui/antd";
+import { Dropdown, Button, DatePicker, Checkbox } from "@nextgisweb/gui/antd";
 import { HistoryOutlined } from '@ant-design/icons';
 import "./TimeLine.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
+import moment from "moment";
 import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
 
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
+import DoneAll from "@nextgisweb/icon/material/done_all";
 import DeleteObject from "@nextgisweb/icon/material/delete_forever";
 import VectorSource from "ol/source/Vector";
 
@@ -25,6 +26,10 @@ const dateFormat = 'YYYY-MM-DD';
 
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 const msgClearObject = gettext("Delete objects");
+const msgShowlayer = gettext("Show layer");
+const msgHidelayer = gettext("Hide layer");
+const msgAllObject = gettext("Add all object layer");
+
 
 const getDefaultStyle = () => {
     var dataStyle = new Style({
@@ -84,10 +89,10 @@ export function TimeLine({
 }) {
     const { id, layerId, timeline } = nodeData;
 
-    const [valueStart, setValueStart] = useState([null, null]);
-    const [value, setValue] = useState([null, null]);
-    const [featExtent, setFeatExtent] = useState([]);
+    const [valueStart, setValueStart] = useState(['', '']);
+    const [value, setValue] = useState(['', '']);
     const [dateType, setDateType] = useState({ layerId: layerId, status: false });
+    const [checked, setChecked] = useState(true);
 
     if (!timeline) {
         return
@@ -108,21 +113,14 @@ export function TimeLine({
 
     const customLayer = display.map.layers.timelineLayer.olLayer;
 
+    customLayer.setStyle(getDefaultStyle);
+
     useEffect(() => {
-        if (value[0] !== null && value[1] !== null) {
-            customLayer.setStyle(getDefaultStyle);
+        if (value[0] !== '' && value[1] !== '') {
             customLayer.setSource(new VectorSource({
                 format: new GeoJSON()
             }))
             customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
-            let isSubscribed = true;
-            const getFeatureExtent = async () => {
-                let ext = customLayer.getSource().getExtent();
-                // map.getView().fit(ext, map.getSize());
-                console.log(customLayer.getSource());
-            }
-            getFeatureExtent().catch(console.error);
-            return () => isSubscribed = false;
         }
     }, [value]);
 
@@ -142,14 +140,16 @@ export function TimeLine({
 
     if (timeLineClickId === undefined || timeLineClickId !== id) {
         return (
-            <>{
-                dateType.status ?
-                    <span title={msgShowTimeLime} className="more"
-                        onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
-                        <HistoryOutlined />
-                    </span>
-                    : null
-            }</>
+            <>
+                {
+                    dateType.status ?
+                        <span title={msgShowTimeLime} className="more"
+                            onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
+                            <HistoryOutlined />
+                        </span>
+                        : null
+                }
+            </>
         );
     };
 
@@ -168,7 +168,19 @@ export function TimeLine({
 
     const clearObject = () => {
         customLayer.getSource().clear();
-        display._zoomToInitialExtent()
+        display._zoomToInitialExtent();
+        setValue(['', ''])
+    };
+
+    const onChange = (e) => {
+        customLayer.setVisible(e.target.checked)
+        setChecked(e.target.checked);
+    };
+
+    const label = `${checked ? msgShowlayer : msgHidelayer}`;
+
+    const addAllObject = () => {
+        setValue([moment(valueStart[0].toString()).format(dateFormat), moment(valueStart[1].toString()).format(dateFormat)])
     };
 
     return (
@@ -177,23 +189,35 @@ export function TimeLine({
             trigger={["click"]}
             open
             dropdownRender={() => (
-                <span onClick={(e) => { e.stopPropagation(); }}>
+                <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
                     <RangePicker
+                        allowClear={false}
                         defaultValue={valueStart}
                         onChange={onChangeRangePicker}
                     />
                     <Button
+                        disabled={value[0] !== '' & value[1] !== '' ? false : true}
+                        className="more"
                         type="text"
                         title={msgZoomToFiltered}
                         onClick={zoomToObject}
                         icon={<ZoomInMap />}
                     />
                     <Button
+                        className="more"
+                        type="text"
+                        title={msgAllObject}
+                        onClick={addAllObject}
+                        icon={<DoneAll />}
+                    />
+                    <Button
+                        className="more"
                         type="text"
                         title={msgClearObject}
                         onClick={clearObject}
                         icon={<DeleteObject />}
                     />
+                    <Checkbox className="more" defaultChecked={true} onChange={onChange} title={label} />
                 </span>
             )} >
             <span
