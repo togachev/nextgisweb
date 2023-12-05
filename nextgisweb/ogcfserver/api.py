@@ -527,8 +527,8 @@ def openapi(resource, request) -> JSONType:
 
     return oas
 
-
 def setup_pyramid(comp, config):
+
     config.add_route(
         "ogcfserver.landing_page",
         "/api/resource/{id:uint}/ogcf",

@@ -239,6 +239,10 @@ msgstr "Включен"
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
+#: amd/ngw-webmap/template/ItemWidget.hbs:80
+msgid "Timeline"
+msgstr "Временная шкала"
+
 #: amd/ngw-webmap/template/ItemWidget.hbs:87
 msgid "Transparency"
 msgstr "Прозрачность"

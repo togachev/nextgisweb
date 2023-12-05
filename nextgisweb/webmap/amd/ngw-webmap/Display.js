@@ -26,6 +26,7 @@ define([
     "./controls/MyLocation",
     "./FeatureHighlighter",
     "./FeatureHighlighterDiagram",
+    "./VectorImage",
     "./MapStatesObserver",
     "./ui/react-panel",
     "./ui/react-webmap-tabs",
@@ -76,6 +77,7 @@ define([
     MyLocation,
     FeatureHighlighter,
     FeatureHighlighterDiagram,
+    VectorImage,
     MapStatesObserver,
     reactPanel,
     ReactWebMapTabs,
@@ -326,6 +328,9 @@ define([
                             this.map
                         );
                         widget.featureHighlighterDiagram = new FeatureHighlighterDiagram(
+                            this.map
+                        );
+                        widget.timelineLayer = new VectorImage(
                             this.map
                         );
                     })
@@ -975,6 +980,16 @@ define([
                     name: "search",
                     order: 20,
                     menuIcon: "material-search",
+                },
+            });
+
+            panels.push({
+                cls: reactPanel("@nextgisweb/webmap/panel/timeline"),
+                params: {
+                    title: gettext("TimeLine"),
+                    name: "timeline",
+                    order: 20,
+                    menuIcon: "material-timeline",
                 },
             });
 
