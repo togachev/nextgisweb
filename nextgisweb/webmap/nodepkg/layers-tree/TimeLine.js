@@ -197,27 +197,27 @@ export function TimeLine({
                     />
                     <Button
                         disabled={value[0] !== '' & value[1] !== '' ? false : true}
-                        className="more"
+                        className="button-style"
                         type="text"
                         title={msgZoomToFiltered}
                         onClick={zoomToObject}
                         icon={<ZoomInMap />}
                     />
                     <Button
-                        className="more"
+                        className="button-style"
                         type="text"
                         title={msgAllObject}
                         onClick={addAllObject}
                         icon={<DoneAll />}
                     />
                     <Button
-                        className="more"
+                        className="button-style"
                         type="text"
                         title={msgClearObject}
                         onClick={clearObject}
                         icon={<DeleteObject />}
                     />
-                    <Checkbox className="more" defaultChecked={true} onChange={onChange} title={label} />
+                    <Checkbox className="button-style" defaultChecked={true} onChange={onChange} title={label} />
                 </span>
             )} >
             <span

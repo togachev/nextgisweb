@@ -1,5 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { Button, Card, Divider, InputNumber } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
@@ -20,9 +19,10 @@ const Rebuild = gettext("Rebuild");
 const Delete = gettext("Delete");
 const InfoForecast = gettext("The calculation is performed for the last selected object");
 const Info = gettext("To select objects, press and hold the CTRL key");
-const Calculate = gettext("Calculate");
+const Forecasting = gettext("Forecasting");
+const Recovery = gettext("Recovery");
 const CountOfTrajectories = gettext("Count of trajectories");
-const ForecastCalculation = gettext("Forecast calculation");
+const PredictionAndRecovery = gettext("Prediction and recovery");
 const StaticData = gettext("Graphs based on static data");
 
 const InfoCard = () => (
@@ -100,12 +100,8 @@ export function DiagramPanel({ value, close, clear }) {
     const [selected, setSelected] = useState(value);
     const [data, setData] = useState([]);
     const [result, setResult] = useState([]);
-    const [resultReq, setResultReq] = useState([]);
-    const [countTraectories, setCountTraectories] = useState(10000)
-
-    const onChangeCount = (value) => {
-        setCountTraectories(value);
-    };
+    const [countTraectoriesReq, setCountTraectoriesReq] = useState(1500)
+    const [countTraectoriesCalc, setCountTraectoriesCalc] = useState(1000)
 
     const resultData = async (item) => {
         const features = await route("resource.feature_diagram",
@@ -179,14 +175,18 @@ export function DiagramPanel({ value, close, clear }) {
         }]);
     };
 
-    const forecastData = async (el) => {
-        const item = el.at(-1)
-        console.log(item);
+    const forecastData = async (type) => {
+        if (selected.length === 0) {
+            return;
+        }
+        const item = selected.at(-1)
+
         const features = await route("resource.feature_diagram",
             item.column_key,
             item.column_constraint,
             item.fields[item.column_from_const]
         ).get();
+
         features.sort(function (a, b) {
             return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
         });
@@ -206,18 +206,69 @@ export function DiagramPanel({ value, close, clear }) {
         const square = Object.fromEntries(
             square_.map((item, i) => [item.fields.date.year, item.fields.value])
         )
+        if (type === 'req') {
+            let query = {
+                id: uuidv4(),
+                main_param_name: "square",
+                count_of_trajectories: countTraectoriesReq,
+                type: "randomize_modeling",
+                data: {
+                    temperature,
+                    precipitation,
+                    square,
+                },
+            }
 
-        setResultReq(e => [...e, {
-            id: uuidv4(),
-            period_type: "short",
-            count_of_trajectories: countTraectories,
-            main_param_name: "square",
-            data: {
-                temperature,
-                precipitation,
-                square,
-            },
-        }])
+            console.log(JSON.stringify(query));
+
+            // return fetch('http://192.168.14.171:8080/v1/recovery', {
+            //     method: 'POST',
+            //     body: JSON.stringify(query),
+            //     mode: 'no-cors',
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //     },
+            // }).then((response) => response.json())
+            //     .then((result) => {
+            //         console.log(result);
+            //         return result;
+            //     })
+
+        }
+        if (type === 'calc') {
+            let query = {
+                id: uuidv4(),
+                main_param_name: "square",
+                count_of_trajectories: countTraectoriesCalc,
+                type: "randomize_modeling",
+                data: {
+                    temperature: temperature,
+                    precipitation: temperature,
+                    square: square,
+                },
+                period_type: "short",
+            }
+
+            console.log(JSON.stringify(query));
+
+            // return fetch('http://192.168.14.171:8080/v1/forecast', {
+            //     method: 'POST',
+            //     body: JSON.stringify(query),
+            //     mode: 'no-cors',
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //     },
+            // }).then((response) => console.log(response))
+
+        }
+    };
+
+    const onChangeCountReq = (values) => {
+        setCountTraectoriesReq(values);
+    };
+
+    const onChangeCountCalc = (values) => {
+        setCountTraectoriesCalc(values);
     };
 
     useEffect(() => {
@@ -226,11 +277,6 @@ export function DiagramPanel({ value, close, clear }) {
             resultData(item);
         })
     }, [data]);
-
-    useEffect(() => {
-        setResultReq([])
-        selected ? forecastData(selected) : null
-    }, [selected]);
 
     const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.tu, item])).values()]
     const lineItems = (
@@ -251,26 +297,43 @@ export function DiagramPanel({ value, close, clear }) {
         <div className="ngw-webmap-diagram-panel">
             <PanelHeader {...{ title, close }} />
             <div className="results">
-                <Divider>{ForecastCalculation}</Divider>
+                <Divider>{PredictionAndRecovery}</Divider>
                 <div className={selected ? "diagram-button" : null}>
                     {
                         selected ?
-                            <div className="request-block">
-                                <Button
-                                    type="primary"
-                                    onClick={
-                                        () => {
-                                            console.log(resultReq);
-                                        }
-                                    }
-                                >
-                                    {Calculate}
-                                </Button>
-                                <div className="float-input-label">
-                                    <label class="float">{CountOfTrajectories}</label>
-                                    <InputNumber style={{ width: '100%' }} min={1000} max={100000} defaultValue={countTraectories} onChange={onChangeCount} />
+                            <div className="request-block-list">
+                                <div className="request-block">
+                                    <Button
+                                        type="primary"
+                                        onClick={() => {
+                                            forecastData('req')
+                                        }}
+                                    >
+                                        {Recovery}
+                                    </Button>
+                                    <div className="float-input-label">
+                                        <label className="float">{CountOfTrajectories}</label>
+                                        <InputNumber style={{ width: '100%' }}
+                                            defaultValue={countTraectoriesReq}
+                                            onChange={onChangeCountReq} />
+                                    </div>
+                                </div>
+                                <div className="request-block">
+                                    <Button
+                                        type="primary"
+                                        onClick={() => forecastData('calc')}
+                                    >
+                                        {Forecasting}
+                                    </Button>
+                                    <div className="float-input-label">
+                                        <label className="float">{CountOfTrajectories}</label>
+                                        <InputNumber style={{ width: '100%' }} min={1000} max={100000}
+                                            defaultValue={countTraectoriesCalc}
+                                            onChange={onChangeCountCalc} />
+                                    </div>
                                 </div>
                             </div>
+
                             : <InfoCardForecast />
                     }
                 </div>
