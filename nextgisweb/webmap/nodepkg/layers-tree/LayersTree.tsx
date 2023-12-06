@@ -3,12 +3,19 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
+import FolderClosedIcon from "./icons/folder.svg";
+import FolderOpenIcon from "./icons/folder_open.svg";
 
 import type WebmapStore from "../store";
 import type { LayerItem, TreeItem } from "../type/TreeItems";
 import type { WebmapPlugin } from "../type/WebmapPlugin";
+import type { DojoDisplay } from "../type/DojoDisplay";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
+import { TimeLine } from "./TimeLine";
+import { Desc } from "./Desc";
+import { DropdownFile } from "./DropdownFile";
 import { Legend, LegendAction } from "./Legend";
 import { useDrag } from "./hook/useDrag";
 
@@ -33,12 +40,19 @@ interface LayersTreeProps {
     onReady?: () => void;
     showLegend?: boolean;
     showDropdown?: boolean;
+    display: DojoDisplay;
+    zoomToNgwExtent: (ngwExtent: NgwExtent, displayProjection?: string) => void;
 }
 
 const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
     const { key, title } = webMapItem;
     const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-    if (item.treeItem.type === "layer") {
+    if (item.treeItem.type === "root" || item.treeItem.type === "group") {
+        item.icon = ({ expanded }) =>
+            expanded ? <FolderOpenIcon className="close-open-icon" /> :
+                <FolderClosedIcon className="close-open-icon" />;
+
+    } else if (item.treeItem.type === "layer") {
         item.isLeaf = true;
 
         if ("legendInfo" in item.treeItem) {
@@ -88,16 +102,21 @@ export const LayersTree = observer(
         onReady,
         showLegend = true,
         showDropdown = true,
+        display,
+        zoomToNgwExtent
     }: LayersTreeProps) => {
         const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
+        const [timeLineClickId, setTimeLineClickId] = useState<number>();
+        const [descClickId, setDescClickId] = useState<number>();
+        const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const webmapItems = store.webmapItems as TreeItem[];
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
-
+        
         const treeItems = useMemo(
             () => prepareWebMapItems(webmapItems),
             [webmapItems]
@@ -127,6 +146,7 @@ export const LayersTree = observer(
             const checkedKeysValue = Array.isArray(val) ? val : val.checked;
             store.handleCheckChanged(checkedKeysValue.map(Number));
         };
+            
 
         const _onSelect = (selectedKeysValue: React.Key[]) => {
             const val = selectedKeysValue.map(Number);
@@ -135,18 +155,15 @@ export const LayersTree = observer(
         };
 
         const titleRender = (nodeData: TreeWebmapItem) => {
-            const { title } = nodeData.treeItem;
-
+            const { title, plugin, description } = nodeData.treeItem;
+            const descStyle = description ? true : false
+            const descLayer = plugin ? (plugin['ngw-webmap/plugin/LayerInfo'].description ? true : false) : false
+            
             const shouldActions = showLegend || showDropdown;
-
+            
             let actions;
             if (shouldActions) {
-                const legendAction = showLegend && (
-                    <LegendAction
-                        nodeData={nodeData.treeItem}
-                        onClick={() => setUpdate(!update)}
-                    />
-                );
+
 
                 const dropdownAction = showDropdown && (
                     <DropdownActions
@@ -158,26 +175,56 @@ export const LayersTree = observer(
                         setUpdate={setUpdate}
                     />
                 );
+                const dropdownTimeline = showDropdown && (
+                    <TimeLine
+                        nodeData={nodeData.treeItem}
+                        setTimeLineClickId={setTimeLineClickId}
+                        timeLineClickId={timeLineClickId}
+                        display={display}
+                    />
+                );
+                const dropdownFile = showDropdown && (
+                    <DropdownFile
+                        nodeData={nodeData.treeItem}
+                        setFileClickId={setFileClickId}
+                        fileClickId={fileClickId}
+                    />
+                );
                 actions = (
                     <Col
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
-                        {legendAction}
+                        
+                        {descStyle || descLayer ?
+                            (<Desc
+                                nodeData={nodeData.treeItem}
+                                setDescClickId={setDescClickId}
+                                descClickId={descClickId}
+                            />) :
+                            null}
+                        {dropdownTimeline}
+                        {dropdownFile}
                         {dropdownAction}
                     </Col>
                 );
             }
-
+            const legendAction = showLegend && (
+                <LegendAction
+                    nodeData={nodeData.treeItem}
+                    onClick={() => setUpdate(!update)}
+                    // zoomToNgwExtent={zoomToNgwExtent}
+                />
+            );
             return (
                 <>
                     <Row wrap={false}>
                         <Col flex="auto" className="tree-item-title">
-                            {title}
+                            <div className="legend-title">{legendAction}{title}</div>
                         </Col>
                         {actions}
                     </Row>
-                    {showLegend && <Legend nodeData={nodeData.treeItem} />}
+                    {showLegend && <Legend zoomToNgwExtent={zoomToNgwExtent} nodeData={nodeData.treeItem} />}
                 </>
             );
         };

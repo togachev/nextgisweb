@@ -1,9 +1,7 @@
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-export const IconItem = ({ item, single, 
-    // zoomToNgwExtent 
-}) => {
+export const IconItem = ({ item, single, zoomToNgwExtent }) => {
     const asyncFunc = async (id, name) => {
         if (name) {
             const query = { ilike: name }
@@ -17,7 +15,7 @@ export const IconItem = ({ item, single,
                 }
             }
             getData()
-                // .then(extent => zoomToNgwExtent(extent))
+                .then(extent => zoomToNgwExtent(extent))
                 .catch(console.error);
         }
     };
@@ -31,7 +29,7 @@ export const IconItem = ({ item, single,
             key={idx}
             title={single ? item.title : s.display_name } 
             className={single ? "iconSingle" : "legend-item"}
-            // onClick={() => asyncFunc(item.layerId, s.display_name ? s.display_name : item.title)}
+            onClick={() => asyncFunc(item.layerId, s.display_name ? s.display_name : item.title)}
         >
             <img title={single ? zoomToLayer : zoomToFeatureLayer }
                 className={single ? null : "icon-list"}

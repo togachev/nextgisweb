@@ -1,6 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { TreeItem } from "../type/TreeItems";
+import type { DisplayMap } from "../type/DisplayMap";
 
 import ExpandLessIcon from "@nextgisweb/icon/material/expand_less/outline";
 import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
@@ -46,7 +47,7 @@ export function LegendAction({
     );
 }
 
-export function Legend({ nodeData }: { nodeData: TreeItem }) {
+export function Legend({ nodeData, zoomToNgwExtent }: { nodeData: TreeItem; zoomToNgwExtent: DisplayMap }) {
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
     if (!nodeData || !legendInfo || !legendInfo.open) {
         return <></>;
@@ -57,7 +58,7 @@ export function Legend({ nodeData }: { nodeData: TreeItem }) {
             <IconItem
                 single={false}
                 item={nodeData}
-                // zoomToNgwExtent={zoomToNgwExtent}
+                zoomToNgwExtent={zoomToNgwExtent}
             />
             {/* {legendInfo.symbols.map((s, idx) => (
                 <div key={idx} className="legend-symbol" title={s.display_name}>

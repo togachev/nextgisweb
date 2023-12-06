@@ -175,8 +175,8 @@ def display(obj, request):
                 identifiable=item.layer_identifiable,
                 timeline=item.layer_timeline,
                 transparency=item.layer_transparency,
-                minScaleDenom=style.minScale(),
-                maxScaleDenom=style.maxScale(),
+                minScaleDenom=item.layer_min_scale_denom,
+                maxScaleDenom=item.layer_max_scale_denom,
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
             )
