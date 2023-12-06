@@ -12,10 +12,8 @@ import DoneAll from "@nextgisweb/icon/material/done_all";
 import DeleteObject from "@nextgisweb/icon/material/delete_forever";
 import VectorSource from "ol/source/Vector";
 
-import VectorImageLayer from 'ol/layer/VectorImage';
-
 import GeoJSON from "ol/format/GeoJSON";
-import { Circle, Fill, Stroke, Style, Text } from 'ol/style';
+import { Circle, Fill, Stroke, Style } from 'ol/style';
 
 const { RangePicker } = DatePicker;
 const msgShowTimeLime = gettext("Show time line");
@@ -30,20 +28,19 @@ const msgShowlayer = gettext("Show layer");
 const msgHidelayer = gettext("Hide layer");
 const msgAllObject = gettext("Add all object layer");
 
-
 const getDefaultStyle = () => {
     var dataStyle = new Style({
         stroke: new Stroke({
-            width: 5,
-            color: '#FF8B00'
+            color: "rgba(255,255,0,0.5)",
+            width: 12
         }),
         image: new Circle({
             anchor: [0.5, 46],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
             stroke: new Stroke({
-                width: 1,
-                color: 'rgba(0,0,0,0.8)'
+                color: "rgba(255,255,0,0.5)",
+                width: 12
             }),
             radius: 4,
             fill: new Stroke({
@@ -52,39 +49,18 @@ const getDefaultStyle = () => {
             }),
         }),
         fill: new Fill({
-            color: 'rgba(0, 0, 255, 0.5)',
-        }),
-        text: new Text({
-            textAlign: 'center',
-            textBaseline: "bottom",
-            font: '12px Calibri,sans-serif',
-
-            fill: new Fill({
-                color: '#000'
-            }),
-            stroke: new Stroke({
-                color: '#fff',
-                width: 2
-            }),
-            offsetY: -10,
-            offsetX: 15,
-            placement: "point",
-            maxAngle: 0,
-            overflow: true,
-            rotation: 0,
+            color: "rgba(255,255,0,0.5)",
+            width: 12
         })
     });
 
     return dataStyle;
 }
 
-
-
 export function TimeLine({
     nodeData,
     timeLineClickId,
     setTimeLineClickId,
-    store,
     display
 }) {
     const { id, layerId, timeline } = nodeData;
@@ -92,7 +68,8 @@ export function TimeLine({
     const [valueStart, setValueStart] = useState(['', '']);
     const [value, setValue] = useState(['', '']);
     const [dateType, setDateType] = useState({ layerId: layerId, status: false });
-    const [checked, setChecked] = useState(true);
+    const [checked, setChecked] = useState(false);
+    const [status, setStatus] = useState(false);
 
     if (!timeline) {
         return
@@ -110,19 +87,22 @@ export function TimeLine({
     }, []);
 
     const map = display.map.olMap;
-
     const customLayer = display.map.layers.timelineLayer.olLayer;
-
     customLayer.setStyle(getDefaultStyle);
 
+    const setProps = async () => {
+        customLayer.setSource(new VectorSource({
+            format: new GeoJSON()
+        }))
+        customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+    };
+
     useEffect(() => {
-        if (value[0] !== '' && value[1] !== '') {
-            customLayer.setSource(new VectorSource({
-                format: new GeoJSON()
-            }))
-            customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+        if (status) {
+            setProps()
+            setStatus(false)
         }
-    }, [value]);
+    }, [status]);
 
     const startValue = async () => {
         const fields = await route('resource.item', layerId).get();
@@ -158,18 +138,25 @@ export function TimeLine({
     };
 
     const onChangeRangePicker = (item, dateString) => {
-        setValue([dateString[0], dateString[1]]);
+        setValue(dateString);
+        setStatus(true)
+        setChecked(true);
     };
 
     const zoomToObject = () => {
         let ext = customLayer.getSource().getExtent();
-        map.getView().fit(ext, map.getSize());
+        if (!isFinite(ext[0])) {
+            return
+        } else {
+            map.getView().fit(ext, map.getSize());
+        }
     };
 
     const clearObject = () => {
         customLayer.getSource().clear();
         display._zoomToInitialExtent();
-        setValue(['', ''])
+        setStatus(false)
+        setChecked(false);
     };
 
     const onChange = (e) => {
@@ -181,7 +168,15 @@ export function TimeLine({
 
     const addAllObject = () => {
         setValue([moment(valueStart[0].toString()).format(dateFormat), moment(valueStart[1].toString()).format(dateFormat)])
+        setStatus(true)
+        setChecked(true);
     };
+
+    const onCalendarChange = (item, dateString) => {
+        setValue(dateString);
+        setStatus(true)
+        setChecked(true);
+    }
 
     return (
         <Dropdown
@@ -194,9 +189,9 @@ export function TimeLine({
                         allowClear={false}
                         defaultValue={valueStart}
                         onChange={onChangeRangePicker}
+                        onCalendarChange={onCalendarChange}
                     />
                     <Button
-                        disabled={value[0] !== '' & value[1] !== '' ? false : true}
                         className="button-style"
                         type="text"
                         title={msgZoomToFiltered}
@@ -217,7 +212,7 @@ export function TimeLine({
                         onClick={clearObject}
                         icon={<DeleteObject />}
                     />
-                    <Checkbox className="button-style" defaultChecked={true} onChange={onChange} title={label} />
+                    <Checkbox checked={checked} className="button-style" defaultChecked={false} onChange={onChange} title={label} />
                 </span>
             )} >
             <span

@@ -221,18 +221,17 @@ export function DiagramPanel({ value, close, clear }) {
 
             console.log(JSON.stringify(query));
 
-            // return fetch('http://192.168.14.171:8080/v1/recovery', {
-            //     method: 'POST',
-            //     body: JSON.stringify(query),
-            //     mode: 'no-cors',
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            // }).then((response) => response.json())
-            //     .then((result) => {
-            //         console.log(result);
-            //         return result;
-            //     })
+            return fetch('http://192.168.14.171:8080/v1/recovery', {
+                method: 'POST',
+                body: JSON.stringify(query),
+                mode: 'no-cors',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((response) => response.json())
+                .then((result) => {
+                    return result;
+                })
 
         }
         if (type === 'calc') {
@@ -243,22 +242,22 @@ export function DiagramPanel({ value, close, clear }) {
                 type: "randomize_modeling",
                 data: {
                     temperature: temperature,
-                    precipitation: temperature,
+                    precipitation: precipitation,
                     square: square,
                 },
                 period_type: "short",
             }
 
             console.log(JSON.stringify(query));
-
-            // return fetch('http://192.168.14.171:8080/v1/forecast', {
-            //     method: 'POST',
-            //     body: JSON.stringify(query),
-            //     mode: 'no-cors',
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            // }).then((response) => console.log(response))
+            const headers = {
+                'Content-Type': 'application/json',
+            }
+            return fetch('http://192.168.14.171:8080/v1/forecast', {
+                method: 'POST',
+                body: JSON.stringify(query),
+                mode: 'no-cors',
+                headers: headers,
+            }).then((response) => { console.log(response) })
 
         }
     };
@@ -298,90 +297,98 @@ export function DiagramPanel({ value, close, clear }) {
             <PanelHeader {...{ title, close }} />
             <div className="results">
                 <Divider>{PredictionAndRecovery}</Divider>
-                <div className={selected ? "diagram-button" : null}>
-                    {
-                        selected ?
-                            <div className="request-block-list">
-                                <div className="request-block">
-                                    <Button
-                                        type="primary"
-                                        onClick={() => {
-                                            forecastData('req')
-                                        }}
-                                    >
-                                        {Recovery}
-                                    </Button>
-                                    <div className="float-input-label">
-                                        <label className="float">{CountOfTrajectories}</label>
-                                        <InputNumber style={{ width: '100%' }}
-                                            defaultValue={countTraectoriesReq}
-                                            onChange={onChangeCountReq} />
-                                    </div>
-                                </div>
-                                <div className="request-block">
-                                    <Button
-                                        type="primary"
-                                        onClick={() => forecastData('calc')}
-                                    >
-                                        {Forecasting}
-                                    </Button>
-                                    <div className="float-input-label">
-                                        <label className="float">{CountOfTrajectories}</label>
-                                        <InputNumber style={{ width: '100%' }} min={1000} max={100000}
-                                            defaultValue={countTraectoriesCalc}
-                                            onChange={onChangeCountCalc} />
-                                    </div>
+                {
+                    selected ?
+                        <div className="request-block-list">
+                            <div className="request-block">
+                                <Button
+                                    size="small"
+                                    onClick={() => {
+                                        forecastData('req')
+                                    }}
+                                >
+                                    {Recovery}
+                                </Button>
+                                <div className="float-input-label">
+                                    <label className="float">{CountOfTrajectories}</label>
+                                    <InputNumber
+                                        size="small"
+                                        style={{ width: '100%' }}
+                                        min={1000}
+                                        max={100000}
+                                        defaultValue={countTraectoriesReq}
+                                        onChange={onChangeCountReq} />
                                 </div>
                             </div>
+                            <div className="request-block">
+                                <Button
 
-                            : <InfoCardForecast />
-                    }
-                </div>
+                                    size="small"
+                                    onClick={() => forecastData('calc')}
+                                >
+                                    {Forecasting}
+                                </Button>
+                                <div className="float-input-label">
+                                    <label className="float">{CountOfTrajectories}</label>
+                                    <InputNumber
+                                        size="small"
+                                        style={{ width: '100%' }}
+                                        min={1000}
+                                        max={100000}
+                                        defaultValue={countTraectoriesCalc}
+                                        onChange={onChangeCountCalc} />
+                                </div>
+                            </div>
+                        </div>
+
+                        : <InfoCardForecast />
+                }
                 <Divider>{StaticData}</Divider>
-                <div className={selected ? "diagram-button" : null}>
-                    {
-                        result.length > 0 ?
-                            <div className="diagram-button-old-new">
-                                <Button
-                                    type="primary"
-                                    onClick={
-                                        () => {
-                                            setData(value);
-                                        }
-                                    }
-                                >
-                                    {Rebuild}
+                {
+                    result.length > 0 ?
+                        <div className="diagram-button-old-new">
+                            <Button
 
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    onClick={
-                                        () => {
-                                            setResult([]);
-                                            setData([]);
-                                            setSelected(undefined)
-                                            clear();
-                                        }
+                                size="small"
+                                onClick={
+                                    () => {
+                                        setData(value);
                                     }
-                                >
-                                    {Delete}
-                                </Button>
-                            </div>
-                            :
-                            selected ?
-                                <Button
-                                    type="primary"
-                                    onClick={
-                                        () => {
-                                            setData(value);
-                                        }
+                                }
+                            >
+                                {Rebuild}
+
+                            </Button>
+                            <Button
+
+                                size="small"
+                                onClick={
+                                    () => {
+                                        setResult([]);
+                                        setData([]);
+                                        setSelected(undefined)
+                                        clear();
                                     }
-                                >
-                                    {Build}
-                                </Button>
-                                : null
-                    }
-                </div>
+                                }
+                            >
+                                {Delete}
+                            </Button>
+                        </div>
+                        :
+                        selected ?
+                            <Button
+
+                                size="small"
+                                onClick={
+                                    () => {
+                                        setData(value);
+                                    }
+                                }
+                            >
+                                {Build}
+                            </Button>
+                            : null
+                }
                 {selected ? null : <InfoCard />}
                 {lineItems}
             </div>

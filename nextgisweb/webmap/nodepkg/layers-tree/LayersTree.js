@@ -187,7 +187,6 @@ export const LayersTree = observer(
                             nodeData={nodeData}
                             setTimeLineClickId={setTimeLineClickId}
                             timeLineClickId={timeLineClickId}
-                            store={store}
                             display={display}
                         />
                         {dropdownAction}
