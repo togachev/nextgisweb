@@ -14,7 +14,6 @@ import VectorSource from "ol/source/Vector";
 
 import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style } from 'ol/style';
-
 const { RangePicker } = DatePicker;
 const msgShowTimeLime = gettext("Show time line");
 const msgHideTimeLime = gettext("Hide time line");
@@ -202,6 +201,18 @@ export function TimeLine({
         }
     }
 
+    const onChangeMin = (date, dateString) => {
+        console.log(date, dateString);
+    }
+
+    const onChangeMax = (date, dateString) => {
+        console.log(date, dateString);
+    }
+
+    const disabledDate = (current) => {
+        return current && current < valueStart[0] || current && current > valueStart[1];
+    };
+
     return (
         <Dropdown
             onOpenChange={onOpenChange}
@@ -209,12 +220,16 @@ export function TimeLine({
             open
             dropdownRender={() => (
                 <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
-                    <RangePicker
+
+                    <DatePicker disabledDate={disabledDate} defaultValue={valueStart[0]} onChange={onChangeMin} />
+                    <DatePicker disabledDate={disabledDate} defaultValue={valueStart[1]} onChange={onChangeMax} />
+
+                    {/* <RangePicker
                         // allowClear={false}
                         defaultValue={valueStart}
                         // onCalendarChange={onCalendarChange}
                         onChange={onChangeRangePicker}
-                    />
+                    /> */}
                     <Button
                         className="button-style"
                         type="text"
