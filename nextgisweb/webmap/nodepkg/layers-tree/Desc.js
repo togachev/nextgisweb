@@ -1,5 +1,5 @@
 import { Dropdown, Card } from "@nextgisweb/gui/antd";
-import { FileTextOutlined } from '@ant-design/icons';
+import Description from "@nextgisweb/icon/material/description";
 import "./Desc.less";
 import ParseDesc from "./ParseDesc"
 
@@ -14,7 +14,7 @@ export function Desc({
         return (
             <span title="Описание" className="more"
                 onClick={(e) => { setDescClickId(id); e.stopPropagation(); }} >
-                <FileTextOutlined />
+                <Description />
             </span>
         );
     }
@@ -52,7 +52,7 @@ export function Desc({
             )} >
             <span title="Описание" className="more"
                 onClick={(e) => { setDescClickId(id); e.stopPropagation(); }} >
-                <FileTextOutlined />
+                <Description />
             </span>
         </Dropdown>
     );

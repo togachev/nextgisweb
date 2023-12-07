@@ -3,7 +3,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { TreeItem } from "../type/TreeItems";
 import type { DisplayMap } from "../type/DisplayMap";
 
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import MenuFoldOutlined from "./icons/MenuFoldOutlined.svg";
+import MenuUnfoldOutlined from "./icons/MenuUnfoldOutlined.svg";
 import { IconItem } from "./IconItem";
 
 import "./Legend.less";

@@ -27,5 +27,7 @@
     "auto_graph",
     "settings_suggest",
     "timeline",
-    "done_all"
+    "done_all",
+    "history",
+    "description"
 ]

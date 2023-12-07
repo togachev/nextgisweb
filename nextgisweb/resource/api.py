@@ -19,6 +19,7 @@ from nextgisweb.feature_layer.api import query_feature_or_not_found, serialize
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.ogcfserver.api import feature_to_ogc
 import datetime
+from datetime import datetime as dt
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
@@ -731,7 +732,17 @@ def geojson_filter_by_data(resource, request) -> JSONType:
         box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
         query.intersects(box_geom)
 
+    def strftime_format(format):
+        def func(value):
+            try:
+                datetime.strptime(value, format)
+            except ValueError:
+                return False
+            return True
+        return func
+
     features = [feature_to_ogc(feature) for feature in query()]
+    features = [x for x in features if x['properties']['data'] is not None and bool(dt.strptime(x['properties']['data'], f))]
     features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data and datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
 
     items = dict(

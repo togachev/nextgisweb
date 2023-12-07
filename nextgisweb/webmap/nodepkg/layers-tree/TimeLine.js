@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dropdown, Button, DatePicker, Checkbox } from "@nextgisweb/gui/antd";
-import { HistoryOutlined } from '@ant-design/icons';
+import History from "@nextgisweb/icon/material/history";
 import "./TimeLine.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -91,25 +91,44 @@ export function TimeLine({
     customLayer.setStyle(getDefaultStyle);
 
     const setProps = async () => {
-        customLayer.setSource(new VectorSource({
-            format: new GeoJSON()
-        }))
-        customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+        console.log(value[0], value[1]);
+        if (!value.includes['']) {
+            customLayer.setSource(new VectorSource({
+                format: new GeoJSON()
+            }))
+            customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+        }
     };
 
     useEffect(() => {
-        if (status) {
+        if (status == true) {
             setProps()
             setStatus(false)
         }
     }, [status]);
+
+    const validDate = (feat, r) => {
+        if (r == 0) {
+            if (feat[r].fields.data !== null & feat[r].fields.data !== undefined) {
+                return feat[r].fields.data;
+            } else {
+                return validDate(feat, r + 1);
+            }
+        } else {
+            if (feat.at(-r).fields.data !== null & feat.at(-r).fields.data !== undefined) {
+                return feat.at(-r).fields.data;
+            } else {
+                return validDate(feat, r + 1);
+            }
+        }
+    }
 
     const startValue = async () => {
         const fields = await route('resource.item', layerId).get();
         if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
             const query = { geom: 'no', extensions: 'no', order_by: 'data' }
             const item = await route('feature_layer.feature.collection', layerId).get({ query });
-            const date = [item[0].fields.data, item.at(-1).fields.data]
+            let date = [validDate(item, 0), validDate(item, 1)];
             setValueStart([parseNgwAttribute("DATE", date[0]), parseNgwAttribute("DATE", date[1])]);
         }
     };
@@ -125,7 +144,7 @@ export function TimeLine({
                     dateType.status ?
                         <span title={msgShowTimeLime} className="more"
                             onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
-                            <HistoryOutlined />
+                            <History />
                         </span>
                         : null
                 }
@@ -135,12 +154,6 @@ export function TimeLine({
 
     const onOpenChange = () => {
         setTimeLineClickId(undefined);
-    };
-
-    const onChangeRangePicker = (item, dateString) => {
-        setValue(dateString);
-        setStatus(true)
-        setChecked(true);
     };
 
     const zoomToObject = () => {
@@ -157,6 +170,7 @@ export function TimeLine({
         display._zoomToInitialExtent();
         setStatus(false)
         setChecked(false);
+        setTimeLineClickId(undefined)
     };
 
     const onChange = (e) => {
@@ -173,9 +187,19 @@ export function TimeLine({
     };
 
     const onCalendarChange = (item, dateString) => {
-        setValue(dateString);
-        setStatus(true)
-        setChecked(true);
+        if (item) {
+            setValue(dateString);
+            setStatus(true)
+            setChecked(true);
+        }
+    }
+
+    const onChangeRangePicker = (item, dateString) => {
+        if (item) {
+            setValue(dateString);
+            setStatus(true)
+            setChecked(true);
+        }
     }
 
     return (
@@ -186,10 +210,10 @@ export function TimeLine({
             dropdownRender={() => (
                 <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
                     <RangePicker
-                        allowClear={false}
+                        // allowClear={false}
                         defaultValue={valueStart}
+                        // onCalendarChange={onCalendarChange}
                         onChange={onChangeRangePicker}
-                        onCalendarChange={onCalendarChange}
                     />
                     <Button
                         className="button-style"
@@ -219,7 +243,7 @@ export function TimeLine({
                 title={msgHideTimeLime}
                 className="more"
                 onClick={(e) => { setTimeLineClickId(id); e.stopPropagation(); }} >
-                <HistoryOutlined />
+                <History />
             </span>
         </Dropdown>
     );

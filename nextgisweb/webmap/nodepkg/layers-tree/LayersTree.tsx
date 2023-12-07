@@ -17,6 +17,7 @@ import { TimeLine } from "./TimeLine";
 import { Desc } from "./Desc";
 import { DropdownFile } from "./DropdownFile";
 import { Legend, LegendAction } from "./Legend";
+import { IconItem } from "./IconItem";
 import { useDrag } from "./hook/useDrag";
 
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
@@ -44,55 +45,6 @@ interface LayersTreeProps {
     zoomToNgwExtent: (ngwExtent: NgwExtent, displayProjection?: string) => void;
 }
 
-const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
-    const { key, title } = webMapItem;
-    const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-    if (item.treeItem.type === "root" || item.treeItem.type === "group") {
-        item.icon = ({ expanded }) =>
-            expanded ? <FolderOpenIcon className="close-open-icon" /> :
-                <FolderClosedIcon className="close-open-icon" />;
-
-    } else if (item.treeItem.type === "layer") {
-        item.isLeaf = true;
-
-        if ("legendInfo" in item.treeItem) {
-            const { legendInfo } = item.treeItem;
-            if (legendInfo && legendInfo.visible && legendInfo.single) {
-                item.legendIcon = (
-                    <img
-                        width={20}
-                        height={20}
-                        src={
-                            "data:image/png;base64," +
-                            legendInfo.symbols[0].icon.data
-                        }
-                    />
-                );
-            }
-        }
-
-        item.icon = (item_) => {
-            const item = item_ as TreeWebmapItem;
-            if ((item.treeItem as LayerItem).editable === true) {
-                return <EditIcon />;
-            } else {
-                if (item.legendIcon) {
-                    return item.legendIcon;
-                }
-            }
-        };
-    }
-
-    if ("children" in webMapItem) {
-        item.children = webMapItem.children.map(handleWebMapItem);
-    }
-    return item;
-};
-
-const prepareWebMapItems = (webMapItems: TreeItem[]) => {
-    return webMapItems.map(handleWebMapItem);
-};
-
 export const LayersTree = observer(
     ({
         store,
@@ -114,6 +66,55 @@ export const LayersTree = observer(
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const webmapItems = store.webmapItems as TreeItem[];
+
+        const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
+            const { key, title } = webMapItem;
+            const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
+            if (item.treeItem.type === "root" || item.treeItem.type === "group") {
+                item.icon = ({ expanded }) =>
+                    expanded ? <FolderOpenIcon className="close-open-icon" /> :
+                        <FolderClosedIcon className="close-open-icon" />;
+        
+            } else if (item.treeItem.type === "layer") {
+                item.isLeaf = true;
+        
+                if ("legendInfo" in item.treeItem) {
+                    const { legendInfo } = item.treeItem;
+                    if (legendInfo && legendInfo.visible && legendInfo.single) {
+                        item.legendIcon = (
+                            <div className="colSingleIconLegend">
+                                <IconItem
+                                    single={legendInfo.single}
+                                    item={item.treeItem}
+                                    zoomToNgwExtent={zoomToNgwExtent}
+                                />
+                            </div>
+
+                        );
+                    }
+                }
+        
+                item.icon = (item_) => {
+                    const item = item_ as TreeWebmapItem;
+                    if ((item.treeItem as LayerItem).editable === true) {
+                        return <EditIcon />;
+                    } else {
+                        if (item.legendIcon) {
+                            return item.legendIcon;
+                        }
+                    }
+                };
+            }
+        
+            if ("children" in webMapItem) {
+                item.children = webMapItem.children.map(handleWebMapItem);
+            }
+            return item;
+        };
+
+        const prepareWebMapItems = (webMapItems: TreeItem[]) => {
+            return webMapItems.map(handleWebMapItem);
+        };
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
         

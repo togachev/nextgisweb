@@ -12,8 +12,8 @@ class NogeomComponent(Component):
 
     @require('feature_layer')
     def setup_pyramid(self, config):
-        from . import view  # NOQA
-        from . import api
+        from . import view, api
+
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
