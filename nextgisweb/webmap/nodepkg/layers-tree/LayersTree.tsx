@@ -213,7 +213,6 @@ export const LayersTree = observer(
                 <LegendAction
                     nodeData={nodeData.treeItem}
                     onClick={() => setUpdate(!update)}
-                    // zoomToNgwExtent={zoomToNgwExtent}
                 />
             );
             return (

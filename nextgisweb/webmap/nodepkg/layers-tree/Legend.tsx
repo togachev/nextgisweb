@@ -3,9 +3,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { TreeItem } from "../type/TreeItems";
 import type { DisplayMap } from "../type/DisplayMap";
 
-import ExpandLessIcon from "@nextgisweb/icon/material/expand_less/outline";
-import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
-
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { IconItem } from "./IconItem";
 
@@ -35,7 +32,7 @@ export function LegendAction({
         nodeData.legendInfo.open = !open;
         onClick(id);
     };
-
+    
     return (
         <span
             className="legend legend-list"
