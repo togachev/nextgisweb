@@ -22,10 +22,10 @@ const datatype = "DATE"
 const dateFormat = 'YYYY-MM-DD';
 
 const msgZoomToFiltered = gettext("Zoom to filtered features");
-const msgClearObject = gettext("Delete objects");
+const msgClearObjectsMap = gettext("Clear objects on the map");
 const msgShowlayer = gettext("Show layer");
 const msgHidelayer = gettext("Hide layer");
-const msgAllObject = gettext("Add all object layer");
+const msgAllObject = gettext("Add all layer objects");
 
 const getDefaultStyle = () => {
     var dataStyle = new Style({
@@ -69,10 +69,9 @@ export function TimeLine({
     const [dateType, setDateType] = useState({ layerId: layerId, status: false });
     const [checked, setChecked] = useState(false);
     const [status, setStatus] = useState(false);
+    const [open, setOpen] = useState();
 
-    if (!timeline) {
-        return
-    };
+    if (!timeline) { return };
 
     const dataTypeCheck = async () => {
         const fields = await route('resource.item', layerId).get();
@@ -90,7 +89,6 @@ export function TimeLine({
     customLayer.setStyle(getDefaultStyle);
 
     const setProps = async () => {
-        console.log(value[0], value[1]);
         if (!value.includes['']) {
             customLayer.setSource(new VectorSource({
                 format: new GeoJSON()
@@ -100,11 +98,11 @@ export function TimeLine({
     };
 
     useEffect(() => {
-        if (status == true) {
+        if (status == true && !open) {
             setProps()
             setStatus(false)
         }
-    }, [status]);
+    }, [status, open]);
 
     const validDate = (feat, r) => {
         if (r == 0) {
@@ -155,15 +153,6 @@ export function TimeLine({
         setTimeLineClickId(undefined);
     };
 
-    const zoomToObject = () => {
-        let ext = customLayer.getSource().getExtent();
-        if (!isFinite(ext[0])) {
-            return
-        } else {
-            map.getView().fit(ext, map.getSize());
-        }
-    };
-
     const clearObject = () => {
         customLayer.getSource().clear();
         display._zoomToInitialExtent();
@@ -177,6 +166,15 @@ export function TimeLine({
         setChecked(e.target.checked);
     };
 
+    const zoomToObject = () => {
+        let ext = customLayer.getSource().getExtent();
+        if (!isFinite(ext[0])) {
+            return
+        } else {
+            map.getView().fit(ext, map.getSize());
+        }
+    };
+
     const label = `${checked ? msgShowlayer : msgHidelayer}`;
 
     const addAllObject = () => {
@@ -184,14 +182,6 @@ export function TimeLine({
         setStatus(true)
         setChecked(true);
     };
-
-    const onCalendarChange = (item, dateString) => {
-        if (item) {
-            setValue(dateString);
-            setStatus(true)
-            setChecked(true);
-        }
-    }
 
     const onChangeRangePicker = (item, dateString) => {
         if (item) {
@@ -201,17 +191,13 @@ export function TimeLine({
         }
     }
 
-    const onChangeMin = (date, dateString) => {
-        console.log(date, dateString);
-    }
-
-    const onChangeMax = (date, dateString) => {
-        console.log(date, dateString);
-    }
-
     const disabledDate = (current) => {
         return current && current < valueStart[0] || current && current > valueStart[1];
     };
+
+    const onOpenChangeRange = (open) =>{
+        setOpen(open);
+    }
 
     return (
         <Dropdown
@@ -220,16 +206,13 @@ export function TimeLine({
             open
             dropdownRender={() => (
                 <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
-
-                    <DatePicker disabledDate={disabledDate} defaultValue={valueStart[0]} onChange={onChangeMin} />
-                    <DatePicker disabledDate={disabledDate} defaultValue={valueStart[1]} onChange={onChangeMax} />
-
-                    {/* <RangePicker
-                        // allowClear={false}
+                    <RangePicker
+                        allowClear={false}
                         defaultValue={valueStart}
-                        // onCalendarChange={onCalendarChange}
+                        disabledDate={disabledDate}
+                        onOpenChange={onOpenChangeRange}
                         onChange={onChangeRangePicker}
-                    /> */}
+                    />
                     <Button
                         className="button-style"
                         type="text"
@@ -247,7 +230,7 @@ export function TimeLine({
                     <Button
                         className="button-style"
                         type="text"
-                        title={msgClearObject}
+                        title={msgClearObjectsMap}
                         onClick={clearObject}
                         icon={<DeleteObject />}
                     />
