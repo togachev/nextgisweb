@@ -418,7 +418,7 @@ define([
                                             "layer_style_id": resourceId,
                                             "layer_enabled": true,
                                             "layer_identifiable": true,
-                                            "layer_timeline": false,
+                                            "layer_filter_by_data": false,
                                             "layer_transparency": null,
                                             "layer_min_scale_denom": null,
                                             "layer_max_scale_denom": null,
@@ -496,9 +496,9 @@ define([
                                     "checked",
                                     widget.getItemValue("layer_identifiable")
                                 );
-                                widget.wdgtItemLayerTimeline.set(
+                                widget.wdgtItemLayerFilterByData.set(
                                     "checked",
-                                    widget.getItemValue("layer_timeline")
+                                    widget.getItemValue("layer_filter_by_data")
                                 );
                                 widget.wLayerTransparency.set(
                                     "value",
@@ -583,10 +583,10 @@ define([
                     }
                 );
 
-                this.wdgtItemLayerTimeline.watch(
+                this.wdgtItemLayerFilterByData.watch(
                     "checked",
                     function (attr, oldValue, newValue) {
-                        widget.setItemValue("layer_timeline", newValue);
+                        widget.setItemValue("layer_filter_by_data", newValue);
                     }
                 );
 
@@ -681,9 +681,9 @@ define([
                             itm,
                             "layer_identifiable"
                         ),
-                        layer_timeline: store.getValue(
+                        layer_filter_by_data: store.getValue(
                             itm,
-                            "layer_timeline"
+                            "layer_filter_by_data"
                         ),
                         layer_transparency: store.getValue(
                             itm,

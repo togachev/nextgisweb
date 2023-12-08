@@ -14,11 +14,11 @@ define([
         _overlay: null,
         _zIndex: 1000,
 
-        constructor: function (map, timelineLayerStyle) {
+        constructor: function (map, FilterByDataLayerStyle) {
             this._map = map;
             this._zIndex = this._zIndex + map.layers.length;
-            this._overlay = new VectorImage("timelineLayer", {
-                title: "TimelineLayer",
+            this._overlay = new VectorImage("FilterByDataLayer", {
+                title: "FilterByDataLayer",
             });
             this._overlay.olLayer.setZIndex(this._zIndex);
             this._source = this._overlay.olLayer.getSource();

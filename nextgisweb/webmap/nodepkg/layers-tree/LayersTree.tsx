@@ -13,7 +13,7 @@ import type { DojoDisplay } from "../type/DojoDisplay";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
-import { TimeLine } from "./TimeLine";
+import { FilterByData } from "./FilterByData";
 import { Desc } from "./Desc";
 import { DropdownFile } from "./DropdownFile";
 import { Legend, LegendAction } from "./Legend";
@@ -61,7 +61,7 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
-        const [timeLineClickId, setTimeLineClickId] = useState<number>();
+        const [filterByDataClickId, setFilterByDataClickId] = useState<number>();
         const [descClickId, setDescClickId] = useState<number>();
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
@@ -176,12 +176,13 @@ export const LayersTree = observer(
                         setUpdate={setUpdate}
                     />
                 );
-                const dropdownTimeline = showDropdown && (
-                    <TimeLine
+                const dropdownFilterByData = showDropdown && (
+                    <FilterByData
                         nodeData={nodeData.treeItem}
-                        setTimeLineClickId={setTimeLineClickId}
-                        timeLineClickId={timeLineClickId}
+                        setFilterByDataClickId={setFilterByDataClickId}
+                        filterByDataClickId={filterByDataClickId}
                         display={display}
+                        store={store}
                     />
                 );
                 const dropdownFile = showDropdown && (
@@ -204,7 +205,7 @@ export const LayersTree = observer(
                                 descClickId={descClickId}
                             />) :
                             null}
-                        {dropdownTimeline}
+                        {dropdownFilterByData}
                         {dropdownFile}
                         {dropdownAction}
                     </Col>

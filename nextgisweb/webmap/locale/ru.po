@@ -240,8 +240,8 @@ msgid "Identifiable"
 msgstr "Идентифицируемый"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:80
-msgid "Timeline"
-msgstr "Временная шкала"
+msgid "FilterByData"
+msgstr "Фильтрация по дате"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:87
 msgid "Transparency"
@@ -974,13 +974,45 @@ msgstr "Загрузка"
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
 
-#: nodepkg/layers-tree/Timeline.js:25
+#: nodepkg/layers-tree/FilterByData.js:25
 msgid "Clear objects on the map"
 msgstr "Очистить объекты на карте"
 
-#: nodepkg/layers-tree/Timeline.js:25
+#: nodepkg/layers-tree/FilterByData.js:25
 msgid "Add all layer objects"
 msgstr "Добавить все объекты слоя"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Show layer filter by date"
+msgstr "Показать фильтр слоя по дате"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Hide layer filter by date"
+msgstr "Скрыть фильтр слоя по дате"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Show layer objects"
+msgstr "Показать объекты слоя"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Hide layer objects"
+msgstr "Скрыть объекты слоя"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Data loaded"
+msgstr "Данные загружены"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "No data available"
+msgstr "Данные отсутствуют"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Turn on a layer to get information about an object"
+msgstr "Включите слой для получения информации об объекте"
+
+#: nodepkg/layers-tree/FilterByData.js:25
+msgid "Zoom to object(s)"
+msgstr "Увеличить до объекта(ов)"
 
 #: template/invalid_origin.mako:3
 msgid "Web map embedding is not allowed for %s in the Web GIS settings."
