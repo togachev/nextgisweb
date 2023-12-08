@@ -974,6 +974,14 @@ msgstr "Загрузка"
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
 
+#: nodepkg/layers-tree/Timeline.js:25
+msgid "Clear objects on the map"
+msgstr "Очистить объекты на карте"
+
+#: nodepkg/layers-tree/Timeline.js:25
+msgid "Add all layer objects"
+msgstr "Добавить все объекты слоя"
+
 #: template/invalid_origin.mako:3
 msgid "Web map embedding is not allowed for %s in the Web GIS settings."
 msgstr "Встраивание веб-карты не разрешено для %s в настройках Веб ГИС."
