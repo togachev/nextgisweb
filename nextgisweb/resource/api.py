@@ -15,12 +15,6 @@ from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType, viewargs
 
-from nextgisweb.feature_layer.api import query_feature_or_not_found, serialize
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.ogcfserver.api import feature_to_ogc
-import datetime
-from datetime import datetime as dt
-
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
 from .model import Resource, ResourceSerializer, ResourceWebMapGroup, WebMapGroupResource
@@ -475,8 +469,7 @@ def resource_export_put(request) -> JSONType:
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
-@viewargs(renderer='json')
-def getWebmapGroup(request):
+def getWebmapGroup(request) -> JSONType:
     request.require_administrator()
 
     query = DBSession.query(ResourceWebMapGroup)
@@ -490,8 +483,7 @@ def getWebmapGroup(request):
                     
     return result
 
-@viewargs(renderer='json')
-def getMaplist(request):
+def getMaplist(request) -> JSONType:
 
     query = DBSession.query(Resource, ResourceWebMapGroup, WebMapGroupResource, ResourceSocial) \
         .join(WebMapGroupResource, Resource.id == WebMapGroupResource.resource_id) \
@@ -516,8 +508,7 @@ def getMaplist(request):
 
     return dict(scope=is_adm, result=result)
 
-@viewargs(renderer='json')
-def wmgroup_delete(request):
+def wmgroup_delete(request) -> JSONType:
     request.require_administrator()
     wmg_id = int(request.matchdict['id'])
     def delete(wmg_id):
@@ -537,8 +528,7 @@ def wmgroup_delete(request):
     
     return dict(id=wmg_id)
 
-@viewargs(renderer='json')
-def wmgroup_update(request):
+def wmgroup_update(request) -> JSONType:
     request.require_administrator()
     wmg_id = int(request.matchdict['id'])
     wmg_value = str(request.matchdict['wmg']).strip()
@@ -558,8 +548,7 @@ def wmgroup_update(request):
     else:
         raise ResourceError("Введено некорректное имя группы")
 
-@viewargs(renderer='json')
-def wmgroup_create(request):
+def wmgroup_create(request) -> JSONType:
     request.require_administrator()
     webmap_group_name = request.json['webmap_group_name'].strip()
     action_map = request.json['action_map']
@@ -571,8 +560,7 @@ def wmgroup_create(request):
         except SQLAlchemyError as exc:
             raise ExternalDatabaseError(message=_("ERROR: duplicate key violates unique constraint."), sa_error=exc)
 
-@viewargs(renderer='json')
-def wmg_item_create(request):
+def wmg_item_create(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
     resource_id = int(request.matchdict['id'])
     webmap_group_id = int(request.matchdict['webmap_group_id'])
@@ -584,8 +572,7 @@ def wmg_item_create(request):
     except SQLAlchemyError as exc:
         raise ExternalDatabaseError(message=_("ERROR: Error not create."), sa_error=exc)
         
-@viewargs(renderer='json')
-def wmg_item_delete(request):
+def wmg_item_delete(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
     resource_id = int(request.matchdict['id'])
     webmap_group_id = int(request.matchdict['webmap_group_id'])
@@ -603,15 +590,13 @@ def wmg_item_delete(request):
     
     return dict(resource_id=resource_id, webmap_group_id=webmap_group_id)
 
-@viewargs(renderer='json')
-def wmg_item_delete_all(request):
+def wmg_item_delete_all(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
     DBSession.query(WebMapGroupResource).filter_by(resource_id=request.context.id).delete()
     DBSession.flush()
     return None
 
-@viewargs(renderer='json')
-def tbl_res(request):
+def tbl_res(request) -> JSONType:
     clsItems = ['nogeom_layer','postgis_layer', 'vector_layer'];
     query = DBSession.query(Resource).filter(Resource.cls.in_(clsItems)).all()
     result = list()
@@ -630,8 +615,7 @@ def tbl_res(request):
             ))
     return result
 
-@viewargs(renderer='json')
-def webmap_group_item(request):
+def webmap_group_item(request) -> JSONType:
     id = int(request.matchdict['id'])
 
     query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(webmap_group_id=id) \
@@ -648,16 +632,10 @@ def webmap_group_item(request):
             owner=True, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
             preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
             preview_description=None if res_social == None else res_social.preview_description))
-        # if not res.has_permission(PERM_READ, request.user) and action_map == True:
-        #     result.append(dict(wmg_id=wmg.webmap_group_id,
-        #     webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
-        #     owner=False, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
-        #     preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
-        #     preview_description=None if res_social == None else res_social.preview_description))
+
     return result
 
-@viewargs(renderer='json')
-def webmap_item(request):
+def webmap_item(request) -> JSONType:
     id = int(request.matchdict['id'])
 
     query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(resource_id=id) \
@@ -682,89 +660,7 @@ def webmap_item(request):
             preview_description=None if res_social == None else res_social.preview_description))
     return result
 
-def geojson(resource, request) -> JSONType:
-    id = request.matchdict["id"]
-
-    query = resource.feature_query()
-    query.srs(SRS.filter_by(id=4326).one())
-    query.geom()
-
-    bbox = request.GET.get("bbox")
-    if bbox is not None:
-        box_coords = map(float, bbox.split(",")[:4])
-        box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
-        query.intersects(box_geom)
-
-    features = [feature_to_ogc(feature) for feature in query()]
-
-    items = dict(
-        type="FeatureCollection",
-        features=features,
-    )
-    items["links"] = [
-        {
-            "rel": "self",
-            "type": "application/geo+json",
-            "href": request.route_url(
-                "resource.geojson",
-                id=id,
-            ),
-        },
-    ]
-    return items
-
-def geojson_filter_by_data(resource, request) -> JSONType:
-    id = request.matchdict["id"]
-    f = "%Y-%m-%d"
-    mind = request.matchdict["min_data"]
-    min_data = datetime.datetime.strptime(mind, f)
-    maxd = request.matchdict["max_data"]
-    max_data = datetime.datetime.strptime(maxd, f)
-    
-
-    query = resource.feature_query()
-    query.srs(SRS.filter_by(id=4326).one())
-    query.geom()
-
-    bbox = request.GET.get("bbox")
-    if bbox is not None:
-        box_coords = map(float, bbox.split(",")[:4])
-        box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
-        query.intersects(box_geom)
-
-    def strftime_format(format):
-        def func(value):
-            try:
-                datetime.strptime(value, format)
-            except ValueError:
-                return False
-            return True
-        return func
-
-    features = [feature_to_ogc(feature) for feature in query()]
-    features = [x for x in features if x['properties']['data'] is not None and bool(dt.strptime(x['properties']['data'], f))]
-    features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data and datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
-
-    items = dict(
-        type="FeatureCollection",
-        features=features,
-    )
-
-    return items
-
 def setup_pyramid(comp, config):
-
-    config.add_route(
-        "resource.geojson_filter_by_data",
-        "/api/resource/{id:uint}/{min_data:any}/{max_data:any}/geojson",
-        factory=resource_factory,
-    ).get(geojson_filter_by_data)
-
-    config.add_route(
-        "resource.geojson",
-        "/api/resource/{id:uint}/geojson",
-        factory=resource_factory,
-    ).get(geojson, context=Resource)
 
     config.add_route(
         "resource.blueprint",

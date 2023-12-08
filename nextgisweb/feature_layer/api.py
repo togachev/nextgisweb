@@ -3,7 +3,9 @@ import re
 import tempfile
 import uuid
 import zipfile
-from datetime import date, datetime, time
+from datetime import date, datetime, time, datetime as dt
+import datetime
+
 from typing import List, Optional
 
 from msgspec import Meta
@@ -932,7 +934,99 @@ def feature_extent(resource, request) -> JSONType:
     extent = query().extent
     return dict(extent=extent)
 
+def feature_to_ogc(feature):
+    result = serialize(feature, geom_format="geojson", dt_format="iso")
+    return dict(
+        type="Feature",
+        geometry=result["geom"],
+        properties=result["fields"],
+        id=feature.id,
+    )
+
+def geojson(resource, request) -> JSONType:
+    id = request.matchdict["id"]
+
+    query = resource.feature_query()
+    query.srs(SRS.filter_by(id=4326).one())
+    query.geom()
+
+    bbox = request.GET.get("bbox")
+    if bbox is not None:
+        box_coords = map(float, bbox.split(",")[:4])
+        box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
+        query.intersects(box_geom)
+
+    features = [feature_to_ogc(feature) for feature in query()]
+
+    items = dict(
+        type="FeatureCollection",
+        features=features,
+    )
+    items["links"] = [
+        {
+            "rel": "self",
+            "type": "application/geo+json",
+            "href": request.route_url(
+                "feature_layer.geo_json",
+                id=id,
+            ),
+        },
+    ]
+    return items
+
+def geojson_filter_by_data(resource, request) -> JSONType:
+    id = request.matchdict["id"]
+    f = "%Y-%m-%d"
+    mind = request.matchdict["min_data"]
+    min_data = datetime.datetime.strptime(mind, f)
+    maxd = request.matchdict["max_data"]
+    max_data = datetime.datetime.strptime(maxd, f)
+    
+
+    query = resource.feature_query()
+    query.srs(SRS.filter_by(id=4326).one())
+    query.geom()
+
+    bbox = request.GET.get("bbox")
+    if bbox is not None:
+        box_coords = map(float, bbox.split(",")[:4])
+        box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
+        query.intersects(box_geom)
+
+    def strftime_format(format):
+        def func(value):
+            try:
+                datetime.strptime(value, format)
+            except ValueError:
+                return False
+            return True
+        return func
+
+    features = [feature_to_ogc(feature) for feature in query()]
+    features = [x for x in features if x['properties']['data'] is not None and bool(dt.strptime(x['properties']['data'], f))]
+    features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data and datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
+
+    items = dict(
+        type="FeatureCollection",
+        features=features,
+    )
+
+    return items
+
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        "feature_layer.geojson_filter_by_data",
+        "/api/resource/{id:uint}/{min_data:any}/{max_data:any}/geojson",
+        factory=resource_factory,
+    ).get(geojson_filter_by_data)
+
+    config.add_route(
+        "feature_layer.geo_json",
+        "/api/resource/{id:uint}/geo_json",
+        factory=resource_factory,
+    ).get(geojson, context=Resource)
+
     geojson_route = config.add_route(
         "feature_layer.geojson",
         "/api/resource/{id:uint}/geojson",

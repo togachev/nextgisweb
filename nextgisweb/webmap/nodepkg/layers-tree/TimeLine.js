@@ -95,7 +95,7 @@ export function TimeLine({
             customLayer.setSource(new VectorSource({
                 format: new GeoJSON()
             }))
-            customLayer.getSource().setUrl(routeURL("resource.geojson_filter_by_data", layerId, value[0], value[1]))
+            customLayer.getSource().setUrl(routeURL("feature_layer.geojson_filter_by_data", layerId, value[0], value[1]))
         }
     };
 
