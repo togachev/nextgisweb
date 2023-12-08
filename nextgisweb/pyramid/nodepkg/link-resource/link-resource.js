@@ -8,15 +8,23 @@ import "./link-resource.less";
 
 export function linkResource() {
 
-  const [link, setLink] = useState([]);
-  useEffect(async () => {
-    const url = routeURL("resource.show", 0);
-    setLink(<a title={gettext("Resources")} className="link-resource" href={url}>
-      <ResourceGroup />
-    </a>);
-  }, [])
+	const [link, setLink] = useState([]);
 
-  return (
-    <>{link}</>
-  );
+	const links_show = async () => {
+		const url = routeURL("resource.show", 0);
+		return url;
+
+	}
+
+	useEffect(() => {
+		links_show().then(url =>
+			setLink(<a title={gettext("Resources")} className="link-resource" href={url}>
+				<ResourceGroup />
+			</a>)
+		)
+	}, [])
+
+	return (
+		<>{link}</>
+	);
 }
