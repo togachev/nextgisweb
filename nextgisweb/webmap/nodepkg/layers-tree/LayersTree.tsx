@@ -9,7 +9,7 @@ import FolderOpenIcon from "./icons/folder_open.svg";
 import type WebmapStore from "../store";
 import type { LayerItem, TreeItem } from "../type/TreeItems";
 import type { WebmapPlugin } from "../type/WebmapPlugin";
-import type { DojoDisplay } from "../type/DojoDisplay";
+import type { DojoDisplay } from "../type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
@@ -42,7 +42,6 @@ interface LayersTreeProps {
     showLegend?: boolean;
     showDropdown?: boolean;
     display: DojoDisplay;
-    zoomToNgwExtent: (ngwExtent: NgwExtent, displayProjection?: string) => void;
 }
 
 export const LayersTree = observer(
@@ -55,7 +54,6 @@ export const LayersTree = observer(
         showLegend = true,
         showDropdown = true,
         display,
-        zoomToNgwExtent
     }: LayersTreeProps) => {
         const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -74,10 +72,10 @@ export const LayersTree = observer(
                 item.icon = ({ expanded }) =>
                     expanded ? <FolderOpenIcon className="close-open-icon" /> :
                         <FolderClosedIcon className="close-open-icon" />;
-        
+
             } else if (item.treeItem.type === "layer") {
                 item.isLeaf = true;
-        
+
                 if ("legendInfo" in item.treeItem) {
                     const { legendInfo } = item.treeItem;
                     if (legendInfo && legendInfo.visible && legendInfo.single) {
@@ -86,14 +84,19 @@ export const LayersTree = observer(
                                 <IconItem
                                     single={legendInfo.single}
                                     item={item.treeItem}
-                                    zoomToNgwExtent={zoomToNgwExtent}
+                                    zoomToNgwExtent={(ngwExtent: NgwExtent) => {
+                                        display.map.zoomToNgwExtent(
+                                            ngwExtent,
+                                            display.displayProjection
+                                        );
+                                    }}
                                 />
                             </div>
 
                         );
                     }
                 }
-        
+
                 item.icon = (item_) => {
                     const item = item_ as TreeWebmapItem;
                     if ((item.treeItem as LayerItem).editable === true) {
@@ -105,7 +108,7 @@ export const LayersTree = observer(
                     }
                 };
             }
-        
+
             if ("children" in webMapItem) {
                 item.children = webMapItem.children.map(handleWebMapItem);
             }
@@ -117,7 +120,7 @@ export const LayersTree = observer(
         };
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
-        
+
         const treeItems = useMemo(
             () => prepareWebMapItems(webmapItems),
             [webmapItems]
@@ -147,7 +150,7 @@ export const LayersTree = observer(
             const checkedKeysValue = Array.isArray(val) ? val : val.checked;
             store.handleCheckChanged(checkedKeysValue.map(Number));
         };
-            
+
 
         const _onSelect = (selectedKeysValue: React.Key[]) => {
             const val = selectedKeysValue.map(Number);
@@ -159,9 +162,9 @@ export const LayersTree = observer(
             const { title, plugin, description } = nodeData.treeItem;
             const descStyle = description ? true : false
             const descLayer = plugin ? (plugin['ngw-webmap/plugin/LayerInfo'].description ? true : false) : false
-            
+
             const shouldActions = showLegend || showDropdown;
-            
+
             let actions;
             if (shouldActions) {
 
@@ -197,7 +200,7 @@ export const LayersTree = observer(
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
-                        
+
                         {descStyle || descLayer ?
                             (<Desc
                                 nodeData={nodeData.treeItem}
@@ -225,7 +228,14 @@ export const LayersTree = observer(
                         </Col>
                         {actions}
                     </Row>
-                    {showLegend && <Legend zoomToNgwExtent={zoomToNgwExtent} nodeData={nodeData.treeItem} />}
+                    {showLegend && <Legend
+                        zoomToNgwExtent={(ngwExtent: NgwExtent) => {
+                            display.map.zoomToNgwExtent(
+                                ngwExtent,
+                                display.displayProjection
+                            );
+                        }}
+                        nodeData={nodeData.treeItem} />}
                 </>
             );
         };
