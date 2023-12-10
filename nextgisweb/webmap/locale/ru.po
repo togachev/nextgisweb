@@ -983,8 +983,8 @@ msgid "Add all layer objects"
 msgstr "Добавить все объекты слоя"
 
 #: nodepkg/layers-tree/FilterByData.js:25
-msgid "Show layer filter by date"
-msgstr "Показать фильтр слоя по дате"
+msgid "Filter layer by date"
+msgstr "Фильтр слоя по дате"
 
 #: nodepkg/layers-tree/FilterByData.js:25
 msgid "Hide layer filter by date"

@@ -8,4 +8,5 @@ export interface WebmapItem {
     styleId: number;
     type: string;
     visibility: boolean;
+    filter_by_data: boolean;
 }
