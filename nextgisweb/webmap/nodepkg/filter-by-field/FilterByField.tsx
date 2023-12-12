@@ -10,7 +10,6 @@ import type { SizeType } from "@nextgisweb/gui/antd";
 import type { DojoDisplay, WebmapItem } from "../type/index.ts";
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
 import type WebmapStore from "../store/index.ts";
-import type { MenuProps } from "@nextgisweb/gui/antd";
 
 import History from "@nextgisweb/icon/material/history";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
@@ -32,47 +31,12 @@ interface FilterByFieldBtnProps {
     size?: SizeType;
 }
 
-const msgAllObject = gettext("Add all layer objects");
-const msgSuccessDataLoaded = gettext("Data loaded");
-const msgNoDataAvailable = gettext("No data available");
 const msgShowLayerFilterByDate = gettext("Filter layer by date");
 const msgInfo = gettext("Turn on a layer to get information about an object");
 const msgShowLayerObjects = gettext("Show layer objects");
 const msgHideLayerObjects = gettext("Hide layer objects");
-const msgShowHideLayerObjects = gettext("Hide/Show layer objects");
 const msgAddFeature = gettext("Zoom to object(s)");
 const msgClearObjectsMap = gettext("Clear objects on the map");
-
-const buttonTypesInfo = [
-    {
-        label: msgAllObject,
-        key: "allObject",
-        icon: <ZoomInMap />,
-    },
-    {
-        label: msgAddFeature,
-        key: "addFeature",
-        icon: <CenterFocusWeak />,
-    },
-    {
-        label: msgShowHideLayerObjects,
-        key: "checkBoxHS",
-    },
-    {
-        label: msgClearObjectsMap,
-        key: "clearObject",
-        icon: <DeleteObject />,
-    },
-];
-
-const buttonTypesMap = new Map();
-buttonTypesInfo.forEach((i) => {
-    buttonTypesMap.set(i.key, i);
-});
-
-const buttonTypesOptions = buttonTypesInfo.map(({ icon, key, label }) => {
-    return { icon, key, label };
-});
 
 const { RangePicker } = DatePicker;
 
@@ -102,6 +66,9 @@ const validDate = (feat, r) => {
 const datatype = "DATE"
 const dateFormat = 'YYYY-MM-DD';
 
+const msgAllObject = gettext("Add all layer objects");
+const msgSuccessDataLoaded = gettext("Data loaded");
+const msgNoDataAvailable = gettext("No data available");
 
 const getDefaultStyle = () => {
     var dataStyle = new Style({
@@ -274,19 +241,10 @@ export const FilterByField = ({
         }
     };
 
-
-    const buttonTypesMenuItems: MenuProps = {
-        items: buttonTypesOptions,
-        onClick: (item) => {
-            console.log(item);
-            
-        },
-    };
-
     return (
         <>
             {contextHolder}
-            {/* <Dropdown
+            <Dropdown
                 dropdownRender={() => (
                     <>
                         {dateType ?
@@ -349,14 +307,7 @@ export const FilterByField = ({
                         <History />
                     </Space>
                 </Button>
-            </Dropdown> */}
-            <Dropdown menu={buttonTypesMenuItems}>
-            <Button size={size}>
-                <Space>
-                    <History />
-                </Space>
-            </Button>
-        </Dropdown>
+            </Dropdown>
         </>
     );
 };
