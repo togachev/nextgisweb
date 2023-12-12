@@ -418,7 +418,6 @@ define([
                                             "layer_style_id": resourceId,
                                             "layer_enabled": true,
                                             "layer_identifiable": true,
-                                            "layer_filter_by_data": false,
                                             "layer_transparency": null,
                                             "layer_min_scale_denom": null,
                                             "layer_max_scale_denom": null,
@@ -495,10 +494,6 @@ define([
                                 widget.wdgtItemLayerIdentifiable.set(
                                     "checked",
                                     widget.getItemValue("layer_identifiable")
-                                );
-                                widget.wdgtItemLayerFilterByData.set(
-                                    "checked",
-                                    widget.getItemValue("layer_filter_by_data")
                                 );
                                 widget.wLayerTransparency.set(
                                     "value",
@@ -580,13 +575,6 @@ define([
                     "checked",
                     function (attr, oldValue, newValue) {
                         widget.setItemValue("layer_identifiable", newValue);
-                    }
-                );
-
-                this.wdgtItemLayerFilterByData.watch(
-                    "checked",
-                    function (attr, oldValue, newValue) {
-                        widget.setItemValue("layer_filter_by_data", newValue);
                     }
                 );
 
@@ -680,10 +668,6 @@ define([
                         layer_identifiable: store.getValue(
                             itm,
                             "layer_identifiable"
-                        ),
-                        layer_filter_by_data: store.getValue(
-                            itm,
-                            "layer_filter_by_data"
                         ),
                         layer_transparency: store.getValue(
                             itm,

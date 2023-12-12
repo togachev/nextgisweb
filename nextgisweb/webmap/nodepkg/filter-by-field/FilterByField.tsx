@@ -7,13 +7,16 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import moment from "moment";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type { DojoDisplay, WebmapItem } from "../type";
-import type WebmapStore from "../store";
+import type { DojoDisplay, WebmapItem } from "../type/index.ts";
+import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
+import type WebmapStore from "../store/index.ts";
 
 import History from "@nextgisweb/icon/material/history";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import CenterFocusWeak from "@nextgisweb/icon/material/center_focus_weak";
 import DeleteObject from "@nextgisweb/icon/material/delete_forever";
+
+import "./FilterByField.less";
 
 import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
 
@@ -21,7 +24,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 import VectorSource from "ol/source/Vector";
 
-interface FilterByDataBtnProps {
+interface FilterByFieldBtnProps {
     nodeData: WebmapItem;
     display: DojoDisplay;
     store: WebmapStore;
@@ -112,18 +115,15 @@ const error = (messageApi) => {
     });
 };
 
-export const FilterByData = ({
+export const FilterByField = ({
     nodeData,
     display,
     store,
     size = "middle",
-}: FilterByDataBtnProps) => {
-    const { id, layerId, filter_by_data } = nodeData;
+}: FilterByFieldBtnProps) => {
+    const { id, layerId } = nodeData;
 
-    const [dateType, setDateType] = useState<{ layerId: number; status: boolean }>({
-        layerId: layerId,
-        salary: false,
-    });
+    const [dateType, setDateType] = useState<boolean>(false);
 
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
@@ -133,12 +133,10 @@ export const FilterByData = ({
     const [messageApi, contextHolder] = message.useMessage();
     const [checked, setChecked] = useState<boolean>(false);
 
-    if (!filter_by_data) { return };
-
     const dataTypeCheck = async () => {
-        const fields = await route('resource.item', layerId).get();
-        if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
-            setDateType({ layerId: layerId, status: true })
+        const fields = await route('feature_layer.field', layerId).get<FeatureLayerField>({ id: layerId });
+        if (fields.find(item => item.datatype === datatype)) {
+            setDateType(true)
         }
     };
 
@@ -171,7 +169,7 @@ export const FilterByData = ({
     };
 
     const map = display.map.olMap;
-    const customLayer = display.map.layers.FilterByDataLayer.olLayer;
+    const customLayer = display.map.layers.FilterByFieldLayer.olLayer;
     customLayer.setZIndex(1000);
     customLayer.setStyle(getDefaultStyle);
 
@@ -249,53 +247,58 @@ export const FilterByData = ({
             <Dropdown
                 dropdownRender={() => (
                     <>
-                        <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
-                            <RangePicker
-                                allowClear={false}
-                                defaultValue={valueStart}
-                                disabledDate={disabledDate}
-                                onOpenChange={onOpenChangeRange}
-                                onChange={onChangeRangePicker}
-                            />
-                            <Button
-                                className="button-style"
-                                type="text"
-                                title={msgAllObject}
-                                onClick={addAllObject}
-                                icon={<ZoomInMap />}
-                            />
-                            {
-                                visible ?
+                        {dateType ?
+                            <>
+                                <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
+                                    <RangePicker
+                                        allowClear={false}
+                                        defaultValue={valueStart}
+                                        disabledDate={disabledDate}
+                                        onOpenChange={onOpenChangeRange}
+                                        onChange={onChangeRangePicker}
+                                    />
                                     <Button
                                         className="button-style"
                                         type="text"
-                                        title={msgAddFeature}
-                                        onClick={zoomToObject}
-                                        icon={<CenterFocusWeak />}
-                                    /> : <></>
-                            }
-                            {
-                                visible ?
-                                    <Checkbox
-                                        checked={checked}
-                                        className="button-style"
-                                        defaultChecked={false}
-                                        onChange={onChange}
-                                        title={label}
-                                    /> : <></>
-                            }
-                            {
-                                visible ?
-                                    <Button
-                                        className="button-style"
-                                        type="text"
-                                        title={msgClearObjectsMap}
-                                        onClick={clearObject}
-                                        icon={<DeleteObject />}
-                                    /> : <></>
-                            }
-                        </span>
-                        {store.checked.includes(nodeData.id) ? <></> : <InfoCard />}
+                                        title={msgAllObject}
+                                        onClick={addAllObject}
+                                        icon={<ZoomInMap />}
+                                    />
+                                    {
+                                        visible ?
+                                            <Button
+                                                className="button-style"
+                                                type="text"
+                                                title={msgAddFeature}
+                                                onClick={zoomToObject}
+                                                icon={<CenterFocusWeak />}
+                                            /> : <></>
+                                    }
+                                    {
+                                        visible ?
+                                            <Checkbox
+                                                checked={checked}
+                                                className="button-style"
+                                                defaultChecked={false}
+                                                onChange={onChange}
+                                                title={label}
+                                            /> : <></>
+                                    }
+                                    {
+                                        visible ?
+                                            <Button
+                                                className="button-style"
+                                                type="text"
+                                                title={msgClearObjectsMap}
+                                                onClick={clearObject}
+                                                icon={<DeleteObject />}
+                                            /> : <></>
+                                    }
+                                </span>
+                                {store.checked.includes(nodeData.id) ? <></> : <InfoCard />}
+                            </>
+                            : null}
+
                     </>
                 )}
             >

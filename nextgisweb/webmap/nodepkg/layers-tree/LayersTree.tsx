@@ -13,7 +13,6 @@ import type { DojoDisplay } from "../type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
-import { FilterByData } from "./FilterByData";
 import { Desc } from "./Desc";
 import { DropdownFile } from "./DropdownFile";
 import { Legend, LegendAction } from "./Legend";
@@ -167,8 +166,6 @@ export const LayersTree = observer(
 
             let actions;
             if (shouldActions) {
-
-
                 const dropdownAction = showDropdown && (
                     <DropdownActions
                         nodeData={nodeData.treeItem}
@@ -177,15 +174,6 @@ export const LayersTree = observer(
                         moreClickId={moreClickId}
                         update={update}
                         setUpdate={setUpdate}
-                    />
-                );
-                const dropdownFilterByData = showDropdown && (
-                    <FilterByData
-                        nodeData={nodeData.treeItem}
-                        setFilterByDataClickId={setFilterByDataClickId}
-                        filterByDataClickId={filterByDataClickId}
-                        display={display}
-                        store={store}
                     />
                 );
                 const dropdownFile = showDropdown && (
@@ -208,7 +196,6 @@ export const LayersTree = observer(
                                 descClickId={descClickId}
                             />) :
                             null}
-                        {dropdownFilterByData}
                         {dropdownFile}
                         {dropdownAction}
                     </Col>

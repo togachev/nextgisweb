@@ -14,11 +14,11 @@ define([
         _overlay: null,
         _zIndex: 1000,
 
-        constructor: function (map, FilterByDataLayerStyle) {
+        constructor: function (map, FilterByFieldLayerStyle) {
             this._map = map;
             this._zIndex = this._zIndex + map.layers.length;
-            this._overlay = new VectorImage("FilterByDataLayer", {
-                title: "FilterByDataLayer",
+            this._overlay = new VectorImage("FilterByFieldLayer", {
+                title: "FilterByFieldLayer",
             });
             this._overlay.olLayer.setZIndex(this._zIndex);
             this._source = this._overlay.olLayer.getSource();

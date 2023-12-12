@@ -330,7 +330,7 @@ define([
                         widget.featureHighlighterDiagram = new FeatureHighlighterDiagram(
                             this.map
                         );
-                        widget.filterByDataLayer = new VectorImage(
+                        widget.FilterByFieldLayer = new VectorImage(
                             this.map
                         );
                     })

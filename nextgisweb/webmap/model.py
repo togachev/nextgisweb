@@ -156,10 +156,6 @@ def _layer_identifiable_default(context):
     if context.get_current_parameters()["item_type"] == "layer":
         return True
 
-def _layer_filter_by_data_default(context):
-    if context.get_current_parameters()["item_type"] == "layer":
-        return False
-
 class WebMapItem(Base):
     __tablename__ = "webmap_item"
 
@@ -172,7 +168,6 @@ class WebMapItem(Base):
     layer_style_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
     layer_enabled = db.Column(db.Boolean, nullable=True, default=_layer_enabled_default)
     layer_identifiable = db.Column(db.Boolean, nullable=True, default=_layer_identifiable_default)
-    layer_filter_by_data = db.Column(db.Boolean, nullable=True, default=_layer_filter_by_data_default)
     layer_transparency = db.Column(db.Float, nullable=True)
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
@@ -219,7 +214,6 @@ class WebMapItem(Base):
             data.update(
                 layer_enabled=self.layer_enabled,
                 layer_identifiable=self.layer_identifiable,
-                layer_filter_by_data=self.layer_filter_by_data,
                 layer_transparency=self.layer_transparency,
                 layer_style_id=self.layer_style_id,
                 layer_min_scale_denom=self.layer_min_scale_denom,
@@ -246,7 +240,6 @@ class WebMapItem(Base):
             "group_expanded",
             "layer_enabled",
             "layer_identifiable",
-            "layer_filter_by_data",
             "layer_adapter",
             "layer_style_id",
             "layer_transparency",
@@ -285,7 +278,6 @@ class WebMapItem(Base):
                 for k in (
                     "layer_enabled",
                     "layer_identifiable",
-                    "layer_filter_by_data",
                     "layer_transparency",
                     "layer_min_scale_denom",
                     "layer_max_scale_denom",

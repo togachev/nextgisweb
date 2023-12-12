@@ -173,7 +173,6 @@ def display(obj, request):
                 legend_symbols = request.route_url('render.legend_symbols', id=style.id),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
-                filter_by_data=item.layer_filter_by_data,
                 transparency=item.layer_transparency,
                 minScaleDenom=item.layer_min_scale_denom,
                 maxScaleDenom=item.layer_max_scale_denom,
