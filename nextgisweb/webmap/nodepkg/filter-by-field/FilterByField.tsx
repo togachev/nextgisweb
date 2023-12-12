@@ -248,7 +248,7 @@ export const FilterByField = ({
                 dropdownRender={() => (
                     <>
                         {dateType ?
-                            <>
+                            <div>
                                 <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
                                     <RangePicker
                                         allowClear={false}
@@ -257,13 +257,17 @@ export const FilterByField = ({
                                         onOpenChange={onOpenChangeRange}
                                         onChange={onChangeRangePicker}
                                     />
+
+
+                                </span>
+                                <span>
                                     <Button
                                         className="button-style"
                                         type="text"
                                         title={msgAllObject}
                                         onClick={addAllObject}
                                         icon={<ZoomInMap />}
-                                    />
+                                    >AllObject</Button>
                                     {
                                         visible ?
                                             <Button
@@ -272,7 +276,7 @@ export const FilterByField = ({
                                                 title={msgAddFeature}
                                                 onClick={zoomToObject}
                                                 icon={<CenterFocusWeak />}
-                                            /> : <></>
+                                            >AddFeature</Button> : <></>
                                     }
                                     {
                                         visible ?
@@ -282,7 +286,7 @@ export const FilterByField = ({
                                                 defaultChecked={false}
                                                 onChange={onChange}
                                                 title={label}
-                                            /> : <></>
+                                            >Layer</Checkbox> : <></>
                                     }
                                     {
                                         visible ?
@@ -292,13 +296,12 @@ export const FilterByField = ({
                                                 title={msgClearObjectsMap}
                                                 onClick={clearObject}
                                                 icon={<DeleteObject />}
-                                            /> : <></>
+                                            >ClearObjectsMap</Button> : <></>
                                     }
+                                    {store.checked.includes(nodeData.id) ? <></> : <InfoCard />}
                                 </span>
-                                {store.checked.includes(nodeData.id) ? <></> : <InfoCard />}
-                            </>
+                            </div>
                             : null}
-
                     </>
                 )}
             >
