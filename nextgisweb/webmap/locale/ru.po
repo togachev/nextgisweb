@@ -6,65 +6,70 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:477 amd/ngw-webmap/tool/Zoom.js:14
+#: amd/ngw-webmap/Display.js:487 amd/ngw-webmap/tool/Zoom.js:14
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:503
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:478 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:488 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:482 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
+#: amd/ngw-webmap/Display.js:492 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:498 amd/ngw-webmap/template/ExtentWidget.hbs:12
+#: amd/ngw-webmap/Display.js:508 amd/ngw-webmap/template/ExtentWidget.hbs:12
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:503
+#: amd/ngw-webmap/Display.js:513
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:506 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
+#: amd/ngw-webmap/Display.js:516 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:929 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
+#: amd/ngw-webmap/Display.js:940 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
+#: amd/ngw-webmap/Display.js:941 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:958 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:969 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:968
+#: amd/ngw-webmap/Display.js:979
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:978
+#: amd/ngw-webmap/Display.js:989
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:992
+#: amd/ngw-webmap/Display.js:1003
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1009 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1020 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: nodepkg/panel/description/DescriptionPanel.js:8
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1027
+#: amd/ngw-webmap/Display.js:1035
+msgid "Diagram"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:1056
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1079
+#: amd/ngw-webmap/Display.js:1108
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -159,6 +164,10 @@ msgstr "Завершить редактирование"
 msgid "Edit"
 msgstr "Редактировать"
 
+#: amd/ngw-webmap/plugin/StyleSettings.js:20
+msgid "Style settings"
+msgstr "Настройки стиля"
+
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -239,10 +248,6 @@ msgstr "Включен"
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:80
-msgid "FilterByData"
-msgstr "Фильтрация по дате"
-
 #: amd/ngw-webmap/template/ItemWidget.hbs:87
 msgid "Transparency"
 msgstr "Прозрачность"
@@ -267,19 +272,19 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:277
+#: amd/ngw-webmap/tool/Identify.js:291
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:289
+#: amd/ngw-webmap/tool/Identify.js:303
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: amd/ngw-webmap/tool/Identify.js:378 amd/ngw-webmap/tool/Identify.js:394
+#: amd/ngw-webmap/tool/Identify.js:392 amd/ngw-webmap/tool/Identify.js:412
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:538
+#: amd/ngw-webmap/tool/Identify.js:739
 msgid "Features"
 msgstr "Объектов"
 
@@ -329,17 +334,9 @@ msgid "Cancel"
 msgstr "Отменить"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:119
-#: nodepkg/panel/DiagramPanel.js:15
+#: nodepkg/panel/diagram/DiagramPanel.js:19
 msgid "Delete"
 msgstr "Удалить"
-
-#: nodepkg/panel/DiagramPanel.js:19
-msgid "To select objects, press and hold the CTRL key"
-msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
-
-#: nodepkg/panel/DiagramPanel.js:19
-msgid "The calculation is performed for the last selected object"
-msgstr "Рассчет производится для последнего выделенного объекта"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
 msgid "Create as public"
@@ -352,38 +349,6 @@ msgstr "Создать как приватную"
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
 msgid "Create"
 msgstr "Создать"
-
-#: nodepkg/panel/DiagramPanel.js:15
-msgid "Diagrams"
-msgstr "Диаграммы"
-
-#: nodepkg/panel/DiagramPanel.js:16
-msgid "Rebuild"
-msgstr "Перестроить"
-
-#: nodepkg/panel/DiagramPanel.js:17
-msgid "Forecasting"
-msgstr "Прогнозирование"
-
-#: nodepkg/panel/DiagramPanel.js:17
-msgid "Recovery"
-msgstr "Восстановление"
-
-#: nodepkg/panel/DiagramPanel.js:17
-msgid "Count of trajectories"
-msgstr "Количество траекторий"
-
-#: nodepkg/panel/DiagramPanel.js:17
-msgid "Prediction and recovery"
-msgstr "Прогнозирование и восстановление"
-
-#: nodepkg/panel/DiagramPanel.js:17
-msgid "Graphs based on static data"
-msgstr "Графики на основе статических данных"
-
-#: nodepkg/panel/DiagramPanel.js:17
-msgid "Build"
-msgstr "Построить"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:255
 msgid "Create annotation"
@@ -444,7 +409,7 @@ msgstr "Открыть карту целиком"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:34 model.py:53 view.py:307 view.py:345
+#: model.py:34 model.py:53 view.py:360 view.py:408
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -468,13 +433,53 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:323
+#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:376
 msgid "Clone"
 msgstr "Клонировать"
 
 #: nodepkg/clone-webmap/CloneWebmap.tsx:60
 msgid "Resource group"
 msgstr "Группа ресурсов"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:39
+msgid "Select date range"
+msgstr "Выберите диапазон дат"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:40
+msgid "Filter layer by date"
+msgstr "Фильтр слоя по дате"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:41
+msgid "Turn on a layer to get information about an object"
+msgstr "Включите слой для получения информации об объекте"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:42
+msgid "Show layer objects"
+msgstr "Показать объекты слоя"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:43
+msgid "Hide layer objects"
+msgstr "Скрыть объекты слоя"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:44
+msgid "Zoom to object(s)"
+msgstr "Увеличить до объекта(ов)"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:45
+msgid "Clear objects on the map"
+msgstr "Очистить объекты на карте"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:46
+msgid "Add all layer objects"
+msgstr "Добавить все объекты слоя"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:47
+msgid "Data loaded"
+msgstr "Данные загружены"
+
+#: nodepkg/filter-by-field/FilterByField.tsx:48
+msgid "No data available"
+msgstr "Данные отсутствуют"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:47
 msgid "Circle"
@@ -527,7 +532,7 @@ msgstr "Остановить рисование"
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/layers-tree/DropdownActions.js:8
+#: nodepkg/layers-tree/DropdownActions.tsx:11
 msgid "Additional tools"
 msgstr "Дополнительные инструменты"
 
@@ -539,27 +544,19 @@ msgstr "Скачать прикрепленные файлы"
 msgid "Zoom to feature layer"
 msgstr "Увеличить до объекта слоя"
 
-#: nodepkg/layers-tree/Legend.js:8
+#: nodepkg/layers-tree/Legend.tsx:12
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/Legend.js:9
+#: nodepkg/layers-tree/Legend.tsx:13
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/layers-tree/ParseDesc.js:8
-msgid "Style"
-msgstr ""
-
-#: nodepkg/layers-tree/ParseDesc.js:9
-msgid "Layer resource"
-msgstr ""
-
-#: nodepkg/map-viewer-info/MapViewerInfo.js:123
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:87
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:122
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
@@ -615,6 +612,46 @@ msgstr "Мои приватные аннотации"
 #: nodepkg/panel/annotations/AnnotationsPanel.js:198
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:16
+msgid "Diagrams"
+msgstr "Диаграммы"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:17
+msgid "Build"
+msgstr "Построить"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:18
+msgid "Rebuild"
+msgstr "Перестроить"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:20
+msgid "The calculation is performed for the last selected object"
+msgstr "Рассчет производится для последнего выделенного объекта"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:21
+msgid "To select objects, press and hold the CTRL key"
+msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:22
+msgid "Forecasting"
+msgstr "Прогнозирование"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:23
+msgid "Recovery"
+msgstr "Восстановление"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:24
+msgid "Count of trajectories"
+msgstr "Количество траекторий"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:25
+msgid "Prediction and recovery"
+msgstr "Прогнозирование и восстановление"
+
+#: nodepkg/panel/diagram/DiagramPanel.js:26
+msgid "Graphs based on static data"
+msgstr "Графики на основе статических данных"
 
 #: nodepkg/panel/layers/LayersDropdown.js:12
 msgid "Zoom to all layers"
@@ -914,27 +951,27 @@ msgstr "Nominatim (OSM)"
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: nodepkg/utils/format-units.js:12
+#: nodepkg/utils/format-units.tsx:13
 msgid "m"
 msgstr "м"
 
-#: nodepkg/utils/format-units.js:13
+#: nodepkg/utils/format-units.tsx:14
 msgid "km"
 msgstr "км"
 
-#: nodepkg/utils/format-units.js:14
+#: nodepkg/utils/format-units.tsx:15
 msgid "ft"
 msgstr "фут"
 
-#: nodepkg/utils/format-units.js:15
+#: nodepkg/utils/format-units.tsx:16
 msgid "mi"
 msgstr "миля"
 
-#: nodepkg/utils/format-units.js:16
+#: nodepkg/utils/format-units.tsx:17
 msgid "ha"
 msgstr "га"
 
-#: nodepkg/utils/format-units.js:17
+#: nodepkg/utils/format-units.tsx:18
 msgid "ac"
 msgstr "акр"
 
@@ -962,7 +999,7 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:22
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:23
 msgid "Go to"
 msgstr "Перейти"
 
@@ -973,46 +1010,6 @@ msgstr "Загрузка"
 #: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.tsx:21
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Clear objects on the map"
-msgstr "Очистить объекты на карте"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Add all layer objects"
-msgstr "Добавить все объекты слоя"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Filter layer by date"
-msgstr "Фильтр слоя по дате"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Hide layer filter by date"
-msgstr "Скрыть фильтр слоя по дате"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Show layer objects"
-msgstr "Показать объекты слоя"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Hide layer objects"
-msgstr "Скрыть объекты слоя"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Data loaded"
-msgstr "Данные загружены"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "No data available"
-msgstr "Данные отсутствуют"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Turn on a layer to get information about an object"
-msgstr "Включите слой для получения информации об объекте"
-
-#: nodepkg/layers-tree/FilterByData.js:25
-msgid "Zoom to object(s)"
-msgstr "Увеличить до объекта(ов)"
 
 #: template/invalid_origin.mako:3
 msgid "Web map embedding is not allowed for %s in the Web GIS settings."
@@ -1046,29 +1043,32 @@ msgstr ""
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:257
+#: view.py:291
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:270
+#: view.py:304
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:313
+#: view.py:326
+msgid "Setting up a web map group"
+msgstr ""
+
+#: view.py:366
 msgid "Display"
 msgstr "Открыть"
 
-#: view.py:355
+#: view.py:385
 msgid "Group setting"
 msgstr "Настройка группы"
 
 #~ msgid "Map"
 #~ msgstr "Карта"
 
-#: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
-msgid "Zoom to layer"
-msgstr "Увеличить до слоя"
+#~ msgid "FilterByData"
+#~ msgstr "Фильтрация по дате"
 
-#: amd/ngw-webmap/plugin/SettingsStyle.js:20
-msgid "Style settings"
-msgstr "Настройки стиля"
+#~ msgid "Hide layer filter by date"
+#~ msgstr "Скрыть фильтр слоя по дате"
+

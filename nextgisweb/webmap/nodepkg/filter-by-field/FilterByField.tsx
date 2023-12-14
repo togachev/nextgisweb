@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api/route";
-import { Button, Dropdown, Space, DatePicker, Checkbox, message, Card } from "@nextgisweb/gui/antd";
+import { Button, Dropdown, Space, DatePicker, Checkbox, message, Card, Tooltip } from "@nextgisweb/gui/antd";
 import { Balancer } from "react-wrap-balancer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import moment from "moment";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type { DojoDisplay, WebmapItem } from "../type/index.ts";
+import type { DojoDisplay } from "../type/index.ts";
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
 import type WebmapStore from "../store/index.ts";
 
 import History from "@nextgisweb/icon/material/history";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import CenterFocusWeak from "@nextgisweb/icon/material/center_focus_weak";
-import DeleteObject from "@nextgisweb/icon/material/delete_forever";
+import CloseIcon from "@nextgisweb/icon/material/close/outline";
 
 import "./FilterByField.less";
 
@@ -24,21 +24,28 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 import VectorSource from "ol/source/Vector";
 
+const { RangePicker } = DatePicker;
+
 interface FilterByFieldBtnProps {
-    nodeData: WebmapItem;
+    id: number;
     display: DojoDisplay;
     store: WebmapStore;
     size?: SizeType;
 }
 
+const datatype = "DATE"
+const dateFormat = 'YYYY-MM-DD';
+
+const msgRangePicker = gettext("Select date range");
 const msgShowLayerFilterByDate = gettext("Filter layer by date");
 const msgInfo = gettext("Turn on a layer to get information about an object");
 const msgShowLayerObjects = gettext("Show layer objects");
 const msgHideLayerObjects = gettext("Hide layer objects");
 const msgAddFeature = gettext("Zoom to object(s)");
 const msgClearObjectsMap = gettext("Clear objects on the map");
-
-const { RangePicker } = DatePicker;
+const msgAllObject = gettext("Add all layer objects");
+const msgSuccessDataLoaded = gettext("Data loaded");
+const msgNoDataAvailable = gettext("No data available");
 
 const InfoCard = () => (
     <Card size="small">
@@ -61,14 +68,6 @@ const validDate = (feat, r) => {
         }
     }
 }
-
-
-const datatype = "DATE"
-const dateFormat = 'YYYY-MM-DD';
-
-const msgAllObject = gettext("Add all layer objects");
-const msgSuccessDataLoaded = gettext("Data loaded");
-const msgNoDataAvailable = gettext("No data available");
 
 const getDefaultStyle = () => {
     var dataStyle = new Style({
@@ -99,8 +98,6 @@ const getDefaultStyle = () => {
     return dataStyle;
 }
 
-
-
 const success = (messageApi) => {
     messageApi.open({
         type: 'success',
@@ -116,15 +113,12 @@ const error = (messageApi) => {
 };
 
 export const FilterByField = ({
-    nodeData,
+    id,
     display,
     store,
     size = "middle",
 }: FilterByFieldBtnProps) => {
-    const { id, layerId } = nodeData;
-
     const [dateType, setDateType] = useState<boolean>(false);
-
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
     const [status, setStatus] = useState<boolean>(false);
@@ -134,21 +128,21 @@ export const FilterByField = ({
     const [checked, setChecked] = useState<boolean>(false);
 
     const dataTypeCheck = async () => {
-        const fields = await route('feature_layer.field', layerId).get<FeatureLayerField>({ id: layerId });
+        const fields = await route('feature_layer.field', id).get<FeatureLayerField>({ id: id });
         if (fields.find(item => item.datatype === datatype)) {
             setDateType(true)
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         dataTypeCheck()
     }, []);
 
     const startValue = async () => {
-        const fields = await route('resource.item', layerId).get();
+        const fields = await route('resource.item', id).get();
         if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
             const query = { geom: 'no', extensions: 'no', order_by: 'data' }
-            const item = await route('feature_layer.feature.collection', layerId).get({ query });
+            const item = await route('feature_layer.feature.collection', id).get({ query });
             let date = [validDate(item, 0), validDate(item, 1)];
             setValueStart([parseNgwAttribute("DATE", date[0]), parseNgwAttribute("DATE", date[1])]);
         }
@@ -178,7 +172,7 @@ export const FilterByField = ({
             customLayer.setSource(new VectorSource({
                 format: new GeoJSON()
             }))
-            customLayer.getSource().setUrl(routeURL("feature_layer.geojson_filter_by_data", layerId, value[0], value[1]));
+            customLayer.getSource().setUrl(routeURL("feature_layer.geojson_filter_by_data", id, value[0], value[1]));
             return customLayer
         }
     };
@@ -230,10 +224,8 @@ export const FilterByField = ({
         setChecked(e.target.checked);
     };
 
-    const label = `${checked ? msgHideLayerObjects : msgShowLayerObjects}`;
-
     const zoomToObject = () => {
-        let extent = customLayer.getSource().getExtent();
+        const extent = customLayer.getSource().getExtent();
         if (!isFinite(extent[0])) {
             return
         } else {
@@ -241,15 +233,19 @@ export const FilterByField = ({
         }
     };
 
+    const label = `${checked ? msgHideLayerObjects : msgShowLayerObjects}`;
+
     return (
         <>
             {contextHolder}
             <Dropdown
+                overlayClassName="filter-by-field-menu"
+                trigger={['click']}
                 dropdownRender={() => (
                     <>
                         {dateType ?
-                            <div>
-                                <span className="date-picker-panel" onClick={(e) => { e.stopPropagation(); }}>
+                            <div className="menu-filter">
+                                <Tooltip title={msgRangePicker}>
                                     <RangePicker
                                         allowClear={false}
                                         defaultValue={valueStart}
@@ -257,49 +253,49 @@ export const FilterByField = ({
                                         onOpenChange={onOpenChangeRange}
                                         onChange={onChangeRangePicker}
                                     />
-
-
-                                </span>
-                                <span>
+                                </Tooltip>
+                                <Tooltip title={msgAllObject}>
                                     <Button
-                                        className="button-style"
+                                    className="button-all-obj"
                                         type="text"
-                                        title={msgAllObject}
                                         onClick={addAllObject}
                                         icon={<ZoomInMap />}
-                                    >AllObject</Button>
+                                    />
+                                </Tooltip>
+                                <div className="button-list">
                                     {
                                         visible ?
                                             <Button
                                                 className="button-style"
                                                 type="text"
-                                                title={msgAddFeature}
                                                 onClick={zoomToObject}
                                                 icon={<CenterFocusWeak />}
-                                            >AddFeature</Button> : <></>
+                                            >{msgAddFeature}</Button>
+                                            : <></>
                                     }
                                     {
                                         visible ?
                                             <Checkbox
                                                 checked={checked}
-                                                className="button-style"
+                                                className="button-style layer-visible"
                                                 defaultChecked={false}
                                                 onChange={onChange}
                                                 title={label}
-                                            >Layer</Checkbox> : <></>
+                                            >{label}</Checkbox>
+                                            : <></>
                                     }
                                     {
                                         visible ?
                                             <Button
                                                 className="button-style"
                                                 type="text"
-                                                title={msgClearObjectsMap}
                                                 onClick={clearObject}
-                                                icon={<DeleteObject />}
-                                            >ClearObjectsMap</Button> : <></>
+                                                icon={<CloseIcon />}
+                                            >{msgClearObjectsMap}</Button>
+                                            : <></>
                                     }
-                                    {store.checked.includes(nodeData.id) ? <></> : <InfoCard />}
-                                </span>
+                                    {store.checked.includes(display.item.id[0]) ? <></> : <InfoCard />}
+                                </div>
                             </div>
                             : null}
                     </>
@@ -310,7 +306,7 @@ export const FilterByField = ({
                         <History />
                     </Space>
                 </Button>
-            </Dropdown>
+            </Dropdown >
         </>
     );
 };
