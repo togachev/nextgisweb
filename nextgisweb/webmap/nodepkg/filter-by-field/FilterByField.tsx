@@ -55,13 +55,13 @@ const InfoCard = () => (
 
 const validDate = (feat, r) => {
     if (r == 0) {
-        if (feat[r].fields.data !== null & feat[r].fields.data !== undefined) {
+        if (!!feat[r].fields.data) {
             return feat[r].fields.data;
         } else {
             return validDate(feat, r + 1);
         }
     } else {
-        if (feat.at(-r).fields.data !== null & feat.at(-r).fields.data !== undefined) {
+        if (!!feat.at(-r).fields.data) {
             return feat.at(-r).fields.data;
         } else {
             return validDate(feat, r + 1);
@@ -75,22 +75,8 @@ const getDefaultStyle = () => {
             color: "rgba(255,255,0,0.5)",
             width: 12
         }),
-        image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'pixels',
-            stroke: new Stroke({
-                color: "rgba(255,255,0,0.5)",
-                width: 12
-            }),
-            radius: 4,
-            fill: new Stroke({
-                width: 1,
-                color: 'rgba(16,106,144,0.5)'
-            }),
-        }),
         fill: new Fill({
-            color: "rgba(255,255,0,0.5)",
+            color: "rgba(255,255,0,0.2)",
             width: 12
         })
     });
@@ -209,6 +195,7 @@ export const FilterByField = ({
             setStatus(true)
             setChecked(true);
         }
+        
     }
 
     const clearObject = () => {
@@ -216,7 +203,7 @@ export const FilterByField = ({
         display._zoomToInitialExtent();
         setStatus(false)
         setChecked(false);
-        setVisible(false)
+        setVisible(false);
     };
 
     const onChange = (e) => {
@@ -247,7 +234,7 @@ export const FilterByField = ({
                             <div className="menu-filter">
                                 <Tooltip title={msgRangePicker}>
                                     <RangePicker
-                                        allowClear={false}
+                                        // allowClear={false}
                                         defaultValue={valueStart}
                                         disabledDate={disabledDate}
                                         onOpenChange={onOpenChangeRange}
