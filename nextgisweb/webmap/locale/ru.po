@@ -453,25 +453,9 @@ msgstr "Фильтр слоя по дате"
 msgid "Turn on a layer to get information about an object"
 msgstr "Включите слой для получения информации об объекте"
 
-#: nodepkg/filter-by-field/FilterByField.tsx:42
-msgid "Show layer objects"
-msgstr "Показать объекты слоя"
-
-#: nodepkg/filter-by-field/FilterByField.tsx:43
-msgid "Hide layer objects"
-msgstr "Скрыть объекты слоя"
-
 #: nodepkg/filter-by-field/FilterByField.tsx:44
 msgid "Zoom to object(s)"
 msgstr "Увеличить до объекта(ов)"
-
-#: nodepkg/filter-by-field/FilterByField.tsx:45
-msgid "Clear objects on the map"
-msgstr "Очистить объекты на карте"
-
-#: nodepkg/filter-by-field/FilterByField.tsx:46
-msgid "Add all layer objects"
-msgstr "Добавить все объекты слоя"
 
 #: nodepkg/filter-by-field/FilterByField.tsx:47
 msgid "Data loaded"

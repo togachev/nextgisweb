@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api/route";
-import { Button, Dropdown, Space, DatePicker, Checkbox, message, Card, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Dropdown, Space, DatePicker, message, Card, Tooltip } from "@nextgisweb/gui/antd";
 import { Balancer } from "react-wrap-balancer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import moment from "moment";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { DojoDisplay } from "../type/index.ts";
@@ -12,16 +10,13 @@ import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
 import type WebmapStore from "../store/index.ts";
 
 import History from "@nextgisweb/icon/material/history";
-import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import CenterFocusWeak from "@nextgisweb/icon/material/center_focus_weak";
-import CloseIcon from "@nextgisweb/icon/material/close/outline";
 
 import "./FilterByField.less";
 
 import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
 
 import GeoJSON from "ol/format/GeoJSON";
-import { Circle, Fill, Stroke, Style } from 'ol/style';
 import VectorSource from "ol/source/Vector";
 
 const { RangePicker } = DatePicker;
@@ -34,16 +29,11 @@ interface FilterByFieldBtnProps {
 }
 
 const datatype = "DATE"
-const dateFormat = 'YYYY-MM-DD';
 
 const msgRangePicker = gettext("Select date range");
 const msgShowLayerFilterByDate = gettext("Filter layer by date");
 const msgInfo = gettext("Turn on a layer to get information about an object");
-const msgShowLayerObjects = gettext("Show layer objects");
-const msgHideLayerObjects = gettext("Hide layer objects");
 const msgAddFeature = gettext("Zoom to object(s)");
-const msgClearObjectsMap = gettext("Clear objects on the map");
-const msgAllObject = gettext("Add all layer objects");
 const msgSuccessDataLoaded = gettext("Data loaded");
 const msgNoDataAvailable = gettext("No data available");
 
@@ -67,21 +57,6 @@ const validDate = (feat, r) => {
             return validDate(feat, r + 1);
         }
     }
-}
-
-const getDefaultStyle = () => {
-    var dataStyle = new Style({
-        stroke: new Stroke({
-            color: "rgba(255,255,0,0.5)",
-            width: 12
-        }),
-        fill: new Fill({
-            color: "rgba(255,255,0,0.2)",
-            width: 12
-        })
-    });
-
-    return dataStyle;
 }
 
 const success = (messageApi) => {
@@ -111,7 +86,6 @@ export const FilterByField = ({
     const [open, setOpen] = useState();
     const [visible, setVisible] = useState<boolean>(false);
     const [messageApi, contextHolder] = message.useMessage();
-    const [checked, setChecked] = useState<boolean>(false);
 
     const dataTypeCheck = async () => {
         const fields = await route('feature_layer.field', id).get<FeatureLayerField>({ id: id });
@@ -142,16 +116,8 @@ export const FilterByField = ({
         return current && current < valueStart[0] || current && current > valueStart[1];
     };
 
-    const addAllObject = () => {
-        setValue([moment(valueStart[0].toString()).format(dateFormat), moment(valueStart[1].toString()).format(dateFormat)])
-        setStatus(true)
-        setChecked(true);
-    };
-
     const map = display.map.olMap;
     const customLayer = display.map.layers.FilterByFieldLayer.olLayer;
-    customLayer.setZIndex(1000);
-    customLayer.setStyle(getDefaultStyle);
 
     const setProps = async () => {
         if (!value.includes['']) {
@@ -162,6 +128,8 @@ export const FilterByField = ({
             return customLayer
         }
     };
+
+    const featureCount = customLayer.getSource().getFeatures().length;
 
     useEffect(() => {
         if (status == true && !open) {
@@ -193,7 +161,9 @@ export const FilterByField = ({
         if (item) {
             setValue(dateString);
             setStatus(true)
-            setChecked(true);
+        }
+        if (!item) {
+            clearObject();
         }
         
     }
@@ -202,13 +172,8 @@ export const FilterByField = ({
         customLayer.getSource().clear();
         display._zoomToInitialExtent();
         setStatus(false)
-        setChecked(false);
         setVisible(false);
-    };
-
-    const onChange = (e) => {
-        customLayer.setVisible(e.target.checked)
-        setChecked(e.target.checked);
+        startValue();
     };
 
     const zoomToObject = () => {
@@ -220,33 +185,23 @@ export const FilterByField = ({
         }
     };
 
-    const label = `${checked ? msgHideLayerObjects : msgShowLayerObjects}`;
-
     return (
         <>
             {contextHolder}
             <Dropdown
                 overlayClassName="filter-by-field-menu"
-                trigger={['click']}
+                destroyPopupOnHide={true}
                 dropdownRender={() => (
                     <>
                         {dateType ?
                             <div className="menu-filter">
                                 <Tooltip title={msgRangePicker}>
                                     <RangePicker
-                                        // allowClear={false}
+                                        allowclear={!visible ? true : false}
                                         defaultValue={valueStart}
                                         disabledDate={disabledDate}
                                         onOpenChange={onOpenChangeRange}
                                         onChange={onChangeRangePicker}
-                                    />
-                                </Tooltip>
-                                <Tooltip title={msgAllObject}>
-                                    <Button
-                                    className="button-all-obj"
-                                        type="text"
-                                        onClick={addAllObject}
-                                        icon={<ZoomInMap />}
                                     />
                                 </Tooltip>
                                 <div className="button-list">
@@ -261,27 +216,8 @@ export const FilterByField = ({
                                             : <></>
                                     }
                                     {
-                                        visible ?
-                                            <Checkbox
-                                                checked={checked}
-                                                className="button-style layer-visible"
-                                                defaultChecked={false}
-                                                onChange={onChange}
-                                                title={label}
-                                            >{label}</Checkbox>
-                                            : <></>
+                                        featureCount !== 0 ? store.checked.includes(display.item.id[0]) ? <></> : <InfoCard /> : null
                                     }
-                                    {
-                                        visible ?
-                                            <Button
-                                                className="button-style"
-                                                type="text"
-                                                onClick={clearObject}
-                                                icon={<CloseIcon />}
-                                            >{msgClearObjectsMap}</Button>
-                                            : <></>
-                                    }
-                                    {store.checked.includes(display.item.id[0]) ? <></> : <InfoCard />}
                                 </div>
                             </div>
                             : null}
