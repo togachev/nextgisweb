@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { route, routeURL } from "@nextgisweb/pyramid/api/route";
 import { Button, Dropdown, Space, DatePicker, message, Card, Tooltip } from "@nextgisweb/gui/antd";
-import { Balancer } from "react-wrap-balancer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { route, routeURL } from "@nextgisweb/pyramid/api/route";
+import dayjs from 'dayjs';
+import { Balancer } from "react-wrap-balancer";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { DojoDisplay } from "../type/index.ts";
@@ -10,7 +11,7 @@ import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
 import type WebmapStore from "../store/index.ts";
 
 import History from "@nextgisweb/icon/material/history";
-import CenterFocusWeak from "@nextgisweb/icon/material/center_focus_weak";
+import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
 import "./FilterByField.less";
 
@@ -29,17 +30,25 @@ interface FilterByFieldBtnProps {
 }
 
 const datatype = "DATE"
+const dateFormat = 'YYYY-MM-DD';
 
+const msgAllObject = gettext("Add all layer objects");
 const msgRangePicker = gettext("Select date range");
 const msgShowLayerFilterByDate = gettext("Filter layer by date");
 const msgInfo = gettext("Turn on a layer to get information about an object");
-const msgAddFeature = gettext("Zoom to object(s)");
 const msgSuccessDataLoaded = gettext("Data loaded");
 const msgNoDataAvailable = gettext("No data available");
+const msgSelected = gettext("Selected date range");
+
+const SelectedDateRangeCard = ({ value }) => (
+    <Card size="small">
+        <div className="info-date">{msgSelected}: <span className="selected-date"> {value[0]} - {value[1]}</span></div>
+    </Card>
+);
 
 const InfoCard = () => (
     <Card size="small">
-        <Balancer >{msgInfo}</Balancer>
+        <Balancer ratio={0.62} >{msgInfo}</Balancer>
     </Card>
 );
 
@@ -165,7 +174,6 @@ export const FilterByField = ({
         if (!item) {
             clearObject();
         }
-        
     }
 
     const clearObject = () => {
@@ -176,13 +184,9 @@ export const FilterByField = ({
         startValue();
     };
 
-    const zoomToObject = () => {
-        const extent = customLayer.getSource().getExtent();
-        if (!isFinite(extent[0])) {
-            return
-        } else {
-            map.getView().fit(extent, map.getSize());
-        }
+    const addAllObject = () => {
+        setValue([dayjs(valueStart[0]).format(dateFormat), dayjs(valueStart[1]).format(dateFormat)])
+        setStatus(true)
     };
 
     return (
@@ -191,33 +195,32 @@ export const FilterByField = ({
             <Dropdown
                 overlayClassName="filter-by-field-menu"
                 destroyPopupOnHide={true}
+                trigger={['click']}
                 dropdownRender={() => (
                     <>
                         {dateType ?
                             <div className="menu-filter">
-                                <Tooltip title={msgRangePicker}>
-                                    <RangePicker
-                                        allowclear={!visible ? true : false}
-                                        defaultValue={valueStart}
-                                        disabledDate={disabledDate}
-                                        onOpenChange={onOpenChangeRange}
-                                        onChange={onChangeRangePicker}
-                                    />
-                                </Tooltip>
-                                <div className="button-list">
-                                    {
-                                        visible ?
-                                            <Button
-                                                className="button-style"
-                                                type="text"
-                                                onClick={zoomToObject}
-                                                icon={<CenterFocusWeak />}
-                                            >{msgAddFeature}</Button>
-                                            : <></>
-                                    }
-                                    {
-                                        featureCount !== 0 ? store.checked.includes(display.item.id[0]) ? <></> : <InfoCard /> : null
-                                    }
+                                <div className="range-picker-input">
+                                    <Tooltip title={msgRangePicker}>
+                                        <RangePicker
+                                            defaultValue={valueStart}
+                                            disabledDate={disabledDate}
+                                            onOpenChange={onOpenChangeRange}
+                                            onChange={onChangeRangePicker}
+                                            value={valueStart}
+                                        />
+                                    </Tooltip>
+                                    <Tooltip title={msgAllObject}>
+                                        <Button
+                                            type="text"
+                                            onClick={addAllObject}
+                                            icon={<ZoomInMap />}
+                                        />
+                                    </Tooltip>
+                                </div>
+                                <div className="info-list">
+                                    { visible ? <SelectedDateRangeCard value={value} /> : null }
+                                    { featureCount !== 0 ? store.checked.includes(display.item.id[0]) ? <></> : <InfoCard /> : null }
                                 </div>
                             </div>
                             : null}
