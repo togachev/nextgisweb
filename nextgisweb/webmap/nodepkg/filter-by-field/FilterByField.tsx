@@ -7,8 +7,13 @@ import { Balancer } from "react-wrap-balancer";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { DojoDisplay } from "../type/index.ts";
-import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
+import type { FeatureLayer, NgwAttributeType, FeatureLayerField } from "@nextgisweb/feature-layer/type";
 import type WebmapStore from "../store/index.ts";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+
+import { updateFeaturesValue } from "@nextgisweb/feature-layer/feature-grid/util/updateFeaturesValue";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+
 
 import History from "@nextgisweb/icon/material/history";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
@@ -21,7 +26,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import VectorSource from "ol/source/Vector";
 
 const { RangePicker } = DatePicker;
-
+type Item = Record<string, NgwAttributeType>;
 interface FilterByFieldBtnProps {
     id: number;
     display: DojoDisplay;
@@ -31,6 +36,26 @@ interface FilterByFieldBtnProps {
 
 const datatype = "DATE"
 const dateFormat = 'YYYY-MM-DD';
+
+// const feature = [
+//     {
+//         "gid": 1915,
+//         "layer": "Мероприятие вне 248-ФЗ от 03.10.2023 №2105206-2-20 (№2105206-2-20).gpx",
+//         "data": "2023-10-03",
+//         "ngw_id": 2,
+//         "__id": 2
+//     },
+//     {
+//         "gid": 2109,
+//         "layer": "Мероприятие вне 248-ФЗ от 03.10.2023 №2105206-2-20 (№2105206-2-20)_ed86ae3c-387a-46ac-b0d1-0023bf0c4d70.gpx",
+//         "data": "2023-10-03",
+//         "ngw_id": 19,
+//         "__id": 19
+//     }
+// ]
+
+// const { makeSignal } = useAbortController();
+
 
 const msgAllObject = gettext("Add all layer objects");
 const msgRangePicker = gettext("Select date range");
@@ -95,9 +120,11 @@ export const FilterByField = ({
     const [open, setOpen] = useState();
     const [visible, setVisible] = useState<boolean>(false);
     const [messageApi, contextHolder] = message.useMessage();
-
+    const { makeSignal, abort } = useAbortController();
     const dataTypeCheck = async () => {
         const fields = await route('feature_layer.field', id).get<FeatureLayerField>({ id: id });
+
+        
         if (fields.find(item => item.datatype === datatype)) {
             setDateType(true)
         }
@@ -108,8 +135,7 @@ export const FilterByField = ({
     }, []);
 
     const startValue = async () => {
-        const fields = await route('resource.item', id).get();
-        if (fields.feature_layer.fields.find(item => item.datatype === datatype)) {
+        if (dateType) {
             const query = { geom: 'no', extensions: 'no', order_by: 'data' }
             const item = await route('feature_layer.feature.collection', id).get({ query });
             let date = [validDate(item, 0), validDate(item, 1)];
@@ -134,11 +160,28 @@ export const FilterByField = ({
                 format: new GeoJSON()
             }))
             customLayer.getSource().setUrl(routeURL("feature_layer.geojson_filter_by_data", id, value[0], value[1]));
+
+            const query = { geom: 'no', extensions: 'no', order_by: 'data' }
+            const data = await route('feature_layer.feature.collection', id).get({ query });
+    
+            updateFeaturesValue({
+                resourceId: id,
+                            data: data,
+                
+                makeSignal})
+
             return customLayer
         }
     };
 
     const featureCount = customLayer.getSource().getFeatures().length;
+
+    const updateFeatureValue = (items) => {
+        // const { data } = item.values_
+        // console.log(display, items[0].getProperties());
+        console.log(display);
+        
+    }
 
     useEffect(() => {
         if (status == true && !open) {
@@ -155,8 +198,10 @@ export const FilterByField = ({
                             success(messageApi)
                             map.getView().fit(extent, map.getSize());
                         }
+                        let itm = item.getSource().getFeatures();
+                        updateFeatureValue(itm);
                     });
-
+                    
                 })
             setStatus(false)
         }
