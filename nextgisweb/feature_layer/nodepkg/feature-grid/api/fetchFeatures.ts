@@ -42,6 +42,8 @@ export function fetchFeatures({
     ilike,
     intersects,
 }: FetchFeaturesOptions) {
+    console.log(limit);
+    
     const query: FeatureLayerQuery = {
         offset,
         limit,

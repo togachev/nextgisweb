@@ -149,7 +149,6 @@ export function WebMapFeatureGridTab({
                 store={display.current.webmapStore}
                 nodeData={itemConfig.current}
                 display={display.current}
-                topic={topic}
             />
         );
     }, []);
