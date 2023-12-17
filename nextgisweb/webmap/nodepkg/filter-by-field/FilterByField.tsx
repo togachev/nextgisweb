@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Button, Dropdown, Space, DatePicker, message, Card, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route, routeURL } from "@nextgisweb/pyramid/api/route";
@@ -7,19 +7,15 @@ import { Balancer } from "react-wrap-balancer";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { DojoDisplay } from "../type/index.ts";
-import type { FeatureLayerField, FeatureItem } from "@nextgisweb/feature-layer/feature-grid/type";
+import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
 import type WebmapStore from "../store/index.ts";
-
-import { fetchFeatures } from "@nextgisweb/feature-layer/api/fetchFeatures";
-import { updateFeaturesValue } from "@nextgisweb/feature-layer/feature-grid/util/updateFeaturesValue";
-import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
 import History from "@nextgisweb/icon/material/history";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
 import "./FilterByField.less";
 
-import { parseNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
+import { parseNgwAttribute, formatNgwAttribute } from "../../../feature_layer/nodepkg/util/ngwAttributes.ts";
 
 import GeoJSON from "ol/format/GeoJSON";
 import VectorSource from "ol/source/Vector";
@@ -31,6 +27,7 @@ interface FilterByFieldBtnProps {
     display: DojoDisplay;
     store: WebmapStore;
     size?: SizeType;
+    setQuery: Dispatch<SetStateAction<string>>;
 }
 
 const datatype = "DATE"
@@ -91,6 +88,7 @@ export const FilterByField = ({
     display,
     store,
     size = "middle",
+    setQuery
 }: FilterByFieldBtnProps) => {
     const [dateType, setDateType] = useState<boolean>(false);
     const [valueStart, setValueStart] = useState<string[]>([]);
@@ -99,8 +97,6 @@ export const FilterByField = ({
     const [open, setOpen] = useState();
     const [visible, setVisible] = useState<boolean>(false);
     const [messageApi, contextHolder] = message.useMessage();
-
-    const { makeSignal } = useAbortController();
 
     const dataTypeCheck = async () => {
         const fields = await route('feature_layer.field', id).get<FeatureLayerField>({ id: id });
@@ -156,45 +152,15 @@ export const FilterByField = ({
 
             updateFeature()
                 .then((item) => {
-                    const signal = makeSignal();
-                    const query = {
-                        "offset": 0,
-                        "limit": 100,
-                        "geom": "no",
-                        "extensions": "",
-                        "dt_format": "iso",
-                        "fields": [
-                            "gid",
-                            "layer",
-                            "data",
-                            "ngw_id"
-                        ],
-                        "fld_data__ge": value[0],
-                        "fld_data__le": value[1]
+                    console.log(item);
+
+                    let query = {
+                        "fld_data__ge": item[0],
+                        "fld_data__le": item[1],
                     }
-                    const cache = false
-                    return route("feature_layer.feature.collection", id)
-                        .get<FeatureItem[]>({
-                            query,
-                            signal,
-                            cache,
-                        })
-                        .then((items) => {
-                            return items.map((item) => ({
-                                ...item.fields,
-                                ["__id"]: item.id,
-                            }));
-                        })
-                        .then((features)=>{
-                            console.log(features);
-                            
-                            return updateFeaturesValue({
-                                resourceId: id,
-                                data: features,
-                                signal,
-                            })
-                        });
+                    setQuery(query)
                 })
+
             setProps()
                 .then((item) => {
                     item.getSource().once('change', function () {
@@ -248,7 +214,6 @@ export const FilterByField = ({
             <Dropdown
                 overlayClassName="filter-by-field-menu"
                 destroyPopupOnHide={true}
-                trigger={['click']}
                 dropdownRender={() => (
                     <>
                         {dateType ?
