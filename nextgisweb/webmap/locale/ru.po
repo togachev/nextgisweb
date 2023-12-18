@@ -453,17 +453,9 @@ msgstr "Фильтр слоя по дате"
 msgid "Turn on a layer to get information about an object"
 msgstr "Включите слой для получения информации об объекте"
 
-#: nodepkg/filter-by-field/FilterByField.tsx:44
-msgid "Zoom to object(s)"
-msgstr "Увеличить до объекта(ов)"
-
 #: nodepkg/filter-by-field/FilterByField.tsx:46
 msgid "Add all layer objects"
 msgstr "Добавить все объекты слоя"
-
-#: nodepkg/filter-by-field/FilterByField.tsx:47
-msgid "Selected date range"
-msgstr "Выбранный диапазон дат"
 
 #: nodepkg/filter-by-field/FilterByField.tsx:47
 msgid "Data loaded"

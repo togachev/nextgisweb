@@ -31,11 +31,11 @@ define([
         _getDefaultStyle: function () {
             var dataStyle = new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: "rgba(255,255,0,0.5)",
+                    color: "rgba(255,172,0,0.5)",
                     width: 12
                 }),
                 fill: new ol.style.Fill({
-                    color: "rgba(255,255,0,0.2)",
+                    color: "rgba(255,172,0,0.2)",
                     width: 12
                 })
             });

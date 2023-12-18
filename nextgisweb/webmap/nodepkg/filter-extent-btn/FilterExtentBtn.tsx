@@ -7,7 +7,7 @@ import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
-import { useCallback, useEffect, useRef, useState, Dispatch, SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -32,7 +32,6 @@ interface FilterExtentBtnProps {
     display: DojoDisplay;
     size?: SizeType;
     onGeomChange?: (geom: Geometry, geomWKT: string) => void;
-    setParams: Dispatch<SetStateAction<string>>;
 }
 
 enum FilterExtentBtnMode {
@@ -224,7 +223,6 @@ export const FilterExtentBtn = ({
     display,
     size = "middle",
     onGeomChange,
-    setParams
 }: FilterExtentBtnProps) => {
     const mounted = useIsMounted();
     const [mode, setMode] = useState<FilterExtentBtnMode>(
@@ -245,7 +243,6 @@ export const FilterExtentBtn = ({
         setGeomType(undefined);
         setMode(FilterExtentBtnMode.default);
         onGeomChange(undefined, undefined);
-        setParams(undefined);
     };
 
     useEffect(() => {
@@ -267,7 +264,6 @@ export const FilterExtentBtn = ({
         }
         const geometryWKT = formatWKT.writeGeometry(geometry);
         onGeomChange(geometry, geometryWKT);
-        setParams(undefined);
         const newInteractionInfo = clearDrawInteraction(
             display,
             interactionInfo

@@ -39,7 +39,7 @@ export function WebMapFeatureGridTab({
     const [params, setParams] = useState<string>(undefined);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
-    
+
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
     const itemConfig = useRef<DisplayItemConfig>(
         display.current.get("itemConfig") as DisplayItemConfig
@@ -139,7 +139,6 @@ export function WebMapFeatureGridTab({
                 onGeomChange={(geom, geomWKT) => {
                     setQueryIntersects(geomWKT);
                 }}
-                setParams={setParams}
             />
         );
     }, []);
@@ -210,8 +209,8 @@ export function WebMapFeatureGridTab({
                         }}
                     />
                 ),
-                filterExtentBtn,
-                filterByFieldBtn
+                !params ? filterExtentBtn : null,
+                !queryIntersects ? filterByFieldBtn : null,
             ],
         };
     }, [layerId, query, queryIntersects, params, reloadLayer, zoomToFeature]);

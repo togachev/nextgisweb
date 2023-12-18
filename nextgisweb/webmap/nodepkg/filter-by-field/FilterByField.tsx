@@ -39,13 +39,6 @@ const msgShowLayerFilterByDate = gettext("Filter layer by date");
 const msgInfo = gettext("Turn on a layer to get information about an object");
 const msgSuccessDataLoaded = gettext("Data loaded");
 const msgNoDataAvailable = gettext("No data available");
-const msgSelected = gettext("Selected date range");
-
-const SelectedDateRangeCard = ({ value }) => (
-    <Card size="small">
-        <div className="info-date">{msgSelected}: <span className="selected-date"> {value[0]} - {value[1]}</span></div>
-    </Card>
-);
 
 const InfoCard = () => (
     <Card size="small">
@@ -88,14 +81,14 @@ export const FilterByField = ({
     display,
     store,
     size = "middle",
-    setParams
+    setParams,
 }: FilterByFieldBtnProps) => {
+
     const [dateType, setDateType] = useState<boolean>(false);
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
     const [status, setStatus] = useState<boolean>(false);
     const [open, setOpen] = useState();
-    const [visible, setVisible] = useState<boolean>(false);
     const [messageApi, contextHolder] = message.useMessage();
 
     const dataTypeCheck = async () => {
@@ -115,7 +108,7 @@ export const FilterByField = ({
             const item = await route('feature_layer.feature.collection', id).get({ query });
             let date = [validDate(item, 0), validDate(item, 1)];
             setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]);
-            
+
         }
     };
 
@@ -146,15 +139,13 @@ export const FilterByField = ({
         }
     };
 
-    const featureCount = customLayer.getSource().getFeatures().length;
-
     useEffect(() => {
         if (status == true && !open) {
             updateFeature()
                 .then((item) => {
                     let params = {
-                        "fld_data__ge": formatNgwAttribute( datatype, item[0]),
-                        "fld_data__le": formatNgwAttribute( datatype, item[1]),
+                        "fld_data__ge": formatNgwAttribute(datatype, item[0]),
+                        "fld_data__le": formatNgwAttribute(datatype, item[1]),
                     }
                     setParams(params)
                 })
@@ -164,11 +155,9 @@ export const FilterByField = ({
                     item.getSource().once('change', function () {
                         let extent = item.getSource().getExtent();
                         if (!isFinite(extent[0])) {
-                            setVisible(false)
                             error(messageApi)
                             return
                         } else {
-                            setVisible(true)
                             success(messageApi)
                             map.getView().fit(extent, map.getSize());
                         }
@@ -177,11 +166,10 @@ export const FilterByField = ({
             setStatus(false);
         }
     }, [status, open]);
-
+    
     const onOpenChangeRange = (open) => {
         setOpen(open);
     }
-
     const onChangeRangePicker = (item, dateString) => {
         if (item) {
             setValue(dateString);
@@ -196,7 +184,6 @@ export const FilterByField = ({
         customLayer.getSource().clear();
         display._zoomToInitialExtent();
         setStatus(false)
-        setVisible(false);
         startValue();
         setParams(undefined)
     };
@@ -204,7 +191,6 @@ export const FilterByField = ({
     const addAllObject = () => {
         setValue([dayjs(valueStart[0]).format(dateFormat), dayjs(valueStart[1]).format(dateFormat)])
         setStatus(true)
-        setParams(undefined)
     };
 
     return (
@@ -213,7 +199,6 @@ export const FilterByField = ({
             <Dropdown
                 overlayClassName="filter-by-field-menu"
                 destroyPopupOnHide={true}
-                // trigger={['click']}
                 dropdownRender={() => (
                     <>
                         {dateType ?
@@ -237,8 +222,7 @@ export const FilterByField = ({
                                     </Tooltip>
                                 </div>
                                 <div className="info-list">
-                                    {visible ? <SelectedDateRangeCard value={value} /> : null}
-                                    {featureCount !== 0 ? store.checked.includes(display.item.id[0]) ? <></> : <InfoCard /> : null}
+                                    {store.checked.includes(display.item.id[0]) ? <></> : <InfoCard />}
                                 </div>
                             </div>
                             : null}
