@@ -36,9 +36,10 @@ export function WebMapFeatureGridTab({
     const [version, setVersion] = useState(0);
     const [query, setQuery] = useState("");
     const [queryIntersects, setQueryIntersects] = useState<string>(undefined);
+    const [params, setParams] = useState<string>(undefined);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
-
+    
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
     const itemConfig = useRef<DisplayItemConfig>(
         display.current.get("itemConfig") as DisplayItemConfig
@@ -138,6 +139,7 @@ export function WebMapFeatureGridTab({
                 onGeomChange={(geom, geomWKT) => {
                     setQueryIntersects(geomWKT);
                 }}
+                setParams={setParams}
             />
         );
     }, []);
@@ -149,7 +151,7 @@ export function WebMapFeatureGridTab({
                 store={display.current.webmapStore}
                 nodeData={itemConfig.current}
                 display={display.current}
-                setQuery={setQuery}
+                setParams={setParams}
             />
         );
     }, []);
@@ -159,6 +161,7 @@ export function WebMapFeatureGridTab({
             id: layerId,
             query,
             queryIntersects,
+            params,
             readonly: data.current?.readonly ?? true,
             size: "small",
             cleanSelectedOnFilter: false,
@@ -211,7 +214,7 @@ export function WebMapFeatureGridTab({
                 filterByFieldBtn
             ],
         };
-    }, [layerId, query, queryIntersects, reloadLayer, zoomToFeature]);
+    }, [layerId, query, queryIntersects, params, reloadLayer, zoomToFeature]);
 
     return (
         <FeatureGrid

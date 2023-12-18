@@ -29,6 +29,7 @@ interface FeatureTableProps {
     total: number;
     query: string;
     queryIntersects?: string;
+    params?: string;
     fields: FeatureLayerField[];
     version?: number;
     selected: FeatureAttrs[];
@@ -48,6 +49,7 @@ const FeatureTable = ({
     total,
     query,
     queryIntersects,
+    params,
     fields,
     version,
     selected,
@@ -131,6 +133,7 @@ const FeatureTable = ({
         version,
         query,
         queryIntersects,
+        params,
         total,
     });
 
@@ -138,7 +141,7 @@ const FeatureTable = ({
         if (cleanSelectedOnFilter) {
             setSelected([]);
         }
-    }, [query, queryIntersects, cleanSelectedOnFilter, setSelected]);
+    }, [query, queryIntersects, params, cleanSelectedOnFilter, setSelected]);
 
     const scrollBarSize = useMemo<number>(() => scrollbarWidth(), []);
 

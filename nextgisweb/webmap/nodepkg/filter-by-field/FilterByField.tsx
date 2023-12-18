@@ -27,7 +27,7 @@ interface FilterByFieldBtnProps {
     display: DojoDisplay;
     store: WebmapStore;
     size?: SizeType;
-    setQuery: Dispatch<SetStateAction<string>>;
+    setParams: Dispatch<SetStateAction<string>>;
 }
 
 const datatype = "DATE"
@@ -88,7 +88,7 @@ export const FilterByField = ({
     display,
     store,
     size = "middle",
-    setQuery
+    setParams
 }: FilterByFieldBtnProps) => {
     const [dateType, setDateType] = useState<boolean>(false);
     const [valueStart, setValueStart] = useState<string[]>([]);
@@ -114,7 +114,8 @@ export const FilterByField = ({
             const query = { geom: 'no', extensions: 'no', order_by: 'data' }
             const item = await route('feature_layer.feature.collection', id).get({ query });
             let date = [validDate(item, 0), validDate(item, 1)];
-            setValueStart([parseNgwAttribute("DATE", date[0]), parseNgwAttribute("DATE", date[1])]);
+            setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]);
+            
         }
     };
 
@@ -149,16 +150,13 @@ export const FilterByField = ({
 
     useEffect(() => {
         if (status == true && !open) {
-
             updateFeature()
                 .then((item) => {
-                    console.log(item);
-
-                    let query = {
-                        "fld_data__ge": item[0],
-                        "fld_data__le": item[1],
+                    let params = {
+                        "fld_data__ge": formatNgwAttribute( datatype, item[0]),
+                        "fld_data__le": formatNgwAttribute( datatype, item[1]),
                     }
-                    setQuery(query)
+                    setParams(params)
                 })
 
             setProps()
@@ -175,7 +173,6 @@ export const FilterByField = ({
                             map.getView().fit(extent, map.getSize());
                         }
                     });
-
                 });
             setStatus(false);
         }
@@ -201,11 +198,13 @@ export const FilterByField = ({
         setStatus(false)
         setVisible(false);
         startValue();
+        setParams(undefined)
     };
 
     const addAllObject = () => {
         setValue([dayjs(valueStart[0]).format(dateFormat), dayjs(valueStart[1]).format(dateFormat)])
         setStatus(true)
+        setParams(undefined)
     };
 
     return (
@@ -214,6 +213,7 @@ export const FilterByField = ({
             <Dropdown
                 overlayClassName="filter-by-field-menu"
                 destroyPopupOnHide={true}
+                // trigger={['click']}
                 dropdownRender={() => (
                     <>
                         {dateType ?

@@ -43,6 +43,7 @@ export interface FeatureGridProps {
     size?: SizeType;
     query?: string;
     queryIntersects?: string;
+    params?: string;
     version?: number;
     readonly?: boolean;
     editOnNewPage?: boolean;
@@ -67,6 +68,7 @@ export const FeatureGrid = ({
     id,
     query: propQuery,
     queryIntersects,
+    params,
     onSave,
     version: propVersion,
     onDelete,
@@ -291,6 +293,7 @@ export const FeatureGrid = ({
                 {...{
                     query,
                     queryIntersects,
+                    params,
                     fields,
                     selected,
                     loadingCol,

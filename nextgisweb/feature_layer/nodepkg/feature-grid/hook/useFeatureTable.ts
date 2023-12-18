@@ -19,6 +19,7 @@ interface UseFeatureTableProps {
     total: number;
     query: string;
     queryIntersects?: string;
+    params?: string;
     columns: FeatureLayerFieldCol[];
     version?: number;
     orderBy?: OrderBy;
@@ -89,6 +90,7 @@ export function useFeatureTable({
     total,
     query,
     queryIntersects,
+    params,
     columns,
     version,
     orderBy,
@@ -121,8 +123,8 @@ export function useFeatureTable({
     };
 
     const queryMode = useMemo<boolean>(
-        () => !!query || !!queryIntersects,
-        [query, queryIntersects]
+        () => !!query || !!queryIntersects || !!params,
+        [query, queryIntersects, params]
     );
 
     const handleFeatures = useCallback(
@@ -171,6 +173,7 @@ export function useFeatureTable({
                         offset: page,
                         ilike: query,
                         intersects: queryIntersects,
+                        params: params,
                         resourceId,
                         orderBy,
                         signal,
@@ -190,7 +193,7 @@ export function useFeatureTable({
                     }
                 });
         },
-        [columns, orderBy, pageSize, query, queryIntersects, resourceId]
+        [columns, orderBy, pageSize, query, queryIntersects, params, resourceId]
     );
 
     const queryFn = useCallback(async () => {
@@ -211,6 +214,7 @@ export function useFeatureTable({
                     orderBy,
                     query,
                     queryIntersects,
+                    params,
                     page,
                 }),
             }));
@@ -262,6 +266,7 @@ export function useFeatureTable({
         pages,
         query,
         queryIntersects,
+        params,
         abort,
     ]);
 
@@ -287,12 +292,12 @@ export function useFeatureTable({
         if (loaderCache.current) {
             loaderCache.current.clean();
         }
-    }, [total]);
+    }, [total, params]);
 
     useEffect(() => {
         setFetchEnabled(false);
         debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query, queryIntersects, orderBy]);
+    }, [pages, pageSize, query, queryIntersects, params, orderBy]);
 
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);
@@ -329,6 +334,7 @@ export function useFeatureTable({
         version,
         query,
         queryIntersects,
+        params,
         total,
         pages,
         data,
@@ -337,11 +343,11 @@ export function useFeatureTable({
     // Update prevTotal only after useEffect with queryFn call!
     useEffect(() => {
         prevTotal.current = total;
-    }, [total]);
+    }, [total, params]);
 
     useEffect(() => {
         setData([]);
-    }, [orderBy, query, queryIntersects, visibleFields]);
+    }, [orderBy, query, queryIntersects, params, visibleFields]);
 
     useEffect(() => {
         if (getTotalSize()) {
@@ -349,7 +355,7 @@ export function useFeatureTable({
         }
         // to init first loading
         setQueryTotal(pageSize);
-    }, [query, queryIntersects, pageSize, scrollToIndex, getTotalSize, total]);
+    }, [query, queryIntersects, params, pageSize, scrollToIndex, getTotalSize, total]);
 
     useEffect(() => {
         const items = [...virtualItems];

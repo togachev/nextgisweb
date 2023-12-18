@@ -7,6 +7,7 @@ interface CreateCacheKeyOptions {
     version?: number;
     query: string;
     queryIntersects?: string;
+    params?: string;
     page: number;
 }
 
@@ -17,6 +18,7 @@ export function createCacheKey({
     version,
     query,
     queryIntersects,
+    params,
     page,
 }: CreateCacheKeyOptions): string {
     return [
@@ -26,6 +28,8 @@ export function createCacheKey({
         query,
         "queryIntersects",
         queryIntersects || "",
+        "params",
+        params || "",
         "page",
         page,
         "version",
