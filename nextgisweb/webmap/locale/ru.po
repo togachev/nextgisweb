@@ -441,29 +441,25 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/filter-by-field/FilterByField.tsx:39
+#: nodepkg/filter-by-data/FilterByData.tsx:39
+msgid "Select field"
+msgstr "Выберите поле"
+
+#: nodepkg/filter-by-data/FilterByData.tsx:39
 msgid "Select date range"
 msgstr "Выберите диапазон дат"
 
-#: nodepkg/filter-by-field/FilterByField.tsx:40
+#: nodepkg/filter-by-data/FilterByData.tsx:40
 msgid "Filter layer by date"
 msgstr "Фильтр слоя по дате"
 
-#: nodepkg/filter-by-field/FilterByField.tsx:41
+#: nodepkg/filter-by-data/FilterByData.tsx:41
 msgid "Turn on a layer to get information about an object"
 msgstr "Включите слой для получения информации об объекте"
 
-#: nodepkg/filter-by-field/FilterByField.tsx:46
+#: nodepkg/filter-by-data/FilterByData.tsx:46
 msgid "Add all layer objects"
 msgstr "Добавить все объекты слоя"
-
-#: nodepkg/filter-by-field/FilterByField.tsx:47
-msgid "Data loaded"
-msgstr "Данные загружены"
-
-#: nodepkg/filter-by-field/FilterByField.tsx:48
-msgid "No data available"
-msgstr "Данные отсутствуют"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:47
 msgid "Circle"

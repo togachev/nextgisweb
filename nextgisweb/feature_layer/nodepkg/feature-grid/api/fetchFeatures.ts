@@ -63,15 +63,15 @@ export function fetchFeatures({
     }
     
     if (params) {
-        query.fld_data__ge = params.fld_data__ge;
-        query.fld_data__le = params.fld_data__le;
+        const keys = Object.keys(params)
+        query[keys[0]] = params[keys[0]];
+        query[keys[1]] = params[keys[1]];
     }
 
     if (intersects) {
         query.intersects = intersects;
     }
 
-    
     return route("feature_layer.feature.collection", resourceId)
         .get<FeatureItem[]>({
             query,

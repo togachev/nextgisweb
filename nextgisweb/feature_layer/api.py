@@ -977,6 +977,7 @@ def geojson(resource, request) -> JSONType:
 def geojson_filter_by_data(resource, request) -> JSONType:
     id = request.matchdict["id"]
     f = "%Y-%m-%d"
+    field_data = request.matchdict["field_data"]
     mind = request.matchdict["min_data"]
     min_data = datetime.datetime.strptime(mind, f)
     maxd = request.matchdict["max_data"]
@@ -1003,8 +1004,8 @@ def geojson_filter_by_data(resource, request) -> JSONType:
         return func
 
     features = [feature_to_ogc(feature) for feature in query()]
-    features = [x for x in features if x['properties']['data'] is not None and bool(dt.strptime(x['properties']['data'], f))]
-    features = [x for x in features if datetime.datetime.strptime(x['properties']['data'], f) <= max_data and datetime.datetime.strptime(x['properties']['data'], f) >= min_data]
+    features = [x for x in features if x['properties'][field_data] is not None and bool(dt.strptime(x['properties'][field_data], f))]
+    features = [x for x in features if datetime.datetime.strptime(x['properties'][field_data], f) <= max_data and datetime.datetime.strptime(x['properties'][field_data], f) >= min_data]
 
     items = dict(
         type="FeatureCollection",
@@ -1017,7 +1018,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "feature_layer.geojson_filter_by_data",
-        "/api/resource/{id:uint}/{min_data:any}/{max_data:any}/geojson",
+        "/api/resource/{id:uint}/{field_data:any}/{min_data:any}/{max_data:any}/geojson",
         factory=resource_factory,
     ).get(geojson_filter_by_data)
 

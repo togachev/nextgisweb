@@ -10,7 +10,7 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
-import FilterByField from "@nextgisweb/webmap/filter-by-field";
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
 
 import type {
     DisplayItemConfig,
@@ -143,9 +143,9 @@ export function WebMapFeatureGridTab({
         );
     }, []);
 
-    const filterByFieldBtn = useCallback((props) => {
+    const filterByDataBtn = useCallback((props) => {
         return (
-            <FilterByField
+            <FilterByData
                 {...props}
                 store={display.current.webmapStore}
                 nodeData={itemConfig.current}
@@ -210,7 +210,7 @@ export function WebMapFeatureGridTab({
                     />
                 ),
                 !params ? filterExtentBtn : null,
-                !queryIntersects ? filterByFieldBtn : null,
+                !queryIntersects ? filterByDataBtn : null,
             ],
         };
     }, [layerId, query, queryIntersects, params, reloadLayer, zoomToFeature]);
