@@ -387,6 +387,7 @@ WM_SETTINGS = dict(
     degree_format="dd",
     measurement_srid=4326,
     legend_symbols=None,
+    hide_nav_menu=False,
 )
 
 

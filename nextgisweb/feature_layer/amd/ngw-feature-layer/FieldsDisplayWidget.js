@@ -37,8 +37,9 @@ define([
         title: i18n.gettext("Attributes"),
         aliases: false,
         grid_visibility: false,
-        urlRE: /^(\b(https?|ftp|file|mailto|tel|e1c):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])(\s+)?$/i,
-        emailRE: new RegExp("^" + regexp.emailAddress() + "$"),
+        urlRegex:
+            /^\s*(((((https?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i,
+        emailRegex: new RegExp("^" + regexp.emailAddress() + "$"),
 
         buildRendering: function () {
             this.inherited(arguments);
@@ -104,15 +105,16 @@ define([
 
                 if (val === null) {
                     // pass
-                } else if (field.datatype == "DATE") {
+                } else if (field.datatype === "DATE") {
                     val = locale.format(
                         new Date(val.year, val.month - 1, val.day),
                         {
                             selector: "date",
-                            formatLength: "medium",
+                            formatLength: "short",
+                            fullYear: true,
                         }
                     );
-                } else if (field.datatype == "TIME") {
+                } else if (field.datatype === "TIME") {
                     val = locale.format(
                         new Date(0, 0, 0, val.hour, val.minute, val.second),
                         {
@@ -120,7 +122,7 @@ define([
                             formatLength: "medium",
                         }
                     );
-                } else if (field.datatype == "DATETIME") {
+                } else if (field.datatype === "DATETIME") {
                     val = locale.format(
                         new Date(
                             val.year,
@@ -131,22 +133,25 @@ define([
                             val.second
                         ),
                         {
-                            formatLength: "medium",
+                            formatLength: "short",
+                            fullYear: true,
                         }
                     );
                 }
 
                 if (val !== null) {
-                    if (this.urlRE.test(val)) {
+                    if (this.urlRegex.test(val)) {
+                        const match = val.match(this.urlRegex);
+                        const urlSimiliar = match[1];
                         put(
                             tbody,
                             "tr th.display_name $ < td.value a[href=$][target='$'] $",
                             fieldmap[k].display_name,
-                            val,
-                            val.match(/https?:/) ? "_blank" : "_self",
-                            val
+                            urlSimiliar,
+                            urlSimiliar.match(/https?:/) ? "_blank" : "_self",
+                            urlSimiliar
                         );
-                    } else if (this.emailRE.test(val)) {
+                    } else if (this.emailRegex.test(val)) {
                         put(
                             tbody,
                             "tr th.display_name $ < td.value a[href=$] $",

@@ -13,7 +13,7 @@ import { updateFeaturesValue } from "../util/updateFeaturesValue";
 
 const debouncedFn = debounce((fn) => {
     fn();
-}, 200);
+}, 100);
 
 interface UseFeatureTableProps {
     total: number;
@@ -103,9 +103,6 @@ export function useFeatureTable({
     const [pages, setPages] = useState<number[]>([]);
     const [hasNextPage, setHasNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
-
-    /** For limit the number of API requests */
-    const [fetchEnabled, setFetchEnabled] = useState(false);
 
     const { makeSignal, abort } = useAbortController();
 
@@ -231,7 +228,7 @@ export function useFeatureTable({
                     )
                 ).flat();
                 handleFeatures(attrs);
-            } else if (fetchEnabled) {
+            } else {
                 const signal = makeSignal();
                 const promises = [];
                 for (const { key, page } of cacheKeys) {
@@ -257,7 +254,6 @@ export function useFeatureTable({
     }, [
         handleFeatures,
         visibleFields,
-        fetchEnabled,
         fetchWrapper,
         makeSignal,
         pageSize,
@@ -294,11 +290,6 @@ export function useFeatureTable({
         }
     }, [total, params]);
 
-    useEffect(() => {
-        setFetchEnabled(false);
-        debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query, queryIntersects, params, orderBy]);
-
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);
     useEffect(() => {
@@ -323,10 +314,9 @@ export function useFeatureTable({
             }
         }
         prevVersion.current = version;
-        queryFn();
+        debouncedFn(queryFn);
     }, [
         visibleFields,
-        fetchEnabled,
         hasNextPage,
         pageSize,
         orderBy,
