@@ -4,7 +4,7 @@ import tempfile
 import uuid
 import zipfile
 from datetime import date, datetime, time, datetime as dt
-import datetime
+import datetime as date_time
 
 from typing import List, Optional
 
@@ -979,9 +979,9 @@ def geojson_filter_by_data(resource, request) -> JSONType:
     f = "%Y-%m-%d"
     field_data = request.matchdict["field_data"]
     mind = request.matchdict["min_data"]
-    min_data = datetime.datetime.strptime(mind, f)
+    min_data = date_time.datetime.strptime(mind, f)
     maxd = request.matchdict["max_data"]
-    max_data = datetime.datetime.strptime(maxd, f)
+    max_data = date_time.datetime.strptime(maxd, f)
     
 
     query = resource.feature_query()
@@ -994,18 +994,9 @@ def geojson_filter_by_data(resource, request) -> JSONType:
         box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
         query.intersects(box_geom)
 
-    def strftime_format(format):
-        def func(value):
-            try:
-                datetime.strptime(value, format)
-            except ValueError:
-                return False
-            return True
-        return func
-
     features = [feature_to_ogc(feature) for feature in query()]
     features = [x for x in features if x['properties'][field_data] is not None and bool(dt.strptime(x['properties'][field_data], f))]
-    features = [x for x in features if datetime.datetime.strptime(x['properties'][field_data], f) <= max_data and datetime.datetime.strptime(x['properties'][field_data], f) >= min_data]
+    features = [x for x in features if date_time.datetime.strptime(x['properties'][field_data], f) <= max_data and date_time.datetime.strptime(x['properties'][field_data], f) >= min_data]
 
     items = dict(
         type="FeatureCollection",
