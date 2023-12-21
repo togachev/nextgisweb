@@ -10,7 +10,7 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import SortIcon from "./component/SortIcon";
-import History from "@nextgisweb/icon/material/history";
+import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type {
@@ -335,7 +335,7 @@ const FeatureTable = ({
                                             type="text"
                                             title="Filter by DATE and DATE" size="small">
                                             <Space>
-                                                <History />
+                                                <FilterIcon />
                                             </Space>
                                         </Button>
                                         : <></>}
