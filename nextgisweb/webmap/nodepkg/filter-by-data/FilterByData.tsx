@@ -1,13 +1,10 @@
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
-import { Select, Button, Dropdown, Space, DatePicker, Card, Tooltip } from "@nextgisweb/gui/antd";
+import { Select, Button, Dropdown, Space, DatePicker, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { route, routeURL } from "@nextgisweb/pyramid/api/route";
-import { Balancer } from "react-wrap-balancer";
+import { route } from "@nextgisweb/pyramid/api/route";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type { DojoDisplay } from "../type/index.ts";
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
-import type WebmapStore from "../store/index.ts";
 import type { SelectProps } from 'antd';
 
 import History from "@nextgisweb/icon/material/history";
@@ -17,32 +14,20 @@ import "./FilterByData.less";
 
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
-import GeoJSON from "ol/format/GeoJSON";
-import VectorSource from "ol/source/Vector";
-
 const { RangePicker } = DatePicker;
 
 interface FilterByDataBtnProps {
     id: number;
-    display: DojoDisplay;
-    store: WebmapStore;
     size?: SizeType;
     setParams: Dispatch<SetStateAction<string>>;
 }
 
 const datatype = "DATE"
 
-const msgAllObject = gettext("Add all layer objects");
+const msgAllInterval = gettext("Apply filter for entire interval");
 const msgSelectField = gettext("Select field");
 const msgRangePicker = gettext("Select date range");
 const msgShowLayerFilterByDate = gettext("Filter layer by date");
-const msgInfo = gettext("Turn on a layer to get information about an object");
-
-const InfoCard = () => (
-    <Card size="small">
-        <Balancer ratio={0.62} >{msgInfo}</Balancer>
-    </Card>
-);
 
 const validDate = (feat, r, data) => {
     if (r == 0) {
@@ -62,8 +47,6 @@ const validDate = (feat, r, data) => {
 
 export const FilterByData = ({
     id,
-    display,
-    store,
     size = "middle",
     setParams,
 }: FilterByDataBtnProps) => {
@@ -80,10 +63,6 @@ export const FilterByData = ({
     fields.map(item => {
         options.push({ value: item.keyname, label: item.display_name });
     })
-
-    const handleChange = (value: string) => {       
-        setCurrentFieldData(value);
-    };
 
     const dataTypeCheck = async () => {
         const fields = await route('feature_layer.field', id).get<FeatureLayerField>({ id: id });
@@ -109,86 +88,62 @@ export const FilterByData = ({
         if (dateType) {
             const query = { geom: 'no', extensions: 'no', order_by: currentFieldData }
             const item = await route('feature_layer.feature.collection', id).get({ query });
-            let date = [validDate(item, 0, currentFieldData), validDate(item, 1, currentFieldData)];
-            setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]);
+            const date = [validDate(item, 0, currentFieldData), validDate(item, 1, currentFieldData)];
+            return date;
         }
     };
 
     useEffect(() => {
         startValue()
+            .then((date) => {
+                date ? setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]) : null
+            })
     }, [dateType, currentFieldData]);
 
     const disabledDate = (current) => {
         return current && current < valueStart[0] || current && current > valueStart[1];
     };
 
-    const map = display.map.olMap;
-    const customLayer = display.map.layers.FilterByDataLayer.olLayer;
-
-    const updateFeature = async () => {
-        if (!value.includes['']) {
-            return value;
-        }
-    };
-
-    const setProps = async () => {
-        if (!value.includes['']) {
-            customLayer.setSource(new VectorSource({
-                format: new GeoJSON()
-            }))
-            customLayer.getSource().setUrl(routeURL("feature_layer.geojson_filter_by_data", id, currentFieldData, value[0], value[1]));
-            return customLayer
-        }
-    };
-
     useEffect(() => {
-        if (status == true && !open) {
-            updateFeature()
-                .then((item) => {
-                    let params = {
-                        ["fld_" + currentFieldData + "__ge"]: formatNgwAttribute(datatype, item[0]),
-                        ["fld_" + currentFieldData + "__le"]: formatNgwAttribute(datatype, item[1]),
-                    }
-                    setParams(params)
-                })
-            setProps()
-                .then((item) => {
-                    item.getSource().once('change', () => {
-                        let extent = item.getSource().getExtent();
-                        if (!isFinite(extent[0])) {
-                            return;
-                        } else {
-                            map.getView().fit(extent, map.getSize());
-                        }
-                    });
-                })
-            setStatus(false);
+        if (status && !open) {
+            if (!value.includes['']) {
+                let params = {
+                    ["fld_" + currentFieldData + "__ge"]: formatNgwAttribute(datatype, value[0]),
+                    ["fld_" + currentFieldData + "__le"]: formatNgwAttribute(datatype, value[1]),
+                }
+                setParams(params)
+                setStatus(false);
+            }
         }
     }, [status, open, currentFieldData]);
 
     const onOpenChangeRange = (open) => {
         setOpen(open);
     }
-    const onChangeRangePicker = (item, dateString) => {
+
+    const handleChange = (value: string) => {
+        setCurrentFieldData(value);
+        setValue([]);
+    };
+
+    console.log('выбор поля', valueStart)
+
+    const onChangeRangePicker = (item) => {
         if (item) {
-            setValue(dateString);
+            setValue(item);
             setStatus(true)
-        }
-        if (!item) {
-            clearObject();
+        } else {
+            setValue([]);
+            // setValueStart([]);
+            // setStatus(false)
+            // startValue();
+            setParams(undefined)
+            // setOpen(!open);
         }
     }
 
-    const clearObject = () => {
-        customLayer.getSource().clear();
-        display._zoomToInitialExtent();
-        setStatus(false)
-        startValue();
-        setParams(undefined)
-    };
-
     const addAllObject = () => {
-        setValue([formatNgwAttribute(datatype, valueStart[0]), formatNgwAttribute(datatype, valueStart[1])])
+        setValue(valueStart)
         setStatus(true)
     };
 
@@ -219,19 +174,16 @@ export const FilterByData = ({
                                         disabledDate={disabledDate}
                                         onOpenChange={onOpenChangeRange}
                                         onChange={onChangeRangePicker}
-                                        value={valueStart}
+                                        value={value.length > 0 ? value : valueStart.length > 0 ? valueStart : []}
                                     />
                                 </Tooltip>
-                                <Tooltip title={msgAllObject}>
+                                <Tooltip title={msgAllInterval}>
                                     <Button
                                         type="text"
                                         onClick={addAllObject}
                                         icon={<ZoomInMap />}
                                     />
                                 </Tooltip>
-                            </div>
-                            <div className="info-list">
-                                {store.checked.includes(display.item.id[0]) ? <></> : <InfoCard />}
                             </div>
                         </div>
                         : null}

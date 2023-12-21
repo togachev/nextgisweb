@@ -457,8 +457,8 @@ msgid "Turn on a layer to get information about an object"
 msgstr "Включите слой для получения информации об объекте"
 
 #: nodepkg/filter-by-data/FilterByData.tsx:46
-msgid "Add all layer objects"
-msgstr "Добавить все объекты слоя"
+msgid "Apply filter for entire interval"
+msgstr "Применить фильтр для всего интервала"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:57
 msgid "Radius:"

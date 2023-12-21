@@ -148,9 +148,6 @@ export function WebMapFeatureGridTab({
         return (
             <FilterByData
                 {...props}
-                store={display.current.webmapStore}
-                nodeData={itemConfig.current}
-                display={display.current}
                 setParams={setParams}
             />
         );
@@ -210,8 +207,8 @@ export function WebMapFeatureGridTab({
                         }}
                     />
                 ),
-                !params ? filterExtentBtn : null,
-                !queryIntersects ? filterByDataBtn : null,
+                filterExtentBtn,
+                filterByDataBtn,
             ],
         };
     }, [

@@ -26,7 +26,6 @@ define([
     "./controls/MyLocation",
     "./FeatureHighlighter",
     "./FeatureHighlighterDiagram",
-    "./VectorImage",
     "./MapStatesObserver",
     "./ui/react-panel",
     "./ui/react-webmap-tabs",
@@ -77,7 +76,6 @@ define([
     MyLocation,
     FeatureHighlighter,
     FeatureHighlighterDiagram,
-    VectorImage,
     MapStatesObserver,
     reactPanel,
     ReactWebMapTabs,
@@ -328,9 +326,6 @@ define([
                             this.map
                         );
                         widget.featureHighlighterDiagram = new FeatureHighlighterDiagram(
-                            this.map
-                        );
-                        widget.FilterByFieldLayer = new VectorImage(
                             this.map
                         );
                     })
