@@ -3,11 +3,14 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import Draggable from "react-draggable";
 
+import { Select, Button, Dropdown, Space, DatePicker, Tooltip } from "@nextgisweb/gui/antd";
+
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import SortIcon from "./component/SortIcon";
+import History from "@nextgisweb/icon/material/history";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type {
@@ -20,6 +23,8 @@ import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import "./FeatureTable.less";
+
+const dataType = ["DATE", "DATETIME"]
 
 type EffectiveWidths = Record<string, number>;
 
@@ -292,7 +297,9 @@ const FeatureTable = ({
                             id,
                             display_name: label,
                             flex,
+                            datatype
                         } = column;
+
                         const colSort =
                             orderBy && orderBy[0] === keyname && orderBy[1];
 
@@ -313,11 +320,26 @@ const FeatureTable = ({
                                 onClick={() => toggleSorting(keyname)}
                             >
                                 <div className="label">{label}</div>
-                                {colSort && (
-                                    <div className="suffix">
-                                        <SortIcon dir={colSort} />
-                                    </div>
-                                )}
+                                <div className="button-column">
+                                    {colSort && (
+                                        <div className="suffix">
+                                            <SortIcon dir={colSort} />
+                                        </div>
+                                    )}
+                                    {dataType.includes(datatype) ?
+                                        <Button
+                                            onClick={(e) => {
+                                                console.log(column);
+                                                e.stopPropagation();
+                                            }}
+                                            type="text"
+                                            title="Filter by DATE and DATE" size="small">
+                                            <Space>
+                                                <History />
+                                            </Space>
+                                        </Button>
+                                        : <></>}
+                                </div>
                             </div>
                         );
                     })
