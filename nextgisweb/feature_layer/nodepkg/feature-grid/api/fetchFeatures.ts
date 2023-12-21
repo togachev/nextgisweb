@@ -61,11 +61,11 @@ export function fetchFeatures({
     } else if (ilike) {
         query.ilike = ilike;
     }
-    
+
     if (params) {
-        const keys = Object.keys(params)
-        query[keys[0]] = params[keys[0]];
-        query[keys[1]] = params[keys[1]];
+        for (const [key] of Object.entries(params)) {
+            query[key] = params[key];
+        }
     }
 
     if (intersects) {

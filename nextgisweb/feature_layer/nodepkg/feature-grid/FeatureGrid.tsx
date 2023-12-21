@@ -39,7 +39,7 @@ export interface FeatureGridProps {
     selectedIds?: number[];
     editOnNewPage?: boolean;
     queryIntersects?: string;
-    params?: string;
+    // params?: string;
     cleanSelectedOnFilter?: boolean;
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
@@ -63,7 +63,7 @@ export const FeatureGrid = ({
     selectedIds,
     editOnNewPage,
     queryIntersects,
-    params,
+    // params,
     cleanSelectedOnFilter = true,
     beforeDelete,
     deleteError,
@@ -195,7 +195,7 @@ export const FeatureGrid = ({
                 resourceId={id}
                 visibleFields={visibleFields}
                 queryIntersects={queryIntersects}
-                params={params}
+                // params={params}
                 cleanSelectedOnFilter={cleanSelectedOnFilter}
                 setSelected={setSelected}
                 loadingCol={loadingCol}

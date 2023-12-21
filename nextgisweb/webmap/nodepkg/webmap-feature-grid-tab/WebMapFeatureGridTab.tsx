@@ -11,7 +11,7 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
-import FilterByData from "@nextgisweb/webmap/filter-by-data";
+import FilterByData from "@nextgisweb/webmap/filter-by-data-old";
 
 import type {
     DisplayItemConfig,
@@ -37,7 +37,7 @@ export function WebMapFeatureGridTab({
     const [version, setVersion] = useState(0);
     const [query, setQuery] = useState("");
     const [queryIntersects, setQueryIntersects] = useState<string>();
-    const [params, setParams] = useState<string>(undefined);
+    // const [params, setParams] = useState<string>(undefined);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
@@ -144,21 +144,21 @@ export function WebMapFeatureGridTab({
         );
     }, []);
 
-    const filterByDataBtn = useCallback((props) => {
-        return (
-            <FilterByData
-                {...props}
-                setParams={setParams}
-            />
-        );
-    }, []);
+    // const filterByDataBtn = useCallback((props) => {
+    //     return (
+    //         <FilterByData
+    //             {...props}
+    //             setParams={setParams}
+    //         />
+    //     );
+    // }, []);
 
     const featureGridProps = useMemo<FeatureGridProps>(() => {
         return {
             id: layerId,
             query,
             queryIntersects,
-            params,
+            // params,
             readonly: data.current?.readonly ?? true,
             size: "small",
             cleanSelectedOnFilter: false,
@@ -208,7 +208,7 @@ export function WebMapFeatureGridTab({
                     />
                 ),
                 filterExtentBtn,
-                filterByDataBtn,
+                // filterByDataBtn,
             ],
         };
     }, [
@@ -216,7 +216,7 @@ export function WebMapFeatureGridTab({
         layerId,
         query,
         queryIntersects,
-        params,
+        // params,
         reloadLayer,
         zoomToFeature,
     ]);

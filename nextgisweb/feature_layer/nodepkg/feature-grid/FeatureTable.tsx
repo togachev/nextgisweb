@@ -3,14 +3,11 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import Draggable from "react-draggable";
 
-import { Select, Button, Dropdown, Space, DatePicker, Tooltip } from "@nextgisweb/gui/antd";
-
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import SortIcon from "./component/SortIcon";
-import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type {
@@ -21,6 +18,7 @@ import type {
 } from "./type";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
 
 import "./FeatureTable.less";
 
@@ -37,7 +35,6 @@ interface FeatureTableProps {
     resourceId: number;
     visibleFields?: number[];
     queryIntersects?: string;
-    params?: string;
     deletedFeatureIds?: number[];
     cleanSelectedOnFilter: boolean;
     setSelected: Dispatch<SetStateAction<FeatureAttrs[]>>;
@@ -56,7 +53,6 @@ const FeatureTable = ({
     resourceId,
     visibleFields = [],
     queryIntersects,
-    params,
     cleanSelectedOnFilter = true,
     setSelected,
     loadingCol,
@@ -77,7 +73,8 @@ const FeatureTable = ({
     const [userDefinedWidths, setUserDefinedWidths] = useState<
         Record<string, number>
     >({});
-
+    const [params, setParams] = useState<string>(undefined);
+    
     const columns = useMemo<FeatureLayerFieldCol[]>(() => {
         const cols = [];
         const fields_: FeatureLayerFieldCol[] = [
@@ -327,17 +324,12 @@ const FeatureTable = ({
                                         </div>
                                     )}
                                     {dataType.includes(datatype) ?
-                                        <Button
-                                            onClick={(e) => {
-                                                console.log(column);
-                                                e.stopPropagation();
-                                            }}
-                                            type="text"
-                                            title="Filter by DATE and DATE" size="small">
-                                            <Space>
-                                                <FilterIcon />
-                                            </Space>
-                                        </Button>
+                                        <FilterByData
+                                            resourceId={resourceId}
+                                            column={column}
+                                            setParams={setParams}
+                                            params={params}
+                                        />
                                         : <></>}
                                 </div>
                             </div>
