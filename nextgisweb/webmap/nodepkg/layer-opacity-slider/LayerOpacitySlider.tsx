@@ -7,7 +7,13 @@ import "./LayerOpacitySlider.less";
 
 const msgTooltip = gettext("Opacity");
 
-export function LayerOpacitySlider({ onChange, defaultValue }) {
+export function LayerOpacitySlider({
+    onChange,
+    defaultValue,
+}: {
+    onChange: (opacity: number) => void;
+    defaultValue: number;
+}) {
     return (
         <div className="ngw-webmap-layer-opacity-slider">
             <Tooltip title={msgTooltip}>

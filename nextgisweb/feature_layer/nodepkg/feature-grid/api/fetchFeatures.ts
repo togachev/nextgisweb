@@ -15,25 +15,24 @@ interface FeatureLayerQuery {
     like?: string;
     ilike?: string;
     intersects?: string;
-    params?: string;
 }
 
-interface FetchFeaturesOptions {
+export interface FetchFeaturesOptions {
     resourceId: number;
+    intersects?: string;
     orderBy?: OrderBy;
     signal?: AbortSignal;
     fields?: string[];
     offset?: number;
     limit?: number;
     cache?: boolean;
-    like?: string;
     ilike?: string;
-    intersects?: string;
-    params?: string;
+    like?: string;
 }
 
 export function fetchFeatures({
     resourceId,
+    intersects,
     orderBy,
     signal,
     fields,
@@ -42,8 +41,6 @@ export function fetchFeatures({
     cache,
     like,
     ilike,
-    intersects,
-    params
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
         offset,
@@ -60,12 +57,6 @@ export function fetchFeatures({
         query.like = like;
     } else if (ilike) {
         query.ilike = ilike;
-    }
-
-    if (params) {
-        for (const [key] of Object.entries(params)) {
-            query[key] = params[key];
-        }
     }
 
     if (intersects) {
