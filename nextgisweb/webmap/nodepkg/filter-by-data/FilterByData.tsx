@@ -1,96 +1,78 @@
-import { useEffect, useState, Dispatch, SetStateAction } from "react";
-import { Select, Button, Dropdown, Space, DatePicker, Tooltip } from "@nextgisweb/gui/antd";
+import { useCallback, useEffect, useState } from "react";
+import { Button, Dropdown, DatePicker, Tooltip } from "@nextgisweb/gui/antd";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
+import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
-import type { FeatureGridStore } from "../FeatureGridStore";
-import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
-import type { SelectProps } from 'antd';
+import type { QueryParams } from "@nextgisweb/feature-layer/feature-grid/hook/useFeatureTable";
+import type { FeatureLayerField, SetValue } from "@nextgisweb/feature-layer/feature-grid/type";
 
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
-
 import "./FilterByData.less";
 
-import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
 const { RangePicker } = DatePicker;
 
 const msgAllInterval = gettext("Apply filter for entire interval");
 const msgRangePicker = gettext("Select date range");
-const msgSelectField = gettext("Select field");
 
 const dataType = ["DATE", "DATETIME"]
 const dt = '1970-01-01';
 
 interface FilterByDataProps {
     resourceId: number;
-    fields: FeatureLayerField[];
-    visibleFields?: number[];
-    store: FeatureGridStore;
+    column: FeatureLayerField;
+    queryParams?: QueryParams;
+    setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
 }
 
 export const FilterByData = ({
     resourceId,
-    fields,
-    visibleFields = [],
-    store,
+    column,
+    queryParams,
+    setQueryParams,
 }: FilterByDataProps) => {
+    const { keyname, datatype } = column;
+
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
     const [status, setStatus] = useState<boolean>(false);
     const [open, setOpen] = useState();
-    const [currentField, setCurrentField] = useState<string>();
-    
-    console.log(valueStart, value);
-    
 
-    const options: SelectProps['options'] = [];
-    const columnFilter = fields.filter((item) => dataType.includes(item.datatype) && visibleFields.includes(item.id))
-    columnFilter.map(item => {
-        options.push({ value: item.id, label: item.display_name });
-    })
+    const [isSending, setIsSending] = useState(false)
 
-
-
-    const startValue = async () => {
-        const query = { geom: 'no', extensions: 'no', order_by: currentField.keyname, ["fld_" + currentField.keyname + "__ne"]: dt }
+    const startValue = useCallback(async () => {
+        if (isSending) return;
+        setIsSending(true)
+        const query = { geom: 'no', extensions: 'no', order_by: keyname, ["fld_" + keyname + "__ne"]: dt }
         const item = await route('feature_layer.feature.collection', resourceId).get({ query });
-        return item;
-    };
-    
-    useEffect(() => {
-        if (currentField) {
-            startValue()
-                .then((item) => {
-                    console.log(item);
-                    const date = [item[0].fields[currentField.keyname], item.at(-1).fields[currentField.keyname]];
-                    item ?
-                        setValueStart([parseNgwAttribute(currentField.datatype, date[0]), parseNgwAttribute(currentField.datatype, date[1])])
-                        : null
-                })
-        }
 
-    }, [currentField]);
-    console.log(store.queryParams);
-    
+        const date = [item[0].fields[keyname], item.at(-1).fields[keyname]];
+
+        item ? value.length > 0 ? setValueStart(value) :
+        setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]) : null
+
+        setIsSending(false)
+    }, [isSending])
+
     useEffect(() => {
-        if (status && !open && currentField) {
+        if (status && !open) {
             if (!value.includes['']) {
                 let fld = {
-                    ["fld_" + currentField.keyname + "__ge"]: formatNgwAttribute(currentField.datatype, value[0]),
-                    ["fld_" + currentField.keyname + "__le"]: formatNgwAttribute(currentField.datatype, value[1]),
+                    ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
+                    ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
                 }
-
-                store.setQueryParams({
-                    ...store.queryParams,
-                    parameters: fld,
+                setQueryParams({
+                    ...queryParams,
+                    ...fld,
                 })
                 setStatus(false);
             }
         }
-    }, [status, open, currentField]);
+    }, [status, open]);
 
     const disabledDate = (current) => {
         return current && current < valueStart[0] || current && current > valueStart[1];
@@ -106,6 +88,7 @@ export const FilterByData = ({
             setStatus(true)
         } else {
             setValue([]);
+            setQueryParams(undefined)
         }
     }
 
@@ -113,10 +96,7 @@ export const FilterByData = ({
         setValue(valueStart)
         setStatus(true)
     };
-    const handleChange = (value: number) => {
-        setCurrentField(columnFilter.find(item => item.id === value));
-        setValue([]);
-    };
+
     return (
         <Dropdown
             overlayClassName="filter-by-data-menu"
@@ -129,25 +109,14 @@ export const FilterByData = ({
                     }}
                 >
                     <div className="range-picker-input">
-                        <Tooltip title={msgSelectField}>
-                            <Select
-                                defaultValue={currentField}
-                                style={{
-                                    maxWidth: 200,
-                                    margin: '0 4px 0px 0',
-                                }}
-                                onChange={handleChange}
-                                options={options}
-                            />
-                        </Tooltip>
                         <Tooltip title={msgRangePicker}>
                             <RangePicker
                                 defaultValue={valueStart}
-                                showTime={currentField?.datatype === "DATETIME" ? true : false}
+                                showTime={datatype === "DATETIME" ? true : false}
                                 disabledDate={disabledDate}
                                 onOpenChange={onOpenChangeRange}
                                 onChange={onChangeRangePicker}
-                                value={value.length > 0 ? value : valueStart.length > 0 ? valueStart : []}
+                                value={valueStart}
                             />
                         </Tooltip>
                         <Tooltip title={msgAllInterval}>
@@ -162,16 +131,13 @@ export const FilterByData = ({
             )}
         >
             <Button
+                type="text"
                 onClick={(e) => {
                     e.stopPropagation();
+                    startValue();
                 }}
-                type="text"
-                title="Filter by DATE and DATE" size="small"
-            >
-                <Space>
-                    <FilterIcon />
-                </Space>
-            </Button>
+                icon={dataType.includes(datatype) && (<FilterIcon />)}
+            />
         </Dropdown >
     )
 }

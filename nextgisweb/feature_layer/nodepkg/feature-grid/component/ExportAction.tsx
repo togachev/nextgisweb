@@ -41,7 +41,7 @@ export const ExportAction = ({
 }: ExportActionProps) => {
     const { exportFeatureLayer, openExportPage, exportLoading } =
         useExportFeatureLayer({ id });
-
+    
     const isFilterSet =
         !!queryParams && Object.values(queryParams).some(Boolean);
 
@@ -70,7 +70,14 @@ export const ExportAction = ({
             },
         ],
         onClick: (e) => {
-            const params: ExportFeatureLayerOptions = queryParams || {};
+            let params: ExportFeatureLayerOptions = queryParams || {};
+            if (params.params_fld) {
+                for (const [key, value] of Object.entries(params.params_fld)) {
+                    params[key] = value;
+                }
+                delete params.params_fld;  
+            }
+        
             if (e.key === settingsKey) {
                 openExportPage(params);
             } else {

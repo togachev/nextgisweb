@@ -15,7 +15,7 @@ export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export type ColOrder = "asc" | "desc" | null;
 
-export type OrderBy = [keynme: string, ordering: ColOrder];
+export type OrderBy = [keyname: string, ordering: ColOrder];
 
 export interface FeatureLayerFieldCol extends FeatureLayerField {
     flex?: string;

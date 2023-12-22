@@ -20,8 +20,6 @@ import type { FeatureGridProps } from "./type";
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
-import FilterByData from "@nextgisweb/webmap/filter-by-data";
-
 import "./FeatureGrid.less";
 
 const msgSettingsTitle = gettext("Open table settings");
@@ -104,14 +102,6 @@ export const FeatureGrid = observer(
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
                     <Tooltip title={msgRefreshTitle}>
-                        <FilterByData
-                            resourceId={id}
-                            fields={fields}
-                            visibleFields={visibleFields}
-                            store={store}
-                        />
-                    </Tooltip>
-                    <Tooltip title={msgRefreshTitle}>
                         <Button
                             type="text"
                             icon={<RefreshIcon />}
@@ -141,6 +131,7 @@ export const FeatureGrid = observer(
                     resourceId={id}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
+                    setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
                 />

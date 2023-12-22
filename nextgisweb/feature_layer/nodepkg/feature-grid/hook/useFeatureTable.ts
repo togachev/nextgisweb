@@ -16,7 +16,7 @@ const debouncedFn = debounce((fn) => {
 }, 100);
 
 export type QueryParams = Partial<
-    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects" | "parameters">
+    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects" | "params_fld">
 >;
 
 export interface UseFeatureTableProps {
@@ -248,7 +248,7 @@ export function useFeatureTable({
         if (loaderCache.current) {
             loaderCache.current.clean();
         }
-    }, [total]);
+    }, [total, queryParams]);
 
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);

@@ -22,6 +22,8 @@ import type {
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
+
 import "./FeatureTable.less";
 
 type EffectiveWidths = Record<string, number>;
@@ -33,6 +35,7 @@ interface FeatureTableProps {
     selectedIds: number[];
     resourceId: number;
     queryParams?: QueryParams;
+    setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
     visibleFields?: number[];
     queryIntersects?: string;
     deletedFeatureIds?: number[];
@@ -52,6 +55,7 @@ const FeatureTable = observer(
         resourceId,
         selectedIds,
         queryParams,
+        setQueryParams,
         visibleFields = [],
         queryIntersects,
         cleanSelectedOnFilter = true,
@@ -319,11 +323,19 @@ const FeatureTable = observer(
                                     onClick={() => toggleSorting(keyname)}
                                 >
                                     <div className="label">{label}</div>
-                                    {colSort && (
-                                        <div className="suffix">
-                                            <SortIcon dir={colSort} />
-                                        </div>
-                                    )}
+                                    <div className="button-column">
+                                        {colSort && (
+                                            <div className="suffix">
+                                                <SortIcon dir={colSort} />
+                                            </div>
+                                        )}
+                                        <FilterByData
+                                            resourceId={resourceId}
+                                            column={column}
+                                            queryParams={queryParams}
+                                            setQueryParams={setQueryParams}
+                                        />
+                                    </div>
                                 </div>
                             );
                         })
