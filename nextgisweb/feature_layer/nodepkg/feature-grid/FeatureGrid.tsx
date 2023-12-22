@@ -20,6 +20,8 @@ import type { FeatureGridProps } from "./type";
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
+
 import "./FeatureGrid.less";
 
 const msgSettingsTitle = gettext("Open table settings");
@@ -101,26 +103,32 @@ export const FeatureGrid = observer(
         return (
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
-                    <div>
-                        <Tooltip title={msgRefreshTitle}>
-                            <Button
-                                type="text"
-                                icon={<RefreshIcon />}
-                                onClick={bumpVersion}
-                                size={size}
-                            />
-                        </Tooltip>
-                        <Tooltip title={msgSettingsTitle}>
-                            <Button
-                                type="text"
-                                icon={<TuneIcon />}
-                                onClick={() => {
-                                    store.setSettingsOpen(!store.settingsOpen);
-                                }}
-                                size={size}
-                            />
-                        </Tooltip>
-                    </div>
+                    <Tooltip title={msgRefreshTitle}>
+                        <FilterByData
+                            resourceId={id}
+                            fields={fields}
+                            visibleFields={visibleFields}
+                            store={store}
+                        />
+                    </Tooltip>
+                    <Tooltip title={msgRefreshTitle}>
+                        <Button
+                            type="text"
+                            icon={<RefreshIcon />}
+                            onClick={bumpVersion}
+                            size={size}
+                        />
+                    </Tooltip>
+                    <Tooltip title={msgSettingsTitle}>
+                        <Button
+                            type="text"
+                            icon={<TuneIcon />}
+                            onClick={() => {
+                                store.setSettingsOpen(!store.settingsOpen);
+                            }}
+                            size={size}
+                        />
+                    </Tooltip>
                 </FeatureGridActions>
 
                 <FeatureTable

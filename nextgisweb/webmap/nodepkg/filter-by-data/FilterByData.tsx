@@ -3,11 +3,10 @@ import { Select, Button, Dropdown, Space, DatePicker, Tooltip } from "@nextgiswe
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
 
-import type { SizeType } from "@nextgisweb/gui/antd";
+import type { FeatureGridStore } from "../FeatureGridStore";
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
 import type { SelectProps } from 'antd';
 
-import History from "@nextgisweb/icon/material/history";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
@@ -20,67 +19,78 @@ const { RangePicker } = DatePicker;
 
 const msgAllInterval = gettext("Apply filter for entire interval");
 const msgRangePicker = gettext("Select date range");
+const msgSelectField = gettext("Select field");
+
+const dataType = ["DATE", "DATETIME"]
+const dt = '1970-01-01';
 
 interface FilterByDataProps {
     resourceId: number;
-    column: FeatureLayerField;
-    setParams: Dispatch<SetStateAction<string>>;
-    params?: string;
+    fields: FeatureLayerField[];
+    visibleFields?: number[];
+    store: FeatureGridStore;
 }
 
 export const FilterByData = ({
     resourceId,
-    column,
-    setParams,
-    params,
+    fields,
+    visibleFields = [],
+    store,
 }: FilterByDataProps) => {
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
     const [status, setStatus] = useState<boolean>(false);
     const [open, setOpen] = useState();
-
-    const {
-        keyname,
-        id,
-        display_name: label,
-        flex,
-        datatype
-    } = column;
-
-    console.log(column);
+    const [currentField, setCurrentField] = useState<string>();
+    
+    console.log(valueStart, value);
     
 
+    const options: SelectProps['options'] = [];
+    const columnFilter = fields.filter((item) => dataType.includes(item.datatype) && visibleFields.includes(item.id))
+    columnFilter.map(item => {
+        options.push({ value: item.id, label: item.display_name });
+    })
+
+
+
     const startValue = async () => {
-        const query = { geom: 'no', extensions: 'no', order_by: keyname, ["flg_" + keyname + "__ne"]: null }
+        const query = { geom: 'no', extensions: 'no', order_by: currentField.keyname, ["fld_" + currentField.keyname + "__ne"]: dt }
         const item = await route('feature_layer.feature.collection', resourceId).get({ query });
         return item;
     };
-
+    
     useEffect(() => {
-        startValue()
-            .then((date) => {
-                date ?
-                    setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])])
-                    : null
-            })
-    }, [keyname]);
+        if (currentField) {
+            startValue()
+                .then((item) => {
+                    console.log(item);
+                    const date = [item[0].fields[currentField.keyname], item.at(-1).fields[currentField.keyname]];
+                    item ?
+                        setValueStart([parseNgwAttribute(currentField.datatype, date[0]), parseNgwAttribute(currentField.datatype, date[1])])
+                        : null
+                })
+        }
 
+    }, [currentField]);
+    console.log(store.queryParams);
+    
     useEffect(() => {
-        if (status && !open) {
+        if (status && !open && currentField) {
             if (!value.includes['']) {
-                let paramsNew = {
-                    ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
-                    ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
+                let fld = {
+                    ["fld_" + currentField.keyname + "__ge"]: formatNgwAttribute(currentField.datatype, value[0]),
+                    ["fld_" + currentField.keyname + "__le"]: formatNgwAttribute(currentField.datatype, value[1]),
                 }
-                let unionParams = {
-                    ...paramsNew,
-                    ...params,
-                };
-                setParams(unionParams)
+
+                store.setQueryParams({
+                    ...store.queryParams,
+                    parameters: fld,
+                })
                 setStatus(false);
             }
         }
-    }, [status, open, keyname]);
+    }, [status, open, currentField]);
 
     const disabledDate = (current) => {
         return current && current < valueStart[0] || current && current > valueStart[1];
@@ -96,7 +106,6 @@ export const FilterByData = ({
             setStatus(true)
         } else {
             setValue([]);
-            setParams(undefined)
         }
     }
 
@@ -104,7 +113,10 @@ export const FilterByData = ({
         setValue(valueStart)
         setStatus(true)
     };
-
+    const handleChange = (value: number) => {
+        setCurrentField(columnFilter.find(item => item.id === value));
+        setValue([]);
+    };
     return (
         <Dropdown
             overlayClassName="filter-by-data-menu"
@@ -117,10 +129,21 @@ export const FilterByData = ({
                     }}
                 >
                     <div className="range-picker-input">
+                        <Tooltip title={msgSelectField}>
+                            <Select
+                                defaultValue={currentField}
+                                style={{
+                                    maxWidth: 200,
+                                    margin: '0 4px 0px 0',
+                                }}
+                                onChange={handleChange}
+                                options={options}
+                            />
+                        </Tooltip>
                         <Tooltip title={msgRangePicker}>
                             <RangePicker
                                 defaultValue={valueStart}
-                                showTime={datatype === "DATETIME" ? true : false}
+                                showTime={currentField?.datatype === "DATETIME" ? true : false}
                                 disabledDate={disabledDate}
                                 onOpenChange={onOpenChangeRange}
                                 onChange={onChangeRangePicker}
