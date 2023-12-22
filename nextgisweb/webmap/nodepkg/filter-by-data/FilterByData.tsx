@@ -28,22 +28,6 @@ interface FilterByDataProps {
     params?: string;
 }
 
-const validDate = (feat, r, data) => {
-    if (r == 0) {
-        if (!!feat[r].fields[data]) {
-            return feat[r].fields[data];
-        } else {
-            return validDate(feat, r + 1, data);
-        }
-    } else {
-        if (!!feat.at(-r).fields[data]) {
-            return feat.at(-r).fields[data];
-        } else {
-            return validDate(feat, r + 1, data);
-        }
-    }
-}
-
 export const FilterByData = ({
     resourceId,
     column,
@@ -63,13 +47,15 @@ export const FilterByData = ({
         datatype
     } = column;
 
-    const startValue = async () => {
-        const query = { geom: 'no', extensions: 'no', order_by: keyname }
-        const item = await route('feature_layer.feature.collection', resourceId).get({ query });
-        const date = [validDate(item, 0, keyname), validDate(item, 1, keyname)];
-        return date;
-    };
+    console.log(column);
     
+
+    const startValue = async () => {
+        const query = { geom: 'no', extensions: 'no', order_by: keyname, ["flg_" + keyname + "__ne"]: null }
+        const item = await route('feature_layer.feature.collection', resourceId).get({ query });
+        return item;
+    };
+
     useEffect(() => {
         startValue()
             .then((date) => {
@@ -158,7 +144,7 @@ export const FilterByData = ({
                 }}
                 type="text"
                 title="Filter by DATE and DATE" size="small"
-                >
+            >
                 <Space>
                     <FilterIcon />
                 </Space>

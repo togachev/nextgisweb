@@ -20,6 +20,8 @@ import type { FeatureAttrs } from "./type";
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
+
 import "./FeatureGrid.less";
 
 export interface ActionProps {
@@ -39,7 +41,6 @@ export interface FeatureGridProps {
     selectedIds?: number[];
     editOnNewPage?: boolean;
     queryIntersects?: string;
-    // params?: string;
     cleanSelectedOnFilter?: boolean;
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
@@ -63,7 +64,6 @@ export const FeatureGrid = ({
     selectedIds,
     editOnNewPage,
     queryIntersects,
-    // params,
     cleanSelectedOnFilter = true,
     beforeDelete,
     deleteError,
@@ -78,6 +78,8 @@ export const FeatureGrid = ({
     const { data: resourceData } = useRouteGet<ResourceItem>("resource.item", {
         id,
     });
+
+    const [params, setParams] = useState<string>(undefined);
 
     const [query, setQuery] = useState("");
     const [version, bumpVersion] = useReducer(
@@ -142,6 +144,9 @@ export const FeatureGrid = ({
         return <LoadingWrapper />;
     }
 
+    // const dataType = ["DATE", "DATETIME"]
+    // const columnFilter = fields.filter((item) => dataType.includes(item.datatype) && visibleFields.includes(item.id))
+
     return (
         <div className="ngw-feature-layer-feature-grid">
             <FeatureGridActions
@@ -184,7 +189,12 @@ export const FeatureGrid = ({
                     </Tooltip>
                 </div>
             </FeatureGridActions>
-
+            {/* <FilterByData
+                resourceId={id}
+                column={columnFilter}
+                setParams={setParams}
+                params={params}
+            /> */}
             <FeatureTable
                 empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                 total={totalData.total_count}
@@ -195,7 +205,7 @@ export const FeatureGrid = ({
                 resourceId={id}
                 visibleFields={visibleFields}
                 queryIntersects={queryIntersects}
-                // params={params}
+                params={params}
                 cleanSelectedOnFilter={cleanSelectedOnFilter}
                 setSelected={setSelected}
                 loadingCol={loadingCol}

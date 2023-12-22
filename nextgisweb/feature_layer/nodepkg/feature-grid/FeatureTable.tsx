@@ -18,11 +18,8 @@ import type {
 } from "./type";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
-import FilterByData from "@nextgisweb/webmap/filter-by-data";
 
 import "./FeatureTable.less";
-
-const dataType = ["DATE", "DATETIME"]
 
 type EffectiveWidths = Record<string, number>;
 
@@ -40,6 +37,7 @@ interface FeatureTableProps {
     setSelected: Dispatch<SetStateAction<FeatureAttrs[]>>;
     loadingCol: () => string;
     empty: () => ReactNode;
+    params: string;
 }
 
 const RESIZE_HANDLE_WIDTH = 6;
@@ -57,6 +55,7 @@ const FeatureTable = ({
     setSelected,
     loadingCol,
     empty,
+    params
 }: FeatureTableProps) => {
     const tbodyRef = useRef<HTMLDivElement>(null);
     const theadRef = useRef<HTMLDivElement>(null);
@@ -73,8 +72,7 @@ const FeatureTable = ({
     const [userDefinedWidths, setUserDefinedWidths] = useState<
         Record<string, number>
     >({});
-    const [params, setParams] = useState<string>(undefined);
-    
+
     const columns = useMemo<FeatureLayerFieldCol[]>(() => {
         const cols = [];
         const fields_: FeatureLayerFieldCol[] = [
@@ -317,21 +315,11 @@ const FeatureTable = ({
                                 onClick={() => toggleSorting(keyname)}
                             >
                                 <div className="label">{label}</div>
-                                <div className="button-column">
-                                    {colSort && (
-                                        <div className="suffix">
-                                            <SortIcon dir={colSort} />
-                                        </div>
-                                    )}
-                                    {dataType.includes(datatype) ?
-                                        <FilterByData
-                                            resourceId={resourceId}
-                                            column={column}
-                                            setParams={setParams}
-                                            params={params}
-                                        />
-                                        : <></>}
-                                </div>
+                                {colSort && (
+                                    <div className="suffix">
+                                        <SortIcon dir={colSort} />
+                                    </div>
+                                )}
                             </div>
                         );
                     })
