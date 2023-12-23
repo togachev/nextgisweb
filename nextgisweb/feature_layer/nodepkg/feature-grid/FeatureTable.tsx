@@ -332,7 +332,6 @@ const FeatureTable = observer(
                                         <FilterByData
                                             resourceId={resourceId}
                                             column={column}
-                                            queryParams={queryParams}
                                             setQueryParams={setQueryParams}
                                         />
                                     </div>

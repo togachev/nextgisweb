@@ -219,8 +219,6 @@ export function DiagramPanel({ value, close, clear }) {
                 },
             }
 
-            console.log(JSON.stringify(query));
-
             return fetch('http://192.168.14.171:8080/v1/recovery', {
                 method: 'POST',
                 body: JSON.stringify(query),

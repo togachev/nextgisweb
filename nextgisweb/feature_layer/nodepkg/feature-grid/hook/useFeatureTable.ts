@@ -16,7 +16,7 @@ const debouncedFn = debounce((fn) => {
 }, 100);
 
 export type QueryParams = Partial<
-    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects" | "params_fld">
+    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects" | "fld_field_op">
 >;
 
 export interface UseFeatureTableProps {

@@ -13,7 +13,6 @@ import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
 import "./FilterByData.less";
 
-
 const { RangePicker } = DatePicker;
 
 const msgAllInterval = gettext("Apply filter for entire interval");
@@ -25,14 +24,12 @@ const dt = '1970-01-01';
 interface FilterByDataProps {
     resourceId: number;
     column: FeatureLayerField;
-    queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
 }
 
 export const FilterByData = ({
     resourceId,
     column,
-    queryParams,
     setQueryParams,
 }: FilterByDataProps) => {
     const { keyname, datatype } = column;
@@ -53,7 +50,7 @@ export const FilterByData = ({
         const date = [item[0].fields[keyname], item.at(-1).fields[keyname]];
 
         item ? value.length > 0 ? setValueStart(value) :
-        setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]) : null
+            setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]) : null
 
         setIsSending(false)
     }, [isSending])
@@ -61,15 +58,15 @@ export const FilterByData = ({
     useEffect(() => {
         if (status && !open) {
             if (!value.includes['']) {
-                let fld = {
+                let params = {
                     ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
                     ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
                 }
-                setQueryParams({
-                    ...queryParams,
-                    ...fld,
-                })
-                setStatus(false);
+
+                setQueryParams((prev) => ({
+                    ...prev,
+                    fld_field_op: params,
+                }));
             }
         }
     }, [status, open]);
@@ -89,6 +86,7 @@ export const FilterByData = ({
         } else {
             setValue([]);
             setQueryParams(undefined)
+            setStatus(false);
         }
     }
 
