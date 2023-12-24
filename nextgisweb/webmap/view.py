@@ -8,8 +8,10 @@ from nextgisweb.env import _
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
 from nextgisweb.pyramid import viewargs
+from nextgisweb.render import IRenderableScaleRange
 from nextgisweb.render.api import legend_symbols_by_resource
 from nextgisweb.render.legend import ILegendSymbols
+from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_factory
 
@@ -160,6 +162,10 @@ def display(obj, request):
             if layer_enabled:
                 items_states.get("checked").append(item.id)
 
+            scale_range = item.scale_range()
+            if IRenderableScaleRange.providedBy(style):
+                scale_range = scale_range_intersection(scale_range, style.scale_range())
+
             # Main element parameters
 
             data.update(
@@ -174,8 +180,8 @@ def display(obj, request):
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
-                minScaleDenom=item.layer_min_scale_denom,
-                maxScaleDenom=item.layer_max_scale_denom,
+                minScaleDenom=scale_range[0],
+                maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
             )
