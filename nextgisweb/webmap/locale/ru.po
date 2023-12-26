@@ -6,69 +6,70 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:483 amd/ngw-webmap/tool/Zoom.js:14
+#: amd/ngw-webmap/Display.js:488 amd/ngw-webmap/tool/Zoom.js:14
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:503
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:484 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:489 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:1035
-msgid "Diagram"
-msgstr ""
-
-#: amd/ngw-webmap/Display.js:488 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
+#: amd/ngw-webmap/Display.js:493 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:504 amd/ngw-webmap/template/ExtentWidget.hbs:12
+#: amd/ngw-webmap/Display.js:509 amd/ngw-webmap/template/ExtentWidget.hbs:12
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:509
+#: amd/ngw-webmap/Display.js:514
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:512 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
+#: amd/ngw-webmap/Display.js:517 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:936 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
+#: amd/ngw-webmap/Display.js:941 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:937 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
+#: amd/ngw-webmap/Display.js:942 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:965 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:970 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:975
+#: amd/ngw-webmap/Display.js:980
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:985
+#: amd/ngw-webmap/Display.js:990
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:999
+#: amd/ngw-webmap/Display.js:1004
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1016 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1021 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: nodepkg/panel/description/DescriptionPanel.js:8
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1034
+#: amd/ngw-webmap/Display.js:1036
+msgid "Diagram"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:1057
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1086
+#: amd/ngw-webmap/Display.js:1109
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -408,7 +409,7 @@ msgstr "Открыть карту целиком"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:34 model.py:53 view.py:360 view.py:408
+#: model.py:34 model.py:53 view.py:366 view.py:414
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -432,7 +433,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:376
+#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:382
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -440,31 +441,19 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/filter-by-data/FilterByData.tsx:39
-msgid "Select field"
-msgstr "Выберите поле"
-
-#: nodepkg/filter-by-data/FilterByData.tsx:39
-msgid "Select date range"
-msgstr "Выберите диапазон дат"
-
-#: nodepkg/filter-by-data/FilterByData.tsx:40
-msgid "Filter layer by date"
-msgstr "Фильтр слоя по дате"
-
-#: nodepkg/filter-by-data/FilterByData.tsx:41
-msgid "Turn on a layer to get information about an object"
-msgstr "Включите слой для получения информации об объекте"
-
-#: nodepkg/filter-by-data/FilterByData.tsx:46
+#: nodepkg/filter-by-data/FilterByData.tsx:18
 msgid "Apply filter for entire interval"
 msgstr "Применить фильтр для всего интервала"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:57
+#: nodepkg/filter-by-data/FilterByData.tsx:19
+msgid "Select date range"
+msgstr "Выберите диапазон дат"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:56
 msgid "Radius:"
 msgstr "Радиус"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:58
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:57
 #: nodepkg/utils/format-units.tsx:13
 msgid "m"
 msgstr "м"
@@ -516,7 +505,7 @@ msgstr "Изменить геометрию для фильтра"
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
-#: nodepkg/layer-opacity-slider/LayerOpacitySlider.js:8
+#: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
 msgid "Opacity"
 msgstr "Непрозрачность"
 
@@ -528,11 +517,15 @@ msgstr "Дополнительные инструменты"
 msgid "Download attached files"
 msgstr "Скачать прикрепленные файлы"
 
-#: nodepkg/layers-tree/Legend.tsx:10
+#: nodepkg/layers-tree/IconItem.js:25
+msgid "Zoom to feature layer"
+msgstr ""
+
+#: nodepkg/layers-tree/Legend.tsx:12
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/Legend.tsx:11
+#: nodepkg/layers-tree/Legend.tsx:13
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
@@ -1027,27 +1020,27 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:47
+#: view.py:49
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:291
+#: view.py:297
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:304
+#: view.py:310
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:326
+#: view.py:332
 msgid "Setting up a web map group"
 msgstr ""
 
-#: view.py:366
+#: view.py:372
 msgid "Display"
 msgstr "Открыть"
 
-#: view.py:385
+#: view.py:391
 msgid "Group setting"
 msgstr "Настройка группы"
 
@@ -1059,4 +1052,13 @@ msgstr "Настройка группы"
 
 #~ msgid "Hide layer filter by date"
 #~ msgstr "Скрыть фильтр слоя по дате"
+
+#~ msgid "Select field"
+#~ msgstr "Выберите поле"
+
+#~ msgid "Filter layer by date"
+#~ msgstr "Фильтр слоя по дате"
+
+#~ msgid "Turn on a layer to get information about an object"
+#~ msgstr "Включите слой для получения информации об объекте"
 
