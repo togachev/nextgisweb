@@ -1,4 +1,4 @@
-from .api import query_feature_or_not_found
+from .api import query_feature_or_not_found, filter_feature_op
 from .component import FeatureLayerComponent
 from .event import on_data_change
 from .extension import FeatureExtension

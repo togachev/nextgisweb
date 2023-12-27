@@ -101,7 +101,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     column_from_const = db.Column(db.Unicode, nullable=True)
     column_key = db.Column(db.Integer, nullable=True)
     column_constraint = db.Column(db.Unicode, nullable=True)
-    fld_field_op = db.Column(db.JSONB, nullable=True)
 
     __field_class__ = VectorLayerField
 
@@ -378,7 +377,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def extent(self):
         return calculate_extent(self)
 
-
 def estimate_vector_layer_data(resource):
     tableinfo = TableInfo.from_layer(resource)
     tableinfo.setup_metadata(resource._tablename)
@@ -594,7 +592,6 @@ class VectorLayerSerializer(Serializer):
     column_from_const = SP(read=P_DSS_READ, write=P_DSS_WRITE)
     column_key = SP(read=P_DSS_READ, write=P_DSS_WRITE)
     column_constraint = SP(read=P_DSS_READ, write=P_DSS_WRITE)
-    fld_field_op = SP(read=P_DSS_READ, write=P_DSS_WRITE)
     fields = _fields_attr(write=P_DS_WRITE)
 
     delete_all_features = _delete_all_features_attr(write=P_DS_WRITE)

@@ -177,6 +177,34 @@ class ExportOptions:
 
         self.use_display_name = display_name.lower() == "true"
 
+# To filter the display of objects on the map
+def filter_feature_op(query, params, keynames):
+    filter_ = []
+    for param, value in params.items():
+        if param.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", param)
+        elif param == "id" or param.startswith("id__"):
+            fld_expr = param
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+
+        if key != "id" and key not in keynames:
+            raise ValidationError(message="Unknown field '%s'." % key)
+
+        filter_.append((key, operator, value))
+
+    if len(filter_) > 0:
+        query.filter(*filter_)
+
+    if "like" in params and IFeatureQueryLike.providedBy(query):
+        query.like(value)
+    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
+        query.ilike(value)
 
 def export(resource, options, filepath):
     query = resource.feature_query()
@@ -210,15 +238,7 @@ def export(resource, options, filepath):
     if options.fields is not None:
         query.fields(*options.fields)
 
-    filter_ = []
-    for k, v in options.fld_field_op.items():
-        if k.startswith("fld_"):
-            fld_expr = re.sub("^fld_", "", k)
-        try:
-            key, operator = fld_expr.rsplit("__", 1)
-        except ValueError:
-            key, operator = (fld_expr, "eq")
-        filter_.append((key, operator, v))
+    filter_ = resource.filter_feature_op(options.fld_field_op)
     if len(filter_) > 0:
         query.filter(*filter_)
 
