@@ -238,9 +238,7 @@ def export(resource, options, filepath):
     if options.fields is not None:
         query.fields(*options.fields)
     
-    # filter_ = resource.filter_feature_op(options.fld_field_op)
     if options.fld_field_op:
-        # query.filter(*filter_)
         filter_feature_op(query, options.fld_field_op, None)
 
     ogr_ds = _ogr_memory_ds()
