@@ -192,9 +192,9 @@ def filter_feature_op(query, params, keynames):
             key, operator = fld_expr.rsplit("__", 1)
         except ValueError:
             key, operator = (fld_expr, "eq")
-
-        if key != "id" and key not in keynames:
-            raise ValidationError(message="Unknown field '%s'." % key)
+        if keynames:
+            if key != "id" and key not in keynames:
+                raise ValidationError(message="Unknown field '%s'." % key)
 
         filter_.append((key, operator, value))
 
@@ -237,10 +237,11 @@ def export(resource, options, filepath):
 
     if options.fields is not None:
         query.fields(*options.fields)
-
-    filter_ = resource.filter_feature_op(options.fld_field_op)
-    if len(filter_) > 0:
-        query.filter(*filter_)
+    
+    # filter_ = resource.filter_feature_op(options.fld_field_op)
+    if options.fld_field_op:
+        # query.filter(*filter_)
+        filter_feature_op(query, options.fld_field_op, None)
 
     ogr_ds = _ogr_memory_ds()
     _ogr_layer = _ogr_layer_from_features(
