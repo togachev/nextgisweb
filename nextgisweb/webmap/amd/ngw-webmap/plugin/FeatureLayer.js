@@ -26,10 +26,12 @@ define([
         openFeatureGrid: function () {
             var item = this.display.dumpItem(),
                 layerId = item.layerId;
+                styleId = item.styleId;
 
             this.display.tabContainer.addTab({
                 key: String(layerId),
                 label: item.label,
+                styleId: item.styleId,
                 component: () =>
                     new Promise((resolve) => {
                         require([
@@ -41,6 +43,7 @@ define([
                 props: {
                     topic,
                     layerId: layerId,
+                    styleId: styleId,
                     plugin: this,
                 },
             });

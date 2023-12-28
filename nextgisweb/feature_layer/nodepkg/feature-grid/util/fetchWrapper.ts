@@ -8,7 +8,7 @@ import { updateFeaturesValue } from "../util/updateFeaturesValue";
 interface FetchWrapperProps
     extends Pick<
         UseFeatureTableProps,
-        "columns" | "pageSize" | "orderBy" | "resourceId" | "queryParams"
+        "columns" | "pageSize" | "orderBy" | "resourceId" | "styleId" | "queryParams"
     > {
     page: number;
     signal: AbortSignal;
@@ -25,6 +25,7 @@ export function fetchWrapper({
     orderBy,
     pageSize,
     resourceId,
+    styleId,
     queryParams,
 }: FetchWrapperProps) {
     if (!cache) {
@@ -42,6 +43,7 @@ export function fetchWrapper({
                 cache: false,
                 offset: page,
                 resourceId,
+                styleId,
                 orderBy,
                 signal,
                 ...queryParams,

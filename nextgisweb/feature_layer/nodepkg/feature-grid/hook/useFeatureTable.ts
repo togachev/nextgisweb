@@ -28,6 +28,7 @@ export interface UseFeatureTableProps {
     pageSize: number;
     tbodyRef?: RefObject<HTMLDivElement>;
     resourceId: number;
+    styleId: number;
     rowMinHeight: number;
     visibleFields: number[];
 }
@@ -96,6 +97,7 @@ export function useFeatureTable({
     pageSize,
     tbodyRef,
     resourceId,
+    styleId,
     queryParams,
     rowMinHeight,
     visibleFields,
@@ -192,6 +194,7 @@ export function useFeatureTable({
                                 orderBy,
                                 pageSize,
                                 resourceId,
+                                styleId,
                                 queryParams,
                             })
                         );

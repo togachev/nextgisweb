@@ -40,6 +40,7 @@ export const FeatureGrid = observer(
 
         const {
             id,
+            styleId,
             size,
             fields,
             version,
@@ -54,6 +55,7 @@ export const FeatureGrid = observer(
         const { data: totalData, refresh: refreshTotal } =
             useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
                 id,
+                styleId
             });
         const { data: resourceData, isLoading } = useRouteGet<ResourceItem>(
             "resource.item",
@@ -129,6 +131,7 @@ export const FeatureGrid = observer(
                     selectedIds={selectedIds}
                     loadingCol={loadingCol}
                     resourceId={id}
+                    styleId={styleId}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
                     setQueryParams={store.setQueryParams}
