@@ -220,7 +220,6 @@ def export(resource, options, filepath):
             )
 
     query.geom()
-
     if options.intersects_geom is not None:
         if options.intersects_srs is not None and options.intersects_srs.id != resource.srs_id:
             transformer = Transformer(options.intersects_srs.wkt, resource.srs.wkt)
@@ -825,7 +824,7 @@ def cget(resource, request) -> JSONType:
     styleId = request.GET.get("styleId")
     fld_field_op = style_attrs_from_resource(resource.children, styleId)
     if fld_field_op:
-        filter_feature_op(query, fld_field_op, None)
+        filter_feature_op(query, fld_field_op, keys)
 
     # Paging
     limit = request.GET.get("limit")
