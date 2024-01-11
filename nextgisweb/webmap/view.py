@@ -171,6 +171,7 @@ def display(obj, request):
             data.update(
                 layerId=style.parent_id,
                 styleId=style.id,
+                filter_options=style.fld_field_op, # для фильтрации
                 cls=style.cls, # для создания легенды (фильтрация ресурсов)
                 layerCls=layer.cls, # для создания легенды (фильтрация ресурсов)
                 labelLayer=layer.display_name, # Наименование слоя
