@@ -750,6 +750,33 @@ def idelete(resource, request) -> JSONType:
     fid = int(request.matchdict["fid"])
     resource.feature_delete(fid)
 
+def filter_feature_op(query, params, keynames):
+    filter_ = []
+    for param, value in params.items():
+        if param.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", param)
+        elif param == "id" or param.startswith("id__"):
+            fld_expr = param
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        if keynames:
+            if key != "id" and key not in keynames:
+                raise ValidationError(message="Unknown field '%s'." % key)
+
+        filter_.append((key, operator, value))
+
+    if len(filter_) > 0:
+        query.filter(*filter_)
+
+    if "like" in params and IFeatureQueryLike.providedBy(query):
+        query.like(value)
+    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
+        query.ilike(value)
 
 def apply_attr_filter(query, request, keynames):
     # Fields filters
@@ -825,6 +852,12 @@ def cget(resource, request) -> JSONType:
     fld_field_op = style_attrs_from_resource(resource.children, styleId)
     if fld_field_op:
         filter_feature_op(query, fld_field_op, keys)
+
+    d = {}
+    for k,v in dict(request.GET).items():
+        if k.startswith("fld_"):
+            d[k] = v
+    filter_feature_op(query, d, keys)
 
     # Paging
     limit = request.GET.get("limit")

@@ -25,6 +25,7 @@ interface FilterByDataProps {
     resourceId: number;
     styleId: number;
     column: FeatureLayerField;
+    queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
 }
 
@@ -32,6 +33,7 @@ export const FilterByData = ({
     resourceId,
     styleId,
     column,
+    queryParams,
     setQueryParams,
 }: FilterByDataProps) => {
     const { keyname, datatype } = column;
@@ -42,7 +44,8 @@ export const FilterByData = ({
     const [open, setOpen] = useState();
 
     const [isSending, setIsSending] = useState(false)
-
+    console.log(queryParams);
+    
     const startValue = useCallback(async () => {
         if (isSending) return;
         setIsSending(true)

@@ -336,6 +336,7 @@ const FeatureTable = observer(
                                             resourceId={resourceId}
                                             styleId={styleId}
                                             column={column}
+                                            queryParams={queryParams}
                                             setQueryParams={setQueryParams}
                                         />
                                     </div>
