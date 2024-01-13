@@ -16,12 +16,10 @@ interface FeatureLayerQuery {
     ilike?: string;
     intersects?: string;
     fld_field_op?: string;
-    styleId?: number;
 }
 
 export interface FetchFeaturesOptions {
     resourceId: number;
-    styleId: number;
     intersects?: string;
     orderBy?: OrderBy;
     signal?: AbortSignal;
@@ -36,7 +34,6 @@ export interface FetchFeaturesOptions {
 
 export function fetchFeatures({
     resourceId,
-    styleId,
     intersects,
     orderBy,
     signal,
@@ -55,7 +52,6 @@ export function fetchFeatures({
         extensions: "",
         dt_format: "iso",
         fields,
-        styleId
     };
     
     if (orderBy && orderBy[1]) {

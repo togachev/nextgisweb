@@ -5,7 +5,6 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
-from .api import filter_feature_op
 
 PR_R = ResourceScope.read
 
@@ -14,16 +13,16 @@ def identify(request) -> JSONType:
     data = request.json_body
     srs = int(data["srs"])
     geom = Geometry.from_wkt(data["geom"], srid=srs)
-    styles = map(int, data["styles"])
+    layers = map(int, data["layers"])
 
-    style_list = DBSession.query(Resource).filter(Resource.id.in_(styles))
+    layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
+
     result = dict()
 
     # Number of features in all layers
     feature_count = 0
 
-    for style in style_list:
-        layer = style.parent
+    for layer in layer_list:
         layer_id_str = str(layer.id)
         if not layer.has_permission(DataScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
@@ -33,8 +32,6 @@ def identify(request) -> JSONType:
 
         else:
             query = layer.feature_query()
-            if style.fld_field_op is not None:
-                filter_feature_op(query, style.fld_field_op, None)
             query.intersects(geom)
 
             # Limit number of identifiable features by 100 per layer,
@@ -72,9 +69,9 @@ def identifyConst(request) -> JSONType:
     data = request.json_body
     srs = int(data['srs'])
     geom = Geometry.from_wkt(data['geom'], srid=srs)
-    styles = map(int, data["styles"])
+    layers = map(int, data['layers'])
 
-    style_list = DBSession.query(Resource).filter(Resource.id.in_(styles))
+    layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
 
     result = dict()
 
@@ -83,8 +80,7 @@ def identifyConst(request) -> JSONType:
 
     constraint = None
 
-    for style in style_list:
-        layer = style.parent
+    for layer in layer_list:
         layer_id_str = str(layer.id)
         if not layer.has_permission(DataScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
@@ -94,8 +90,6 @@ def identifyConst(request) -> JSONType:
 
         elif layer.column_from_const:
             query = layer.feature_query()
-            if style.fld_field_op is not None:
-                filter_feature_op(query, style.fld_field_op, None)
             query.intersects(geom)
 
             # Limit number of identifyable features by 10 per layer,

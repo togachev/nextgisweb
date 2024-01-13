@@ -377,6 +377,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def extent(self):
         return calculate_extent(self)
 
+
 def estimate_vector_layer_data(resource):
     tableinfo = TableInfo.from_layer(resource)
     tableinfo.setup_metadata(resource._tablename)

@@ -23,7 +23,6 @@ const dt = '1970-01-01';
 
 interface FilterByDataProps {
     resourceId: number;
-    styleId: number;
     column: FeatureLayerField;
     queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
@@ -31,7 +30,6 @@ interface FilterByDataProps {
 
 export const FilterByData = ({
     resourceId,
-    styleId,
     column,
     queryParams,
     setQueryParams,
@@ -49,7 +47,7 @@ export const FilterByData = ({
     const startValue = useCallback(async () => {
         if (isSending) return;
         setIsSending(true)
-        const query = { styleId: styleId, geom: 'no', extensions: 'no', order_by: keyname, ["fld_" + keyname + "__ne"]: dt }
+        const query = { geom: 'no', extensions: 'no', order_by: keyname, ["fld_" + keyname + "__ne"]: dt }
         const item = await route('feature_layer.feature.collection', resourceId).get({ query });
 
         const date = [item[0].fields[keyname], item.at(-1).fields[keyname]];

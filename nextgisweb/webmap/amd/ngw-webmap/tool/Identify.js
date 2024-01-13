@@ -448,7 +448,7 @@ define([
             var request = {
                 srs: 3857,
                 geom: this._requestGeomString(pixel),
-                styles: []
+                layers: []
             };
 
             this.display.getVisibleItems().then(lang.hitch(this, function (items) {
@@ -460,7 +460,7 @@ define([
                         mapResolution < item.minResolution) {
                         return;
                     }
-                    request.styles.push(item.styleId);
+                    request.layers.push(item.layerId);
                 }, this);
             }));
 
@@ -629,7 +629,7 @@ define([
             var request = {
                 srs: 3857,
                 geom: this._requestGeomString(pixel),
-                styles: [],
+                layers: [],
             };
 
             this.display.getVisibleItems().then(
@@ -649,7 +649,7 @@ define([
                             ) {
                                 return;
                             }
-                            request.styles.push(item.styleId);
+                            request.layers.push(item.layerId);
                         },
                         this
                     );

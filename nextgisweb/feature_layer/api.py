@@ -177,34 +177,6 @@ class ExportOptions:
 
         self.use_display_name = display_name.lower() == "true"
 
-# To filter the display of objects on the map
-def filter_feature_op(query, params, keynames):
-    filter_ = []
-    for param, value in params.items():
-        if param.startswith("fld_"):
-            fld_expr = re.sub("^fld_", "", param)
-        elif param == "id" or param.startswith("id__"):
-            fld_expr = param
-        else:
-            continue
-
-        try:
-            key, operator = fld_expr.rsplit("__", 1)
-        except ValueError:
-            key, operator = (fld_expr, "eq")
-        if keynames:
-            if key != "id" and key not in keynames:
-                raise ValidationError(message="Unknown field '%s'." % key)
-
-        filter_.append((key, operator, value))
-
-    if len(filter_) > 0:
-        query.filter(*filter_)
-
-    if "like" in params and IFeatureQueryLike.providedBy(query):
-        query.like(value)
-    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
-        query.ilike(value)
 
 def export(resource, options, filepath):
     query = resource.feature_query()
@@ -220,6 +192,7 @@ def export(resource, options, filepath):
             )
 
     query.geom()
+
     if options.intersects_geom is not None:
         if options.intersects_srs is not None and options.intersects_srs.id != resource.srs_id:
             transformer = Transformer(options.intersects_srs.wkt, resource.srs.wkt)
@@ -236,9 +209,18 @@ def export(resource, options, filepath):
 
     if options.fields is not None:
         query.fields(*options.fields)
-    
-    if options.fld_field_op:
-        filter_feature_op(query, options.fld_field_op, None)
+
+    filter_ = []
+    for k, v in options.fld_field_op.items():
+        if k.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", k)
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        filter_.append((key, operator, v))
+    if len(filter_) > 0:
+        query.filter(*filter_)
 
     ogr_ds = _ogr_memory_ds()
     _ogr_layer = _ogr_layer_from_features(
@@ -827,11 +809,6 @@ def apply_intersect_filter(query, request, resource):
             raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
-def style_attrs_from_resource(list, styleId):
-    for x in list:
-        if x.id == int(styleId):
-            fld_field_op = x.fld_field_op
-            return fld_field_op
 
 def cget(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
@@ -848,10 +825,6 @@ def cget(resource, request) -> JSONType:
 
     keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
-    styleId = request.GET.get("styleId")
-    fld_field_op = style_attrs_from_resource(resource.children, styleId)
-    if fld_field_op:
-        filter_feature_op(query, fld_field_op, keys)
 
     d = {}
     for k,v in dict(request.GET).items():
@@ -989,10 +962,6 @@ def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     query = resource.feature_query()
-    styleId = request.matchdict["styleId"]
-    fld_field_op = style_attrs_from_resource(resource.children, styleId)
-    if fld_field_op:
-        filter_feature_op(query, fld_field_op, None)
     total_count = query().total_count
 
     return dict(total_count=total_count)
@@ -1158,7 +1127,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "feature_layer.feature.count",
-        "/api/resource/{id:uint}/feature_count/{styleId:uint}",
+        "/api/resource/{id:uint}/feature_count",
         factory=resource_factory,
     ).get(count, context=IFeatureLayer)
 
