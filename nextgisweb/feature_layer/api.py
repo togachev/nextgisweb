@@ -809,6 +809,10 @@ def apply_intersect_filter(query, request, resource):
             raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
+class FeatureQueryParams:
+    def __init__(self):
+        self.params_op = params_op
+        self.keys_op = keys_op
 
 def cget(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
@@ -831,6 +835,9 @@ def cget(resource, request) -> JSONType:
         if k.startswith("fld_"):
             d[k] = v
     filter_feature_op(query, d, keys)
+
+    FeatureQueryParams.params_op = d
+    FeatureQueryParams.keys_op = keys
 
     # Paging
     limit = request.GET.get("limit")

@@ -42,7 +42,6 @@ export const FilterByData = ({
     const [open, setOpen] = useState();
 
     const [isSending, setIsSending] = useState(false)
-    console.log(queryParams);
     
     const startValue = useCallback(async () => {
         if (isSending) return;
