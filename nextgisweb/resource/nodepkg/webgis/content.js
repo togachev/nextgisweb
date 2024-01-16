@@ -115,7 +115,6 @@ export const Content = ({ onChanges, ...rest }) => {
         if (search && search.length > 2) {
             const q = "";
             if (search) {
-                console.log(search);
                 const query = {
                     display_name__ilike: `%${search}%`, cls: 'webmap'
                 };

@@ -37,7 +37,6 @@ export const FilterByData = ({
     setQueryParams,
 }: FilterByDataProps) => {
     const { keyname, datatype } = column;
-    console.log(styleId);
     
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
