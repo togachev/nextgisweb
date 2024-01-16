@@ -62,8 +62,6 @@ const FeatureTable = observer(
         selectedIds,
         queryParams,
         setQueryParams,
-        columnFilter,
-        setColumnFilter,
         visibleFields = [],
         queryIntersects,
         cleanSelectedOnFilter = true,
