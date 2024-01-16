@@ -968,10 +968,8 @@ def cdelete(resource, request) -> JSONType:
 
 
 def count(resource, request) -> JSONType:
-    # raise ValidationError(_(str((FilterQueryParams.prop))))
     request.resource_permission(PERM_READ)
     query = resource.feature_query()
-    # if FilterQueryParams.prop["param"]:
     p = FilterQueryParams.prop
     filter_feature_op(query, p["param"], p["keys"])
 
