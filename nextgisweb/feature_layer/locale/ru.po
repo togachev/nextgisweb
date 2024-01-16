@@ -336,3 +336,6 @@ msgstr ""
 msgid "Features"
 msgstr "Объекты"
 
+#: nodepkg/feature-grid/FeatureTable.tsx:29
+msgid "Clear filter"
+msgstr "Очистить фильтр"

@@ -449,6 +449,10 @@ msgstr "Применить фильтр для всего интервала"
 msgid "Select date range"
 msgstr "Выберите диапазон дат"
 
+#: nodepkg/filter-by-data/FilterByData.tsx:20
+msgid "Add filter"
+msgstr "Добавить фильтр"
+
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:56
 msgid "Radius:"
 msgstr "Радиус"

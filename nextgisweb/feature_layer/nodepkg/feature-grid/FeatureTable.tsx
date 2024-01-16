@@ -308,7 +308,6 @@ const FeatureTable = observer(
                                 id,
                                 display_name: label,
                                 flex,
-                                datatype,
                             } = column;
 
                             const colSort =
@@ -350,8 +349,7 @@ const FeatureTable = observer(
                                             setQueryParams={setQueryParams}
                                         />
                                         {
-                                            dataType.includes(datatype) &&
-                                                filter_column == keyname ?
+                                            filter_column == keyname ?
                                                 <Tooltip title={msgClearFilter}>
                                                     <Button
                                                         type="text"

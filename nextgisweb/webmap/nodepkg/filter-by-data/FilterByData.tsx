@@ -17,6 +17,7 @@ const { RangePicker } = DatePicker;
 
 const msgAllInterval = gettext("Apply filter for entire interval");
 const msgRangePicker = gettext("Select date range");
+const msgAddFilter = gettext("Add filter");
 
 const dt = '1970-01-01';
 
@@ -38,14 +39,14 @@ export const FilterByData = ({
     dataType
 }: FilterByDataProps) => {
     const { keyname, datatype } = column;
-    
+
     const [valueStart, setValueStart] = useState<string[]>([]);
     const [value, setValue] = useState<string[]>([]);
     const [status, setStatus] = useState<boolean>(false);
     const [open, setOpen] = useState();
 
     const [isSending, setIsSending] = useState(false)
-    
+
     const startValue = useCallback(async () => {
         if (isSending) return;
         setIsSending(true)
@@ -136,14 +137,15 @@ export const FilterByData = ({
                 </div>
             )}
         >
-            <Button
-                type="text"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    startValue();
-                }}
-                icon={dataType.includes(datatype) && (<FilterIcon />)}
-            />
+            <Tooltip title={msgAddFilter}>
+                <Button
+                    type="text"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        startValue();
+                    }}
+                    icon={dataType.includes(datatype) && (<FilterIcon />)}
+                /></Tooltip>
         </Dropdown >
     )
 }
