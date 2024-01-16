@@ -499,11 +499,7 @@ def getMaplist(request) -> JSONType:
                 webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id, action_map=res_wmg.action_map,
                 preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
                 preview_description=None if res_social == None else res_social.preview_description))
-            # if not res.has_permission(PERM_READ, request.user) and action_map == True:
-            #     result.append(dict(id=res.id, value=res.id, owner=False, display_name=res.display_name, label=res.display_name,
-            #     webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id, action_map=res_wmg.action_map,
-            #     preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
-            #     preview_description=None if res_social == None else res_social.preview_description))
+
     is_adm = request.user.is_administrator
 
     return dict(scope=is_adm, result=result)

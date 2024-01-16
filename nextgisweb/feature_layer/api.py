@@ -214,6 +214,9 @@ def export(resource, options, filepath):
     for k, v in options.fld_field_op.items():
         if k.startswith("fld_"):
             fld_expr = re.sub("^fld_", "", k)
+        else:
+            continue
+
         try:
             key, operator = fld_expr.rsplit("__", 1)
         except ValueError:
@@ -809,10 +812,10 @@ def apply_intersect_filter(query, request, resource):
             raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
-class FeatureQueryParams:
-    def __init__(self):
-        self.params_op = params_op
-        self.keys_op = keys_op
+class FilterQueryParams:
+    prop = dict(param=dict(), keys=list())
+    def __init__(self, d):
+        self.prop.update(d)
 
 def cget(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
@@ -830,14 +833,13 @@ def cget(resource, request) -> JSONType:
     keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
-    d = {}
+    d = dict()
+    styleId = request.GET.get("styleId")
     for k,v in dict(request.GET).items():
         if k.startswith("fld_"):
             d[k] = v
     filter_feature_op(query, d, keys)
-
-    FeatureQueryParams.params_op = d
-    FeatureQueryParams.keys_op = keys
+    FilterQueryParams(dict(styleId=styleId, param=d, keys=keys))
 
     # Paging
     limit = request.GET.get("limit")

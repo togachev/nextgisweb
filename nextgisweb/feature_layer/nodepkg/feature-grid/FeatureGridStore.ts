@@ -12,6 +12,7 @@ import type { ActionProps, FeatureGridProps, SetValue } from "./type";
 
 export class FeatureGridStore {
     id: number;
+    styleId: number;
     size: SizeType = "middle";
     actions: ActionToolbarAction<ActionProps>[] = [];
     version = 0;
@@ -46,6 +47,10 @@ export class FeatureGridStore {
 
     setId = (id: number) => {
         this.id = id;
+    };
+
+    setStyleId = (styleId: number) => {
+        this.styleId = styleId;
     };
 
     setFields = (fields: FeatureLayerField[]) => {

@@ -34,6 +34,7 @@ interface FeatureTableProps {
     version?: number;
     selectedIds: number[];
     resourceId: number;
+    styleId: number;
     queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
     visibleFields?: number[];
@@ -53,6 +54,7 @@ const FeatureTable = observer(
         fields,
         version,
         resourceId,
+        styleId,
         selectedIds,
         queryParams,
         setQueryParams,
@@ -331,6 +333,7 @@ const FeatureTable = observer(
                                         )}
                                         <FilterByData
                                             resourceId={resourceId}
+                                            styleId={styleId}
                                             column={column}
                                             queryParams={queryParams}
                                             setQueryParams={setQueryParams}
