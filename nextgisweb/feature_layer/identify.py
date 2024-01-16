@@ -5,7 +5,7 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
-from .api import filter_feature_op
+from .api import filter_feature_op, FilterQueryParams
 
 PR_R = ResourceScope.read
 

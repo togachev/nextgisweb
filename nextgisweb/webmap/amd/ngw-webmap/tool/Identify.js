@@ -448,7 +448,6 @@ define([
             var request = {
                 srs: 3857,
                 geom: this._requestGeomString(pixel),
-                // layers: [],
                 styles: []
             };
 
@@ -461,7 +460,6 @@ define([
                         mapResolution < item.minResolution) {
                         return;
                     }
-                    // request.layers.push(item.layerId);
                     request.styles.push(item.styleId);
                 }, this);
             }));
@@ -631,7 +629,6 @@ define([
             var request = {
                 srs: 3857,
                 geom: this._requestGeomString(pixel),
-                // layers: [],
                 styles: [],
             };
 
@@ -652,7 +649,6 @@ define([
                             ) {
                                 return;
                             }
-                            // request.layers.push(item.layerId);
                             request.styles.push(item.styleId);
                         },
                         this

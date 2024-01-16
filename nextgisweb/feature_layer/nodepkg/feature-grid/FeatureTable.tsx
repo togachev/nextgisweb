@@ -23,6 +23,10 @@ import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
+import { Button, Tooltip } from "@nextgisweb/gui/antd";
+import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+const msgClearFilter = gettext("Clear filter");
 
 import "./FeatureTable.less";
 
@@ -58,6 +62,8 @@ const FeatureTable = observer(
         selectedIds,
         queryParams,
         setQueryParams,
+        columnFilter,
+        setColumnFilter,
         visibleFields = [],
         queryIntersects,
         cleanSelectedOnFilter = true,
@@ -304,13 +310,19 @@ const FeatureTable = observer(
                                 id,
                                 display_name: label,
                                 flex,
+                                datatype,
                             } = column;
+
                             const colSort =
                                 orderBy && orderBy[0] === keyname && orderBy[1];
 
                             const style = userDefinedWidths[id]
                                 ? { flex: `0 0 ${userDefinedWidths[id]}px` }
                                 : { flex };
+
+                            const dataType = ["DATE", "DATETIME"]
+
+                            const filter_column = queryParams?.fld_field_op?.keyname
 
                             return (
                                 <div
@@ -333,11 +345,25 @@ const FeatureTable = observer(
                                         )}
                                         <FilterByData
                                             resourceId={resourceId}
+                                            dataType={dataType}
                                             styleId={styleId}
                                             column={column}
                                             queryParams={queryParams}
                                             setQueryParams={setQueryParams}
                                         />
+                                        {
+                                            dataType.includes(datatype) &&
+                                                filter_column == keyname ?
+                                                <Tooltip title={msgClearFilter}>
+                                                    <Button
+                                                        type="text"
+                                                        onClick={() => {
+                                                            setQueryParams(undefined)
+                                                        }}
+                                                        icon={<FilterAltOff />}
+                                                    />
+                                                </Tooltip> : null
+                                        }
                                     </div>
                                 </div>
                             );

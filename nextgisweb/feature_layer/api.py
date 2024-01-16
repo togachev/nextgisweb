@@ -969,7 +969,6 @@ def cdelete(resource, request) -> JSONType:
 
 def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
-
     query = resource.feature_query()
     total_count = query().total_count
 

@@ -18,7 +18,6 @@ const { RangePicker } = DatePicker;
 const msgAllInterval = gettext("Apply filter for entire interval");
 const msgRangePicker = gettext("Select date range");
 
-const dataType = ["DATE", "DATETIME"]
 const dt = '1970-01-01';
 
 interface FilterByDataProps {
@@ -27,6 +26,7 @@ interface FilterByDataProps {
     column: FeatureLayerField;
     queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
+    dataType: string[];
 }
 
 export const FilterByData = ({
@@ -35,6 +35,7 @@ export const FilterByData = ({
     column,
     queryParams,
     setQueryParams,
+    dataType
 }: FilterByDataProps) => {
     const { keyname, datatype } = column;
     
@@ -63,6 +64,7 @@ export const FilterByData = ({
         if (status && !open) {
             if (!value.includes['']) {
                 let params = {
+                    keyname: keyname,
                     styleId: styleId,
                     ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
                     ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
@@ -114,6 +116,7 @@ export const FilterByData = ({
                     <div className="range-picker-input">
                         <Tooltip title={msgRangePicker}>
                             <RangePicker
+                                allowClear={false}
                                 defaultValue={valueStart}
                                 showTime={datatype === "DATETIME" ? true : false}
                                 disabledDate={disabledDate}
