@@ -812,10 +812,22 @@ def apply_intersect_filter(query, request, resource):
             raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
+class calculator:
+    
+    def addition(self, x, y):
+        added = x + y
+        return added
+
 class FilterQueryParams:
-    prop = dict(param=dict(), keys=list())
+    prop_op = dict()
     def __init__(self, d):
-        self.prop.update(d)
+        self.d = d
+
+    def set_prop(self):
+        self.prop_op.update(self.d)
+
+    def get_prop(self):
+        return self.prop_op
 
 def cget(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
@@ -839,7 +851,10 @@ def cget(resource, request) -> JSONType:
         if k.startswith("fld_"):
             d[k] = v
     filter_feature_op(query, d, keys)
-    FilterQueryParams(dict(styleId=styleId, param=d, keys=keys))
+
+    filter_params = dict(zip((str(resource.id),), (dict(styleId=styleId, param=d, keys=keys),)))
+    c = FilterQueryParams(filter_params)
+    c.set_prop()
 
     # Paging
     limit = request.GET.get("limit")
@@ -970,9 +985,11 @@ def cdelete(resource, request) -> JSONType:
 def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     query = resource.feature_query()
-    p = FilterQueryParams.prop
-    filter_feature_op(query, p["param"], p["keys"])
-
+    res_id = str(resource.id)
+    p = FilterQueryParams.prop_op
+    if res_id in p:
+        f = p.get(res_id)
+        filter_feature_op(query, f["param"], f["keys"])
     total_count = query().total_count
 
     return dict(total_count=total_count)

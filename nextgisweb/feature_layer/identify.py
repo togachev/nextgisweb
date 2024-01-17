@@ -34,9 +34,11 @@ def identify(request) -> JSONType:
 
         else:
             query = layer.feature_query()
-            if style.prop["param"]:
-                if style.prop["styleId"] == str(style.id):
-                    filter_feature_op(query, style.prop["param"], style.prop["keys"])
+            res_id = str(style.parent_id)
+            p = style.get_prop()
+            if res_id in p:
+                f = p.get(res_id)
+                filter_feature_op(query, f["param"], f["keys"])
             query.intersects(geom)
 
             # Limit number of identifiable features by 100 per layer,
@@ -96,9 +98,11 @@ def identifyConst(request) -> JSONType:
 
         elif layer.column_from_const:
             query = layer.feature_query()
-            if style.prop["param"]:
-                if style.prop["styleId"] == str(style.id):
-                    filter_feature_op(query, style.prop["param"], style.prop["keys"])
+            res_id = str(style.parent_id)
+            p = style.get_prop()
+            if res_id in p:
+                f = p.get(res_id)
+                filter_feature_op(query, f["param"], f["keys"])
             query.intersects(geom)
 
             # Limit number of identifyable features by 10 per layer,
