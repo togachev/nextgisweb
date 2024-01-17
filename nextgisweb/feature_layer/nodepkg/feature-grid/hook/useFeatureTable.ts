@@ -248,7 +248,7 @@ export function useFeatureTable({
         if (loaderCache.current) {
             loaderCache.current.clean();
         }
-    }, [total, queryParams]);
+    }, [total]);
 
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);

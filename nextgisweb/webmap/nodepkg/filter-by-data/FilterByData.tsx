@@ -23,7 +23,6 @@ const dt = '1970-01-01';
 
 interface FilterByDataProps {
     resourceId: number;
-    styleId: number;
     column: FeatureLayerField;
     queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
@@ -32,7 +31,6 @@ interface FilterByDataProps {
 
 export const FilterByData = ({
     resourceId,
-    styleId,
     column,
     queryParams,
     setQueryParams,
@@ -66,7 +64,6 @@ export const FilterByData = ({
             if (!value.includes['']) {
                 let params = {
                     keyname: keyname,
-                    styleId: styleId,
                     ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
                     ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
                 }

@@ -26,7 +26,6 @@ define([
         openFeatureGrid: function () {
             var item = this.display.dumpItem(),
                 layerId = item.layerId;
-                styleId = item.styleId;
 
             this.display.tabContainer.addTab({
                 key: String(layerId),
@@ -42,7 +41,6 @@ define([
                 props: {
                     topic,
                     layerId: layerId,
-                    styleId: styleId,
                     plugin: this,
                 },
             });

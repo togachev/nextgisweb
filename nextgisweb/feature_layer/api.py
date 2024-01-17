@@ -846,12 +846,11 @@ def cget(resource, request) -> JSONType:
     query = resource.feature_query()
 
     d = dict()
-    styleId = request.GET.get("styleId")
     for k,v in dict(request.GET).items():
         d[k] = v
     filter_feature_op(query, d, keys)
 
-    filter_params = dict(zip((str(resource.id),), (dict(styleId=styleId, param=d, keys=keys),)))
+    filter_params = dict(zip((str(resource.id),), (dict(param=d),)))
     c = FilterQueryParams(filter_params)
     c.set_prop()
 
@@ -988,7 +987,7 @@ def count(resource, request) -> JSONType:
     p = FilterQueryParams.prop_op
     if res_id in p:
         f = p.get(res_id)
-        filter_feature_op(query, f["param"], f["keys"])
+        filter_feature_op(query, f["param"], None)
     total_count = query().total_count
 
     return dict(total_count=total_count)

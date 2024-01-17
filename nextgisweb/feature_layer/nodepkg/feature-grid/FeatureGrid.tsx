@@ -40,7 +40,6 @@ export const FeatureGrid = observer(
 
         const {
             id,
-            styleId,
             size,
             fields,
             version,
@@ -130,7 +129,6 @@ export const FeatureGrid = observer(
                     selectedIds={selectedIds}
                     loadingCol={loadingCol}
                     resourceId={id}
-                    styleId={styleId}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
                     setQueryParams={store.setQueryParams}
