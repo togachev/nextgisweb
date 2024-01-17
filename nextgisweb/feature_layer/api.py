@@ -848,8 +848,7 @@ def cget(resource, request) -> JSONType:
     d = dict()
     styleId = request.GET.get("styleId")
     for k,v in dict(request.GET).items():
-        if k.startswith("fld_"):
-            d[k] = v
+        d[k] = v
     filter_feature_op(query, d, keys)
 
     filter_params = dict(zip((str(resource.id),), (dict(styleId=styleId, param=d, keys=keys),)))
