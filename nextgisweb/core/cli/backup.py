@@ -10,6 +10,8 @@ from tempfile import TemporaryDirectory, mkdtemp, mkstemp
 from typing import Optional
 from zipfile import ZipFile, is_zipfile
 
+import transaction
+
 from nextgisweb.env.cli import EnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
 
@@ -21,6 +23,7 @@ from ..component import CoreComponent
 def backup(
     self: EnvCommand,
     no_zip: bool = opt(False),
+    one_shot: bool = opt(False),
     target: Optional[str] = arg(metavar="path"),
     *,
     core: CoreComponent,
@@ -28,6 +31,7 @@ def backup(
     """Backup data into an archive
 
     :param no_zip: Don't compress a backup with ZIP
+    :param one_shot: Don't record metadata about this backup
     :param target: Output file or directory"""
 
     opts = core.options.with_prefix("backup")
@@ -41,6 +45,7 @@ def backup(
 
     to_stdout = target == "-"
 
+    started_at = datetime.utcnow()
     tmp_root = opts.get("tmpdir", None if to_stdout else path_split(target)[0])
 
     if not to_stdout and path_exists(target):
@@ -85,6 +90,14 @@ def backup(
 
     with tgt_context() as tgt:
         mod.backup(self.env, tgt)
+
+    if not one_shot:
+        with transaction.manager:
+            core.settings_set(
+                core.identity,
+                "last_backup",
+                started_at.isoformat(),
+            )
 
     if not to_stdout:
         print(target)

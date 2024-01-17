@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 from time import sleep
 from typing import List
 
+import transaction
+
 from nextgisweb.env import DBSession
-from nextgisweb.env.cli import EnvCommand, arg, cli, opt
+from nextgisweb.env.cli import EnvCommand, UninitializedEnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
 
 from ..backup import pg_connection_options
@@ -72,7 +74,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
 @cli.command()
 def psql(
-    self: EnvCommand.customize(env_initialize=False),
+    self: UninitializedEnvCommand,
     arg: List[str] = arg(nargs="..."),
 ):
     """Launch psql connected to database
@@ -109,16 +111,26 @@ def psql(
 def maintenance(
     self: EnvCommand,
     estimate_storage: bool = opt(False),
+    one_shot: bool = opt(False),
     *,
     core: CoreComponent,
 ):
     """Perform housekeeping tasks
 
-    :param estimate_storage: Execute storage estimation after maintenance"""
+    :param estimate_storage: Execute storage estimation after maintenance
+    :param one_shot: Don't record metadata about this maintenance"""
 
     for comp in self.env.chain("maintenance"):
         logger.debug("Maintenance for component: %s...", comp.identity)
         comp.maintenance()
+
+    if not one_shot:
+        with transaction.manager:
+            core.settings_set(
+                core.identity,
+                "last_maintenance",
+                datetime.utcnow().isoformat(),
+            )
 
     if estimate_storage:
         core.estimate_storage_all()
