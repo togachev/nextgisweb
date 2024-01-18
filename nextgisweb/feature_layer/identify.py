@@ -22,7 +22,6 @@ def identify(request) -> JSONType:
     # Number of features in all layers
     feature_count = 0
 
-    # for layer in layer_list:
     for style in style_list:
         layer = style.parent
         layer_id_str = str(layer.id)

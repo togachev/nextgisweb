@@ -253,13 +253,7 @@ const FeatureTable = observer(
                                                 <SortIcon dir={colSort} />
                                             </div>
                                         )}
-                                        <FilterByData
-                                            resourceId={resourceId}
-                                            dataType={dataType}
-                                            column={column}
-                                            queryParams={queryParams}
-                                            setQueryParams={setQueryParams}
-                                        />
+
                                         {
                                             queryParams && filter_column == keyname ?
                                                 <Tooltip title={msgClearFilter}>
@@ -270,7 +264,14 @@ const FeatureTable = observer(
                                                         }}
                                                         icon={<FilterAltOff />}
                                                     />
-                                                </Tooltip> : null
+                                                </Tooltip> :
+                                                <FilterByData
+                                                    resourceId={resourceId}
+                                                    dataType={dataType}
+                                                    column={column}
+                                                    queryParams={queryParams}
+                                                    setQueryParams={setQueryParams}
+                                                />
                                         }
                                     </div>
                                 </div>
