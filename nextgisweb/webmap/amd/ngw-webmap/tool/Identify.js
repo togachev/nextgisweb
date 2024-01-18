@@ -5,7 +5,6 @@ define([
     "./Base",
     "dojo/_base/lang",
     "dojo/_base/array",
-    "dojo/query",
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/json",
@@ -23,7 +22,6 @@ define([
     "dijit/form/Select",
     "dijit/form/Button",
     "put-selector/put",
-    "ngw-pyramid/route",
     "openlayers/ol",
     "ngw-webmap/ol/Popup",
     "@nextgisweb/pyramid/api",
@@ -46,7 +44,6 @@ define([
     Base,
     lang,
     array,
-    query,
     Deferred,
     all,
     json,
@@ -64,7 +61,6 @@ define([
     Select,
     Button,
     put,
-    route,
     ol,
     Popup,
     api,
@@ -252,7 +248,10 @@ define([
             var widget = this,
                 lid = featureInfo.layerId,
                 fid = featureInfo.id,
-                iurl = api.routeURL("feature_layer.feature.item", { id: lid, fid: fid });
+                iurl = api.routeURL("feature_layer.feature.item", {
+                    id: lid,
+                    fid: fid,
+                });
 
             domConstruct.empty(widget.featureContainer.domNode);
 
@@ -464,17 +463,11 @@ define([
                 }, this);
             }));
 
-            const features = async () => {
-                const url = api.routeURL("feature_layer.identifyConst");
-                const identifyConst = xhr.post(url, {
-                    handleAs: "json",
-                    data: json.stringify(request),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                return identifyConst.then((response) => {
+            api.route("feature_layer.identifyConst")
+                .post({
+                    body: json.stringify(request),
+                })
+                .then((response) => {
                     this.response = response;
 
                     const resourcesId = Object.keys(response)
@@ -495,12 +488,10 @@ define([
                         topic.publish("feature.unhighlightDiagram");
                         return false;
                     }
+                })
+                .then(value => {
+                    this.featurePush(value);
                 });
-            }
-            features().then(value => {
-                this.featurePush(value);
-            });
-
         },
 
         clear: function () {
@@ -665,17 +656,13 @@ define([
                         this
                     );
 
-                    const url = api.routeURL("feature_layer.identify");
-                    const identify = xhr.post(url, {
-                        handleAs: "json",
-                        data: json.stringify(request),
-                        headers: {
-                            "Content-Type": "application/json",
-                        }
-                    });
-                    identify.then(function (response) {
-                        tool._responsePopup(response, point, layerLabels);
-                    });
+                    api.route("feature_layer.identify")
+                        .post({
+                            body: json.stringify(request),
+                        })
+                        .then(function (response) {
+                            tool._responsePopup(response, point, layerLabels);
+                        });
                 })
             );
         },
@@ -759,12 +746,11 @@ define([
             zoom
         ) {
             const identifyDeferred = new Deferred();
-            const urlGetLayerInfo = api.routeURL("resource.item", {
-                id: layerId,
-            });
-            const getLayerInfo = xhr.get(urlGetLayerInfo, {
-                handleAs: "json",
-            });
+            const getLayerInfo = api
+                .route("resource.item", {
+                    id: layerId,
+                })
+                .get();
 
             const query = {
                 limit: 1,

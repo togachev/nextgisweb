@@ -8,7 +8,6 @@ define([
     "dojo/promise/all",
     "dojox/validate/regexp",
     "put-selector/put",
-    "ngw-pyramid/route",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     "ngw-lookup-table/cached",
@@ -25,7 +24,6 @@ define([
     all,
     regexp,
     put,
-    route,
     api,
     i18n,
     lookupTableCached,
@@ -53,39 +51,34 @@ define([
                 // TODO: Here it would be nice to get not all the resource
                 // but only needed part through API. Though not critical at the moment.
 
-                url = api.routeURL("resource.item", { id: this.resourceId });
-
-                const urlXHR = xhr.get(url, {
-                    method: "GET",
-                    handleAs: "json",
-                });
-
-                urlXHR.then(
-                    lang.hitch(this, function (data) {
-                        var fieldmap = {};
-                        var deferreds = [];
-                        array.forEach(
-                            data.feature_layer.fields,
-                            function (itm) {
-                                fieldmap[itm.keyname] = itm;
-                                if (itm.lookup_table !== null) {
-                                    deferreds.push(
-                                        lookupTableCached.load(
-                                            itm.lookup_table.id
-                                        )
-                                    );
+                api.route("resource.item", { id: this.resourceId })
+                    .get()
+                    .then(
+                        lang.hitch(this, function (data) {
+                            var fieldmap = {};
+                            var deferreds = [];
+                            array.forEach(
+                                data.feature_layer.fields,
+                                function (itm) {
+                                    fieldmap[itm.keyname] = itm;
+                                    if (itm.lookup_table !== null) {
+                                        deferreds.push(
+                                            lookupTableCached.load(
+                                                itm.lookup_table.id
+                                            )
+                                        );
+                                    }
                                 }
-                            }
-                        );
+                            );
 
-                        fieldsCache[this.resourceId] = fieldmap;
-                        all(deferreds).then(
-                            lang.hitch(this, function () {
-                                this._render(value, fieldmap);
-                            })
-                        );
-                    })
-                );
+                            fieldsCache[this.resourceId] = fieldmap;
+                            all(deferreds).then(
+                                lang.hitch(this, function () {
+                                    this._render(value, fieldmap);
+                                })
+                            );
+                        })
+                    );
             }
         },
 
