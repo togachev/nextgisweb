@@ -34,7 +34,7 @@ export function WebMapFeatureGridTab({
     layerId,
 }: WebMapFeatureGridTabProps) {
     const topicHandlers = useRef<TopicSubscription[]>([]);
-
+    const [selected, setSelected] = useState(false);
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
     const itemConfig = useRef<DisplayItemConfig>(
         display.current.get("itemConfig") as DisplayItemConfig
@@ -151,6 +151,7 @@ export function WebMapFeatureGridTab({
             featureId: number;
             layerId: number;
         }) => {
+            setSelected(false)
             if (featureId !== undefined && eventLayerId === layerId) {
                 store.setSelectedIds([featureId]);
             } else {
@@ -173,9 +174,8 @@ export function WebMapFeatureGridTab({
     const subscribe = useCallback(() => {
         topicHandlers.current.push(
             topic.subscribe("feature.highlight", featureHighlightedEvent),
-            topic.subscribe(
-                "feature.unhighlight",
-                store.setSelectedIds.bind(null, [])
+            topic.subscribe("feature.unhighlight",
+                setSelected.bind(null, true)
             ),
             topic.subscribe("feature.updated", featureUpdatedEvent),
             topic.subscribe("/webmap/feature-table/refresh", () => {
@@ -184,6 +184,12 @@ export function WebMapFeatureGridTab({
             })
         );
     }, [featureHighlightedEvent, featureUpdatedEvent, topic, store]);
+    
+    useEffect(() => {
+        if (selected) {
+            store.setSelectedIds([]);
+        }
+    }, [selected]);
 
     const unsubscribe = () => {
         topicHandlers.current.forEach((handler) => handler.remove());

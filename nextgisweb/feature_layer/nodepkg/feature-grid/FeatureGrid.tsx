@@ -50,7 +50,6 @@ export const FeatureGrid = observer(
             bumpVersion,
             onSelect,
         } = store;
-        console.log(selectedIds);
         
         const { data: totalData, refresh: refreshTotal } =
             useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
