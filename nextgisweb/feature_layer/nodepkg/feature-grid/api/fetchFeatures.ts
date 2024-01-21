@@ -15,6 +15,7 @@ interface FeatureLayerQuery {
     like?: string;
     ilike?: string;
     intersects?: string;
+    fld_field_op?: string;
 }
 
 export interface FetchFeaturesOptions {
@@ -28,6 +29,7 @@ export interface FetchFeaturesOptions {
     cache?: boolean;
     ilike?: string;
     like?: string;
+    fld_field_op?: string;
 }
 
 export function fetchFeatures({
@@ -41,6 +43,7 @@ export function fetchFeatures({
     cache,
     like,
     ilike,
+    fld_field_op,
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
         offset,
@@ -57,6 +60,10 @@ export function fetchFeatures({
         query.like = like;
     } else if (ilike) {
         query.ilike = ilike;
+    }
+
+    if (fld_field_op) {
+        Object.assign(query, fld_field_op)
     }
 
     if (intersects) {

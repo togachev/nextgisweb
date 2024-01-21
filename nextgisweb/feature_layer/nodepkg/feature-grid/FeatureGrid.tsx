@@ -50,7 +50,8 @@ export const FeatureGrid = observer(
             bumpVersion,
             onSelect,
         } = store;
-
+        console.log(queryParams);
+        
         const { data: totalData, refresh: refreshTotal } =
             useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
                 id,
@@ -133,6 +134,7 @@ export const FeatureGrid = observer(
                     resourceId={id}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
+                    setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
                 />

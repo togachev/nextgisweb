@@ -22,6 +22,12 @@ import type {
 } from "./type";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
+import { Button, Tooltip } from "@nextgisweb/gui/antd";
+import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+const msgClearFilter = gettext("Clear filter");
+
 import "./FeatureTable.less";
 
 interface FeatureTableProps {
@@ -31,6 +37,7 @@ interface FeatureTableProps {
     selectedIds: number[];
     resourceId: number;
     queryParams?: QueryParams;
+    setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
     visibleFields?: number[];
     queryIntersects?: string;
     deletedFeatureIds?: number[];
@@ -50,6 +57,7 @@ const FeatureTable = observer(
         resourceId,
         selectedIds,
         queryParams,
+        setQueryParams,
         visibleFields = [],
         queryIntersects,
         cleanSelectedOnFilter = true,
@@ -60,7 +68,8 @@ const FeatureTable = observer(
         const tbodyRef = useRef<HTMLDivElement>(null);
         const theadRef = useRef<HTMLDivElement>(null);
         const columnRef = useRef<Record<number, HTMLDivElement>>({});
-
+        console.log(queryParams);
+        
         const [rowMinHeight] = useState(27);
         const [pageSize] = useState(100);
 
@@ -220,6 +229,9 @@ const FeatureTable = observer(
                             const style = userDefinedWidths[id]
                                 ? { flex: `0 0 ${userDefinedWidths[id]}px` }
                                 : { flex };
+                            const dataType = ["DATE", "DATETIME"]
+
+                            const filter_column = queryParams?.fld_field_op?.keyname
 
                             return (
                                 <div
@@ -234,11 +246,32 @@ const FeatureTable = observer(
                                     onClick={() => toggleSorting(keyname)}
                                 >
                                     <div className="label">{label}</div>
-                                    {colSort && (
-                                        <div className="suffix">
-                                            <SortIcon dir={colSort} />
-                                        </div>
-                                    )}
+                                    <div className="button-column">
+                                        {colSort && (
+                                            <div className="suffix">
+                                                <SortIcon dir={colSort} />
+                                            </div>
+                                        )}
+                                        {
+                                            queryParams && filter_column == keyname ?
+                                                <Tooltip title={msgClearFilter}>
+                                                    <Button
+                                                        type="text"
+                                                        onClick={() => {
+                                                            setQueryParams(null)
+                                                        }}
+                                                        icon={<FilterAltOff />}
+                                                    />
+                                                </Tooltip> :
+                                                <FilterByData
+                                                    resourceId={resourceId}
+                                                    dataType={dataType}
+                                                    column={column}
+                                                    queryParams={queryParams || undefined}
+                                                    setQueryParams={setQueryParams}
+                                                />
+                                        }
+                                    </div>
                                 </div>
                             );
                         })
