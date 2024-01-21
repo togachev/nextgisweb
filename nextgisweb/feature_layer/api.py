@@ -3,7 +3,9 @@ import re
 import tempfile
 import uuid
 import zipfile
-from datetime import date, datetime, time
+from datetime import date, datetime, time, datetime as dt
+import datetime as date_time
+
 from typing import List, Optional
 
 from msgspec import Meta
@@ -169,6 +171,44 @@ class ExportOptions:
 
         self.use_display_name = display_name.lower() == "true"
 
+class FilterQueryParams:
+    prop_op = dict()
+    def __init__(self, d):
+        self.d = d
+
+    def set_prop(self):
+        self.prop_op.update(self.d)
+
+    def get_prop(self):
+        return self.prop_op
+
+def filter_feature_op(query, params, keynames):
+    filter_ = []
+    for param, value in params.items():
+        if param.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", param)
+        elif param == "id" or param.startswith("id__"):
+            fld_expr = param
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        if keynames:
+            if key != "id" and key not in keynames:
+                raise ValidationError(message="Unknown field '%s'." % key)
+
+        filter_.append((key, operator, value))
+
+    if len(filter_) > 0:
+        query.filter(*filter_)
+
+    if "like" in params and IFeatureQueryLike.providedBy(query):
+        query.like(value)
+    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
+        query.ilike(value)
 
 def export(resource, options, filepath):
     query = resource.feature_query()
@@ -776,6 +816,15 @@ def cget(resource, request) -> JSONType:
     keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
+    d = dict()
+    for k,v in dict(request.GET).items():
+        d[k] = v
+    filter_feature_op(query, d, keys)
+
+    filter_params = dict(zip((str(resource.id),), (dict(param=d),)))
+    c = FilterQueryParams(filter_params)
+    c.set_prop()
+
     # Paging
     limit = request.GET.get("limit")
     offset = request.GET.get("offset", 0)
@@ -899,8 +948,12 @@ def cdelete(resource, request) -> JSONType:
 
 def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
-
     query = resource.feature_query()
+    res_id = str(resource.id)
+    p = FilterQueryParams.prop_op
+    if res_id in p:
+        f = p.get(res_id)
+        filter_feature_op(query, f["param"], None)
     total_count = query().total_count
 
     return dict(total_count=total_count)
