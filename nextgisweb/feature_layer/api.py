@@ -990,7 +990,7 @@ def count(resource, request) -> JSONType:
     p = FilterQueryParams.prop_op
     if res_id in p:
         f = p.get(res_id)
-        if "param" in f:
+        if f and "param" in f:
             filter_feature_op(query, f["param"], None)
     total_count = query().total_count
 

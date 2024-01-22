@@ -70,7 +70,6 @@ const FeatureTable = observer(
         const tbodyRef = useRef<HTMLDivElement>(null);
         const theadRef = useRef<HTMLDivElement>(null);
         const columnRef = useRef<Record<number, HTMLDivElement>>({});
-        console.log(queryParams);
         
         const [rowMinHeight] = useState(27);
         const [pageSize] = useState(100);
