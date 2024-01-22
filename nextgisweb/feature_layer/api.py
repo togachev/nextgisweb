@@ -850,7 +850,7 @@ def cget(resource, request) -> JSONType:
         label=request.GET.get("label", False),
         extensions=_extensions(request.GET.get("extensions"), resource),
     )
-    raise ValidationError(_(str((request.cookies["ngw_sid"]))))
+    # raise ValidationError(_(str((request.cookies["ngw_sid"]))))
     keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
