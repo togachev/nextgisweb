@@ -1,6 +1,6 @@
 import debounce from "lodash-es/debounce";
 import { observer } from "mobx-react-lite";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Draggable from "react-draggable";
 
@@ -27,6 +27,8 @@ import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 const msgClearFilter = gettext("Clear filter");
+
+import { route } from "@nextgisweb/pyramid/api/route";
 
 import "./FeatureTable.less";
 
@@ -212,6 +214,11 @@ const FeatureTable = observer(
             isEmpty = !hasNextPage && queryTotal === 0;
         }
 
+        const deleteParams = useCallback(async (id) => {
+            await route('feature_layer.clear_filter', id, 0).get();
+        }, [])
+    
+
         const HeaderCols = () => {
             return (
                 <>
@@ -259,6 +266,7 @@ const FeatureTable = observer(
                                                         type="text"
                                                         onClick={() => {
                                                             setQueryParams(null)
+                                                            deleteParams(resourceId)
                                                         }}
                                                         icon={<FilterAltOff />}
                                                     />

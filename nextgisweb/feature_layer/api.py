@@ -188,6 +188,22 @@ class FilterQueryParams:
     def get_prop(self):
         return self.prop_op
 
+def clear_filter_params(request) -> JSONType:
+    id = str(request.matchdict['id'])
+    status = int(request.matchdict['status'])
+    result = dict()
+    params = FilterQueryParams.prop_op
+    # status 0, delete filter
+    if status == 0:
+        if id in params:
+            params[id] = dict()
+            result[id] = params[id]
+    elif status == 1:
+        if id in params:
+            result = params
+    return result
+
+
 def filter_feature_op(query, params, keynames):
     filter_ = []
     for param, value in params.items():
@@ -665,16 +681,6 @@ def iget(resource, request) -> JSONType:
 
     query = resource.feature_query()
 
-    d = dict()
-    for k,v in dict(request.GET).items():
-        d[k] = v
-    filter_feature_op(query, d, keys)
-
-    filter_params = dict(zip((str(resource.id),), (dict(param=d),)))
-    c = FilterQueryParams(filter_params)
-    c.set_prop()
-
-
     if not geom_skip:
         if srs is not None:
             query.srs(SRS.filter_by(id=int(srs)).one())
@@ -844,7 +850,7 @@ def cget(resource, request) -> JSONType:
         label=request.GET.get("label", False),
         extensions=_extensions(request.GET.get("extensions"), resource),
     )
-
+    raise ValidationError(_(str((request.cookies["ngw_sid"]))))
     keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
@@ -863,7 +869,6 @@ def cget(resource, request) -> JSONType:
     if limit is not None:
         query.limit(int(limit), int(offset))
 
-    apply_attr_filter(query, request, keys)
 
     # Ordering
     order_by = request.GET.get("order_by")
@@ -985,7 +990,8 @@ def count(resource, request) -> JSONType:
     p = FilterQueryParams.prop_op
     if res_id in p:
         f = p.get(res_id)
-        filter_feature_op(query, f["param"], None)
+        if "param" in f:
+            filter_feature_op(query, f["param"], None)
     total_count = query().total_count
 
     return dict(total_count=total_count)
@@ -1071,6 +1077,12 @@ def setup_pyramid(comp, config):
         "/api/resource/{id:uint}/feature_count",
         factory=resource_factory,
     ).get(count, context=IFeatureLayer)
+
+    config.add_route(
+        "feature_layer.clear_filter",
+        "/api/resource/{id:uint}/clear_filter/{status:int}",
+        factory=resource_factory,
+    ).get(clear_filter_params, context=IFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.extent",
