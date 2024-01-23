@@ -22,7 +22,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, resource_factory, SessionResources
+from nextgisweb.resource import DataScope, Resource, resource_factory, SessionResources, update_sid
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -193,16 +193,19 @@ def clear_filter_params(request) -> JSONType:
     status = int(request.matchdict['status'])
     result = dict()
     params = FilterQueryParams.prop_op
-    # status 0, delete filter
-    if status == 0:
-        if id in params:
-            params[id] = dict()
-            result[id] = params[id]
-    elif status == 1:
-        if id in params:
-            result = params
+    session_prop = SessionResources.prop_session_resource
+    if session_prop and session_prop['ngw_sid'] and params:
+        key = id + "_" + session_prop['ngw_sid']
+        # status 0, delete filter
+        if status == 0:
+            if key in params:
+                params[key]['param'] = dict()
+                result[key] = params[key]['param']
+        # status 1, show all filter
+        elif status == 1:
+            if key in params:
+                result = params
     return result
-
 
 def filter_feature_op(query, params, keynames):
     filter_ = []
@@ -850,7 +853,7 @@ def cget(resource, request) -> JSONType:
         label=request.GET.get("label", False),
         extensions=_extensions(request.GET.get("extensions"), resource),
     )
-    # raise ValidationError(_(str((request.cookies["ngw_sid"]))))
+
     keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
@@ -859,18 +862,12 @@ def cget(resource, request) -> JSONType:
         d[k] = v
     filter_feature_op(query, d, keys)
 
-    b = FilterQueryParams.prop_op
-    bb = { 'res_id': { 'param': d }}
-    res_id = str(resource.id)
-    ngw_sid = request.cookies["ngw_sid"]
-    a = { ngw_sid: {res_id: { 'param': d }}}
-    # a.update(bb)
-    b.update(a)
-    # filter_p = 
 
-    # filter_params = dict(zip((ngw_sid,), (dict(zip((str(resource.id),), (dict(param=d),))),)))
-    # c = FilterQueryParams(ss)
-    # c.set_prop()
+    update_sid(request)
+    prop_op_session = SessionResources.prop_session_resource
+    prop_op = FilterQueryParams.prop_op
+    res_id = str(resource.id) + "_" + prop_op_session['ngw_sid']
+    prop_op.update({ res_id: { 'param': d }})
 
     # Paging
     limit = request.GET.get("limit")
@@ -995,12 +992,18 @@ def cdelete(resource, request) -> JSONType:
 def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     query = resource.feature_query()
+
     res_id = str(resource.id)
-    p = FilterQueryParams.prop_op
-    if res_id in p:
-        f = p.get(res_id)
-        if f and "param" in f:
-            filter_feature_op(query, f["param"], None)
+    params = FilterQueryParams.prop_op
+    session_prop = SessionResources.prop_session_resource
+    
+    if session_prop and session_prop['ngw_sid'] and params:
+        key = res_id + "_" + session_prop['ngw_sid']
+        if key in params:
+            f = params[key]
+            if "param" in f:
+                filter_feature_op(query, f["param"], None)
+
     total_count = query().total_count
 
     return dict(total_count=total_count)

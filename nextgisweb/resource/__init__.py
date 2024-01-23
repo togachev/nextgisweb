@@ -26,5 +26,5 @@ from .serialize import (
     SerializedResourceRelationship,
     Serializer,
 )
-from .view import resource_factory, SessionResources
+from .view import resource_factory, SessionResources, update_sid
 from .widget import Widget
