@@ -541,8 +541,7 @@ define([
             if (afterPopupInit && afterPopupInit instanceof Function)
                 afterPopupInit();
 
-            const closeSpan = document.getElementById('close-popup');
-            closeSpan.onclick = () => {
+            this._popup._closeSpan.onclick = () => {
                 this._popup.setPosition(undefined);
                 topic.publish("feature.unhighlight");
             };

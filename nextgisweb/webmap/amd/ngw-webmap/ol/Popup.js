@@ -62,7 +62,6 @@ define([
             {
                 class: "dijitDialogCloseIcon",
                 style: "margin-top: 2px",
-                id: "close-popup"
             },
             this.titleBar,
             "last"
