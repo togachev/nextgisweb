@@ -13,7 +13,7 @@ from nextgisweb.render.api import legend_symbols_by_resource
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.render.view import TMSLink
-from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_factory
+from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_factory, SessionResources
 
 from .adapter import WebMapAdapter
 from .model import LegendSymbolsEnum, WebMap, WebMapScope
@@ -85,6 +85,12 @@ def check_origin(request):
 
 @viewargs(renderer="mako")
 def display(obj, request):
+
+    if request.cookies:
+        session_params = dict(ngw_sid=request.cookies["ngw_sid"])
+        c = SessionResources(session_params)
+        c.set_prop_session()
+
     is_valid_or_error = check_origin(request)
     if is_valid_or_error is not True:
         return is_valid_or_error

@@ -22,7 +22,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, resource_factory
+from nextgisweb.resource import DataScope, Resource, resource_factory, SessionResources
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -859,9 +859,18 @@ def cget(resource, request) -> JSONType:
         d[k] = v
     filter_feature_op(query, d, keys)
 
-    filter_params = dict(zip((str(resource.id),), (dict(param=d),)))
-    c = FilterQueryParams(filter_params)
-    c.set_prop()
+    b = FilterQueryParams.prop_op
+    bb = { 'res_id': { 'param': d }}
+    res_id = str(resource.id)
+    ngw_sid = request.cookies["ngw_sid"]
+    a = { ngw_sid: {res_id: { 'param': d }}}
+    # a.update(bb)
+    b.update(a)
+    # filter_p = 
+
+    # filter_params = dict(zip((ngw_sid,), (dict(zip((str(resource.id),), (dict(param=d),))),)))
+    # c = FilterQueryParams(ss)
+    # c.set_prop()
 
     # Paging
     limit = request.GET.get("limit")

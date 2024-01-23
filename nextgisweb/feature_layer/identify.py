@@ -1,4 +1,4 @@
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, _
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.pyramid import JSONType
@@ -6,7 +6,7 @@ from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 from .api import filter_feature_op
-
+from nextgisweb.core.exception import ValidationError
 PR_R = ResourceScope.read
 
 
@@ -36,6 +36,7 @@ def identify(request) -> JSONType:
             query = layer.feature_query()
             res_id = str(style.parent_id)
             p = style.get_prop()
+            raise ValidationError(_(str(p)))
             if res_id in p:
                 f = p.get(res_id)
                 if f and "param" in f:

@@ -10,8 +10,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib.dynmenu import DynItem, DynMenu, Label, Link
 
-from nextgisweb.core.exception import InsufficientPermissions
-from nextgisweb.pyramid import JSONType, viewargs
+from nextgisweb.core.exception import InsufficientPermissions, ValidationError
+from nextgisweb.pyramid import JSONType, viewargs, WebSession
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from nextgisweb.pyramid.psection import PageSections
 
@@ -71,9 +71,24 @@ def resource_breadcrumb(obj, request):
             parent=obj.parent,
         )
 
+class SessionResources:
+    prop_session_resource = dict()
+    def __init__(self, params_session):
+        self.params_session = params_session
+
+    def set_prop_session(self):
+        self.prop_session_resource.update(self.params_session)
+
+    def get_prop_session(self):
+        return self.prop_session_resource
 
 @viewargs(renderer="nextgisweb:pyramid/template/psection.mako")
 def show(request):
+    if request.cookies:
+        session_params = dict(ngw_sid=request.cookies["ngw_sid"])
+        c = SessionResources(session_params)
+        c.set_prop_session()
+
     request.resource_permission(PERM_READ)
     return dict(obj=request.context, sections=request.context.__psection__)
 
