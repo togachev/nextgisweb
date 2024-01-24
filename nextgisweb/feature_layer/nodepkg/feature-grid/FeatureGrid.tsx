@@ -49,6 +49,7 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
+            display,
         } = store;
         
         const { data: totalData, refresh: refreshTotal } =
@@ -139,7 +140,7 @@ export const FeatureGrid = observer(
                     setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
-                    display={store.display}
+                    display={display}
                 />
                 <TableConfigModal store={store} />
             </div>
