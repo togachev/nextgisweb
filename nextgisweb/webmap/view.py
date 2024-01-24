@@ -14,6 +14,7 @@ from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_factory, update_sid
+from nextgisweb.feature_layer import FilterQueryParams
 
 from .adapter import WebMapAdapter
 from .model import LegendSymbolsEnum, WebMap, WebMapScope
@@ -87,7 +88,12 @@ def check_origin(request):
 
 @viewargs(renderer="mako")
 def display(obj, request):
-
+    params = FilterQueryParams.prop_op
+    ngw_sid=request.cookies["ngw_sid"]
+    if params:
+        res = dict(filter(lambda item: ngw_sid in item[0], params.items()))
+        if res:
+            del params[list(res)[0]]
     update_sid(request)
 
     is_valid_or_error = check_origin(request)

@@ -1,4 +1,4 @@
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.pyramid import JSONType

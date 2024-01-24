@@ -34,8 +34,9 @@ export const ZoomToFilteredBtn = ({
         if (!onZoomToFiltered) {
             return;
         }
+        const params = queryParams.fld_field_op ? queryParams.fld_field_op : queryParams ? queryParams : undefined
         const resp = await route.get<FeatureExtent>({
-            query: queryParams?.fld_field_op || undefined,
+            query: params,
             cache: true,
         });
         onZoomToFiltered(resp.extent);
