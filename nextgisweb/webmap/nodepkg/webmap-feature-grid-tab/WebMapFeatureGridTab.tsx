@@ -54,6 +54,7 @@ export function WebMapFeatureGridTab({
         () =>
             new FeatureGridStore({
                 id: layerId,
+                display: display,
                 readonly: data.current?.readonly ?? true,
                 size: "small",
                 cleanSelectedOnFilter: false,

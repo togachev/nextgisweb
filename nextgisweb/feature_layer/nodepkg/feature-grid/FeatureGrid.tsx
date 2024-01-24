@@ -139,6 +139,7 @@ export const FeatureGrid = observer(
                     setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
+                    display={store.display}
                 />
                 <TableConfigModal store={store} />
             </div>

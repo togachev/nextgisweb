@@ -20,6 +20,7 @@ import type {
     OrderBy,
     SetValue,
 } from "./type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
@@ -34,6 +35,7 @@ import "./FeatureTable.less";
 
 interface FeatureTableProps {
     empty: () => ReactNode;
+    display: DojoDisplay;
     total: number;
     fields: FeatureLayerField[];
     version?: number;
@@ -52,6 +54,7 @@ interface FeatureTableProps {
 const FeatureTable = observer(
     ({
         empty,
+        display,
         total,
         fields,
         version,
