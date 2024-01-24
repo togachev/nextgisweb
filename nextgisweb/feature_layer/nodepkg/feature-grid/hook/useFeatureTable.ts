@@ -179,7 +179,7 @@ export function useFeatureTable({
                 handleFeatures(attrs);
             } else {
                 const signal = makeSignal();
-                const promises : string[] = [];
+                const promises: any[] = [];
                 for (const { key, page } of cacheKeys) {
                     if (pages.includes(page)) {
                         promises.push(
