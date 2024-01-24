@@ -2,7 +2,7 @@ from nextgisweb.env import DBSession, _
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceScope
+from nextgisweb.resource import DataScope, Resource, ResourceScope, SessionResources
 
 from .interface import IFeatureLayer
 from .api import filter_feature_op
@@ -15,7 +15,6 @@ def identify(request) -> JSONType:
     srs = int(data["srs"])
     geom = Geometry.from_wkt(data["geom"], srid=srs)
     styles = map(int, data["styles"])
-
     style_list = DBSession.query(Resource).filter(Resource.id.in_(styles))
     result = dict()
 
@@ -34,10 +33,13 @@ def identify(request) -> JSONType:
         else:
             query = layer.feature_query()
             res_id = str(style.parent_id)
-            p = style.get_prop()
-            if res_id in p:
-                f = p.get(res_id)
-                filter_feature_op(query, f["param"], None)
+            params = style.get_prop()
+            session_prop = SessionResources.prop_session_resource
+            if session_prop and session_prop['ngw_sid'] and params:
+                key = res_id + "_" + session_prop['ngw_sid']
+                if key in params:
+                    f = params[key]
+                    filter_feature_op(query, f["param"], None)
             query.intersects(geom)
 
             # Limit number of identifiable features by 100 per layer,

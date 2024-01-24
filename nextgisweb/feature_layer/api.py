@@ -22,7 +22,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, resource_factory
+from nextgisweb.resource import DataScope, Resource, resource_factory, SessionResources, update_sid
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -169,14 +169,71 @@ class ExportOptions:
         self.ilike = ilike
 
         self.fields = fields.split(",") if fields is not None else None
-        
+
         # options to filter function returns using the operation operator
         self.fld_field_op = params
-        
+
         self.fid_field = fid if fid != "" else None
 
         self.use_display_name = display_name.lower() == "true"
 
+class FilterQueryParams:
+    prop_op = dict()
+    def __init__(self, d):
+        self.d = d
+
+    def set_prop(self):
+        self.prop_op.update(self.d)
+
+    def get_prop(self):
+        return self.prop_op
+
+def clear_filter_params(request) -> JSONType:
+    id = str(request.matchdict['id'])
+    status = int(request.matchdict['status'])
+    result = dict()
+    params = FilterQueryParams.prop_op
+    session_prop = SessionResources.prop_session_resource
+    if session_prop and session_prop['ngw_sid'] and params:
+        key = id + "_" + session_prop['ngw_sid']
+        # status 0, delete filter
+        if status == 0:
+            if key in params:
+                params[key]['param'] = dict()
+                result[key] = params[key]['param']
+        # status 1, show all filter
+        elif status == 1:
+            if key in params:
+                result = params
+    return result
+
+def filter_feature_op(query, params, keynames):
+    filter_ = []
+    for param, value in params.items():
+        if param.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", param)
+        elif param == "id" or param.startswith("id__"):
+            fld_expr = param
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        if keynames:
+            if key != "id" and key not in keynames:
+                raise ValidationError(message="Unknown field '%s'." % key)
+
+        filter_.append((key, operator, value))
+
+    if len(filter_) > 0:
+        query.filter(*filter_)
+
+    if "like" in params and IFeatureQueryLike.providedBy(query):
+        query.like(value)
+    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
+        query.ilike(value)
 
 def export(resource, options, filepath):
     query = resource.feature_query()
@@ -626,6 +683,7 @@ def iget(resource, request) -> JSONType:
     )
 
     query = resource.feature_query()
+
     if resource.cls != 'nogeom_layer':
         if not geom_skip:
             if srs is not None:
@@ -850,9 +908,12 @@ def cget(resource, request) -> JSONType:
         d[k] = v
     filter_feature_op(query, d, keys)
 
-    filter_params = dict(zip((str(resource.id),), (dict(param=d),)))
-    c = FilterQueryParams(filter_params)
-    c.set_prop()
+
+    update_sid(request)
+    prop_op_session = SessionResources.prop_session_resource
+    prop_op = FilterQueryParams.prop_op
+    res_id = str(resource.id) + "_" + prop_op_session['ngw_sid']
+    prop_op.update({ res_id: { 'param': d }})
 
     # Paging
     limit = request.GET.get("limit")
@@ -860,7 +921,6 @@ def cget(resource, request) -> JSONType:
     if limit is not None:
         query.limit(int(limit), int(offset))
 
-    apply_attr_filter(query, request, keys)
 
     # Ordering
     order_by = request.GET.get("order_by")
@@ -983,11 +1043,18 @@ def cdelete(resource, request) -> JSONType:
 def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     query = resource.feature_query()
+
     res_id = str(resource.id)
-    p = FilterQueryParams.prop_op
-    if res_id in p:
-        f = p.get(res_id)
-        filter_feature_op(query, f["param"], None)
+    params = FilterQueryParams.prop_op
+    session_prop = SessionResources.prop_session_resource
+    
+    if session_prop and session_prop['ngw_sid'] and params:
+        key = res_id + "_" + session_prop['ngw_sid']
+        if key in params:
+            f = params[key]
+            if "param" in f:
+                filter_feature_op(query, f["param"], None)
+
     total_count = query().total_count
 
     return dict(total_count=total_count)
@@ -1156,6 +1223,12 @@ def setup_pyramid(comp, config):
         "/api/resource/{id:uint}/feature_count",
         factory=resource_factory,
     ).get(count, context=IFeatureLayer)
+
+    config.add_route(
+        "feature_layer.clear_filter",
+        "/api/resource/{id:uint}/clear_filter/{status:int}",
+        factory=resource_factory,
+    ).get(clear_filter_params, context=IFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.extent",

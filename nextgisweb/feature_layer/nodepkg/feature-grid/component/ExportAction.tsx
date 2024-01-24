@@ -72,7 +72,7 @@ export const ExportAction = ({
             },
         ],
         onClick: (e) => {
-            let params: ExportFeatureLayerOptions = queryParams || {};
+            const params: ExportFeatureLayerOptions = queryParams || {};
             if (params.fld_field_op) {
                 Object.assign(params, params.fld_field_op)
                 delete params.fld_field_op;

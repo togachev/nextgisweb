@@ -1,23 +1,26 @@
 import debounce from "lodash-es/debounce";
 import { observer } from "mobx-react-lite";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import Draggable from "react-draggable";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
-import { FeatureTableRows } from "./component/FeatureTableRows";
-import { HeaderCols } from "./component/HeaderCols";
-import { HeaderHandles } from "./component/HeaderHandles";
-import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
+import { FeatureTableRows } from "./FeatureTableRows";
+import SortIcon from "./component/SortIcon";
+import { KEY_FIELD_ID, KEY_FIELD_KEYNAME, RESIZE_HANDLE_WIDTH } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type {
+    ColOrder,
     EffectiveWidths,
     FeatureLayerFieldCol,
     OrderBy,
     SetValue,
 } from "./type";
+import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
 import { Button, Tooltip } from "@nextgisweb/gui/antd";
@@ -25,10 +28,12 @@ import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 const msgClearFilter = gettext("Clear filter");
 
+import { route } from "@nextgisweb/pyramid/api/route";
+
 import "./FeatureTable.less";
 
 interface FeatureTableProps {
-    empty: React.ReactElement;
+    empty: () => ReactNode;
     total: number;
     fields: FeatureLayerField[];
     version?: number;
@@ -63,7 +68,7 @@ const FeatureTable = observer(
         const tbodyRef = useRef<HTMLDivElement>(null);
         const theadRef = useRef<HTMLDivElement>(null);
         const columnRef = useRef<Record<number, HTMLDivElement>>({});
-
+        
         const [rowMinHeight] = useState(27);
         const [pageSize] = useState(100);
 
@@ -143,6 +148,29 @@ const FeatureTable = observer(
             setSelectedIds,
         ]);
 
+        const scrollBarSize = useMemo<number>(() => scrollbarWidth(), []);
+
+        const toggleSorting = (keyname: string, curOrder: ColOrder = null) => {
+            if (keyname === KEY_FIELD_KEYNAME) {
+                setOrderBy(undefined);
+                return;
+            }
+            const sortOrderSeq: ColOrder[] = ["asc", "desc", null];
+            setOrderBy((old) => {
+                if (old) {
+                    const [oldSortKey, oldSortOrder] = old;
+                    if (oldSortKey === keyname) {
+                        curOrder = oldSortOrder;
+                    }
+                }
+                const curOrderIndex = sortOrderSeq.indexOf(curOrder);
+                const nextOrderIndex =
+                    (curOrderIndex + 1) % sortOrderSeq.length;
+                const nextOrder = sortOrderSeq[nextOrderIndex];
+                return [keyname, nextOrder];
+            });
+        };
+
         useLayoutEffect(() => {
             const tbodyRefElement = tbodyRef.current;
             if (!tbodyRefElement) {
@@ -183,7 +211,125 @@ const FeatureTable = observer(
             isEmpty = !hasNextPage && queryTotal === 0;
         }
 
-        const EmptyComponent = empty;
+        const deleteParams = useCallback(async (id) => {
+            await route('feature_layer.clear_filter', id, 0).get();
+        }, [])
+    
+
+        const HeaderCols = () => {
+            return (
+                <>
+                    {columns
+                        .map((column) => {
+                            const {
+                                keyname,
+                                id,
+                                display_name: label,
+                                flex,
+                            } = column;
+                            const colSort =
+                                orderBy && orderBy[0] === keyname && orderBy[1];
+
+                            const style = userDefinedWidths[id]
+                                ? { flex: `0 0 ${userDefinedWidths[id]}px` }
+                                : { flex };
+                            const dataType = ["DATE", "DATETIME"]
+
+                            const filter_column = queryParams?.fld_field_op?.keyname
+
+                            return (
+                                <div
+                                    key={id}
+                                    ref={(element) => {
+                                        if (element) {
+                                            columnRef.current[id] = element;
+                                        }
+                                    }}
+                                    className="th"
+                                    style={style}
+                                    onClick={() => toggleSorting(keyname)}
+                                >
+                                    <div className="label">{label}</div>
+                                    <div className="button-column">
+                                        {colSort && (
+                                            <div className="suffix">
+                                                <SortIcon dir={colSort} />
+                                            </div>
+                                        )}
+                                        {
+                                            queryParams && filter_column == keyname ?
+                                                <Tooltip title={msgClearFilter}>
+                                                    <Button
+                                                        type="text"
+                                                        onClick={() => {
+                                                            setQueryParams(null)
+                                                            deleteParams(resourceId)
+                                                        }}
+                                                        icon={<FilterAltOff />}
+                                                    />
+                                                </Tooltip> :
+                                                <FilterByData
+                                                    resourceId={resourceId}
+                                                    dataType={dataType}
+                                                    column={column}
+                                                    queryParams={queryParams || undefined}
+                                                    setQueryParams={setQueryParams}
+                                                />
+                                        }
+                                    </div>
+                                </div>
+                            );
+                        })
+                        .concat([
+                            <div
+                                key="scrollbar"
+                                style={{ flex: `0 0 ${scrollBarSize}px` }}
+                            />,
+                        ])}
+                </>
+            );
+        };
+
+        const HeaderHandles = () => {
+            let cumWidth = 0;
+            return (
+                <>
+                    {columns.map(({ id }) => {
+                        const width = effectiveWidths[id];
+                        if (isNaN(width)) {
+                            return null;
+                        }
+                        cumWidth += width;
+                        return (
+                            <Draggable
+                                key={id}
+                                axis="x"
+                                defaultClassName="handle"
+                                defaultClassNameDragging="handle-dragging"
+                                defaultClassNameDragged="handle-dragged"
+                                onStop={(_, { lastX }) => {
+                                    setTimeout(() => {
+                                        setUserDefinedWidths((prev) => ({
+                                            ...prev,
+                                            [id]: width + lastX,
+                                        }));
+                                    });
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        left:
+                                            cumWidth - RESIZE_HANDLE_WIDTH / 2,
+                                        width: RESIZE_HANDLE_WIDTH,
+                                    }}
+                                ></div>
+                            </Draggable>
+                        );
+                    })}
+                </>
+            );
+        };
+
         return (
             <div
                 className="ngw-feature-layer-feature-table"
@@ -220,8 +366,8 @@ const FeatureTable = observer(
                         }
                     }}
                 >
-                    {isEmpty && EmptyComponent ? (
-                        EmptyComponent
+                    {isEmpty && empty ? (
+                        empty
                     ) : (
                         <div
                             className="tbody"

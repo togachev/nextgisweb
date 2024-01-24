@@ -30,6 +30,7 @@ export interface FetchFeaturesOptions {
     ilike?: string;
     fld_field_op?: string;
     like?: string;
+    fld_field_op?: string;
 }
 
 export function fetchFeatures({
