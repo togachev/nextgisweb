@@ -83,7 +83,7 @@ class SessionResources:
         return self.prop_session_resource
 
 def update_sid(request):
-    if request.cookies:
+    if "ngw_sid" in request.cookies:
         ngw_sid=request.cookies["ngw_sid"]
         session_params = dict(ngw_sid=ngw_sid)
         c = SessionResources(session_params)

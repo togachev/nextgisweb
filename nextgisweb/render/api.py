@@ -272,7 +272,8 @@ def image(request):
                     rimg.paste(timg, toffset)
 
         if rimg is None:
-            req = obj.render_request(obj.srs)
+            cond = obj.prop_op
+            req = obj.render_request(obj.srs, cond)
             rimg = req.render_extent(ext_extent, ext_size)
 
             empty_image = rimg is None

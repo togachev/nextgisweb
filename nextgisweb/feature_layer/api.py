@@ -908,12 +908,15 @@ def cget(resource, request) -> JSONType:
         d[k] = v
     filter_feature_op(query, d, keys)
 
-
-    update_sid(request)
-    prop_op_session = SessionResources.prop_session_resource
+    # update_sid(request)
+    # prop_op_session = SessionResources.prop_session_resource
+    # if prop_op_session:
     prop_op = FilterQueryParams.prop_op
-    res_id = str(resource.id) + "_" + prop_op_session['ngw_sid']
-    prop_op.update({ res_id: { 'param': d }})
+    #     res_id = str(resource.id) + "_" + prop_op_session['ngw_sid']
+    #     prop_op.update({ res_id: { 'param': d }})
+
+    res_id = str(resource.id)
+    prop_op.update({ res_id: d })
 
     # Paging
     limit = request.GET.get("limit")

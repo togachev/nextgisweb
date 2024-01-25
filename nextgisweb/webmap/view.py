@@ -88,12 +88,13 @@ def check_origin(request):
 
 @viewargs(renderer="mako")
 def display(obj, request):
-    params = FilterQueryParams.prop_op
-    ngw_sid=request.cookies["ngw_sid"]
-    if params:
-        res = dict(filter(lambda item: ngw_sid in item[0], params.items()))
-        if res:
-            del params[list(res)[0]]
+    if "ngw_sid" in request.cookies:
+        ngw_sid=request.cookies["ngw_sid"]
+        params = FilterQueryParams.prop_op
+        if params:
+            res = dict(filter(lambda item: ngw_sid in item[0], params.items()))
+            if res:
+                del params[list(res)[0]]
     update_sid(request)
 
     is_valid_or_error = check_origin(request)
