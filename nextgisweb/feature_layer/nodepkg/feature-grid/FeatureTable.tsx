@@ -4,8 +4,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { ReactNode } from "react";
 import Draggable from "react-draggable";
 
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
-
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
