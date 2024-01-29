@@ -8,12 +8,22 @@ export interface BlueprintResource {
     scopes: string[];
 }
 
-type Permissions = Record<string, unknown>;
+interface Permissions {
+    identity:
+        | "write"
+        | "read"
+        | "create"
+        | "update"
+        | "delete"
+        | "manage_children"
+        | "change_permissions";
+    label: string;
+}
 
 export interface BlueprintScope {
     identity: string;
     label: string;
-    permissions: Permissions;
+    permissions: Record<string, Permissions>;
 }
 
 interface Resources {
