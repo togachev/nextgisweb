@@ -1109,7 +1109,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.clear_filter",
         "/api/resource/{id:uint}/clear_filter/{status:int}",
-        factory=resource_factory,
+        factory=feature_layer_factory,
     ).get(clear_filter_params, context=IFeatureLayer)
 
     config.add_route(
