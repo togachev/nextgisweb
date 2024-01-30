@@ -1,6 +1,8 @@
 import warnings
 from dataclasses import dataclass
 
+import uuid
+
 import zope.event
 from msgspec import Meta
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
@@ -104,23 +106,6 @@ def resource_breadcrumb(obj, request):
             icon=f"rescls-{obj.cls}",
             parent=obj.parent,
         )
-
-class SessionResources:
-    prop_session_resource = dict()
-    def __init__(self, params_session):
-        self.params_session = params_session
-
-    def set_prop_session(self):
-        self.prop_session_resource.update(self.params_session)
-
-    def get_prop_session(self):
-        return self.prop_session_resource
-
-def update_sid(request):
-    if request.cookies:
-        session_params = dict(ngw_sid=request.cookies["ngw_sid"])
-        c = SessionResources(session_params)
-        c.set_prop_session()
 
 @viewargs(renderer="nextgisweb:pyramid/template/psection.mako")
 def show(request):

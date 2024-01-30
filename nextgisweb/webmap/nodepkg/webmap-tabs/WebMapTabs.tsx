@@ -20,10 +20,6 @@ const msgLoading = gettext("Loading");
 export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
     const { activeKey, setActiveKey, removeTab } = store;
     
-    const deleteParams = useCallback(async (id) => {
-        await route('feature_layer.clear_filter', id, 0).get();
-    }, [])
-
     const items = useMemo(() => {
         if (store.tabs.length) {
             const tabs: TabItems = [];
@@ -63,7 +59,6 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
             onEdit={(targetKey, action) => {
                 if (action === "remove") {
                     removeTab(String(targetKey));
-                    deleteParams(String(targetKey))
                 }
             }}
             parentHeight

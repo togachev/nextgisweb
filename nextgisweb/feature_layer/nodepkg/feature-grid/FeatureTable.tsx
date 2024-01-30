@@ -213,11 +213,6 @@ const FeatureTable = observer(
             isEmpty = !hasNextPage && queryTotal === 0;
         }
 
-        const deleteParams = useCallback(async (id) => {
-            await route('feature_layer.clear_filter', id, 0).get();
-        }, [])
-    
-
         const HeaderCols = () => {
             return (
                 <>
@@ -265,7 +260,6 @@ const FeatureTable = observer(
                                                         type="text"
                                                         onClick={() => {
                                                             setQueryParams(null)
-                                                            deleteParams(resourceId)
                                                         }}
                                                         icon={<FilterAltOff />}
                                                     />

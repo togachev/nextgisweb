@@ -22,7 +22,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceFactory, SessionResources, update_sid
+from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -179,6 +179,9 @@ class ExportOptions:
 
         self.use_display_name = display_name.lower() == "true"
 
+    def get_prop(self):
+        return self.fld_field_op
+
 class FilterQueryParams:
     prop_op = dict()
     def __init__(self, d):
@@ -189,25 +192,6 @@ class FilterQueryParams:
 
     def get_prop(self):
         return self.prop_op
-
-def clear_filter_params(request) -> JSONType:
-    id = str(request.matchdict['id'])
-    status = int(request.matchdict['status'])
-    result = dict()
-    params = FilterQueryParams.prop_op
-    session_prop = SessionResources.prop_session_resource
-    if session_prop and session_prop['ngw_sid'] and params:
-        key = id + "_" + session_prop['ngw_sid']
-        # status 0, delete filter
-        if status == 0:
-            if key in params:
-                params[key]['param'] = dict()
-                result[key] = params[key]['param']
-        # status 1, show all filter
-        elif status == 1:
-            if key in params:
-                result = params
-    return result
 
 def filter_feature_op(query, params, keynames):
     filter_ = []
@@ -864,13 +848,6 @@ def cget(resource, request) -> JSONType:
         d[k] = v
     filter_feature_op(query, d, keys)
 
-
-    update_sid(request)
-    prop_op_session = SessionResources.prop_session_resource
-    prop_op = FilterQueryParams.prop_op
-    res_id = str(resource.id) + "_" + prop_op_session['ngw_sid']
-    prop_op.update({ res_id: { 'param': d }})
-
     # Paging
     limit = request.GET.get("limit")
     offset = request.GET.get("offset", 0)
@@ -995,17 +972,11 @@ def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     query = resource.feature_query()
 
-    res_id = str(resource.id)
-    params = FilterQueryParams.prop_op
-    session_prop = SessionResources.prop_session_resource
-    
-    if session_prop and session_prop['ngw_sid'] and params:
-        key = res_id + "_" + session_prop['ngw_sid']
-        if key in params:
-            f = params[key]
-            if "param" in f:
-                filter_feature_op(query, f["param"], None)
-
+    d = dict()
+    keys = [fld.keyname for fld in resource.fields]
+    for k,v in dict(request.GET).items():
+        d[k] = v
+    filter_feature_op(query, d, keys)
     total_count = query().total_count
 
     return dict(total_count=total_count)
@@ -1105,12 +1076,6 @@ def setup_pyramid(comp, config):
         factory=feature_layer_factory,
         get=count,
     )
-
-    config.add_route(
-        "feature_layer.clear_filter",
-        "/api/resource/{id:uint}/clear_filter/{status:int}",
-        factory=feature_layer_factory,
-    ).get(clear_filter_params, context=IFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.extent",

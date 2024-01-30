@@ -12,7 +12,7 @@ from nextgisweb.env import _
 
 from nextgisweb.core.exception import UserException, ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound, SessionResources, update_sid
+from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound
 
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
@@ -152,7 +152,6 @@ def tile(request):
 
 def image(request):
     check_origin(request)
-    update_sid(request)
     p_extent = tuple(map(float, request.GET["extent"].split(",")))
     p_size = tuple(map(int, request.GET["size"].split(",")))
     p_resource = map(int, filter(None, request.GET["resource"].split(",")))
@@ -272,6 +271,7 @@ def image(request):
                     rimg.paste(timg, toffset)
 
         if rimg is None:
+            # raise ValidationError(_(str(dir(obj))))
             req = obj.render_request(obj.srs)
             rimg = req.render_extent(ext_extent, ext_size)
 

@@ -51,16 +51,16 @@ export const FeatureGrid = observer(
             onSelect,
         } = store;
         
-        const { data: totalData, refresh: refreshTotal } =
-            useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
-                id,
-            });
-        const { data: resourceData, isLoading } = useRouteGet<ResourceItem>(
-            "resource.item",
-            {
-                id,
-            }
-        );
+        const { data: totalData, refresh: refreshTotal } = useRouteGet<FeatureLayerCount>({
+            name: "feature_layer.feature.count", 
+            params: { id: id },
+            options: { query: queryParams?.fld_field_op },
+        });
+
+        const { data: resourceData, isLoading } = useRouteGet<ResourceItem>({
+            name: "resource.item",
+            params: { id: id },
+        });
 
         useEffect(() => {
             // Do not refresh on init version
