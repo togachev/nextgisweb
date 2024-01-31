@@ -8,7 +8,7 @@ from nextgisweb.resource import IResourceAdapter, IResourceBase
 class IRenderableStyle(IResourceBase):
     srs = Attribute(""" Source SRS """)
 
-    def render_request(self, srs, cond=None):
+    def render_request(self, srs, cond):
         pass
 
 

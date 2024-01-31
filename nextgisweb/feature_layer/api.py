@@ -971,12 +971,10 @@ def cdelete(resource, request) -> JSONType:
 def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     query = resource.feature_query()
-
     d = dict()
-    keys = [fld.keyname for fld in resource.fields]
     for k,v in dict(request.GET).items():
         d[k] = v
-    filter_feature_op(query, d, keys)
+    filter_feature_op(query, d, None)
     total_count = query().total_count
 
     return dict(total_count=total_count)

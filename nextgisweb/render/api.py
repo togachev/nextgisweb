@@ -4,6 +4,8 @@ from itertools import product
 from math import ceil, floor, log
 from pathlib import Path
 
+import re
+
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
@@ -18,6 +20,8 @@ from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
 from .util import af_transform, zxy_from_request
+
+from nextgisweb.feature_layer import filter_feature_op
 
 
 class InvalidOriginError(UserException):
@@ -173,7 +177,27 @@ def image(request):
     zexact = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one_or_none()
+        keys = [fld.keyname for fld in obj.parent.fields]
+        # raise ValidationError(_(str(keys)))
+        filter_ = []
+        for param in request.GET.keys():
+            if param.startswith("fld_"):
+                fld_expr = re.sub("^fld_", "", param)
+            elif param == "id" or param.startswith("id__"):
+                fld_expr = param
+            else:
+                continue
 
+            try:
+                key, operator = fld_expr.rsplit("__", 1)
+            except ValueError:
+                key, operator = (fld_expr, "eq")
+            if key != "id" and key not in keys:
+                raise ValidationError(message="Unknown field '%s'." % key)
+
+            filter_.append((key, operator, request.GET[param]))
+        filter_ = tuple(i for i in filter_)
+    
         if obj is None:
             raise ResourceNotFound(resid)
 
@@ -271,8 +295,7 @@ def image(request):
                     rimg.paste(timg, toffset)
 
         if rimg is None:
-            # raise ValidationError(_(str(dir(obj))))
-            req = obj.render_request(obj.srs)
+            req = obj.render_request(obj.srs, filter_)
             rimg = req.render_extent(ext_extent, ext_size)
 
             empty_image = rimg is None

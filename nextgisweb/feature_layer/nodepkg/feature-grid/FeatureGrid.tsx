@@ -49,8 +49,11 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
+            topic
         } = store;
         
+        topic?.publish("query.params", queryParams);
+
         const { data: totalData, refresh: refreshTotal } = useRouteGet<FeatureLayerCount>({
             name: "feature_layer.feature.count", 
             params: { id: id },
