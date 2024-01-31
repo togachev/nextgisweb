@@ -259,7 +259,7 @@ const FeatureTable = observer(
                                                     <Button
                                                         type="text"
                                                         onClick={() => {
-                                                            setQueryParams(null)
+                                                            setQueryParams(undefined)
                                                         }}
                                                         icon={<FilterAltOff />}
                                                     />

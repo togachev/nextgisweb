@@ -179,7 +179,7 @@ export function WebMapFeatureGridTab({
             ),
             topic.subscribe("feature.updated", featureUpdatedEvent),
             topic.subscribe("/webmap/feature-table/refresh", () => {
-                store.setQueryParams(null);
+                store.setQueryParams(undefined);
                 store.bumpVersion();
             })
         );

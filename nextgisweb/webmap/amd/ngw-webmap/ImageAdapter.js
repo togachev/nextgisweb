@@ -5,24 +5,21 @@ define([
     "@nextgisweb/pyramid/api",
     "ngw-webmap/ol/layer/Image",
     "dojo/topic",
-], function (declare, ioQuery, Adapter, api, Image, topic) {
+], (declare, ioQuery, Adapter, api, Image, topic) => {
     return declare(Adapter, {
-        createLayer: function (item) {
-            const _params = {
-                resource: item.styleId,
-            }
-
-            var _filters = "";
-
-            topic.subscribe("query.params", (e) => {
-                filters_load(e);
-            });
-
-            const filters_load = async (e) => {
-                _filters = '&' + new URLSearchParams(e?.fld_field_op).toString()
-            }
-
-            
+        createLayer: (item) => {
+            var _filters = "", p_filters = ""
+            topic.subscribe("query.params",
+                async (e) => {
+                    if (e?.fld_field_op && e?.fld_field_op.resourceId === item.layerId) {
+                        _filters = e?.fld_field_op;
+                        let { resourceId, keyname, ...filterData } = _filters;
+                        p_filters = '&' + new URLSearchParams(filterData).toString();
+                    } else {
+                        p_filters = ""
+                    }
+                }
+            );
 
             var layer = new Image(
                 item.id,
@@ -40,16 +37,14 @@ define([
                 },
                 {
                     url: api.routeURL("render.image"),
-                    params: _params,
+                    params: { resource: item.styleId, },
                     ratio: 1,
                     crossOrigin: "anonymous",
-                    imageLoadFunction: function (image, src) {
-
+                    imageLoadFunction: (image, src) => {
                         var url = src.split("?")[0];
                         var query = src.split("?")[1];
                         var queryObject = ioQuery.queryToObject(query);
-                        var filter = _filters !== "" ? _filters : ""
-
+                        var filter = p_filters !== "" ? p_filters : "";
                         image.getImage().src =
                             url +
                             "?resource=" +

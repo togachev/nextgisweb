@@ -63,6 +63,7 @@ export const FilterByData = ({
         if (status && !open) {
             if (!value.includes['']) {
                 let params = {
+                    resourceId: resourceId,
                     keyname: keyname,
                     ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
                     ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
