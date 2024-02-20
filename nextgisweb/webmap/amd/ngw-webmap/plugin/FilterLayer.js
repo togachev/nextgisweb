@@ -5,9 +5,9 @@ define([
     "@nextgisweb/webmap/filter-layer",
     "dojo/topic",
     "@nextgisweb/pyramid/i18n!",
-], function (declare, _PluginBase, reactApp, FilterLayerComp, topic, i18n) {
-    return declare([_PluginBase], {
-        FilterLayerCompDomNode: undefined,
+    "dijit/layout/TabContainer",
+], function (declare, _PluginBase, reactApp, FilterLayerComp, topic, i18n, _WidgetBase) {
+    return declare([_PluginBase, _WidgetBase], {
         getPluginState: function (nodeData) {
             return {
                 enabled:
@@ -15,34 +15,42 @@ define([
             };
         },
 
+        run: function () {
+            this._runReactApp();
+        },
+
         getMenuItem: function () {
+            var plugin = this;
             return {
                 icon: "material-filter_alt",
                 title: i18n.gettext("Filter layer"),
                 onClick: (item) => {
-                    this.makeComp(item);
-                    return Promise.resolve(undefined);
+                    return plugin._runReactApp(item);
                 },
             };
         },
 
-        makeComp: function (item) {
-            var display = this.display;
-            if (!this.FilterLayerCompDomNode) {
-                const newNode = document.createElement("div");
-                newNode.classList.add("ngw-filter-layer");
-                display.domNode.after(newNode);
-                this.FilterLayerCompDomNode = newNode;
+        _destroyComponent: function () {
+            if (this.component) {
+                this.component.unmount();
             }
-            reactApp.default(
-                FilterLayerComp.default,
-                {
-                    item: item,
-                    plugin: this,
-                    topic,
-                },
-                this.FilterLayerCompDomNode
-            );
+            this.component = null;
+        },
+
+        _runReactApp: function (item) {
+            if (!this.component) {
+                this.component = reactApp.default(
+                    FilterLayerComp.default,
+                    {
+                        item: item,
+                        fields: item.plugin[this.identity],
+                        plugin: this,
+                        topic,
+                        store: this.display.webmapStore,
+                    },
+                    this.domNode
+                );
+            }
         },
     });
 });

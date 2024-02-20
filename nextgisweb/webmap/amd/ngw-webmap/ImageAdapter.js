@@ -9,9 +9,9 @@ define([
     return declare(Adapter, {
         createLayer: (item) => {
             var _filters = "", p_filters = ""
-            topic.subscribe("query.params",
+            topic.subscribe("query.params_" + item.layerId,
                 async (e) => {
-                    if (e?.fld_field_op && e?.fld_field_op.resourceId === item.layerId) {
+                    if (e?.fld_field_op) {
                         _filters = e?.fld_field_op;
                         let { resourceId, keyname, ...filterData } = _filters;
                         p_filters = '&' + new URLSearchParams(filterData).toString();

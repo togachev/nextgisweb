@@ -1,11 +1,20 @@
-.ngw-filter-layer {
+.content-filters {
     display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 0 12px;
+    flex-direction: column;
 
-    > .ant-slider {
-        flex-grow: 1;
-        min-width: 15ch;
+    label-item{
+        span {
+            border: 0.1em solid #8eb9fb;
+            margin-top: -0.1em;
+            margin-left: -0.1em;
+            box-shadow: 0 0 0.2em #3b88fd;
+        }
+
+    }
+
+    .content-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 }

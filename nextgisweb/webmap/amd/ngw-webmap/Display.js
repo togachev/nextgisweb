@@ -358,6 +358,7 @@ define([
                 main: this.mainContainer,
                 leftPanel: this.leftPanelPane,
                 navigation: this.navigationMenuPane.domNode,
+                // filter: this.filterPane,
             };
             this.panelsManager.initDomElements(domElements);
 

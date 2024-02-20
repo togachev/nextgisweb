@@ -52,7 +52,7 @@ export const FilterByData = ({
         const item = await route('feature_layer.feature.collection', resourceId).get({ query });
 
         const date = [item[0].fields[keyname], item.at(-1).fields[keyname]];
-
+        console.log(datatype, item[0].fields[keyname], parseNgwAttribute(datatype, date[0]));
         item ? value.length > 0 ? setValueStart(value) :
             setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]) : null
 
@@ -68,11 +68,13 @@ export const FilterByData = ({
                     ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
                     ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
                 }
-
+                
+                
                 setQueryParams((prev) => ({
                     ...prev,
                     fld_field_op: params,
                 }));
+                console.log({fld_field_op: params});
             }
         }
     }, [status, open]);
