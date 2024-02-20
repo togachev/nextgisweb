@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { DatePicker, Modal, Checkbox, Input, Tooltip } from "@nextgisweb/gui/antd";
+import { DatePicker, Modal, Checkbox, Input, Tooltip, Tree } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
 import type { LayerItem } from "../type/TreeItems";
-import type { SelectProps } from 'antd';
+import type { SelectProps, TreeDataNode } from "@nextgisweb/gui/antd";
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
 import type WebmapStore from "../store";
 import type {
@@ -39,8 +39,12 @@ export function FilterLayer({
 }) {
     const { layerId } = item;
     const options: SelectProps['options'] = [];
+    const treeData: TreeDataNode[] = [];
     fields.map((x) => {
         options.push({ id: x.id, key: x.keyname, title: x.display_name, checked: false, datatype: x.datatype });
+    });
+    fields.map((x) => {
+        treeData.push({ title: x.display_name, key: x.keyname });
     });
 
     const [openModal, setOpenModal] = useState(true);
@@ -49,6 +53,8 @@ export function FilterLayer({
     const [currentRangeOption, setCurrentRangeOption] = useState<string>({});
     const [data, setData] = useState<any[]>(options)
     const [statusRG, setStatusRG] = useState<boolean>(false);
+
+    const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
 
     useMemo(() => {
         if (store.startDate && Object.keys(store.startDate).length > 0) {
@@ -135,78 +141,28 @@ export function FilterLayer({
         setData(data.map(e => e.id === item.id ? { ...e, checked: !item.checked } : e));
     }
 
-    const ContentFilter = () => {
-        if (statusRG) {
-            return (
-                <Tooltip title={msgRangePicker}>
-                    <RangePicker
-                        allowClear={false}
-                        defaultValue={store.startDate && store.startDate[currentRangeOption]}
-                        showTime={store.dataType === "DATETIME" ? true : false}
-                        // disabledDate={disabledDate}
-                        onOpenChange={onOpenChangeRange}
-                        onChange={onChangeRangePicker}
-                        value={store.currentDate && store.currentDate[currentRangeOption]}
-                    />
-                </Tooltip>
-            )
-        } else {
-            return (
-                <Tooltip title={msgRangePicker}>
-                    <Input placeholder="Basic usage" />
-                </Tooltip>
-            )
-        }
-    }
-
-    const ContentFilterInput = ({ item }) => {
-
-
-        return (
-            <TextArea defaultValue={store.inputData ? store.inputData[item.id] : null} rows={4} onChange={(e) => {
-                if (statusRG) {
-                    let params = {
-                        resourceId: layerId,
-                        keyname: item.key,
-                        ["fld_" + item.key + "__ge"]: e.currentTarget.value,
-                    }
-                    store.setInputData((prev) => ({
-                        ...prev,
-                        [item.id]: params,
-                    }));
-                } else {
-                    let params = {
-                        resourceId: layerId,
-                        keyname: item.key,
-                        ["fld_" + item.key]: parseInt(e.currentTarget.value),
-                    }
-                    store.setInputData((prev) => ({
-                        ...prev,
-                        [item.id]: params,
-                    }));
-                }
-            }} />
-        )
-    }
+    const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+        console.log("onSelect", info);
+        setSelectedKeys(selectedKeysValue);
+    };
 
     return (
         <Modal
+            className="filter-layer-modal"
             maskClosable={false}
             open={openModal}
             onOk={() => {
                 setOpenModal(false);
-                
+
                 console.log(store.inputData);
-                store.inputData ? 
-                Object.keys(store.inputData).map(id => {
-                    // store.setQueryParams({fld_field_op: store.inputData[id]})
-                    console.log(id);
-                    
-                })
-                 : null;
+                store.inputData ?
+                    Object.keys(store.inputData).map(id => {
+                        console.log(id);
+                    })
+                    : null;
                 console.log(store.queryParams);
                 topicQueryParams(store.queryParams)
-                
+
             }}
             onCancel={() => {
                 setOpenModal(false);
@@ -218,34 +174,12 @@ export function FilterLayer({
                 }));
             }}
         >
-            <p>Filter layer content...</p>
-            <div className="content-filters">
-                {data.map((item) => {
-                    return (
-                        <Checkbox
-                            key={item.id}
-                            checked={item.checked}
-                            onChange={() => {
-                                onChange(item)
-                                if (dataType.includes(item.datatype)) {
-                                    startValue(item.key, item.datatype);
-                                    store.setDataType(item.datatype);
-                                    setStatusRG(true)
-                                } else {
-                                    setStatusRG(false)
-                                }
-                            }}
-                        >
-                            <span>{item.title}</span>
-                            {
-                                item.checked ?
-                                    (<ContentFilterInput item={item} />)
-                                    : null
-                            }
-                        </Checkbox>
-                    )
-                })}
-            </div>
+            <Tree
+                switcherIcon={false}
+                onSelect={onSelect}
+                selectedKeys={selectedKeys}
+                treeData={treeData}
+            />
         </Modal>
     );
 }
