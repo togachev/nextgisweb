@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { DatePicker, Modal, Checkbox, Input, Tooltip, Tree } from "@nextgisweb/gui/antd";
+import { DatePicker, Modal, Checkbox, Input, Row, Col, Tooltip, Tree } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
@@ -53,8 +53,6 @@ export function FilterLayer({
     const [currentRangeOption, setCurrentRangeOption] = useState<string>({});
     const [data, setData] = useState<any[]>(options)
     const [statusRG, setStatusRG] = useState<boolean>(false);
-
-    const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
 
     useMemo(() => {
         if (store.startDate && Object.keys(store.startDate).length > 0) {
@@ -141,9 +139,45 @@ export function FilterLayer({
         setData(data.map(e => e.id === item.id ? { ...e, checked: !item.checked } : e));
     }
 
+    const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+    const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
+    const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
+    const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+
+    const onExpand = (expandedKeysValue: React.Key[]) => {
+        setExpandedKeys(expandedKeysValue);
+        setAutoExpandParent(false);
+    };
+
+    const onCheck = (checkedKeysValue: React.Key[], e) => {
+        console.log('onCheck', checkedKeysValue, treeData.find(item => item.key === e.node.key));
+        setCheckedKeys(checkedKeysValue);
+    };
+
     const onSelect = (selectedKeysValue: React.Key[], info: any) => {
-        console.log("onSelect", info);
+        console.log('onSelect', info);
         setSelectedKeys(selectedKeysValue);
+    };
+
+    const titleRender = (e) => {
+        return (
+            <>
+                {
+                    checkedKeys.includes(e.title) ?
+                        (
+                            <Row>
+                                <Col>{e.title}</Col>
+                                <Col>
+                                    <Input onClick={e => {
+                                        e.stopPropagation()
+                                    }} />
+                                </Col>
+                            </Row>
+                        )
+                        : e.title
+                }
+            </>
+        );
     };
 
     return (
@@ -175,13 +209,18 @@ export function FilterLayer({
             }}
         >
             <Tree
-                switcherIcon={false}
+                checkable
+                onExpand={onExpand}
+                expandedKeys={expandedKeys}
+                autoExpandParent={autoExpandParent}
+                onCheck={onCheck}
+                checkedKeys={checkedKeys}
                 onSelect={onSelect}
                 selectedKeys={selectedKeys}
                 treeData={treeData}
+                selectable={false}
+                titleRender={titleRender}
             />
         </Modal>
     );
 }
-
-// setData(data.map(e => e.id === item.id ? { ...e, checked: !item.checked } : e));
