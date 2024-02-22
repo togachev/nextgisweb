@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { DatePicker, Modal, Checkbox, Input, Row, Col, Tooltip, Tree } from "@nextgisweb/gui/antd";
+import React, { useCallback, useEffect, useMemo, useState, Dispatch } from 'react';
+import { Button, DatePicker, Form, Modal, Checkbox, Input, InputNumber, Select, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
+import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+
 import type { LayerItem } from "../type/TreeItems";
-import type { SelectProps, TreeDataNode } from "@nextgisweb/gui/antd";
+import type { SelectProps } from 'antd';
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
 import type WebmapStore from "../store";
 import type {
@@ -39,12 +41,8 @@ export function FilterLayer({
 }) {
     const { layerId } = item;
     const options: SelectProps['options'] = [];
-    const treeData: TreeDataNode[] = [];
     fields.map((x) => {
         options.push({ id: x.id, key: x.keyname, title: x.display_name, checked: false, datatype: x.datatype });
-    });
-    fields.map((x) => {
-        treeData.push({ title: x.display_name, key: x.keyname });
     });
 
     const [openModal, setOpenModal] = useState(true);
@@ -53,6 +51,8 @@ export function FilterLayer({
     const [currentRangeOption, setCurrentRangeOption] = useState<string>({});
     const [data, setData] = useState<any[]>(options)
     const [statusRG, setStatusRG] = useState<boolean>(false);
+
+    const [values, setValues] = useState();
 
     useMemo(() => {
         if (store.startDate && Object.keys(store.startDate).length > 0) {
@@ -135,63 +135,38 @@ export function FilterLayer({
         topic.publish("query.params_" + layerId, params)
     }
 
-    const onChange = (item) => {
-        setData(data.map(e => e.id === item.id ? { ...e, checked: !item.checked } : e));
-    }
+    const onFinish = (fieldsValue) => {
+        console.log('Received values of form:', fieldsValue);
+        // const rangeValue = fieldsValue['range-picker'];
+        // const values = {
+        //     ...fieldsValue,
+        //     'range-picker': { 'start': rangeValue[0].format('YYYY-MM-DD'), 'end': rangeValue[0].format('YYYY-MM-DD') },
+        // };
 
-    const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-    const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
-    const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
-    const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
-
-    const onExpand = (expandedKeysValue: React.Key[]) => {
-        setExpandedKeys(expandedKeysValue);
-        setAutoExpandParent(false);
+        // https://codepen.io/togachev/pen/OJqYQdy?editors=0011
     };
 
-    const onCheck = (checkedKeysValue: React.Key[], e) => {
-        console.log('onCheck', checkedKeysValue, treeData.find(item => item.key === e.node.key));
-        setCheckedKeys(checkedKeysValue);
-    };
-
-    const onSelect = (selectedKeysValue: React.Key[], info: any) => {
-        console.log('onSelect', info);
-        setSelectedKeys(selectedKeysValue);
-    };
-
-    const titleRender = (e) => {
+    const TestItem = ({ keyname }) => {
         return (
-            <>
-                {
-                    checkedKeys.includes(e.title) ?
-                        (
-                            <Row>
-                                <Col>{e.title}</Col>
-                                <Col>
-                                    <Input onClick={e => {
-                                        e.stopPropagation()
-                                    }} />
-                                </Col>
-                            </Row>
-                        )
-                        : e.title
-                }
-            </>
+            <Form.Item name={keyname}>
+                <RangePicker />
+            </Form.Item>
         );
     };
 
     return (
         <Modal
-            className="filter-layer-modal"
             maskClosable={false}
             open={openModal}
             onOk={() => {
                 setOpenModal(false);
 
-                console.log(store.inputData);
+                console.log(values);
                 store.inputData ?
                     Object.keys(store.inputData).map(id => {
+                        // store.setQueryParams({fld_field_op: store.inputData[id]})
                         console.log(id);
+
                     })
                     : null;
                 console.log(store.queryParams);
@@ -208,19 +183,39 @@ export function FilterLayer({
                 }));
             }}
         >
-            <Tree
-                checkable
-                onExpand={onExpand}
-                expandedKeys={expandedKeys}
-                autoExpandParent={autoExpandParent}
-                onCheck={onCheck}
-                checkedKeys={checkedKeys}
-                onSelect={onSelect}
-                selectedKeys={selectedKeys}
-                treeData={treeData}
-                selectable={false}
-                titleRender={titleRender}
-            />
+            <p>Filter layer content...</p>
+            <div className="content-filters">
+                <Form
+                    name="dynamic_form_nest_item"
+                    onFinish={onFinish}
+                    style={{ maxWidth: 600 }}
+                    autoComplete="off"
+                >
+                    <Form.List name="params">
+                        {() => (
+                            <>
+                                {fields.map(({ keyname, display_name, datatype }) => (
+                                    <Space key={keyname} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                                        {dataType.includes(datatype) ?
+                                            (<TestItem keyname={keyname} />)
+                                            :
+                                            (<Form.Item
+                                                name={keyname}
+                                            >
+                                                <Input placeholder={display_name} />
+                                            </Form.Item>)}
+                                    </Space>
+                                ))}
+                            </>
+                        )}
+                    </Form.List>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit">
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </div>
         </Modal>
     );
 }
