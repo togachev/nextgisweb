@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, Dispatch } from 'react';
-import { Button, DatePicker, Form, Modal, Checkbox, Input, InputNumber, Select, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, DatePicker, Form, Modal, Checkbox, Input, InputNumber, Select, Space, Tooltip, Radio } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
@@ -7,7 +7,6 @@ import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
 import type { LayerItem } from "../type/TreeItems";
-import type { SelectProps } from 'antd';
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
 import type WebmapStore from "../store";
 import type {
@@ -16,7 +15,7 @@ import type {
 
 import "./FilterLayer.less";
 
-import type { GetProps } from "@nextgisweb/gui/antd";
+import type { GetProps, RadioChangeEvent, SelectProps } from "@nextgisweb/gui/antd";
 
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 
@@ -25,6 +24,23 @@ const dt = '1970-01-01';
 const dataType = ["DATE", "DATETIME"]
 const { TextArea } = Input;
 const msgRangePicker = gettext("Select date range");
+
+const operator = {
+    no: { label: '', value: '' },
+    eq: { label: 'равно', value: 'eq' },
+    ne: { label: 'не равно', value: 'ne' },
+    lt: { label: 'меньше', value: 'lt' },
+    gt: { label: 'больше', value: 'gt' },
+    le: { label: 'меньше или равно', value: 'le' },
+    ge: { label: 'больше или равно', value: 'ge' },
+    like: { label: 'like', value: 'like', opt: "%" },
+    ilike: { label: 'ilike', value: 'ilike', opt: "%" },
+};
+
+const op_type = {
+    string: ['like', 'ilike'],
+    integer: ['eq', 'ne', 'lt', 'gt', 'le', 'ge'],
+}
 
 export function FilterLayer({
     item,
@@ -41,6 +57,7 @@ export function FilterLayer({
 }) {
     const { layerId } = item;
     const options: SelectProps['options'] = [];
+    
     fields.map((x) => {
         options.push({ id: x.id, key: x.keyname, title: x.display_name, checked: false, datatype: x.datatype });
     });
@@ -135,23 +152,61 @@ export function FilterLayer({
         topic.publish("query.params_" + layerId, params)
     }
 
-    const onFinish = (fieldsValue) => {
-        console.log('Received values of form:', fieldsValue);
-        // const rangeValue = fieldsValue['range-picker'];
-        // const values = {
-        //     ...fieldsValue,
-        //     'range-picker': { 'start': rangeValue[0].format('YYYY-MM-DD'), 'end': rangeValue[0].format('YYYY-MM-DD') },
-        // };
+    const [opStr, setOpStr] = useState(operator.ilike);
+    const [opInt, setOpInt] = useState(operator.eq);
 
-        // https://codepen.io/togachev/pen/OJqYQdy?editors=0011
+    const onChangeSelect = (e: SelectProps) => {
+        console.log(e);
+        
+        if (e !== undefined) {
+            setOpStr(operator[e])
+            setOpInt(operator[e])
+        } else {
+            setOpStr(operator.ilike)
+            setOpInt(operator.eq)
+        }
+
     };
 
-    const TestItem = ({ keyname }) => {
-        return (
-            <Form.Item name={keyname}>
-                <RangePicker />
-            </Form.Item>
-        );
+
+    const onFinish = (value) => {
+        console.log(value);
+
+        const keys_ = Object.keys(value.params || {})
+        const values = {}
+
+        fields.map((a) => {
+            if (keys_.includes(a.keyname)) {
+                console.log(value, a.keyname, opInt, opStr);
+                const field = value.params[a.keyname];
+
+                if (dataType.includes(a.datatype)) {
+                    Object.assign(values, field ? {
+                        ...value.fld_field_op,
+                        ['fld_' + a.keyname + '__ge']: field[0].format('YYYY-MM-DD'),
+                        ['fld_' + a.keyname + '__le']: field[1].format('YYYY-MM-DD'),
+                    } : undefined)
+                } else if (a.datatype === "STRING") {
+                    let val_ = opStr.value !== '' ? "__" + opStr.value : ""
+                    let opt_ = opStr.value !== '' ? opStr.opt : ""
+                    Object.assign(values, field ? {
+                        ...value.fld_field_op,
+                        ['fld_' + a.keyname + val_]: opt_ + field + opt_,
+                    } : undefined)
+                } else if (a.datatype === "INTEGER") {
+                    let val_ = opInt.value !== '' ? "__" + opInt.value : ""
+                    Object.assign(values, field ? {
+                        ...value.fld_field_op,
+                        ['fld_' + a.keyname + val_]: field,
+                    } : undefined)
+                }
+            }
+        });
+        store.setQueryParams((prev) => ({
+            ...prev,
+            fld_field_op: values,
+        }));
+        // тест RangePicker https://codepen.io/togachev/pen/OJqYQdy?editors=0011
     };
 
     return (
@@ -160,23 +215,12 @@ export function FilterLayer({
             open={openModal}
             onOk={() => {
                 setOpenModal(false);
-
-                console.log(values);
-                store.inputData ?
-                    Object.keys(store.inputData).map(id => {
-                        // store.setQueryParams({fld_field_op: store.inputData[id]})
-                        console.log(id);
-
-                    })
-                    : null;
-                console.log(store.queryParams);
                 topicQueryParams(store.queryParams)
-
             }}
             onCancel={() => {
                 setOpenModal(false);
                 topicQueryParams("");
-                store.setQueryParams(undefined)
+                store.setQueryParams(null)
                 store.setCurrentDate((prev) => ({
                     ...prev,
                     [currentRangeOption]: null,
@@ -195,15 +239,56 @@ export function FilterLayer({
                         {() => (
                             <>
                                 {fields.map(({ keyname, display_name, datatype }) => (
-                                    <Space key={keyname} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                                    <Space key={keyname} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }} align="baseline">
                                         {dataType.includes(datatype) ?
-                                            (<TestItem keyname={keyname} />)
-                                            :
-                                            (<Form.Item
-                                                name={keyname}
-                                            >
-                                                <Input placeholder={display_name} />
-                                            </Form.Item>)}
+                                            (
+                                                <Form.Item name={keyname} label={display_name} >
+                                                    <RangePicker />
+                                                </Form.Item>
+                                            )
+                                            : (<></>)}
+                                        {datatype === "INTEGER" ?
+                                            (
+                                                <>
+                                                    <Form.Item name={keyname} label={display_name} >
+                                                        <Input />
+                                                    </Form.Item>
+                                                    <Select
+                                                        allowClear
+                                                        showSearch
+                                                        style={{ width: 200 }}
+                                                        placeholder="Операторы"
+                                                        onChange={onChangeSelect}
+                                                        options={
+                                                            op_type.integer.map(item => {
+                                                                return operator[item];
+                                                            })
+                                                        }
+                                                    />
+
+                                                </>
+                                            ) : (<></>)}
+                                        {datatype === "STRING" ?
+                                            (
+                                                <>
+                                                    <Form.Item name={keyname} label={display_name} >
+                                                        <Input />
+                                                    </Form.Item>
+                                                    <Select
+                                                        allowClear
+                                                        showSearch
+                                                        style={{ width: 200 }}
+                                                        placeholder="Операторы"
+                                                        onChange={onChangeSelect}
+                                                        options={
+                                                            op_type.string.map(item => {
+                                                                return operator[item];
+                                                            })
+                                                        }
+                                                    />
+                                                </>
+
+                                            ) : (<></>)}
                                     </Space>
                                 ))}
                             </>
