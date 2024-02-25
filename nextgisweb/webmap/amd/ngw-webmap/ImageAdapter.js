@@ -12,7 +12,7 @@ define([
             topic.subscribe("query.params_" + item.layerId,
                 async (e) => {
                     if (e?.fld_field_op) {
-                        p_filters = '&' + new URLSearchParams(e.fld_field_op).toString();
+                        p_filters = '&' + e?.fld_field_op.map(item => new URLSearchParams(item).toString()).join('&');
                     } else {
                         p_filters = ""
                     }

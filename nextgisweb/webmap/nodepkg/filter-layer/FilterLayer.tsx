@@ -5,6 +5,8 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import Add from "@nextgisweb/icon/material/add";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever";
 
 import type { LayerItem } from "../type/TreeItems";
 import type { FeatureLayerField } from "@nextgisweb/feature-layer/feature-grid/type";
@@ -26,8 +28,8 @@ const { TextArea } = Input;
 const msgRangePicker = gettext("Select date range");
 
 const operator = {
-    no: { label: '', value: '' },
     eq: { label: 'равно', value: 'eq' },
+    in: { label: 'массив', value: 'in' },
     ne: { label: 'не равно', value: 'ne' },
     lt: { label: 'меньше', value: 'lt' },
     gt: { label: 'больше', value: 'gt' },
@@ -39,7 +41,7 @@ const operator = {
 
 const op_type = {
     string: ['like', 'ilike'],
-    integer: ['eq', 'ne', 'lt', 'gt', 'le', 'ge'],
+    integer: ['eq', 'in', 'ne', 'lt', 'gt', 'le', 'ge'],
 }
 
 export function FilterLayer({
@@ -57,7 +59,7 @@ export function FilterLayer({
 }) {
     const { layerId } = item;
     const options: SelectProps['options'] = [];
-    
+
     fields.map((x) => {
         options.push({ id: x.id, key: x.keyname, title: x.display_name, checked: false, datatype: x.datatype });
     });
@@ -152,36 +154,43 @@ export function FilterLayer({
         topic.publish("query.params_" + layerId, params)
     }
 
+    const [opInt, setOpInt] = useState({ 0: operator.eq });
     const [opStr, setOpStr] = useState(operator.ilike);
-    const [opInt, setOpInt] = useState(operator.eq);
 
-    const onChangeSelect = (e: SelectProps) => {
-        console.log(e);
-        
-        if (e !== undefined) {
-            setOpStr(operator[e])
-            setOpInt(operator[e])
+    const onChangeSelect = (e: SelectProps, key) => {
+        if (e === undefined) {
+            setOpInt((prev) => ({
+                ...prev,
+                [key]: operator.eq
+            }));
         } else {
-            setOpStr(operator.ilike)
-            setOpInt(operator.eq)
+            setOpInt((prev) => ({
+                ...prev,
+                [key]: operator[e]
+            }));
         }
-
     };
 
+    const onChangeSelectStr = (e: SelectProps) => {
+        if (e === undefined) {
+            setOpStr(operator.ilike);
+        } else {
+            setOpStr(operator[e]);
+        }
+    };
 
     const onFinish = (value) => {
-        console.log(value);
-
         const keys_ = Object.keys(value.params || {})
-        const values = {}
+        let values = []
 
         fields.map((a) => {
             if (keys_.includes(a.keyname)) {
-                console.log(value, a.keyname, opInt, opStr);
                 const field = value.params[a.keyname];
+                console.log(field);
+
 
                 if (dataType.includes(a.datatype)) {
-                    Object.assign(values, field ? {
+                    values.push(field ? {
                         ...value.fld_field_op,
                         ['fld_' + a.keyname + '__ge']: field[0].format('YYYY-MM-DD'),
                         ['fld_' + a.keyname + '__le']: field[1].format('YYYY-MM-DD'),
@@ -189,23 +198,44 @@ export function FilterLayer({
                 } else if (a.datatype === "STRING") {
                     let val_ = opStr.value !== '' ? "__" + opStr.value : ""
                     let opt_ = opStr.value !== '' ? opStr.opt : ""
-                    Object.assign(values, field ? {
-                        ...value.fld_field_op,
-                        ['fld_' + a.keyname + val_]: opt_ + field + opt_,
-                    } : undefined)
+                    values.push(
+                        field
+                            ? {
+                                ...value.fld_field_op,
+                                ["fld_" + a.keyname + val_]: opt_ + field + opt_
+                            }
+                            : undefined
+                    );
                 } else if (a.datatype === "INTEGER") {
-                    let val_ = opInt.value !== '' ? "__" + opInt.value : ""
-                    Object.assign(values, field ? {
-                        ...value.fld_field_op,
-                        ['fld_' + a.keyname + val_]: field,
-                    } : undefined)
+                    Object.keys(opInt)?.map((i, index) => {
+                        let val_ = opInt[i].value
+                            ? "__" + opInt[i].value
+                            : "";
+                        values.push(
+                            field !== undefined ? {
+                                ...value.fld_field_op,
+                                ["fld_" + a.keyname + val_]: field[index]
+                            } : {}
+                        );
+                    });
                 }
             }
+        });
+
+        values = values.filter((obj) => {
+            return (
+                (Object.values(obj)[0] !== undefined) &&
+                (Object.values(obj)[0] !== "%" + undefined + "%")
+            );
         });
         store.setQueryParams((prev) => ({
             ...prev,
             fld_field_op: values,
         }));
+        console.log(values);
+        // console.log(opInt);
+        // console.log(opStr);
+
         // тест RangePicker https://codepen.io/togachev/pen/OJqYQdy?editors=0011
     };
 
@@ -247,27 +277,67 @@ export function FilterLayer({
                                                 </Form.Item>
                                             )
                                             : (<></>)}
-                                        {datatype === "INTEGER" ?
-                                            (
-                                                <>
-                                                    <Form.Item name={keyname} label={display_name} >
-                                                        <Input />
-                                                    </Form.Item>
-                                                    <Select
-                                                        allowClear
-                                                        showSearch
-                                                        style={{ width: 200 }}
-                                                        placeholder="Операторы"
-                                                        onChange={onChangeSelect}
-                                                        options={
-                                                            op_type.integer.map(item => {
-                                                                return operator[item];
-                                                            })
-                                                        }
-                                                    />
-
-                                                </>
-                                            ) : (<></>)}
+                                        {datatype === "INTEGER" ? (
+                                            <>
+                                                <Form.List name={keyname}>
+                                                    {(intArray, { add, remove }) => (
+                                                        <>
+                                                            {intArray.map(({ key, name, ...rest }) => (
+                                                                <Space key={key} align="baseline">
+                                                                    <Form.Item {...rest} name={[name]}>
+                                                                        <Input placeholder="First Name" />
+                                                                    </Form.Item>
+                                                                    <Select
+                                                                        allowClear
+                                                                        showSearch
+                                                                        style={{ width: 200 }}
+                                                                        placeholder="Операторы"
+                                                                        defaultValue={operator.eq}
+                                                                        onChange={(e) => {
+                                                                            onChangeSelect(e, key);
+                                                                        }}
+                                                                        options={op_type.integer.map((item) => {
+                                                                            return operator[item];
+                                                                        })}
+                                                                    />
+                                                                    <DeleteForever
+                                                                        onClick={() => {
+                                                                            delete opInt[rest.fieldKey];
+                                                                            remove(name);
+                                                                        }}
+                                                                    />
+                                                                </Space>
+                                                            ))}
+                                                            <Form.Item>
+                                                                <Button
+                                                                    type="dashed"
+                                                                    onClick={() => {
+                                                                        add();
+                                                                        if (intArray.length > 0) {
+                                                                            setOpInt((prev) => ({
+                                                                                ...prev,
+                                                                                [intArray.slice(-1)[0].fieldKey + 1]: operator.eq
+                                                                            }));
+                                                                        } else {
+                                                                            setOpInt((prev) => ({
+                                                                                ...prev,
+                                                                                0: operator.eq
+                                                                            }));
+                                                                        }
+                                                                    }}
+                                                                    block
+                                                                    icon={<Add />}
+                                                                >
+                                                                    Добавить фильтр для поля: {keyname}
+                                                                </Button>
+                                                            </Form.Item>
+                                                        </>
+                                                    )}
+                                                </Form.List>
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
                                         {datatype === "STRING" ?
                                             (
                                                 <>
@@ -279,7 +349,8 @@ export function FilterLayer({
                                                         showSearch
                                                         style={{ width: 200 }}
                                                         placeholder="Операторы"
-                                                        onChange={onChangeSelect}
+                                                        defaultValue={operator.ilike}
+                                                        onChange={onChangeSelectStr}
                                                         options={
                                                             op_type.string.map(item => {
                                                                 return operator[item];

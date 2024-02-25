@@ -40,7 +40,7 @@ export function WebMapFeatureGridTab({
     );
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current.plugin[
-            plugin.identity as string
+        plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
 
@@ -177,9 +177,21 @@ export function WebMapFeatureGridTab({
                 "feature.unhighlight",
                 store.setSelectedIds.bind(null, [])
             ),
+            // подписка на фильтрацию черезе дерево слоев
+            // исправить параметры фильтрации в таблице атрибутов, объект на массив с параметрами
+            // сейчас берется первый фильтр
+            topic.subscribe(
+                "query.params_" + layerId,
+                (e) => {
+                    if (e?.fld_field_op) {
+                        store.setQueryParams({ fld_field_op: e.fld_field_op[0] });
+                    }
+                    // console.log(typeof e?.fld_field_op);
+
+                }
+            ),
             topic.subscribe("feature.updated", featureUpdatedEvent),
             topic.subscribe("/webmap/feature-table/refresh", () => {
-                store.setQueryParams(undefined);
                 store.bumpVersion();
             })
         );
