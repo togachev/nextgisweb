@@ -58,7 +58,6 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
-        const [filterByDataClickId, setFilterByDataClickId] = useState<number>();
         const [descClickId, setDescClickId] = useState<number>();
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);

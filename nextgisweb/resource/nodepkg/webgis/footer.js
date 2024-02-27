@@ -44,8 +44,8 @@ export const Footer = () => {
                 <LogoUriitComp />
                 <div className="block-info">
                     <div className="content-services">
-                        <div className="services-a">{info.find((e) => e.key == 'services').value}</div>
-                        <div className="services-b">{info.find((e) => e.key == 'services').list.map(item => {
+                        <div className="services-a">{info.find((e) => e.key === 'services').value}</div>
+                        <div className="services-b">{info.find((e) => e.key === 'services').list.map(item => {
                             return (
                                 <span key={item.key}><Link href={item.value} target="_blank"><RightOutlined />{item.label}</Link></span>
                             )
@@ -53,7 +53,7 @@ export const Footer = () => {
                     </div>
                     <Divider />
                     <div className="content-info">
-                        <div className="info-a">{info.find((e) => e.key == 'address').value}</div>
+                        <div className="info-a">{info.find((e) => e.key === 'address').value}</div>
                         <div className="info-b">{info.filter((e) => e.key !== 'address' && e.key !== 'services').map(item => {
                             return (
                                 <div key={item.key} className="info-b-item">

@@ -1,10 +1,8 @@
-import os
 import re
 import sqlite3
 from contextlib import closing
 from functools import lru_cache
 from io import BytesIO
-from shutil import copyfile
 from tempfile import NamedTemporaryFile
 from typing import Optional
 from zipfile import ZipFile, is_zipfile
@@ -23,6 +21,7 @@ from nextgisweb.lib.registry import list_registry
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.render import (
     IExtentRenderRequest,
@@ -151,8 +150,8 @@ class Tileset(Base, Resource, SpatialLayerMixin):
 
         image = None
 
-        db_path = env.file_storage.filename(self.fileobj)
-        connection = get_tile_db(db_path)
+        db_path = self.fileobj.filename()
+        connection = get_tile_db(str(db_path))
 
         # fmt: off
         for x, y, data in connection.execute("""
@@ -313,17 +312,14 @@ def read_file(fn):
 
 class _source_attr(SerializedProperty):
     def setter(self, srlzr, value):
-        if srlzr.obj.id is None:
-            srlzr.obj.fileobj = env.file_storage.fileobj(component=COMP_ID)
-            dstfile = env.file_storage.filename(srlzr.obj.fileobj, makedirs=True)
-        else:
-            dstfile = env.file_storage.filename(srlzr.obj.fileobj)
-            size = os.stat(dstfile).st_size
+        if srlzr.obj.id is not None:
             env.core.reserve_storage(
-                COMP_ID, TilesetData, value_data_volume=-size, resource=srlzr.obj
+                COMP_ID,
+                TilesetData,
+                value_data_volume=-srlzr.obj.fileobj.size,
+                resource=srlzr.obj,
             )
 
-        fn, fn_meta = env.file_upload.get_filename(value["id"])
         stat = dict()
         with NamedTemporaryFile() as tf:
             with sqlite3.connect(tf.name) as connection:
@@ -341,7 +337,7 @@ class _source_attr(SerializedProperty):
                 """)
                 # fmt: on
 
-                for z, x, y, img_data in read_file(fn):
+                for z, x, y, img_data in read_file(FileUpload(id=value["id"]).data_path):
                     img = Image.open(BytesIO(img_data))
                     if img.size != (256, 256):
                         raise ValidationError(message=_("Only 256x256 px tiles are supported."))
@@ -369,11 +365,12 @@ class _source_attr(SerializedProperty):
                 connection.commit()
                 cursor.execute("VACUUM")
 
-            copyfile(tf.name, dstfile)
-
-            size = os.stat(dstfile).st_size
+            srlzr.obj.fileobj = FileObj().copy_from(tf.name)
             env.core.reserve_storage(
-                COMP_ID, TilesetData, value_data_volume=size, resource=srlzr.obj
+                COMP_ID,
+                TilesetData,
+                value_data_volume=srlzr.obj.fileobj.size,
+                resource=srlzr.obj,
             )
 
         zmin = zmax = None

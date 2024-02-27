@@ -30,23 +30,6 @@
                     background-color: var(--color-secondary);
                 }
 
-                .button-column {
-                    display: flex;
-                    align-items: center;
-                    
-                    button {
-                        font-size: 14px;
-                        height: 24px;
-                        padding: 0px 0px;
-                        border-radius: 4px;
-                        font-weight: var(--font-weight-strong);
-                    }
-
-                    button:hover {
-                        background-color: var(--on-primary-text);
-                    }
-                }
-
                 .label {
                     flex-grow: 1;
                     min-width: 0;
@@ -61,7 +44,7 @@
                     span.asc,
                     span.desc {
                         svg.icon {
-                            margin: 0 2px;
+                            margin: 0 -2px;
                         }
                     }
 
@@ -107,7 +90,7 @@
 
                 .td {
                     flex: 0 0 auto;
-                    overflow: hidden;
+                    overflow: clip;
                     text-overflow: ellipsis;
                 }
 

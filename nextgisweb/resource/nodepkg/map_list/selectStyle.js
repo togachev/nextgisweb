@@ -14,25 +14,25 @@ export default function getSelectStyle() {
             }
         }),
         dropdownIndicator: base => ({ ...base, padding: '2px' }), 
-        indicatorsContainer: (provided, state) => ({
+        indicatorsContainer: (provided) => ({
             ...provided,
             padding: '0px',
             margin: '0px',
         }),
-        valueContainer: (provided, state) => ({
+        valueContainer: (provided) => ({
             ...provided,
             padding: '0px 2px',
             margin: '0px',
             maxHeight: '300px',
             overflow: 'overlay',
           }),
-        input: (provided, state) => ({
+        input: (provided) => ({
             ...provided,
             margin: '0 0 0 10px',
             padding: '0px',
         }),
     
-        placeholder: (provided, state) => ({
+        placeholder: (provided) => ({
             ...provided,
             margin: '0 2px',
             padding: '0 2px',
@@ -66,15 +66,13 @@ export default function getSelectStyle() {
                 backgroundColor: '#106a9050',
             },
         }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+        option: (styles, { isDisabled, isFocused, isSelected }) => {
             return {
                 ...styles,
-                backgroundColor: isSelected ? '#106a90' : '#fff',
-                height: isSelected ? '34px' : '34px',
+                backgroundColor: isSelected ? '#106a90' : isFocused ? '#106a9010' : '#fff',
+                height: isSelected && isFocused ? '34px' : '34px',
                 cursor: isDisabled ? 'not-allowed' : 'default',
-                backgroundColor: isFocused ? '#106a9010' : '#fff',
                 color: isFocused ? '#106a90' : '#106a90',
-                height: isFocused ? '34px' : '34px',
                 
                 ':active': {
                     backgroundColor: '#106a90',

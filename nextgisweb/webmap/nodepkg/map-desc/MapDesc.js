@@ -15,10 +15,10 @@ const zoomToFeature = (display, resourceId, featureId) => {
 export const MapDesc = ({description, display, upath_info}) => {
     const options = {
         replace: item => {
-            if (item instanceof Element && item.attribs && item.name == 'img') {
+            if (item instanceof Element && item.attribs && item.name === 'img') {
                 return <Image src={item.attribs.src}>item</Image>;
             }
-            if (item instanceof Element && item.name == 'a' && !upath_info) {
+            if (item instanceof Element && item.name === 'a' && !upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<a onClick={
                         () => {
@@ -32,7 +32,7 @@ export const MapDesc = ({description, display, upath_info}) => {
                 Если открыты свойства ресурса, ссылка на объект удаляется, остается заголовок.
                 Можно оставить ссылку, и добавить переход к объекту в таблице ресурса или к объекту на карте.
             */ 
-            if (item instanceof Element && item.name == 'a' && upath_info) {
+            if (item instanceof Element && item.name === 'a' && upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<>{domToReact(item.children, options)}</>);
                 }

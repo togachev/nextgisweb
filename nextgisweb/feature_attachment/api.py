@@ -5,21 +5,28 @@ from tempfile import NamedTemporaryFile
 from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from msgspec import Meta
 from PIL import Image
 from pyramid.response import FileResponse, Response
+from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession
 from nextgisweb.lib.json import dumpb
 
+from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer.api import FeatureID
 from nextgisweb.feature_layer.exception import FeatureNotFound
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.tomb import UnsafeFileResponse
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory
 
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
 from .util import attachments_import
+
+AttachmentID = Annotated[int, Meta(ge=1, description="Attachment ID")]
 
 
 def attachment_or_not_found(resource_id, feature_id, attachment_id):
@@ -46,8 +53,8 @@ def download(resource, request):
         attachment_id=int(request.matchdict["aid"]),
     )
 
-    fn = env.file_storage.filename(obj.fileobj)
-    response = UnsafeFileResponse(fn, content_type=obj.mime_type, request=request)
+    fn = obj.fileobj.filename()
+    response = UnsafeFileResponse(str(fn), content_type=obj.mime_type, request=request)
     response.content_disposition = f"filename*=utf-8''{quote_plus(obj.name)}"
     return response
 
@@ -61,7 +68,7 @@ def image(resource, request):
         attachment_id=int(request.matchdict["aid"]),
     )
 
-    image = Image.open(env.file_storage.filename(obj.fileobj))
+    image = Image.open(obj.fileobj.filename())
     ext = image.format
 
     exif = None
@@ -210,8 +217,7 @@ def export(resource, request):
                 if obj.description is not None:
                     metadata_item["description"] = obj.description
 
-                fn = env.file_storage.filename(obj.fileobj)
-                zipf.write(fn, arcname=arcname)
+                zipf.write(obj.fileobj.filename(), arcname=arcname)
 
             zipf.writestr("metadata.json", dumpb(metadata))
 
@@ -225,34 +231,37 @@ def import_attachment(resource, request) -> JSONType:
 
     data = request.json_body
     replace = data.get("replace", False) is True
-    upload_meta = data["source"]
-    data, meta = request.env.file_upload.get_filename(upload_meta["id"])
-
-    return attachments_import(resource, data, replace=replace)
+    fupload = FileUpload(id=data["source"]["id"])
+    return attachments_import(resource, fupload.data_path, replace=replace)
 
 
 def setup_pyramid(comp, config):
-    colurl = "/api/resource/{id:uint}/feature/{fid:int}/attachment/"
-    itmurl = "/api/resource/{id:uint}/feature/{fid:int}/attachment/{aid:uint}"
+    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+
+    itmurl = "/api/resource/{id}/feature/{fid}/attachment/{aid}"
+    colurl = "/api/resource/{id}/feature/{fid}/attachment/"
 
     config.add_route(
         "feature_attachment.download",
         itmurl + "/download",
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID, aid=AttachmentID),
         get=download,
     )
 
     config.add_route(
         "feature_attachment.image",
         itmurl + "/image",
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID, aid=AttachmentID),
         get=image,
     )
 
     config.add_route(
         "feature_attachment.item",
         itmurl,
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID, aid=AttachmentID),
         get=iget,
         put=iput,
         delete=idelete,
@@ -261,21 +270,22 @@ def setup_pyramid(comp, config):
     config.add_route(
         "feature_attachment.collection",
         colurl,
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
         get=cget,
         post=cpost,
     )
 
     config.add_route(
         "feature_attachment.export",
-        "/api/resource/{id:uint}/feature_attachment/export",
-        factory=resource_factory,
+        "/api/resource/{id}/feature_attachment/export",
+        factory=feature_layer_factory,
         get=export,
     )
 
     config.add_route(
         "feature_attachment.import",
-        "/api/resource/{id:uint}/feature_attachment/import",
-        factory=resource_factory,
+        "/api/resource/{id}/feature_attachment/import",
+        factory=feature_layer_factory,
         put=import_attachment,
     )

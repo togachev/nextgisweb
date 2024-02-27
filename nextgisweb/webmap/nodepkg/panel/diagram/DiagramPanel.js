@@ -122,9 +122,9 @@ export function DiagramPanel({ value, close, clear }) {
         var _labelTemperature = [];
         var _temperature = [];
 
-        const square_ = features.filter((item) => item.fields.type_id == 1);
-        const precipitation_ = features.filter((item) => item.fields.type_id == 2);
-        const temperature_ = features.filter((item) => item.fields.type_id == 3);
+        const square_ = features.filter((item) => item.fields.type_id === 1);
+        const precipitation_ = features.filter((item) => item.fields.type_id === 2);
+        const temperature_ = features.filter((item) => item.fields.type_id === 3);
 
         square_.map(item => {
             let date = item.fields.date;
@@ -191,20 +191,20 @@ export function DiagramPanel({ value, close, clear }) {
             return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
         });
 
-        const square_ = features.filter((item) => item.fields.type_id == 1);
-        const precipitation_ = features.filter((item) => item.fields.type_id == 2);
-        const temperature_ = features.filter((item) => item.fields.type_id == 3);
+        const square_ = features.filter((item) => item.fields.type_id === 1);
+        const precipitation_ = features.filter((item) => item.fields.type_id === 2);
+        const temperature_ = features.filter((item) => item.fields.type_id === 3);
 
         const temperature = Object.fromEntries(
-            temperature_.map((item, i) => [item.fields.date.year, item.fields.value])
+            temperature_.map((item) => [item.fields.date.year, item.fields.value])
         )
 
         const precipitation = Object.fromEntries(
-            precipitation_.map((item, i) => [item.fields.date.year, item.fields.value])
+            precipitation_.map((item) => [item.fields.date.year, item.fields.value])
         )
 
         const square = Object.fromEntries(
-            square_.map((item, i) => [item.fields.date.year, item.fields.value])
+            square_.map((item) => [item.fields.date.year, item.fields.value])
         )
         if (type === 'req') {
             let query = {

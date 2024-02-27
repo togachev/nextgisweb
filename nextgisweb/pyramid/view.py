@@ -1,10 +1,12 @@
 import os
 import os.path
+from base64 import b64decode
 from datetime import datetime, timedelta
 from hashlib import md5
 from itertools import chain
 from pathlib import Path
 from time import sleep
+from typing import Optional
 
 from markupsafe import Markup
 from psutil import Process
@@ -13,18 +15,20 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
-from nextgisweb.env import DBSession, _, env
+from nextgisweb.env import DBSession, _, env, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
-from nextgisweb.lib.apitype import JSONType
+from nextgisweb.lib.apitype import JSONType, QueryString
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
 
 from . import exception, renderer
+from .component import PyramidComponent
 from .openapi import openapi
 from .session import WebSession
 from .tomb.predicate import ErrorRendererPredicate
@@ -57,6 +61,80 @@ def static_view(request):
     static_path = request.environ["static_path"]
     cache = request.matchdict["skey"] == request.env.pyramid.static_key[1:]
     return StaticFileResponse(str(static_path), cache=cache, request=request)
+
+
+@inject()
+def asset_favicon(request, *, pyramid: PyramidComponent):
+    fn_favicon = pyramid.options["favicon"]
+    if os.path.isfile(fn_favicon):
+        return FileResponse(fn_favicon, request=request, content_type="image/x-icon")
+    else:
+        raise HTTPNotFound()
+
+
+@inject()
+def asset_header_image(request, *, pyramid: PyramidComponent):
+    fn_header_image = request.env.pyramid.options['header_image']
+    if os.path.isfile(fn_header_image):
+        return FileResponse(fn_header_image, request=request, content_type='image/png')
+    else:
+        raise HTTPNotFound()
+
+
+@inject()
+def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
+    response = Response(
+        core.settings_get("pyramid", "custom_css", ""),
+        content_type="text/css",
+        charset="utf-8",
+    )
+
+    if ckey == core.settings_get("pyramid", "custom_css.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
+
+
+@inject()
+def asset_hlogo(request, *, ckey: Optional[str] = None, core: CoreComponent):
+    if (data := core.settings_get("pyramid", "logo", None)) is None:
+        raise HTTPNotFound()
+
+    response = Response(b64decode(data), content_type="image/png")
+
+    if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
+
+
+@inject()
+def asset_blogo(
+    request,
+    *,
+    ckey: Optional[str] = None,
+    core: CoreComponent,
+    pyramid: PyramidComponent,
+):
+    if (view := pyramid.company_logo_view) is not None:
+        try:
+            response = view(request)
+        except HTTPNotFound:
+            response = None
+    else:
+        response = None
+
+    if response is None:
+        default = pyramid.resource_path("asset/logo_outline.png")
+        response = FileResponse(default)
+
+    if ckey and ckey == core.settings_get("pyramid", "company_logo.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
 
 
 def home(request):
@@ -95,6 +173,12 @@ def swagger(request):
         props=dict(url=request.route_url("pyramid.openapi_json")),
     )
 
+@viewargs(renderer='webgis.mako')
+def webgis(request):
+    return dict(
+        custom_layout=True
+    )
+
 
 @viewargs(renderer="mako")
 def control_panel(request):
@@ -102,27 +186,6 @@ def control_panel(request):
 
     return dict(title=_("Control panel"), control_panel=request.env.pyramid.control_panel)
 
-
-def favicon(request):
-    fn_favicon = request.env.pyramid.options["favicon"]
-    if os.path.isfile(fn_favicon):
-        return FileResponse(fn_favicon, request=request, content_type="image/x-icon")
-    else:
-        raise HTTPNotFound()
-def header_image(request):
-    fn_header_image = request.env.pyramid.options['header_image']
-    if os.path.isfile(fn_header_image):
-        return FileResponse(
-            fn_header_image, request=request,
-            content_type='image/png')
-    else:
-        raise HTTPNotFound()
-
-@viewargs(renderer='webgis.mako')
-def webgis(request):
-    return dict(
-        custom_layout=True
-    )
 
 def locale(request):
     request.session["pyramid.locale"] = request.matchdict["locale"]
@@ -305,10 +368,12 @@ def setup_pyramid(comp, config):
 
     # COMMON REQUEST'S ATTRIBUTES
 
+    qs_parser = lambda req: QueryString(req.environ["QUERY_STRING"])
+    is_api = lambda req: req.path_info.lower().startswith("/api/")
+
+    config.add_request_method(qs_parser, "qs_parser", property=True)
     config.add_request_method(lambda req: env, "env", property=True)
-    config.add_request_method(
-        lambda req: req.path_info.lower().startswith("/api/"), "is_api", property=True
-    )
+    config.add_request_method(is_api, "is_api", property=True)
 
     # ERROR HANGLING
 
@@ -352,10 +417,14 @@ def setup_pyramid(comp, config):
     # Substitute localizer from pyramid with our own, original is
     # too tied to translationstring, that works strangely with string
     # interpolation via % operator.
-    def localizer(request):
-        return request.env.core.localizer(request.locale_name)
+    def localizer(request, localizer=comp.env.core.localizer):
+        return localizer(request.locale_name)
+
+    def translate(request):
+        return request.localizer.translate
 
     config.add_request_method(localizer, "localizer", property=True)
+    config.add_request_method(translate, "translate", property=True)
 
     locale_default = comp.env.core.locale_default
     locale_sorted = [locale_default] + [
@@ -414,6 +483,12 @@ def setup_pyramid(comp, config):
 
     # OTHERS
 
+    config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
+    config.add_route("pyramid.asset.header_image", "/header_image.png", get=asset_header_image)
+    config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
+    config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
+    config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
+
     config.add_route("home", "/", client=False).add_view(home)
 
     config.add_route("pyramid.openapi_json", "/openapi.json", get=openapi_json)
@@ -426,17 +501,6 @@ def setup_pyramid(comp, config):
         "pyramid.control_panel",
         "/control-panel",
     ).add_view(control_panel)
-
-    config.add_route(
-        "pyramid.favicon",
-        "/favicon.ico",
-        client=False,
-    ).add_view(favicon)
-
-    config.add_route(
-        'pyramid.header_image',
-        '/header_image.png',
-    ).add_view(header_image)
 
     config.add_route(
         "pyramid.control_panel.sysinfo",

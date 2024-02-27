@@ -59,7 +59,7 @@ export function ResourceConstraint(props) {
         if (items) {
             const getFieldConst = async () => {
                 const filter = Object.values(items).filter((item) => {
-                    return item.value == resId 
+                    return item.value === resId 
                 })
                 if (isSubscribed) {
                     setFieldsConst(filter[0].fields);
@@ -70,15 +70,8 @@ export function ResourceConstraint(props) {
         return () => isSubscribed = false;
     }, [resId])
 
-    const onClear = () => {
-        setColumn_from_const(null)
-        setColumn_key(null)
-        setColumn_constraint(null)
-    };
-
-
     const onChange = (value, context, el) => {
-        if (el == 'column_from_const') {
+        if (el === 'column_from_const') {
             if (context.action === "select-option") {
                 setColumn_from_const(value)
             }
@@ -86,7 +79,7 @@ export function ResourceConstraint(props) {
                 setColumn_from_const(null)
             }
         }
-        else if (el == 'column_key') {
+        else if (el === 'column_key') {
             if (context.action === "select-option") {
                 setResId(value.value)
                 setColumn_key(value)
@@ -96,7 +89,7 @@ export function ResourceConstraint(props) {
                 setColumn_key(null)
             }
         }
-        else if (el == 'column_constraint') {
+        else if (el === 'column_constraint') {
             if (context.action === "select-option") {
                 setColumn_constraint(value)
             }
@@ -104,9 +97,6 @@ export function ResourceConstraint(props) {
                 setColumn_constraint(null)
             }
         }
-        // if (context.action === "clear") {
-        //     onClear()
-        // }
     }
 
     const query = { [props.cls] : {

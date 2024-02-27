@@ -41,7 +41,7 @@ export function WebMapFeatureGridTab({
     );
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current.plugin[
-            plugin.identity as string
+        plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
 
@@ -54,7 +54,6 @@ export function WebMapFeatureGridTab({
         () =>
             new FeatureGridStore({
                 id: layerId,
-                display: display,
                 readonly: data.current?.readonly ?? true,
                 size: "small",
                 cleanSelectedOnFilter: false,
@@ -205,5 +204,5 @@ export function WebMapFeatureGridTab({
         return unsubscribe;
     }, [subscribe, layerId, store]);
 
-    return <FeatureGrid store={store} />;
+    return <FeatureGrid id={layerId} store={store} />;
 }

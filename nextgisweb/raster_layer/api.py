@@ -9,7 +9,7 @@ from nextgisweb.env import _, env
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import set_output_buffering
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .gdaldriver import EXPORT_FORMAT_GDAL
@@ -76,59 +76,63 @@ def export(resource, request):
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_filename(resource.fileobj)
+    source_filename = env.raster_layer.workdir_path(resource.fileobj)
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
-            gdal.Translate(tmp_file.name, source_filename, bandList=bands)
+            gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)
             return _warp(tmp_file.name)
     else:
-        return _warp(source_filename)
+        return _warp(str(source_filename))
 
 
-def cog(resource, request):
+def cog(resource: RasterLayer, request):
+    """Cloud optimized GeoTIFF endpoint"""
+
     request.resource_permission(PERM_READ)
 
-    fn = env.raster_layer.workdir_filename(resource.fileobj)
-    filesize = os.path.getsize(fn)
+    if not resource.cog:
+        raise ValidationError(_("Requested raster is not COG."))
 
     if request.method == "HEAD":
         return Response(
             accept_ranges="bytes",
-            content_length=filesize,
+            content_length=resource.fileobj.size,
             content_type="image/geo+tiff",
         )
 
     if request.method == "GET":
-        if not resource.cog:
-            raise ValidationError(_("Requested raster is not COG."))
-
         range = request.range
         if range is None:
             raise ValidationError(_("Range header is missed or invalid."))
 
-        content_range = range.content_range(filesize)
+        content_range = range.content_range(resource.fileobj.size)
         if content_range is None:
             raise ValidationError(_("Range %s can not be read." % range))
 
         content_length = content_range.stop - content_range.start
         response = Response(
-            status_code=206, content_range=content_range, content_type="image/geo+tiff"
+            status_code=206,
+            content_range=content_range,
+            content_type="image/geo+tiff",
         )
 
         response.app_iter = RangeFileWrapper(
-            open(fn, "rb"), offset=content_range.start, length=content_length
+            open(resource.fileobj.filename(), "rb"),
+            offset=content_range.start,
+            length=content_length,
         )
         response.content_length = content_length
 
         return response
 
 
-def download(request):
+def download(resource: RasterLayer, request):
+    """Download raster in internal representation format"""
+
     request.resource_permission(PERM_READ)
 
-    filename = env.raster_layer.workdir_filename(request.context.fileobj)
     response = FileResponse(
-        filename,
+        resource.fileobj.filename(),
         content_type="image/tiff; application=geotiff",
         request=request,
     )
@@ -145,16 +149,19 @@ def setup_pyramid(comp, config):
         request_method="GET",
     )
 
-    route_cog = config.add_route(
+    raster_layer_factory = ResourceFactory(context=RasterLayer)
+
+    config.add_route(
         "raster_layer.cog",
-        "/api/resource/{id:uint}/cog",
-        factory=resource_factory,
+        "/api/resource/{id}/cog",
+        factory=raster_layer_factory,
+        head=cog,
+        get=cog,
     )
-    route_cog.head(cog, context=RasterLayer)
-    route_cog.get(cog, context=RasterLayer)
 
     config.add_route(
         "raster_layer.download",
-        "/api/resource/{id:uint}/download",
-        factory=resource_factory,
-    ).get(download, context=RasterLayer)
+        "/api/resource/{id}/download",
+        factory=raster_layer_factory,
+        get=download,
+    )

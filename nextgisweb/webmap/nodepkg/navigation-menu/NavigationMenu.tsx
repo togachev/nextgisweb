@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import type { ReactElement } from "react";
 
-import type { PanelDojoItem } from "../type";
+import type { PanelDojoItem, DojoDisplay } from "../type";
 
 import { navigationMenuStore } from "./NavigationMenuStore";
 import { Typography } from "@nextgisweb/gui/antd";
@@ -11,18 +11,10 @@ import "./NavigationMenu.less";
 
 export interface NavigationMenuProps {
     panels: Map<string, PanelDojoItem>;
+    display: DojoDisplay;
 }
 
 const { Link } = Typography;
-
-const Links = ({ infomap }) => {
-    return (
-        <div className="infoblock">
-            <Link href={infomap.link}><span className="iconLinks"><InfoCircleOutlined /></span></Link>
-            <Link href={infomap.update}><span className="iconLinks"><SettingOutlined /></span></Link>
-        </div>
-    )
-}
 
 export const NavigationMenu = observer(({ panels, display }: NavigationMenuProps) => {
     const onClickItem = (item: PanelDojoItem) => {
@@ -51,5 +43,14 @@ export const NavigationMenu = observer(({ panels, display }: NavigationMenuProps
         });
     }
 
-    return <div className="navigation-menu">{menuItems}{infomap.scope ? <Links infomap={infomap} /> : null}</div>;
+    return (
+        <div className="navigation-menu">
+            {menuItems}
+            {infomap.scope ? (
+                <div className="infoblock">
+                    <Link href={infomap.link}><span className="iconLinks"><InfoCircleOutlined /></span></Link>
+                    <Link href={infomap.update}><span className="iconLinks"><SettingOutlined /></span></Link>
+                </div>
+            ) : null}
+        </div>);
 });

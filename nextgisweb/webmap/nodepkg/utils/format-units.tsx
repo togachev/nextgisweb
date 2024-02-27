@@ -1,5 +1,4 @@
 import type { Projection } from "ol/proj";
-import ReactDOMServer from "react-dom/server";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -17,7 +16,7 @@ const msgSiMi = gettext("mi");
 const msgSiHa = gettext("ha");
 const msgSiAc = gettext("ac");
 
-interface DefaultConfig {
+export interface DefaultConfig {
     format: "html-string" | "jsx";
     locale: string;
 }
@@ -64,7 +63,7 @@ const makeDomResult = (
         </>
     );
     if (format === "html-string") {
-        return ReactDOMServer.renderToStaticMarkup(domResult);
+        return `${value} ${postfix}`;
     } else if (format === "jsx") {
         return domResult;
     } else {
@@ -223,7 +222,7 @@ const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
  */
 export const formatCoordinatesValue = (
     value: number,
-    locale: string
+    locale?: string
 ): string => {
     const numberRound = roundValue(value, 2);
     return numberRound.toLocaleString(locale);

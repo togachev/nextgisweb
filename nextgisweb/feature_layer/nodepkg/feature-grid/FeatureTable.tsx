@@ -1,6 +1,6 @@
 import debounce from "lodash-es/debounce";
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Draggable from "react-draggable";
 
@@ -10,7 +10,7 @@ import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import { FeatureTableRows } from "./FeatureTableRows";
 import SortIcon from "./component/SortIcon";
-import { KEY_FIELD_ID, KEY_FIELD_KEYNAME, RESIZE_HANDLE_WIDTH } from "./constant";
+import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type {
@@ -20,58 +20,47 @@ import type {
     OrderBy,
     SetValue,
 } from "./type";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import { scrollbarWidth } from "./util/scrollbarWidth";
-
-import FilterByData from "@nextgisweb/webmap/filter-by-data";
-import { Button, Tooltip } from "@nextgisweb/gui/antd";
-import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-const msgClearFilter = gettext("Clear filter");
-
-import { route } from "@nextgisweb/pyramid/api/route";
 
 import "./FeatureTable.less";
 
 interface FeatureTableProps {
-    empty: () => ReactNode;
-    display: DojoDisplay;
     total: number;
     fields: FeatureLayerField[];
     version?: number;
     selectedIds: number[];
     resourceId: number;
     queryParams?: QueryParams;
-    setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
     visibleFields?: number[];
     queryIntersects?: string;
     deletedFeatureIds?: number[];
     cleanSelectedOnFilter?: boolean;
     setSelectedIds: (ids: SetValue<number[]>) => void;
     loadingCol: () => string;
+    empty: () => ReactNode;
 }
+
+const RESIZE_HANDLE_WIDTH = 6;
 
 const FeatureTable = observer(
     ({
-        empty,
-        display,
         total,
         fields,
         version,
         resourceId,
         selectedIds,
         queryParams,
-        setQueryParams,
         visibleFields = [],
         queryIntersects,
         cleanSelectedOnFilter = true,
         setSelectedIds,
         loadingCol,
+        empty,
     }: FeatureTableProps) => {
         const tbodyRef = useRef<HTMLDivElement>(null);
         const theadRef = useRef<HTMLDivElement>(null);
         const columnRef = useRef<Record<number, HTMLDivElement>>({});
-        
+
         const [rowMinHeight] = useState(27);
         const [pageSize] = useState(100);
 
@@ -214,11 +203,6 @@ const FeatureTable = observer(
             isEmpty = !hasNextPage && queryTotal === 0;
         }
 
-        const deleteParams = useCallback(async (id) => {
-            await route('feature_layer.clear_filter', id, 0).get();
-        }, [])
-    
-
         const HeaderCols = () => {
             return (
                 <>
@@ -236,9 +220,6 @@ const FeatureTable = observer(
                             const style = userDefinedWidths[id]
                                 ? { flex: `0 0 ${userDefinedWidths[id]}px` }
                                 : { flex };
-                            const dataType = ["DATE", "DATETIME"]
-
-                            const filter_column = queryParams?.fld_field_op?.keyname
 
                             return (
                                 <div
@@ -253,36 +234,11 @@ const FeatureTable = observer(
                                     onClick={() => toggleSorting(keyname)}
                                 >
                                     <div className="label">{label}</div>
-                                    <div className="button-column">
-                                        {colSort && (
-                                            <div className="suffix">
-                                                <SortIcon dir={colSort} />
-                                            </div>
-                                        )}
-                                        {
-                                            queryParams && filter_column == keyname ?
-                                                <Tooltip title={msgClearFilter}>
-                                                    <Button
-                                                        type="text"
-                                                        onClick={() => {
-                                                            setQueryParams(null)
-                                                            deleteParams(resourceId)
-                                                            display.current.map.zoomToExtent(
-                                                                display.current._extent                                                                ,
-                                                            );
-                                                        }}
-                                                        icon={<FilterAltOff />}
-                                                    />
-                                                </Tooltip> :
-                                                <FilterByData
-                                                    resourceId={resourceId}
-                                                    dataType={dataType}
-                                                    column={column}
-                                                    queryParams={queryParams || undefined}
-                                                    setQueryParams={setQueryParams}
-                                                />
-                                        }
-                                    </div>
+                                    {colSort && (
+                                        <div className="suffix">
+                                            <SortIcon dir={colSort} />
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })
@@ -343,24 +299,9 @@ const FeatureTable = observer(
             >
                 <div ref={theadRef} className="thead">
                     <div className="tr">
-                        <HeaderCols
-                            userDefinedWidths={userDefinedWidths}
-                            columns={columns}
-                            orderBy={orderBy}
-                            columnRef={columnRef}
-                            setOrderBy={setOrderBy}
-                            resourceId={resourceId}
-                            queryParams={queryParams}
-                            setQueryParams={setQueryParams}
-                        />
+                        <HeaderCols />
                     </div>
-                    {effectiveWidths && (
-                        <HeaderHandles
-                            columns={columns}
-                            effectiveWidths={effectiveWidths}
-                            setUserDefinedWidths={setUserDefinedWidths}
-                        />
-                    )}
+                    {effectiveWidths && <HeaderHandles />}
                 </div>
                 <div
                     ref={tbodyRef}
@@ -373,7 +314,7 @@ const FeatureTable = observer(
                     }}
                 >
                     {isEmpty && empty ? (
-                        empty
+                        empty()
                     ) : (
                         <div
                             className="tbody"

@@ -3,8 +3,9 @@ import sys
 import traceback
 import warnings
 from hashlib import md5
+from typing import cast
 
-from pyramid import httpexceptions
+import pyramid.httpexceptions as httpexceptions
 from pyramid.renderers import render_to_response
 from pyramid.request import RequestLocalCache
 from pyramid.response import Response
@@ -84,6 +85,9 @@ def unhandled_exception_tween_factory(handler, registry):
             if request.path_info.startswith("/test/request/"):
                 raise
 
+            if (env := getattr(request, "env", None)) and env.running_tests:
+                raise
+
             try:
                 logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
                 iexc = InternalServerError(sys.exc_info())
@@ -143,18 +147,19 @@ def json_error(request, err_info, exc, exc_info, debug=True):
     exc_full_name = exc_module + "." + exc.__class__.__name__
 
     result = dict()
+    tr = request.localizer.translate
 
     title = err_info_attr(err_info, exc, "title")
     if title is not None:
-        result["title"] = request.localizer.translate(title)
+        result["title"] = tr(title)
 
     message = err_info_attr(err_info, exc, "message")
     if message is not None:
-        result["message"] = request.localizer.translate(message)
+        result["message"] = tr(message)
 
     detail = err_info_attr(err_info, exc, "detail", warn=False)
     if detail is not None:
-        result["detail"] = request.localizer.translate(detail)
+        result["detail"] = tr(detail)
 
     result["exception"] = exc_full_name
     result["status_code"] = err_info_attr(err_info, exc, "http_status_code", 500)
@@ -270,5 +275,5 @@ for exc, title, explanation in (
         _("The server is currently unavailable. " "Please try again at a later time."),
     ),
 ):
-    exc.title = title
-    exc.explanation = explanation
+    exc.title = cast(str, title)
+    exc.explanation = cast(str, explanation)

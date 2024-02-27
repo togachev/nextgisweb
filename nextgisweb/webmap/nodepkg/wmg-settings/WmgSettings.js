@@ -11,7 +11,6 @@ const animatedComponents = makeAnimated();
 export function WmgSettings(props) {
     const [items, setItems] = useState([]);
     const [defaultItems, setDefault] = useState([]);
-    const [newValue, setNewValue] = useState([]);
 
     useEffect(() => {
         let isSubscribed = true;
@@ -27,7 +26,7 @@ export function WmgSettings(props) {
         }
         getData().catch(console.error);
         return () => isSubscribed = false;
-    }, [newValue]);
+    }, []);
 
     const createItem = async (e) => {
         try {

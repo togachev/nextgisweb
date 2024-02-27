@@ -7,10 +7,10 @@ import { Balancer } from "react-wrap-balancer";
 const ParseDesc = ({ item }) => {
     const options = {
         replace: item => {
-            if (item instanceof Element && item.attribs && item.name == 'img') {
+            if (item instanceof Element && item.attribs && item.name === 'img') {
                 return <span className="imgDesc"><Image className="imageParse" src={item.attribs.src}>item</Image></span>;
             }
-            if (item instanceof Element && item.attribs && item.name == 'p') {
+            if (item instanceof Element && item.attribs && item.name === 'p') {
                 return <span className="test"><Balancer >{domToReact(item.children, options)}</Balancer></span>;
             }
         }

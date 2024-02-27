@@ -5,6 +5,7 @@ from os import environ
 import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
+from msgspec.inspect import IntType, Metadata, StrType, type_info
 
 from nextgisweb.env import Component, _, require
 from nextgisweb.lib.config import Option, OptionAnnotations
@@ -18,7 +19,7 @@ from .util import StaticMap, gensecret
 
 
 class PyramidComponent(Component):
-    def make_app(self, settings=None):
+    def make_app(self, settings={}):
         settings = dict(self._settings, **settings)
         settings["pyramid.static_map"] = StaticMap()
         config = Configurator(settings=settings)
@@ -28,6 +29,10 @@ class PyramidComponent(Component):
         for comp in chain:
             comp.setup_pyramid(config)
 
+        from .api import setup_pyramid_csettings
+
+        setup_pyramid_csettings(self, config)
+
         config.commit()
 
         self.route_meta = route_meta = dict()
@@ -35,11 +40,8 @@ class PyramidComponent(Component):
         for route in iter_routes(config.registry.introspector):
             if not route.client or route.name.startswith("_"):
                 continue
-            template = route.template
-            route_meta[route.name] = [
-                template,
-            ] + list(route.mdtypes.keys())
-            route_mdtypes[route.name] = route.mdtypes
+            route_meta[route.name] = [route.itemplate, *route.path_params.keys()]
+            route_mdtypes[route.name] = {k: v.type for k, v in route.path_params.items()}
 
         return config
 
@@ -133,19 +135,20 @@ class PyramidComponent(Component):
     def client_codegen(self):
         self.make_app(settings=dict())
 
-        typemap = {
-            "int": "number",
-            "uint": "number",
-            "str": "string",
-            "any": "string",
-        }
+        def tstype(tdef):
+            tinfo = type_info(tdef)
+            titype = tinfo.type if isinstance(tinfo, Metadata) else tinfo
+            if isinstance(titype, IntType):
+                return "number"
+            elif isinstance(titype, StrType):
+                return "string"
 
         code = ["export interface RouteParameters /* prettier-ignore */ {"]
         for k, v in self.route_mdtypes.items():
             if len(v) == 0:
                 cv = "[]"
             else:
-                cv = ", ".join(p + ": " + typemap[t] for p, t in v.items())
+                cv = ", ".join(p + ": " + tstype(t) for p, t in v.items())
                 cv = f"[{cv}] | [{{ {cv} }}]" if len(v) == 1 else f"[{{ {cv} }}]"
             code.append(f'    "{k}": {cv};')
         code.append("}")

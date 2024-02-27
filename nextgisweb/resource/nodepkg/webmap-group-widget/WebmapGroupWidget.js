@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
 import "./WebmapGroupWidget.less";
 
@@ -129,14 +129,12 @@ export function WebmapGroupWidget() {
                         return a.id - b.id;
                     }).map((item) => {
 
-                        const wmgItemUrl = routeURL("resource.webmap_group_item", {id: item.id});
-
                         return (
                             <div key={item.id} className="detail">
                                 <div className="col-1">
                                     <Radio
-                                    checked={active==item.id}
-                                    onClick={(e) => {
+                                    checked={active===item.id}
+                                    onClick={() => {
                                         setActive(item.id);
                                         setActiveInput(item.id);
                                         setDisSave(true);
@@ -178,7 +176,6 @@ export function WebmapGroupWidget() {
                                             type="text"
                                             defaultValue={item.webmap_group_name}
                                         />
-                                    {/* <a className="edit_wmg" title="Добавить цифровую карту" href={wmgItemUrl}><Edit /></a> */}
                                 </div>
                             </div>
                         )

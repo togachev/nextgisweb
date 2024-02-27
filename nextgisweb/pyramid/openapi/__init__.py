@@ -1,28 +1,22 @@
 from collections import defaultdict
+from itertools import chain
 from typing import Any, Dict
 
-from msgspec import UNSET, Meta
+from msgspec import NODEFAULT, UNSET
+from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
-from typing_extensions import Annotated
 
 from nextgisweb.env import Component
 from nextgisweb.lib.apitype import ContentType as CType
-from nextgisweb.lib.apitype import JSONType, deannotated, is_optional, iter_anyof
+from nextgisweb.lib.apitype import JSONType, annotate, iter_anyof, unannotate
 from nextgisweb.lib.apitype import StatusCode as SCode
 
 from ..tomb import is_json_type, iter_routes
 from .docstring import Doctring
 
-_PATH_TYPE = dict(
-    str=str,
-    any=str,
-    int=int,
-    uint=Annotated[int, Meta(ge=0)],
-)
-
 
 def _apply_json_content_type(ct, tdef):
-    if ct == CType.EMPTY and is_json_type(deannotated(tdef)):
+    if ct == CType.EMPTY and is_json_type(unannotate(tdef)):
         return CType.JSON
     return ct
 
@@ -42,7 +36,7 @@ def _pfact(pin, **defaults):
 
 
 def _ctag(cid):
-    return Component.registry[cid].__name__[: -len("Component")]
+    return Component.registry[cid].basename
 
 
 def _context_str(context):
@@ -70,35 +64,46 @@ def openapi(introspector, prefix="/api/"):
             return {}
 
         ref = dict()
-        if default is not UNSET:
+        if default not in (UNSET, NODEFAULT):
             ref["default"] = default
 
         schema_refs.append((tdef, ref))
         return ref
 
-    def schema_for_json(obj, ct, tdef):
+    def schema_for_json(ct, tdef):
+        result = dict()
         if ct == CType.JSON:
-            obj["schema"] = schema_ref(tdef)
+            result["schema"] = schema_ref(tdef)
+        return result
 
     # Paths
     for route in iter_routes(introspector):
-        if not route.template.startswith(prefix):
+        if not route.itemplate.startswith(prefix):
             continue
-
-        # Path parameters
-        p_params, p_param = _pfact("path", required=True)
-        for pname, ptype in route.mdtypes.items():
-            p_param(pname, schema=schema_ref(_PATH_TYPE[ptype]))
 
         # Operations
         for view in route.views:
             if not isinstance(view.method, str) or not view.openapi:
                 continue
 
-            o_params, o_param = _pfact("query", style="form", explode=False)
+            # Path parameters
+            view_path_params_renamed = {p.name: p for p in view.path_params.values()}
+            p_params, p_param = _pfact("path", required=True)
+            for pname, pobj in route.path_params.items():
+                ptype = pobj.type
+                if (pvobj := view_path_params_renamed.get(pname)) is not None:
+                    ptype = annotate(ptype, pvobj.extras)
+                p_kwargs = dict()
+                ti = type_info(ptype)
+                if isinstance(ti, Metadata) and (ejs := ti.extra_json_schema):
+                    if desc := ejs.get("description"):
+                        p_kwargs.update(description=desc)
+                p_param(pname, schema=schema_ref(ptype), **p_kwargs)
+
+            o_params, o_param = _pfact("query", explode=False)
 
             # Handle operation overloading
-            oper_pattern = route.wotypes
+            oper_pattern = route.ktemplate
             oper_context = _context_str(view.context)
             assert isinstance(route.overloaded, bool)
             if route.overloaded:
@@ -126,12 +131,18 @@ def openapi(introspector, prefix="/api/"):
             oper["x-nextgisweb-context"] = oper_context
 
             # Operation parameters
-            for pname, (ptype, pdefault) in view.param_types.items():
+            for param in chain(*(p.spreaded for p in view.query_params.values())):
+                if (pdesc := dstr.params.get(param.name)) is None:
+                    ti = type_info(param.type)
+                    if isinstance(ti, Metadata) and (ejs := ti.extra_json_schema):
+                        pdesc = ejs.get("description")
+
                 o_param(
-                    pname,
-                    required=not is_optional(ptype)[0] and pdefault is UNSET,
-                    schema=schema_ref(ptype, pdefault),
-                    description=dstr.params.get(pname),
+                    param.name,
+                    style=param.style.value,
+                    required=param.default is NODEFAULT,
+                    schema=schema_ref(param.type, param.default),
+                    description=pdesc,
                 )
 
             # Merge path and operation parameters
@@ -143,20 +154,18 @@ def openapi(introspector, prefix="/api/"):
                 rbody_content = rbody["content"] = dict()
                 for t, ct in iter_anyof(btype, CType()):
                     ct = _apply_json_content_type(ct, t)
-                    rbody_ct = rbody_content[str(ct)] = dict()
-                    schema_for_json(rbody_ct, ct, t)
+                    rbody_content[str(ct)] = schema_for_json(ct, t)
                     rbody["required"] = True
 
             # Responses
-            responses = oper["responses"] = defaultdict(lambda: dict(content=dict()))
+            responses = oper["responses"] = defaultdict(lambda: dict(content=defaultdict(list)))
             if rtype := view.return_type:
                 for t, sc, ct in iter_anyof(rtype, SCode(200), CType()):
                     ct = _apply_json_content_type(ct, t)
                     response = responses[str(sc)]
                     response["description"] = dstr.returns
                     if ct != CType.EMPTY:
-                        rbody_ct = response["content"][str(ct)] = dict()
-                        schema_for_json(rbody_ct, ct, t)
+                        response["content"][str(ct)].append(schema_for_json(ct, t))
 
     # Sort paths by path components
     doc["paths"] = dict(sorted(paths.items(), key=lambda i: i[0].split("/")))
@@ -169,5 +178,17 @@ def openapi(introspector, prefix="/api/"):
 
     for pschema, r in zip(schemas, [i[1] for i in schema_refs]):
         r.update(pschema)
+
+    for path_obj in doc["paths"].values():
+        for meth_object in path_obj.values():
+            for sc, sc_obj in meth_object["responses"].items():
+                for ct, ct_arr in list(sc_obj["content"].items()):
+                    subst = None
+                    if len(ct_arr) == 1:
+                        subst = ct_arr[0]
+                    else:
+                        one_off = [ct_itm["schema"] for ct_itm in ct_arr]
+                        subst = dict(schema=dict(oneOf=one_off))
+                    sc_obj["content"][ct] = subst
 
     return doc

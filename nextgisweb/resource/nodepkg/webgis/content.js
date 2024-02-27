@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { SearchOutlined } from '@ant-design/icons';
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { Input, AutoComplete, Empty, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
@@ -172,7 +172,7 @@ export const Content = ({ onChanges, ...rest }) => {
 
                 let items = []
                 data.sort((x, y) => {
-                    return x.webmap_group_name == firstValueSort ? -1 : y.webmap_group_name == firstValueSort ? 1 : 0;
+                    return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
                 }).map((item) => {
                     items.push({ key: item.webmap_group_id, label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip> });
                     items.push({ type: 'divider' });

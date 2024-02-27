@@ -1,11 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useCallback, useMemo } from "react";
+import { Suspense, lazy, useMemo } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import { route } from "@nextgisweb/pyramid/api/route";
 
 import type { WebMapTabsStore } from "./WebMapTabsStore";
 
@@ -19,10 +17,6 @@ const msgLoading = gettext("Loading");
 
 export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
     const { activeKey, setActiveKey, removeTab } = store;
-    
-    const deleteParams = useCallback(async (id) => {
-        await route('feature_layer.clear_filter', id, 0).get();
-    }, [])
 
     const items = useMemo(() => {
         if (store.tabs.length) {
@@ -63,7 +57,6 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
             onEdit={(targetKey, action) => {
                 if (action === "remove") {
                     removeTab(String(targetKey));
-                    deleteParams(String(targetKey))
                 }
             }}
             parentHeight

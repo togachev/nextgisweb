@@ -36,9 +36,10 @@ def override(ngw_core_settings_override):
     ),
 )
 def test_validation(domain, ok, ngw_webtest_app, override):
-    API_URL = "/api/component/pyramid/cors"
+    API_URL = "/api/component/pyramid/csettings"
     with override():
-        ngw_webtest_app.put_json(API_URL, dict(allow_origin=[domain]), status=200 if ok else 422)
+        body = dict(pyramid=dict(allow_origin=[domain]))
+        ngw_webtest_app.put_json(API_URL, body, status=200 if ok else 422)
 
 
 @pytest.mark.parametrize(
@@ -52,7 +53,7 @@ def test_validation(domain, ok, ngw_webtest_app, override):
 )
 def test_headers(domain, resource_exists, expected_ok, ngw_webtest_app, override):
     with override(good_domains):
-        url = "/api/resource/%d" % (0 if resource_exists else -1)
+        url = "/api/resource/%d" % (0 if resource_exists else 2**31)
         response = ngw_webtest_app.get(url, headers=dict(Origin=domain), status="*")
 
         exp_creds = "true" if expected_ok else None
@@ -72,7 +73,7 @@ def test_headers(domain, resource_exists, expected_ok, ngw_webtest_app, override
 )
 def test_options(domain, resource_exists, expected_ok, ngw_webtest_app, override):
     with override(good_domains):
-        url = "/api/resource/%d" % (0 if resource_exists else -1)
+        url = "/api/resource/%d" % (0 if resource_exists else 2**31)
         response = ngw_webtest_app.options(
             url, headers={"Origin": domain, "Access-Control-Request-Method": "OPTIONS"}, status="*"
         )

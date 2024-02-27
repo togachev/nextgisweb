@@ -1,4 +1,4 @@
 /** @entrypoint */
-import { map_list } from "./map_list";
+import { MapList } from "./MapList";
 
-export default map_list;
+export default MapList;

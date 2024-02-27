@@ -1,4 +1,5 @@
 import { toPng } from "html-to-image";
+import type { Coordinate } from "ol/coordinate";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -10,11 +11,15 @@ import {
     Switch,
 } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
+import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import PrintMap from "@nextgisweb/webmap/print-map";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Import URL parser module
+import URL from "ngw-webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/PrintMap";
 import type { DojoDisplay } from "../../type";
@@ -25,16 +30,20 @@ import {
     pageFormats,
     scaleToLabel,
     scalesList,
+    urlPrintParams,
 } from "./options";
+import type { UrlPrintParams } from "./options";
 
-import { DownOutlined } from "@ant-design/icons";
+import { DownOutlined, ShareAltOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
 
 interface PrintMapCompProps {
     settings: PrintMapSettings;
     display: DojoDisplay;
+    initCenter: Coordinate | null;
     onScaleChange: (scale: number) => void;
+    onCenterChange: (center: Coordinate) => void;
 }
 
 type Comp = ReturnType<typeof reactApp<PrintMapCompProps>>;
@@ -48,7 +57,9 @@ interface PrintMapCompElements {
 const makePrintMapComp = ({
     settings,
     display,
+    initCenter,
     onScaleChange,
+    onCenterChange,
 }: PrintMapCompProps): PrintMapCompElements => {
     const div = document.createElement("div");
     div.classList.add("print-map-pane");
@@ -65,9 +76,10 @@ const makePrintMapComp = ({
 
     const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
         PrintMap,
-        { settings, display, onScaleChange },
+        { settings, display, initCenter, onScaleChange, onCenterChange },
         div
     );
+
     return { comp, element: div, resizeObserver };
 };
 
@@ -138,6 +150,49 @@ const defaultPanelMapSettings: PrintMapSettings = {
     scaleValue: false,
 };
 
+const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
+    const parsed = URL.getURLParams() as Record<
+        keyof UrlPrintParams<PrintMapSettings>,
+        string
+    >;
+
+    const settingsUrl: Record<string, unknown> = {};
+    for (const [urlParam, urlValue] of Object.entries(parsed) as [
+        keyof UrlPrintParams<PrintMapSettings>,
+        string,
+    ][]) {
+        if (!(urlParam in urlPrintParams) || urlValue === null) {
+            continue;
+        }
+        const { fromParam, setting } = urlPrintParams[urlParam];
+        const value = fromParam(urlValue);
+        if (value === undefined) {
+            continue;
+        }
+        settingsUrl[setting] = value as PrintMapSettings[typeof setting];
+    }
+    return settingsUrl as Partial<PrintMapSettings>;
+};
+
+const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
+    const parsed = URL.getURLParams();
+
+    for (const [urlParam, settingInfo] of Object.entries(urlPrintParams)) {
+        const { setting } = settingInfo;
+        const mapSettingValue = mapSettings[setting];
+        parsed[urlParam] = settingInfo.toParam
+            ? settingInfo.toParam(mapSettingValue as never)
+            : mapSettingValue;
+    }
+
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+    const urlWithoutParams = `${origin}${pathname}`;
+    const queryString = new URLSearchParams(parsed).toString();
+
+    return `${urlWithoutParams}?${queryString}`;
+};
+
 interface PrintPanelProps {
     display: DojoDisplay;
     title: string;
@@ -154,9 +209,12 @@ export const PrintPanel = ({
     const [mapSettings, setMapSettings] = useState<PrintMapSettings>(
         defaultPanelMapSettings
     );
+    const [urlParsed, setUrlParsed] = useState(false);
+    const [mapInit, setMapInit] = useState(false);
     const [paperFormat, setPaperFormat] = useState("210_297");
     const [disableChangeSize, setDisableChangeSize] = useState(true);
     const [scales, setScales] = useState(scalesList);
+    const [center, setCenter] = useState<Coordinate>();
     const [printMapScale, setPrintMapScale] = useState<number>();
     const [printMapComp, setPrintMapComp] = useState<Comp>();
     const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
@@ -169,6 +227,45 @@ export const PrintPanel = ({
         setMapSettings(newMapSettings);
     };
 
+    const changePaperFormat = (newPaperFormat: string) => {
+        setPaperFormat(newPaperFormat);
+        setDisableChangeSize(newPaperFormat !== "custom");
+        if (newPaperFormat !== "custom") {
+            const widthHeight = newPaperFormat.split("_");
+            const width = parseInt(widthHeight[0], 10);
+            const height = parseInt(widthHeight[1], 10);
+            updateMapSettings({
+                width,
+                height,
+            });
+        }
+    };
+
+    if (!urlParsed) {
+        const urlSettings = getPrintUrlSettings();
+
+        const keysPaperSize: (keyof PrintMapSettings)[] = ["height", "width"];
+        if (keysPaperSize.every((k) => k in urlSettings)) {
+            changePaperFormat("custom");
+        } else {
+            keysPaperSize.forEach((k) => {
+                delete urlSettings[k];
+            });
+        }
+
+        updateMapSettings(urlSettings);
+        setUrlParsed(true);
+    }
+
+    const getCenterFromUrl = (): Coordinate | null => {
+        if (mapInit) {
+            return null;
+        }
+
+        const urlSettings = getPrintUrlSettings();
+        return urlSettings.center || null;
+    };
+
     const show = () => {
         const {
             comp,
@@ -177,17 +274,23 @@ export const PrintPanel = ({
         } = makePrintMapComp({
             settings: mapSettings,
             display,
+            initCenter: getCenterFromUrl(),
             onScaleChange: (scale: number) => {
                 setPrintMapScale(scale);
+            },
+            onCenterChange: (center: Coordinate) => {
+                setCenter(center);
             },
         });
         setPrintMapComp(comp);
         setPrintMapEl(element);
         resizeObserver.current = resize;
+        setMapInit(true);
     };
 
     const hide = () => {
         setTimeout(() => {
+            updateMapSettings({ scale: undefined });
             if (resizeObserver.current) {
                 resizeObserver.current.disconnect();
             }
@@ -205,6 +308,13 @@ export const PrintPanel = ({
     useEffect(() => {
         visible ? show() : hide();
     }, [visible]);
+
+    useEffect(() => {
+        if (!center) {
+            return;
+        }
+        updateMapSettings({ center: center });
+    }, [center]);
 
     useEffect(() => {
         if (printMapComp) {
@@ -233,20 +343,6 @@ export const PrintPanel = ({
         setScales(newScales);
         updateMapSettings({ scale: printMapScale });
     }, [printMapScale]);
-
-    const changePaperFormat = (newPaperFormat: string) => {
-        setPaperFormat(newPaperFormat);
-        setDisableChangeSize(newPaperFormat !== "custom");
-        if (newPaperFormat !== "custom") {
-            const widthHeight = newPaperFormat.split("_");
-            const width = parseInt(widthHeight[0], 10);
-            const height = parseInt(widthHeight[1], 10);
-            updateMapSettings({
-                width,
-                height,
-            });
-        }
-    };
 
     const exportToFormat = (format: string) => {
         if (!printMapEl) {
@@ -376,24 +472,39 @@ export const PrintPanel = ({
                     ></Select>
                 </FloatingLabel>
 
-                <Space.Compact>
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            window.print();
-                        }}
-                    >
-                        {gettext("Print")}
-                    </Button>
-                    <Dropdown menu={exportFormatsProps} disabled={loadingFile}>
-                        <Button loading={loadingFile}>
-                            <Space>
-                                {gettext("Save as")}
-                                <DownOutlined />
-                            </Space>
+                <div className="actions">
+                    <Space.Compact>
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                window.print();
+                            }}
+                        >
+                            {gettext("Print")}
                         </Button>
-                    </Dropdown>
-                </Space.Compact>
+                        <Dropdown
+                            menu={exportFormatsProps}
+                            disabled={loadingFile}
+                        >
+                            <Button loading={loadingFile}>
+                                <Space>
+                                    {gettext("Save as")}
+                                    <DownOutlined />
+                                </Space>
+                            </Button>
+                        </Dropdown>
+                    </Space.Compact>
+
+                    <Space.Compact>
+                        <CopyToClipboardButton
+                            type="link"
+                            getTextToCopy={() => getPrintMapLink(mapSettings)}
+                            icon={<ShareAltOutlined />}
+                            title={gettext("Copy link to the print map")}
+                            iconOnly
+                        ></CopyToClipboardButton>
+                    </Space.Compact>
+                </div>
             </section>
         </div>
     );

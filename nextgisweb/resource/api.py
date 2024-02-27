@@ -1,8 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Literal, Union
 
 import zope.event
 from msgspec import Struct
-from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -10,10 +9,12 @@ from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
+from nextgisweb.lib.apitype import EmptyObject
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
-from nextgisweb.pyramid import JSONType, viewargs
+from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.api import csetting
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
@@ -54,8 +55,7 @@ class BlueprintResponse(Struct):
 
 
 def blueprint(request) -> BlueprintResponse:
-    tr = request.localizer.translate
-
+    tr = request.translate
     SResource = BlueprintResponse.Resource
 
     resources = {
@@ -115,7 +115,7 @@ def item_put(context, request) -> JSONType:
     return result
 
 
-def item_delete(context, request) -> JSONType:
+def item_delete(context, request) -> EmptyObject:
     def delete(obj):
         request.resource_permission(PERM_DELETE, obj)
         request.resource_permission(PERM_MCHILDREN, obj)
@@ -192,10 +192,10 @@ def collection_post(request) -> JSONType:
     serializer = CompositeSerializer(resource, request.user, data)
     serializer.members["resource"].mark("cls")
 
+    resource.persist()
     with DBSession.no_autoflush:
         serializer.deserialize()
 
-    resource.persist()
     DBSession.flush()
 
     result = dict(id=resource.id)
@@ -442,32 +442,17 @@ def quota_check(request) -> JSONType:
         request.env.resource.quota_check(request.json_body)
     except QuotaExceeded as exc:
         request.response.status_code = exc.http_status_code
-        tr = request.localizer.translate
-        return dict(exc.data, message=tr(exc.message))
+        return dict(exc.data, message=request.translate(exc.message))
     return dict(success=True)
 
 
-def resource_export_get(request) -> JSONType:
-    request.require_administrator()
-    try:
-        value = request.env.core.settings_get("resource", "resource_export")
-    except KeyError:
-        value = "data_read"
-    return dict(resource_export=value)
+# Component settings
 
-
-def resource_export_put(request) -> JSONType:
-    request.require_administrator()
-
-    body = request.json_body
-    for k, v in body.items():
-        if k == "resource_export":
-            if v in ("data_read", "data_write", "administrators"):
-                request.env.core.settings_set("resource", "resource_export", v)
-            else:
-                raise HTTPBadRequest(explanation="Invalid value '%s'" % v)
-        else:
-            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
+csetting(
+    "resource_export",
+    Union[Literal["data_read"], Literal["data_write"], Literal["administrators"]],
+    default="data_read",
+)
 
 def getWebmapGroup(request) -> JSONType:
     request.require_administrator()
@@ -666,7 +651,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "resource.item",
-        "/api/resource/{id:uint}",
+        "/api/resource/{id}",
         factory=resource_factory,
         get=item_get,
         put=item_put,
@@ -682,21 +667,21 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "resource.permission",
-        "/api/resource/{id:uint}/permission",
+        "/api/resource/{id}/permission",
         factory=resource_factory,
         get=permission,
     )
 
     config.add_route(
         "resource.permission.explain",
-        "/api/resource/{id:uint}/permission/explain",
+        "/api/resource/{id}/permission/explain",
         factory=resource_factory,
         get=permission_explain,
     )
 
     config.add_route(
         "resource.volume",
-        "/api/resource/{id:uint}/volume",
+        "/api/resource/{id}/volume",
         factory=resource_factory,
         get=resource_volume,
     )
@@ -719,25 +704,18 @@ def setup_pyramid(comp, config):
         post=quota_check,
     )
 
-    config.add_route(
-        "resource.resource_export",
-        "/api/component/resource/resource_export",
-        get=resource_export_get,
-        put=resource_export_put,
-    )
-
     # Overloaded routes
 
     config.add_route(
         "resource.export",
-        "/api/resource/{id:uint}/export",
+        "/api/resource/{id}/export",
         factory=resource_factory,
         overloaded=True,
     )
 
     config.add_route(
         "resource.file_download",
-        "/api/resource/{id:uint}/file/{name:any}",
+        "/api/resource/{id}/file/{name:any}",
         factory=resource_factory,
         overloaded=True)
 

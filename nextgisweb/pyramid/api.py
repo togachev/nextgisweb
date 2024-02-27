@@ -1,33 +1,39 @@
 import base64
 import re
-from datetime import timedelta
-from typing import Any, Dict, List, Optional, TypedDict, Union
+from datetime import datetime, timedelta
+from enum import Enum
+from inspect import Parameter, signature
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
+)
 
-from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
+from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse, Response
+from pyramid.response import Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, _, env
-from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
+from nextgisweb.env import COMP_ID, Component, DBSession, _, env, inject
+from nextgisweb.env.package import pkginfo
+from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
+from nextgisweb.lib.imptool import module_from_stack
 
-from nextgisweb.core import KindOfData
+from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
-
-CKey = Annotated[
-    str,
-    Meta(
-        title="CKey",
-        description=(
-            "An unique hash key for content. If the requested content key mathes "
-            "the current, the server will set caching headers."
-        ),
-    ),
-]
 
 
 def _get_cors_olist():
@@ -136,52 +142,6 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
-# fmt: off
-ORIGIN_RE = (
-    r"^SCHEME(?:(\*\.)?(HOST\.)+(HOST)\.?|(HOST)|(IPv4))(:PORT)?\/?$"
-    .replace("SCHEME", r"https?:\/\/")
-    .replace("HOST", r"[_a-z-][_a-z0-9-]*")
-    .replace("IPv4", r"((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}")
-    .replace("PORT", r"([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])")
-)
-# fmt: on
-
-Origin = Annotated[
-    str,
-    Meta(
-        pattern=ORIGIN_RE,
-        description=(
-            "An origin including scheme, domain and optional port if differs "
-            "from the default (80 for HTTP and 443 for HTTPS). Wildcards are "
-            "allowed on the third level and below."
-        ),
-        examples=["https://example.com", "https://*.example.com"],
-    ),
-]
-
-
-class CORSSettings(TypedDict):
-    allow_origin: Annotated[List[Origin], Meta(description="The list of allowed origins")]
-
-
-def cors_get(request) -> CORSSettings:
-    """Read CORS settings"""
-    request.require_administrator()
-    return CORSSettings(allow_origin=_get_cors_olist())
-
-
-def cors_put(request, body: CORSSettings) -> JSONType:
-    """Update CORS settings"""
-    request.require_administrator()
-
-    v = [o.lower().rstrip("/") for o in body["allow_origin"]]
-    for origin in v:
-        if v.count(origin) > 1:
-            raise ValidationError("Duplicate origin '%s'" % origin)
-
-    env.core.settings_set("pyramid", "cors_allow_origin", v)
-
-
 class SystemNameSettings(TypedDict):
     full_name: Optional[str]
 
@@ -228,46 +188,16 @@ def home_path_put(request, body: HomePathSettings) -> JSONType:
         env.core.settings_delete("pyramid", "home_path")
 
 
-class GoogleAnalytics(Struct):
-    id: str
+SettingsComponentGap = Gap[
+    Annotated[
+        Literal["pyramid", "unknown"],
+        Meta(description="Component identity"),
+    ]
+]
 
 
-class YandexMetrica(Struct):
-    id: str
-    webvisor: bool
-
-
-class MetricsSettings(Struct):
-    google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
-    yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
-
-
-def metrics_get(request) -> MetricsSettings:
-    request.require_administrator()
-
-    try:
-        value = env.core.settings_get("pyramid", "metrics")
-    except KeyError:
-        value = {}
-
-    return convert(value, MetricsSettings)
-
-
-def metrics_put(request, *, body: MetricsSettings) -> JSONType:
-    request.require_administrator()
-
-    value = to_builtins(body)
-    if len(value) == 0:
-        env.core.settings_delete("pyramid", "metrics")
-    else:
-        env.core.settings_set("pyramid", "metrics", value)
-
-
-def settings(request, *, component: str) -> JSONType:
-    comp = request.env.components.get(component)
-    if comp is None:
-        raise ValidationError(message=_("Invalid component identity."))
-
+def settings(request, *, component: SettingsComponentGap) -> AsJSON[Dict[str, Any]]:
+    comp = request.env.components[component]
     return comp.client_settings(request)
 
 
@@ -281,7 +211,7 @@ def pkg_version(request) -> AsJSON[Dict[str, str]]:
     return {pn: p.version for pn, p in request.env.packages.items()}
 
 
-class HealthcheckResponse(TypedDict):
+class HealthcheckResponse(Struct, kw_only=True):
     success: bool
     component: Dict[str, Any]
 
@@ -293,22 +223,20 @@ def healthcheck(
     Annotated[HealthcheckResponse, StatusCode(503)],
 ]:
     """Run healtchecks and return the result"""
+    result = HealthcheckResponse(success=True, component=dict())
     components = [comp for comp in env.components.values() if hasattr(comp, "healthcheck")]
-
-    result = dict(success=True)
-    result["component"] = dict()
-
     for comp in components:
         cresult = comp.healthcheck()
-        result["success"] = result["success"] and cresult["success"]
-        result["component"][comp.identity] = cresult
+        result.success = result.success and cresult["success"]
+        result.component[comp.identity] = cresult
 
-    if not result["success"]:
+    if not result.success:
         request.response.status_code = 503
+
     return result
 
 
-def statistics(request) -> JSONType:
+def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
     request.require_administrator()
 
     result = dict()
@@ -323,78 +251,39 @@ def require_storage_enabled(request):
         raise HTTPNotFound()
 
 
-def estimate_storage(request) -> JSONType:
-    require_storage_enabled(request)
+def storage_estimate(request) -> EmptyObject:
     request.require_administrator()
-
+    require_storage_enabled(request)
     request.env.core.start_estimation()
 
 
-def storage_status(request) -> JSONType:
+class StorageStatusResponse(Struct, kw_only=True):
+    estimation_running: bool
+
+
+@inject()
+def storage_status(request, *, core: CoreComponent) -> StorageStatusResponse:
+    request.require_administrator()
     require_storage_enabled(request)
+    return StorageStatusResponse(estimation_running=core.estimation_running())
+
+
+class StorageResponseValue(Struct, kw_only=True):
+    estimated: Optional[Annotated[datetime, Meta(tz=False)]]
+    updated: Optional[Annotated[datetime, Meta(tz=False)]]
+    data_volume: Annotated[int, Meta(gt=0)]
+
+
+@inject()
+def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponseValue]]:
     request.require_administrator()
-
-    return dict(estimation_running=request.env.core.estimation_running())
-
-
-def storage(request) -> JSONType:
     require_storage_enabled(request)
+    return {kod: StorageResponseValue(**data) for kod, data in core.query_storage().items()}
+
+
+def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     request.require_administrator()
-    return dict((k, v) for k, v in request.env.core.query_storage().items())
-
-
-def kind_of_data(request) -> JSONType:
-    request.require_administrator()
-
-    result = dict()
-    for item in KindOfData.registry.values():
-        result[item.identity] = request.localizer.translate(item.display_name)
-    return result
-
-
-CSSGetPutContent = AnyOf[
-    Annotated[str, ContentType("application/json")],
-    Annotated[str, ContentType("text/css")],
-]
-
-
-def custom_css_get(request, *, ckey: Optional[CKey]) -> CSSGetPutContent:
-    """Read custom CSS styles as plain CSS or as JSON string
-
-    :param ckey: Caching key
-    :returns: Current custom CSS rules"""
-    try:
-        body = request.env.core.settings_get("pyramid", "custom_css")
-    except KeyError:
-        body = ""
-
-    m = request.accept.best_match(("application/json", "text/css"))
-    if m == "application/json":
-        return body
-    elif m == "text/css":
-        response = Response(body, content_type="text/css", charset="utf-8")
-
-    if ckey == request.env.core.settings_get("pyramid", "custom_css.ckey"):
-        request.response.cache_control.public = True
-        request.response.cache_control.max_age = 86400
-
-    return response
-
-
-def custom_css_put(request, body: CSSGetPutContent) -> AsJSON[CKey]:
-    """Update custom CSS styles from plain CSS or JSON string
-
-    :returns: New caching key"""
-    request.require_administrator()
-
-    if body is None or re.match(r"^\s*$", body, re.MULTILINE):
-        request.env.core.settings_delete("pyramid", "custom_css")
-    else:
-        request.env.core.settings_set("pyramid", "custom_css", body)
-
-    ckey = gensecret(8)
-    request.env.core.settings_set("pyramid", "custom_css.ckey", ckey)
-    return ckey
+    return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
 
 
 def logo_get(request):
@@ -418,42 +307,299 @@ def logo_get(request):
 def logo_put(request):
     request.require_administrator()
 
-    value = request.json_body
-
-    if value is None:
-        request.env.core.settings_delete("pyramid", "logo")
-
+    if value := request.json_body:
+        fupload = FileUpload(id=value["id"])
+        data = base64.b64encode(fupload.data_path.read_bytes())
+        request.env.core.settings_set("pyramid", "logo", data.decode("utf-8"))
     else:
-        fn, fnmeta = request.env.file_upload.get_filename(value["id"])
-        with open(fn, "rb") as fd:
-            data = base64.b64encode(fd.read())
-            request.env.core.settings_set("pyramid", "logo", data.decode("utf-8"))
+        request.env.core.settings_delete("pyramid", "logo")
 
     request.env.core.settings_set("pyramid", "logo.ckey", gensecret(8))
 
     return Response()
 
 
-def company_logo(request):
-    response = None
-    company_logo_view = request.env.pyramid.company_logo_view
-    if company_logo_view is not None:
-        try:
-            response = company_logo_view(request)
-        except HTTPNotFound:
-            pass
+# Component settings machinery
 
-    if response is None:
-        default = request.env.pyramid.resource_path("asset/logo_outline.png")
-        response = FileResponse(default)
+SType = Type
+SValue = Any
 
-    if "ckey" in request.GET and request.GET["ckey"] == request.env.core.settings_get(
-        "pyramid", "company_logo.ckey"
+
+class csetting:
+    component: str
+    name: str
+
+    gtype: SType
+    stype: SType
+    default: SValue
+    skey: Tuple[str, str]
+    ckey: bool
+
+    registry: ClassVar[Dict[str, Dict[str, "csetting"]]] = dict()
+
+    def __init__(
+        self,
+        name: str,
+        type: Union[Type, Tuple[Type, Type]],
+        *,
+        default: Any = None,
+        skey: Optional[Tuple[str, str]] = None,
+        ckey: Optional[bool] = None,
+        register: bool = True,
+        stacklevel: int = 0,
     ):
-        response.cache_control.public = True
-        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
+        caller_module = module_from_stack(stacklevel)
+        self.component = pkginfo.component_by_module(caller_module)
 
-    return response
+        self.name = name
+        self.gtype, self.stype = type if isinstance(type, tuple) else (type, type)
+        self.default = default
+
+        if not getattr(self, "skey", None):
+            self.skey = skey if skey else (self.component, self.name)
+        elif skey is not None:
+            raise ValueError("skey already defined")
+
+        if not getattr(self, "ckey", None):
+            self.ckey = bool(ckey)
+        elif ckey is not None:
+            raise ValueError("ckey already defined")
+
+        if register:
+            if (comp_items := self.registry.get(self.component)) is None:
+                self.registry[self.component] = comp_items = dict()
+
+            assert self.name not in comp_items
+            comp_items[self.name] = self
+
+    def __init_subclass__(cls) -> None:
+        name = cls.__name__
+        if not re.match(r"^[a-z][a-z0-9_]*[a-z0-9]$", name):
+            raise TypeError("snake_case class name required, got: " + name)
+
+        type = getattr(cls, "vtype")
+        default = getattr(cls, "default", None)
+
+        cls(name, type, default=default, stacklevel=1)
+
+    def normalize(self, value: SValue) -> Optional[SValue]:
+        return value
+
+    @inject()
+    def getter(self, *, core: CoreComponent) -> SValue:
+        try:
+            value = core.settings_get(*self.skey)
+        except KeyError:
+            return self.default
+        return convert(value, self.gtype)
+
+    @inject()
+    def setter(self, value: Optional[SValue], *, core: CoreComponent):
+        if value is not None:
+            value = self.normalize(value)
+
+        if value is None:
+            core.settings_delete(*self.skey)
+        else:
+            core.settings_set(*self.skey, to_builtins(value))
+
+        if self.ckey:
+            skey = (self.skey[0], self.skey[1] + ".ckey")
+            core.settings_set(*skey, gensecret(8))
+
+
+def setup_pyramid_csettings(comp, config):
+    NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
+    fld_unset = lambda n, t: (n, Union[t, UnsetType], UNSET)
+    fld_reset = lambda n, t: (n, Union[t, NoneDefault, UnsetType], UNSET)
+
+    rfields, ufields = list(), list()
+    getters, setters = dict(), dict()
+    get_parameters = list()
+
+    for component, stngs in csetting.registry.items():
+        sitems = list(stngs.items())
+        basename = Component.registry[component].basename
+
+        rfields.append(
+            fld_unset(
+                component,
+                defstruct(
+                    f"{basename}SettingsRead",
+                    [fld_unset(name, stng.gtype) for name, stng in sitems],
+                ),
+            )
+        )
+
+        ufields.append(
+            fld_unset(
+                component,
+                defstruct(
+                    f"{basename}SettingsUpdate",
+                    [fld_reset(name, stng.stype) for name, stng in sitems],
+                ),
+            )
+        )
+
+        getters[component] = {k: v.getter for k, v in sitems}
+        setters[component] = {k: v.setter for k, v in sitems}
+
+        cstype = Annotated[
+            List[Enum(f"{basename}SettingsEnum", dict(all="all", **{k: k for k in stngs}))],
+            Meta(description=f"{basename} component settings to read"),
+        ]
+        get_parameters.append(
+            Parameter(
+                component,
+                Parameter.KEYWORD_ONLY,
+                default=[],
+                annotation=cstype,
+            )
+        )
+
+    if TYPE_CHECKING:
+        CSettingsRead = Struct
+        CSettingsUpadate = Struct
+    else:
+        CSettingsRead = defstruct("ComponentSettingsRead", rfields)
+        CSettingsUpadate = defstruct("ComponentSettingUpdate", ufields)
+
+    def get(request, **kwargs) -> CSettingsRead:
+        """Read component settings"""
+
+        request.require_administrator()
+
+        sf = dict()
+        for cid, attrs in kwargs.items():
+            cgetters = getters[cid]
+
+            attrs = [a.value for a in attrs]
+            if "all" in attrs:
+                if len(attrs) > 1:
+                    raise ValidationError(
+                        message=_(
+                            "The '{}' query parameter should not contain "
+                            "additional values if 'all' is specified."
+                        ).format(cid)
+                    )
+                else:
+                    attrs = list(cgetters)
+
+            sf[cid] = {a: cgetters[a]() for a in attrs}
+
+        return CSettingsRead(**sf)
+
+    # Patch signature to get parameter extraction working
+    get_sig = signature(get)
+    get.__signature__ = get_sig.replace(
+        parameters=[get_sig.parameters["request"]] + get_parameters
+    )
+
+    def put(request, *, body: CSettingsUpadate) -> EmptyObject:
+        """Update component settings"""
+
+        request.require_administrator()
+
+        for cid, csetters in setters.items():
+            if (cvalue := getattr(body, cid)) is not UNSET:
+                for sid, loader in csetters.items():
+                    if (abody := getattr(cvalue, sid)) is not UNSET:
+                        loader(abody)
+
+    config.add_route(
+        "pyramid.csettings",
+        "/api/component/pyramid/csettings",
+        get=get,
+        put=put,
+    )
+
+
+# Pyramid component setting
+
+ORIGIN_RE = (
+    r"^%(scheme)s(?:(\*\.)?(%(host)s\.)+(%(host)s)\.?|(%(host)s)|(%(ipv4)s))(:%(port)s)?\/?$"
+    % dict(
+        scheme=r"https?:\/\/",
+        host=r"[_a-z-][_a-z0-9-]*",
+        ipv4=r"((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}",
+        port=r"([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])",
+    )
+)
+
+AllowOrigin = Annotated[
+    List[Annotated[str, Meta(pattern=ORIGIN_RE)]],
+    Meta(
+        description="Origins are composed of a scheme, domain, and an optional "
+        "port if it differs from the default (80 for HTTP and 443 for HTTPS). "
+        "Wildcards can be used on the third level and below in the domain.",
+        examples=[
+            [
+                "https://example.com",
+                "https://*.example.com",
+                "http://localhost:8080",
+                "http://127.0.0.1:8080",
+            ]
+        ],
+    ),
+]
+
+
+class allow_origin(csetting):
+    vtype = AllowOrigin
+    default = list()
+    skey = (COMP_ID, "cors_allow_origin")
+
+    def normalize(self, value: AllowOrigin) -> Optional[AllowOrigin]:
+        value = [itm.rstrip("/").lower() for itm in value]
+        result = list()
+        for itm in value:
+            norm = itm.rstrip("/").lower()
+            norm = re.sub(r"^(http:\/\/.*):80$", lambda m: m.group(1), norm)
+            norm = re.sub(r"^(https:\/\/.*):443$", lambda m: m.group(1), norm)
+            if norm in result:
+                raise ValidationError("Duplicate origin '%s'" % itm)
+            result.append(norm)
+        return result if result else None
+
+
+class custom_css(csetting):
+    vtype = str
+    default = ""
+    ckey = True
+
+    def normalize(self, value: str) -> Optional[str]:
+        if re.match(r"^\s*$", value, re.MULTILINE):
+            return None
+        return value
+
+
+class header_logo(csetting):
+    vtype = (bytes, FileUploadRef)
+    skey = (COMP_ID, "logo")
+    ckey = True
+
+    def normalize(self, value: FileUploadRef) -> Optional[bytes]:
+        fupload = value()
+        if fupload.size > 64 * 1024:
+            raise ValidationError(message=_("64K should be enough for a logo."))
+        return value().data_path.read_bytes()
+
+
+class GoogleAnalytics(Struct):
+    id: str
+
+
+class YandexMetrica(Struct):
+    id: str
+    webvisor: bool
+
+
+class MetricsSettings(Struct):
+    google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
+    yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
+
+
+csetting("metrics", MetricsSettings, default={})
 
 
 def setup_pyramid(comp, config):
@@ -465,18 +611,15 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "pyramid.cors",
-        "/api/component/pyramid/cors",
-        get=cors_get,
-        put=cors_put,
-    )
-
-    config.add_route(
         "pyramid.system_name",
         "/api/component/pyramid/system_name",
         get=system_name_get,
         put=system_name_put,
     )
+
+    comps = comp.env.components.values()
+    comp_ids = [comp.identity for comp in comps if hasattr(comp, "client_settings")]
+    fillgap(SettingsComponentGap, Literal[tuple(comp_ids)])  # type: ignore
 
     config.add_route(
         "pyramid.settings",
@@ -510,13 +653,13 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "pyramid.estimate_storage",
-        "/api/component/pyramid/estimate_storage",
-        post=estimate_storage,
+        "/api/component/pyramid/storage/estimate",
+        post=storage_estimate,
     )
 
     config.add_route(
         "pyramid.storage_status",
-        "/api/component/pyramid/storage_status",
+        "/api/component/pyramid/storage/status",
         get=storage_status,
     )
 
@@ -533,13 +676,6 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "pyramid.custom_css",
-        "/api/component/pyramid/custom_css",
-        get=custom_css_get,
-        put=custom_css_put,
-    )
-
-    config.add_route(
         "pyramid.logo",
         "/api/component/pyramid/logo",
         get=logo_get,
@@ -551,10 +687,8 @@ def setup_pyramid(comp, config):
     comp.company_logo_view = None
     comp.company_url_view = lambda request: comp.options["company_url"]
 
-    comp.help_page_url_view = (
-        lambda request: comp.options["help_page.url"]
-        if comp.options["help_page.enabled"]
-        else None
+    comp.help_page_url_view = lambda request: (
+        comp.options["help_page.url"] if comp.options["help_page.enabled"] else None
     )
 
     def preview_link_view(request):
@@ -594,12 +728,6 @@ def setup_pyramid(comp, config):
 
     comp.preview_link_view = preview_link_view
 
-    config.add_route(
-        "pyramid.company_logo",
-        "/api/component/pyramid/company_logo",
-        get=company_logo,
-    )
-
     # TODO: Add PUT method for changing custom_css setting and GUI
 
     config.add_route(
@@ -607,11 +735,4 @@ def setup_pyramid(comp, config):
         "/api/component/pyramid/home_path",
         get=home_path_get,
         put=home_path_put,
-    )
-
-    config.add_route(
-        "pyramid.metrics",
-        "/api/component/pyramid/metrics",
-        get=metrics_get,
-        put=metrics_put,
     )

@@ -24,7 +24,6 @@ export async function updateFeaturesValue({
     if (!featureLayer) {
         throw new Error("");
     }
-    
     const newData: Item[] = [];
     for (const item of data) {
         const newItem: Item = {};

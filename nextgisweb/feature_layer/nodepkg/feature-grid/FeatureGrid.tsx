@@ -1,6 +1,6 @@
 import isEqual from "lodash-es/isEqual";
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -49,9 +49,8 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
-            display,
         } = store;
-        
+
         const { data: totalData, refresh: refreshTotal } =
             useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
                 id,
@@ -95,11 +94,6 @@ export const FeatureGrid = observer(
             }
         }, [onSelect, selectedIds]);
 
-        const empty = useMemo(
-            () => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />,
-            []
-        );
-
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }
@@ -128,7 +122,7 @@ export const FeatureGrid = observer(
                 </FeatureGridActions>
 
                 <FeatureTable
-                    empty={empty}
+                    empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                     total={totalData.total_count}
                     fields={fields}
                     version={version}
@@ -137,10 +131,8 @@ export const FeatureGrid = observer(
                     resourceId={id}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
-                    setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
-                    display={display}
                 />
                 <TableConfigModal store={store} />
             </div>

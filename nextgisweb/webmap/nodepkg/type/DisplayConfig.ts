@@ -16,6 +16,13 @@ interface WebmapPlugin {
     [name: string]: Record<string, unknown>;
 }
 
+interface InfoMap {
+    resource: string;
+    link: string;
+    update: string;
+    scope: Scope;
+}
+
 interface Mid {
     adapter: string[];
     basemap: string[];
@@ -32,6 +39,7 @@ export interface DisplayConfig {
     extent_const: null[];
     rootItem: GroupItem;
     itemsStates: ItemsStates;
+    infomap: InfoMap;
     mid: Mid;
     webmapPlugin: WebmapPlugin;
     bookmarkLayerId?: any;
