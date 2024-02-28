@@ -101,7 +101,7 @@ def identifyConst(request) -> JSONType:
 
             # Add name of parent resource to identification results,
             # if there is no way to get layer name by id on the client
-            allow = layer.parent.has_permission(PR_R, request.user)
+            allow = layer.parent.has_permission(ResourceScope.read, request.user)
 
             if allow:
                 for feature in features:
