@@ -1084,6 +1084,10 @@ msgstr "Открыть"
 msgid "Group setting"
 msgstr "Настройка группы"
 
-#: nodepkg/panel/upload-layer/UploadLayer.js:87
+#: nodepkg/panel/upload-layer/UploadLayer.js:23
 msgid "Zoom to object"
 msgstr "Увеличить до объекта"
+
+#: nodepkg/panel/upload-layer/UploadLayer.js:24
+msgid "No attribute information available"
+msgstr "Атрибутивная информация отсутсвует"

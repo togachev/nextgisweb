@@ -21,6 +21,7 @@ const allDeleteItems = gettext("Delete all layers");
 const DeleteLayer = gettext("Delete Layer");
 const supportLayer = gettext("Supported layers for import: GPX, GeoJSON, KML");
 const ZoomToObject = gettext("Zoom to object");
+const noAttribute = gettext("No attribute information available");
 
 const { Dragger } = Upload;
 const getBase64 = (file, callback) => {
@@ -289,14 +290,16 @@ export function UploadLayer({ display, close }) {
                                 }}
                             >
                                 {
-                                    Object.keys(res).map((keyName, i) => {
-                                        return (
-                                            <div key={i} className="feature-info">
-                                                <div className="title-info" >{keyName}</div>
-                                                <div className="value-info" title={res[keyName]}>{res[keyName]}</div>
-                                            </div>
-                                        )
-                                    })
+                                    Object.keys(res).length > 0 ?
+                                        Object.keys(res).map((keyName, i) => {
+                                            return (
+                                                <div key={i} className="feature-info">
+                                                    <div className="title-info" >{keyName}</div>
+                                                    <div className="value-info" title={res[keyName]}>{res[keyName]}</div>
+                                                </div>
+                                            )
+                                        }) :
+                                        <div className="title-info" >{noAttribute}</div>
                                 }
                             </Card>
                         </div>
