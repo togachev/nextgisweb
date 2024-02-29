@@ -42,6 +42,7 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         measurement_srid: number;
         legend_symbols: unknown;
         hide_nav_menu: boolean;
+        max_count_file_upload: number;
     }
 
     const value: Config;

@@ -397,6 +397,7 @@ WM_SETTINGS = dict(
     measurement_srid=4326,
     legend_symbols=None,
     hide_nav_menu=False,
+    max_count_file_upload=10,
 )
 
 

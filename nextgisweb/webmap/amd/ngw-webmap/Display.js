@@ -985,6 +985,16 @@ define([
             });
 
             panels.push({
+                cls: reactPanel("@nextgisweb/webmap/panel/upload-layer"),
+                params: {
+                    title: gettext("UploadLayer"),
+                    name: "upload-layer",
+                    order: 30,
+                    menuIcon: "material-upload_file",
+                },
+            });
+
+            panels.push({
                 cls: reactPanel("@nextgisweb/webmap/panel/print"),
                 params: {
                     title: gettext("Print map"),

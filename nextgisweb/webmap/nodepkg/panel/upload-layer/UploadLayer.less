@@ -1,0 +1,118 @@
+.ngw-webmap-upload-layer-panel {
+    .ant-upload.ant-upload-drag {
+        min-height: 40px;
+        display: flex;
+        height: fit-content;
+        align-items: center;
+        margin: 5px;
+        width: auto;
+    }
+
+    .ant-btn-primary.ant-btn-background-ghost {
+        background: #ffffff;
+        border-color: #d9d9d9;
+        color: rgba(0, 0, 0, 0.88);
+        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+    }
+
+    .ant-upload.ant-upload-drag p.ant-upload-drag-icon .anticon {
+        color: var(--primary);
+        font-size: 24px;
+    }
+
+    .ant-upload.ant-upload-drag .ant-upload-btn {
+        display: table;
+    }
+
+    .ant-upload.ant-upload-drag .anticon-plus {
+        color: rgba(0, 0, 0, .25);
+        font-size: 24px;
+        transition: all .3s;
+    }
+
+    .ant-upload.ant-upload-drag p.ant-upload-text {
+        color: rgba(0, 0, 0, .85);
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .ant-upload.ant-upload-drag p.ant-upload-drag-icon {
+        margin-bottom: 0;
+    }
+
+    .layer-item-title {
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+
+        &:hover {
+            color: #106a90;
+        }
+    }
+
+    .custom-button {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        cursor: pointer;
+    }
+
+    .icon-symbol {
+        font-size: 18px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        justify-items: center;
+        justify-content: center;
+        align-items: center;
+        flex: 0 0 auto;
+
+        &:hover {
+            color: #106a90;
+        }
+    }
+
+    .delete-all-layer {
+        display: flex;
+        margin: 5px;
+        justify-content: flex-end;
+        font-size: 12px;
+    }
+
+    .ant-card-small>.ant-card-body {
+        .ant-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0 0 0;
+        }
+    }
+
+    .ant-card-small>.ant-card-head>.ant-card-head-wrapper>.ant-card-extra {
+        font-size: 14px;
+        padding: 2px 5px;
+    }
+
+    .feature-info {
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 5px 0;
+        border-bottom: 0.005em solid #106a9050;
+        font-size: 13px;
+
+        .title-info {
+            margin: 0 10px 0 0;
+        }
+
+        .value-info {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+}

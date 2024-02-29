@@ -147,6 +147,24 @@ export const SettingsForm = ({
                 </Col>
             </Row>
 
+            <Title level={4}>{gettext("File upload webmap")}</Title>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item
+                        name="max_count_file_upload"
+                        label={gettext("Maximum number of uploaded files")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="1" />
+                    </Form.Item>
+                </Col>
+            </Row>
+
             <Title level={4}>{gettext("Measurement")}</Title>
 
             <Row gutter={[16, 16]}>

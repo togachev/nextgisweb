@@ -121,8 +121,7 @@ def install(
     c_pyramid["compression"] = {algo: True for algo in o_pyramid["compression.algorithms"]}
 
     s_jsrealm = nextgisweb["jsrealm"] = dict()
-    # s_jsrealm["tscheck"] = jsrealm.options.get("tscheck", debug)
-    s_jsrealm["tscheck"] = jsrealm.options["tscheck"]
+    s_jsrealm["tscheck"] = jsrealm.options.get("tscheck", debug)
     s_jsrealm["eslint"] = jsrealm.options.get("eslint", debug)
 
     stylesheets = s_jsrealm["stylesheets"] = list()
