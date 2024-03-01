@@ -180,8 +180,8 @@ def display(obj, request):
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
-                minScaleDenom=scale_range[0],
-                maxScaleDenom=scale_range[1],
+                minScaleDenom=item.layer_min_scale_denom,
+                maxScaleDenom=item.layer_max_scale_denom,
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
             )

@@ -558,9 +558,9 @@ define([
                     } catch (err) {
                         console.warn(
                             "Can't initialize layer [" +
-                                baseOptions.keyname +
-                                "]: " +
-                                err
+                            baseOptions.keyname +
+                            "]: " +
+                            err
                         );
                     }
 
@@ -644,10 +644,10 @@ define([
                 queryOptions: { deep: true },
                 sort: widget.config.drawOrderEnabled
                     ? [
-                          {
-                              attribute: "position",
-                          },
-                      ]
+                        {
+                            attribute: "position",
+                        },
+                    ]
                     : null,
                 onItem: function (item) {
                     widget._onNewStoreItem(item, visibleStyles);
