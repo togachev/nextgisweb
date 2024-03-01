@@ -53,7 +53,7 @@ export const Header = observer(() => {
                     <Space className="button-link">
                         <Button type="link" href="https://uriit.ru/">на главную ЮНИИИТ</Button>
                         <DividerMenu />
-                        <Button type="link" href="https://uriit.ru/services/infospace-technologies/">услуги ЦКУ</Button>
+                        <Button type="link" href="https://uriit.ru/services/">услуги</Button>
                         <DividerMenu />
                         <Button type="link" href="https://uriit.ru/contacts/">контакты</Button>
                         <DividerMenu />
