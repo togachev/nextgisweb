@@ -172,7 +172,7 @@ msgstr "Редактировать"
 msgid "Style settings"
 msgstr "Настройки стиля"
 
-#: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
+#: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24 nodepkg/panel/upload-layer/UploadLayer.js:25
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 

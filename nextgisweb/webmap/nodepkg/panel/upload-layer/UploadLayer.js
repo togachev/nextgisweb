@@ -1,16 +1,18 @@
-import { useState } from 'react';
-import { message, Upload, Button, Card, Col, Row, Empty } from "@nextgisweb/gui/antd";
+import { useEffect, useState } from 'react';
+import { Button, Card, Checkbox, Col, Empty, FloatButton, message, Row, Upload } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever";
+import ZoomIn from "@nextgisweb/icon/material/zoom_in";
 import "./UploadLayer.less";
 import { PanelHeader } from "../header";
+import Feature from "ol/Feature";
 
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GPX from 'ol/format/GPX';
 import KML from 'ol/format/KML';
 import GeoJSON from "ol/format/GeoJSON";
-import { Circle, Fill, Stroke, Style, Text } from 'ol/style';
+import { Circle, Fill, Stroke, Style } from 'ol/style';
 
 const title = gettext("UploadLayer")
 const validTypeMesssage = gettext("This file type is not supported");
@@ -20,6 +22,7 @@ const areaUpload = gettext("Click or drag file to this area to upload layer");
 const allDeleteItems = gettext("Delete all layers");
 const DeleteLayer = gettext("Delete Layer");
 const supportLayer = gettext("Supported layers for import: GPX, GeoJSON, KML");
+const ZoomToLayer = gettext("Zoom to layer");
 const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
 
@@ -30,52 +33,54 @@ const getBase64 = (file, callback) => {
     reader.readAsDataURL(file);
 };
 
-const getDefaultStyle = () => {
-    var dataStyle = new Style({
+var customStyle = new Style({
+    stroke: new Stroke({
+        width: 1.66,
+        color: '#FF8B00'
+    }),
+    image: new Circle({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
         stroke: new Stroke({
-            width: 1.66,
-            color: '#FF8B00'
+            width: 1,
+            color: 'rgba(0,0,0,0.8)'
         }),
-        image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'pixels',
-            stroke: new Stroke({
-                width: 1,
-                color: 'rgba(0,0,0,0.8)'
-            }),
-            radius: 4,
-            fill: new Stroke({
-                width: 1,
-                color: 'rgba(16,106,144,0.5)'
-            }),
+        radius: 4,
+        fill: new Stroke({
+            width: 1,
+            color: 'rgba(16,106,144,0.5)'
         }),
-        fill: new Fill({
-            color: 'rgba(0, 0, 255, 0.5)',
-        }),
-        text: new Text({
-            textAlign: 'center',
-            textBaseline: "bottom",
-            font: '12px Calibri,sans-serif',
+    }),
+    fill: new Fill({
+        color: 'rgba(0, 0, 255, 0.5)',
+    }),
+});
 
-            fill: new Fill({
-                color: '#000'
-            }),
-            stroke: new Stroke({
-                color: '#fff',
-                width: 2
-            }),
-            offsetY: -10,
-            offsetX: 15,
-            placement: "point",
-            maxAngle: 0,
-            overflow: true,
-            rotation: 0,
-        })
-    });
-
-    return dataStyle;
-}
+var clickStyle = new Style({
+    stroke: new Stroke({
+        width: 4,
+        color: '#FFE900'
+    }),
+    fill: new Fill({
+        color: 'rgba(0, 0, 255, 0.5)',
+    }),
+    image: new Circle({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        stroke: new Stroke({
+            width: 1,
+            color: '#000000'
+        }),
+        radius: 6,
+        fill: new Stroke({
+            width: 1,
+            color: '#FFE900'
+        }),
+    }),
+    zIndex: 100,
+});
 
 export function UploadLayer({ display, close }) {
 
@@ -85,15 +90,16 @@ export function UploadLayer({ display, close }) {
 
     const [fileList, setFileList] = useState([]);
     const [result, setResult] = useState([]);
+    const [feature, setFeature] = useState([]);
 
     const numberOfFiles = gettext("Number of files:") + " " + fileList.length;
 
     const addLayerMap = (props) => {
         const customSource = new VectorSource({ url: props.url, format: props.format })
         const customLayer = new VectorLayer({
-            style: () => getDefaultStyle(),
-            source: customSource
+            source: customSource,
         })
+        customLayer.setStyle(customStyle);
         customLayer.set("name", props.info.file.uid);
         map.addLayer(customLayer);
         props.info.fileList.length <= 1 &&
@@ -184,17 +190,34 @@ export function UploadLayer({ display, close }) {
         setResult([]);
     }
 
+    const visibleLayer = (e, item) => {
+        map.getLayers().getArray().forEach(layer => {
+            if (layer.get('name') === item.uid) {
+                e.target.checked ? layer.setVisible(true) : layer.setVisible(false);
+            }
+        });
+    }
+
     const LayerList = ({ list, onRemove, zoomToLayer }) => (
         list.map(item => {
             return (
-                <Row wrap={false} key={item.uid}>
-                    <Col className="layer-item-title" title={item.name} onClick={() => zoomToLayer(item.uid)}>{item.name}</Col>
-                    <Col className="custom-button">
+                <div className="layer-item" key={item.uid}>
+                    <label className="layer-item-title" title={item.name}>
+                        <Checkbox
+                            defaultChecked={true}
+                            onChange={(e) => visibleLayer(e, item)}
+                        />
+                        <span className="title">{item.name}</span>
+                    </label>
+                    <div className="custom-button">
+                        <span title={ZoomToLayer} className="icon-symbol" onClick={() => zoomToLayer(item.uid)}>
+                            <ZoomIn />
+                        </span>
                         <span title={DeleteLayer} className="icon-symbol" onClick={() => onRemove(item.uid)}>
                             <DeleteForever />
                         </span>
-                    </Col>
-                </Row>
+                    </div>
+                </div >
             )
         })
     );
@@ -217,13 +240,14 @@ export function UploadLayer({ display, close }) {
         </Button>
     );
 
-
     const displayFeatureInfo = (pixel) => {
         const features = [];
-        map.forEachFeatureAtPixel(pixel, (feature) => {
-            features.push(feature);
+        map.forEachFeatureAtPixel(pixel, (e) => {
+            features.push(e);
         },
-            { hitTolerance: 10 });
+            { hitTolerance: 10 }
+        );
+        setFeature(features)
         if (features.length > 0) {
             const info = [];
             let i, ii;
@@ -241,12 +265,36 @@ export function UploadLayer({ display, close }) {
     };
 
     map.on('click', (e) => {
-        if (e.dragging) {
-            return;
-        }
+        if (e.dragging) return;
         const pixel = map.getEventPixel(e.originalEvent);
+        const items = fileList.map(e => e.uid)
+
+        map.getLayers().forEach(layer => {
+            if (items.includes(layer.get('name'))) {
+                layer.getSource().forEachFeature((e) => {
+                    e.setStyle(customStyle)
+                })
+            }
+        })
+
         displayFeatureInfo(pixel);
     });
+
+    useEffect(() => {
+        if (result.length > 0) {
+            const res = result.filter(item => item.feature !== feature)
+            res.map(item => item.feature.setStyle(customStyle))
+            feature.map(item => item.setStyle(clickStyle))
+        }
+    }, [feature, result])
+
+    const zoomfeature = (item) => {
+        const geometry = item.feature.getGeometry()
+        display.map.zoomToFeature(
+            new Feature({ geometry })
+        );
+        setFeature([item.feature]);
+    }
 
     return (
         <div className="ngw-webmap-upload-layer-panel">
@@ -258,6 +306,7 @@ export function UploadLayer({ display, close }) {
                 fileList.length > 0 ?
                     (
                         <Card
+                            bordered={false}
                             size="small"
                             title={numberOfFiles}
                             extra={
@@ -270,7 +319,9 @@ export function UploadLayer({ display, close }) {
                                 )
                             }
                         >
-                            <LayerList list={fileList} onRemove={e => removeItem(e)} zoomToLayer={zoomToLayer} />
+                            <div className="layer-list-block">
+                                <LayerList list={fileList} onRemove={e => removeItem(e)} zoomToLayer={zoomToLayer} />
+                            </div>
                         </Card>
                     ) : (
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
@@ -283,29 +334,30 @@ export function UploadLayer({ display, close }) {
                     )
                     return (
                         <div key={index} title={ZoomToObject} >
-                            <Card size="small" style={{ cursor: 'pointer', backgroundColor: "#e7f0f350", margin: '5px' }}
-                                onClick={() => {
-                                    let extent = item.feature.getGeometry().getExtent();
-                                    map.getView().fit(extent, map.getSize());
-                                }}
+                            <Card
+                                size="small"
+                                onClick={() => zoomfeature(item)}
                             >
-                                {
-                                    Object.keys(res).length > 0 ?
-                                        Object.keys(res).map((keyName, i) => {
-                                            return (
-                                                <div key={i} className="feature-info">
-                                                    <div className="title-info" >{keyName}</div>
-                                                    <div className="value-info" title={res[keyName]}>{res[keyName]}</div>
-                                                </div>
-                                            )
-                                        }) :
-                                        <div className="title-info" >{noAttribute}</div>
-                                }
+                                <div className="feature-info-block">
+                                    {
+                                        Object.keys(res).length > 0 ?
+                                            Object.keys(res).map((keyName, i) => {
+                                                return (
+                                                    <div key={i} className="feature-info">
+                                                        <div className="title-info" title={keyName}>{keyName}</div>
+                                                        <div className="value-info" title={res[keyName]}>{res[keyName]}</div>
+                                                    </div>
+                                                )
+                                            }) :
+                                            <div className="title-info" >{noAttribute}</div>
+                                    }
+                                </div>
                             </Card>
                         </div>
                     )
                 })
             }
+            <FloatButton.BackTop />
         </div>
     );
 };
