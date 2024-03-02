@@ -6,7 +6,19 @@
 
 <%page args="title, hide_resource_filter=False"/>
 
-<% return_url = request.GET['return'] if 'return' in request.GET else False %>
+<%
+    return_url = request.GET['return'] if 'return' in request.GET else False
+
+    try:
+        user = request.user
+        is_administrator = user.is_administrator
+        is_guest = user.keyname == 'guest'
+
+    except Exception:
+        is_administrator = False
+        is_guest = True
+
+%>
 <div id="header" class="ngw-pyramid-layout-header">
     <a href="${return_url if return_url else request.application_url}">
         %if return_url:
@@ -67,11 +79,13 @@
     require([
         "@nextgisweb/pyramid/link-resource",
         "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) { 
+    ], function (comp, reactApp) {
+        %if not is_guest:
         reactApp.default(
             comp.default,
             {},
             document.getElementById('link-resource')
         );
+        %endif
     });
 </script>
