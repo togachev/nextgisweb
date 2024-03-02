@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Table } from "@nextgisweb/gui/antd";
+import { Table, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
@@ -11,7 +11,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RednerActions";
 import type { ChildrenResource as Resource } from "./type";
-
+import Schema from "@nextgisweb/icon/material/schema";
 import "./ChildrenSection.less";
 
 interface ChildrenSectionProps {
@@ -29,6 +29,7 @@ export function ChildrenSection({
 }: ChildrenSectionProps) {
     const [volumeVisible, setVolumeVisible] = useState(false);
     const [creationDateVisible, setCreationDateVisible] = useState(false);
+    const [relationVisible, setRelationVisible] = useState(false);
     const [batchDeletingInProgress, setBatchDeletingInProgress] =
         useState(false);
 
@@ -135,6 +136,27 @@ export function ChildrenSection({
                         }}
                     />
                 )}
+                {relationVisible && (
+                    <Column
+                        title={ () =>
+                            <div className="iconColumnKey" >
+                                <Tooltip title={gettext("Relationship with a resource")}>
+                                    <Schema />
+                                </Tooltip>
+                            </div>
+                        }
+                        responsive={["md"]}
+                        render={(record) => (
+                            record.column_key ? (
+                                <div className="columnKey">
+                                    <span title={record.display_name_const}>
+                                        <a href={record.update_link_const} ><div className="iconColumnKey" ><Schema /></div></a>
+                                    </span>
+                                </div>
+                            ) : null
+                        )}
+                    />
+                )}
                 <Column
                     title={
                         <MenuDropdown
@@ -146,10 +168,12 @@ export function ChildrenSection({
                             volumeVisible={volumeVisible}
                             storageEnabled={storageEnabled}
                             creationDateVisible={creationDateVisible}
+                            relationVisible={relationVisible}
                             setBatchDeletingInProgress={
                                 setBatchDeletingInProgress
                             }
                             setCreationDateVisible={setCreationDateVisible}
+                            setRelationVisible={setRelationVisible}
                             setVolumeVisible={setVolumeVisible}
                             setVolumeValues={setVolumeValues}
                             setAllowBatch={setAllowBatch}

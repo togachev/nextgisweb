@@ -32,8 +32,10 @@ interface MenuDropdownProps {
     volumeVisible: boolean;
     storageEnabled: boolean;
     creationDateVisible: boolean;
+    relationVisible: boolean;
     setBatchDeletingInProgress: React.Dispatch<React.SetStateAction<boolean>>;
     setCreationDateVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    setRelationVisible: React.Dispatch<React.SetStateAction<boolean>>;
     setVolumeVisible: React.Dispatch<React.SetStateAction<boolean>>;
     setVolumeValues: React.Dispatch<
         React.SetStateAction<Record<number, number>>
@@ -55,8 +57,10 @@ export function MenuDropdown({
     volumeVisible,
     storageEnabled,
     creationDateVisible,
+    relationVisible,
     setBatchDeletingInProgress,
     setCreationDateVisible,
+    setRelationVisible,
     setVolumeVisible,
     setVolumeValues,
     setAllowBatch,
@@ -194,6 +198,15 @@ export function MenuDropdown({
                 setCreationDateVisible(!creationDateVisible);
             },
         });
+        menuItems_.push({
+            key: "relation",
+            label: relationVisible
+                ? gettext("Hide relationship with a resource")
+                : gettext("Show relationship with a resource"),
+            onClick: () => {
+                setRelationVisible(!relationVisible);
+            },
+        });
         if (allowBatch) {
             // Batch delete
             const checkNotAllForDelete =
@@ -282,6 +295,7 @@ export function MenuDropdown({
         selectedAllowedForFeatureExport,
         selectedAllowedForDelete,
         creationDateVisible,
+        relationVisible,
         storageEnabled,
         volumeVisible,
         allowBatch,
@@ -295,6 +309,7 @@ export function MenuDropdown({
         setVolumeValues,
         setVolumeVisible,
         setCreationDateVisible,
+        setRelationVisible,
     ]);
 
     if (!menuItems.length) {
