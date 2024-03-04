@@ -2,7 +2,7 @@ import debounce from "lodash-es/debounce";
 import GeoJSON from "ol/format/GeoJSON";
 import { useCallback, useState } from "react";
 
-import { Alert, Button, Input, Spin } from "@nextgisweb/gui/antd";
+import { Alert, Button, Typography, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -19,7 +19,7 @@ import LocationOnIcon from "@nextgisweb/icon/material/location_on";
 import PublicIcon from "@nextgisweb/icon/material/public";
 
 import "./SearchPanel.less";
-
+const { Link } = Typography;
 const GEO_JSON_FORMAT = new GeoJSON();
 
 const parseCoordinatesInput = async (criteria, limit, display) => {
@@ -372,7 +372,22 @@ export const SearchPanel = ({ display, close }) => {
                 <CloseButton {...{ close }} />
             </div>
             {info}
-            <div className="results">{results}</div>
+            <div className="results">
+                {
+                    results ? results :
+                        <div className="description-coords">
+                            <span>Для поиска введите координаты в десятичном формате:</span>
+                            <span style={{cursor: 'pointer'}} onClick={() => {
+                                !searchText && setSearchText('61.018944, 69.089089')
+                                _search('61.018944, 69.089089');
+                            }} >61.018944, 69.089089</span>
+                            <span>Разделитель целой и дробной части <i>точка</i>, разделитель координат <i>пробел</i> или <i>запятая</i></span>
+                            <Link href="https://geo.uriit.ru/resource/17212" target="_blank">
+                                Примеры поддерживаемых форматов
+                            </Link>
+                        </div>
+                }
+            </div>
         </div>
     );
 };

@@ -3,7 +3,7 @@
     flex-direction: column;
     height: 100%;
 
-    > .control {
+    >.control {
         display: flex;
         border-bottom: 1px solid var(--divider-color);
         padding: 2px;
@@ -13,7 +13,7 @@
         }
     }
 
-    > .results {
+    >.results {
         flex: auto;
         overflow-y: auto;
 
@@ -44,6 +44,29 @@
             margin-top: 20px;
             color: #076dbf;
             text-align: center;
+        }
+    }
+
+    .ant-descriptions {
+        margin: 5px;
+    }
+
+    .description-coords {
+        display: flex;
+        flex-direction: column;
+        margin: 14px;
+        color: #93979b;
+        span {
+            margin: 5px 0;
+        }
+        a {
+            font-weight: 600;
+            color: #93979b;
+            margin: 5px 0;
+
+            &:hover {
+                color: #106a90;
+            }
         }
     }
 }
