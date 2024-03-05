@@ -242,8 +242,12 @@ export function UploadLayer({ display, close }) {
 
     const displayFeatureInfo = (pixel) => {
         const features = [];
-        map.forEachFeatureAtPixel(pixel, (e) => {
-            features.push(e);
+        map.forEachFeatureAtPixel(pixel, function (feature) {
+            features.push(feature);
+        }, {
+            layerFilter: function (layer) {
+                return layer.get('name') !== 'drawing-layer';
+            }
         },
             { hitTolerance: 10 }
         );

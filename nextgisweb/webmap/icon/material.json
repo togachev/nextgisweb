@@ -30,5 +30,6 @@
     "done_all",
     "history",
     "description",
-    "upload_file"
+    "upload_file",
+    "draw"
 ]
