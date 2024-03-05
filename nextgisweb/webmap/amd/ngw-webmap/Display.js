@@ -992,12 +992,16 @@ define([
             });
 
             panels.push({
-                cls: reactPanel("@nextgisweb/webmap/panel/upload-layer"),
+                cls: reactPanel("@nextgisweb/webmap/panel/custom-layer", {
+                    props: {
+                        topic: topic,
+                    },
+                }),
                 params: {
-                    title: gettext("UploadLayer"),
-                    name: "upload-layer",
+                    title: gettext("CustomLayer"),
+                    name: "custom-layer",
                     order: 30,
-                    menuIcon: "material-upload_file",
+                    menuIcon: "material-playlist_add",
                 },
             });
 

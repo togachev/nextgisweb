@@ -48,8 +48,8 @@ msgstr "Слои"
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:990 nodepkg/panel/upload-layer/UploadLayer.js:15
-msgid "UploadLayer"
+#: amd/ngw-webmap/Display.js:990 nodepkg/panel/upload-layer/CustomLayer.js:19
+msgid "CustomLayer"
 msgstr "Пользовательские слои"
 
 #: amd/ngw-webmap/Display.js:1000

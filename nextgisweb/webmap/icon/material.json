@@ -30,6 +30,7 @@
     "done_all",
     "history",
     "description",
-    "upload_file",
+    "playlist_add",
+    "upload",
     "draw"
 ]

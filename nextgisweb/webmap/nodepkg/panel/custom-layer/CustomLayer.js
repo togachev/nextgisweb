@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, Checkbox, Col, Empty, FloatButton, message, Row, Upload } from "@nextgisweb/gui/antd";
+import { Button, Card, Checkbox, Col, Empty, FloatButton, message, Row, Select, Tabs, Upload } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever";
+import UploadIcon from "@nextgisweb/icon/material/upload";
+import Draw from "@nextgisweb/icon/material/draw";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in";
-import "./UploadLayer.less";
+import "./CustomLayer.less";
 import { PanelHeader } from "../header";
 import Feature from "ol/Feature";
 
@@ -14,7 +16,7 @@ import KML from 'ol/format/KML';
 import GeoJSON from "ol/format/GeoJSON";
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 
-const title = gettext("UploadLayer")
+const title = gettext("CustomLayer")
 const validTypeMesssage = gettext("This file type is not supported");
 
 const validVolumeMessage = gettext("Exceeding the volume of 16mb");
@@ -82,8 +84,7 @@ var clickStyle = new Style({
     zIndex: 100,
 });
 
-export function UploadLayer({ display, close }) {
-
+export function CustomLayer({ display, close, topic }) {
     const map = display.map.olMap;
     const maxCount = display.clientSettings.max_count_file_upload;
     const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
@@ -126,6 +127,15 @@ export function UploadLayer({ display, close }) {
         }
     }
 
+    const actionControl = (value) => {
+        value.length === 0 ?
+            topic.publish("webmap/tool/identify/on") :
+            (
+                topic.publish("webmap/tool/identify/off"),
+                topic.publish("feature.unhighlight")
+            )
+    }
+
     const props = {
         onChange: (info) => {
             let newFileList = [...info.fileList];
@@ -142,6 +152,7 @@ export function UploadLayer({ display, close }) {
                     olLayerMap(url, info);
                 });
             }
+            actionControl(newFileList);
         },
         multiple: true,
         beforeUpload: (file, info) => {
@@ -188,6 +199,7 @@ export function UploadLayer({ display, close }) {
         }
         map.getView().fit(display._extent, map.getSize());
         setResult([]);
+        actionControl(fileList.filter((item) => item.uid !== uid));
     }
 
     const visibleLayer = (e, item) => {
@@ -231,6 +243,7 @@ export function UploadLayer({ display, close }) {
         });
         map.getView().fit(display._extent, map.getSize());
         setFileList([]);
+        actionControl([]);
         setResult([]);
     }
 
@@ -300,37 +313,84 @@ export function UploadLayer({ display, close }) {
         setFeature([item.feature]);
     }
 
+    const items = [
+        {
+            key: '1',
+            label: 'Загрузка',
+            children:
+                <>
+                    <Dragger {...props} fileList={fileList}>
+                        {areaUpload}
+                    </Dragger>
+                    {
+                        fileList.length > 0 ?
+                            (
+                                <Card
+                                    bordered={false}
+                                    size="small"
+                                    title={numberOfFiles}
+                                    extra={
+                                        fileList.length > 1 && (
+                                            <Row>
+                                                <Col>
+                                                    <DeleteItems list={fileList} onRemove={removeItems} />
+                                                </Col>
+                                            </Row>
+                                        )
+                                    }
+                                >
+                                    <div className="layer-list-block">
+                                        <LayerList list={fileList} onRemove={e => removeItem(e)} zoomToLayer={zoomToLayer} />
+                                    </div>
+                                </Card>
+                            ) : (
+                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
+                            )
+                    }
+                </>,
+            icon: <UploadIcon />,
+        },
+        {
+            key: '2',
+            label: 'Создание',
+            children: <Select
+                showSearch
+                style={{
+                    width: 200,
+                }}
+                placeholder="Search to Select"
+                optionFilterProp="children"
+                filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={[
+                    {
+                        value: '1',
+                        label: 'Линия',
+                    },
+                    {
+                        value: '2',
+                        label: 'Точка',
+                    },
+                    {
+                        value: '3',
+                        label: 'Полигон',
+                    },
+                ]}
+            />,
+            icon: <Draw />,
+        },
+    ];
+
     return (
-        <div className="ngw-webmap-upload-layer-panel">
+        <div className="ngw-webmap-custom-layer-panel">
             <PanelHeader {...{ title, close }} />
-            <Dragger {...props} fileList={fileList}>
-                {areaUpload}
-            </Dragger>
-            {
-                fileList.length > 0 ?
-                    (
-                        <Card
-                            bordered={false}
-                            size="small"
-                            title={numberOfFiles}
-                            extra={
-                                fileList.length > 1 && (
-                                    <Row>
-                                        <Col>
-                                            <DeleteItems list={fileList} onRemove={removeItems} />
-                                        </Col>
-                                    </Row>
-                                )
-                            }
-                        >
-                            <div className="layer-list-block">
-                                <LayerList list={fileList} onRemove={e => removeItem(e)} zoomToLayer={zoomToLayer} />
-                            </div>
-                        </Card>
-                    ) : (
-                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
-                    )
-            }
+            <Tabs
+                items={items}
+                defaultActiveKey="1"
+                type="card"
+            />
             {
                 result.map((item, index) => {
                     const res = Object.fromEntries(
