@@ -4,8 +4,8 @@ import { errorModal } from "@nextgisweb/gui/error";
 import "./WebmapGroupWidget.less";
 
 import SaveOutline from "@nextgisweb/icon/mdi/content-save-outline";
-import Add from "@nextgisweb/icon/material/add";
-import Delete from "@nextgisweb/icon/material/delete_forever";
+import Add from "@nextgisweb/icon/material/add/outline";
+import Delete from "@nextgisweb/icon/material/delete_forever/outline";
 
 import { Input, Radio, Button } from "@nextgisweb/gui/antd";
 

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import InfoIcon from "@nextgisweb/icon/material/info";
-import MapIcon from "@nextgisweb/icon/material/map";
-import Edit from "@nextgisweb/icon/material/edit";
-import Lock from "@nextgisweb/icon/material/lock";
-import Block from "@nextgisweb/icon/material/block";
-import LockOpen from "@nextgisweb/icon/material/lock_open";
+import InfoIcon from "@nextgisweb/icon/material/info/outline";
+import MapIcon from "@nextgisweb/icon/material/map/outline";
+import Edit from "@nextgisweb/icon/material/edit/outline";
+import Lock from "@nextgisweb/icon/material/lock/outline";
+import Block from "@nextgisweb/icon/material/block/outline";
+import LockOpen from "@nextgisweb/icon/material/lock_open/outline";
 import getSelectStyle from "./selectStyle";
 import "./MapList.less";
 import "./details.less";

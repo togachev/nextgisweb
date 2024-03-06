@@ -11,7 +11,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RednerActions";
 import type { ChildrenResource as Resource } from "./type";
-import Schema from "@nextgisweb/icon/material/schema";
+import Schema from "@nextgisweb/icon/material/schema/outline";
 import "./ChildrenSection.less";
 
 interface ChildrenSectionProps {

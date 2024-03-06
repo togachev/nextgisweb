@@ -1000,7 +1000,7 @@ define([
                 params: {
                     title: gettext("CustomLayer"),
                     name: "custom-layer",
-                    order: 30,
+                    order: 90,
                     menuIcon: "material-playlist_add",
                 },
             });

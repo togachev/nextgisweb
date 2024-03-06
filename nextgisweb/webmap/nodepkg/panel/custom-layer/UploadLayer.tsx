@@ -1,24 +1,35 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, Checkbox, Col, Empty, FloatButton, message, Row, Select, Tabs, Upload } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import DeleteForever from "@nextgisweb/icon/material/delete_forever";
-import UploadIcon from "@nextgisweb/icon/material/upload";
-import Draw from "@nextgisweb/icon/material/draw";
-import ZoomIn from "@nextgisweb/icon/material/zoom_in";
-import "./CustomLayer.less";
-import { PanelHeader } from "../header";
-import Feature from "ol/Feature";
 
-import VectorLayer from "ol/layer/Vector";
-import VectorSource from "ol/source/Vector";
+import { Vector as VectorSource } from "ol/source";
+import { Vector as VectorLayer } from "ol/layer";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import {
+    Button, Card,
+    Checkbox,
+    Col, Empty, message, Row, Upload
+} from "@nextgisweb/gui/antd";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
+
+
 import GPX from 'ol/format/GPX';
 import KML from 'ol/format/KML';
 import GeoJSON from "ol/format/GeoJSON";
+import Feature from "ol/Feature";
+
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 
-const title = gettext("CustomLayer")
-const validTypeMesssage = gettext("This file type is not supported");
+import type { DojoDisplay, DojoTopic } from "../type";
 
+const { Dragger } = Upload;
+const getBase64 = (file, callback) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(file);
+};
+
+const validTypeMesssage = gettext("This file type is not supported");
 const validVolumeMessage = gettext("Exceeding the volume of 16mb");
 const areaUpload = gettext("Click or drag file to this area to upload layer");
 const allDeleteItems = gettext("Delete all layers");
@@ -28,14 +39,12 @@ const ZoomToLayer = gettext("Zoom to layer");
 const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
 
-const { Dragger } = Upload;
-const getBase64 = (file, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(file);
-};
+interface UploadLayerProps {
+    display: DojoDisplay;
+    topic: DojoTopic;
+}
 
-var customStyle = new Style({
+const customStyle = new Style({
     stroke: new Stroke({
         width: 1.66,
         color: '#FF8B00'
@@ -59,7 +68,7 @@ var customStyle = new Style({
     }),
 });
 
-var clickStyle = new Style({
+const clickStyle = new Style({
     stroke: new Stroke({
         width: 4,
         color: '#FFE900'
@@ -84,7 +93,15 @@ var clickStyle = new Style({
     zIndex: 100,
 });
 
-export function CustomLayer({ display, close, topic }) {
+type SourceType = {
+    url: string;
+    format: string;
+    info: object;
+};
+
+
+export function UploadLayer({ display, topic }: UploadLayerProps) {
+
     const map = display.map.olMap;
     const maxCount = display.clientSettings.max_count_file_upload;
     const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
@@ -95,15 +112,15 @@ export function CustomLayer({ display, close, topic }) {
 
     const numberOfFiles = gettext("Number of files:") + " " + fileList.length;
 
-    const addLayerMap = (props) => {
-        const customSource = new VectorSource({ url: props.url, format: props.format })
+    const addLayerMap = ({ url, format, info }: SourceType) => {
+        const customSource = new VectorSource({ url: url, format: format })
         const customLayer = new VectorLayer({
             source: customSource,
         })
         customLayer.setStyle(customStyle);
-        customLayer.set("name", props.info.file.uid);
+        customLayer.set("name", info.file.uid);
         map.addLayer(customLayer);
-        props.info.fileList.length <= 1 &&
+        info.fileList.length <= 1 &&
             customSource.once('change', function () {
                 if (customSource.getState() === 'ready') {
                     map.getView().fit(customSource.getExtent(), map.getSize());
@@ -179,7 +196,7 @@ export function CustomLayer({ display, close, topic }) {
     const zoomToLayer = (uid) => {
         map.getLayers().forEach((layer) => {
             if (layer.get('name') === uid) {
-                let extent = layer.getSource().getExtent();
+                const extent = layer.getSource().getExtent();
                 map.getView().fit(extent, map.getSize());
             }
         })
@@ -187,22 +204,25 @@ export function CustomLayer({ display, close, topic }) {
 
     const removeItem = (uid) => {
         setFileList(fileList.filter((item) => item.uid !== uid));
-        var layers = [];
+        const layers = [];
         map.getLayers().forEach((layer) => {
             if (layer.get('name') !== undefined && layer.get('name') === uid) {
                 layers.push(layer);
             }
         });
-        var len = layers.length;
-        for (var i = 0; i < len; i++) {
+
+        for (let i = 0; i < layers.length; i++) {
             map.removeLayer(layers[i]);
         }
+
         map.getView().fit(display._extent, map.getSize());
         setResult([]);
         actionControl(fileList.filter((item) => item.uid !== uid));
     }
 
     const visibleLayer = (e, item) => {
+        console.log(e);
+        
         map.getLayers().getArray().forEach(layer => {
             if (layer.get('name') === item.uid) {
                 e.target.checked ? layer.setVisible(true) : layer.setVisible(false);
@@ -210,32 +230,40 @@ export function CustomLayer({ display, close, topic }) {
         });
     }
 
-    const LayerList = ({ list, onRemove, zoomToLayer }) => (
-        list.map(item => {
-            return (
-                <div className="layer-item" key={item.uid}>
-                    <label className="layer-item-title" title={item.name}>
-                        <Checkbox
-                            defaultChecked={true}
-                            onChange={(e) => visibleLayer(e, item)}
-                        />
-                        <span className="title">{item.name}</span>
-                    </label>
-                    <div className="custom-button">
-                        <span title={ZoomToLayer} className="icon-symbol" onClick={() => zoomToLayer(item.uid)}>
-                            <ZoomIn />
-                        </span>
-                        <span title={DeleteLayer} className="icon-symbol" onClick={() => onRemove(item.uid)}>
-                            <DeleteForever />
-                        </span>
-                    </div>
-                </div >
-            )
-        })
-    );
+    const LayerList = (fileList) => {
+        const { list } = fileList;
+        
+        return (
+            <>
+                {
+                    list.map(item => {
+                        return (
+                            <div className="layer-item" key={item.uid}>
+                                <label  className="layer-item-title" title={item.name}>
+                                    <Checkbox
+                                        defaultChecked={true}
+                                        onChange={(e) => visibleLayer(e, item)}
+                                    />
+                                    <span className="title">{item.name}</span>
+                                </label>
+                                <div className="custom-button">
+                                    <span title={ZoomToLayer} className="icon-symbol" onClick={() => zoomToLayer(item.uid)}>
+                                        <ZoomIn />
+                                    </span>
+                                    <span title={DeleteLayer} className="icon-symbol" onClick={() => removeItem(item.uid)}>
+                                        <DeleteForever />
+                                    </span>
+                                </div>
+                            </div >
+                        )
+                    })
+                }
+            </>
+        )
+    }
 
     const removeItems = (items) => {
-        let nameLayer = items.map(e => e.uid)
+        const nameLayer = items.map(e => e.uid)
         map.getLayers().getArray().slice(0).forEach(function (layer) {
             if (nameLayer.includes(layer.get('name'))) {
                 map.removeLayer(layer);
@@ -247,24 +275,33 @@ export function CustomLayer({ display, close, topic }) {
         setResult([]);
     }
 
-    const DeleteItems = ({ list, onRemove }) => (
-        <Button type="primary" ghost={true} icon={<DeleteForever />} size="small" onClick={() => onRemove(list)} block>
+    const DeleteItems = (fileList) => {
+        const { list } = fileList;
+        return (
+        <Button
+            type="primary"
+            ghost={true}
+            icon={<DeleteForever />}
+            size="small"
+            onClick={() => removeItems(list)}
+            block
+        >
             {allDeleteItems}
         </Button>
-    );
+    )};
 
     const displayFeatureInfo = (pixel) => {
         const features = [];
-        map.forEachFeatureAtPixel(pixel, function (feature) {
+        map.forEachFeatureAtPixel(pixel, (feature) => {
             features.push(feature);
-        }, {
-            layerFilter: function (layer) {
-                return layer.get('name') !== 'drawing-layer';
-            }
         },
-            { hitTolerance: 10 }
+            { hitTolerance: 10 },
+            {
+                layerFilter: (layer) => {
+                    return layer.get('name') !== 'drawing-layer';
+                }
+            }
         );
-        setFeature(features)
         if (features.length > 0) {
             const info = [];
             let i, ii;
@@ -276,6 +313,7 @@ export function CustomLayer({ display, close, topic }) {
                 }
             }
             setResult(info)
+            setFeature(features)
         } else {
             setResult([])
         }
@@ -295,6 +333,7 @@ export function CustomLayer({ display, close, topic }) {
         })
 
         displayFeatureInfo(pixel);
+        e.stopPropagation()
     });
 
     useEffect(() => {
@@ -313,84 +352,36 @@ export function CustomLayer({ display, close, topic }) {
         setFeature([item.feature]);
     }
 
-    const items = [
-        {
-            key: '1',
-            label: 'Загрузка',
-            children:
-                <>
-                    <Dragger {...props} fileList={fileList}>
-                        {areaUpload}
-                    </Dragger>
-                    {
-                        fileList.length > 0 ?
-                            (
-                                <Card
-                                    bordered={false}
-                                    size="small"
-                                    title={numberOfFiles}
-                                    extra={
-                                        fileList.length > 1 && (
-                                            <Row>
-                                                <Col>
-                                                    <DeleteItems list={fileList} onRemove={removeItems} />
-                                                </Col>
-                                            </Row>
-                                        )
-                                    }
-                                >
-                                    <div className="layer-list-block">
-                                        <LayerList list={fileList} onRemove={e => removeItem(e)} zoomToLayer={zoomToLayer} />
-                                    </div>
-                                </Card>
-                            ) : (
-                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
-                            )
-                    }
-                </>,
-            icon: <UploadIcon />,
-        },
-        {
-            key: '2',
-            label: 'Создание',
-            children: <Select
-                showSearch
-                style={{
-                    width: 200,
-                }}
-                placeholder="Search to Select"
-                optionFilterProp="children"
-                filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                }
-                options={[
-                    {
-                        value: '1',
-                        label: 'Линия',
-                    },
-                    {
-                        value: '2',
-                        label: 'Точка',
-                    },
-                    {
-                        value: '3',
-                        label: 'Полигон',
-                    },
-                ]}
-            />,
-            icon: <Draw />,
-        },
-    ];
-
     return (
-        <div className="ngw-webmap-custom-layer-panel">
-            <PanelHeader {...{ title, close }} />
-            <Tabs
-                items={items}
-                defaultActiveKey="1"
-                type="card"
-            />
+        <>
+            <Dragger {...props} fileList={fileList}>
+                {areaUpload}
+            </Dragger>
+            {
+                fileList.length > 0 ?
+                    (
+                        <Card
+                            bordered={false}
+                            size="small"
+                            title={numberOfFiles}
+                            extra={
+                                fileList.length > 1 && (
+                                    <Row>
+                                        <Col>
+                                            <DeleteItems list={fileList} />
+                                        </Col>
+                                    </Row>
+                                )
+                            }
+                        >
+                            <div className="layer-list-block">
+                                <LayerList list={fileList}  />
+                            </div>
+                        </Card>
+                    ) : (
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
+                    )
+            }
             {
                 result.map((item, index) => {
                     const res = Object.fromEntries(
@@ -421,7 +412,6 @@ export function CustomLayer({ display, close, topic }) {
                     )
                 })
             }
-            <FloatButton.BackTop />
-        </div>
-    );
+        </>
+    )
 };

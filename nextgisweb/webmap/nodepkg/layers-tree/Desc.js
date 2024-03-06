@@ -1,5 +1,5 @@
 import { Dropdown, Card } from "@nextgisweb/gui/antd";
-import Description from "@nextgisweb/icon/material/description";
+import Description from "@nextgisweb/icon/material/description/outline";
 import "./Desc.less";
 import ParseDesc from "./ParseDesc"
 
