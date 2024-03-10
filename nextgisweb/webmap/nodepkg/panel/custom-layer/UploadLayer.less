@@ -1,0 +1,63 @@
+.upload-layers.ant-tree {
+
+    .ant-tree-switcher-noop {
+        display: none;
+    }
+
+    .ant-tree-checkbox {
+        top: initial;
+        margin-inline-end: 10px;
+        align-self: center;
+        margin-top: 0;
+        margin-inline-start: 5px;
+    }
+
+    .ant-tree-node-content-wrapper {
+        display: flex;
+        column-gap: 6px;
+        align-items: start;
+        padding-left: 0;
+        width: 100%;
+        min-width: 0;
+        line-height: 28px;
+
+        &:hover {
+            background: #ffffff00;
+        }
+        
+        .ant-tree-title {
+            width: 100%;
+            min-width: 0;
+
+            .tree-item-title {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .custom-button {
+                display: flex;
+                flex-direction: row;
+                justify-content: end;
+                cursor: pointer;
+            }
+
+            .icon-symbol {
+                font-size: 18px;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                justify-items: center;
+                justify-content: center;
+                align-items: center;
+                flex: 0 0 auto;
+
+                &:hover {
+                    color: #106a90;
+                    background: #ffffff00;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,379 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { Vector as VectorSource } from "ol/source";
+import { Vector as VectorLayer } from "ol/layer";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import {
+    Button, Card,
+    Checkbox,
+    Col, Empty, message, Row, Upload
+} from "@nextgisweb/gui/antd";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
+
+import { useFeatures } from "./hook/useFeatures";
+
+import GPX from 'ol/format/GPX';
+import KML from 'ol/format/KML';
+import GeoJSON from "ol/format/GeoJSON";
+import Feature from "ol/Feature";
+
+import { Circle, Fill, Stroke, Style } from 'ol/style';
+
+import type { DojoDisplay, DojoTopic } from "../type";
+import type { GetProp, UploadFile, UploadProps } from 'antd';
+
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+
+const { Dragger } = Upload;
+
+const getBase64 = (file: FileType, callback): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+    });
+
+
+
+const validTypeMesssage = gettext("This file type is not supported");
+const validVolumeMessage = gettext("Exceeding the volume of 16mb");
+const areaUpload = gettext("Click or drag file to this area to upload layer");
+const allDeleteItems = gettext("Delete all layers");
+const DeleteLayer = gettext("Delete Layer");
+const supportLayer = gettext("Supported layers for import: GPX, GeoJSON, KML");
+const ZoomToLayer = gettext("Zoom to layer");
+const ZoomToObject = gettext("Zoom to object");
+const noAttribute = gettext("No attribute information available");
+
+interface UploadLayerProps {
+    display: DojoDisplay;
+    topic: DojoTopic;
+}
+
+const customStyle = new Style({
+    stroke: new Stroke({
+        width: 1.66,
+        color: '#FF8B00'
+    }),
+    image: new Circle({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        stroke: new Stroke({
+            width: 1,
+            color: 'rgba(0,0,0,0.8)'
+        }),
+        radius: 4,
+        fill: new Stroke({
+            width: 1,
+            color: 'rgba(16,106,144,0.5)'
+        }),
+    }),
+    fill: new Fill({
+        color: 'rgba(0, 0, 255, 0.5)',
+    }),
+});
+
+const clickStyle = new Style({
+    stroke: new Stroke({
+        width: 4,
+        color: '#FFE900'
+    }),
+    fill: new Fill({
+        color: 'rgba(0, 0, 255, 0.5)',
+    }),
+    image: new Circle({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        stroke: new Stroke({
+            width: 1,
+            color: '#000000'
+        }),
+        radius: 6,
+        fill: new Stroke({
+            width: 1,
+            color: '#FFE900'
+        }),
+    }),
+    zIndex: 100,
+});
+
+type SourceType = {
+    url: string;
+    format: string;
+    info: object;
+};
+
+
+const typeFile = [
+    { type: 'application/gpx+xml', format: new GPX() },
+    { type: 'application/geo+json', format: new GeoJSON() },
+    { type: 'application/vnd.google-earth.kml+xml', format: new KML() },
+];
+
+export function UploadLayer({ display, topic }: UploadLayerProps) {
+    const { visibleLayer, displayFeatureInfo, zoomfeature } = useFeatures(display);
+
+    const map = display.map.olMap;
+    const maxCount = display.clientSettings.max_count_file_upload;
+    const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
+
+    const [fileList, setFileList] = useState([]);
+    const [result, setResult] = useState([]);
+    const [feature, setFeature] = useState([]);
+
+    const numberOfFiles = gettext("Number of files:") + " " + fileList.length;
+
+    const addLayerMap = ({ url, format, info }: SourceType) => {
+        const customSource = new VectorSource({ url: url, format: format })
+        const customLayer = new VectorLayer({
+            source: customSource,
+        })
+        customLayer.setStyle(customStyle);
+        customLayer.set("name", info.file.uid);
+        map.addLayer(customLayer);
+        info.fileList.length <= 1 &&
+            customSource.once('change', function () {
+                if (customSource.getState() === 'ready') {
+                    map.getView().fit(customSource.getExtent(), map.getSize());
+                }
+            });
+    }
+
+    const actionControl = (value) => {
+        value.length === 0 ?
+            topic.publish("webmap/tool/identify/on") :
+            (
+                topic.publish("webmap/tool/identify/off"),
+                topic.publish("feature.unhighlight")
+            )
+    }
+
+    const CustomNode = ({ originNode, file }) => {
+        return (
+            <div>
+                <label>
+                    <Checkbox
+                        defaultChecked={true}
+                        onChange={(e) => visibleLayer(e, file)}
+                    />
+                    {originNode}
+
+                </label>
+            </div>
+
+        );
+    };
+    const props = {
+        onChange: (info) => {
+            if (info.file.status === 'done') {
+                getBase64(info.file.originFileObj, (url) => {
+                    const data = typeFile.find(e => e.type === info.file.type);
+                    addLayerMap({ info: info, url: url, format: data?.format })
+                    let newFileList = [...info.fileList];
+                    newFileList = newFileList.map((file) => {
+                        if (file.response) {
+                            file.url = file.response.url;
+                        }
+                        return file;
+                    });
+                    setFileList(newFileList);
+                    actionControl(newFileList);
+                })
+            }
+        },
+        multiple: true,
+        beforeUpload: (file, info) => {
+            const isValidType = typeFile.some(e => e.type === file.type);
+            const isMaxCount = info.length <= maxCount;
+            if (!isValidType) {
+                message.error(validTypeMesssage + ': ' + file.type);
+            }
+            if (!isMaxCount) {
+                message.error(maxCountMesssage);
+            }
+            const isLimitVolume = file.size / 1024 / 1024 < 16;
+            if (!isLimitVolume) {
+                message.error(validVolumeMessage);
+            }
+            return isValidType && isMaxCount && isLimitVolume && file.type || Upload.LIST_IGNORE;
+        },
+        maxCount: maxCount,
+        // showUploadList: false,
+        listType: "text",
+        name: "file",
+        itemRender: (originNode, file) => (
+            <CustomNode originNode={originNode} file={file} />
+        ),
+        onRemove: (file) => {
+            const layers = [];
+            map.getLayers().forEach((layer) => {
+                if (layer.get('name') !== undefined && layer.get('name') === file.uid) {
+                    layers.push(layer);
+                }
+            });
+
+            for (let i = 0; i < layers.length; i++) {
+                map.removeLayer(layers[i]);
+            }
+
+            map.getView().fit(display._extent, map.getSize());
+            setResult([])
+
+            fileList.length > 1 ? setFileList(fileList.filter((item) => item.uid !== file.uid)) : actionControl([])
+
+        },
+    };
+
+    const zoomToLayer = (uid) => {
+        map.getLayers().forEach((layer) => {
+            if (layer.get('name') === uid) {
+                const extent = layer.getSource().getExtent();
+                map.getView().fit(extent, map.getSize());
+            }
+        })
+    }
+
+    const removeItem = (uid) => {
+        setFileList(fileList.filter((item) => item.uid !== uid));
+        const layers = [];
+        map.getLayers().forEach((layer) => {
+            if (layer.get('name') !== undefined && layer.get('name') === uid) {
+                layers.push(layer);
+            }
+        });
+
+        for (let i = 0; i < layers.length; i++) {
+            map.removeLayer(layers[i]);
+        }
+
+        map.getView().fit(display._extent, map.getSize());
+        setResult([]);
+        actionControl(fileList.filter((item) => item.uid !== uid));
+    }
+
+
+    const LayerList = (e) => {
+        const { list } = e;
+
+        return (
+            <>
+                {
+                    list.map(item => {
+                        return (
+                            <div className="layer-item" key={item.uid}>
+                                <label className="layer-item-title" title={item.name}>
+                                    <Checkbox
+                                        defaultChecked={true}
+                                        onChange={(e) => visibleLayer(e, item)}
+                                    />
+                                    <span className="title">{item.name}</span>
+                                </label>
+                                <div className="custom-button">
+                                    <span title={ZoomToLayer} className="icon-symbol" onClick={() => zoomToLayer(item.uid)}>
+                                        <ZoomIn />
+                                    </span>
+                                    <span title={DeleteLayer} className="icon-symbol" onClick={() => removeItem(item.uid)}>
+                                        <DeleteForever />
+                                    </span>
+                                </div>
+                            </div >
+                        )
+                    })
+                }
+            </>
+        )
+    }
+
+    const removeItems = (items) => {
+        const nameLayer = items.map(e => e.uid)
+        map.getLayers().getArray().slice(0).forEach(function (layer) {
+            if (nameLayer.includes(layer.get('name'))) {
+                map.removeLayer(layer);
+            }
+        });
+        map.getView().fit(display._extent, map.getSize());
+        setFileList([]);
+        actionControl([]);
+        setResult([]);
+    }
+
+    const DeleteItems = (fileList) => {
+        const { list } = fileList;
+        return (
+            <Button
+                type="primary"
+                ghost={true}
+                icon={<DeleteForever />}
+                size="small"
+                onClick={() => removeItems(list)}
+                block
+            >
+                {allDeleteItems}
+            </Button>
+        )
+    };
+
+    
+    map.on('click', (e) => {
+        if (e.dragging) return;
+        const items = fileList.map(e => e.uid)
+
+        map.getLayers().forEach(layer => {
+            if (items.includes(layer.get('name'))) {
+                layer.getSource().forEachFeature((e) => {
+                    e.setStyle(customStyle)
+                })
+            }
+        })
+        setFeature(displayFeatureInfo(e.pixel));
+    });
+
+    return (
+        <>
+            <Dragger {...props}>
+                {areaUpload}
+            </Dragger>
+            {
+                feature.map((item, index) => {
+                    const data = item.getProperties();
+                    const res = Object.fromEntries(
+                        Object.entries(data).filter(([, v]) => v !== null && v !== undefined)
+                    )
+                    const properties = Object.fromEntries(Object.entries(res).filter(([key]) => !key.includes('geometry')));
+
+                    return (
+                        <div key={index} title={ZoomToObject}>
+                            {/* {aa.length > 0 && */}
+                                <Card
+                                    size="small"
+                                    onClick={() => zoomfeature(item)}
+                                >
+                                    <div className="feature-info-block">
+                                        {
+                                            Object.keys(properties).length > 0 ?
+                                                Object.keys(properties).map((keyName, i) => {
+                                                    return (
+                                                        <div key={i} className="feature-info">
+                                                            <div className="title-info" title={keyName}>{keyName}</div>
+                                                            <div className="value-info" title={properties[keyName]}>{properties[keyName]}</div>
+                                                        </div>
+                                                    )
+                                                }) :
+                                                <div className="title-info" >{noAttribute}</div>
+                                        }
+                                    </div>
+                                </Card>
+                                {/* } */}
+                        </div>
+                    )
+                })
+            }
+        </>
+    )
+};
