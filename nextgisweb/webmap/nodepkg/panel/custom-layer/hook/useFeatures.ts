@@ -1,13 +1,12 @@
 import type { DojoDisplay } from "../type";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import Feature from "ol/Feature";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import GPX from "ol/format/GPX";
 import KML from "ol/format/KML";
 import GeoJSON from "ol/format/GeoJSON";
-
 
 import { Circle, Fill, Stroke, Style } from "ol/style";
 type SourceType = {
@@ -15,7 +14,6 @@ type SourceType = {
     format: string;
     info: object;
 };
-
 
 const customStyle = new Style({
     stroke: new Stroke({
@@ -66,11 +64,14 @@ const clickStyle = new Style({
     zIndex: 100,
 });
 
+const typeFile = [
+    { type: 'application/gpx+xml', format: new GPX() },
+    { type: 'application/geo+json', format: new GeoJSON() },
+    { type: 'application/vnd.google-earth.kml+xml', format: new KML() },
+];
+
 export const useFeatures = (display: DojoDisplay) => {
-
     const olmap = display.map.olMap;
-
-
     const addLayerMap = useCallback(({ url, format, info }: SourceType) => {
         const customSource = new VectorSource({ url: url, format: format })
         const customLayer = new VectorLayer({
@@ -94,10 +95,21 @@ export const useFeatures = (display: DojoDisplay) => {
         );
     })
 
+    const zoomToLayer = useCallback((value) => {
+        olmap.getLayers().forEach((layer) => {
+            const uid = layer?.get("name")?.split("__")[0]
+            if (value === uid) {
+                const extent = layer.getSource().getExtent();
+                olmap.getView().fit(extent, olmap.getSize());
+            }
+        })
+    })
+
     const displayFeatureInfo = useCallback(
         (pixel: number[]): number[] => {
             const features = [];
             olmap.forEachFeatureAtPixel(pixel, (e) => {
+                e.setStyle(clickStyle);
                 features.push(e);
             },
                 { hitTolerance: 10 },
@@ -107,40 +119,41 @@ export const useFeatures = (display: DojoDisplay) => {
                     }
                 }
             );
-
             return features;
         }
     );
 
-    // const visibleLayer = useCallback((e, item) => {
-    //     olmap.getLayers().getArray().forEach(layer => {
-    //         if (layer.get("name") === item.uid) {
-    //             e.target.checked ? layer.setVisible(true) : layer.setVisible(false);
-    //         }
-    //     });
-    // });
 
-    const visibleLayer = useCallback((value) => {
-
+    const visibleLayer = useCallback((e, value) => {
         olmap.getLayers().getArray().forEach(layer => {
             const uid = layer.get("name")?.split("__")[0]
             const pref = layer.get("name")?.split("__")[1]
-            if (pref === "upload-layer") {
-                if (value.includes(uid)) {
-                    layer.setVisible(true)
-                } else {
-                    layer.setVisible(false)
-                }
+            if (pref === "upload-layer" && uid === value) {
+                e.target.checked ? layer.setVisible(true) : layer.setVisible(false);
             }
-
         });
     });
 
+    const setCustomStyle = useCallback((value, status) => {
+        if (status) {
+            setCustomStyle()
+            value.setStyle(clickStyle);
+        } else {
+            olmap.getLayers().forEach(layer => {
+                const pref = layer.get("name")?.split("__")[1]
+                if (pref === "upload-layer" || layer.get("name") === "drawing-layer") {
+                    layer.getSource().forEachFeature((e) => {
+                        e.setStyle(customStyle)
+                    })
+                }
+            })
+        }
+    })
 
     const removeItem = (value) => {
 
         olmap.getLayers().forEach((layer) => {
-            const uid = layer.get("name")?.split("__")[0]
+            const uid = layer?.get("name")?.split("__")[0]
             if (value === uid) {
                 olmap.removeLayer(layer);
             }
@@ -150,5 +163,5 @@ export const useFeatures = (display: DojoDisplay) => {
 
     }
 
-    return { olmap, visibleLayer, removeItem, displayFeatureInfo, zoomfeature, addLayerMap };
+    return { displayFeatureInfo, olmap, removeItem, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap };
 };
