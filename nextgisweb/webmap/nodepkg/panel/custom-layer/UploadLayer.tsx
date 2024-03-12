@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
     Button, Card,
-    Checkbox, Tree,
+    Checkbox,
     Col, Empty, message, Row, Upload
 } from "@nextgisweb/gui/antd";
 
@@ -25,7 +25,7 @@ import Feature from "ol/Feature";
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 
 import type { DojoDisplay, DojoTopic } from "../type";
-import type { GetProp, UploadFile, UploadProps, TreeProps } from "@nextgisweb/gui/antd";
+import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -64,21 +64,24 @@ const typeFile = [
 ];
 
 export function UploadLayer({ display, topic }: UploadLayerProps) {
-    const { visibleLayer, displayFeatureInfo, zoomfeature } = useFeatures(display);
+    const { olmap, addLayerMap, visibleLayer, removeItem, displayFeatureInfo, zoomfeature } = useFeatures(display);
 
-    const olmap = display.map.olMap;
     const maxCount = display.clientSettings.max_count_file_upload;
     const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [defaultKey, setDefaultKey] = useState<string[]>([]);
+    const [features, setFeatures] = useState<string[]>([]);
 
     const props = {
         onChange: (info) => {
             if (info.file.status === 'done') {
                 getBase64(info.file.originFileObj, (url) => {
-                    setFileList(info.fileList.map(x => ({ ...x, url: url, title: x.name, key: x.uid, checked: true })));
+                    const data = typeFile.find(e => e.type === info.file.type);
+
+                    setFileList(info.fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
                     setDefaultKey(info.fileList.map(x => x.uid))
+                    addLayerMap({ info: info, url: url, format: data?.format })
                 })
             }
         },
@@ -104,74 +107,53 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
         name: "file",
         onRemove: (file) => {
             setFileList(fileList.filter((item) => item.uid !== file.uid));
+            removeItem(file.uid)
         }
     };
+    useEffect(() => {
+        olmap.on('click', (e) => {
+            if (e.dragging) return;
+            setFeatures(displayFeatureInfo(e.pixel));
+        });
+    }, [])
 
-    olmap.on('click', (e) => {
-        if (e.dragging) return;
-        // console.log(e.pixel);
-    });
-
-    const removeItem = (nodeData, uid) => {
-        console.log(nodeData, uid, fileList);
-        
-        // setFileList(l => l.filter(item => item.uid !== uid));
-    }
-
-    const onCheck: TreeProps["onCheck"] = (val) => {
-        setDefaultKey(val)
+    const onChange: GetProp<typeof Checkbox.Group, 'onChange'> = (checkedValues) => {
+        setDefaultKey([...checkedValues]);
+        visibleLayer(checkedValues)
     };
-
-    const titleRender = (nodeData) => {
-        // console.log(nodeData);
-
-        const { title, uid } = nodeData;
-        const deleteLayer = (
-            <div
-                className="custom-button"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <span title={ZoomToLayer} className="icon-symbol"
-                // onClick={() => zoomToLayer(item.uid)}
-                >
-                    <ZoomIn />
-                </span>
-                <span title={DeleteLayer} className="icon-symbol"
-                    onClick={() => removeItem(nodeData, uid)}
-                >
-                    <DeleteForever />
-                </span>
-            </div>
-        );
-
-        return (
-
-            <Row wrap={false}>
-                <Col flex="auto" className="tree-item-title">
-                    {title}
-                </Col>
-                <Col flex="none" className="tree-item-title">
-                    {deleteLayer}
-                </Col>
-            </Row>
-        );
-    };
-
     return (
         <>
             <Dragger {...props}>
                 {areaUpload}
             </Dragger>
-            <Tree
-                titleRender={titleRender}
-                className="upload-layers"
-                checkable
-                selectable={false}
-                onCheck={onCheck}
-                treeData={fileList}
-                blockNode
-                checkedKeys={defaultKey}
-            />
+            <Checkbox.Group options={fileList} value={defaultKey} onChange={onChange} />
+            {
+                features.map((item, index) => {
+                    const data = item.getProperties();
+                    const res = Object.fromEntries(
+                        Object.entries(data).filter(([, v]) => v !== null && v !== undefined)
+                    )
+                    const properties = Object.fromEntries(Object.entries(res).filter(([key]) => !key.includes('geometry')));
+
+                    return (
+                        <div className="feature-info-block"
+                            onClick={() => zoomfeature(item)} key={index} title={ZoomToObject}>
+                            {
+                                Object.keys(properties).length > 0 ?
+                                    Object.keys(properties).map((keyName, i) => {
+                                        return (
+                                            <div key={i} className="feature-info">
+                                                <div className="title-info" title={keyName}>{keyName}</div>
+                                                <div className="value-info" title={properties[keyName]}>{properties[keyName]}</div>
+                                            </div>
+                                        )
+                                    }) :
+                                    <div className="title-info" >{noAttribute}</div>
+                            }
+                        </div>
+                    )
+                })
+            }
         </>
     )
 };

@@ -1,63 +1,62 @@
-.upload-layers.ant-tree {
+.item-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    .ant-tree-switcher-noop {
-        display: none;
+.custom-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    cursor: pointer;
+}
+
+.icon-symbol {
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+
+    &:hover {
+        color: #106a90;
+        background: #ffffff00;
+    }
+}
+
+.feature-info-block {
+    cursor: pointer;
+    margin: 0 10px 5px 10px;
+    padding: 5px;
+    border: 0.005em solid #efefef;
+    border-radius: 2px;
+
+    &:hover {
+        background-color: #00000005;
+        border-radius: 2px;
     }
 
-    .ant-tree-checkbox {
-        top: initial;
-        margin-inline-end: 10px;
-        align-self: center;
-        margin-top: 0;
-        margin-inline-start: 5px;
-    }
-
-    .ant-tree-node-content-wrapper {
+    .feature-info {
+        white-space: nowrap;
         display: flex;
-        column-gap: 6px;
-        align-items: start;
-        padding-left: 0;
-        width: 100%;
-        min-width: 0;
-        line-height: 28px;
+        align-items: center;
+        justify-content: space-between;
+        height: 24px;
+        border-bottom: 0.005em solid #00000020;
+        font-size: 13px;
 
-        &:hover {
-            background: #ffffff00;
+        .title-info {
+            margin: 0 10px 0 0;
         }
-        
-        .ant-tree-title {
-            width: 100%;
-            min-width: 0;
 
-            .tree-item-title {
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .custom-button {
-                display: flex;
-                flex-direction: row;
-                justify-content: end;
-                cursor: pointer;
-            }
-
-            .icon-symbol {
-                font-size: 18px;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                justify-items: center;
-                justify-content: center;
-                align-items: center;
-                flex: 0 0 auto;
-
-                &:hover {
-                    color: #106a90;
-                    background: #ffffff00;
-                }
-            }
+        .value-info {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 }
