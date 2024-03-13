@@ -9,14 +9,14 @@ from .model import NogeomConnection, NogeomLayer
 
 class NogeomConnectionWidget(Widget):
     resource = NogeomConnection
-    operation = ('create', 'update')
-    amdmod = 'ngw-nogeom/ConnectionWidget'
+    operation = ("create", "update")
+    amdmod = "ngw-nogeom/ConnectionWidget"
 
 
 class NogeomLayerWidget(Widget):
     resource = NogeomLayer
-    operation = ('create', 'update')
-    amdmod = 'ngw-nogeom/LayerWidget'
+    operation = ("create", "update")
+    amdmod = "ngw-nogeom/LayerWidget"
 
 
 def setup_pyramid(comp, config):
@@ -24,37 +24,42 @@ def setup_pyramid(comp, config):
         "nogeom.diagnostics_page",
         r"/resource/{id:uint}/nogeom-diagnostics",
         factory=resource_factory
-    ) \
-        .add_view(diagnostics_page, context=NogeomConnection) \
-        .add_view(diagnostics_page, context=NogeomLayer)
+    ).add_view(diagnostics_page, context=NogeomConnection).add_view(
+        diagnostics_page, context=NogeomLayer
+    )
 
     class NogeomMenu(DynItem):
         def build(self, args):
-            if isinstance(args.obj, (NogeomConnection, NogeomLayer)):
+            if (
+                isinstance(args.obj, (NogeomConnection, NogeomLayer))
+                and args.request.user.keyname != "guest"
+            ):
                 yield Link(
-                    'extra/nogeom-diagnostics', _("Diagnostics"),
+                    "extra/nogeom-diagnostics",
+                    _("Diagnostics"),
                     lambda args: args.request.route_url(
-                        'nogeom.diagnostics_page', id=args.obj.id),
-                    icon="material-flaky")
+                        "nogeom.diagnostics_page", id=args.obj.id
+                    ),
+                    icon="material-flaky"
+                )
 
     Resource.__dynmenu__.add(NogeomMenu())
 
 
-@viewargs(renderer='react')
+@viewargs(renderer="react")
 def diagnostics_page(context, request):
     if isinstance(context, NogeomConnection):
         request.resource_permission(ConnectionScope.connect)
         data = dict(connection=dict(id=context.id))
     elif isinstance(context, NogeomLayer):
         request.resource_permission(DataScope.read)
-        data = dict(
-            connection=dict(id=context.connection.id),
-            layer=dict(id=context.id))
+        data = dict(connection=dict(id=context.connection.id), layer=dict(id=context.id))
     else:
         raise ValueError
 
     return dict(
-        entrypoint='@nextgisweb/nogeom/diagnostics-widget',
-        props=dict(data=data), title=_("NoGEOM diagnostics"),
+        entrypoint="@nextgisweb/nogeom/diagnostics-widget",
+        props=dict(data=data),
+        title=_("NoGEOM diagnostics"),
         obj=request.context,
     )

@@ -10,14 +10,14 @@ class NogeomComponent(Component):
         super().initialize()
         self._engine = dict()
 
-    @require('feature_layer')
+    @require("feature_layer")
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import api, view
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
     option_annotations = (
-        Option('connect_timeout', timedelta, default=timedelta(seconds=15)),
-        Option('statement_timeout', timedelta, default=timedelta(seconds=15)),
+        Option("connect_timeout", timedelta, default=timedelta(seconds=15)),
+        Option("statement_timeout", timedelta, default=timedelta(seconds=15)),
     )

@@ -38,13 +38,12 @@ _FIELD_TYPE_2_DB = {
 
 
 class StatusEnum(Enum):
-    SUCCESS = 'success'
-    WARNING = 'warning'
-    ERROR = 'error'
+    SUCCESS = "success"
+    WARNING = "warning"
+    ERROR = "error"
 
     def __lt__(self, other):
-        return (self == SUCCESS and other != SUCCESS) \
-            or (self == WARNING and other == ERROR)
+        return (self == SUCCESS and other != SUCCESS) or (self == WARNING and other == ERROR)
 
 
 SUCCESS = StatusEnum.SUCCESS
@@ -76,8 +75,8 @@ class Check:
         if message:
             m = dict()
             if status:
-                m['status'] = status
-            m['text'] = message
+                m["status"] = status
+            m["text"] = message
             self.messages.append(m)
 
     def success(self, message=None):
@@ -109,7 +108,7 @@ class Check:
 
 
 class ConnectionCheck(Check):
-    group = 'connection'
+    group = "connection"
 
     def __init__(self, *, hostname, port, database, username, password):
         super().__init__()
@@ -121,11 +120,15 @@ class ConnectionCheck(Check):
 
 
 class LayerCheck(Check):
-    group = 'layer'
+    group = "layer"
 
     def __init__(
-        self, *,
-        schema, table, column_id=None, fields=None
+        self,
+        *,
+        schema,
+        table,
+        column_id=None,
+        fields=None,
     ):
         super().__init__()
         self.schema = schema
@@ -150,17 +153,21 @@ class PostgresCheck(ConnectionCheck):
         try:
             gethostbyname(self.hostname)
         except gaierror as exc:
-            self.error(_("Host name resolution failed: {}.").format(
-                exc.strerror.lower()))
+            self.error(_("Host name resolution failed: {}.").format(exc.strerror.lower()))
             return
 
         url = EngineURL.create(
-            'postgresql+psycopg2',
-            host=self.hostname, port=self.port, database=self.database,
-            username=self.username, password=self.password)
+            "postgresql+psycopg2",
+            host=self.hostname,
+            port=self.port,
+            database=self.database,
+            username=self.username,
+            password=self.password,
+        )
 
-        engine = create_engine(url, client_encoding='utf-8', poolclass=NullPool, connect_args=dict(
-            connect_timeout=5))
+        engine = create_engine(
+            url, client_encoding="utf-8", poolclass=NullPool, connect_args=dict(connect_timeout=5)
+        )
         try:
             conn = self._conn = engine.connect()
         except OperationalError:
@@ -171,13 +178,13 @@ class PostgresCheck(ConnectionCheck):
         self.success(_("Connected to the database."))
 
         conn.execute(sql.text("SELECT 1"))
-        self.success(_("Executed {} query.").format('SELECT 1'))
+        self.success(_("Executed {} query.").format("SELECT 1"))
 
-        ver = conn.execute(sql.text("SHOW server_version")).scalar().split(' ')[0]
+        ver = conn.execute(sql.text("SHOW server_version")).scalar().split(" ")[0]
         self.success(_("PostgreSQL version {}.").format(ver))
 
     def cleanup(self):
-        if conn := getattr(self, '_conn', None):
+        if conn := getattr(self, "_conn", None):
             conn.close()
         super().cleanup()
 
@@ -186,29 +193,32 @@ class TableNotExists(Exception):
 
 
 class TableInspector:
-
     def __init__(self, conn, schema, table):
         i = inspect(conn)
         if not i.has_table(table, schema):
             raise TableNotExists()
 
+        # fmt: off
         self.table_type = conn.execute(sql.text("""
             SELECT table_type FROM information_schema.tables
             WHERE table_schema = :schema AND table_name = :table
         """), dict(schema=schema, table=table)).scalar()
-        self.columns = {c['name']: c for c in i.get_columns(table, schema)}
+        # fmt: on
+
+        self.columns = {c["name"]: c for c in i.get_columns(table, schema)}
         self.pk_constraint = i.get_pk_constraint(table, schema)
         self.indexes = i.get_indexes(table, schema)
 
     def is_column_primary_key(self, column):
-        ccols = self.pk_constraint['constrained_columns']
+        ccols = self.pk_constraint["constrained_columns"]
         return len(ccols) == 1 and ccols[0] == column
 
     def has_unique_index_on(self, column):
         for idx in self.indexes:
             if (
-                idx['unique'] and len(idx['column_names']) == 1
-                and idx['column_names'][0] == column
+                idx["unique"]
+                and len(idx["column_names"]) == 1
+                and idx["column_names"][0] == column
             ):
                 return True
         return False
@@ -225,16 +235,21 @@ class TableCheck(LayerCheck):
             return
         self.success(_("Table found, table type is {}.").format(tins.table_type))
 
-        for (priv, req) in (
-            ('SELECT', True),
-            ('INSERT', False),
-            ('UPDATE', False),
-            ('DELETE', False),
+        sql_has_privilege = """
+            SELECT has_table_privilege(
+                quote_ident(:schema) || '.' || quote_ident(:table), :privilege)
+        """
+
+        for priv, req in (
+            ("SELECT", True),
+            ("INSERT", False),
+            ("UPDATE", False),
+            ("DELETE", False),
         ):
-            has_privilege = conn.execute(sql.text("""
-                SELECT has_table_privilege(
-                    quote_ident(:schema) || '.' || quote_ident(:table), :privilege)
-            """), dict(schema=self.schema, table=self.table, privilege=priv)).scalar()
+            has_privilege = conn.execute(
+                sql.text(sql_has_privilege),
+                dict(schema=self.schema, table=self.table, privilege=priv),
+            ).scalar()
             if has_privilege:
                 self.success(_("{} privilege is present.").format(priv))
             elif not req:
@@ -242,7 +257,7 @@ class TableCheck(LayerCheck):
             else:
                 self.error(_("{} privilege is absent.").format(priv))
 
-        count = conn.execute(select(func.count('*')).select_from(self.sa_table)).scalar()
+        count = conn.execute(select(func.count("*")).select_from(self.sa_table)).scalar()
         self.say(_("Number of records: {}.").format(count))
 
         if self.column_id is None:
@@ -261,13 +276,13 @@ class IdColumnCheck(LayerCheck):
             self.error(_("Column not found."))
             return
 
-        ctype_repr = coltype_as_str(cinfo['type'])
-        if not isinstance(cinfo['type'], Integer):
+        ctype_repr = coltype_as_str(cinfo["type"])
+        if not isinstance(cinfo["type"], Integer):
             self.error(_("Column found, but has non-integer type - {}.").format(ctype_repr))
 
         self.success(_("Column found, type is {}.").format(ctype_repr))
 
-        is_table = tins.table_type == 'BASE TABLE'
+        is_table = tins.table_type == "BASE TABLE"
 
         if is_table and tins.is_column_primary_key(self.column_id):
             self.success(_("Column is the primary key."))
@@ -275,7 +290,7 @@ class IdColumnCheck(LayerCheck):
             if is_table:
                 self.say(_("Column is not the primary key."))
 
-            nullable = cinfo['nullable']
+            nullable = cinfo["nullable"]
             has_unique_index = is_table and tins.has_unique_index_on(self.column_id)
 
             column_id = sql.column(self.column_id)
@@ -300,13 +315,16 @@ class IdColumnCheck(LayerCheck):
                     self.success(_("Unique index found."))
 
             if not has_unique_index:
-                fcount = func.count('*')
-                expr = select(column_id, fcount) \
-                    .select_from(self.sa_table) \
-                    .group_by(column_id) \
-                    .having(fcount > 1) \
-                    .limit(1) \
-                    .exists().select()
+                fcount = func.count("*")
+                expr = (
+                    select(column_id, fcount)
+                    .select_from(self.sa_table)
+                    .group_by(column_id)
+                    .having(fcount > 1)
+                    .limit(1)
+                    .exists()
+                    .select()
+                )
                 not_unique = conn.execute(expr).scalar()
 
                 if not_unique:
@@ -315,8 +333,8 @@ class IdColumnCheck(LayerCheck):
                     self.success(_("All values are unique."))
 
         if is_table:
-            ai = cinfo['autoincrement']
-            if (isinstance(ai, bool) and ai) or (ai == 'auto'):
+            ai = cinfo["autoincrement"]
+            if (isinstance(ai, bool) and ai) or (ai == "auto"):
                 self.success(_("Column is auto-incrementable."))
             else:
                 self.warning(_("Column isn't auto-incrementable."))
@@ -332,22 +350,23 @@ class ColumnsCheck(LayerCheck):
                 self.error(_("Column of field '{}' not found.").format(field.keyname))
                 return
 
-            ctype = cinfo['type']
-            ctype_repr = coltype_as_str(ctype).upper().replace(',', ', ')
+            ctype = cinfo["type"]
+            ctype_repr = coltype_as_str(ctype).upper().replace(",", ", ")
 
             type_expected = _FIELD_TYPE_2_DB[field.datatype]
             if not isinstance(ctype, type_expected):
-                self.error(_(
-                    "Column of field '{}' found, but has an incompatible type - {}."
-                ).format(field.keyname, ctype_repr))
+                self.error(
+                    _("Column of field '{}' found, but has an incompatible type - {}.").format(
+                        field.keyname, ctype_repr
+                    )
+                )
             else:
-                self.success(_(
-                    "Column of field '{}' found, type is {}."
-                ).format(field.keyname, ctype_repr))
+                self.success(
+                    _("Column of field '{}' found, type is {}.").format(field.keyname, ctype_repr)
+                )
 
 
 class Checker:
-
     def __init__(self, *, connection, layer=None) -> None:
         self.status = None
         self.checks = checks = list()
@@ -360,7 +379,7 @@ class Checker:
             elif issubclass(cls, LayerCheck):
                 if layer is None:
                     continue
-                if issubclass(cls, ColumnsCheck) and 'fields' not in layer:
+                if issubclass(cls, ColumnsCheck) and "fields" not in layer:
                     continue
                 ck = cls(**layer)
             else:
@@ -393,9 +412,7 @@ class Checker:
                         deps.update(ck.injects)
                         deps[type(ck)] = ck
 
-                    if ck.status is not None and (
-                        self.status is None or self.status < ck.status
-                    ):
+                    if ck.status is not None and (self.status is None or self.status < ck.status):
                         self.status = ck.status
         finally:
             for ck in cleanup:
