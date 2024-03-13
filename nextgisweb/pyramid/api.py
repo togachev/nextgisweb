@@ -1,24 +1,10 @@
-import base64
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    Type,
-    TypedDict,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
-from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from typing_extensions import Annotated
 
@@ -28,9 +14,8 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, 
 from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core import CoreComponent, KindOfData
-from nextgisweb.core.exception import ValidationError
-from nextgisweb.file_upload import FileUpload, FileUploadRef
-from nextgisweb.pyramid import JSONType
+from nextgisweb.core.exception import NotConfigured, ValidationError
+from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
@@ -121,10 +106,14 @@ def cors_tween_factory(handler, registry):
                 hadd(response, "Access-Control-Allow-Methods", method)
                 hadd(response, "Access-Control-Allow-Credentials", "true")
 
-                # Add allowed Authorization header for HTTP authentication
-                # from JavaScript. It is a good idea?
+                # Authorization + CORS-safeist headers are allowed
 
-                hadd(response, "Access-Control-Allow-Headers", "Authorization, Range")
+                hadd(
+                    response,
+                    "Access-Control-Allow-Headers",
+                    "Authorization, Accept, Accept-Language, "
+                    "Content-Language, Content-Type, Range",
+                )
 
                 return response
 
@@ -140,52 +129,6 @@ def cors_tween_factory(handler, registry):
         return handler(request)
 
     return cors_tween
-
-
-class SystemNameSettings(TypedDict):
-    full_name: Optional[str]
-
-
-def system_name_get(request) -> AsJSON[SystemNameSettings]:
-    """Read system name settings"""
-    try:
-        value = env.core.settings_get("core", "system.full_name")
-    except KeyError:
-        value = None
-    return SystemNameSettings(full_name=value)
-
-
-def system_name_put(request, body: SystemNameSettings) -> JSONType:
-    """Update system name settings"""
-    request.require_administrator()
-
-    if value := body["full_name"]:
-        env.core.settings_set("core", "system.full_name", value)
-    else:
-        env.core.settings_delete("core", "system.full_name")
-
-
-class HomePathSettings(TypedDict):
-    home_path: Optional[str]
-
-
-def home_path_get(request) -> AsJSON[HomePathSettings]:
-    """Read home path settings"""
-    try:
-        value = env.core.settings_get("pyramid", "home_path")
-    except KeyError:
-        value = None
-    return HomePathSettings(home_path=value)
-
-
-def home_path_put(request, body: HomePathSettings) -> JSONType:
-    """Update home path settings"""
-    request.require_administrator()
-
-    if value := body["home_path"]:
-        env.core.settings_set("pyramid", "home_path", value)
-    else:
-        env.core.settings_delete("pyramid", "home_path")
 
 
 SettingsComponentGap = Gap[
@@ -246,14 +189,19 @@ def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
     return result
 
 
-def require_storage_enabled(request):
-    if not request.env.core.options["storage.enabled"]:
-        raise HTTPNotFound()
+class StorageNotConfigured(NotConfigured):
+    message = _("Storage management is not enabled on this server.")
+
+
+@inject()
+def require_storage_enabled(*, core: CoreComponent):
+    if not core.options["storage.enabled"]:
+        raise StorageNotConfigured
 
 
 def storage_estimate(request) -> EmptyObject:
     request.require_administrator()
-    require_storage_enabled(request)
+    require_storage_enabled()
     request.env.core.start_estimation()
 
 
@@ -264,7 +212,7 @@ class StorageStatusResponse(Struct, kw_only=True):
 @inject()
 def storage_status(request, *, core: CoreComponent) -> StorageStatusResponse:
     request.require_administrator()
-    require_storage_enabled(request)
+    require_storage_enabled()
     return StorageStatusResponse(estimation_running=core.estimation_running())
 
 
@@ -277,46 +225,13 @@ class StorageResponseValue(Struct, kw_only=True):
 @inject()
 def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponseValue]]:
     request.require_administrator()
-    require_storage_enabled(request)
+    require_storage_enabled()
     return {kod: StorageResponseValue(**data) for kod, data in core.query_storage().items()}
 
 
 def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     request.require_administrator()
     return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
-
-
-def logo_get(request):
-    try:
-        logodata = request.env.core.settings_get("pyramid", "logo")
-    except KeyError:
-        raise HTTPNotFound()
-
-    bindata = base64.b64decode(logodata)
-    response = Response(bindata, content_type="image/png")
-
-    if "ckey" in request.GET and request.GET["ckey"] == request.env.core.settings_get(
-        "pyramid", "logo.ckey"
-    ):
-        response.cache_control.public = True
-        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
-
-    return response
-
-
-def logo_put(request):
-    request.require_administrator()
-
-    if value := request.json_body:
-        fupload = FileUpload(id=value["id"])
-        data = base64.b64encode(fupload.data_path.read_bytes())
-        request.env.core.settings_set("pyramid", "logo", data.decode("utf-8"))
-    else:
-        request.env.core.settings_delete("pyramid", "logo")
-
-    request.env.core.settings_set("pyramid", "logo.ckey", gensecret(8))
-
-    return Response()
 
 
 # Component settings machinery
@@ -333,18 +248,18 @@ class csetting:
     stype: SType
     default: SValue
     skey: Tuple[str, str]
-    ckey: bool
+    ckey: Union[bool, Tuple[str, str]]
 
     registry: ClassVar[Dict[str, Dict[str, "csetting"]]] = dict()
 
     def __init__(
         self,
         name: str,
-        type: Union[Type, Tuple[Type, Type]],
+        type: Union[Any, Tuple[Any, Any]],
         *,
         default: Any = None,
         skey: Optional[Tuple[str, str]] = None,
-        ckey: Optional[bool] = None,
+        ckey: Optional[Union[bool, Tuple[str, str]]] = None,
         register: bool = True,
         stacklevel: int = 0,
     ):
@@ -361,7 +276,7 @@ class csetting:
             raise ValueError("skey already defined")
 
         if not getattr(self, "ckey", None):
-            self.ckey = bool(ckey)
+            self.ckey = ckey if ckey is not None else False
         elif ckey is not None:
             raise ValueError("ckey already defined")
 
@@ -403,9 +318,10 @@ class csetting:
         else:
             core.settings_set(*self.skey, to_builtins(value))
 
-        if self.ckey:
-            skey = (self.skey[0], self.skey[1] + ".ckey")
-            core.settings_set(*skey, gensecret(8))
+        if cskey := self.ckey:
+            if cskey is True:
+                cskey = (self.skey[0], self.skey[1] + ".ckey")
+            core.settings_set(*cskey, gensecret(8))
 
 
 def setup_pyramid_csettings(comp, config):
@@ -599,6 +515,8 @@ class MetricsSettings(Struct):
     yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
 
 
+csetting("full_name", Optional[str], skey=("core", "system.full_name"))
+csetting("home_path", Optional[str])
 csetting("metrics", MetricsSettings, default={})
 
 
@@ -608,13 +526,6 @@ def setup_pyramid(comp, config):
     config.add_tween(
         "nextgisweb.pyramid.api.cors_tween_factory",
         under=("nextgisweb.pyramid.exception.handled_exception_tween_factory", "INGRESS"),
-    )
-
-    config.add_route(
-        "pyramid.system_name",
-        "/api/component/pyramid/system_name",
-        get=system_name_get,
-        put=system_name_put,
     )
 
     comps = comp.env.components.values()
@@ -675,13 +586,6 @@ def setup_pyramid(comp, config):
         get=kind_of_data,
     )
 
-    config.add_route(
-        "pyramid.logo",
-        "/api/component/pyramid/logo",
-        get=logo_get,
-        put=logo_put,
-    )
-
     # Methods for customization in components
     comp.company_logo_enabled = lambda request: True
     comp.company_logo_view = None
@@ -729,10 +633,3 @@ def setup_pyramid(comp, config):
     comp.preview_link_view = preview_link_view
 
     # TODO: Add PUT method for changing custom_css setting and GUI
-
-    config.add_route(
-        "pyramid.home_path",
-        "/api/component/pyramid/home_path",
-        get=home_path_get,
-        put=home_path_put,
-    )

@@ -28,7 +28,6 @@
     <dt>${tr(_("Owner"))}</dt>
     <dd>${obj.owner_user}</dd>
 
-
     %if len(group):
         <dt>${tr(_("Web map group"))}</dt>
         <dd>${', '.join(group)}</dd>

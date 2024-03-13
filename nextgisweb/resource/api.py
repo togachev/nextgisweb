@@ -1,23 +1,25 @@
-from typing import Dict, List, Literal, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union
 
 import zope.event
-from msgspec import Struct
+from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
+from typing_extensions import Annotated
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
-from nextgisweb.lib.apitype import EmptyObject
+from nextgisweb.lib.apitype import EmptyObject, annotate
 
 from nextgisweb.auth import User
-from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.auth.api import UserID
+from nextgisweb.core.exception import InsufficientPermissions, ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.api import csetting
+from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
-from .exception import QuotaExceeded, ResourceError, ValidationError
+from .exception import HierarchyError, QuotaExceeded
 from .model import Resource, ResourceSerializer, ResourceWebMapGroup, WebMapGroupResource
 from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
@@ -126,7 +128,7 @@ def item_delete(context, request) -> EmptyObject:
         DBSession.delete(obj)
 
     if context.id == 0:
-        raise ResourceError(_("Root resource could not be deleted."))
+        raise HierarchyError(message=_("Root resource could not be deleted."))
 
     with DBSession.no_autoflush:
         delete(context)
@@ -210,36 +212,60 @@ def collection_post(request) -> JSONType:
     return result
 
 
-def permission(resource, request) -> JSONType:
+if TYPE_CHECKING:
+    scope_permissions_struct: Mapping[str, Any] = dict()
+
+    class PermissionResponse(Struct, kw_only=True):
+        pass
+
+else:
+    scope_permissions_struct = dict()
+    for sid, scope in Scope.registry.items():
+        struct = defstruct(
+            f"{scope.__name__}Permissions",
+            [
+                (
+                    perm.name,
+                    annotate(bool, [Meta(description=f"{scope.label}: {perm.label}")]),
+                )
+                for perm in scope.values(ordered=True)
+            ],
+            module=scope.__module__,
+        )
+        struct = annotate(struct, [Meta(description=str(scope.label))])
+        scope_permissions_struct[sid] = struct
+
+    PermissionResponse = defstruct(
+        "PermissionResponse",
+        [
+            ((sid, struct) if sid == "resource" else (sid, Union[(struct, UnsetType)], UNSET))
+            for sid, struct in scope_permissions_struct.items()
+        ],
+    )
+
+
+def permission(
+    resource,
+    request,
+    *,
+    user: Optional[UserID] = None,
+) -> PermissionResponse:
+    """Get resource effective permissions"""
     request.resource_permission(PERM_READ)
 
-    # In some cases it is convenient to pass empty string instead of
-    # user's identifier, that's why it so tangled.
-
-    user = request.params.get("user", "")
-    user = None if user == "" else user
-
-    if user is not None:
-        # To see permissions for arbitrary user additional permissions are needed
+    user_obj = User.filter_by(id=user).one() if (user is not None) else request.user
+    if user_obj.id != request.user.id:
         request.resource_permission(PERM_CPERM)
-        user = User.filter_by(id=user).one()
 
-    else:
-        # If it is not set otherwise, use current user
-        user = request.user
-
-    effective = resource.permissions(user)
-
-    result = dict()
-    for k, scope in resource.scope.items():
-        sres = dict()
-
-        for perm in scope.values(ordered=True):
-            sres[perm.name] = perm in effective
-
-        result[k] = sres
-
-    return result
+    effective = resource.permissions(user_obj)
+    return PermissionResponse(
+        **{
+            sid: scope_permissions_struct[sid](
+                **{p.name: (p in effective) for p in scope.values()},
+            )
+            for sid, scope in resource.scope.items()
+        }
+    )
 
 
 def permission_explain(request) -> JSONType:
@@ -416,17 +442,28 @@ def search(request) -> JSONType:
     return result
 
 
-def resource_volume(resource, request) -> JSONType:
-    ids = []
+class ResourceVolumeResponse(Struct, kw_only=True):
+    volume: Annotated[int, Meta(ge=0, description="Resource volume in bytes")]
 
-    def _collect_ids(res):
+
+def resource_volume(
+    resource,
+    request,
+    *,
+    recursive: Annotated[bool, Meta(description="Include children resources")] = True,
+) -> ResourceVolumeResponse:
+    """Get resource data volume"""
+    require_storage_enabled()
+
+    def _traverse(res):
         request.resource_permission(ResourceScope.read, res)
-        ids.append(res.id)
-        for child in res.children:
-            _collect_ids(child)
+        yield res.id
+        if recursive:
+            for child in res.children:
+                yield from _traverse(child)
 
     try:
-        _collect_ids(resource)
+        ids = list(_traverse(resource))
     except InsufficientPermissions:
         volume = 0
     else:
@@ -434,7 +471,7 @@ def resource_volume(resource, request) -> JSONType:
         volume = res.get("", dict()).get("data_volume", 0)
         volume = volume if volume is not None else 0
 
-    return dict(volume=volume)
+    return ResourceVolumeResponse(volume=volume)
 
 
 def quota_check(request) -> JSONType:
@@ -450,7 +487,7 @@ def quota_check(request) -> JSONType:
 
 csetting(
     "resource_export",
-    Union[Literal["data_read"], Literal["data_write"], Literal["administrators"]],
+    Literal["data_read", "data_write", "administrators"],
     default="data_read",
 )
 
@@ -502,7 +539,7 @@ def wmgroup_delete(request) -> JSONType:
             raise ExternalDatabaseError(message="ОШИБКА:  UPDATE или DELETE в таблице 'resource_wmg' нарушает ограничение внешнего ключа 'webmap_group_id_fkey' таблицы 'resource' DETAIL:  На ключ (id)=(%s) всё ещё есть ссылки в таблице 'resource'." % wmg_id, sa_error=exc)
 
     if wmg_id == 0:
-        raise ResourceError(_("Root resource could not be deleted."))
+        raise HierarchyError(_("Root resource could not be deleted."))
 
     with DBSession.no_autoflush:
         delete(wmg_id)
@@ -521,13 +558,13 @@ def wmgroup_update(request) -> JSONType:
                 resource_wmg.webmap_group_name = wmg_value
                 resource_wmg.action_map = eval(action_map_value.lower().capitalize())
             else:
-                raise ResourceError("Имя корневой группы с идентификатором %s изменять запрещено." % wmg_id)
+                raise HierarchyError("Имя корневой группы с идентификатором %s изменять запрещено." % wmg_id)
         with DBSession.no_autoflush:
             update(wmg_id, wmg_value, action_map_value)
         DBSession.flush()
         return dict(webmap_group_name=wmg_value, action_map=action_map_value)
     else:
-        raise ResourceError("Введено некорректное имя группы")
+        raise HierarchyError("Введено некорректное имя группы")
 
 def wmgroup_create(request) -> JSONType:
     request.require_administrator()

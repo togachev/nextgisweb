@@ -51,7 +51,7 @@ class PyramidComponent(Component):
 
     @require("resource")
     def setup_pyramid(self, config):
-        from . import api, view
+        from . import api, lunkwill, view
         from . import uacompat as uac
 
         view.setup_pyramid(self, config)
@@ -94,11 +94,10 @@ class PyramidComponent(Component):
                 raise RuntimeError("Lunkwill requires uWSGI stack loaded")
             if not lunkwill_rpc:
                 raise RuntimeError("Lunkwill RPC missing in uWSGI stack")
-            from . import lunkwill
-
-            lunkwill.setup_pyramid(self, config)
         else:
             logger.debug("Lunkwill extension disabled")
+
+        lunkwill.setup_pyramid(self, config)
 
         if rt_not_set and (ev := self.options["request_timeout"]):
             logger.debug("Request timeout %s detected from uWSGI", str(ev))
@@ -251,6 +250,7 @@ class PyramidComponent(Component):
         Option("lunkwill.enabled", bool, default=None),
         Option("lunkwill.host", str, default=None),
         Option("lunkwill.port", int, default=None),
+        Option("lunkwill.secret", str, secure=True, default=None),
 
         Option("compression.algorithms", list, default=['br', 'gzip']),
     )) + uacompat.option_annotations

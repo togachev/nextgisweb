@@ -59,9 +59,11 @@ Supported types:
 
 - Primitives:
       - Basic types: ``str``, ``int``, ``bool``, ``float``
-      - ``enum.Enum`` and ``typing.Literal`` both with string values only
-- Arrays of primitive types:
-      - ``typing.List``
+      - ``enum.Enum`` with string values only
+      - ``typing.Literal`` with string and integer values
+- Arrays and lists of primitive types:
+      - ``typing.List`` for variable-length uniform arrays
+      - ``typing.Tuple`` for fixed-length and non-uniform lists
 - Objects:
       - ``msgspec.Struct`` with primitive values
       - ``typing.Dict`` with primitive keys and values

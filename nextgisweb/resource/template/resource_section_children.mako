@@ -27,7 +27,7 @@
         idata = dict(
             id=item.id, displayName=item.display_name, link=request.route_url('resource.show', id=item.id),
             cls=item.cls, clsDisplayName=tr(item.cls_display_name), creationDate=item.creation_date,
-            ownerUserDisplayName=item.owner_user.display_name, 
+            ownerUserDisplayName=tr(item.owner_user.display_name_i18n), 
             column_key=column_key, update_link_const=update_link_const,
             display_name_const=display_name_const)
         

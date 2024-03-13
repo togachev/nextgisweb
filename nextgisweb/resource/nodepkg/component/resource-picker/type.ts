@@ -52,6 +52,7 @@ export interface ResourcePickerTitleProps {
 export interface ResourcePickerStoreOptions {
     multiple?: boolean;
     parentId?: number;
+    saveLastParentIdGlobal?: boolean;
     selected?: number[];
     requireClass?: ResourceClass | null;
     getThisMsg?: string;
@@ -88,6 +89,7 @@ export interface ResourcePickerModalProps<V extends SelectValue = SelectValue>
     visible?: boolean;
     store?: ResourcePickerStore;
     onSelect?: (val: V) => void;
+    onPick?: (val: ResourceItem | ResourceItem[]) => void;
     closeOnSelect?: boolean;
     pickerOptions?: ResourcePickerStoreOptions;
 }
