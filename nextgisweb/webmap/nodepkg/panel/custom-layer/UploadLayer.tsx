@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { Checkbox, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
+import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 
 import "./UploadLayer.less";
 
@@ -12,9 +12,10 @@ import { useFeatures } from "./hook/useFeatures";
 
 import type { DojoDisplay, DojoTopic } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
-import type { Feature, Features} from "ol/Feature";
+import type { Feature, Features } from "ol/Feature";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+
 type FeatureContext = {
     name: string;
     value: any;
@@ -24,23 +25,19 @@ type UploadLayerProps = {
     topic: DojoTopic;
 }
 
-
 const { Dragger } = Upload;
 const { Text } = Typography;
 
-const getBase64 = (file: FileType, callback): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result));
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-    });
+const getBase64 = (file: FileType, callback: (url: string) => void) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result as string));
+    reader.readAsDataURL(file);
+};
 
 const validTypeMesssage = gettext("This file type is not supported");
 const validVolumeMessage = gettext("Exceeding the volume of 16mb");
 const areaUpload = gettext("Click or drag file to this area to upload layer");
-// const allDeleteItems = gettext("Delete all layers");
+const allDeleteItems = gettext("Delete all layers");
 const DeleteLayer = gettext("Delete Layer");
 const supportLayer = gettext("Supported layers for import: GPX, GeoJSON, KML");
 const ZoomToLayer = gettext("Zoom to layer");
@@ -48,20 +45,22 @@ const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
 
 export function UploadLayer({ display, topic }: UploadLayerProps) {
-    const { displayFeatureInfo, olmap, removeItem, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
+    const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
     const maxCount = display.clientSettings.max_count_file_upload;
     const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
+    const [uploadkey, setUploadkey] = useState(Date.now())
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [features, setFeatures] = useState<string[]>([]);
 
-    const props = {
+    const numberOfFiles = gettext("Number of files downloaded/maximum:") + " " + fileList.length + "/" + maxCount;
+
+    const props: UploadProps = {
         onChange: (info) => {
             if (info.file.status === 'done') {
                 getBase64(info.file.originFileObj, (url) => {
                     const data = typeFile.find(e => e.type === info.file.type);
-
                     setFileList(info.fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
                     addLayerMap({ info: info, url: url, format: data?.format })
                 })
@@ -129,7 +128,7 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
         visibleLayer(e, uid)
     };
 
-    const FeatureList = ({ features }: Features) => (
+    const LayerList = ({ features }: Features) => (
         <div className="feature-info-block">
             {
                 features.map((feature: Feature, index: number) => {
@@ -176,15 +175,41 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
         </div>
     )
 
+    const DeleteItems = () => {
+        return (
+            <div title={allDeleteItems} className="custom-button icon-symbol"
+                onClick={() => {
+                    setUploadkey(Date.now());
+                    removeItems();
+                    setFileList([]);
+                }}
+            >
+                <DeleteForever />
+            </div>
+        )
+    };
+
     return (
-        <>
-            <Dragger {...props}>
-                <Space direction="vertical">
-                    <Text>{areaUpload}</Text>
-                    <Text type="secondary">{supportLayer}</Text>
-                </Space>
-            </Dragger>
-            <FeatureList features={features} />
-        </>
+        <div className="upload-tab-panel">
+            <div className="info-file">
+                <Text>{numberOfFiles}</Text>
+                {fileList.length > 1 && (<DeleteItems />)}
+            </div>
+            <div key={uploadkey}>
+                <Dragger {...props}>
+                    <Space direction="vertical">
+                        <Text>{areaUpload}</Text>
+                    </Space>
+                </Dragger>
+            </div>
+            {
+                fileList.length > 0 ?
+                    (
+                        <LayerList features={features} />
+                    ) : (
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={supportLayer} />
+                    )
+            }
+        </div>
     )
 };

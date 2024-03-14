@@ -52,6 +52,14 @@ msgstr "Поиск"
 msgid "CustomLayer"
 msgstr "Пользовательские слои"
 
+#: amd/ngw-webmap/Display.js:990 nodepkg/panel/custom-layer/CustomLayer.tsx:19
+msgid "Loading"
+msgstr "Загрузка"
+
+#: amd/ngw-webmap/Display.js:990 nodepkg/panel/custom-layer/CustomLayer.tsx:19
+msgid "Creation"
+msgstr "Создание"
+
 #: amd/ngw-webmap/Display.js:1000
 msgid "Print map"
 msgstr "Распечатать карту"
@@ -172,7 +180,7 @@ msgstr "Редактировать"
 msgid "Style settings"
 msgstr "Настройки стиля"
 
-#: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24 nodepkg/panel/custom-layer/CustomLayer.tsx:25
+#: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24 nodepkg/panel/custom-layer/UploadLayer.tsx:25
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
@@ -768,37 +776,37 @@ msgstr "Копировать код"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:16
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:16
 msgid "This file type is not supported"
 msgstr "Этот тип файла не поддерживается"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:18
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:18
 msgid "Exceeding the volume of 16mb"
 msgstr "Превышение объема 16мб"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:19
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:19
 msgid "Click or drag file to this area to upload layer"
 msgstr "Нажмите или перетащите файл в эту область, чтобы загрузить слой"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:20
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:20
 msgid "Delete all layers"
 msgstr "Удалить все слои"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:21
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:21
 msgid "Delete Layer"
 msgstr "Удалить слой"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:22
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:22
 msgid "Supported layers for import: GPX, GeoJSON, KML"
 msgstr "Поддерживаемые слои для импорта: GPX, GeoJSON, KML"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:82
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:82
 msgid "Maximum number of uploaded files:"
 msgstr "Максимальное количество загружаемых файлов:"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:87
-msgid "Number of files:"
-msgstr "Количество файлов:"
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:87
+msgid "Number of files downloaded/maximum:"
+msgstr "Количество файлов загружено/максимум:"
 
 #: nodepkg/settings-widget/SettingsWidget.js:26
 msgid "Enable layers editing"
@@ -1084,10 +1092,10 @@ msgstr "Открыть"
 msgid "Group setting"
 msgstr "Настройка группы"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:23
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:23
 msgid "Zoom to object"
 msgstr "Увеличить до объекта"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:24
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:24
 msgid "No attribute information available"
 msgstr "Атрибутивная информация отсутсвует"

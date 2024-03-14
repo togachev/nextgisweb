@@ -9,8 +9,6 @@ import { UploadLayer } from "./UploadLayer";
 // import { DrawFeature } from "./DrawFeature";
 import type { DojoDisplay, DojoTopic } from "../type";
 
-
-
 interface CustomLayerProps {
     display: DojoDisplay;
     topic: DojoTopic;
@@ -18,21 +16,22 @@ interface CustomLayerProps {
 }
 
 const title = gettext("CustomLayer")
-
+const loading = gettext("Loading")
+const creation = gettext("Creation")
 
 export function CustomLayer({ display, close, topic }: CustomLayerProps) {
     
     const items = [
         {
             key: '1',
-            label: 'Загрузка',
+            label: loading,
             children:
                 <UploadLayer display={display} topic={topic} />,
             icon: <UploadIcon />,
         },
         {
             key: '2',
-            label: 'Создание',
+            label: creation,
             children: <Select
                 showSearch
                 style={{
@@ -71,7 +70,6 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
                 defaultActiveKey="1"
                 type="card"
             />
-
         </div>
     );
 };

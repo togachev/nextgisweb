@@ -1,4 +1,3 @@
-import type { DojoDisplay } from "../type";
 import Feature from "ol/Feature";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
@@ -9,12 +8,22 @@ import GeoJSON from "ol/format/GeoJSON";
 
 import { Circle, Fill, Stroke, Style } from "ol/style";
 
+import type { DojoDisplay } from "../type";
+
+interface FileUpload {
+    uid: string;
+}
+
+interface InfoUpload {
+    file: FileUpload;
+    fileList: FileUpload[];
+}
+
 type SourceType = {
     url: string;
     format: string;
-    info: object;
+    info: InfoUpload;
 };
-
 
 const customStyle = new Style({
     stroke: new Stroke({
@@ -70,9 +79,6 @@ const typeFile = [
     { type: 'application/geo+json', format: new GeoJSON() },
     { type: 'application/vnd.google-earth.kml+xml', format: new KML() },
 ];
-
-
-
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
@@ -158,9 +164,22 @@ export const useFeatures = (display: DojoDisplay) => {
                 olmap.removeLayer(layer);
             }
         });
-
         olmap.getView().fit(display._extent, olmap.getSize());
     }
 
-    return { displayFeatureInfo, olmap, removeItem, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap };
+    const removeItems = () => {
+        const layers = [...olmap.getLayers().getArray()];
+        layers.forEach(layer => {
+            const pref = layer.get("name")?.split("__")[1]
+            if (
+                pref === "upload-layer"
+                // || layer.get("name") === "drawing-layer"
+            ) {
+                olmap.removeLayer(layer);
+            }
+        });
+        olmap.getView().fit(display._extent, olmap.getSize());
+    };
+
+    return { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap };
 };
