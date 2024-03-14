@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { Checkbox, message, Upload } from "@nextgisweb/gui/antd";
+import { Checkbox, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 
 import "./UploadLayer.less";
 
@@ -12,10 +12,21 @@ import { useFeatures } from "./hook/useFeatures";
 
 import type { DojoDisplay, DojoTopic } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
+import type { Feature, Features} from "ol/Feature";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+type FeatureContext = {
+    name: string;
+    value: any;
+}
+type UploadLayerProps = {
+    display: DojoDisplay;
+    topic: DojoTopic;
+}
+
 
 const { Dragger } = Upload;
+const { Text } = Typography;
 
 const getBase64 = (file: FileType, callback): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -29,17 +40,12 @@ const getBase64 = (file: FileType, callback): Promise<string> =>
 const validTypeMesssage = gettext("This file type is not supported");
 const validVolumeMessage = gettext("Exceeding the volume of 16mb");
 const areaUpload = gettext("Click or drag file to this area to upload layer");
-const allDeleteItems = gettext("Delete all layers");
+// const allDeleteItems = gettext("Delete all layers");
 const DeleteLayer = gettext("Delete Layer");
 const supportLayer = gettext("Supported layers for import: GPX, GeoJSON, KML");
 const ZoomToLayer = gettext("Zoom to layer");
 const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
-
-interface UploadLayerProps {
-    display: DojoDisplay;
-    topic: DojoTopic;
-}
 
 export function UploadLayer({ display, topic }: UploadLayerProps) {
     const { displayFeatureInfo, olmap, removeItem, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
@@ -86,7 +92,6 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
                 </div>
             )
         },
-
         multiple: true,
         beforeUpload: (file, info) => {
             const isValidType = typeFile.some(e => e.type === file.type);
@@ -115,7 +120,7 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
     useEffect(() => {
         olmap.on('click', (e) => {
             if (e.dragging) return;
-            setCustomStyle();
+            setCustomStyle(null, false);
             setFeatures(displayFeatureInfo(e.pixel));
         });
     }, [])
@@ -123,43 +128,63 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
     const onChange: GetProp<typeof Checkbox, 'onChange'> = (e, uid) => {
         visibleLayer(e, uid)
     };
+
+    const FeatureList = ({ features }: Features) => (
+        <div className="feature-info-block">
+            {
+                features.map((feature: Feature, index: number) => {
+                    const data = feature.getProperties();
+                    const res = Object.fromEntries(
+                        Object.entries(data).filter(([key, value]) =>
+                            value !== null && value !== undefined && value !== '' && key !== 'geometry'
+                        )
+                    )
+
+                    const values: FeatureContext[] = [];
+
+                    Object.keys(res).map(key => {
+                        if (res[key] !== null && res[key] !== '') {
+                            values.push({ name: key, value: res[key] })
+                        }
+                    })
+
+                    return (
+                        <div
+                            className="feature-item"
+                            onClick={() => {
+                                zoomfeature(feature);
+                                setCustomStyle(feature, true);
+                            }}
+                            key={index}
+                            title={ZoomToObject}
+                        >
+                            {
+                                Object.keys(res).length > 0 ?
+                                    values.map((i, idx) => {
+                                        return (
+                                            <div key={idx} className="feature-info">
+                                                <div className="title-info" title={i.name}>{i.name}</div>
+                                                <div className="value-info" title={i.value}>{i.value}</div>
+                                            </div>
+                                        )
+                                    }) : <div className="title-info" >{noAttribute}</div>
+                            }
+                        </div>
+                    )
+                })
+            }
+        </div>
+    )
+
     return (
         <>
             <Dragger {...props}>
-                {areaUpload}
+                <Space direction="vertical">
+                    <Text>{areaUpload}</Text>
+                    <Text type="secondary">{supportLayer}</Text>
+                </Space>
             </Dragger>
-            <div className="feature-info-block">
-                {
-                    features.map((item, index) => {
-                        const data = item.getProperties();
-                        const res = Object.fromEntries(
-                            Object.entries(data).filter(([, v]) => v !== null && v !== undefined)
-                        )
-                        const properties = Object.fromEntries(Object.entries(res).filter(([key]) => !key.includes('geometry')));
-
-                        return (
-                            <div className="feature-item"
-                                onClick={() => {
-                                    zoomfeature(item);
-                                    setCustomStyle(item, true);
-                                }} key={index} title={ZoomToObject}>
-                                {
-                                    Object.keys(properties).length > 0 ?
-                                        Object.keys(properties).map((keyName, i) => {
-                                            return (
-                                                <div key={i} className="feature-info">
-                                                    <div className="title-info" title={keyName}>{keyName}</div>
-                                                    <div className="value-info" title={properties[keyName]}>{properties[keyName]}</div>
-                                                </div>
-                                            )
-                                        }) :
-                                        <div className="title-info" >{noAttribute}</div>
-                                }
-                            </div>
-                        )
-                    })
-                }
-            </div>
+            <FeatureList features={features} />
         </>
     )
 };

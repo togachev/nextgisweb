@@ -210,7 +210,8 @@ export const LayersTree = observer(
                 <>
                     <Row wrap={false}>
                         <Col flex="auto" className="tree-item-title">
-                            <div className="legend-title">{legendAction}{title}</div>
+                        {legendAction}
+                            <div className="legend-title">{title}</div>
                         </Col>
                         {actions}
                     </Row>
