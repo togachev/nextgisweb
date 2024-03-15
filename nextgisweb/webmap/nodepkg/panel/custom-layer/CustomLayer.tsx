@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Select, Tabs, Button, Dropdown, Space } from "@nextgisweb/gui/antd";
+import { useCallback, useMemo, useState } from "react";
+import { Tabs, Button, Dropdown, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import UploadIcon from "@nextgisweb/icon/material/upload/outline";
 import Draw from "@nextgisweb/icon/material/draw/outline";
-import CropFreeIcon from "@nextgisweb/icon/material/crop_free/outline";
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
 import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
-import DrawIcon from "@nextgisweb/icon/material/draw/outline";
-import SaveIcon from "@nextgisweb/icon/material/save/outline";
 
 import type { DrawEvent } from "ol/interaction/Draw";
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -31,7 +28,6 @@ const loading = gettext("Loading")
 const creation = gettext("Creation")
 const create = gettext("Create")
 const save = gettext("Save")
-const selectGeometryType = gettext("Select geometry type")
 
 type DrawFeatureMode = "default" | "draw";
 
@@ -39,31 +35,25 @@ const geomTypeDefault = "line"
 
 const geomTypesInfo = [
     {
-        label: gettext("Line"),
-        titleSave: gettext("line layer"),
+        label: (<div className="label-type"><span className="label">{gettext("line layer")}</span><span className="icon"><LineIcon /></span></div>),
         key: "line",
         geomType: "LineString",
-        icon: <LineIcon />,
     },
     {
-        label: gettext("Polygon"),
-        titleSave: gettext("polygon layer"),
+        label: (<div className="label-type"><span className="label">{gettext("polygon layer")}</span><span className="icon"><PolyIcon /></span></div>),
         key: "poly",
         geomType: "Polygon",
-        icon: <PolyIcon />,
     },
     {
-        label: gettext("Point"),
-        titleSave: gettext("point layer"),
+        label: (<div className="label-type"><span className="label">{gettext("point layer")}</span><span className="icon"><CircleIcon /></span></div>),
         key: "point",
         geomType: "Point",
-        icon: <CircleIcon />,
     },
 ];
 
-const geomTypesOptions = geomTypesInfo.map(({ icon, key, label }) => {
+const geomTypesOptions = geomTypesInfo.map(({ key, label }) => {
     if (key !== geomTypeDefault) {
-        return { icon, key, label };
+        return { key, label };
     }
 });
 
@@ -106,7 +96,7 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
     const geomTypeFilterIcon = (geomType, value) => {
         const type = geomTypesInfo.filter(item => item.key === geomType)
         const status = value === "save" ? save : create
-        return <><div>{status + " "}{type[0].titleSave}</div>{type[0].icon}</>;
+        return <div className="button-operation"><div className="status-operation">{status}</div>{type[0].label}</div>;
     }
 
     const buildDrawSection = () => {
