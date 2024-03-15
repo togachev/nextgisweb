@@ -8,6 +8,7 @@ import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
 import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
 import DrawIcon from "@nextgisweb/icon/material/draw/outline";
+import SaveIcon from "@nextgisweb/icon/material/save/outline";
 
 import type { DrawEvent } from "ol/interaction/Draw";
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -28,41 +29,43 @@ interface CustomLayerProps {
 const title = gettext("CustomLayer")
 const loading = gettext("Loading")
 const creation = gettext("Creation")
-
+const create = gettext("Create")
+const save = gettext("Save")
+const selectGeometryType = gettext("Select geometry type")
 
 type DrawFeatureMode = "default" | "draw";
 
+const geomTypeDefault = "line"
 
 const geomTypesInfo = [
     {
         label: gettext("Line"),
+        titleSave: gettext("line layer"),
         key: "line",
         geomType: "LineString",
         icon: <LineIcon />,
     },
     {
         label: gettext("Polygon"),
+        titleSave: gettext("polygon layer"),
         key: "poly",
         geomType: "Polygon",
         icon: <PolyIcon />,
     },
     {
         label: gettext("Point"),
+        titleSave: gettext("point layer"),
         key: "point",
         geomType: "Point",
         icon: <CircleIcon />,
     },
 ];
 
-const geomTypesMap = new Map();
-geomTypesInfo.forEach((i) => {
-    geomTypesMap.set(i.key, i);
-});
-
 const geomTypesOptions = geomTypesInfo.map(({ icon, key, label }) => {
-    return { icon, key, label };
+    if (key !== geomTypeDefault) {
+        return { icon, key, label };
+    }
 });
-
 
 export function CustomLayer({ display, close, topic }: CustomLayerProps) {
 
@@ -83,39 +86,38 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
         },
     };
 
-    console.log(mode, geomType);
-
     const clearGeometry = useCallback(() => {
         setDrawEnd(undefined);
         setGeomType(undefined);
     }, []);
 
+    const onDefaultType = () => {
+        setGeomType(geomTypeDefault);
+    };
+
     const buildDropdown = () => (
-        <Dropdown trigger={['click']} menu={geomTypesMenuItems}>
-            <Button size="small">
-                <Space>
-                    <CropFreeIcon />
-                </Space>
-            </Button>
-        </Dropdown>
+        <Dropdown.Button trigger={['hover']} menu={geomTypesMenuItems} onClick={onDefaultType} >
+            <Space>
+                {geomTypeFilterIcon(geomTypeDefault, "create")}
+            </Space>
+        </Dropdown.Button>
     );
+
+    const geomTypeFilterIcon = (geomType, value) => {
+        const type = geomTypesInfo.filter(item => item.key === geomType)
+        const status = value === "save" ? save : create
+        return <><div>{status + " "}{type[0].titleSave}</div>{type[0].icon}</>;
+    }
 
     const buildDrawSection = () => {
         return (
-            <Button
-                type="primary"
-                size="small"
-                danger
-                onClick={clearGeometry}
-            >
+            <Button type="primary" onClick={clearGeometry}>
                 <Space>
-                    <DrawIcon />
+                    {geomTypeFilterIcon(geomType, "save")}
                 </Space>
             </Button>
         );
     };
-
-
 
     let result;
     if (mode === "default") {
@@ -124,9 +126,6 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
     else if (mode === "draw") {
         result = buildDrawSection();
     }
-    // else if (mode === "geometry") {
-    //     result = buildGeomSection();
-    // }
 
     const items = [
         {
@@ -140,12 +139,10 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
             key: '2',
             label: creation,
             children:
-                <>{result}</>,
+                <div className="dropdown-button-draw">{result}</div>,
             icon: <Draw />,
         },
     ];
-    
-
 
     return (
         <div className="ngw-webmap-custom-layer-panel">

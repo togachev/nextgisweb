@@ -54,7 +54,7 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [features, setFeatures] = useState<string[]>([]);
 
-    const numberOfFiles = gettext("Number of files downloaded/maximum:") + " " + fileList.length + "/" + maxCount;
+    const numberOfFiles = gettext("Number of files maximum/downloaded:") + " " + maxCount + "/" + fileList.length;
 
     const props: UploadProps = {
         onChange: (info) => {
@@ -192,7 +192,12 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
     return (
         <div className="upload-tab-panel">
             <div className="info-file">
-                <Text>{numberOfFiles}</Text>
+                <Text
+                    style={true ? { width: 350 } : undefined}
+                    ellipsis={true ? { tooltip: numberOfFiles } : false}
+                >
+                    {numberOfFiles}
+                </Text>
                 {fileList.length > 1 && (<DeleteItems />)}
             </div>
             <div key={uploadkey}>
