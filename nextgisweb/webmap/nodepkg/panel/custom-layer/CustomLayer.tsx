@@ -31,36 +31,58 @@ const save = gettext("Save")
 
 type DrawFeatureMode = "default" | "draw";
 
-const geomTypeDefault = "line"
+const typeComponentIcon = [
+    { key: "line", component: <LineIcon /> },
+    { key: "polygon", component: <PolyIcon /> },
+    { key: "point", component: <CircleIcon /> }
+]
+
+const iconTypeGeom = (value) => {
+    const comp = typeComponentIcon.filter(item => item.key === value);
+    return comp[0].component
+}
+
+const labelTypeGeom = (value) => {
+    return (
+        <div className="label-type">
+            <span className="label">{gettext(`${value} layer`)}</span>
+            <span className="icon">
+                {iconTypeGeom(value)}
+            </span>
+        </div>
+    )
+}
 
 const geomTypesInfo = [
     {
-        label: (<div className="label-type"><span className="label">{gettext("line layer")}</span><span className="icon"><LineIcon /></span></div>),
+        label: labelTypeGeom("line"),
         key: "line",
         geomType: "LineString",
     },
     {
-        label: (<div className="label-type"><span className="label">{gettext("polygon layer")}</span><span className="icon"><PolyIcon /></span></div>),
-        key: "poly",
+        label: labelTypeGeom("polygon"),
+        key: "polygon",
         geomType: "Polygon",
     },
     {
-        label: (<div className="label-type"><span className="label">{gettext("point layer")}</span><span className="icon"><CircleIcon /></span></div>),
+        label: labelTypeGeom("point"),
         key: "point",
         geomType: "Point",
     },
 ];
 
-const geomTypesOptions = geomTypesInfo.map(({ key, label }) => {
-    if (key !== geomTypeDefault) {
-        return { key, label };
-    }
-});
 
 export function CustomLayer({ display, close, topic }: CustomLayerProps) {
 
     const [geomType, setGeomType] = useState<string>();
+    const [geomTypeDefault, setGeomTypeDefault] = useState<string>("line");
     const [drawEnd, setDrawEnd] = useState<DrawEvent>();
+
+    const geomTypesOptions = geomTypesInfo.map(({ key, label }) => {
+        if (key !== geomTypeDefault) {
+            return { key, label };
+        }
+    });
 
     const mode = useMemo<DrawFeatureMode>(() => {
         if (drawEnd) {
@@ -72,6 +94,7 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
     const geomTypesMenuItems: MenuProps = {
         items: geomTypesOptions,
         onClick: (item) => {
+            setGeomTypeDefault(item.key)
             setGeomType(item.key);
         },
     };
