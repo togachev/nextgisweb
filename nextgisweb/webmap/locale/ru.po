@@ -178,6 +178,14 @@ msgstr "Настройки стиля"
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
+msgid "Edit layer"
+msgstr "Редактировать слой"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
+msgid "Save layer"
+msgstr "Сохранить слой"
+
 #: amd/ngw-webmap/template/ExtentWidget.hbs:5
 msgid "Select vector layer"
 msgstr "Выберите векторный слой"

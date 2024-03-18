@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
+import { useCallback, useMemo, useState } from "react";
+import { Button, Checkbox, Dropdown, Input, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
 import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
+import SaveIcon from "@nextgisweb/icon/material/save/outline";
 
 import { useDraw } from "./hook/useDraw";
 
@@ -23,7 +26,10 @@ interface DrawFeaturesProps {
 
 const create = gettext("Create")
 const save = gettext("Save")
-
+const DeleteLayer = gettext("Delete Layer");
+const ZoomToLayer = gettext("Zoom to layer");
+const EditLayer = gettext("Edit layer");
+const SaveLayer = gettext("Save Layer");
 
 type DrawFeatureMode = "default" | "draw";
 
@@ -70,12 +76,12 @@ const geomTypesInfo = [
 export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
     const { addLayerMap, drawInteractionClear, drawInteraction, olmap } = useDraw(display);
 
-
     const [geomType, setGeomType] = useState<string>();
     const [geomTypeDefault, setGeomTypeDefault] = useState<string>("line");
     const [drawEnd, setDrawEnd] = useState<DrawEvent>();
 
     const [drawLayer, setDrawLayer] = useState([]);
+    const [layerName, setLayerName] = useState<string>('');
 
     const geomTypesOptions = geomTypesInfo.map(({ key, label }) => {
         if (key !== geomTypeDefault) {
@@ -95,11 +101,26 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
         return geomType ? "draw" : "default";
     }, [drawEnd, geomType]);
 
+    const addLayer = () => {
+        addLayerMap()
+        olmap.getLayers().forEach((layer, index) => {
+            const name = layer?.get("name")
+            if (name === 'drawing-layer') {
+                setDrawLayer([
+                    ...drawLayer,
+                    { key: layer.ol_uid, label: layerName ? layerName : "Пользовательский слой " + index, layer: layer }
+                ])
+                setLayerName(null)
+            }
+        });
+    }
+
     const geomTypesMenuItems: MenuProps = {
         items: geomTypesOptions,
         onClick: (item) => {
             setGeomTypeDefault(item.key)
             setGeomType(item.key);
+            addLayer();
         },
     };
 
@@ -110,6 +131,7 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
 
     const onDefaultType = () => {
         setGeomType(geomTypeDefault);
+        addLayer();
     };
 
     const buildDropdown = () => (
@@ -149,39 +171,59 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
         result = buildDrawSection();
     }
 
-    useEffect(() => {
-        console.log(drawLayer);
-        
-    }, [drawLayer])
-    
+    const onChangeName = (e) => {
+        setLayerName(e.target.value)
+    };
+
     return (
         <div className="dropdown-button-draw">
-            <Button type="primary" onClick={() => {
-                addLayerMap()
-                olmap.getLayers().forEach((layer) => {
-                    const name = layer?.get("name")
-                    if (name === 'drawing-layer') {
-                        setDrawLayer([
-                            ...drawLayer,
-                            layer
-                        ])
-                    }
-                });
-
-            }}>
-                add layer
-            </Button>
+            <div style={{ margin: '5px' }}>
+                <div className="dropdown-button">{result}</div>
+                <Input
+                    value={layerName}
+                    className="layer-name-input"
+                    placeholder="Введите название слоя"
+                    onChange={onChangeName} />
+            </div>
             {
                 drawLayer.map((item, index) => {
-
-                     return (
-                        <div key={index} style={{display: 'flex', justifyContent: 'space-between'}}>
-                            <div>Пользовательский слой {index}</div><div><EditIcon /></div>
+                    return (
+                        <div key={item.key} className="layer-item">
+                            <div className="checkbox-item">
+                                <Checkbox
+                                    defaultChecked={true}
+                                    onChange={(e) => {
+                                        console.log(e);
+                                    }}>
+                                    {item.label}
+                                </Checkbox>
+                            </div>
+                            <div className="custom-button">
+                                <span title={SaveLayer} className="icon-symbol" onClick={() => {
+                                    console.log(SaveLayer)
+                                }}>
+                                    <SaveIcon />
+                                </span>
+                                <span title={ZoomToLayer} className="icon-symbol" onClick={() => {
+                                    console.log(ZoomToLayer)
+                                }}>
+                                    <ZoomIn />
+                                </span>
+                                <span title={DeleteLayer} className="icon-symbol" onClick={() => {
+                                    console.log(DeleteLayer);
+                                }}>
+                                    <DeleteForever />
+                                </span>
+                                <span title={EditLayer} className="icon-symbol" onClick={() => {
+                                    console.log(item.layer);
+                                }}>
+                                    <EditIcon />
+                                </span>
+                            </div>
                         </div>
-                     )
+                    )
                 })
             }
-            {/* {result} */}
         </div>
     )
 }
