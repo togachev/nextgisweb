@@ -8,7 +8,7 @@ import GeoJSON from "ol/format/GeoJSON";
 
 import { Circle, Fill, Stroke, Style } from "ol/style";
 
-import type { DojoDisplay } from "../type";
+import type { DojoDisplay } from "../../type";
 
 interface FileUpload {
     uid: string;

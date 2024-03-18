@@ -193,8 +193,7 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
         <div className="upload-tab-panel">
             <div className="info-file">
                 <Text
-                    style={true ? { width: 350 } : undefined}
-                    ellipsis={true ? { tooltip: numberOfFiles } : false}
+                    ellipsis={{ tooltip: true }}
                 >
                     {numberOfFiles}
                 </Text>
