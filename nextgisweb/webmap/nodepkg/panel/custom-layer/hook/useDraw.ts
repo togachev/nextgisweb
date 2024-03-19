@@ -35,7 +35,6 @@ const style = new Style({
 export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
     const [featureCount, setFeatureCount] = useState([]);
-    const [layerKeyDraw, setLayerKeyDraw] = useState();
 
     const addLayerMap = useCallback(() => {
         const source = new VectorSource({ wrapX: false });
@@ -58,22 +57,17 @@ export const useDraw = (display: DojoDisplay) => {
             condition: (e) => noModifierKeys(e) && primaryAction(e),
         });
         olmap.addInteraction(draw);
-        setLayerKeyDraw(item.key)
-        item.change = true
         draw.on('drawend', (e) => {
             setFeatureCount([...featureCount, item.key])
         });
     })
 
     const drawInteractionClear = (item) => {
-        const interactions = [...olmap.getInteractions().getArray()];
         olmap.getInteractions().forEach((interaction) => {
             if (interaction instanceof Draw) {
                 olmap.removeInteraction(interaction);
             }
         });
-        setLayerKeyDraw(null)
-        item.change = false
     }
 
     const visibleLayer = (e, layer) => {
@@ -90,5 +84,5 @@ export const useDraw = (display: DojoDisplay) => {
         olmap.getView().fit(display._extent, olmap.getSize());
     }
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, layerKeyDraw, olmap, removeItem, visibleLayer, zoomToLayer };
+    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, olmap, removeItem, visibleLayer, zoomToLayer };
 };

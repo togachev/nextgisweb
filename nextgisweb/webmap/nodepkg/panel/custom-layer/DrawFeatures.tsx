@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Checkbox, Dropdown, Input, message, Space, Switch, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -18,6 +18,9 @@ import type { MenuProps } from "@nextgisweb/gui/antd";
 
 import type { DojoTopic, DojoDisplay } from "../type";
 
+import { DrawStore } from "./DrawStore";
+import { observer } from "mobx-react-lite";
+
 interface DrawFeaturesProps {
     display: DojoDisplay;
     topic: DojoTopic;
@@ -30,6 +33,7 @@ const ZoomToLayer = gettext("Zoom to layer");
 const EditLayer = gettext("Edit layer");
 const SaveAs = gettext("Save as");
 const allDeleteItems = gettext("Delete all layers");
+const maxCountLayer = gettext("The limit of created layers has been exceeded")
 
 const typeComponentIcon = [
     { key: "LineString", component: <LineIcon />, label: gettext("line layer") },
@@ -76,16 +80,24 @@ const geomTypesInfo = [
     },
 ];
 
-export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
-    const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, layerKeyDraw, olmap, removeItem, visibleLayer, zoomToLayer } = useDraw(display);
+export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => {
+    const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, olmap, removeItem, visibleLayer, zoomToLayer } = useDraw(display);
     const maxCount = display.clientSettings.max_count_file_upload;
 
     const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
 
-    const [drawLayer, setDrawLayer] = useState([]);
     const [layerName, setLayerName] = useState<string>('');
 
-    const maxCountLayer = gettext("The limit of created layers has been exceeded")
+    const [store] = useState(() => new DrawStore({}));
+
+    const {
+        drawLayer,
+        setDrawLayer,
+        switchKey,
+        setSwitchKey,
+    } = store;
+
+
 
     const currentMaxLayer = gettext("Number of layers maximum/created:") + " " + maxCount + "/" + drawLayer.length
 
@@ -160,6 +172,14 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
         )
     };
 
+    useEffect(() => {
+        setDrawLayer(prevState => {
+            return prevState.map((item) => {
+                return item.key === switchKey ? {...item, change: false} : {...item, change: true}
+            })
+        })
+    }, [switchKey])
+
     return (
         <div className="dropdown-button-draw">
             <div className="info-file">
@@ -202,7 +222,7 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
                                         statusFeature ?
                                             zoomToLayer(item.layer)
                                             : undefined
-                                        console.log(layerKeyDraw, item)
+                                        console.log(switchKey, item)
                                     }}>
                                     <ZoomIn />
                                 </span>
@@ -215,20 +235,29 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
                                 <span title={EditLayer} className="icon-symbol" onClick={() => {
 
                                 }}>
-                                    {/* <EditIcon /> */}
                                     <Switch
+                                        disabled={item.change}
                                         size="small"
                                         defaultChecked={false}
                                         onChange={
                                             (checked) => {
                                                 checked ?
-                                                    (drawInteraction(item),
-                                                        topic.publish("webmap/tool/identify/off"))
+                                                    (
+                                                        drawInteraction(item),
+                                                        topic.publish("webmap/tool/identify/off"),
+                                                        setSwitchKey(item.key.toString())
+                                                    )
                                                     :
-                                                    (drawInteractionClear(item),
-                                                        topic.publish("webmap/tool/identify/on"))
+                                                    (
+                                                        drawInteractionClear(item),
+                                                        topic.publish("webmap/tool/identify/on"),
+                                                        setDrawLayer(prevState => {
+                                                            return prevState.map((item) => {
+                                                                return {...item, change: false}
+                                                            })
+                                                        })
+                                                    )
                                             }
-
                                         } />
                                 </span>
                             </div>
@@ -239,3 +268,4 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
         </div>
     )
 }
+)
