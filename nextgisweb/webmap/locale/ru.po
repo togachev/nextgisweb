@@ -48,7 +48,7 @@ msgstr "Слои"
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:1001 nodepkg/panel/custom-layer/CustomLayer.tsx:29
+#: amd/ngw-webmap/Display.js:1001 nodepkg/panel/custom-layer/CustomLayer.tsx:28
 msgid "CustomLayer"
 msgstr "Пользовательские слои"
 
@@ -92,7 +92,7 @@ msgstr "Учитывать на карте"
 #: amd/ngw-webmap/ItemWidget.js:179
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:33
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:28
 #: nodepkg/settings/SettingsForm.js:331
 msgid "Save"
 msgstr "Сохранить"
@@ -174,17 +174,10 @@ msgid "Style settings"
 msgstr "Настройки стиля"
 
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:30
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:43
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
-
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
-msgid "Edit layer"
-msgstr "Редактировать слой"
-
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
-msgid "Save layer"
-msgstr "Сохранить слой"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:5
 msgid "Select vector layer"
@@ -361,6 +354,7 @@ msgid "Create as private"
 msgstr "Создать как приватную"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:27
 msgid "Create"
 msgstr "Создать"
 
@@ -470,7 +464,6 @@ msgstr "Окружность"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:87
 #: nodepkg/panel/annotations/AnnotationsPanel.js:111
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:41
 msgid "Line"
 msgstr "Линия"
 
@@ -480,7 +473,7 @@ msgstr ""
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:100
 #: nodepkg/panel/annotations/AnnotationsPanel.js:115
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:48 nodepkg/utils/geometry-types.ts:15
+#: nodepkg/utils/geometry-types.ts:15
 msgid "Polygon"
 msgstr "Полигон"
 
@@ -553,7 +546,7 @@ msgid "Geometry type"
 msgstr "Тип геометрии"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:108
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:55 nodepkg/utils/geometry-types.ts:6
+#: nodepkg/utils/geometry-types.ts:6
 msgid "Point"
 msgstr "Точка"
 
@@ -597,30 +590,53 @@ msgstr "Мои приватные аннотации"
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:30
+#: nodepkg/panel/custom-layer/CustomLayer.tsx:29
 #: nodepkg/webmap-tabs/WebMapTabs.tsx:16
 msgid "Loading"
 msgstr "Загрузка"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:31
+#: nodepkg/panel/custom-layer/CustomLayer.tsx:30
 msgid "Creation"
 msgstr "Создание"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:32
-msgid "Select geometry type"
-msgstr "Выбрать тип геометрии"
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:29
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:41
+msgid "Delete Layer"
+msgstr "Удалить слой"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:42
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:31
+msgid "Edit layer"
+msgstr "Редактировать слой"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:32
+#: nodepkg/panel/print/PrintPanel.tsx:491
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:33
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:40
+msgid "Delete all layers"
+msgstr "Удалить все слои"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:61
 msgid "line layer"
 msgstr "линейный слой"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:49
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:66
 msgid "polygon layer"
 msgstr "полигональный слой"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:56
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:71
 msgid "point layer"
 msgstr "точечный слой"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:88
+msgid "The limit of created layers has been exceeded"
+msgstr "Превышен лимит созданных слоев"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:90
+msgid "Number of layers maximum/created:"
+msgstr "Максимальное количество слоев/созданно"
 
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:37
 msgid "This file type is not supported"
@@ -633,14 +649,6 @@ msgstr "Превышение объема 16мб"
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:39
 msgid "Click or drag file to this area to upload layer"
 msgstr "Нажмите или перетащите файл в эту область, чтобы загрузить слой"
-
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:40
-msgid "Delete all layers"
-msgstr "Удалить все слои"
-
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:41
-msgid "Delete Layer"
-msgstr "Удалить слой"
 
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:42
 msgid "Supported layers for import: GPX, GeoJSON, KML"
@@ -737,10 +745,6 @@ msgstr "Масштабная линейка"
 #: nodepkg/panel/print/PrintPanel.tsx:483
 msgid "Print"
 msgstr "Печать"
-
-#: nodepkg/panel/print/PrintPanel.tsx:491
-msgid "Save as"
-msgstr "Сохранить как"
 
 #: nodepkg/panel/print/PrintPanel.tsx:503
 msgid "Copy link to the print map"

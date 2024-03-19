@@ -48,6 +48,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     webmapStore: WebmapStore;
     mapStates: MapStatesObserver;
     _plugins: WebmapPlugin[];
+    _extent: number[];
     /**
      * @deprecated use webmapStore.getlayers() instead
      */

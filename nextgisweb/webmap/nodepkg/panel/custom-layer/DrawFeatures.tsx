@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Button, Checkbox, Dropdown, Input, Space } from "@nextgisweb/gui/antd";
+import { Button, Checkbox, Dropdown, Input, message, Space, Switch, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
@@ -8,13 +8,12 @@ import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
-import SaveIcon from "@nextgisweb/icon/material/save/outline";
+import SaveAsIcon from "@nextgisweb/icon/material/save_as/outline";
 
 import { useDraw } from "./hook/useDraw";
-
+const { Text } = Typography;
 import "./DrawFeatures.less";
 
-import type { DrawEvent } from "ol/interaction/Draw";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 
 import type { DojoTopic, DojoDisplay } from "../type";
@@ -29,14 +28,13 @@ const save = gettext("Save")
 const DeleteLayer = gettext("Delete Layer");
 const ZoomToLayer = gettext("Zoom to layer");
 const EditLayer = gettext("Edit layer");
-const SaveLayer = gettext("Save Layer");
-
-type DrawFeatureMode = "default" | "draw";
+const SaveAs = gettext("Save as");
+const allDeleteItems = gettext("Delete all layers");
 
 const typeComponentIcon = [
-    { key: "line", component: <LineIcon /> },
-    { key: "polygon", component: <PolyIcon /> },
-    { key: "point", component: <CircleIcon /> }
+    { key: "LineString", component: <LineIcon />, label: gettext("line layer") },
+    { key: "Polygon", component: <PolyIcon />, label: gettext("polygon layer") },
+    { key: "Point", component: <CircleIcon />, label: gettext("point layer") }
 ]
 
 const iconTypeGeom = (value) => {
@@ -44,12 +42,17 @@ const iconTypeGeom = (value) => {
     return component
 }
 
-const labelTypeGeom = (value) => {
+const labelLayer = (value) => {
+    const label = typeComponentIcon.filter(item => item.key === value)[0].label;
+    return label
+}
+
+const labelTypeGeom = (value, key) => {
     return (
         <div className="label-type">
-            <span className="label">{gettext(`${value} layer`)}</span>
+            <span className="label">{value}</span>
             <span className="icon">
-                {iconTypeGeom(value)}
+                {iconTypeGeom(key)}
             </span>
         </div>
     )
@@ -57,31 +60,34 @@ const labelTypeGeom = (value) => {
 
 const geomTypesInfo = [
     {
-        label: labelTypeGeom("line"),
-        key: "line",
+        label: labelTypeGeom(gettext("line layer"), "LineString"),
+        key: "LineString",
         geomType: "LineString",
     },
     {
-        label: labelTypeGeom("polygon"),
-        key: "polygon",
+        label: labelTypeGeom(gettext("polygon layer"), "Polygon"),
+        key: "Polygon",
         geomType: "Polygon",
     },
     {
-        label: labelTypeGeom("point"),
-        key: "point",
+        label: labelTypeGeom(gettext("point layer"), "Point"),
+        key: "Point",
         geomType: "Point",
     },
 ];
 
 export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
-    const { addLayerMap, drawInteractionClear, drawInteraction, olmap } = useDraw(display);
+    const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, layerKeyDraw, olmap, removeItem, visibleLayer, zoomToLayer } = useDraw(display);
+    const maxCount = display.clientSettings.max_count_file_upload;
 
-    const [geomType, setGeomType] = useState<string>();
-    const [geomTypeDefault, setGeomTypeDefault] = useState<string>("line");
-    const [drawEnd, setDrawEnd] = useState<DrawEvent>();
+    const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
 
     const [drawLayer, setDrawLayer] = useState([]);
     const [layerName, setLayerName] = useState<string>('');
+
+    const maxCountLayer = gettext("The limit of created layers has been exceeded")
+
+    const currentMaxLayer = gettext("Number of layers maximum/created:") + " " + maxCount + "/" + drawLayer.length
 
     const geomTypesOptions = geomTypesInfo.map(({ key, label }) => {
         if (key !== geomTypeDefault) {
@@ -94,48 +100,33 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
         return geomType
     }
 
-    const mode = useMemo<DrawFeatureMode>(() => {
-        if (drawEnd) {
-            return "geometry";
+    const addLayer = (geomType) => {
+        if (drawLayer.length < maxCount) {
+            const layer = addLayerMap();
+            setDrawLayer([
+                ...drawLayer,
+                { key: layer.ol_uid, change: false, label: layerName ? layerName : labelLayer(geomType), geomType: geomType, layer: layer }
+            ])
+            setLayerName(null)
+        } else {
+            message.error(maxCountLayer);
         }
-        return geomType ? "draw" : "default";
-    }, [drawEnd, geomType]);
-
-    const addLayer = () => {
-        addLayerMap()
-        olmap.getLayers().forEach((layer, index) => {
-            const name = layer?.get("name")
-            if (name === 'drawing-layer') {
-                setDrawLayer([
-                    ...drawLayer,
-                    { key: layer.ol_uid, label: layerName ? layerName : "Пользовательский слой " + index, layer: layer }
-                ])
-                setLayerName(null)
-            }
-        });
     }
 
     const geomTypesMenuItems: MenuProps = {
         items: geomTypesOptions,
         onClick: (item) => {
             setGeomTypeDefault(item.key)
-            setGeomType(item.key);
-            addLayer();
+            addLayer(item.key);
         },
     };
 
-    const clearGeometry = useCallback(() => {
-        setDrawEnd(undefined);
-        setGeomType(undefined);
-    }, []);
-
     const onDefaultType = () => {
-        setGeomType(geomTypeDefault);
-        addLayer();
+        addLayer(currentTypeGeom(geomTypeDefault));
     };
 
-    const buildDropdown = () => (
-        <Dropdown.Button trigger={['hover']} menu={geomTypesMenuItems} onClick={onDefaultType} >
+    const DropdownType = () => (
+        <Dropdown.Button size="small" trigger={['hover']} menu={geomTypesMenuItems} onClick={onDefaultType} >
             <Space>
                 {geomTypeFilterIcon(geomTypeDefault, "create")}
             </Space>
@@ -153,71 +144,92 @@ export function DrawFeatures({ display, topic }: DrawFeaturesProps) {
         );
     }
 
-    const buildDrawSection = () => {
-        return (
-            <Button type="primary" onClick={clearGeometry}>
-                <Space>
-                    {geomTypeFilterIcon(geomType, "save")}
-                </Space>
-            </Button>
-        );
-    };
-
-    let result;
-    if (mode === "default") {
-        result = buildDropdown();
-    }
-    else if (mode === "draw") {
-        result = buildDrawSection();
-    }
-
     const onChangeName = (e) => {
         setLayerName(e.target.value)
     };
 
+    const DeleteItems = () => {
+        return (
+            <div title={allDeleteItems} className="custom-button icon-symbol"
+                onClick={() => {
+                    console.log(allDeleteItems);
+                }}
+            >
+                <DeleteForever />
+            </div>
+        )
+    };
+
     return (
         <div className="dropdown-button-draw">
+            <div className="info-file">
+                <Text
+                    title={currentMaxLayer}
+                    ellipsis={true}
+                >
+                    {currentMaxLayer}
+                </Text>
+                {drawLayer.length > 1 && (<DeleteItems />)}
+            </div>
             <div style={{ margin: '5px' }}>
-                <div className="dropdown-button">{result}</div>
-                <Input
-                    value={layerName}
-                    className="layer-name-input"
-                    placeholder="Введите название слоя"
-                    onChange={onChangeName} />
+                <div className="dropdown-button">{DropdownType()}</div>
             </div>
             {
                 drawLayer.map((item, index) => {
+                    const statusFeature = featureCount.includes(item.key)
+
                     return (
-                        <div key={item.key} className="layer-item">
+                        <div key={index} className="layer-item">
                             <div className="checkbox-item">
                                 <Checkbox
                                     defaultChecked={true}
                                     onChange={(e) => {
-                                        console.log(e);
+                                        visibleLayer(e, item.layer)
                                     }}>
-                                    {item.label}
+                                    {item.label} {index + 1}
                                 </Checkbox>
                             </div>
                             <div className="custom-button">
-                                <span title={SaveLayer} className="icon-symbol" onClick={() => {
-                                    console.log(SaveLayer)
+                                <span title={SaveAs} className="icon-symbol" onClick={() => {
+                                    console.log(SaveAs)
                                 }}>
-                                    <SaveIcon />
+                                    <SaveAsIcon />
                                 </span>
-                                <span title={ZoomToLayer} className="icon-symbol" onClick={() => {
-                                    console.log(ZoomToLayer)
-                                }}>
+                                <span
+                                    title={ZoomToLayer}
+                                    className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
+                                    onClick={() => {
+                                        statusFeature ?
+                                            zoomToLayer(item.layer)
+                                            : undefined
+                                        console.log(layerKeyDraw, item)
+                                    }}>
                                     <ZoomIn />
                                 </span>
-                                <span title={DeleteLayer} className="icon-symbol" onClick={() => {
-                                    console.log(DeleteLayer);
+                                <span title={DeleteLayer} className="icon-symbol" onClick={(e) => {
+                                    removeItem(item.layer);
+                                    setDrawLayer(drawLayer.filter((x) => x.key !== item.key));
                                 }}>
                                     <DeleteForever />
                                 </span>
                                 <span title={EditLayer} className="icon-symbol" onClick={() => {
-                                    console.log(item.layer);
+
                                 }}>
-                                    <EditIcon />
+                                    {/* <EditIcon /> */}
+                                    <Switch
+                                        size="small"
+                                        defaultChecked={false}
+                                        onChange={
+                                            (checked) => {
+                                                checked ?
+                                                    (drawInteraction(item),
+                                                        topic.publish("webmap/tool/identify/off"))
+                                                    :
+                                                    (drawInteractionClear(item),
+                                                        topic.publish("webmap/tool/identify/on"))
+                                            }
+
+                                        } />
                                 </span>
                             </div>
                         </div>
