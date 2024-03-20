@@ -66,17 +66,14 @@ const geomTypesInfo = [
     {
         label: labelTypeGeom(gettext("line layer"), "LineString"),
         key: "LineString",
-        geomType: "LineString",
     },
     {
         label: labelTypeGeom(gettext("polygon layer"), "Polygon"),
         key: "Polygon",
-        geomType: "Polygon",
     },
     {
         label: labelTypeGeom(gettext("point layer"), "Point"),
         key: "Point",
-        geomType: "Point",
     },
 ];
 
@@ -108,7 +105,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     });
 
     const currentTypeGeom = (value) => {
-        const geomType = geomTypesInfo.filter(item => item.key === value)[0].geomType;
+        const geomType = geomTypesInfo.filter(item => item.key === value)[0].key;
         return geomType
     }
 
@@ -222,7 +219,6 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                                         statusFeature ?
                                             zoomToLayer(item.layer)
                                             : undefined
-                                        console.log(switchKey, item)
                                     }}>
                                     <ZoomIn />
                                 </span>
@@ -245,7 +241,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                                                     (
                                                         drawInteraction(item),
                                                         topic.publish("webmap/tool/identify/off"),
-                                                        setSwitchKey(item.key.toString())
+                                                        setSwitchKey(item.key)
                                                     )
                                                     :
                                                     (
