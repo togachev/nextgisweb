@@ -121,12 +121,13 @@ export const useFeatures = (display: DojoDisplay) => {
             e.setStyle(clickStyle);
             features.push(e);
         },
-            { hitTolerance: 10 },
             {
                 layerFilter: (layer) => {
                     return layer.get("name") !== "drawing-layer";
                 }
-            }
+            },
+            { hitTolerance: 10 },
+
         );
         return features;
     };

@@ -10,7 +10,7 @@ import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 
 import { useFeatures } from "./hook/useFeatures";
 
-import type { DojoDisplay, DojoTopic } from "../type";
+import type { DojoDisplay } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
 
@@ -22,7 +22,6 @@ type FeatureContext = {
 }
 type UploadLayerProps = {
     display: DojoDisplay;
-    topic: DojoTopic;
 }
 
 const { Dragger } = Upload;
@@ -44,7 +43,7 @@ const ZoomToLayer = gettext("Zoom to layer");
 const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
 
-export function UploadLayer({ display, topic }: UploadLayerProps) {
+export function UploadLayer({ display }: UploadLayerProps) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
     const maxCount = display.clientSettings.max_count_file_upload;

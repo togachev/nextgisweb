@@ -1,16 +1,11 @@
 import { useCallback, useState } from "react";
 import type { DojoDisplay } from "../../../type";
-import { Draw, Snap } from "ol/interaction";
+import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
-import type { Vector as OlVectorLayer } from "ol/layer";
 import { Vector as VectorLayer } from "ol/layer";
 import { noModifierKeys, primaryAction } from 'ol/events/condition';
-import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
-import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
-import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
 
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
-
 
 const style = new Style({
     fill: new Fill({
@@ -32,6 +27,13 @@ const style = new Style({
     }),
 });
 
+type ItemType = {
+    key: number;
+    change: boolean;
+    label: string;
+    geomType: string;
+};
+
 export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
     const [featureCount, setFeatureCount] = useState([]);
@@ -47,42 +49,64 @@ export const useDraw = (display: DojoDisplay) => {
         return vector;
     })
 
+    const getLayer = useCallback((key: number) => {
+        const layers = [...olmap.getLayers().getArray()];
+        const layer = layers.find(layer => layer.ol_uid === key);
+        return layer;
+    })
 
-    const drawInteraction = useCallback((item) => {
+    const drawInteraction = useCallback((item: ItemType) => {
+        const layer = getLayer(item.key);
+        const source = layer.getSource()
+        const modify = new Modify({ source: source });
+        const snap = new Snap({ source: source })
         const draw = new Draw({
-            source: item.layer?.getSource(),
+            source: source,
             type: item.geomType,
             style: style,
             stopClick: true,
             condition: (e) => noModifierKeys(e) && primaryAction(e),
         });
+
         olmap.addInteraction(draw);
-        draw.on('drawend', (e) => {
+        olmap.addInteraction(snap);
+        olmap.addInteraction(modify);
+
+        draw.on('drawend', () => {
             setFeatureCount([...featureCount, item.key])
         });
     })
 
-    const drawInteractionClear = (item) => {
+    const drawInteractionClear = useCallback(() => {
         olmap.getInteractions().forEach((interaction) => {
+            if (interaction instanceof Modify) {
+                olmap.removeInteraction(interaction);
+            }
+            if (interaction instanceof Snap) {
+                olmap.removeInteraction(interaction);
+            }
             if (interaction instanceof Draw) {
                 olmap.removeInteraction(interaction);
             }
         });
-    }
+    })
 
-    const visibleLayer = (e, layer) => {
-        e.target.checked ? layer.setVisible(true) : layer.setVisible(false);
+    const visibleLayer = (checked: boolean, key: number) => {
+        const layer = getLayer(key);
+        checked ? layer.setVisible(true) : layer.setVisible(false);
     };
 
-    const zoomToLayer = (layer) => {
+    const zoomToLayer = (key: number) => {
+        const layer = getLayer(key);
         const extent = layer.getSource().getExtent();
         olmap.getView().fit(extent, olmap.getSize());
     }
 
-    const removeItem = (layer) => {
+    const removeItem = (key: number) => {
+        const layer = getLayer(key);
         olmap.removeLayer(layer);
         olmap.getView().fit(display._extent, olmap.getSize());
     }
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, olmap, removeItem, visibleLayer, zoomToLayer };
+    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, visibleLayer, zoomToLayer };
 };

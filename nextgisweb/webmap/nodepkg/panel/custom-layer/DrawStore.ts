@@ -5,8 +5,9 @@ export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export class DrawStore {
     drawLayer: string[] = [];
-    switchKey: number[] = [];
-    
+    switchKey: string;
+    readonly = true;
+
     constructor({ ...props }) {
         for (const key in props) {
             const k = key;
@@ -23,8 +24,12 @@ export class DrawStore {
         this.setValue("drawLayer", drawLayer);
     };
 
-    setSwitchKey = (switchKey: SetValue<number[]>) => {
+    setSwitchKey = (switchKey: SetValue<string>) => {
         this.setValue("switchKey", switchKey);
+    };
+
+    setReadonly = (readonly: boolean) => {
+        this.readonly = readonly;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
