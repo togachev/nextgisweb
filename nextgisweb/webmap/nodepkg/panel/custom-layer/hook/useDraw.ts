@@ -3,8 +3,7 @@ import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { noModifierKeys, primaryAction } from 'ol/events/condition';
-
+import { primaryAction, shiftKeyOnly } from 'ol/events/condition';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 
 const style = new Style({
@@ -38,6 +37,10 @@ export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
     const [featureCount, setFeatureCount] = useState([]);
 
+    const [draw, setDraw] = useState();
+    const [snap, setSnap] = useState();
+    const [modify, setModify] = useState();
+
     const addLayerMap = useCallback(() => {
         const source = new VectorSource({ wrapX: false });
         const vector = new VectorLayer({
@@ -58,37 +61,44 @@ export const useDraw = (display: DojoDisplay) => {
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
         const source = layer.getSource()
-        const modify = new Modify({ source: source });
-        const snap = new Snap({ source: source })
-        const draw = new Draw({
+
+        const modify_ = new Modify({
+            source: source,
+            deleteCondition: shiftKeyOnly,
+        });
+        olmap.addInteraction(modify_);
+
+        const snap_ = new Snap({
+            source: source,
+            edge: true,
+            vertex: true,
+        });
+
+        const draw_ = new Draw({
             source: source,
             type: item.geomType,
             style: style,
             stopClick: true,
-            condition: (e) => noModifierKeys(e) && primaryAction(e),
+            condition: (e) => primaryAction(e),
+            snapTolerance: 10,
         });
+        olmap.addInteraction(draw_);
+        olmap.addInteraction(snap_);
 
-        olmap.addInteraction(draw);
-        olmap.addInteraction(snap);
-        olmap.addInteraction(modify);
+        setDraw(draw_);
+        setSnap(snap_);
+        setModify(modify_);
 
-        draw.on('drawend', () => {
+        draw_.on('drawend', () => {
             setFeatureCount([...featureCount, item.key])
         });
+
     })
 
     const drawInteractionClear = useCallback(() => {
-        olmap.getInteractions().forEach((interaction) => {
-            if (interaction instanceof Modify) {
-                olmap.removeInteraction(interaction);
-            }
-            if (interaction instanceof Snap) {
-                olmap.removeInteraction(interaction);
-            }
-            if (interaction instanceof Draw) {
-                olmap.removeInteraction(interaction);
-            }
-        });
+        olmap.removeInteraction(draw);
+        olmap.removeInteraction(snap);
+        olmap.removeInteraction(modify);
     })
 
     const visibleLayer = (checked: boolean, key: number) => {
