@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
@@ -39,6 +39,7 @@ export const useDraw = (display: DojoDisplay) => {
 
     const [draw, setDraw] = useState();
     const [snap, setSnap] = useState();
+    const [snapStatus, setSnapStatus] = useState(false);
     const [modify, setModify] = useState();
 
     const addLayerMap = useCallback(() => {
@@ -58,6 +59,26 @@ export const useDraw = (display: DojoDisplay) => {
         return layer;
     })
 
+    useEffect(() => {
+        if (snapStatus) {
+            olmap.getLayers().forEach(layer => {
+                if (layer.get("name") === "drawing-layer") {
+                    const snap_ = new Snap({
+                        source: layer.getSource(),
+                        edge: true,
+                        vertex: true,
+                    });
+                    setSnap(s => ({
+                        ...s,
+                        [layer.ol_uid]: snap_
+                    }))
+                    olmap.addInteraction(snap_)
+                }
+            })
+        }
+        setSnapStatus(false)
+    }, [snapStatus])
+
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
         const source = layer.getSource()
@@ -68,11 +89,7 @@ export const useDraw = (display: DojoDisplay) => {
         });
         olmap.addInteraction(modify_);
 
-        const snap_ = new Snap({
-            source: source,
-            edge: true,
-            vertex: true,
-        });
+        setSnapStatus(true)
 
         const draw_ = new Draw({
             source: source,
@@ -83,10 +100,7 @@ export const useDraw = (display: DojoDisplay) => {
             snapTolerance: 10,
         });
         olmap.addInteraction(draw_);
-        olmap.addInteraction(snap_);
-
         setDraw(draw_);
-        setSnap(snap_);
         setModify(modify_);
 
         draw_.on('drawend', () => {
@@ -97,8 +111,11 @@ export const useDraw = (display: DojoDisplay) => {
 
     const drawInteractionClear = useCallback(() => {
         olmap.removeInteraction(draw);
-        olmap.removeInteraction(snap);
         olmap.removeInteraction(modify);
+        Object.entries(snap).forEach(([key, value]) => {
+            olmap.removeInteraction(value);
+        });
+        setSnap(undefined)
     })
 
     const visibleLayer = (checked: boolean, key: number) => {
