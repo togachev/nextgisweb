@@ -24,14 +24,14 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
 
     const items = [
         {
-            key: '1',
+            key: "1",
             label: loading,
             children:
                 <UploadLayer display={display} />,
             icon: <UploadIcon />,
         },
         {
-            key: '2',
+            key: "2",
             label: creation,
             children:
                 <DrawFeatures display={display} topic={topic} />,

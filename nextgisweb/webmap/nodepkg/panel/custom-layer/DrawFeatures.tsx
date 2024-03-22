@@ -85,7 +85,7 @@ export const DrawFeatures = observer(
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
 
-        const [layerName, setLayerName] = useState<string>('');
+        const [layerName, setLayerName] = useState<string>("");
 
         const [store] = useState(() => new DrawStore({}));
 
@@ -141,7 +141,7 @@ export const DrawFeatures = observer(
         };
 
         const DropdownType = () => (
-            <Dropdown.Button size="small" trigger={['hover']} menu={geomTypesMenuItems} onClick={onDefaultType} >
+            <Dropdown.Button size="small" trigger={["hover"]} menu={geomTypesMenuItems} onClick={onDefaultType} >
                 <Space>
                     {geomTypeFilterIcon(geomTypeDefault, "create")}
                 </Space>
@@ -214,8 +214,8 @@ export const DrawFeatures = observer(
                 theme={{
                     components: {
                         Switch: {
-                            colorPrimary: '#FF0000',
-                            colorPrimaryHover: '#106a90',
+                            colorPrimary: "#FF0000",
+                            colorPrimaryHover: "#106a90",
                         },
                     },
                 }}
@@ -227,7 +227,7 @@ export const DrawFeatures = observer(
                         </Text>
                         {drawLayer.length > 1 && (<DeleteItems />)}
                     </div>
-                    <div style={{ margin: '5px' }}>
+                    <div style={{ margin: "5px" }}>
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
                     {

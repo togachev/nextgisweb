@@ -317,7 +317,7 @@ export const FilterExtentBtn = ({
     };
 
     const buildDropdown = () => (
-        <Dropdown trigger={['click']} menu={geomTypesMenuItems}>
+        <Dropdown trigger={["click"]} menu={geomTypesMenuItems}>
             <Button title={msgZoomToFiltered} size={size}>
                 <Space>
                     <CropFreeIcon />
@@ -375,7 +375,7 @@ export const FilterExtentBtn = ({
         const menuItems = geomActionProps(visibleGeom);
 
         return (
-            <Dropdown trigger={['click']} menu={menuItems}>
+            <Dropdown trigger={["click"]} menu={menuItems}>
                 <Button title={msgChangeGeom} size={size}>
                     <Space>{geomInfo.icon}</Space>
                 </Button>

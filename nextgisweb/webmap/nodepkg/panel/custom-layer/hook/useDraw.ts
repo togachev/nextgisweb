@@ -3,21 +3,21 @@ import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { primaryAction, shiftKeyOnly } from 'ol/events/condition';
-import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
+import { primaryAction, shiftKeyOnly } from "ol/events/condition";
+import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 
 const style = new Style({
     fill: new Fill({
-        color: '#B6B1B150',
+        color: "#B6B1B150",
     }),
     stroke: new Stroke({
-        color: '#33cc33',
+        color: "#33cc33",
         width: 2,
     }),
     image: new CircleStyle({
         radius: 7,
         fill: new Fill({
-            color: '#B6B1B150',
+            color: "#B6B1B150",
         }),
         stroke: new Stroke({
             width: 1,
@@ -48,7 +48,7 @@ export const useDraw = (display: DojoDisplay) => {
             source: source,
         });
         vector.setStyle(style);
-        vector.set('name', 'drawing-layer');
+        vector.set("name", "drawing-layer");
         olmap.addLayer(vector);
         return vector;
     })
@@ -103,7 +103,7 @@ export const useDraw = (display: DojoDisplay) => {
         setDraw(draw_);
         setModify(modify_);
 
-        draw_.on('drawend', () => {
+        draw_.on("drawend", () => {
             setFeatureCount([...featureCount, item.key])
         });
 

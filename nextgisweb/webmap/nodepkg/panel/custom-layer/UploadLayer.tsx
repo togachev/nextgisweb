@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
@@ -13,8 +13,8 @@ import { useFeatures } from "./hook/useFeatures";
 import type { DojoDisplay } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
-
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+import { decode } from "./de";
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 type FeatureContext = {
     name: string;
@@ -29,9 +29,17 @@ const { Text } = Typography;
 
 const getBase64 = (file: FileType, callback: (url: string) => void) => {
     const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result as string));
+    reader.addEventListener("load", () => callback(reader.result as string));
     reader.readAsDataURL(file);
 };
+
+const _getBase64 = (file: FileType): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+    });
 
 const validTypeMesssage = gettext("This file type is not supported");
 const validVolumeMessage = gettext("Exceeding the volume of 16mb");
@@ -57,7 +65,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
 
     const props: UploadProps = {
         onChange: (info) => {
-            if (info.file.status === 'done') {
+            if (info.file.status === "done") {
                 getBase64(info.file.originFileObj, (url) => {
                     const data = typeFile.find(e => e.type === info.file.type);
                     setFileList(info.fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
@@ -91,11 +99,22 @@ export function UploadLayer({ display }: UploadLayerProps) {
             )
         },
         multiple: true,
-        beforeUpload: (file, info) => {
+        beforeUpload: async (file, info) => {
+            _getBase64(file).then(item => {
+                let arrayBuffer = item;
+                let arr = (new Uint8Array(decode(arrayBuffer))).subarray(0, 4);
+
+                let fileSignature = "";
+                for (let i = 0; i < arr.length; i++) {
+                    fileSignature += arr[i].toString(16);
+                }
+                console.log(fileSignature, file);
+
+            })
             const isValidType = typeFile.some(e => e.type === file.type);
             const isMaxCount = info.length <= maxCount;
             if (!isValidType) {
-                message.error(validTypeMesssage + ': ' + file.type);
+                message.error(validTypeMesssage + ": " + file.type);
             }
             if (!isMaxCount) {
                 message.error(maxCountMesssage);
@@ -116,14 +135,14 @@ export function UploadLayer({ display }: UploadLayerProps) {
     };
 
     useEffect(() => {
-        olmap.on('click', (e) => {
+        olmap.on("click", (e) => {
             if (e.dragging) return;
             setCustomStyle(null, false);
             setFeatures(displayFeatureInfo(e.pixel));
         });
     }, [])
 
-    const onChange: GetProp<typeof Checkbox, 'onChange'> = (e, uid) => {
+    const onChange: GetProp<typeof Checkbox, "onChange"> = (e, uid) => {
         visibleLayer(e, uid)
     };
 
@@ -134,14 +153,14 @@ export function UploadLayer({ display }: UploadLayerProps) {
                     const data = feature.getProperties();
                     const res = Object.fromEntries(
                         Object.entries(data).filter(([key, value]) =>
-                            value !== null && value !== undefined && value !== '' && key !== 'geometry'
+                            value !== null && value !== undefined && value !== "" && key !== "geometry"
                         )
                     )
 
                     const values: FeatureContext[] = [];
 
                     Object.keys(res).map(key => {
-                        if (res[key] !== null && res[key] !== '') {
+                        if (res[key] !== null && res[key] !== "") {
                             values.push({ name: key, value: res[key] })
                         }
                     })
