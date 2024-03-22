@@ -34,7 +34,6 @@ define([
     "./tool/Measure",
     "./tool/Identify",
     "./tool/ViewerInfo",
-    "./tool/DrawFeature",
     "./tool/Swipe",
     // panels
     "@nextgisweb/webmap/panel/layers",
@@ -84,7 +83,6 @@ define([
     ToolMeasure,
     Identify,
     ToolViewerInfo,
-    ToolDrawFeature,
     ToolSwipe,
     LayersPanelModule,
     URL,
@@ -730,11 +728,6 @@ define([
             this.mapToolbar.items.addTool(
                 new ToolViewerInfo({ display: this }),
                 "~viewerInfo"
-            );
-
-            this.mapToolbar.items.addTool(
-                new ToolDrawFeature({ display: this }),
-                "~drawFeature"
             );
 
             this.identify = new Identify({ display: this });

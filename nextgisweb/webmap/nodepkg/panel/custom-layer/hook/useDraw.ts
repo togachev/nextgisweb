@@ -4,25 +4,29 @@ import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import { primaryAction, shiftKeyOnly } from "ol/events/condition";
-import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
+import { Circle, Fill, Stroke, Style } from "ol/style";
 
 const style = new Style({
-    fill: new Fill({
-        color: "#B6B1B150",
-    }),
     stroke: new Stroke({
-        color: "#33cc33",
         width: 2,
+        color: "#FF8B00",
     }),
-    image: new CircleStyle({
-        radius: 7,
-        fill: new Fill({
-            color: "#B6B1B150",
-        }),
+    image: new Circle({
+        anchor: [0.5, 46],
+        anchorXUnits: "fraction",
+        anchorYUnits: "pixels",
         stroke: new Stroke({
-            width: 1,
-            color: "rgba(0,0,0,0.8)"
+            width: 2,
+            color: "#fff",
         }),
+        radius: 5,
+        fill: new Stroke({
+            width: 2,
+            color: "#106a90",
+        }),
+    }),
+    fill: new Fill({
+        color: "#106a9020",
     }),
 });
 
@@ -112,7 +116,7 @@ export const useDraw = (display: DojoDisplay) => {
     const drawInteractionClear = useCallback(() => {
         olmap.removeInteraction(draw);
         olmap.removeInteraction(modify);
-        Object.entries(snap).forEach(([key, value]) => {
+        Object.entries(snap).forEach(([value]) => {
             olmap.removeInteraction(value);
         });
         setSnap(undefined)
@@ -135,5 +139,15 @@ export const useDraw = (display: DojoDisplay) => {
         olmap.getView().fit(display._extent, olmap.getSize());
     }
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, visibleLayer, zoomToLayer };
+    const removeItems = () => {
+        const layers = [...olmap.getLayers().getArray()];
+        layers.forEach(layer => {
+            if (layer.get("name") === "drawing-layer") {
+                olmap.removeLayer(layer);
+            }
+        })
+        olmap.getView().fit(display._extent, olmap.getSize());
+    };
+
+    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, visibleLayer, zoomToLayer };
 };

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 
 import "./UploadLayer.less";
@@ -13,7 +12,7 @@ import { useFeatures } from "./hook/useFeatures";
 import type { DojoDisplay } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
-import { decode } from "./de";
+
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 type FeatureContext = {
@@ -30,16 +29,8 @@ const { Text } = Typography;
 const getBase64 = (file: FileType, callback: (url: string) => void) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => callback(reader.result as string));
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file as Blob);
 };
-
-const _getBase64 = (file: FileType): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-    });
 
 const validTypeMesssage = gettext("This file type is not supported");
 const validVolumeMessage = gettext("Exceeding the volume of 16mb");
@@ -63,11 +54,15 @@ export function UploadLayer({ display }: UploadLayerProps) {
 
     const numberOfFiles = gettext("Number of files maximum/downloaded:") + " " + maxCount + "/" + fileList.length;
 
+
     const props: UploadProps = {
         onChange: (info) => {
             if (info.file.status === "done") {
                 getBase64(info.file.originFileObj, (url) => {
-                    const data = typeFile.find(e => e.type === info.file.type);
+                    const fileName = info.file.name
+                    const extension = fileName.slice(fileName.lastIndexOf("."))
+
+                    const data = typeFile.find(e => e.extension === extension);
                     setFileList(info.fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
                     addLayerMap({ info: info, url: url, format: data?.format })
                 })
@@ -99,19 +94,11 @@ export function UploadLayer({ display }: UploadLayerProps) {
             )
         },
         multiple: true,
-        beforeUpload: async (file, info) => {
-            _getBase64(file).then(item => {
-                let arrayBuffer = item;
-                let arr = (new Uint8Array(decode(arrayBuffer))).subarray(0, 4);
+        beforeUpload: (file, info) => {
+            const fileName = file.name
+            const extension = fileName.slice(fileName.lastIndexOf("."))
 
-                let fileSignature = "";
-                for (let i = 0; i < arr.length; i++) {
-                    fileSignature += arr[i].toString(16);
-                }
-                console.log(fileSignature, file);
-
-            })
-            const isValidType = typeFile.some(e => e.type === file.type);
+            const isValidType = typeFile.some(e => e.extension === extension);
             const isMaxCount = info.length <= maxCount;
             if (!isValidType) {
                 message.error(validTypeMesssage + ": " + file.type);
@@ -123,7 +110,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
             if (!isLimitVolume) {
                 message.error(validVolumeMessage);
             }
-            return isValidType && isMaxCount && isLimitVolume && file.type || Upload.LIST_IGNORE;
+            return isValidType && isMaxCount && isLimitVolume || Upload.LIST_IGNORE;
         },
         maxCount: maxCount,
         listType: "text",
@@ -219,7 +206,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
                 {fileList.length > 1 && (<DeleteItems />)}
             </div>
             <div key={uploadkey}>
-                <Dragger {...props}>
+                <Dragger {...props} accept=".gpx,.geojson,.kml">
                     <Space direction="vertical">
                         <Text>{areaUpload}</Text>
                     </Space>

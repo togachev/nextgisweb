@@ -80,7 +80,7 @@ const geomTypesInfo = [
 
 export const DrawFeatures = observer(
     ({ display, topic }: DrawFeaturesProps) => {
-        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, visibleLayer, zoomToLayer } = useDraw(display);
+        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, visibleLayer, zoomToLayer } = useDraw(display);
         const maxCount = display.clientSettings.max_count_file_upload;
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
@@ -161,9 +161,12 @@ export const DrawFeatures = observer(
 
         const DeleteItems = () => {
             return (
-                <div title={allDeleteItems} className="custom-button icon-symbol"
+                <div
+                    title={allDeleteItems}
+                    className="custom-button icon-symbol"
                     onClick={() => {
-                        console.log(allDeleteItems);
+                        removeItems();
+                        setDrawLayer([]);
                     }}
                 >
                     <DeleteForever />
@@ -235,7 +238,7 @@ export const DrawFeatures = observer(
                             const statusFeature = featureCount.includes(item.key)
 
                             return (
-                                <div key={index} className="layer-item">
+                                <div key={item.key} className="layer-item">
                                     <div className="checkbox-item">
                                         <Checkbox
                                             defaultChecked={true}
@@ -274,7 +277,7 @@ export const DrawFeatures = observer(
                                     </div>
                                 </div>
                             )
-                        })
+                        }).reverse()
                     }
                 </div>
             </ConfigProvider>

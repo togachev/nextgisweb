@@ -27,25 +27,25 @@ type SourceType = {
 
 const customStyle = new Style({
     stroke: new Stroke({
-        width: 1.66,
-        color: "#FF8B00"
+        width: 2,
+        color: "#FF8B00",
     }),
     image: new Circle({
         anchor: [0.5, 46],
         anchorXUnits: "fraction",
         anchorYUnits: "pixels",
         stroke: new Stroke({
-            width: 1,
-            color: "rgba(0,0,0,0.8)"
+            width: 2,
+            color: "#fff",
         }),
-        radius: 4,
+        radius: 5,
         fill: new Stroke({
-            width: 1,
-            color: "rgba(16,106,144,0.5)"
+            width: 2,
+            color: "#106a90",
         }),
     }),
     fill: new Fill({
-        color: "rgba(0, 0, 255, 0.5)",
+        color: "#106a9020",
     }),
 });
 
@@ -75,9 +75,9 @@ const clickStyle = new Style({
 });
 
 const typeFile = [
-    { type: 'application/gpx+xml', format: new GPX() },
-    { type: 'application/geo+json', format: new GeoJSON() },
-    { type: 'application/vnd.google-earth.kml+xml', format: new KML() },
+    { extension: '.gpx', format: new GPX() },
+    { extension: '.geojson', format: new GeoJSON() },
+    { extension: '.kml', format: new KML() },
 ];
 
 export const useFeatures = (display: DojoDisplay) => {
