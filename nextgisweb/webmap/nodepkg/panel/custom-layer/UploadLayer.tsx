@@ -12,6 +12,7 @@ import { useFeatures } from "./hook/useFeatures";
 import type { DojoDisplay } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
+import { TYPE_FILE } from "./constant";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -43,7 +44,7 @@ const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
 
 export function UploadLayer({ display }: UploadLayerProps) {
-    const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
+    const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
     const maxCount = display.clientSettings.max_count_file_upload;
     const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
@@ -62,7 +63,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
                     const fileName = info.file.name
                     const extension = fileName.slice(fileName.lastIndexOf("."))
 
-                    const data = typeFile.find(e => e.extension === extension);
+                    const data = TYPE_FILE.find(e => e.extension === extension);
                     setFileList(info.fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
                     addLayerMap({ info: info, url: url, format: data?.format })
                 })
@@ -98,7 +99,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
             const fileName = file.name
             const extension = fileName.slice(fileName.lastIndexOf("."))
 
-            const isValidType = typeFile.some(e => e.extension === extension);
+            const isValidType = TYPE_FILE.some(e => e.extension === extension);
             const isMaxCount = info.length <= maxCount;
             if (!isValidType) {
                 message.error(validTypeMesssage + ": " + file.type);

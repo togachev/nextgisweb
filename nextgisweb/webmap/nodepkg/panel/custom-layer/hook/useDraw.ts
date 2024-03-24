@@ -5,6 +5,7 @@ import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import { primaryAction, shiftKeyOnly } from "ol/events/condition";
 import { Circle, Fill, Stroke, Style } from "ol/style";
+import { TYPE_FILE } from "../constant";
 
 const style = new Style({
     stroke: new Stroke({
@@ -35,6 +36,12 @@ type ItemType = {
     change: boolean;
     label: string;
     geomType: string;
+};
+
+type ParamsFormat = {
+    value: string;
+    label: string;
+    disabled: boolean;
 };
 
 export const useDraw = (display: DojoDisplay) => {
@@ -149,5 +156,30 @@ export const useDraw = (display: DojoDisplay) => {
         olmap.getView().fit(display._extent, olmap.getSize());
     };
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, visibleLayer, zoomToLayer };
+    const features = useCallback((key) => {
+        const layer = getLayer(key);
+        const features = layer.getSource().getFeatures();
+        return features
+    });
+
+    const download = (blob, filename) => {
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    }
+
+    const saveLayer = (item: ItemType, params: ParamsFormat) => {
+        const vf = TYPE_FILE.find(x => x.value === params.value);
+        const data = vf?.format.writeFeatures(features(item.key), {
+            featureProjection: olmap.getView().getProjection()
+        });
+        const blob = new Blob([data], { type: vf?.value });
+        const date = new Date();
+        const formattedDate = `_${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}-${date.getHours()}.${date.getMinutes()}.${date.getMilliseconds()}`;
+        const fileName = item.label + "_" + vf?.label + formattedDate + vf?.extension
+        download(blob, fileName);
+    }
+
+    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, visibleLayer, zoomToLayer };
 };

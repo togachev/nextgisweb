@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Checkbox, ConfigProvider, Dropdown, message, Space, Switch, Typography } from "@nextgisweb/gui/antd";
+import { Checkbox, ConfigProvider, Dropdown, message, Modal, Select, Space, Switch, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
@@ -78,25 +78,41 @@ const geomTypesInfo = [
     },
 ];
 
+type ItemType = {
+    key: number;
+    change: boolean;
+    label: string;
+    geomType: string;
+};
+
+let id = 0;
+
 export const DrawFeatures = observer(
     ({ display, topic }: DrawFeaturesProps) => {
-        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, visibleLayer, zoomToLayer } = useDraw(display);
+        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, visibleLayer, zoomToLayer } = useDraw(display);
         const maxCount = display.clientSettings.max_count_file_upload;
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
 
-        const [layerName, setLayerName] = useState<string>("");
+        const [open, setOpen] = useState(false);
+        const [confirmLoading, setConfirmLoading] = useState(false);
 
         const [store] = useState(() => new DrawStore({}));
 
         const {
+            options,
+            setOptions,
             drawLayer,
             setDrawLayer,
             switchKey,
             setSwitchKey,
             readonly,
             setReadonly,
+            itemModal,
+            setItemModal
         } = store;
+
+        const [defaultOp, setDefaultOp] = useState(options[0]);
 
         const currentMaxLayer = gettext("Number of layers maximum/created:") + " " + maxCount + "/" + drawLayer.length
 
@@ -111,14 +127,13 @@ export const DrawFeatures = observer(
             return geomType
         }
 
-        const addLayer = (geomType) => {
+        const addLayer = (geomType: ItemType) => {
             if (drawLayer.length < maxCount) {
                 const layer = addLayerMap();
                 setDrawLayer([
                     ...drawLayer,
-                    { key: layer.ol_uid, change: false, label: layerName ? layerName : labelLayer(geomType), geomType: geomType }
+                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType }
                 ])
-                setLayerName(null)
             } else {
                 message.error(maxCountLayer);
             }
@@ -174,7 +189,7 @@ export const DrawFeatures = observer(
             )
         };
 
-        const onDeleteLayer = (item) => {
+        const onDeleteLayer = (item: ItemType) => {
             if (readonly) {
                 removeItem(item.key);
                 setDrawLayer(drawLayer.filter((x) => x.key !== item.key));
@@ -183,13 +198,13 @@ export const DrawFeatures = observer(
 
         useEffect(() => {
             setDrawLayer(prevState => {
-                return prevState.map((item) => {
+                return prevState.map((item: ItemType) => {
                     return item.key === switchKey.key ? { ...item, change: false } : { ...item, change: true }
                 })
             })
         }, [switchKey])
 
-        const onSwitchKey = (checked: boolean, item) => {
+        const onSwitchKey = (checked: boolean, item: ItemType) => {
             if (checked) {
                 drawInteraction(item);
                 topic.publish("webmap/tool/identify/off");
@@ -204,12 +219,57 @@ export const DrawFeatures = observer(
                 drawInteractionClear();
                 topic.publish("webmap/tool/identify/on");
                 setDrawLayer(prevState => {
-                    return prevState.map((item) => {
+                    return prevState.map((item: ItemType) => {
                         return { ...item, change: false }
                     })
                 });
                 setReadonly(true)
             }
+        };
+
+        useEffect(() => {
+            itemModal?.geomType === "Polygon" ?
+                (
+                    setDefaultOp(options.filter(item => item.value !== "application/gpx+xml")[0]),
+                    setOptions(options => {
+                        return options.map((item) => {
+                            if (item.value === "application/gpx+xml") {
+                                return { ...item, disabled: true }
+                            } else {
+                                return { ...item, disabled: false }
+                            }
+                        })
+                    })
+                ) :
+                (
+                    setDefaultOp(options[0]),
+                    setOptions(options => {
+                        return options.map((item) => {
+                            return { ...item, disabled: false }
+                        })
+                    })
+                )
+        }, [itemModal])
+
+        const showModal = () => {
+            setOpen(true);
+        };
+
+        const handleOk = () => {
+            saveLayer(itemModal, defaultOp)
+            setConfirmLoading(true);
+            setTimeout(() => {
+                setOpen(false);
+                setConfirmLoading(false);
+            }, 0);
+        };
+
+        const handleCancel = () => {
+            setOpen(false);
+        };
+
+        const handleChange = (value) => {
+            setDefaultOp(value);
         };
 
         return (
@@ -223,6 +283,22 @@ export const DrawFeatures = observer(
                     },
                 }}
             >
+                <Modal
+                    mask={false}
+                    title="Title"
+                    open={open}
+                    onOk={handleOk}
+                    confirmLoading={confirmLoading}
+                    onCancel={handleCancel}
+                >
+                    <Select
+                        labelInValue
+                        value={defaultOp}
+                        style={{ width: 120 }}
+                        onChange={handleChange}
+                        options={options}
+                    />
+                </Modal>
                 <div className="dropdown-button-draw">
                     <div className="info-file">
                         <Text title={currentMaxLayer} ellipsis={true} >
@@ -234,21 +310,23 @@ export const DrawFeatures = observer(
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
                     {
-                        drawLayer.map((item, index) => {
+                        drawLayer.map((item: ItemType, index: number) => {
                             const statusFeature = featureCount.includes(item.key)
-
                             return (
-                                <div key={item.key} className="layer-item">
+                                <div key={index} className="layer-item">
                                     <div className="checkbox-item">
                                         <Checkbox
                                             defaultChecked={true}
                                             onChange={(e) => { visibleLayer(e.target.checked, item.key) }} >
-                                            {item.label} {index + 1}
+                                            {item.label}
                                         </Checkbox>
                                     </div>
                                     <div className="custom-button">
-                                        <span title={SaveAs} className="icon-symbol" onClick={() => {
-                                            console.log(SaveAs)
+                                        <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
+                                            if (statusFeature) {
+                                                showModal()
+                                                setItemModal(item)
+                                            }
                                         }}>
                                             <SaveAsIcon />
                                         </span>

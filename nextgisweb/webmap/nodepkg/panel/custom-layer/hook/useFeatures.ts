@@ -2,10 +2,6 @@ import Feature from "ol/Feature";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 
-import GPX from "ol/format/GPX";
-import KML from "ol/format/KML";
-import GeoJSON from "ol/format/GeoJSON";
-
 import { Circle, Fill, Stroke, Style } from "ol/style";
 
 import type { DojoDisplay } from "../../type";
@@ -73,12 +69,6 @@ const clickStyle = new Style({
     }),
     zIndex: 100,
 });
-
-const typeFile = [
-    { extension: '.gpx', format: new GPX() },
-    { extension: '.geojson', format: new GeoJSON() },
-    { extension: '.kml', format: new KML() },
-];
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
@@ -182,5 +172,5 @@ export const useFeatures = (display: DojoDisplay) => {
         olmap.getView().fit(display._extent, olmap.getSize());
     };
 
-    return { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, typeFile, visibleLayer, zoomfeature, zoomToLayer, addLayerMap };
+    return { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap };
 };
