@@ -1043,20 +1043,21 @@ define([
             panels.push(makeInfoPanel);
 
             const makeDiagramPanel = new Promise((resolve) => {
-                if (this.config.constraintField.length > 0) {
-                    const panel = {
-                        cls: reactPanel("@nextgisweb/webmap/panel/diagram"),
-                        params: {
-                            title: gettext("Diagram"),
-                            name: "diagram",
-                            order: 80,
-                            menuIcon: "material-auto_graph",
-                            class: "diagram-panel dynamic-panel--fullwidth",
-                            withTitle: false,
-                        },
-                    };
-                    resolve(panel);
+                if (this.config.constraintField.length === 0) {
+                    resolve(undefined);
                 }
+                const panel = {
+                    cls: reactPanel("@nextgisweb/webmap/panel/diagram"),
+                    params: {
+                        title: gettext("Diagram"),
+                        name: "diagram",
+                        order: 80,
+                        menuIcon: "material-auto_graph",
+                        class: "diagram-panel dynamic-panel--fullwidth",
+                        withTitle: false,
+                    },
+                };
+                resolve(panel);
             });
             panels.push(makeDiagramPanel);
 

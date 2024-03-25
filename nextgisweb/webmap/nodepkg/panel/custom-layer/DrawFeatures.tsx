@@ -35,6 +35,7 @@ const EditLayer = gettext("Edit layer");
 const SaveAs = gettext("Save as");
 const allDeleteItems = gettext("Delete all layers");
 const maxCountLayer = gettext("The limit of created layers has been exceeded")
+const saveFormat = gettext("Format")
 
 const typeComponentIcon = [
     { key: "LineString", component: <LineIcon />, label: gettext("line layer") },
@@ -280,24 +281,37 @@ export const DrawFeatures = observer(
                             colorPrimary: "#FF0000",
                             colorPrimaryHover: "#106a90",
                         },
+                        Modal: {
+                            titleFontSize: 15,
+                        },
                     },
                 }}
             >
                 <Modal
                     mask={false}
-                    title="Title"
+                    title={SaveAs}
                     open={open}
                     onOk={handleOk}
                     confirmLoading={confirmLoading}
                     onCancel={handleCancel}
+                    className="modal-style"
+                    okButtonProps={{ size: "small" }}
+                    cancelButtonProps={{ size: "small" }}
+                    centered
                 >
-                    <Select
-                        labelInValue
-                        value={defaultOp}
-                        style={{ width: 120 }}
-                        onChange={handleChange}
-                        options={options}
-                    />
+                    <div className="select-format">
+                        <span className="select-title">{saveFormat}</span>
+                        <Select
+                            labelInValue
+                            value={defaultOp}
+                            style={{ width: 120 }}
+                            onChange={handleChange}
+                            options={options}
+                            size="small"
+                            title="knfjko"
+                        />
+                    </div>
+
                 </Modal>
                 <div className="dropdown-button-draw">
                     <div className="info-file">

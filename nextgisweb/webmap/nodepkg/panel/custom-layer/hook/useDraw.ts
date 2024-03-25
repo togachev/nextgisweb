@@ -66,7 +66,7 @@ export const useDraw = (display: DojoDisplay) => {
 
     const getLayer = useCallback((key: number) => {
         const layers = [...olmap.getLayers().getArray()];
-        const layer = layers.find(layer => layer.ol_uid === key);
+        const layer = layers.find(layer => layer.ol_uid === key && layer.get("name") === "drawing-layer");
         return layer;
     })
 
@@ -93,7 +93,7 @@ export const useDraw = (display: DojoDisplay) => {
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
         const source = layer.getSource()
-
+        
         const modify_ = new Modify({
             source: source,
             deleteCondition: shiftKeyOnly,
@@ -163,7 +163,7 @@ export const useDraw = (display: DojoDisplay) => {
     });
 
     const download = (blob, filename) => {
-        var link = document.createElement('a');
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = filename;
         link.click();

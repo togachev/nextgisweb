@@ -638,6 +638,10 @@ msgstr "Превышен лимит созданных слоев"
 msgid "Number of layers maximum/created:"
 msgstr "Максимальное количество слоев/созданно"
 
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:38
+msgid "Format"
+msgstr "Формат"
+
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:37
 msgid "This file type is not supported"
 msgstr "Этот тип файла не поддерживается"
