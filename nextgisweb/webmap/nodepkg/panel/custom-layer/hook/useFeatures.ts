@@ -139,7 +139,7 @@ export const useFeatures = (display: DojoDisplay) => {
         } else {
             olmap.getLayers().forEach(layer => {
                 const pref = layer.get("name")?.split("__")[1]
-                if (pref === "upload-layer" || layer.get("name") === "drawing-layer") {
+                if (pref === "upload-layer") {
                     layer.getSource().forEachFeature((e) => {
                         e.setStyle(customStyle)
                     })
@@ -162,10 +162,7 @@ export const useFeatures = (display: DojoDisplay) => {
         const layers = [...olmap.getLayers().getArray()];
         layers.forEach(layer => {
             const pref = layer.get("name")?.split("__")[1]
-            if (
-                pref === "upload-layer"
-                // || layer.get("name") === "drawing-layer"
-            ) {
+            if (pref === "upload-layer") {
                 olmap.removeLayer(layer);
             }
         });

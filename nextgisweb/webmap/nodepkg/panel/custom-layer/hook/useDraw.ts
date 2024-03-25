@@ -7,29 +7,43 @@ import { primaryAction, shiftKeyOnly } from "ol/events/condition";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 import { TYPE_FILE } from "../constant";
 
-const style = new Style({
-    stroke: new Stroke({
-        width: 2,
-        color: "#FF8B00",
-    }),
-    image: new Circle({
-        anchor: [0.5, 46],
-        anchorXUnits: "fraction",
-        anchorYUnits: "pixels",
+const style = [
+    new Style({
         stroke: new Stroke({
             width: 2,
-            color: "#fff",
+            color: "#FF2128",
         }),
-        radius: 5,
-        fill: new Stroke({
-            width: 2,
-            color: "#106a90",
+        image: new Circle({
+            anchor: [0.5, 46],
+            anchorXUnits: "fraction",
+            anchorYUnits: "pixels",
+            stroke: new Stroke({
+                width: 1,
+                color: "#000000",
+            }),
+            radius: 7,
+            fill: new Stroke({
+                width: 4,
+                color: "#106a9020",
+            }),
+        }),
+        fill: new Fill({
+            color: "#106a9020",
         }),
     }),
-    fill: new Fill({
-        color: "#106a9020",
+    new Style({
+        image: new Circle({
+            anchor: [0.5, 46],
+            anchorXUnits: "fraction",
+            anchorYUnits: "pixels",
+            stroke: new Stroke({
+                width: 1,
+                color: "#ffffff",
+            }),
+            radius: 8,
+        }),
     }),
-});
+];
 
 type ItemType = {
     key: number;
@@ -93,7 +107,7 @@ export const useDraw = (display: DojoDisplay) => {
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
         const source = layer.getSource()
-        
+
         const modify_ = new Modify({
             source: source,
             deleteCondition: shiftKeyOnly,
