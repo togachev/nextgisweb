@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
-
 import "./UploadLayer.less";
 
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
@@ -55,19 +54,24 @@ export function UploadLayer({ display }: UploadLayerProps) {
 
     const numberOfFiles = gettext("Number of files maximum/downloaded:") + " " + maxCount + "/" + fileList.length;
 
-
     const props: UploadProps = {
-        onChange: (info) => {
-            if (info.file.status === "done") {
-                getBase64(info.file.originFileObj, (url) => {
-                    const fileName = info.file.name
+        customRequest: async options => {
+            const { onSuccess, onError, file } = options;
+            try {
+                await getBase64(file, (url) => {
+                    const fileName = file.name
                     const extension = fileName.slice(fileName.lastIndexOf("."))
-
                     const data = TYPE_FILE.find(e => e.extension === extension);
-                    setFileList(info.fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
-                    addLayerMap({ info: info, url: url, format: data?.format })
+                    setFileList(fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
+                    addLayerMap({ url: url, format: data?.format, file: file, length: fileList.length })
                 })
+                onSuccess("Ok");
+            } catch (err) {
+                onError({ err });
             }
+        },
+        onChange: ({ fileList }) => {
+            setFileList(fileList);
         },
         itemRender: (originNode, file, fileList, actions) => {
             return (
@@ -130,8 +134,9 @@ export function UploadLayer({ display }: UploadLayerProps) {
         });
     }, [])
 
-    const onChange: GetProp<typeof Checkbox, "onChange"> = (e, uid) => {
-        visibleLayer(e, uid)
+    const onChange: GetProp<typeof Checkbox, "onChange"> = (e: ChangeEvent<HTMLInputElement>, uid: string) => {
+        const checked = e.target.checked;
+        visibleLayer(checked, uid);
     };
 
     const LayerList = ({ features }: Features) => (

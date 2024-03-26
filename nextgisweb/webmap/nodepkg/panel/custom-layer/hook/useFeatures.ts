@@ -1,30 +1,29 @@
+import type { Feature as OlFeature, FeatureLike } from "ol/Feature";
 import Feature from "ol/Feature";
 import { Vector as VectorSource } from "ol/source";
+import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-
+import type { Vector as OlVectorLayer } from "ol/layer";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 
 import type { DojoDisplay } from "../../type";
 
-interface FileUpload {
-    uid: string;
-}
-
 interface InfoUpload {
-    file: FileUpload;
-    fileList: FileUpload[];
+    uid: string;
+    name: string;
 }
 
 type SourceType = {
     url: string;
     format: string;
-    info: InfoUpload;
+    file: InfoUpload;
+    length: number;
 };
 
 const customStyle = new Style({
     stroke: new Stroke({
-        width: 2,
-        color: "#FF8B00",
+        width: 3,
+        color: "#009DFF",
     }),
     image: new Circle({
         anchor: [0.5, 46],
@@ -72,15 +71,15 @@ const clickStyle = new Style({
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
-    const addLayerMap = ({ url, format, info }: SourceType) => {
+    const addLayerMap = ({ url, format, file, length }: SourceType) => {
         const customSource = new VectorSource({ url: url, format: format })
         const customLayer = new VectorLayer({
             source: customSource,
         })
         customLayer.setStyle(customStyle);
-        customLayer.set("name", info.file.uid + "__upload-layer");
+        customLayer.set("name", file.uid + "__upload-layer");
         olmap.addLayer(customLayer);
-        info.fileList.length <= 1 &&
+        length <= 1 &&
             customSource.once("change", function () {
                 if (customSource.getState() === "ready") {
                     olmap.getView().fit(customSource.getExtent(), olmap.getSize());
@@ -88,15 +87,15 @@ export const useFeatures = (display: DojoDisplay) => {
             });
     }
 
-    const zoomfeature = (item) => {
+    const zoomfeature = (item: OlFeature) => {
         const geometry = item?.getGeometry();
         display.map.zoomToFeature(
             new Feature({ geometry })
         );
     }
 
-    const zoomToLayer = (value) => {
-        olmap.getLayers().forEach((layer) => {
+    const zoomToLayer = (value: string) => {
+        olmap.getLayers().forEach((layer: OlVectorLayer<OlVectorSource>) => {
             const uid = layer?.get("name")?.split("__")[0]
             if (value === uid) {
                 const extent = layer.getSource().getExtent();
@@ -106,13 +105,13 @@ export const useFeatures = (display: DojoDisplay) => {
     }
 
     const displayFeatureInfo = (pixel: number[]): number[] => {
-        const features = [];
-        olmap.forEachFeatureAtPixel(pixel, (e) => {
-            e.setStyle(clickStyle);
-            features.push(e);
+        const features: FeatureLike[] = []
+        olmap.forEachFeatureAtPixel(pixel, (feature: Feature) => {
+            feature.setStyle(clickStyle);
+            features.push(feature);
         },
             {
-                layerFilter: (layer) => {
+                layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
                     return layer.get("name") !== "drawing-layer";
                 }
             },
@@ -122,22 +121,22 @@ export const useFeatures = (display: DojoDisplay) => {
         return features;
     };
 
-    const visibleLayer = (e, value) => {
-        olmap.getLayers().getArray().forEach(layer => {
+    const visibleLayer = (checked: boolean, value: string) => {
+        olmap.getLayers().getArray().forEach((layer: OlVectorLayer<OlVectorSource>) => {
             const uid = layer.get("name")?.split("__")[0]
             const pref = layer.get("name")?.split("__")[1]
             if (pref === "upload-layer" && uid === value) {
-                e.target.checked ? layer.setVisible(true) : layer.setVisible(false);
+                checked ? layer.setVisible(true) : layer.setVisible(false);
             }
         });
     };
 
-    const setCustomStyle = (value, status) => {
+    const setCustomStyle = (value: OlVectorLayer<OlVectorSource>, status: boolean) => {
         if (status) {
             setCustomStyle(null, false)
             value.setStyle(clickStyle);
         } else {
-            olmap.getLayers().forEach(layer => {
+            olmap.getLayers().forEach((layer: OlVectorLayer<OlVectorSource>) => {
                 const pref = layer.get("name")?.split("__")[1]
                 if (pref === "upload-layer") {
                     layer.getSource().forEachFeature((e) => {
@@ -148,8 +147,8 @@ export const useFeatures = (display: DojoDisplay) => {
         }
     }
 
-    const removeItem = (value) => {
-        olmap.getLayers().forEach((layer) => {
+    const removeItem = (value: string) => {
+        olmap.getLayers().forEach((layer: OlVectorLayer<OlVectorSource>) => {
             const uid = layer?.get("name")?.split("__")[0]
             if (value === uid) {
                 olmap.removeLayer(layer);

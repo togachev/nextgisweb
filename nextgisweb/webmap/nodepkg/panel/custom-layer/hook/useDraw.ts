@@ -10,7 +10,7 @@ import { TYPE_FILE } from "../constant";
 const style = [
     new Style({
         stroke: new Stroke({
-            width: 2,
+            width: 3,
             color: "#FF2128",
         }),
         image: new Circle({
@@ -21,7 +21,7 @@ const style = [
                 width: 1,
                 color: "#000000",
             }),
-            radius: 7,
+            radius: 5,
             fill: new Stroke({
                 width: 4,
                 color: "#106a9020",
@@ -40,7 +40,23 @@ const style = [
                 width: 1,
                 color: "#ffffff",
             }),
-            radius: 8,
+            radius: 6,
+        }),
+    }),
+    new Style({
+        image: new Circle({
+            anchor: [0.5, 46],
+            anchorXUnits: "fraction",
+            anchorYUnits: "pixels",
+            stroke: new Stroke({
+                width: 1,
+                color: "#ffffff",
+            }),
+            radius: 2,
+            fill: new Stroke({
+                width: 2,
+                color: "#fff",
+            }),
         }),
     }),
 ];
