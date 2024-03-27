@@ -32,5 +32,6 @@
     "description",
     "playlist_add",
     "upload",
-    "draw"
+    "draw",
+    "upload_file"
 ]

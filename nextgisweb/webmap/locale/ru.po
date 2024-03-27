@@ -670,6 +670,10 @@ msgstr "Атрибутивная информация отсутсвует"
 msgid "Maximum number of uploaded files:"
 msgstr "Максимальное количество загружаемых файлов:"
 
+#: nodepkg/settings/SettingsForm.js:156
+msgid "Maximum number of uploaded files"
+msgstr "Максимальное количество загружаемых файлов"
+
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:57
 msgid "Number of files maximum/downloaded:"
 msgstr "Количество файлов максимум/загружено:"
@@ -893,12 +897,8 @@ msgid "Show geometry info"
 msgstr "Показывать информацию о геометрии"
 
 #: nodepkg/settings/SettingsForm.js:150
-msgid "File upload webmap"
-msgstr ""
-
-#: nodepkg/settings/SettingsForm.js:156
-msgid "Maximum number of uploaded files"
-msgstr ""
+msgid "Custom map settings"
+msgstr "Пользовательские настройки карты"
 
 #: nodepkg/settings/SettingsForm.js:168
 msgid "Measurement"
