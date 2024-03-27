@@ -4,12 +4,17 @@ import { TYPE_FILE } from "./constant";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
+export interface ControlProps {
+    key: number | null;
+    change: boolean;
+}
+
 export class DrawStore {
     options = TYPE_FILE.map(item => {
         return { value: item.value, label: item.label, disabled: item.disabled }
     });
     drawLayer: string[] = [];
-    switchKey: string;
+    switchKey: ControlProps[] = [];
     readonly = true;
     itemModal: null = null;
 

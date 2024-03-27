@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Checkbox, ConfigProvider, Dropdown, message, Modal, Select, Space, Switch, Typography } from "@nextgisweb/gui/antd";
+import { Checkbox, ConfigProvider, Dropdown, Flex, message, Modal, Select, Space, Switch, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
@@ -273,6 +273,13 @@ export const DrawFeatures = observer(
             setDefaultOp(value);
         };
 
+        const [checked, setChecked] = useState(true);
+
+        const toggleChecked = () => {
+            console.log(checked);
+            setChecked(!checked);
+        };
+
         return (
             <ConfigProvider
                 theme={{
@@ -323,6 +330,16 @@ export const DrawFeatures = observer(
                     <div style={{ margin: "5px" }}>
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
+                    {
+                        <Flex horizontal>
+                            <span className="icon-symbol" onClick={toggleChecked}>
+                                {!checked ? <EditIcon /> : <EditOffIcon />}
+                            </span>
+                            <span className="icon-symbol" onClick={toggleChecked}>
+                                {!checked ? <EditIcon /> : <EditOffIcon />}
+                            </span>
+                        </Flex>
+                    }
                     {
                         drawLayer.map((item: ItemType, index: number) => {
                             const statusFeature = featureCount.includes(item.key)
