@@ -3,7 +3,7 @@ import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { primaryAction, shiftKeyOnly } from "ol/events/condition";
+import { primaryAction, shiftKeyOnly, platformModifierKeyOnly } from "ol/events/condition";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 import { TYPE_FILE } from "../constant";
 
@@ -106,7 +106,7 @@ export const useDraw = (display: DojoDisplay) => {
                 if (layer.get("name") === "drawing-layer") {
                     const snap_ = new Snap({
                         source: layer.getSource(),
-                        edge: true,
+                        edge: false,
                         vertex: true,
                     });
                     setSnap(s => ({
@@ -139,6 +139,7 @@ export const useDraw = (display: DojoDisplay) => {
             stopClick: true,
             condition: (e) => primaryAction(e),
             snapTolerance: 10,
+            freehandCondition: platformModifierKeyOnly,
         });
         olmap.addInteraction(draw_);
         setDraw(draw_);
