@@ -111,12 +111,11 @@ export const useFeatures = (display: DojoDisplay) => {
             features.push(feature);
         },
             {
+                hitTolerance: display.clientSettings.identify_radius,
                 layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
                     return layer.get("name") !== "drawing-layer";
                 }
             },
-            { hitTolerance: 10 },
-
         );
         return features;
     };
