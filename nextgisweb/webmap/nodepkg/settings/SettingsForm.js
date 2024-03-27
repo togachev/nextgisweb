@@ -147,7 +147,7 @@ export const SettingsForm = ({
                 </Col>
             </Row>
 
-            <Title level={4}>{gettext("File upload webmap")}</Title>
+            <Title level={4}>{gettext("Custom map settings")}</Title>
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>

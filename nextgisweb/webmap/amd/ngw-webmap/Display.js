@@ -994,7 +994,7 @@ define([
                     title: gettext("CustomLayer"),
                     name: "custom-layer",
                     order: 90,
-                    menuIcon: "material-playlist_add",
+                    menuIcon: "material-upload_file",
                 },
             });
 
