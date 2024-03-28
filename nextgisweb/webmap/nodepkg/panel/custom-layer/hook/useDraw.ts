@@ -126,7 +126,7 @@ export const useDraw = (display: DojoDisplay) => {
 
         const modify_ = new Modify({
             source: source,
-            deleteCondition: shiftKeyOnly,
+            // deleteCondition: shiftKeyOnly,
         });
         olmap.addInteraction(modify_);
 
