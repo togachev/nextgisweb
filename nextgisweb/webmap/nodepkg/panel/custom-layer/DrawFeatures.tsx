@@ -95,7 +95,7 @@ let id = 0;
 
 export const DrawFeatures = observer(
     ({ display, topic }: DrawFeaturesProps) => {
-        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, snapInteraction, visibleLayer, zoomToLayer } = useDraw(display);
+        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, snapDefaultInteraction, saveLayer, snapInteraction, visibleLayer, zoomToLayer } = useDraw(display);
         const maxCount = display.clientSettings.max_count_file_upload;
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
@@ -188,8 +188,10 @@ export const DrawFeatures = observer(
                     title={allDeleteItems}
                     className="custom-button icon-symbol"
                     onClick={() => {
-                        removeItems();
-                        setDrawLayer([]);
+                        if (readonly) {
+                            removeItems();
+                            setDrawLayer([]);
+                        }
                     }}
                 >
                     <DeleteForever />
@@ -214,7 +216,11 @@ export const DrawFeatures = observer(
 
         const onSwitchKey = (checked: boolean, item: ItemType) => {
             if (checked) {
+                modifyInteraction(item)
                 drawInteraction(item);
+                if (controls.enable) {
+                    snapDefaultInteraction(controls)
+                }
                 topic.publish("webmap/tool/identify/off");
                 setSwitchKey({ key: item.key, change: false });
                 setDrawLayer(prevState => {
@@ -286,7 +292,6 @@ export const DrawFeatures = observer(
         }, [controls]);
 
         const toggleChecked = (key) => {
-            const itemDraw = drawLayer.filter(item => item.key === switchKey.key)[0];
             if (key === "enable") {
                 setControls(prev => ({ ...prev, enable: !prev.enable }));
             } else if (key === "vertex" && controls.enable) {
