@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Checkbox, ConfigProvider, Dropdown, Flex, message, Modal, Select, Space, Switch, Typography } from "@nextgisweb/gui/antd";
+import { useEffect, useMemo, useState } from "react";
+import { Checkbox, ConfigProvider, Dropdown, message, Modal, Select, Space, Switch, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
@@ -10,6 +10,11 @@ import EditOffIcon from "@nextgisweb/icon/material/edit_off/outline";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import SaveAsIcon from "@nextgisweb/icon/material/save_as/outline";
+
+import MagnetIcon from "@nextgisweb/icon/mdi/magnet";
+import VertexIcon from "@nextgisweb/icon/mdi/vector-point";
+import EdgeIcon from "@nextgisweb/icon/mdi/vector-polyline";
+
 
 import { useDraw } from "./hook/useDraw";
 const { Text } = Typography;
@@ -90,7 +95,7 @@ let id = 0;
 
 export const DrawFeatures = observer(
     ({ display, topic }: DrawFeaturesProps) => {
-        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, visibleLayer, zoomToLayer } = useDraw(display);
+        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, snapInteraction, visibleLayer, zoomToLayer } = useDraw(display);
         const maxCount = display.clientSettings.max_count_file_upload;
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
@@ -110,7 +115,9 @@ export const DrawFeatures = observer(
             readonly,
             setReadonly,
             itemModal,
-            setItemModal
+            setItemModal,
+            controls,
+            setControls
         } = store;
 
         const [defaultOp, setDefaultOp] = useState(options[0]);
@@ -225,6 +232,7 @@ export const DrawFeatures = observer(
                     })
                 });
                 setReadonly(true)
+                setControls({ enable: false, edge: false, vertex: false });
             }
         };
 
@@ -273,12 +281,81 @@ export const DrawFeatures = observer(
             setDefaultOp(value);
         };
 
-        const [checked, setChecked] = useState(true);
+        useMemo(() => {
+            snapInteraction(controls)
+        }, [controls]);
 
-        const toggleChecked = () => {
-            console.log(checked);
-            setChecked(!checked);
+        const toggleChecked = (key) => {
+            const itemDraw = drawLayer.filter(item => item.key === switchKey.key)[0];
+            if (key === "enable") {
+                setControls(prev => ({ ...prev, enable: !prev.enable }));
+            } else if (key === "vertex" && controls.enable) {
+                setControls(prev => ({ ...prev, vertex: !prev.vertex }));
+            } else if (key === "edge" && controls.enable) {
+                setControls(prev => ({ ...prev, edge: !prev.edge }));
+            }
         };
+
+        const iconControlSnap = [
+            {
+                keyname: "enable",
+                comp: <MagnetIcon style={{ transform: 'rotate(-45deg)' }} />,
+                title: {
+                    enable: "Разрешить прилипание",
+                    disable: "Запретить прилипание",
+                }
+            },
+            {
+                keyname: "edge",
+                comp: <EdgeIcon />,
+                title: "Сегмент",
+            },
+            {
+                keyname: "vertex",
+                comp: <VertexIcon />,
+                title: "Вершина",
+            }
+        ];
+
+        const IconControl = ({ item, control }) => {
+            const titleEnable = control.enable ? item.title?.disable : item.title?.enable;
+            return (
+                <div className={!readonly ? "button-active" : "button-disable"}>
+                    <div onClick={() => {
+                        !readonly ? toggleChecked(item.keyname) : undefined
+                    }}>
+                        {
+                            item.keyname === "enable" ?
+                                (
+                                    <div className={control.enable ? "icon-symbol-active" : "icon-symbol"} title={titleEnable}>
+                                        {item.comp}
+                                    </div>
+                                ) :
+                                (
+                                    <div className={control.enable && control[item.keyname] ? "icon-symbol-active" : "icon-symbol"} title={item.title}>
+                                        {item.comp}
+                                    </div>
+                                )
+                        }
+                    </div>
+                </div>
+            )
+        }
+
+        const ControlEdit = () => {
+            return (
+                <div className="control">
+                    <div>Разрешить прилипание</div>
+                    <div className="control-button">{
+                        iconControlSnap.map((item, index) => {
+                            return (
+                                <IconControl key={index} item={item} control={controls} />
+                            )
+                        })
+                    }</div>
+                </div>
+            )
+        }
 
         return (
             <ConfigProvider
@@ -330,16 +407,7 @@ export const DrawFeatures = observer(
                     <div style={{ margin: "5px" }}>
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
-                    {
-                        <Flex horizontal>
-                            <span className="icon-symbol" onClick={toggleChecked}>
-                                {!checked ? <EditIcon /> : <EditOffIcon />}
-                            </span>
-                            <span className="icon-symbol" onClick={toggleChecked}>
-                                {!checked ? <EditIcon /> : <EditOffIcon />}
-                            </span>
-                        </Flex>
-                    }
+                    {drawLayer.length > 0 && (<ControlEdit />)}
                     {
                         drawLayer.map((item: ItemType, index: number) => {
                             const statusFeature = featureCount.includes(item.key)

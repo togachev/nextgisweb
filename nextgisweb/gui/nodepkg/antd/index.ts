@@ -19,7 +19,6 @@ export {
     Drawer,
     Dropdown,
     Empty,
-    Flex,
     FloatButton,
     Form,
     Grid,

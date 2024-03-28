@@ -82,7 +82,7 @@ export const useDraw = (display: DojoDisplay) => {
     const [snap, setSnap] = useState();
     const [snapStatus, setSnapStatus] = useState(false);
     const [modify, setModify] = useState();
-
+    const [propSnap, setPropSnap] = useState();
     const addLayerMap = useCallback(() => {
         const source = new VectorSource({ wrapX: false });
         const vector = new VectorLayer({
@@ -100,25 +100,41 @@ export const useDraw = (display: DojoDisplay) => {
         return layer;
     })
 
+    const snapInteraction = useCallback((params) => {
+        setPropSnap(params)
+    })
+
+    const removeSnap = useCallback(() => {
+        snap && Object.entries(snap)?.forEach(([key,value]) => {
+            olmap.removeInteraction(value);
+        });
+    })
+
     useEffect(() => {
-        if (snapStatus) {
+        if (propSnap.enable) {
+            removeSnap()
             olmap.getLayers().forEach(layer => {
                 if (layer.get("name") === "drawing-layer") {
                     const snap_ = new Snap({
                         source: layer.getSource(),
-                        edge: true,
-                        vertex: true,
+                        edge: propSnap.edge,
+                        vertex: propSnap.vertex,
                     });
                     setSnap(s => ({
                         ...s,
                         [layer.ol_uid]: snap_
                     }))
+                    snap_.setActive(true)
                     olmap.addInteraction(snap_)
                 }
             })
+        } else {
+            snap && Object.entries(snap)?.forEach(([value]) => {
+                olmap.removeInteraction(value);
+            });
         }
-        setSnapStatus(false)
-    }, [snapStatus])
+
+    }, [propSnap])
 
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
@@ -126,11 +142,8 @@ export const useDraw = (display: DojoDisplay) => {
 
         const modify_ = new Modify({
             source: source,
-            deleteCondition: shiftKeyOnly,
         });
         olmap.addInteraction(modify_);
-
-        setSnapStatus(true)
 
         const draw_ = new Draw({
             source: source,
@@ -153,7 +166,7 @@ export const useDraw = (display: DojoDisplay) => {
     const drawInteractionClear = useCallback(() => {
         olmap.removeInteraction(draw);
         olmap.removeInteraction(modify);
-        Object.entries(snap).forEach(([value]) => {
+        Object.entries(snap).forEach(([key,value]) => {
             olmap.removeInteraction(value);
         });
         setSnap(undefined)
@@ -211,5 +224,5 @@ export const useDraw = (display: DojoDisplay) => {
         download(blob, fileName);
     }
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, visibleLayer, zoomToLayer };
+    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, snapInteraction, visibleLayer, zoomToLayer };
 };
