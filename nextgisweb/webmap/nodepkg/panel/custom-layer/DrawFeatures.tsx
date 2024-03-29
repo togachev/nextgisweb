@@ -181,8 +181,10 @@ export const DrawFeatures = observer(
                     title={allDeleteItems}
                     className="custom-button icon-symbol"
                     onClick={() => {
-                        removeItems();
-                        setDrawLayer([]);
+                        if (readonly) {
+                            removeItems();
+                            setDrawLayer([]);
+                        }
                     }}
                 >
                     <DeleteForever />
