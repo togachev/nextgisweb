@@ -89,13 +89,16 @@ type ItemType = {
     change: boolean;
     label: string;
     geomType: string;
+    enable: boolean;
+    edge: boolean;
+    vertex: boolean;
 };
 
 let id = 0;
 
 export const DrawFeatures = observer(
     ({ display, topic }: DrawFeaturesProps) => {
-        const { addLayerMap, drawInteractionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, snapDefaultInteraction, saveLayer, snapInteraction, visibleLayer, zoomToLayer } = useDraw(display);
+        const { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer } = useDraw(display);
         const maxCount = display.clientSettings.max_count_file_upload;
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
@@ -135,12 +138,12 @@ export const DrawFeatures = observer(
             return geomType
         }
 
-        const addLayer = (geomType: ItemType) => {
+        const addLayer = (geomType: string) => {
             if (drawLayer.length < maxCount) {
                 const layer = addLayerMap();
                 setDrawLayer([
                     ...drawLayer,
-                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType }
+                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, enable: true, edge: false, vertex: geomType !== 'Point' ? true : false }
                 ])
             } else {
                 message.error(maxCountLayer);
@@ -159,7 +162,8 @@ export const DrawFeatures = observer(
 
         const onDefaultType = () => {
             if (readonly) {
-                addLayer(currentTypeGeom(geomTypeDefault));
+                const type = currentTypeGeom(geomTypeDefault);
+                addLayer(type);
             }
         };
 
@@ -216,11 +220,9 @@ export const DrawFeatures = observer(
 
         const onSwitchKey = (checked: boolean, item: ItemType) => {
             if (checked) {
-                modifyInteraction(item)
+                modifyInteraction(item);
                 drawInteraction(item);
-                if (controls.enable) {
-                    snapDefaultInteraction(controls)
-                }
+                snapInteraction(item);
                 topic.publish("webmap/tool/identify/off");
                 setSwitchKey({ key: item.key, change: false });
                 setDrawLayer(prevState => {
@@ -230,7 +232,7 @@ export const DrawFeatures = observer(
                 });
                 setReadonly(false);
             } else {
-                drawInteractionClear();
+                interactionClear();
                 topic.publish("webmap/tool/identify/on");
                 setDrawLayer(prevState => {
                     return prevState.map((item: ItemType) => {
@@ -288,16 +290,39 @@ export const DrawFeatures = observer(
         };
 
         useMemo(() => {
-            snapInteraction(controls)
-        }, [controls]);
+            if (drawLayer) {
+                snapBuild(drawLayer?.filter((x) => x.key === switchKey.key)[0])
+            }
+        }, [drawLayer]);
 
-        const toggleChecked = (key) => {
+        const toggleChecked = (key, item) => {
             if (key === "enable") {
-                setControls(prev => ({ ...prev, enable: !prev.enable }));
-            } else if (key === "vertex" && controls.enable) {
-                setControls(prev => ({ ...prev, vertex: !prev.vertex }));
-            } else if (key === "edge" && controls.enable) {
-                setControls(prev => ({ ...prev, edge: !prev.edge }));
+                setDrawLayer(prev => {
+                    return prev.map((item: ItemType) => {
+                        if (item.key === switchKey.key) {
+                            return { ...item, enable: !item.enable }
+                        };
+                        return item;
+                    })
+                })
+            } else if (key === "vertex" && item.enable) {
+                setDrawLayer(prev => {
+                    return prev.map((item: ItemType) => {
+                        if (item.key === switchKey.key) {
+                            return { ...item, vertex: !item.vertex }
+                        };
+                        return item;
+                    })
+                })
+            } else if (key === "edge" && item.enable) {
+                setDrawLayer(prev => {
+                    return prev.map((item: ItemType) => {
+                        if (item.key === switchKey.key) {
+                            return { ...item, edge: !item.edge }
+                        };
+                        return item;
+                    })
+                })
             }
         };
 
@@ -322,39 +347,39 @@ export const DrawFeatures = observer(
             }
         ];
 
-        const IconControl = ({ item, control }) => {
-            const titleEnable = control.enable ? item.title?.disable : item.title?.enable;
+        const IconControl = ({ item, itemLayer }) => {
+            const titleEnable = itemLayer.enable ? item.title?.disable : item.title?.enable;
+
             return (
-                <div className={!readonly ? "button-active" : "button-disable"}>
-                    <div onClick={() => {
-                        !readonly ? toggleChecked(item.keyname) : undefined
+                <div
+                    className={!readonly && !itemLayer.change ? "button-active" : "button-disable"}
+                    onClick={() => {
+                        !readonly && !itemLayer.change ? toggleChecked(item.keyname, itemLayer) : undefined
                     }}>
-                        {
-                            item.keyname === "enable" ?
-                                (
-                                    <div className={control.enable ? "icon-symbol-active" : "icon-symbol"} title={titleEnable}>
-                                        {item.comp}
-                                    </div>
-                                ) :
-                                (
-                                    <div className={control.enable && control[item.keyname] ? "icon-symbol-active" : "icon-symbol"} title={item.title}>
-                                        {item.comp}
-                                    </div>
-                                )
-                        }
-                    </div>
+                    {
+                        item.keyname === "enable" ?
+                            (
+                                <div className={itemLayer.enable ? "icon-symbol-yes" : "icon-symbol-no"} title={titleEnable}>
+                                    {item.comp}
+                                </div>
+                            ) :
+                            (
+                                <div className={itemLayer.enable && itemLayer[item.keyname] ? "icon-symbol-yes" : "icon-symbol-no"} title={item.title}>
+                                    {item.comp}
+                                </div>
+                            )
+                    }
                 </div>
             )
         }
 
-        const ControlEdit = () => {
+        const ControlEdit = ({ itemLayer }) => {
             return (
                 <div className="control">
-                    <div>Разрешить прилипание</div>
                     <div className="control-button">{
                         iconControlSnap.map((item, index) => {
                             return (
-                                <IconControl key={index} item={item} control={controls} />
+                                <IconControl key={index} item={item} itemLayer={itemLayer} />
                             )
                         })
                     }</div>
@@ -412,51 +437,55 @@ export const DrawFeatures = observer(
                     <div style={{ margin: "5px" }}>
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
-                    {drawLayer.length > 0 && (<ControlEdit />)}
+
                     {
                         drawLayer.map((item: ItemType, index: number) => {
                             const statusFeature = featureCount.includes(item.key)
                             return (
-                                <div key={index} className="layer-item">
-                                    <div className="checkbox-item">
-                                        <Checkbox
-                                            defaultChecked={true}
-                                            onChange={(e) => { visibleLayer(e.target.checked, item.key) }} >
-                                            {item.label}
-                                        </Checkbox>
-                                    </div>
-                                    <div className="custom-button">
-                                        <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
-                                            if (statusFeature) {
-                                                showModal()
-                                                setItemModal(item)
-                                            }
-                                        }}>
-                                            <SaveAsIcon />
-                                        </span>
-                                        <span
-                                            title={ZoomToLayer}
-                                            className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
-                                            onClick={() => {
-                                                statusFeature ?
-                                                    zoomToLayer(item.key)
-                                                    : undefined
-                                            }}>
-                                            <ZoomIn />
-                                        </span>
-                                        <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
-                                            <DeleteForever />
-                                        </span>
-                                        <span title={EditLayer} onClick={() => {
+                                <div key={index} >
 
-                                        }}>
-                                            <Switch
-                                                disabled={item.change}
-                                                size="small"
-                                                checkedChildren={<EditIcon />} unCheckedChildren={<EditOffIcon />}
-                                                onChange={(checked) => onSwitchKey(checked, item)} />
-                                        </span>
+                                    <div className="layer-item">
+                                        <div className="checkbox-item">
+                                            <Checkbox
+                                                defaultChecked={true}
+                                                onChange={(e) => { visibleLayer(e.target.checked, item.key) }} >
+                                                {item.label}
+                                            </Checkbox>
+                                        </div>
+                                        <div className="custom-button">
+                                            <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
+                                                if (statusFeature) {
+                                                    showModal()
+                                                    setItemModal(item)
+                                                }
+                                            }}>
+                                                <SaveAsIcon />
+                                            </span>
+                                            <span
+                                                title={ZoomToLayer}
+                                                className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
+                                                onClick={() => {
+                                                    statusFeature ?
+                                                        zoomToLayer(item.key)
+                                                        : undefined
+                                                }}>
+                                                <ZoomIn />
+                                            </span>
+                                            <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
+                                                <DeleteForever />
+                                            </span>
+                                            <span title={EditLayer} onClick={() => {
+
+                                            }}>
+                                                <Switch
+                                                    disabled={item.change}
+                                                    size="small"
+                                                    checkedChildren={<EditIcon />} unCheckedChildren={<EditOffIcon />}
+                                                    onChange={(checked) => onSwitchKey(checked, item)} />
+                                            </span>
+                                        </div>
                                     </div>
+                                    {!readonly && !item.change && ( <ControlEdit itemLayer={item} /> )}
                                 </div>
                             )
                         }).reverse()

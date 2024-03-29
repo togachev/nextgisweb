@@ -3,7 +3,7 @@ import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { primaryAction, shiftKeyOnly } from "ol/events/condition";
+import { primaryAction } from "ol/events/condition";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 import { TYPE_FILE } from "../constant";
 
@@ -66,7 +66,12 @@ type ItemType = {
     change: boolean;
     label: string;
     geomType: string;
+    enable: boolean;
+    edge: boolean;
+    vertex: boolean;
 };
+
+
 
 type ParamsFormat = {
     value: string;
@@ -76,13 +81,13 @@ type ParamsFormat = {
 
 export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
-    const [featureCount, setFeatureCount] = useState([]);
 
+    const [featureCount, setFeatureCount] = useState([]);
     const [draw, setDraw] = useState();
     const [snap, setSnap] = useState();
-    const [snapStatus, setSnapStatus] = useState(false);
     const [modify, setModify] = useState();
     const [propSnap, setPropSnap] = useState();
+
     const addLayerMap = useCallback(() => {
         const source = new VectorSource({ wrapX: false });
         const vector = new VectorLayer({
@@ -100,32 +105,38 @@ export const useDraw = (display: DojoDisplay) => {
         return layer;
     })
 
-    const snapInteraction = useCallback((params) => {
+    const snapBuild = useCallback((params) => {
         setPropSnap(params)
     })
 
-    const removeSnap = useCallback(() => {
-        snap && Object.entries(snap)?.forEach(([key,value]) => {
-            olmap.removeInteraction(value);
+    const snapInteraction = useCallback((params) => {
+        const layer = getLayer(params.key);
+        const snap_ = new Snap({
+            source: layer.getSource(),
+            edge: params.edge,
+            vertex: params.vertex,
         });
-    })
+        olmap.addInteraction(snap_)
+        setSnap(snap_)
+
+    });
 
     useEffect(() => {
-        if (propSnap.enable) {
-            removeSnap()
-            snapDefaultInteraction(propSnap)
-        } else {
-            snap && Object.entries(snap)?.forEach(([value]) => {
-                olmap.removeInteraction(value);
-            });
+        if (propSnap === undefined) return;
+        if (!propSnap?.enable) {
+            snap.setActive(false)
+        }
+        if (propSnap?.enable) {
+            snap.setActive(true)
+            snap.vertex_ = propSnap.vertex
+            snap.edge_ = propSnap.edge
         }
     }, [propSnap])
 
     const modifyInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
-        const source = layer.getSource()
         const modify_ = new Modify({
-            source: source,
+            source: layer.getSource(),
         });
         olmap.addInteraction(modify_);
         setModify(modify_);
@@ -133,10 +144,8 @@ export const useDraw = (display: DojoDisplay) => {
 
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
-        const source = layer.getSource()
-
         const draw_ = new Draw({
-            source: source,
+            source: layer.getSource(),
             type: item.geomType,
             style: style,
             stopClick: true,
@@ -149,33 +158,12 @@ export const useDraw = (display: DojoDisplay) => {
         draw_.on("drawend", () => {
             setFeatureCount([...featureCount, item.key])
         });
-
     });
 
-    const snapDefaultInteraction = useCallback((params) => {
-        olmap.getLayers().forEach(layer => {
-            if (layer.get("name") === "drawing-layer") {
-                const snap_ = new Snap({
-                    source: layer.getSource(),
-                    edge: params.edge,
-                    vertex: params.vertex,
-                });
-                olmap.addInteraction(snap_)
-                setSnap(s => ({
-                    ...s,
-                    [layer.ol_uid]: snap_
-                }))
-            }
-        })
-    });
-
-    const drawInteractionClear = useCallback(() => {
+    const interactionClear = useCallback(() => {
         olmap.removeInteraction(draw);
         olmap.removeInteraction(modify);
-        // Object.entries(snap).forEach(([key,value]) => {
-        //     olmap.removeInteraction(value);
-        // });
-        // setSnap(undefined)
+        olmap.removeInteraction(snap);
     })
 
     const visibleLayer = (checked: boolean, key: number) => {
@@ -230,5 +218,5 @@ export const useDraw = (display: DojoDisplay) => {
         download(blob, fileName);
     }
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, snapDefaultInteraction, saveLayer, snapInteraction, visibleLayer, zoomToLayer };
+    return { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer };
 };

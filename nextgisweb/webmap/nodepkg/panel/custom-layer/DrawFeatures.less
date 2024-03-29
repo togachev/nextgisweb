@@ -137,29 +137,47 @@
 
 .control {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 5px;
-
+    
     .control-button {
         display: flex;
-        .button-active {
-            margin: 0 2px;
 
-            .icon-symbol-active {
-                box-shadow: inset 0px 0px 3px 0px #797979;
-                border-radius: 3px;
-                cursor: pointer;
-                font-size: 17px;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                justify-items: center;
-                justify-content: center;
-                align-items: center;
-                flex: 0 0 auto;
+        .icon-symbol-yes {
+            box-shadow: inset 0px 0px 3px 0px #797979;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 21px;
+            height: 21px;
+            display: flex;
+            justify-items: center;
+            justify-content: center;
+            align-items: center;
+            flex: 0 0 auto;
+            color: #106a90;
+        }
+
+        .icon-symbol-no {
+            cursor: pointer;
+            font-size: 16px;
+            width: 21px;
+            height: 21px;
+            display: flex;
+            justify-items: center;
+            justify-content: center;
+            align-items: center;
+            flex: 0 0 auto;
+            color: #acacac;
+        }
+
+        .button-active {
+            margin: 0 4px;
+
+            .icon-symbol-no {
+                box-shadow: none;
                 color: #106a90;
             }
-
             &:hover {
                 background-color: #acacac20;
                 border-radius: 3px;
@@ -167,10 +185,10 @@
         }
 
         .button-disable {
-            margin: 0 2px;
+            margin: 0 4px;
             pointer-events: none;
-
-            svg {
+            .icon-symbol-yes {
+                box-shadow: none;
                 color: #acacac;
             }
         }
