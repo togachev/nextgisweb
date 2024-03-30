@@ -11,7 +11,7 @@ import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import SaveAsIcon from "@nextgisweb/icon/material/save_as/outline";
 
-import MagnetIcon from "@nextgisweb/icon/mdi/magnet";
+import CheckAll from "@nextgisweb/icon/mdi/check-all";
 import VertexIcon from "@nextgisweb/icon/mdi/vector-point";
 import EdgeIcon from "@nextgisweb/icon/mdi/vector-polyline";
 
@@ -89,7 +89,7 @@ type ItemType = {
     change: boolean;
     label: string;
     geomType: string;
-    enable: boolean;
+    allLayer: boolean;
     edge: boolean;
     vertex: boolean;
 };
@@ -105,6 +105,7 @@ export const DrawFeatures = observer(
 
         const [open, setOpen] = useState(false);
         const [confirmLoading, setConfirmLoading] = useState(false);
+        const itemDefault = { key: '', change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false };
 
         const [store] = useState(() => new DrawStore({}));
 
@@ -143,7 +144,7 @@ export const DrawFeatures = observer(
                 const layer = addLayerMap();
                 setDrawLayer([
                     ...drawLayer,
-                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, enable: true, edge: false, vertex: geomType !== 'Point' ? true : false }
+                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false }
                 ])
             } else {
                 message.error(maxCountLayer);
@@ -222,7 +223,7 @@ export const DrawFeatures = observer(
             if (checked) {
                 modifyInteraction(item);
                 drawInteraction(item);
-                snapInteraction(item);
+                snapInteraction(item, false);
                 topic.publish("webmap/tool/identify/off");
                 setSwitchKey({ key: item.key, change: false });
                 setDrawLayer(prevState => {
@@ -240,7 +241,7 @@ export const DrawFeatures = observer(
                     })
                 });
                 setReadonly(true)
-                setControls({ enable: false, edge: false, vertex: false });
+                setControls({ allLayer: false, edge: false, vertex: false });
             }
         };
 
@@ -296,16 +297,16 @@ export const DrawFeatures = observer(
         }, [drawLayer]);
 
         const toggleChecked = (key, item) => {
-            if (key === "enable") {
+            if (key === "allLayer") {
                 setDrawLayer(prev => {
                     return prev.map((item: ItemType) => {
                         if (item.key === switchKey.key) {
-                            return { ...item, enable: !item.enable }
+                            return { ...item, allLayer: !item.allLayer }
                         };
                         return item;
                     })
                 })
-            } else if (key === "vertex" && item.enable) {
+            } else if (key === "vertex") {
                 setDrawLayer(prev => {
                     return prev.map((item: ItemType) => {
                         if (item.key === switchKey.key) {
@@ -314,7 +315,7 @@ export const DrawFeatures = observer(
                         return item;
                     })
                 })
-            } else if (key === "edge" && item.enable) {
+            } else if (key === "edge") {
                 setDrawLayer(prev => {
                     return prev.map((item: ItemType) => {
                         if (item.key === switchKey.key) {
@@ -328,14 +329,6 @@ export const DrawFeatures = observer(
 
         const iconControlSnap = [
             {
-                keyname: "enable",
-                comp: <MagnetIcon style={{ transform: 'rotate(-45deg)' }} />,
-                title: {
-                    enable: "Разрешить прилипание",
-                    disable: "Запретить прилипание",
-                }
-            },
-            {
                 keyname: "edge",
                 comp: <EdgeIcon />,
                 title: "Сегмент",
@@ -344,11 +337,19 @@ export const DrawFeatures = observer(
                 keyname: "vertex",
                 comp: <VertexIcon />,
                 title: "Вершина",
-            }
+            },
+            {
+                keyname: "allLayer",
+                comp: <CheckAll />,
+                title: {
+                    enable: "Ко всем слоям",
+                    disable: "К текущему слою",
+                }
+            },
         ];
 
         const IconControl = ({ item, itemLayer }) => {
-            const titleEnable = itemLayer.enable ? item.title?.disable : item.title?.enable;
+            const titleEnable = itemLayer.allLayer ? item.title.disable : item.title.enable;
 
             return (
                 <div
@@ -356,19 +357,10 @@ export const DrawFeatures = observer(
                     onClick={() => {
                         !readonly && !itemLayer.change ? toggleChecked(item.keyname, itemLayer) : undefined
                     }}>
-                    {
-                        item.keyname === "enable" ?
-                            (
-                                <div className={itemLayer.enable ? "icon-symbol-yes" : "icon-symbol-no"} title={titleEnable}>
-                                    {item.comp}
-                                </div>
-                            ) :
-                            (
-                                <div className={itemLayer.enable && itemLayer[item.keyname] ? "icon-symbol-yes" : "icon-symbol-no"} title={item.title}>
-                                    {item.comp}
-                                </div>
-                            )
-                    }
+                    <div className={itemLayer[item.keyname] ? "icon-symbol-yes" : "icon-symbol-no"}
+                        title={item.keyname === "allLayer" ? titleEnable : item.title}>
+                        {item.comp}
+                    </div>
                 </div>
             )
         }
@@ -376,12 +368,15 @@ export const DrawFeatures = observer(
         const ControlEdit = ({ itemLayer }) => {
             return (
                 <div className="control">
+                    <div>Инструмент прилипания</div>
                     <div className="control-button">{
-                        iconControlSnap.map((item, index) => {
-                            return (
-                                <IconControl key={index} item={item} itemLayer={itemLayer} />
-                            )
-                        })
+                        itemLayer !== null ?
+                            iconControlSnap.map((item, index) => {
+                                return (
+                                    <IconControl key={index} item={item} itemLayer={itemLayer} />
+                                )
+                            }) :
+                            (<></>)
                     }</div>
                 </div>
             )
@@ -437,7 +432,12 @@ export const DrawFeatures = observer(
                     <div style={{ margin: "5px" }}>
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
-
+                    {
+                        drawLayer.length > 0 ?
+                            switchKey.key ?
+                                (<ControlEdit itemLayer={drawLayer?.filter((x) => x.key === switchKey.key)[0]} />) :
+                                (<ControlEdit itemLayer={itemDefault} />) : null
+                    }
                     {
                         drawLayer.map((item: ItemType, index: number) => {
                             const statusFeature = featureCount.includes(item.key)
@@ -485,7 +485,7 @@ export const DrawFeatures = observer(
                                             </span>
                                         </div>
                                     </div>
-                                    {!readonly && !item.change && ( <ControlEdit itemLayer={item} /> )}
+
                                 </div>
                             )
                         }).reverse()

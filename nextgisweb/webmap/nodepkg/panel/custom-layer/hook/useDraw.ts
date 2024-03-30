@@ -66,7 +66,7 @@ type ItemType = {
     change: boolean;
     label: string;
     geomType: string;
-    enable: boolean;
+    allLayer: boolean;
     edge: boolean;
     vertex: boolean;
 };
@@ -84,7 +84,7 @@ export const useDraw = (display: DojoDisplay) => {
 
     const [featureCount, setFeatureCount] = useState([]);
     const [draw, setDraw] = useState();
-    const [snap, setSnap] = useState();
+    const [snap, setSnap] = useState([]);
     const [modify, setModify] = useState();
     const [propSnap, setPropSnap] = useState();
 
@@ -109,27 +109,58 @@ export const useDraw = (display: DojoDisplay) => {
         setPropSnap(params)
     })
 
-    const snapInteraction = useCallback((params) => {
-        const layer = getLayer(params.key);
-        const snap_ = new Snap({
-            source: layer.getSource(),
-            edge: params.edge,
-            vertex: params.vertex,
-        });
-        olmap.addInteraction(snap_)
-        setSnap(snap_)
+    const snapInteraction = useCallback((params, status) => {
+        if (!status) {
+            const layer = getLayer(params.key);
+            const snap_ = new Snap({
+                source: layer.getSource(),
+                edge: params.edge,
+                vertex: params.vertex,
+            });
+            olmap.addInteraction(snap_)
+            setSnap([...snap, { [layer.ol_uid] : snap_}])
+        } else {
+            olmap.getLayers().forEach(layer => {
+                if (layer.get("name") === "drawing-layer") {
+                    const snap_ = new Snap({
+                        source: layer.getSource(),
+                        edge: propSnap.edge,
+                        vertex: propSnap.vertex,
+                    });
+                    setSnap([...snap, { [layer.ol_uid] : snap_}])
+                    snap_.setActive(true)
+                    olmap.addInteraction(snap_)
+                }
+            })
+        }
 
     });
 
     useEffect(() => {
         if (propSnap === undefined) return;
-        if (!propSnap?.enable) {
-            snap.setActive(false)
+        if (propSnap?.allLayer) {
+            snapInteraction(propSnap, true)
         }
-        if (propSnap?.enable) {
-            snap.setActive(true)
-            snap.vertex_ = propSnap.vertex
-            snap.edge_ = propSnap.edge
+        if (!propSnap?.vertex && !propSnap?.edge) {
+            snap.map(item => {
+                const key_ = Object.keys(item)[0];
+                const snap_ = Object.values(item)[0];
+                if (key_ === propSnap.key) {
+                    snap_.setActive(false)
+                    snap_.vertex_ = false
+                    snap_.edge_ = false
+                }
+            })
+        } else if (propSnap?.vertex || propSnap?.edge) {
+            snap.map(item => {
+                const key_ = Object.keys(item)[0];
+                const snap_ = Object.values(item)[0];
+                if (key_ === propSnap.key) {
+                    snap_.setActive(true)
+                    snap_.vertex_ = propSnap?.vertex
+                    snap_.edge_ = propSnap?.edge
+                }
+            })
         }
     }, [propSnap])
 
@@ -163,7 +194,12 @@ export const useDraw = (display: DojoDisplay) => {
     const interactionClear = useCallback(() => {
         olmap.removeInteraction(draw);
         olmap.removeInteraction(modify);
-        olmap.removeInteraction(snap);
+        snap?.map(item => {
+            
+            const snap_ = Object.values(item)[0];
+            olmap.removeInteraction(snap_);
+        });
+        setSnap([]);
     })
 
     const visibleLayer = (checked: boolean, key: number) => {

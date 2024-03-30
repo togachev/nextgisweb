@@ -13,7 +13,7 @@ export class DrawStore {
     options = TYPE_FILE.map(item => {
         return { value: item.value, label: item.label, disabled: item.disabled }
     });
-    controls = { enable: true, edge: false, vertex: true };
+    controls = { allLayer: false, edge: false, vertex: true };
     drawLayer: string[] = [];
     switchKey: ControlProps[] = [];
     readonly = true;
