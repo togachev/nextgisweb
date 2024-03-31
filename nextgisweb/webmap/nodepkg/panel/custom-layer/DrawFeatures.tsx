@@ -13,6 +13,7 @@ import SaveAsIcon from "@nextgisweb/icon/material/save_as/outline";
 import CheckAll from "@nextgisweb/icon/material/stacked_line_chart/outline";
 import VertexIcon from "@nextgisweb/icon/mdi/vector-point";
 import EdgeIcon from "@nextgisweb/icon/mdi/vector-polyline";
+import ModifyIcon from "@nextgisweb/icon/mdi/vector-polyline-edit";
 
 import { useDraw } from "./hook/useDraw";
 
@@ -38,6 +39,8 @@ type ItemType = {
     allLayer: boolean;
     edge: boolean;
     vertex: boolean;
+    draw: boolean;
+    modify: boolean;
 };
 
 const { Text } = Typography;
@@ -106,7 +109,7 @@ export const DrawFeatures = observer(
 
         const [open, setOpen] = useState(false);
         const [confirmLoading, setConfirmLoading] = useState(false);
-        const itemDefault = { key: '', change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false };
+        const itemDefault = { key: '', change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false, draw: false, modify: false };
 
         const [store] = useState(() => new DrawStore({}));
 
@@ -141,11 +144,9 @@ export const DrawFeatures = observer(
         const addLayer = (geomType: string) => {
             if (drawLayer.length < maxCount) {
                 const layer = addLayerMap(id);
-                console.log(id);
-                
                 setDrawLayer([
                     ...drawLayer,
-                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false }
+                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false }
                 ])
             } else {
                 message.error(maxCountLayer);
@@ -238,11 +239,22 @@ export const DrawFeatures = observer(
                 topic.publish("webmap/tool/identify/on");
                 setDrawLayer(prevState => {
                     return prevState.map((item: ItemType) => {
-                        return { ...item, change: false }
+                        return { ...item, change: false, modify: false }
                     })
                 });
                 setReadonly(true)
             }
+        };
+
+        const onModify = (checked: boolean) => {
+            setDrawLayer(prev => {
+                return prev.map((item: ItemType) => {
+                    if (item.key === checkedKey.key) {
+                        return { ...item, draw: !checked, modify: checked }
+                    };
+                    return item;
+                })
+            })
         };
 
         useEffect(() => {
@@ -434,38 +446,49 @@ export const DrawFeatures = observer(
                                         </Checkbox>
                                     </div>
                                     <div className="custom-button">
-                                        <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
-                                            if (statusFeature) {
-                                                showModal()
-                                                setItemModal(item)
-                                            }
-                                        }}>
-                                            <SaveAsIcon />
-                                        </span>
-                                        <span
-                                            title={ZoomToLayer}
-                                            className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
-                                            onClick={() => {
-                                                statusFeature ?
-                                                    zoomToLayer(item.key)
-                                                    : undefined
-                                            }}>
-                                            <ZoomIn />
-                                        </span>
-                                        <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
-                                            <DeleteForever />
-                                        </span>
+                                        {statusFeature && (
+                                            <>
+                                                <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
+                                                    if (statusFeature) {
+                                                        showModal()
+                                                        setItemModal(item)
+                                                    }
+                                                }}>
+                                                    <SaveAsIcon />
+                                                </span>
+                                                <span
+                                                    title={ZoomToLayer}
+                                                    className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
+                                                    onClick={() => { if (statusFeature) { zoomToLayer(item.key) } }}>
+                                                    <ZoomIn />
+                                                </span>
+                                                <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
+                                                    <DeleteForever />
+                                                </span>
+                                            </>
+                                        )}
                                         <label>
-                                            <Input
-                                                disabled={item.change}
-                                                type="checkbox"
+                                            <Input disabled={item.change} type="checkbox"
                                                 onChange={(e) => onCheckedKey(e.target.checked, item)}
-                                                style={{ display: 'none' }}
-                                            />
+                                                className="input-button-none" />
                                             <span title={EditLayer} className={!readonly && item.key === checkedKey.key ? "icon-edit icon-symbol" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
                                                 <EditIcon />
                                             </span>
                                         </label>
+                                        {!readonly && !item.change ? (
+                                            <label>
+                                                <Input disabled={item.change} type="checkbox"
+                                                    onChange={(e) => {
+                                                        if (statusFeature) {
+                                                            onModify(e.target.checked)
+                                                        }
+                                                    }}
+                                                    className="input-button-none" />
+                                                <span title="Изменить геометрию" className={!readonly && item.modify ? "icon-edit icon-symbol" : !item.change && statusFeature ? "icon-symbol" : "icon-symbol-disable"}>
+                                                    <ModifyIcon />
+                                                </span>
+                                            </label>
+                                        ) : null}
                                     </div>
                                 </div>
 

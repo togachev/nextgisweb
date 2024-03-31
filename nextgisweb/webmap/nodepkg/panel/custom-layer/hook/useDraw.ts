@@ -3,7 +3,7 @@ import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { primaryAction } from "ol/events/condition";
+import { primaryAction, shiftKeyOnly } from "ol/events/condition";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 import { TYPE_FILE } from "../constant";
 
@@ -69,7 +69,8 @@ type ItemType = {
     allLayer: boolean;
     edge: boolean;
     vertex: boolean;
-    edit: boolean;
+    draw: boolean;
+    modify: boolean;
 };
 
 type ParamsFormat = {
@@ -162,13 +163,23 @@ export const useDraw = (display: DojoDisplay) => {
                 }
             })
         }
+        if (propSnap?.modify) {
+            modify.setActive(true);
+            draw.setActive(false);
+        } else {
+            modify.setActive(false);
+            draw.setActive(true);
+        }
+        
     }, [propSnap])
 
     const modifyInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
         const modify_ = new Modify({
             source: layer.getSource(),
+            deleteCondition: shiftKeyOnly,
         });
+        modify_.setActive(item.modify)
         olmap.addInteraction(modify_);
         setModify(modify_);
     });
@@ -183,6 +194,7 @@ export const useDraw = (display: DojoDisplay) => {
             condition: (e) => primaryAction(e),
             snapTolerance: 10,
         });
+        draw_.setActive(item.draw)
         olmap.addInteraction(draw_);
         setDraw(draw_);
 
