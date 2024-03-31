@@ -54,6 +54,12 @@ const SaveAs = gettext("Save as");
 const allDeleteItems = gettext("Delete all layers");
 const maxCountLayer = gettext("The limit of created layers has been exceeded")
 const saveFormat = gettext("Format")
+const Segment = gettext("Segment")
+const Vertex = gettext("Vertex")
+const ToAllLayers = gettext("To all layers")
+const ToCurrentLayer = gettext("To current layer")
+const StickTool = gettext("Stick Tool")
+
 
 const typeComponentIcon = [
     { key: "LineString", component: <LineIcon />, label: gettext("line layer") },
@@ -343,24 +349,25 @@ export const DrawFeatures = observer(
             {
                 keyname: "edge",
                 comp: <EdgeIcon />,
-                title: "Сегмент",
+                title: Segment,
             },
             {
                 keyname: "vertex",
                 comp: <VertexIcon />,
-                title: "Вершина",
+                title: Vertex,
             },
             {
                 keyname: "allLayer",
                 comp: <CheckAll />,
-                titleEnable: "Ко всем слоям",
-                titleDisable: "К текущему слою",
+                titleEnable: ToAllLayers,
+                titleDisable: ToCurrentLayer,
             },
         ];
 
         const ControlEdit = ({ itemLayer }) => {
             return (
-                <div className="control" title="Инструмент прилипания">
+                <div className="control" title={StickTool}>
+                    {StickTool}
                     <div className="control-button">
                         {itemLayer &&
                             iconControlSnap.map((item, index) => {
@@ -467,16 +474,8 @@ export const DrawFeatures = observer(
                                                 </span>
                                             </>
                                         )}
-                                        <label>
-                                            <Input disabled={item.change} type="checkbox"
-                                                onChange={(e) => onCheckedKey(e.target.checked, item)}
-                                                className="input-button-none" />
-                                            <span title={EditLayer} className={!readonly && item.key === checkedKey.key ? "icon-edit icon-symbol" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
-                                                <EditIcon />
-                                            </span>
-                                        </label>
                                         {!readonly && !item.change ? (
-                                            <label>
+                                            <label className="icon-edit-margin">
                                                 <Input disabled={item.change} type="checkbox"
                                                     onChange={(e) => {
                                                         if (statusFeature) {
@@ -489,6 +488,14 @@ export const DrawFeatures = observer(
                                                 </span>
                                             </label>
                                         ) : null}
+                                        <label className="icon-edit-margin">
+                                            <Input disabled={item.change} type="checkbox"
+                                                onChange={(e) => onCheckedKey(e.target.checked, item)}
+                                                className="input-button-none" />
+                                            <span title={EditLayer} className={!readonly && item.key === checkedKey.key ? "icon-edit icon-symbol icon-red" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
+                                                <EditIcon />
+                                            </span>
+                                        </label>
                                     </div>
                                 </div>
 

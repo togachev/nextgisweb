@@ -10,13 +10,10 @@ import { TYPE_FILE } from "../constant";
 const style = [
     new Style({
         stroke: new Stroke({
-            width: 3,
+            width: 2,
             color: "#FF2128",
         }),
         image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: "fraction",
-            anchorYUnits: "pixels",
             stroke: new Stroke({
                 width: 1,
                 color: "#000000",
@@ -33,9 +30,6 @@ const style = [
     }),
     new Style({
         image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: "fraction",
-            anchorYUnits: "pixels",
             stroke: new Stroke({
                 width: 1,
                 color: "#ffffff",
@@ -45,12 +39,51 @@ const style = [
     }),
     new Style({
         image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: "fraction",
-            anchorYUnits: "pixels",
             stroke: new Stroke({
                 width: 1,
                 color: "#ffffff",
+            }),
+            radius: 2,
+            fill: new Stroke({
+                width: 2,
+                color: "#fff",
+            }),
+        }),
+    }),
+    new Style({
+        image: new Circle({
+            radius: 1,
+            fill: new Stroke({
+                width: 2,
+                color: "#000",
+            }),
+        }),
+    }),
+];
+
+const styleDraw = [
+    new Style({
+        stroke: new Stroke({
+            width: 2,
+            color: "#FF0000",
+            lineDash: [5, 5]
+        }),
+        zIndex: 1000
+    }),
+    new Style({
+        image: new Circle({
+            stroke: new Stroke({
+                width: 2,
+                color: "#1400FF",
+            }),
+            radius: 6,
+        }),
+    }),
+    new Style({
+        image: new Circle({
+            stroke: new Stroke({
+                width: 2,
+                color: "#1400FF",
             }),
             radius: 2,
             fill: new Stroke({
@@ -189,7 +222,7 @@ export const useDraw = (display: DojoDisplay) => {
         const draw_ = new Draw({
             source: layer.getSource(),
             type: item.geomType,
-            style: style,
+            style: styleDraw,
             stopClick: true,
             condition: (e) => primaryAction(e),
             snapTolerance: 10,

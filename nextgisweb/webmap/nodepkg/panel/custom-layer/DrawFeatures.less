@@ -58,13 +58,21 @@
 }
 
 .icon-edit {
-    box-shadow: inset 0px 0px 3px 0px #797979;
+    box-shadow: inset 0px 0px 2px 0px #000000;
     border-radius: 3px;
 
     &:hover {
         background-color: #acacac20;
         border-radius: 3px;
     }
+}
+
+.icon-red {
+    color: #ff0000;
+}
+
+.icon-edit-margin {
+    margin: 0 2px;
 }
 
 .icon-edit-no {
@@ -161,15 +169,19 @@
 
 .control {
     display: flex;
-    justify-content: flex-end;
-    padding: 3px 5px;
-    border-bottom: solid #efefef 0.005em;
+    justify-content: space-between;
+    padding: 5px 3px 5px 5px;
+    align-items: center;
 
     .control-button {
         display: flex;
 
+        &:label {
+            padding: 0 5px;
+        }
+
         .icon-symbol-yes {
-            box-shadow: inset 0px 0px 3px 0px #797979;
+            box-shadow: inset 0px 0px 2px 0px #000000;
             border-radius: 3px;
             cursor: pointer;
             font-size: 16px;
