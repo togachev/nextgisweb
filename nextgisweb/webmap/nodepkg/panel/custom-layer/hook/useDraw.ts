@@ -69,9 +69,8 @@ type ItemType = {
     allLayer: boolean;
     edge: boolean;
     vertex: boolean;
+    edit: boolean;
 };
-
-
 
 type ParamsFormat = {
     value: string;
@@ -88,10 +87,11 @@ export const useDraw = (display: DojoDisplay) => {
     const [modify, setModify] = useState();
     const [propSnap, setPropSnap] = useState();
 
-    const addLayerMap = useCallback(() => {
+    const addLayerMap = useCallback((id) => {
         const source = new VectorSource({ wrapX: false });
         const vector = new VectorLayer({
             source: source,
+            zIndex: 100 + id,
         });
         vector.setStyle(style);
         vector.set("name", "drawing-layer");

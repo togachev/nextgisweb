@@ -13,9 +13,8 @@ export class DrawStore {
     options = TYPE_FILE.map(item => {
         return { value: item.value, label: item.label, disabled: item.disabled }
     });
-    controls = { allLayer: false, edge: false, vertex: true };
     drawLayer: string[] = [];
-    switchKey: ControlProps[] = [];
+    checkedKey: ControlProps[] = [];
     readonly = true;
     itemModal: null = null;
 
@@ -39,16 +38,12 @@ export class DrawStore {
         this.setValue("options", options);
     };
 
-    setControls = (controls: SetValue<string[]>) => {
-        this.setValue("controls", controls);
-    };
-
     setDrawLayer = (drawLayer: SetValue<string[]>) => {
         this.setValue("drawLayer", drawLayer);
     };
 
-    setSwitchKey = (switchKey: SetValue<string>) => {
-        this.setValue("switchKey", switchKey);
+    setCheckedKey = (checkedKey: SetValue<string>) => {
+        this.setValue("checkedKey", checkedKey);
     };
 
     setReadonly = (readonly: boolean) => {

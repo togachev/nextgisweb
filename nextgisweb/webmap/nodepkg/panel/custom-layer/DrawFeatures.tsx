@@ -1,23 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { Checkbox, ConfigProvider, Dropdown, message, Modal, Select, Space, Switch, Typography } from "@nextgisweb/gui/antd";
+import { Checkbox, ConfigProvider, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
 import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
-import EditOffIcon from "@nextgisweb/icon/material/edit_off/outline";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import SaveAsIcon from "@nextgisweb/icon/material/save_as/outline";
 
-import CheckAll from "@nextgisweb/icon/mdi/check-all";
+import CheckAll from "@nextgisweb/icon/material/stacked_line_chart/outline";
 import VertexIcon from "@nextgisweb/icon/mdi/vector-point";
 import EdgeIcon from "@nextgisweb/icon/mdi/vector-polyline";
 
-
 import { useDraw } from "./hook/useDraw";
-const { Text } = Typography;
+
 import "./DrawFeatures.less";
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -27,10 +25,22 @@ import type { DojoTopic, DojoDisplay } from "../type";
 import { DrawStore } from "./DrawStore";
 import { observer } from "mobx-react-lite";
 
-interface DrawFeaturesProps {
+type DrawFeaturesProps = {
     display: DojoDisplay;
     topic: DojoTopic;
 }
+
+type ItemType = {
+    key: number;
+    change: boolean;
+    label: string;
+    geomType: string;
+    allLayer: boolean;
+    edge: boolean;
+    vertex: boolean;
+};
+
+const { Text } = Typography;
 
 const create = gettext("Create")
 const save = gettext("Save")
@@ -84,15 +94,6 @@ const geomTypesInfo = [
     },
 ];
 
-type ItemType = {
-    key: number;
-    change: boolean;
-    label: string;
-    geomType: string;
-    allLayer: boolean;
-    edge: boolean;
-    vertex: boolean;
-};
 
 let id = 0;
 
@@ -114,14 +115,12 @@ export const DrawFeatures = observer(
             setOptions,
             drawLayer,
             setDrawLayer,
-            switchKey,
-            setSwitchKey,
+            checkedKey,
+            setCheckedKey,
             readonly,
             setReadonly,
             itemModal,
             setItemModal,
-            controls,
-            setControls
         } = store;
 
         const [defaultOp, setDefaultOp] = useState(options[0]);
@@ -141,7 +140,9 @@ export const DrawFeatures = observer(
 
         const addLayer = (geomType: string) => {
             if (drawLayer.length < maxCount) {
-                const layer = addLayerMap();
+                const layer = addLayerMap(id);
+                console.log(id);
+                
                 setDrawLayer([
                     ...drawLayer,
                     { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false }
@@ -214,18 +215,18 @@ export const DrawFeatures = observer(
         useEffect(() => {
             setDrawLayer(prevState => {
                 return prevState.map((item: ItemType) => {
-                    return item.key === switchKey.key ? { ...item, change: false } : { ...item, change: true }
+                    return item.key === checkedKey.key ? { ...item, change: false } : { ...item, change: true }
                 })
             })
-        }, [switchKey])
+        }, [checkedKey])
 
-        const onSwitchKey = (checked: boolean, item: ItemType) => {
+        const onCheckedKey = (checked: boolean, item: ItemType) => {
             if (checked) {
                 modifyInteraction(item);
                 drawInteraction(item);
                 snapInteraction(item, false);
                 topic.publish("webmap/tool/identify/off");
-                setSwitchKey({ key: item.key, change: false });
+                setCheckedKey({ key: item.key, change: false });
                 setDrawLayer(prevState => {
                     return prevState.map((item) => {
                         return { ...item, change: true }
@@ -241,7 +242,6 @@ export const DrawFeatures = observer(
                     })
                 });
                 setReadonly(true)
-                setControls({ allLayer: false, edge: false, vertex: false });
             }
         };
 
@@ -292,7 +292,7 @@ export const DrawFeatures = observer(
 
         useMemo(() => {
             if (drawLayer) {
-                snapBuild(drawLayer?.filter((x) => x.key === switchKey.key)[0])
+                snapBuild(drawLayer?.filter((x) => x.key === checkedKey.key)[0])
             }
         }, [drawLayer]);
 
@@ -300,7 +300,7 @@ export const DrawFeatures = observer(
             if (key === "allLayer") {
                 setDrawLayer(prev => {
                     return prev.map((item: ItemType) => {
-                        if (item.key === switchKey.key) {
+                        if (item.key === checkedKey.key) {
                             return { ...item, allLayer: !item.allLayer }
                         };
                         return item;
@@ -309,7 +309,7 @@ export const DrawFeatures = observer(
             } else if (key === "vertex") {
                 setDrawLayer(prev => {
                     return prev.map((item: ItemType) => {
-                        if (item.key === switchKey.key) {
+                        if (item.key === checkedKey.key) {
                             return { ...item, vertex: !item.vertex }
                         };
                         return item;
@@ -318,7 +318,7 @@ export const DrawFeatures = observer(
             } else if (key === "edge") {
                 setDrawLayer(prev => {
                     return prev.map((item: ItemType) => {
-                        if (item.key === switchKey.key) {
+                        if (item.key === checkedKey.key) {
                             return { ...item, edge: !item.edge }
                         };
                         return item;
@@ -341,43 +341,34 @@ export const DrawFeatures = observer(
             {
                 keyname: "allLayer",
                 comp: <CheckAll />,
-                title: {
-                    enable: "Ко всем слоям",
-                    disable: "К текущему слою",
-                }
+                titleEnable: "Ко всем слоям",
+                titleDisable: "К текущему слою",
             },
         ];
 
-        const IconControl = ({ item, itemLayer }) => {
-            const titleEnable = itemLayer.allLayer ? item.title.disable : item.title.enable;
-
-            return (
-                <div
-                    className={!readonly && !itemLayer.change ? "button-active" : "button-disable"}
-                    onClick={() => {
-                        !readonly && !itemLayer.change ? toggleChecked(item.keyname, itemLayer) : undefined
-                    }}>
-                    <div className={itemLayer[item.keyname] ? "icon-symbol-yes" : "icon-symbol-no"}
-                        title={item.keyname === "allLayer" ? titleEnable : item.title}>
-                        {item.comp}
-                    </div>
-                </div>
-            )
-        }
-
         const ControlEdit = ({ itemLayer }) => {
             return (
-                <div className="control">
-                    <div>Инструмент прилипания</div>
-                    <div className="control-button">{
-                        itemLayer !== null ?
+                <div className="control" title="Инструмент прилипания">
+                    <div className="control-button">
+                        {itemLayer &&
                             iconControlSnap.map((item, index) => {
+                                const titleEnable = itemLayer.allLayer ? item.titleDisable : item.titleEnable;
                                 return (
-                                    <IconControl key={index} item={item} itemLayer={itemLayer} />
+                                    <div
+                                        key={index}
+                                        className={!readonly && !itemLayer.change ? "button-active" : "button-disable"}
+                                        onClick={() => {
+                                            !readonly && !itemLayer.change ? toggleChecked(item.keyname, itemLayer) : undefined
+                                        }}>
+                                        <div className={itemLayer[item.keyname] ? "icon-symbol-yes" : "icon-symbol-no"}
+                                            title={item.keyname === "allLayer" ? titleEnable : item.title}>
+                                            {item.comp}
+                                        </div>
+                                    </div>
                                 )
-                            }) :
-                            (<></>)
-                    }</div>
+                            })
+                        }
+                    </div>
                 </div>
             )
         }
@@ -386,16 +377,11 @@ export const DrawFeatures = observer(
             <ConfigProvider
                 theme={{
                     components: {
-                        Switch: {
-                            colorPrimary: "#FF0000",
-                            colorPrimaryHover: "#106a90",
-                        },
                         Modal: {
                             titleFontSize: 15,
                         },
                     },
-                }}
-            >
+                }}>
                 <Modal
                     mask={false}
                     title={SaveAs}
@@ -420,7 +406,6 @@ export const DrawFeatures = observer(
                             title="knfjko"
                         />
                     </div>
-
                 </Modal>
                 <div className="dropdown-button-draw">
                     <div className="info-file">
@@ -432,64 +417,61 @@ export const DrawFeatures = observer(
                     <div style={{ margin: "5px" }}>
                         <div className="dropdown-button">{DropdownType()}</div>
                     </div>
-                    {
-                        drawLayer.length > 0 ?
-                            switchKey.key ?
-                                (<ControlEdit itemLayer={drawLayer?.filter((x) => x.key === switchKey.key)[0]} />) :
-                                (<ControlEdit itemLayer={itemDefault} />) : null
-                    }
-                    {
-                        drawLayer.map((item: ItemType, index: number) => {
-                            const statusFeature = featureCount.includes(item.key)
-                            return (
-                                <div key={index} >
-
-                                    <div className="layer-item">
-                                        <div className="checkbox-item">
-                                            <Checkbox
-                                                defaultChecked={true}
-                                                onChange={(e) => { visibleLayer(e.target.checked, item.key) }} >
-                                                {item.label}
-                                            </Checkbox>
-                                        </div>
-                                        <div className="custom-button">
-                                            <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
-                                                if (statusFeature) {
-                                                    showModal()
-                                                    setItemModal(item)
-                                                }
-                                            }}>
-                                                <SaveAsIcon />
-                                            </span>
-                                            <span
-                                                title={ZoomToLayer}
-                                                className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
-                                                onClick={() => {
-                                                    statusFeature ?
-                                                        zoomToLayer(item.key)
-                                                        : undefined
-                                                }}>
-                                                <ZoomIn />
-                                            </span>
-                                            <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
-                                                <DeleteForever />
-                                            </span>
-                                            <span title={EditLayer} onClick={() => {
-
-                                            }}>
-                                                <Switch
-                                                    disabled={item.change}
-                                                    size="small"
-                                                    checkedChildren={<EditIcon />} unCheckedChildren={<EditOffIcon />}
-                                                    onChange={(checked) => onSwitchKey(checked, item)} />
-                                            </span>
-                                        </div>
+                    {drawLayer.length > 0 ?
+                        checkedKey.key ?
+                            (<ControlEdit itemLayer={drawLayer?.filter((x) => x.key === checkedKey.key)[0]} />) :
+                            (<ControlEdit itemLayer={itemDefault} />) : null}
+                    {drawLayer.map((item: ItemType, index: number) => {
+                        const statusFeature = featureCount.includes(item.key)
+                        return (
+                            <div key={index} >
+                                <div className="layer-item">
+                                    <div className="checkbox-item">
+                                        <Checkbox
+                                            defaultChecked={true}
+                                            onChange={(e) => { visibleLayer(e.target.checked, item.key) }} >
+                                            {item.label}
+                                        </Checkbox>
                                     </div>
-
+                                    <div className="custom-button">
+                                        <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
+                                            if (statusFeature) {
+                                                showModal()
+                                                setItemModal(item)
+                                            }
+                                        }}>
+                                            <SaveAsIcon />
+                                        </span>
+                                        <span
+                                            title={ZoomToLayer}
+                                            className={statusFeature ? "icon-symbol" : "icon-symbol-disable"}
+                                            onClick={() => {
+                                                statusFeature ?
+                                                    zoomToLayer(item.key)
+                                                    : undefined
+                                            }}>
+                                            <ZoomIn />
+                                        </span>
+                                        <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
+                                            <DeleteForever />
+                                        </span>
+                                        <label>
+                                            <Input
+                                                disabled={item.change}
+                                                type="checkbox"
+                                                onChange={(e) => onCheckedKey(e.target.checked, item)}
+                                                style={{ display: 'none' }}
+                                            />
+                                            <span title={EditLayer} className={!readonly && item.key === checkedKey.key ? "icon-edit icon-symbol" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
+                                                <EditIcon />
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
-                            )
-                        }).reverse()
-                    }
+
+                            </div>
+                        )
+                    }).reverse()}
                 </div>
             </ConfigProvider>
         )

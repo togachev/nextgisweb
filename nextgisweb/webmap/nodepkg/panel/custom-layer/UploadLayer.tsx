@@ -42,6 +42,8 @@ const ZoomToLayer = gettext("Zoom to layer");
 const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
 
+let id = 0;
+
 export function UploadLayer({ display }: UploadLayerProps) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
@@ -63,7 +65,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
                     const extension = fileName.slice(fileName.lastIndexOf("."))
                     const data = TYPE_FILE.find(e => e.extension === extension);
                     setFileList(fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
-                    addLayerMap({ url: url, format: data?.format, file: file, length: fileList.length })
+                    addLayerMap({ id: id++, url: url, format: data?.format, file: file, length: fileList.length })
                 })
                 onSuccess("Ok");
             } catch (err) {

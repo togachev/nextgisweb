@@ -14,6 +14,7 @@ interface InfoUpload {
 }
 
 type SourceType = {
+    id: number;
     url: string;
     format: string;
     file: InfoUpload;
@@ -71,10 +72,11 @@ const clickStyle = new Style({
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
-    const addLayerMap = ({ url, format, file, length }: SourceType) => {
+    const addLayerMap = ({ id, url, format, file, length }: SourceType) => {
         const customSource = new VectorSource({ url: url, format: format })
         const customLayer = new VectorLayer({
             source: customSource,
+            zIndex: 100 + id,
         })
         customLayer.setStyle(customStyle);
         customLayer.set("name", file.uid + "__upload-layer");

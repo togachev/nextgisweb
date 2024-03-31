@@ -50,6 +50,23 @@
     align-items: center;
     flex: 0 0 auto;
     color: #106a90;
+    &:hover {
+        background-color: #acacac20;
+        border-radius: 3px;
+    }
+}
+
+.icon-edit {
+    box-shadow: inset 0px 0px 3px 0px #797979;
+    border-radius: 3px;
+    &:hover {
+        background-color: #acacac20;
+        border-radius: 3px;
+    }
+}
+
+.icon-edit-no {
+    cursor: default;
 }
 
 .icon-symbol-disable {
@@ -137,8 +154,9 @@
 
 .control {
     display: flex;
-    justify-content: space-between;
-    padding: 0 5px;
+    justify-content: flex-end;
+    padding: 3px 5px;
+    border-bottom: solid #efefef 0.005em;
     
     .control-button {
         display: flex;
