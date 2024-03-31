@@ -15,8 +15,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
-import type { SpatialReferenceSystem } from "@nextgisweb/spatial-ref-sys/type";
+import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { FeatureLayerField } from "../type";
@@ -40,7 +39,7 @@ interface FieldOption {
 
 const exportFormats = settings.export_formats;
 
-const srsListToOptions = (srsList: SpatialReferenceSystem[]): SrsOption[] =>
+const srsListToOptions = (srsList: SRSRead[]): SrsOption[] =>
     srsList.map((srs) => ({
         label: srs.display_name,
         value: srs.id,
@@ -89,14 +88,17 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const load = useCallback(async () => {
         try {
             const signal = makeSignal();
-            const promises = [route("spatial_ref_sys.collection")];
-            if (id !== undefined) {
-                promises.push(route("resource.item", id));
-            }
-            const [srsInfo, itemInfo] = (await Promise.all(
-                promises.map((r) => r.get({ signal }))
-            )) as [SpatialReferenceSystem[], ResourceItem];
+            const srsInfo = await route("spatial_ref_sys.collection").get({
+                signal,
+            });
             setSrsOptions(srsListToOptions(srsInfo));
+            let itemInfo = null;
+            if (id !== undefined) {
+                itemInfo = await route("resource.item", id).get({
+                    signal,
+                });
+            }
+
             if (itemInfo && itemInfo.feature_layer) {
                 const cls = itemInfo.resource.cls as "vector_layer";
                 const vectorLayer = itemInfo[cls];

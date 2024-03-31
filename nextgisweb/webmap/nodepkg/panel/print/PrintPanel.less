@@ -19,25 +19,6 @@
         }
     }
 
-    .input-group {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 4px;
-
-        span.grow {
-            flex-grow: 1;
-        }
-
-        .ant-input-number {
-            width: 9ch;
-        }
-    }
-
-    .float-label {
-        margin-top: 15px;
-    }
-
     .ant-space-compact {
         margin-top: 20px;
     }
@@ -55,4 +36,22 @@
     z-index: 10;
     background-color: white;
     overflow: auto;
+}
+
+.custom-scale {
+    display: flex;
+    position: relative;
+    align-items: baseline;
+    clear: both;
+    padding: 4px 10px;
+    max-width: 100%;
+    column-gap: 5px;
+
+    .prefix {
+        white-space: nowrap;
+    }
+
+    .input {
+        flex-grow: 1;
+    }
 }

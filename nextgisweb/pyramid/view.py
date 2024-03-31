@@ -25,20 +25,15 @@ from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
-from nextgisweb.core.exception import UserException
+from nextgisweb.core.exception import ForbiddenError, UserException
 
-from . import exception, renderer
+from . import exception, permission, renderer
 from .component import PyramidComponent
 from .openapi import openapi
 from .session import WebSession
 from .tomb.predicate import ErrorRendererPredicate
 from .tomb.response import StaticFileResponse
-from .util import (
-    StaticMap,
-    StaticSourcePredicate,
-    set_output_buffering,
-    viewargs,
-)
+from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
 
 
 def asset(request):
@@ -100,8 +95,8 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
 def asset_hlogo(request, *, ckey: Optional[str] = None, core: CoreComponent):
     if (data := core.settings_get("pyramid", "logo", None)) is None:
         raise HTTPNotFound()
-
-    response = Response(b64decode(data), content_type="image/png")
+    mime_type, file = data
+    response = Response(b64decode(file), content_type=mime_type)
 
     if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
         response.cache_control.public = True
@@ -181,10 +176,14 @@ def webgis(request):
 
 
 @viewargs(renderer="mako")
-def control_panel(request):
-    request.require_administrator()
-
-    return dict(title=_("Control panel"), control_panel=request.env.pyramid.control_panel)
+@inject()
+def control_panel(request, *, comp: PyramidComponent):
+    if not request.user.is_administrator and len(request.user.effective_permissions) == 0:
+        raise ForbiddenError
+    return dict(
+        title=_("Control panel"),
+        control_panel=request.env.pyramid.control_panel,
+    )
 
 
 def locale(request):
@@ -227,10 +226,11 @@ def backup_download(request):
 
 @viewargs(renderer="react")
 def cors(request):
-    request.require_administrator()
+    request.user.require_permission(any, *permission.cors)
     return dict(
-        entrypoint="@nextgisweb/pyramid/cors-settings",
         title=_("Cross-origin resource sharing (CORS)"),
+        entrypoint="@nextgisweb/pyramid/cors-settings",
+        props=dict(readonly=not request.user.has_permission(permission.cors_manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -567,61 +567,72 @@ def setup_pyramid(comp, config):
 
     comp.control_panel = dm.DynMenu(
         dm.Label("info", _("Info")),
-        dm.Link(
+        dm.Label("settings", _("Settings")),
+    )
+
+    @comp.control_panel.add
+    def _control_panel(kwargs):
+        user = kwargs.request.user
+
+        if user.has_permission(any, *permission.cors):
+            yield dm.Link(
+                "settings/cors",
+                _("Cross-origin resource sharing (CORS)"),
+                lambda args: (args.request.route_url("pyramid.control_panel.cors")),
+            )
+
+        if not user.is_administrator:
+            return
+
+        yield dm.Link(
             "info/sysinfo",
             _("System information"),
             lambda args: (args.request.route_url("pyramid.control_panel.sysinfo")),
-        ),
-        dm.Label("settings", _("Settings")),
-        dm.Link(
+        )
+
+        yield dm.Link(
             "settings/core",
             _("Web GIS name"),
             lambda args: (args.request.route_url("pyramid.control_panel.system_name")),
-        ),
-        dm.Link(
-            "settings/cors",
-            _("Cross-origin resource sharing (CORS)"),
-            lambda args: (args.request.route_url("pyramid.control_panel.cors")),
-        ),
-        dm.Link(
+        )
+
+        yield dm.Link(
             "settings/custom_css",
             _("Custom CSS"),
             lambda args: (args.request.route_url("pyramid.control_panel.custom_css")),
-        ),
-        dm.Link(
+        )
+
+        yield dm.Link(
             "settings/logo",
             _("Custom logo"),
             lambda args: (args.request.route_url("pyramid.control_panel.logo")),
-        ),
-        dm.Link(
+        )
+
+        yield dm.Link(
             "settings/home_path",
             _("Home path"),
             lambda args: (args.request.route_url("pyramid.control_panel.home_path")),
-        ),
-        dm.Link(
+        )
+
+        yield dm.Link(
             "settings/metrics",
             _("Metrics and analytics"),
             lambda args: (args.request.route_url("pyramid.control_panel.metrics")),
-        ),
-    )
+        )
 
-    if env.core.options["storage.enabled"]:
-        comp.control_panel.add(
-            dm.Link(
+        if env.core.options["storage.enabled"]:
+            yield dm.Link(
                 "info/storage",
                 _("Storage"),
                 lambda args: (args.request.route_url("pyramid.control_panel.storage")),
             )
-        )
 
-    if comp.options["backup.download"]:
-        comp.control_panel.add(
-            dm.Link(
+        if comp.options["backup.download"]:
+            yield dm.Link(
                 "info/backups",
                 _("Backups"),
                 lambda args: args.request.route_url("pyramid.control_panel.backup.browse"),
             )
-        )
 
 
 def _setup_static(comp, config):
@@ -705,7 +716,8 @@ def _setup_pyramid_debugtoolbar(comp, config):
     config.include(pyramid_debugtoolbar)
 
     config.add_static_path(
-        "pyramid_debugtoolbar:static", module_path("pyramid_debugtoolbar") / "static"
+        "pyramid_debugtoolbar:static",
+        module_path("pyramid_debugtoolbar") / "static",
     )
 
 

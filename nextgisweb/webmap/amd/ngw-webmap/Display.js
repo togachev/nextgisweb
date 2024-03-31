@@ -5,7 +5,6 @@ define([
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/aspect",
-    "dojo/dom-construct",
     "dojo/topic",
     "dojo/data/ItemFileWriteStore",
     "dijit/_WidgetBase",
@@ -14,34 +13,28 @@ define([
     "dijit/layout/ContentPane",
     "openlayers/ol",
     "@nextgisweb/gui/error",
-    "@nextgisweb/pyramid/icon",
     "@nextgisweb/pyramid/company-logo",
     "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/panels-manager",
     "@nextgisweb/webmap/store/annotations",
     "./ol/Map",
     "./MapToolbar",
-    "./controls/InitialExtent",
-    "./controls/InfoScale",
-    "./controls/MyLocation",
     "./FeatureHighlighter",
     "./FeatureHighlighterDiagram",
     "./MapStatesObserver",
     "./ui/react-panel",
     "./ui/react-webmap-tabs",
     // tools
-    "./tool/Zoom",
-    "./tool/Measure",
-    "./tool/Identify",
-    "./tool/ViewerInfo",
-    "./tool/Swipe",
+    "@nextgisweb/webmap/map-controls",
+    // Tiny display
+    "ngw-webmap/controls/LinkToMainMap",
     // panels
     "@nextgisweb/webmap/panel/layers",
     // utils
     "./utils/URL",
     // settings
     "@nextgisweb/pyramid/i18n!",
-    "@nextgisweb/pyramid/settings!",
+    "@nextgisweb/pyramid/settings!webmap",
     "dojo/text!./template/Display.hbs",
     // template
     "dijit/layout/BorderContainer",
@@ -55,7 +48,6 @@ define([
     Deferred,
     all,
     aspect,
-    domConstruct,
     topic,
     ItemFileWriteStore,
     _WidgetBase,
@@ -64,26 +56,19 @@ define([
     ContentPane,
     ol,
     errorModule,
-    icon,
     companyLogo,
     WebmapStore,
     PanelsManager,
     AnnotationsStore,
     Map,
     MapToolbar,
-    InitialExtent,
-    InfoScale,
-    MyLocation,
     FeatureHighlighter,
     FeatureHighlighterDiagram,
     MapStatesObserver,
     reactPanel,
     ReactWebMapTabs,
-    ToolZoom,
-    ToolMeasure,
-    Identify,
-    ToolViewerInfo,
-    ToolSwipe,
+    MapControls,
+    LinkToMainMap,
     LayersPanelModule,
     URL,
     { gettext, renderTemplate },
@@ -176,10 +161,10 @@ define([
         emptyModeURLValue: "none",
 
         webmapStore: undefined,
+        tinyConfig: undefined,
 
         constructor: function (options) {
             declare.safeMixin(this, options);
-
             this._urlParams = URL.getURLParams();
 
             this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
@@ -201,20 +186,7 @@ define([
 
             this.clientSettings = settings;
 
-            const activePanelKey = this._urlParams[this.modeURLParam];
-            const onChangePanel = (panel) => {
-                if (panel) {
-                    URL.setURLParam(this.modeURLParam, panel.name);
-                } else {
-                    URL.setURLParam(this.modeURLParam, this.emptyModeURLValue);
-                }
-            };
-            this.panelsManager = new PanelsManager.default(
-                this,
-                activePanelKey,
-                onChangePanel
-            );
-            this._buildPanels();
+            this._buildPanelsManager();
 
             this.tabContainer = new ReactWebMapTabs({ display: this });
 
@@ -337,10 +309,8 @@ define([
             // Tools and plugins
             all([this._midDeferred.plugin, this._layersDeferred])
                 .then(function () {
-                    widget._toolsSetup();
                     widget._pluginsSetup();
                     widget._buildLayersTree();
-                    widget._identifyFeatureByAttrValue();
                 })
                 .then(undefined, function (err) {
                     console.error(err);
@@ -365,6 +335,7 @@ define([
                 navigation: this.navigationMenuPane.domNode,
             };
             this.panelsManager.initDomElements(domElements);
+            this._handleTinyDisplayMode();
 
             this._postCreateDeferred.resolve();
         },
@@ -475,54 +446,17 @@ define([
                 }),
             });
 
-            this._mapAddControls([
-                new ol.control.Zoom({
-                    zoomInLabel: domConstruct.create("span", {
-                        class: "ol-control__icon",
-                        innerHTML: icon.html({ glyph: "add" }),
-                    }),
-                    zoomOutLabel: domConstruct.create("span", {
-                        class: "ol-control__icon",
-                        innerHTML: icon.html({ glyph: "remove" }),
-                    }),
-                    zoomInTipLabel: gettext("Zoom in"),
-                    zoomOutTipLabel: gettext("Zoom out"),
-                    target: widget.leftTopControlPane,
-                }),
-                new ol.control.Attribution({
-                    tipLabel: gettext("Attributions"),
-                    target: widget.rightBottomControlPane,
-                    collapsible: false,
-                }),
-                new ol.control.ScaleLine({
-                    target: widget.rightBottomControlPane,
-                    units: settings.units,
-                    minWidth: 48,
-                }),
-                new InfoScale({
-                    display: widget,
-                    target: widget.rightBottomControlPane,
-                }),
-                new InitialExtent({
-                    display: widget,
-                    target: widget.leftTopControlPane,
-                    tipLabel: gettext("Initial extent"),
-                }),
-                new MyLocation({
-                    display: widget,
-                    target: widget.leftTopControlPane,
-                    tipLabel: gettext("Locate me"),
-                }),
-                new ol.control.Rotate({
-                    tipLabel: gettext("Reset rotation"),
-                    target: widget.leftTopControlPane,
-                    label: domConstruct.create("span", {
-                        class: "ol-control__icon",
-                        innerHTML: icon.html({ glyph: "arrow_upward" }),
-                    }),
-                }),
-                widget.mapToolbar,
-            ]);
+            const controlsReady = MapControls.buildControls(this);
+
+            if (controlsReady.has("id")) {
+                const { control } = controlsReady.get("id");
+                this.identify = control;
+                this.mapStates.addState("identifying", this.identify);
+                this.mapStates.setDefaultState("identifying", true);
+                widget._identifyFeatureByAttrValue();
+            }
+
+            topic.publish("/webmap/tools/initialized");
 
             // Resize OpenLayers Map on container resize
             aspect.after(this.mapPane, "resize", function () {
@@ -701,43 +635,6 @@ define([
             this.webmapStore.addLayer(data.id, layer);
         },
 
-        _toolsSetup: function () {
-            this.mapToolbar.items.addTool(
-                new ToolZoom({ display: this, out: false }),
-                "zoomingIn"
-            );
-            this.mapToolbar.items.addTool(
-                new ToolZoom({ display: this, out: true }),
-                "zoomingOut"
-            );
-
-            this.mapToolbar.items.addTool(
-                new ToolMeasure({ display: this, type: "LineString" }),
-                "measuringLength"
-            );
-            this.mapToolbar.items.addTool(
-                new ToolMeasure({ display: this, type: "Polygon" }),
-                "measuringArea"
-            );
-
-            this.mapToolbar.items.addTool(
-                new ToolSwipe({ display: this, orientation: "vertical" }),
-                "swipeVertical"
-            );
-
-            this.mapToolbar.items.addTool(
-                new ToolViewerInfo({ display: this }),
-                "~viewerInfo"
-            );
-
-            this.identify = new Identify({ display: this });
-
-            this.mapStates.addState("identifying", this.identify);
-            this.mapStates.setDefaultState("identifying", true);
-
-            topic.publish("/webmap/tools/initialized");
-        },
-
         _pluginsPanels: [],
         _pluginsSetup: function (wmplugin) {
             if (!this._plugins) {
@@ -755,6 +652,10 @@ define([
                 Object.keys(plugins),
                 function (key) {
                     console.log("Plugin [%s]::constructor...", key);
+
+                    if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+                        return;
+                    }
 
                     var plugin = new plugins[key]({
                         identity: key,
@@ -946,6 +847,70 @@ define([
                 });
         },
 
+        _handleTinyDisplayMode: function () {
+            if (!this.isTinyMode()) {
+                return;
+            }
+
+            this.domNode.classList.add("tiny");
+
+            all([
+                this._layersDeferred,
+                this._mapDeferred,
+                this._postCreateDeferred,
+                this.panelsManager.panelsReady.promise,
+            ])
+                .then(() => {
+                    this._buildTinyPanels();
+                    this._addLinkToMainMap();
+                    this._handlePostMessage();
+                })
+                .then(undefined, function (err) {
+                    console.error(err);
+                });
+        },
+
+        _buildTinyPanels: function () {
+            if (!this.panelsManager.getPanelsCount()) {
+                return;
+            }
+
+            this.domNode.classList.add("tiny-panels");
+            const activePanel = this.panelsManager.getActivePanelName();
+            if (!activePanel) {
+                return;
+            }
+            this.panelsManager.deactivatePanel();
+            this.panelsManager.activatePanel(activePanel);
+        },
+
+        _buildPanelsManager: function () {
+            const activePanelKey = this._urlParams[this.modeURLParam];
+            const onChangePanel = (panel) => {
+                if (panel) {
+                    URL.setURLParam(this.modeURLParam, panel.name);
+                } else {
+                    URL.setURLParam(this.modeURLParam, this.emptyModeURLValue);
+                }
+            };
+
+            let allowPanels;
+            if (this.isTinyMode()) {
+                allowPanels = this._urlParams.panels
+                    ? this._urlParams.panels.split(",")
+                    : [];
+            }
+
+            this.panelsManager = new PanelsManager.default(
+                this,
+                activePanelKey,
+                allowPanels,
+                onChangePanel
+            );
+
+            this._buildPanels();
+        },
+
         _buildPanels: function () {
             const promises = all([
                 this._layersDeferred,
@@ -971,6 +936,7 @@ define([
                     name: "layers",
                     order: 10,
                     menuIcon: "material-layers",
+                    applyToTinyMap: true,
                 },
             });
 
@@ -981,6 +947,7 @@ define([
                     name: "search",
                     order: 20,
                     menuIcon: "material-search",
+                    applyToTinyMap: true,
                 },
             });
 
@@ -1019,6 +986,7 @@ define([
                         name: "bookmark",
                         order: 50,
                         menuIcon: "material-bookmark",
+                        applyToTinyMap: true,
                     },
                 };
                 resolve(panel);
@@ -1036,6 +1004,7 @@ define([
                         name: "info",
                         order: 40,
                         menuIcon: "material-info-outline",
+                        applyToTinyMap: true,
                     },
                 };
                 resolve(panel);
@@ -1125,6 +1094,7 @@ define([
                     name: "annotation",
                     order: 30,
                     menuIcon: "material-message",
+                    applyToTinyMap: true,
                 },
             };
             resolve(panel);
@@ -1135,6 +1105,108 @@ define([
             topic.publish("feature.highlight", {
                 olGeometry: geometry,
             });
+        },
+
+        getUrlParams: function () {
+            return this._urlParams;
+        },
+
+        isTinyMode: function () {
+            return this.tinyConfig !== undefined;
+        },
+
+        isTinyModePlugin: function (pluginKey) {
+            const disabledPlugins = [
+                "ngw-webmap/plugin/LayerEditor",
+                "ngw-webmap/plugin/FeatureLayer",
+            ];
+            return !disabledPlugins.includes(pluginKey);
+        },
+
+        _addLinkToMainMap: function () {
+            if (this._urlParams.linkMainMap !== "true") {
+                return;
+            }
+            this.map.olMap.addControl(
+                new LinkToMainMap({
+                    url: this.tinyConfig.mainDisplayUrl,
+                    target: this.rightTopControlPane,
+                    tipLabel: gettext("Open full map"),
+                })
+            );
+        },
+
+        /**
+         * Generate window `message` events to listen from iframe
+         * @example
+         * window.addEventListener('message', function(evt) {
+         *    var data = evt.data;
+         *    if (data.event === 'ngMapExtentChanged') {
+         *        if (data.detail === 'zoom') {
+         *        } else if (data.detail === 'move') {
+         *        }
+         *        // OR
+         *        if (data.detail === 'position') {}
+         *    }
+         * }, false);
+         */
+        _handlePostMessage: function () {
+            var widget = this;
+            var parent = window.parent;
+            if (
+                this._urlParams.events === "true" &&
+                parent &&
+                parent.postMessage
+            ) {
+                var commonOptions = {
+                    event: "ngMapExtentChanged",
+                };
+                var parsePosition = function (pos) {
+                    return {
+                        zoom: pos.zoom,
+                        lat: pos.center[1],
+                        lon: pos.center[0],
+                    };
+                };
+                widget.map.watch(
+                    "position",
+                    function (name, oldPosition, newPosition) {
+                        oldPosition = oldPosition
+                            ? parsePosition(oldPosition)
+                            : {};
+                        newPosition = parsePosition(newPosition);
+                        // set array of position part to compare between old and new state
+                        var events = [
+                            { params: ["lat", "lon"], name: "move" },
+                            { params: ["zoom"], name: "zoom" },
+                        ];
+                        var transformPosition = widget.map.getPosition(
+                            widget.lonlatProjection
+                        );
+                        // prepare to send transform position
+                        commonOptions.data = parsePosition(transformPosition);
+                        array.forEach(events, function (event) {
+                            var isChange = array.some(
+                                event.params,
+                                function (p) {
+                                    return oldPosition[p] !== newPosition[p];
+                                }
+                            );
+                            if (isChange) {
+                                commonOptions.detail = event.name;
+                                // message should be a string to work correctly with all browsers and systems
+                                parent.postMessage(
+                                    JSON.stringify(commonOptions),
+                                    "*"
+                                );
+                            }
+                        });
+                        // on any position change
+                        commonOptions.detail = name;
+                        parent.postMessage(JSON.stringify(commonOptions), "*");
+                    }
+                );
+            }
         },
     });
 });

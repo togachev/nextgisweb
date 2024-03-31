@@ -1,3 +1,4 @@
+import orderBy from "lodash-es/orderBy";
 import { useCallback, useEffect, useState } from "react";
 
 import {
@@ -5,6 +6,7 @@ import {
     Button,
     Input,
     InputNumber,
+    Select,
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
@@ -13,6 +15,7 @@ import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!";
+import { getControls } from "@nextgisweb/webmap/map-controls";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelHeader } from "../header";
@@ -21,6 +24,7 @@ import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 
 import "./SharePanel.less";
+import "../styles/panels.less";
 
 // prettier-ignore
 const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
@@ -33,7 +37,7 @@ const makeIframeTag = (iframeSrc, height, width) => {
     );
 };
 
-function CORSWarning() {
+const CORSWarning = () => {
     if (!settings["check_origin"]) return <></>;
     return (
         <Alert
@@ -47,9 +51,9 @@ function CORSWarning() {
             }
         />
     );
-}
+};
 
-function CodeArea(props) {
+const CodeArea = (props) => {
     return (
         <Input.TextArea
             style={{ wordBreak: "break-all", overflow: "hidden" }}
@@ -57,17 +61,92 @@ function CodeArea(props) {
             {...props}
         />
     );
-}
+};
+
+const toolsOptions = getControls()
+    .filter((c) => c.embeddedShowMode === "customize")
+    .map((c) => {
+        return {
+            label: c.label,
+            value: c.key,
+        };
+    });
+
+const ToolsSelect = (props) => {
+    return (
+        <Select
+            mode="multiple"
+            allowClear
+            style={{
+                width: "100%",
+            }}
+            placeholder={gettext("Select tools")}
+            options={toolsOptions}
+            {...props}
+        />
+    );
+};
+
+const PanelsSelect = (props) => {
+    return (
+        <Select
+            mode="multiple"
+            allowClear
+            style={{
+                width: "100%",
+            }}
+            {...props}
+            placeholder={gettext("Select panels")}
+        />
+    );
+};
+
+const DEFAULT_ACTIVE_PANEL = "none";
+const ActivePanelSelect = ({ panelsOptions, onChange, activePanel }) => {
+    const NoneOption = {
+        label: gettext("None"),
+        value: "none",
+    };
+    const options = [NoneOption, ...panelsOptions];
+
+    return (
+        <Select
+            style={{
+                width: "100%",
+            }}
+            options={options}
+            onChange={onChange}
+            value={activePanel}
+        />
+    );
+};
+
+const PanelTitle = ({ panelInfo }) => {
+    return (
+        <div className="panel-title">
+            <div>
+                <svg className="icon" fill="currentColor">
+                    <use xlinkHref={`#icon-${panelInfo.menuIcon}`} />
+                </svg>
+            </div>
+            <div className="title">{panelInfo.title}</div>
+        </div>
+    );
+};
 
 export const SharePanel = ({ display, title, close, visible }) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
-    const [widthMap, setWidthMap] = useState(600);
-    const [heightMap, setHeightMap] = useState(400);
+    const [widthMap, setWidthMap] = useState(800);
+    const [heightMap, setHeightMap] = useState(600);
     const [addLinkToMap, setAddLinkToMap] = useState(true);
     const [generateEvents, setGenerateEvents] = useState(false);
     const [embedCode, setEmbedCode] = useState("");
+    const [controls, setControls] = useState([]);
+    const [panelsOptions, setPanelsOptions] = useState([]);
+    const [panels, setPanels] = useState([]);
+    const [activePanel, setActivePanel] = useState(DEFAULT_ACTIVE_PANEL);
 
     const updatePermalinkUrl = () => {
         display.getVisibleItems().then((visibleItems) => {
@@ -85,6 +164,9 @@ export const SharePanel = ({ display, title, close, visible }) => {
                 additionalParams: {
                     linkMainMap: addLinkToMap,
                     events: generateEvents,
+                    panel: activePanel,
+                    controls,
+                    panels,
                 },
             };
             const iframeSrc = getPermalink(
@@ -118,12 +200,65 @@ export const SharePanel = ({ display, title, close, visible }) => {
         display._mapExtentDeferred.then(() => {
             updateEmbedCode();
         });
-    }, [widthMap, heightMap, addLinkToMap, generateEvents]);
+    }, [
+        widthMap,
+        heightMap,
+        addLinkToMap,
+        generateEvents,
+        controls,
+        panels,
+        activePanel,
+    ]);
+
+    useEffect(() => {
+        if (panels.length) {
+            if (activePanel !== DEFAULT_ACTIVE_PANEL) {
+                const found = panels.find((p) => p === activePanel);
+                if (!found) {
+                    setActivePanel(DEFAULT_ACTIVE_PANEL);
+                }
+            }
+        } else {
+            setActivePanel(DEFAULT_ACTIVE_PANEL);
+        }
+    }, [panels, activePanel]);
+
+    useEffect(() => {
+        display.panelsManager.panelsReady.promise.then(() => {
+            const panelsForTinyMap = display.panelsManager
+                .getPanels()
+                .filter((p) => p.applyToTinyMap === true)
+                .map((p) => {
+                    return {
+                        label: <PanelTitle panelInfo={p} />,
+                        value: p.name,
+                    };
+                });
+            setPanelsOptions(orderBy(panelsForTinyMap, "label", "asc"));
+        });
+    }, [display]);
 
     const previewUrl = routeURL("webmap.preview_embedded", webmapId);
 
+    let activePanelSelect;
+    if (panels.length) {
+        const activePanelsOptions = panelsOptions.filter((o) =>
+            panels.includes(o.value)
+        );
+        activePanelSelect = (
+            <div className="input-group column">
+                <label>{gettext("Active panel")}</label>
+                <ActivePanelSelect
+                    panelsOptions={activePanelsOptions}
+                    onChange={setActivePanel}
+                    activePanel={activePanel}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className="ngw-webmap-share-panel">
+        <div className="ngw-panel ngw-webmap-share-panel">
             <PanelHeader {...{ title, close }} />
             <section>
                 <h5 className="heading">{gettext("Map link")}</h5>
@@ -157,6 +292,20 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     />
                     <span>{gettext("px")}</span>
                 </div>
+                <div className="input-group column">
+                    <label>{gettext("Map tools")}</label>
+                    <ToolsSelect value={controls} onChange={setControls} />
+                </div>
+                <div className="input-group column">
+                    <label>{gettext("Panels")}</label>
+                    <PanelsSelect
+                        value={panels}
+                        options={panelsOptions}
+                        onChange={setPanels}
+                        className="panels-select"
+                    />
+                </div>
+                {activePanelSelect}
                 <div className="input-group">
                     <Switch
                         checked={addLinkToMap}
@@ -175,7 +324,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         {gettext("Generate events")}
                     </span>
                 </div>
-                <div className="input-group">
+                <div className="input-group  column">
+                    <label>{gettext("Embed code")}</label>
                     <CodeArea value={embedCode} rows={4} />
                 </div>
 

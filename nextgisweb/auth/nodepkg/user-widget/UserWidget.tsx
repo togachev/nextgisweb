@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import type { GroupRead } from "@nextgisweb/auth/type/api";
 import { Alert } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import {
@@ -14,9 +15,8 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
-import { PrincipalSelect } from "../field";
+import { PermissionSelect, PrincipalSelect } from "../field";
 import { makeTeamManageButton, default as oauth } from "../oauth";
-import type { Group } from "../type";
 
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
 import { UserWidgetPassword } from "./UserWidgetPassword";
@@ -32,7 +32,7 @@ interface UserWidgetProps {
 }
 
 export function UserWidget({ id, readonly }: UserWidgetProps) {
-    const { data: group, isLoading } = useRouteGet<Group[]>(
+    const { data: group, isLoading } = useRouteGet<GroupRead[]>(
         "auth.group.collection"
     );
 
@@ -98,6 +98,13 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                     group && isNewUser
                         ? group.filter((g) => g.register).map((g) => g.id)
                         : [],
+            },
+            {
+                name: "permissions",
+                label: gettext("Permissions"),
+                widget: PermissionSelect,
+                inputProps: { multiple: true },
+                value: [],
             },
             {
                 name: "language",

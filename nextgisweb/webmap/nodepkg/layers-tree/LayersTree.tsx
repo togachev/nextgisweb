@@ -15,8 +15,9 @@ import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 import { DropdownActions } from "./DropdownActions";
 import { Desc } from "./Desc";
 import { DropdownFile } from "./DropdownFile";
-import { Legend, LegendAction } from "./Legend";
 import { IconItem } from "./IconItem";
+import { Legend } from "./Legend";
+import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
 
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
@@ -215,14 +216,14 @@ export const LayersTree = observer(
                         </Col>
                         {actions}
                     </Row>
-                    {showLegend && <Legend
+                    {showLegend && (<Legend
                         zoomToNgwExtent={(ngwExtent: NgwExtent) => {
                             display.map.zoomToNgwExtent(
                                 ngwExtent,
                                 display.displayProjection
                             );
                         }}
-                        nodeData={nodeData.treeItem} />}
+                        nodeData={nodeData.treeItem} store={store} />)}
                 </>
             );
         };

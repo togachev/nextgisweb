@@ -5,7 +5,7 @@ from urllib.parse import unquote, urljoin, urlparse
 from pyramid.renderers import render_to_response
 
 from nextgisweb.env import _
-from nextgisweb.lib.dynmenu import DynItem, Label, Link
+from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import viewargs
 from nextgisweb.render import IRenderableScaleRange
@@ -13,7 +13,7 @@ from nextgisweb.render.api import legend_symbols_by_resource
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.render.view import TMSLink
-from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_factory
+from nextgisweb.resource import DataScope, Resource, ResourceScope, Widget, resource_factory
 
 from .adapter import WebMapAdapter
 from .model import LegendSymbolsEnum, WebMap, WebMapScope
@@ -361,59 +361,10 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).add_view(clone, context=WebMap)
 
-    class DisplayMenu(DynItem):
-        def build(self, args):
-            yield Label("webmap", _("Web map"))
-
-            if isinstance(args.obj, WebMap):
-                if args.obj.has_permission(WebMapScope.display, args.request.user):
-                    yield Link(
-                        "webmap/display",
-                        _("Display"),
-                        self._display_url(),
-                        important=True,
-                        target="_self",
-                        icon="webmap-display",
-                    )
-
-                if args.obj.has_permission(ResourceScope.update, args.request.user):
-                    yield Link(
-                        "webmap/clone",
-                        _("Clone"),
-                        self._clone_url(),
-                        important=False,
-                        target="_self",
-                        icon="material-content_copy",
-                    )
-
-                if args.obj.has_permission(ResourceScope.update, args.request.user):
-                    yield Link(
-                        'wmgroup/settings', _("Group setting"), self._get_wmg_settings_url(),
-                        important=False, target='_self',
-                        icon='material-edit')
-
-        def _display_url(self):
-            return lambda args: args.request.route_url("webmap.display", id=args.obj.id)
-
-        def _clone_url(self):
-            return lambda args: args.request.route_url("webmap.clone", id=args.obj.id)
-
-        def _get_wmg_settings_url(self):
-            return lambda args: args.request.route_url(
-                'wmgroup.settings', id=args.obj.id)
-
-    WebMap.__dynmenu__.add(DisplayMenu())
-
-    config.add_route("webmap.control_panel.settings", "/control-panel/webmap-settings").add_view(
-        settings
-    )
-
-    comp.env.pyramid.control_panel.add(
-        Link(
-            "settings.webmap",
-            _("Web map"),
-            lambda args: (args.request.route_url("webmap.control_panel.settings")),
-        )
+    config.add_route(
+        "webmap.control_panel.settings",
+        "/control-panel/webmap-settings",
+        get=settings,
     )
 
     config.add_route(
@@ -421,3 +372,49 @@ def setup_pyramid(comp, config):
         r'/wmgroup/{id:uint}/settings',
         factory=resource_factory,
     ).add_view(wmg_settings, context=WebMap)
+
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        if not isinstance(args.obj, WebMap):
+            return
+
+        yield Label("webmap", _("Web map"))
+
+        if args.obj.has_permission(WebMapScope.display, args.request.user):
+            yield Link(
+                "webmap/display",
+                _("Display"),
+                lambda args: args.request.route_url("webmap.display", id=args.obj.id),
+                important=True,
+                target="_blank",
+                icon="webmap-display",
+            )
+
+        if args.obj.has_permission(ResourceScope.read, args.request.user):
+            yield Link(
+                "webmap/clone",
+                _("Clone"),
+                lambda args: args.request.route_url("webmap.clone", id=args.obj.id),
+                important=False,
+                target="_self",
+                icon="material-content_copy",
+            )
+
+        if args.obj.has_permission(ResourceScope.update, args.request.user):
+            yield Link(
+                "wmgroup/settings",
+                _("Group setting"),
+                lambda args: args.request.route_url("wmgroup.settings", id=args.obj.id),
+                important=False,
+                target="_self",
+                icon="material-edit",
+            )
+
+    @comp.env.pyramid.control_panel.add
+    def _control_panel(args):
+        if args.request.user.is_administrator:
+            yield Link(
+                "settings.webmap",
+                _("Web map"),
+                lambda args: (args.request.route_url("webmap.control_panel.settings")),
+            )
