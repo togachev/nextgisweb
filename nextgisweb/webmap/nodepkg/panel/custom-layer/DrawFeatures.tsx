@@ -375,9 +375,15 @@ export const DrawFeatures = observer(
                                 return (
                                     <div
                                         key={index}
-                                        className={!readonly && !itemLayer.change ? "button-active" : "button-disable"}
+                                        className={
+                                            !readonly && !itemLayer.change ?
+                                                "button-active" :
+                                                "button-disable"
+                                        }
                                         onClick={() => {
-                                            !readonly && !itemLayer.change ? toggleChecked(item.keyname, itemLayer) : undefined
+                                            !readonly && !itemLayer.change ?
+                                                toggleChecked(item.keyname, itemLayer) :
+                                                undefined
                                         }}>
                                         <div className={itemLayer[item.keyname] ? "icon-symbol-yes" : "icon-symbol-no"}
                                             title={item.keyname === "allLayer" ? titleEnable : item.title}>
@@ -388,7 +394,7 @@ export const DrawFeatures = observer(
                             })
                         }
                     </div>
-                </div>
+                </div >
             )
         }
 

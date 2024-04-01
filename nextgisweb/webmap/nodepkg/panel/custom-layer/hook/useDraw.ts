@@ -125,7 +125,7 @@ export const useDraw = (display: DojoDisplay) => {
         const source = new VectorSource({ wrapX: false });
         const vector = new VectorLayer({
             source: source,
-            zIndex: 100 + id,
+            zIndex: 1000 + id,
         });
         vector.setStyle(style);
         vector.set("name", "drawing-layer");
@@ -155,7 +155,7 @@ export const useDraw = (display: DojoDisplay) => {
             setSnap([...snap, { [layer.ol_uid] : snap_}])
         } else {
             olmap.getLayers().forEach(layer => {
-                if (layer.get("name") === "drawing-layer") {
+                if (layer instanceof VectorLayer) {
                     const snap_ = new Snap({
                         source: layer.getSource(),
                         edge: propSnap.edge,

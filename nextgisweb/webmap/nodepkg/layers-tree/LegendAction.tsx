@@ -4,11 +4,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { TreeItem } from "../type/TreeItems";
 
-import ExpandLessIcon from "@nextgisweb/icon/material/expand_less/outline";
-import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
-
-import MenuFoldOutlined from "./icons/MenuFoldOutlined.svg";
-import MenuUnfoldOutlined from "./icons/MenuUnfoldOutlined.svg";
+import ExpandMore from "@nextgisweb/icon/material/expand_more";
+import CheckList from "@nextgisweb/icon/material/checklist";
 
 const msgShowLegend = gettext("Show legend");
 const msgHideLegend = gettext("Hide legend");
@@ -26,7 +23,7 @@ export function LegendAction({
     }
 
     const { open } = nodeData.legendInfo;
-    const icon = open ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />;
+    const icon = open ? <ExpandMore /> : <CheckList />;
 
     const click = (evt: MouseEvent) => {
         evt.stopPropagation();
@@ -36,7 +33,7 @@ export function LegendAction({
 
     return (
         <span
-            className="legend"
+            className="more legend-list"
             onClick={click}
             title={open ? msgHideLegend : msgShowLegend}
         >

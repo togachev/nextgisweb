@@ -6,43 +6,52 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:837
+#: amd/ngw-webmap/Display.js:842
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:838
+#: amd/ngw-webmap/Display.js:843
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:935 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:941
+#: amd/ngw-webmap/Display.js:946
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:952
+#: amd/ngw-webmap/Display.js:961 nodepkg/panel/custom-layer/CustomLayer.tsx:19
+msgid "CustomLayer"
+msgstr "Пользовательские слои"
+
+#: amd/ngw-webmap/Display.js:971
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:966
+#: amd/ngw-webmap/Display.js:985
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:984 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1003 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: nodepkg/panel/description/DescriptionPanel.js:8
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1003
+#: amd/ngw-webmap/Display.js:1021
+msgid "Diagram"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:1041
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1055
+#: amd/ngw-webmap/Display.js:1093
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:1096
+#: amd/ngw-webmap/Display.js:1134
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -262,11 +271,11 @@ msgstr "Атрибуты"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: amd/ngw-webmap/tool/Identify.js:387 amd/ngw-webmap/tool/Identify.js:403
+#: amd/ngw-webmap/tool/Identify.js:400 amd/ngw-webmap/tool/Identify.js:420
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:547
+#: amd/ngw-webmap/tool/Identify.js:735
 msgid "Features"
 msgstr "Объектов"
 
@@ -398,7 +407,7 @@ msgstr "Не сохранять"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:28 model.py:47 view.py:322 view.py:349
+#: model.py:28 model.py:47 view.py:381 view.py:418
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -422,7 +431,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:337
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:396
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -444,7 +453,7 @@ msgid "Circle"
 msgstr "Окружность"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:87
-#: nodepkg/panel/annotations/AnnotationsPanel.js:111
+#: nodepkg/panel/annotations/AnnotationsPanel.js:109
 msgid "Line"
 msgstr "Линия"
 
@@ -453,7 +462,7 @@ msgid "Rectangle"
 msgstr ""
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:100
-#: nodepkg/panel/annotations/AnnotationsPanel.js:115
+#: nodepkg/panel/annotations/AnnotationsPanel.js:113
 #: nodepkg/utils/geometry-types.ts:15
 msgid "Polygon"
 msgstr "Полигон"
@@ -490,11 +499,23 @@ msgstr "Остановить рисование"
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/layers-tree/LegendAction.tsx:8
+#: nodepkg/layers-tree/DropdownActions.tsx:11
+msgid "Additional tools"
+msgstr "Дополнительные инструменты"
+
+#: nodepkg/layers-tree/DropdownFile.js:8
+msgid "Download attached files"
+msgstr "Скачать прикрепленные файлы"
+
+#: nodepkg/layers-tree/IconItem.js:25
+msgid "Zoom to feature layer"
+msgstr ""
+
+#: nodepkg/layers-tree/LegendAction.tsx:13
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/LegendAction.tsx:9
+#: nodepkg/layers-tree/LegendAction.tsx:14
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
@@ -508,11 +529,11 @@ msgstr "Отменить поворот"
 
 #: nodepkg/map-controls/map-controls.ts:85
 msgid "Scale line"
-msgstr "Линейка масштаба"
+msgstr ""
 
 #: nodepkg/map-controls/map-controls.ts:97
 msgid "Info scale"
-msgstr "Числовой масштаб"
+msgstr ""
 
 #: nodepkg/map-controls/map-controls.ts:120
 #: nodepkg/map-controls/map-controls.ts:123
@@ -521,11 +542,11 @@ msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:128
 msgid "Identification"
-msgstr "Идентификация"
+msgstr ""
 
 #: nodepkg/map-controls/map-tools.ts:68
 msgid "Cursor coordinates / extent"
-msgstr "Координаты курсора / охвата"
+msgstr ""
 
 #: nodepkg/map-viewer-info/MapViewerInfo.tsx:87
 msgid "Show extent"
@@ -543,48 +564,48 @@ msgstr "Редактировать аннотации"
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:108
+#: nodepkg/panel/annotations/AnnotationsPanel.js:106
 #: nodepkg/utils/geometry-types.ts:6
 msgid "Point"
 msgstr "Точка"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:137
+#: nodepkg/panel/annotations/AnnotationsPanel.js:135
 msgid "Annotations layer"
 msgstr "Слой аннотаций"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:140
+#: nodepkg/panel/annotations/AnnotationsPanel.js:138
 #: nodepkg/settings-widget/SettingsWidget.js:40
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:149
+#: nodepkg/panel/annotations/AnnotationsPanel.js:144
 #: nodepkg/settings-widget/SettingsWidget.js:50
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:150
+#: nodepkg/panel/annotations/AnnotationsPanel.js:145
 #: nodepkg/settings-widget/SettingsWidget.js:51
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:153
+#: nodepkg/panel/annotations/AnnotationsPanel.js:148
 #: nodepkg/settings-widget/SettingsWidget.js:52
 msgid "With messages"
 msgstr "С сообщениями"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:164
+#: nodepkg/panel/annotations/AnnotationsPanel.js:159
 msgid "Private annotations"
 msgstr "Приватные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:175
+#: nodepkg/panel/annotations/AnnotationsPanel.js:170
 msgid "Public annotations"
 msgstr "Публичные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:185
+#: nodepkg/panel/annotations/AnnotationsPanel.js:180
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:198
+#: nodepkg/panel/annotations/AnnotationsPanel.js:193
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
@@ -607,7 +628,7 @@ msgid "Edit layer"
 msgstr "Редактировать слой"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
-#: nodepkg/panel/print/PrintPanel.tsx:491
+#: nodepkg/panel/print/PrintPanel.tsx:571
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -739,47 +760,43 @@ msgstr "Графики на основе статических данных"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/print/PrintPanel.tsx:272
+#: nodepkg/panel/print/PrintPanel.tsx:267
 msgid "Custom scale"
-msgstr "Произвольный масштаб"
+msgstr ""
 
-#: nodepkg/panel/print/PrintPanel.tsx:473
+#: nodepkg/panel/print/PrintPanel.tsx:468
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:485
+#: nodepkg/panel/print/PrintPanel.tsx:478
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:503
+#: nodepkg/panel/print/PrintPanel.tsx:494
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:521
+#: nodepkg/panel/print/PrintPanel.tsx:510
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:539 nodepkg/panel/print/PrintPanel.tsx:560
+#: nodepkg/panel/print/PrintPanel.tsx:526 nodepkg/panel/print/PrintPanel.tsx:547
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:546
+#: nodepkg/panel/print/PrintPanel.tsx:533
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:555
+#: nodepkg/panel/print/PrintPanel.tsx:542
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:578
+#: nodepkg/panel/print/PrintPanel.tsx:563
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintPanel.tsx:586
-msgid "Save as"
-msgstr "Сохранить как"
-
-#: nodepkg/panel/print/PrintPanel.tsx:598
+#: nodepkg/panel/print/PrintPanel.tsx:583
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
 
@@ -823,89 +840,89 @@ msgstr "Уточните критерий поиска. Отображены п�
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/share/SharePanel.js:29
+#: nodepkg/panel/share/SharePanel.js:30
 msgid ""
 "<a>CORS</a> must be enabled for the target origin when embedding a web map on"
 " a different domain."
 msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
 
-#: nodepkg/panel/share/SharePanel.js:82
+#: nodepkg/panel/share/SharePanel.js:83
 msgid "Select tools"
-msgstr "Выберите инструменты"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:98
+#: nodepkg/panel/share/SharePanel.js:99
 msgid "Select panels"
-msgstr "Выберите панели"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:106
+#: nodepkg/panel/share/SharePanel.js:107
 msgid "None"
-msgstr "Нет"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:249
+#: nodepkg/panel/share/SharePanel.js:250
 msgid "Active panel"
-msgstr "Активная панель"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:263
+#: nodepkg/panel/share/SharePanel.js:264
 msgid "Map link"
 msgstr "Ссылка на карту"
 
-#: nodepkg/panel/share/SharePanel.js:269
+#: nodepkg/panel/share/SharePanel.js:270
 msgid "The map link copied to clipboard."
 msgstr "Ссылка на карту скопирована в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:271
+#: nodepkg/panel/share/SharePanel.js:272
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
-#: nodepkg/panel/share/SharePanel.js:276
+#: nodepkg/panel/share/SharePanel.js:277
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: nodepkg/panel/share/SharePanel.js:280
+#: nodepkg/panel/share/SharePanel.js:281
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.js:282 nodepkg/settings/SettingsForm.js:81
+#: nodepkg/panel/share/SharePanel.js:283 nodepkg/settings/SettingsForm.js:81
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:288 nodepkg/settings/SettingsForm.js:94
+#: nodepkg/panel/share/SharePanel.js:289 nodepkg/settings/SettingsForm.js:94
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:292
+#: nodepkg/panel/share/SharePanel.js:293
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.js:295
+#: nodepkg/panel/share/SharePanel.js:296
 msgid "Map tools"
-msgstr "Инструменты карты"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:299
+#: nodepkg/panel/share/SharePanel.js:300
 msgid "Panels"
-msgstr "Панели"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:314
+#: nodepkg/panel/share/SharePanel.js:315
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: nodepkg/panel/share/SharePanel.js:323
+#: nodepkg/panel/share/SharePanel.js:324
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: nodepkg/panel/share/SharePanel.js:327
+#: nodepkg/panel/share/SharePanel.js:328
 msgid "Embed code"
-msgstr "Код для встраивания"
+msgstr ""
 
-#: nodepkg/panel/share/SharePanel.js:340
+#: nodepkg/panel/share/SharePanel.js:341
 msgid "The embed code copied to clipboard."
 msgstr "Код для встраивания скопирован в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:344
+#: nodepkg/panel/share/SharePanel.js:345
 msgid "Copy code"
 msgstr "Копировать код"
 
-#: nodepkg/panel/share/SharePanel.js:347
+#: nodepkg/panel/share/SharePanel.js:348
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -1085,23 +1102,23 @@ msgstr "Nominatim (OSM)"
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: nodepkg/utils/format-units.tsx:13
+#: nodepkg/utils/format-units.tsx:14
 msgid "km"
 msgstr "км"
 
-#: nodepkg/utils/format-units.tsx:14
+#: nodepkg/utils/format-units.tsx:15
 msgid "ft"
 msgstr "фут"
 
-#: nodepkg/utils/format-units.tsx:15
+#: nodepkg/utils/format-units.tsx:16
 msgid "mi"
 msgstr "миля"
 
-#: nodepkg/utils/format-units.tsx:16
+#: nodepkg/utils/format-units.tsx:17
 msgid "ha"
 msgstr "га"
 
-#: nodepkg/utils/format-units.tsx:17
+#: nodepkg/utils/format-units.tsx:18
 msgid "ac"
 msgstr "акр"
 
@@ -1177,34 +1194,66 @@ msgstr "Клонировать веб-карту"
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:327
-msgid "Display"
-msgstr "Открыть"
-
-#: view.py:391
-msgid "Group setting"
-msgstr "Настройка группы"
-
-#: amd/ngw-webmap/Display.js:994 nodepkg/panel/custom-layer/CustomLayer.tsx:19
-msgid "CustomLayer"
-msgstr "Пользовательские слои"
-
-#: amd/ngw-webmap/Display.js:1052
-msgid "Diagram"
-msgstr ""
-
-#: nodepkg/layers-tree/DropdownActions.tsx:11
-msgid "Additional tools"
-msgstr "Дополнительные инструменты"
-
-#: nodepkg/layers-tree/DropdownFile.js:8
-msgid "Download attached files"
-msgstr "Скачать прикрепленные файлы"
-
-#: nodepkg/layers-tree/IconItem.js:25
-msgid "Zoom to feature layer"
-msgstr ""
-
 #: view.py:332
 msgid "Setting up a web map group"
 msgstr ""
+
+#: view.py:386
+msgid "Display"
+msgstr "Открыть"
+
+#: view.py:406
+msgid "Group setting"
+msgstr "Настройка группы"
+
+#~ msgid "Scale line"
+#~ msgstr "Линейка масштаба"
+
+#~ msgid "Info scale"
+#~ msgstr "Числовой масштаб"
+
+#~ msgid "Identification"
+#~ msgstr "Идентификация"
+
+#~ msgid "Cursor coordinates / extent"
+#~ msgstr "Координаты курсора / охвата"
+
+#~ msgid "Segment"
+#~ msgstr "Сегмент"
+
+#~ msgid "Vertex"
+#~ msgstr "Вершина"
+
+#~ msgid "To all layers"
+#~ msgstr "Ко всем слоям"
+
+#~ msgid "To current layer"
+#~ msgstr "К текущему слою"
+
+#~ msgid "Stick Tool"
+#~ msgstr "Инструмент прилипания"
+
+#~ msgid "Custom scale"
+#~ msgstr "Произвольный масштаб"
+
+#~ msgid "Select tools"
+#~ msgstr "Выберите инструменты"
+
+#~ msgid "Select panels"
+#~ msgstr "Выберите панели"
+
+#~ msgid "None"
+#~ msgstr "Нет"
+
+#~ msgid "Active panel"
+#~ msgstr "Активная панель"
+
+#~ msgid "Map tools"
+#~ msgstr "Инструменты карты"
+
+#~ msgid "Panels"
+#~ msgstr "Панели"
+
+#~ msgid "Embed code"
+#~ msgstr "Код для встраивания"
+

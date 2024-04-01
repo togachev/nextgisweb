@@ -130,6 +130,8 @@ export function UploadLayer({ display }: UploadLayerProps) {
 
     useEffect(() => {
         olmap.on("click", (e) => {
+            console.log(e);
+            
             if (e.dragging) return;
             setCustomStyle(null, false);
             setFeatures(displayFeatureInfo(e.pixel));
