@@ -966,6 +966,20 @@ define([
             });
 
             panels.push({
+                cls: reactPanel("@nextgisweb/webmap/panel/custom-layers", {
+                    props: {
+                        topic: topic,
+                    },
+                }),
+                params: {
+                    title: gettext("CustomLayers"),
+                    name: "custom-layers",
+                    order: 90,
+                    menuIcon: "material-upload_file",
+                },
+            });
+
+            panels.push({
                 cls: reactPanel("@nextgisweb/webmap/panel/print"),
                 params: {
                     title: gettext("Print map"),
