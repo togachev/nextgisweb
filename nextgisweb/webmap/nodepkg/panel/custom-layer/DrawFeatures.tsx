@@ -150,10 +150,12 @@ export const DrawFeatures = observer(
         const addLayer = (geomType: string) => {
             if (drawLayer.length < maxCount) {
                 const layer = addLayerMap(id);
+                const currentItem = { key: layer.ol_uid, change: true, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
                 setDrawLayer([
                     ...drawLayer,
-                    { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false }
+                    currentItem
                 ])
+                onCheckedKey(true, currentItem);             
             } else {
                 message.error(maxCountLayer);
             }
@@ -220,6 +222,7 @@ export const DrawFeatures = observer(
         }
 
         useEffect(() => {
+            console.log(checkedKey);
             setDrawLayer(prevState => {
                 return prevState.map((item: ItemType) => {
                     return item.key === checkedKey.key ? { ...item, change: false } : { ...item, change: true }
@@ -308,7 +311,7 @@ export const DrawFeatures = observer(
             setDefaultOp(value);
         };
 
-        useMemo(() => {
+        useEffect(() => {
             if (drawLayer) {
                 snapBuild(drawLayer?.filter((x) => x.key === checkedKey.key)[0])
             }
@@ -475,11 +478,12 @@ export const DrawFeatures = observer(
                                                     onClick={() => { if (statusFeature) { zoomToLayer(item.key) } }}>
                                                     <ZoomIn />
                                                 </span>
-                                                <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
-                                                    <DeleteForever />
-                                                </span>
+
                                             </>
                                         )}
+                                        <span title={DeleteLayer} className={readonly ? "icon-symbol" : "icon-symbol-disable"} onClick={() => { onDeleteLayer(item) }}>
+                                            <DeleteForever />
+                                        </span>
                                         {!readonly && !item.change ? (
                                             <label className="icon-edit-margin">
                                                 <Input disabled={item.change} type="checkbox"

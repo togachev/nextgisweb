@@ -115,7 +115,10 @@ export const useFeatures = (display: DojoDisplay) => {
             {
                 hitTolerance: display.clientSettings.identify_radius,
                 layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
-                    return layer.get("name") !== "drawing-layer";
+                    const pref = layer.get("name")?.split("__")[1]
+                    if (pref === "upload-layer") {
+                        return layer;
+                    }
                 }
             },
         );
