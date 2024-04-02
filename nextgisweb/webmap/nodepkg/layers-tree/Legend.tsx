@@ -65,8 +65,6 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                     const id = nodeData.id;
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;
-                    console.log(s.render);
-                    
                     return (
                         <div
                             key={idx}

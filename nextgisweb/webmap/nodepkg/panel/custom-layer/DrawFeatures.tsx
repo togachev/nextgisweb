@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Checkbox, ConfigProvider, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
+import { Checkbox, Radio, ConfigProvider, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
@@ -112,6 +112,7 @@ export const DrawFeatures = observer(
         const maxCount = display.clientSettings.max_count_file_upload;
 
         const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
+        const [selectedValue, setSelectedValue] = useState();
 
         const [open, setOpen] = useState(false);
         const [confirmLoading, setConfirmLoading] = useState(false);
@@ -150,12 +151,12 @@ export const DrawFeatures = observer(
         const addLayer = (geomType: string) => {
             if (drawLayer.length < maxCount) {
                 const layer = addLayerMap(id);
-                const currentItem = { key: layer.ol_uid, change: true, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
+                const currentItem = { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
                 setDrawLayer([
                     ...drawLayer,
                     currentItem
                 ])
-                onCheckedKey(true, currentItem);             
+                // onCheckedKey(true, currentItem);
             } else {
                 message.error(maxCountLayer);
             }
@@ -164,7 +165,7 @@ export const DrawFeatures = observer(
         const geomTypesMenuItems: MenuProps = {
             items: geomTypesOptions,
             onClick: (item) => {
-                if (readonly) {
+                if (readonly && !selectedValue) {
                     setGeomTypeDefault(item.key)
                     addLayer(item.key);
                 }
@@ -172,7 +173,7 @@ export const DrawFeatures = observer(
         };
 
         const onDefaultType = () => {
-            if (readonly) {
+            if (readonly && !selectedValue) {
                 const type = currentTypeGeom(geomTypeDefault);
                 addLayer(type);
             }
@@ -222,7 +223,6 @@ export const DrawFeatures = observer(
         }
 
         useEffect(() => {
-            console.log(checkedKey);
             setDrawLayer(prevState => {
                 return prevState.map((item: ItemType) => {
                     return item.key === checkedKey.key ? { ...item, change: false } : { ...item, change: true }
@@ -231,28 +231,34 @@ export const DrawFeatures = observer(
         }, [checkedKey])
 
         const onCheckedKey = (checked: boolean, item: ItemType) => {
-            if (checked) {
-                modifyInteraction(item);
-                drawInteraction(item);
-                snapInteraction(item, false);
-                topic.publish("webmap/tool/identify/off");
-                setCheckedKey({ key: item.key, change: false });
-                setDrawLayer(prevState => {
-                    return prevState.map((item) => {
-                        return { ...item, change: true }
-                    })
-                });
-                setReadonly(false);
-            } else {
-                interactionClear();
-                topic.publish("webmap/tool/identify/on");
-                setDrawLayer(prevState => {
-                    return prevState.map((item: ItemType) => {
-                        return { ...item, change: false, modify: false }
-                    })
-                });
-                setReadonly(true)
-            }
+            console.log(checked);
+
+            //     setDrawLayer(prevState => {
+            //         return prevState.map((item: ItemType) => {
+            //             return { ...item, change: false, modify: false }
+            //         })
+            // if (checked) {
+            //     modifyInteraction(item);
+            //     drawInteraction(item);
+            //     snapInteraction(item, false);
+            //     topic.publish("webmap/tool/identify/off");
+            //     setCheckedKey({ key: item.key, change: false });
+            //     setDrawLayer(prevState => {
+            //         return prevState.map((item) => {
+            //             return { ...item, change: true }
+            //         })
+            //     });
+            //     setReadonly(false);
+            // } else {
+            //     interactionClear();
+            //     topic.publish("webmap/tool/identify/on");
+            //     setDrawLayer(prevState => {
+            //         return prevState.map((item: ItemType) => {
+            //             return { ...item, change: false, modify: false }
+            //         })
+            //     });
+            //     setReadonly(true)
+            // }
         };
 
         const onModify = (checked: boolean) => {
@@ -401,6 +407,37 @@ export const DrawFeatures = observer(
             )
         }
 
+        const onChange1 = (e) => {
+            const { value } = e.target;
+            setSelectedValue(value)
+            setDrawLayer(prev => {
+                return prev.map((item: ItemType) => {
+                    if (item.key === value) {
+                        return { ...item, change: false }
+                    }
+                    else {
+                        return { ...item, change: true }
+                    }
+                })
+            })
+        };
+
+        const deselectOnClick = (e) => {
+            const { value } = e.target;
+            const itemCurrent = drawLayer.filter(item => item.key === value)[0]
+            if (value == selectedValue) {
+                setSelectedValue(null);
+                setDrawLayer(prev => {
+                    return prev.map((item: ItemType) => {
+                        if (item.key !== itemCurrent.key) {
+                            return { ...item, change: false }
+                        }
+                        return item;
+                        
+                    })
+                })
+            }
+        };
         return (
             <ConfigProvider
                 theme={{
@@ -449,7 +486,7 @@ export const DrawFeatures = observer(
                         checkedKey.key ?
                             (<ControlEdit itemLayer={drawLayer?.filter((x) => x.key === checkedKey.key)[0]} />) :
                             (<ControlEdit itemLayer={itemDefault} />) : null}
-                    {drawLayer.map((item: ItemType, index: number) => {
+                    <Radio.Group onChange={onChange1} value={selectedValue} >{drawLayer.map((item: ItemType, index: number) => {
                         const statusFeature = featureCount.includes(item.key)
                         return (
                             <div key={index} >
@@ -499,19 +536,26 @@ export const DrawFeatures = observer(
                                             </label>
                                         ) : null}
                                         <label className="icon-edit-margin">
-                                            <Input disabled={item.change} type="checkbox"
+                                            <Input
+                                                disabled={item.change}
+                                                type="checkbox"
                                                 onChange={(e) => onCheckedKey(e.target.checked, item)}
                                                 className="input-button-none" />
                                             <span title={EditLayer} className={!readonly && item.key === checkedKey.key ? "icon-edit icon-symbol icon-red" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
                                                 <EditIcon />
                                             </span>
                                         </label>
+                                        <Radio.Button
+                                            disabled={item.change} 
+                                            onClick={deselectOnClick} value={item.key}>
+                                            {item.key}
+                                        </Radio.Button>
                                     </div>
                                 </div>
 
                             </div>
                         )
-                    }).reverse()}
+                    }).reverse()}</Radio.Group>
                 </div>
             </ConfigProvider>
         )
