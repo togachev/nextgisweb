@@ -70,7 +70,7 @@ msgstr "Учитывать на карте"
 #: amd/ngw-webmap/ItemWidget.js:179
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:49
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:54
 #: nodepkg/settings/SettingsForm.js:331
 msgid "Save"
 msgstr "Сохранить"
@@ -152,7 +152,7 @@ msgid "Style settings"
 msgstr "Настройки стиля"
 
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:51
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:56
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:41
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -287,7 +287,7 @@ msgstr "Измерение расстояния"
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:218
+#: amd/ngw-webmap/tool/Measure.js:224
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -348,7 +348,7 @@ msgid "Create as private"
 msgstr "Создать как приватную"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:48
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
 msgid "Create"
 msgstr "Создать"
 
@@ -507,15 +507,15 @@ msgstr "Дополнительные инструменты"
 msgid "Download attached files"
 msgstr "Скачать прикрепленные файлы"
 
-#: nodepkg/layers-tree/IconItem.js:25
+#: nodepkg/layers-tree/IconItem.js:25 nodepkg/layers-tree/Legend.tsx:49
 msgid "Zoom to feature layer"
 msgstr ""
 
-#: nodepkg/layers-tree/LegendAction.tsx:13
+#: nodepkg/layers-tree/LegendAction.tsx:10
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/LegendAction.tsx:14
+#: nodepkg/layers-tree/LegendAction.tsx:11
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
@@ -618,69 +618,77 @@ msgstr "Загрузка"
 msgid "Creation"
 msgstr "Создание"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:50
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:55
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:39
 msgid "Delete Layer"
 msgstr "Удалить слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:52
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:57
 msgid "Edit layer"
 msgstr "Редактировать слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:58
 #: nodepkg/panel/print/PrintPanel.tsx:571
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:54
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:59
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:38
 msgid "Delete all layers"
 msgstr "Удалить все слои"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:55
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:60
 msgid "The limit of created layers has been exceeded"
 msgstr "Превышен лимит созданных слоев"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:56
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:61
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:57
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:62
 msgid "Segment"
 msgstr "Сегмент"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:58
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:63
 msgid "Vertex"
 msgstr "Вершина"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:59
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:64
 msgid "To all layers"
 msgstr "Ко всем слоям"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:60
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:65
 msgid "To current layer"
 msgstr "К текущему слою"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:61
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:66
 msgid "Stick Tool"
 msgstr "Инструмент прилипания"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:65
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:93
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:67
+msgid "Start editing after layer creation"
+msgstr "Начните редактирование после создания слоя"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:68
+msgid "Do not enable edit mode after creating a layer"
+msgstr "Не включать режим редактирования после создания слоя"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:71
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:99
 msgid "line layer"
 msgstr "линейный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:66
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:97
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:72
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:103
 msgid "polygon layer"
 msgstr "полигональный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:67
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:101
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:73
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:107
 msgid "point layer"
 msgstr "точечный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:137
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:142
 msgid "Number of layers maximum/created:"
 msgstr "Максимальное количество слоев/созданно"
 
