@@ -666,8 +666,8 @@ msgid "Stick Tool"
 msgstr "Инструмент прилипания"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:50
-msgid "Start editing after layer creation"
-msgstr "Начните редактирование после создания слоя"
+msgid "Enable edit mode after layer creation"
+msgstr "Включить режим редактирования после создания слоя"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:51
 msgid "Do not enable edit mode after creating a layer"
@@ -1214,55 +1214,3 @@ msgstr "Открыть"
 #: view.py:406
 msgid "Group setting"
 msgstr "Настройка группы"
-
-#~ msgid "Scale line"
-#~ msgstr "Линейка масштаба"
-
-#~ msgid "Info scale"
-#~ msgstr "Числовой масштаб"
-
-#~ msgid "Identification"
-#~ msgstr "Идентификация"
-
-#~ msgid "Cursor coordinates / extent"
-#~ msgstr "Координаты курсора / охвата"
-
-#~ msgid "Segment"
-#~ msgstr "Сегмент"
-
-#~ msgid "Vertex"
-#~ msgstr "Вершина"
-
-#~ msgid "To all layers"
-#~ msgstr "Ко всем слоям"
-
-#~ msgid "To current layer"
-#~ msgstr "К текущему слою"
-
-#~ msgid "Stick Tool"
-#~ msgstr "Инструмент прилипания"
-
-#~ msgid "Custom scale"
-#~ msgstr "Произвольный масштаб"
-
-#~ msgid "Select tools"
-#~ msgstr "Выберите инструменты"
-
-#~ msgid "Select panels"
-#~ msgstr "Выберите панели"
-
-#~ msgid "None"
-#~ msgstr "Нет"
-
-#~ msgid "Active panel"
-#~ msgstr "Активная панель"
-
-#~ msgid "Map tools"
-#~ msgstr "Инструменты карты"
-
-#~ msgid "Panels"
-#~ msgstr "Панели"
-
-#~ msgid "Embed code"
-#~ msgstr "Код для встраивания"
-

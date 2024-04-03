@@ -13,7 +13,7 @@ import CheckAll from "@nextgisweb/icon/material/stacked_line_chart/outline";
 import VertexIcon from "@nextgisweb/icon/mdi/vector-point";
 import EdgeIcon from "@nextgisweb/icon/mdi/vector-polyline";
 import ModifyIcon from "@nextgisweb/icon/mdi/vector-polyline-edit";
-import ContainStart from "@nextgisweb/icon/mdi/contain-start";
+import AutoMode from "@nextgisweb/icon/material/auto_mode";
 
 import { useDraw } from "./hook/useDraw";
 
@@ -47,7 +47,7 @@ const Vertex = gettext("Vertex")
 const ToAllLayers = gettext("To all layers")
 const ToCurrentLayer = gettext("To current layer")
 const StickTool = gettext("Stick Tool")
-const AutoStartEdit = gettext("Start editing after layer creation")
+const AutoStartEdit = gettext("Enable edit mode after layer creation")
 const DisableStartEdit = gettext("Do not enable edit mode after creating a layer")
 const MaxCreated = gettext("Maximum layers/created:")
 const LineLayer = gettext("line layer")
@@ -449,7 +449,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                     <label className="icon-edit-auto">
                         <Checkbox onChange={(e) => setStartEdit(e.target.checked)} className="input-button-none" />
                         <span title={startEdit ? DisableStartEdit : AutoStartEdit} className={startEdit ? "icon-edit icon-symbol" : "icon-symbol"}>
-                            <ContainStart />
+                            <AutoMode />
                         </span>
                     </label>
                 </div>

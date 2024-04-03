@@ -32,18 +32,6 @@ export type SourceType = {
     length: number;
 };
 
-export type ItemType = {
-    key: number;
-    change: boolean;
-    label: string;
-    geomType: string;
-    allLayer: boolean;
-    edge: boolean;
-    vertex: boolean;
-    draw: boolean;
-    modify: boolean;
-};
-
 export type ParamsFormat = {
     value: string;
     label: string;

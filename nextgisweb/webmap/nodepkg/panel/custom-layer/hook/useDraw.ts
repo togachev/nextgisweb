@@ -2,17 +2,25 @@ import { useCallback, useEffect, useState } from "react";
 import type { DojoDisplay } from "../../../type";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
+import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
+import type { Vector as OlVectorLayer } from "ol/layer";
 import { primaryAction, shiftKeyOnly } from "ol/events/condition";
 import { TYPE_FILE, style, styleDraw } from "../constant";
 import type { ItemType, ParamsFormat } from "../type";
+import type { Options as SnapOptions } from "ol/interaction/Snap";
+
+type SnapProps = {
+    key: number;
+    value: SnapOptions;
+}
 
 export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
 
     const [featureCount, setFeatureCount] = useState([]);
     const [draw, setDraw] = useState();
-    const [snap, setSnap] = useState([]);
+    const [snap, setSnap] = useState<SnapProps[]>([]);
     const [modify, setModify] = useState();
     const [propSnap, setPropSnap] = useState();
 
@@ -34,11 +42,11 @@ export const useDraw = (display: DojoDisplay) => {
         return layer;
     })
 
-    const snapBuild = useCallback((params) => {
+    const snapBuild = useCallback((params: ItemType) => {
         setPropSnap(params)
     })
 
-    const snapInteraction = useCallback((params, status) => {
+    const snapInteraction = useCallback((params: ItemType, status: boolean) => {
         if (!status) {
             const layer = getLayer(params.key);
             const snap_ = new Snap({
@@ -47,16 +55,16 @@ export const useDraw = (display: DojoDisplay) => {
                 vertex: params.vertex,
             });
             olmap.addInteraction(snap_)
-            setSnap([...snap, { [layer.ol_uid] : snap_}])
+            setSnap([...snap, { [layer.ol_uid]: snap_ }])
         } else {
-            olmap.getLayers().forEach(layer => {
+            olmap.getLayers().forEach((layer: OlVectorLayer<OlVectorSource>) => {
                 if (layer instanceof VectorLayer) {
                     const snap_ = new Snap({
                         source: layer.getSource(),
                         edge: propSnap.edge,
                         vertex: propSnap.vertex,
                     });
-                    setSnap([...snap, { [layer.ol_uid] : snap_}])
+                    setSnap([...snap, { [layer.ol_uid]: snap_ }])
                     snap_.setActive(true)
                     olmap.addInteraction(snap_)
                 }
@@ -71,7 +79,7 @@ export const useDraw = (display: DojoDisplay) => {
             snapInteraction(propSnap, true)
         }
         if (!propSnap?.vertex && !propSnap?.edge) {
-            snap.map(item => {
+            snap.map((item: SnapProps) => {
                 const key_ = Object.keys(item)[0];
                 const snap_ = Object.values(item)[0];
                 if (key_ === propSnap.key) {
@@ -81,7 +89,7 @@ export const useDraw = (display: DojoDisplay) => {
                 }
             })
         } else if (propSnap?.vertex || propSnap?.edge) {
-            snap.map(item => {
+            snap.map((item: SnapProps) => {
                 const key_ = Object.keys(item)[0];
                 const snap_ = Object.values(item)[0];
                 if (key_ === propSnap.key) {
@@ -98,7 +106,7 @@ export const useDraw = (display: DojoDisplay) => {
             modify.setActive(false);
             draw.setActive(true);
         }
-        
+
     }, [propSnap])
 
     const modifyInteraction = useCallback((item: ItemType) => {
@@ -135,7 +143,7 @@ export const useDraw = (display: DojoDisplay) => {
         olmap.removeInteraction(draw);
         olmap.removeInteraction(modify);
         snap?.map(item => {
-            
+
             const snap_ = Object.values(item)[0];
             olmap.removeInteraction(snap_);
         });
@@ -156,8 +164,6 @@ export const useDraw = (display: DojoDisplay) => {
     const removeItem = (key: number) => {
         const layer = getLayer(key);
         olmap.removeLayer(layer);
-        console.log(display);
-        
         olmap.getView().fit(display._extent, olmap.getSize());
     }
 
