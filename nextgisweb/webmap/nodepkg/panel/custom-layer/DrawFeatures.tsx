@@ -204,6 +204,7 @@ export const DrawFeatures = observer(
                     ...drawLayer,
                     currentItem
                 ])
+                
                 if (selectedValue) {
                     deselectOnClick({ status: false, value: selectedValue })
                     onChangeSelect({ item: currentItem, value: layer.ol_uid })
@@ -233,7 +234,7 @@ export const DrawFeatures = observer(
                 setGeomTypeDefault(item.key)
                 if (readonly && !selectedValue) {
                     addLayer(item.key);
-                } else if (startEdit) {
+                } else if (startEdit && featureCount.includes(selectedValue)) {
                     addLayer(item.key);
                 }
             },
@@ -243,7 +244,7 @@ export const DrawFeatures = observer(
             const type = currentTypeGeom(geomTypeDefault);
             if (readonly && !selectedValue) {
                 addLayer(type);
-            } else if (startEdit) {
+            } else if (startEdit && featureCount.includes(selectedValue)) {
                 addLayer(type);
             }
         };
