@@ -690,7 +690,7 @@ msgstr "точечный слой"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:142
 msgid "Number of layers maximum/created:"
-msgstr "Максимальное количество слоев/созданно"
+msgstr "Максимальное количество слоев/созданно:"
 
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:35
 msgid "This file type is not supported"
