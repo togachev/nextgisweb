@@ -153,7 +153,7 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="max_count_file_upload"
-                        label={gettext("Maximum number of uploaded files")}
+                        label={gettext("Maximum uploaded files")}
                         rules={[
                             {
                                 required: true,

@@ -70,7 +70,7 @@ msgstr "Учитывать на карте"
 #: amd/ngw-webmap/ItemWidget.js:179
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:54
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:37
 #: nodepkg/settings/SettingsForm.js:331
 msgid "Save"
 msgstr "Сохранить"
@@ -152,8 +152,8 @@ msgid "Style settings"
 msgstr "Настройки стиля"
 
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:56
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:41
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:39
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:38
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
@@ -348,7 +348,7 @@ msgid "Create as private"
 msgstr "Создать как приватную"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:36
 msgid "Create"
 msgstr "Создать"
 
@@ -618,111 +618,112 @@ msgstr "Загрузка"
 msgid "Creation"
 msgstr "Создание"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:55
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:39
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:38
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:36
 msgid "Delete Layer"
 msgstr "Удалить слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:57
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:40
 msgid "Edit layer"
 msgstr "Редактировать слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:58
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:41
 #: nodepkg/panel/print/PrintPanel.tsx:571
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:59
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:38
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:42
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:35
 msgid "Delete all layers"
 msgstr "Удалить все слои"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:60
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
 msgid "The limit of created layers has been exceeded"
 msgstr "Превышен лимит созданных слоев"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:61
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:44
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:62
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:45
 msgid "Segment"
 msgstr "Сегмент"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:63
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:46
 msgid "Vertex"
 msgstr "Вершина"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:64
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:47
 msgid "To all layers"
 msgstr "Ко всем слоям"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:65
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:48
 msgid "To current layer"
 msgstr "К текущему слою"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:66
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:49
 msgid "Stick Tool"
 msgstr "Инструмент прилипания"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:67
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:50
 msgid "Start editing after layer creation"
 msgstr "Начните редактирование после создания слоя"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:68
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:51
 msgid "Do not enable edit mode after creating a layer"
 msgstr "Не включать режим редактирования после создания слоя"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:71
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:99
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:52
+msgid "Maximum layers/created:"
+msgstr "Максимум слоев/созданно:"
+
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
 msgid "line layer"
 msgstr "линейный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:72
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:103
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:54
 msgid "polygon layer"
 msgstr "полигональный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:73
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:107
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:55
 msgid "point layer"
 msgstr "точечный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:142
-msgid "Number of layers maximum/created:"
-msgstr "Максимальное количество слоев/созданно:"
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:56
+msgid "Change geometry"
+msgstr "Изменить геометрию"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:35
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:32
 msgid "This file type is not supported"
 msgstr "Этот тип файла не поддерживается"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:36
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:33
 msgid "Exceeding the volume of 16mb"
 msgstr "Превышение объема 16мб"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:37
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:34
 msgid "Click or drag file to this area to upload layer"
 msgstr "Нажмите или перетащите файл в эту область, чтобы загрузить слой"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:40
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:37
 msgid "Supported layers for import: GPX, GeoJSON, KML"
 msgstr "Поддерживаемые слои для импорта: GPX, GeoJSON, KML"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:42
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:39
 msgid "Zoom to object"
 msgstr "Увеличить до объекта"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:43
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:40
 msgid "No attribute information available"
 msgstr "Атрибутивная информация отсутсвует"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:51
-msgid "Maximum number of uploaded files:"
-msgstr "Максимальное количество загружаемых файлов:"
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:48
+msgid "Maximum uploaded files:"
+msgstr "Максимум загружаемых файлов:"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:57
-msgid "Number of files maximum/downloaded:"
-msgstr "Количество файлов максимум/загружено:"
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:54
+msgid "Maximum files/loaded:"
+msgstr "Максимум файлов/загружено:"
 
 #: nodepkg/panel/diagram/DiagramPanel.js:16
 msgid "Diagrams"
@@ -979,8 +980,8 @@ msgid "Custom map settings"
 msgstr "Пользовательские настройки карты"
 
 #: nodepkg/settings/SettingsForm.js:156
-msgid "Maximum number of uploaded files"
-msgstr "Максимальное количество загружаемых файлов"
+msgid "Maximum uploaded files"
+msgstr "Максимум загружаемых файлов"
 
 #: nodepkg/settings/SettingsForm.js:168
 msgid "Measurement"

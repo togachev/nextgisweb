@@ -11,14 +11,11 @@ import { useFeatures } from "./hook/useFeatures";
 import type { DojoDisplay } from "../type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
+import type { FeatureContext } from "./type";
 import { TYPE_FILE } from "./constant";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
-type FeatureContext = {
-    name: string;
-    value: any;
-}
 type UploadLayerProps = {
     display: DojoDisplay;
 }
@@ -41,6 +38,8 @@ const supportLayer = gettext("Supported layers for import: GPX, GeoJSON, KML");
 const ZoomToLayer = gettext("Zoom to layer");
 const ZoomToObject = gettext("Zoom to object");
 const noAttribute = gettext("No attribute information available");
+const MaxUploadFile = gettext("Maximum uploaded files:");
+const MaxFiles = gettext("Maximum files/loaded:");
 
 let id = 0;
 
@@ -48,13 +47,13 @@ export function UploadLayer({ display }: UploadLayerProps) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
     const maxCount = display.clientSettings.max_count_file_upload;
-    const maxCountMesssage = gettext("Maximum number of uploaded files:") + " " + maxCount;
+    const maxCountMesssage = MaxUploadFile + " " + maxCount;
     const [uploadkey, setUploadkey] = useState(Date.now())
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [features, setFeatures] = useState<string[]>([]);
 
-    const numberOfFiles = gettext("Number of files maximum/downloaded:") + " " + maxCount + "/" + fileList.length;
+    const numberOfFiles = MaxFiles + " " + maxCount + "/" + fileList.length;
 
     const props: UploadProps = {
         customRequest: async options => {
@@ -116,6 +115,10 @@ export function UploadLayer({ display }: UploadLayerProps) {
             const isLimitVolume = file.size / 1024 / 1024 < 16;
             if (!isLimitVolume) {
                 message.error(validVolumeMessage);
+            }
+            if (info.findIndex(f => f.uid === file.uid) + 1 + fileList.length > maxCount) {
+                message.error(maxCountMesssage);
+                return Upload.LIST_IGNORE;
             }
             return isValidType && isMaxCount && isLimitVolume || Upload.LIST_IGNORE;
         },

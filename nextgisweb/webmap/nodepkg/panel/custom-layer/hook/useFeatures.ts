@@ -4,7 +4,7 @@ import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
-import { Circle, Fill, Stroke, Style } from "ol/style";
+import { customStyle, clickStyle } from "../constant";
 
 import type { DojoDisplay } from "../../type";
 
@@ -20,55 +20,6 @@ type SourceType = {
     file: InfoUpload;
     length: number;
 };
-
-const customStyle = new Style({
-    stroke: new Stroke({
-        width: 3,
-        color: "#009DFF",
-    }),
-    image: new Circle({
-        anchor: [0.5, 46],
-        anchorXUnits: "fraction",
-        anchorYUnits: "pixels",
-        stroke: new Stroke({
-            width: 2,
-            color: "#fff",
-        }),
-        radius: 5,
-        fill: new Stroke({
-            width: 2,
-            color: "#106a90",
-        }),
-    }),
-    fill: new Fill({
-        color: "#106a9020",
-    }),
-});
-
-const clickStyle = new Style({
-    stroke: new Stroke({
-        width: 4,
-        color: "#FFE900"
-    }),
-    fill: new Fill({
-        color: "rgba(0, 0, 255, 0.5)",
-    }),
-    image: new Circle({
-        anchor: [0.5, 46],
-        anchorXUnits: "fraction",
-        anchorYUnits: "pixels",
-        stroke: new Stroke({
-            width: 1,
-            color: "#000000"
-        }),
-        radius: 6,
-        fill: new Stroke({
-            width: 1,
-            color: "#FFE900"
-        }),
-    }),
-    zIndex: 100,
-});
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
