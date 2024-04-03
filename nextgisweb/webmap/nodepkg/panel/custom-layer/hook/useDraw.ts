@@ -5,24 +5,7 @@ import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import { primaryAction, shiftKeyOnly } from "ol/events/condition";
 import { TYPE_FILE, style, styleDraw } from "../constant";
-
-type ItemType = {
-    key: number;
-    change: boolean;
-    label: string;
-    geomType: string;
-    allLayer: boolean;
-    edge: boolean;
-    vertex: boolean;
-    draw: boolean;
-    modify: boolean;
-};
-
-type ParamsFormat = {
-    value: string;
-    label: string;
-    disabled: boolean;
-};
+import type { ItemType, ParamsFormat } from "../type";
 
 export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
@@ -173,6 +156,8 @@ export const useDraw = (display: DojoDisplay) => {
     const removeItem = (key: number) => {
         const layer = getLayer(key);
         olmap.removeLayer(layer);
+        console.log(display);
+        
         olmap.getView().fit(display._extent, olmap.getSize());
     }
 

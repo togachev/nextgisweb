@@ -7,19 +7,7 @@ import type { Vector as OlVectorLayer } from "ol/layer";
 import { customStyle, clickStyle } from "../constant";
 
 import type { DojoDisplay } from "../../type";
-
-interface InfoUpload {
-    uid: string;
-    name: string;
-}
-
-type SourceType = {
-    id: number;
-    url: string;
-    format: string;
-    file: InfoUpload;
-    length: number;
-};
+import type { SourceType } from "../type";
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
