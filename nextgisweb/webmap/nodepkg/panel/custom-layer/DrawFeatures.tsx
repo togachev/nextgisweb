@@ -444,16 +444,14 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                     <Text title={currentMaxLayer} ellipsis={true} >{currentMaxLayer}</Text>
                     {drawLayer.length > 1 && (<DeleteItems />)}
                 </div>
-                <div style={{ margin: "5px" }}>
-                    <div className="dropdown-button">
-                        {DropdownType()}
-                        <label className="icon-edit-auto">
-                            <Checkbox onChange={(e) => setStartEdit(e.target.checked)} className="input-button-none" />
-                            <span title={startEdit ? DisableStartEdit : AutoStartEdit} className={startEdit ? "icon-edit icon-symbol" : "icon-symbol"}>
-                                <ContainStart />
-                            </span>
-                        </label>
-                    </div>
+                <div className="dropdown-button">
+                    {DropdownType()}
+                    <label className="icon-edit-auto">
+                        <Checkbox onChange={(e) => setStartEdit(e.target.checked)} className="input-button-none" />
+                        <span title={startEdit ? DisableStartEdit : AutoStartEdit} className={startEdit ? "icon-edit icon-symbol" : "icon-symbol"}>
+                            <ContainStart />
+                        </span>
+                    </label>
                 </div>
                 {drawLayer.length > 0 ?
                     selectedValue ?
@@ -532,5 +530,4 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
             </div>
         </ConfigProvider>
     )
-}
-)
+})
