@@ -27,6 +27,7 @@ export function Desc({
                     style={{
                         width: 350,
                     }}
+                    onClick={(e) => { e.stopPropagation(); }}
                 >
                     <ParseDesc item={nodeData} />
                 </Card>

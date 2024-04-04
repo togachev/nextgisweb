@@ -65,12 +65,13 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                     const id = nodeData.id;
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;
+                    const title = s.display_name ? s.display_name : nodeData.title;
                     return (
                         <div
                             key={idx}
                             className="legend-symbol"
                             title={s.display_name}
-                            onClick={() => asyncFunc(nodeData.layerId, s.display_name ? s.display_name : nodeData.title, zoomToNgwExtent)}
+                            onClick={() => asyncFunc(nodeData.layerId, title, zoomToNgwExtent)}
                         >
                             <Checkbox
                                 defaultChecked={render}
@@ -84,13 +85,12 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                                 onClick={(evt) => evt.stopPropagation()}
                             />
                             <img
-                                title={zoomToFeatureLayer}
                                 className="icon-list"
                                 width={20}
                                 height={20}
                                 src={"data:image/png;base64," + s.icon.data}
                             />
-                            <span className="titleName">{s.display_name ? s.display_name : nodeData.title}</span>
+                            <span className="titleName">{title}</span>
                         </div>
                     );
                 })}
