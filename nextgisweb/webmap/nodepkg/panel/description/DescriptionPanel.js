@@ -53,7 +53,6 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
         return (
             <>{
                 content.map((item, index) => {
-                    console.log(item);
                     const title = item.type === "layer" ? msgLayer : msgStyle;
                     return (
                         <div key={index} className="item-description">
