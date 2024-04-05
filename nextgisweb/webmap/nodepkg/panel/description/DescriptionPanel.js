@@ -2,7 +2,7 @@ import parse, { Element, domToReact } from 'html-react-parser';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelHeader } from "../header";
 import { Image } from "@nextgisweb/gui/antd";
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import "./DescriptionPanel.less";
 
 const title = gettext("Description");
@@ -53,19 +53,23 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
         return (
             <>{
                 content.map((item, index) => {
+                    console.log(item);
                     const title = item.type === "layer" ? msgLayer : msgStyle;
                     return (
                         <div key={index} className="item-description">
                             <span className="titleDesc">
-                                <SvgIcon
-                                    className="icon"
+                                <SvgIconLink
+                                    className="desc-link"
+                                    href={item.permissions ? item.url : undefined}
                                     icon={`rescls-${item.cls}`}
                                     fill="currentColor"
-                                />
-                                <span className="labelDesc">{title}</span>
+                                    target="_blank"
+                                >
+                                    <span className="labelDesc">{title}</span>
+                                </SvgIconLink>
                             </span>
                             {parse(item.description, options)}
-                        </div>
+                        </div >
                     )
                 })
 
