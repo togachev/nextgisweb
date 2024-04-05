@@ -2,10 +2,12 @@ import parse, { Element, domToReact } from 'html-react-parser';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelHeader } from "../header";
 import { Image } from "@nextgisweb/gui/antd";
-
+import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import "./DescriptionPanel.less";
 
 const title = gettext("Description");
+const msgLayer = gettext("Layer");
+const msgStyle = gettext("Style");
 
 const zoomToFeature = (display, resourceId, featureId) => {
     display.featureHighlighter
@@ -38,7 +40,7 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
             /*
                 Если открыты свойства ресурса, ссылка на объект удаляется, остается заголовок.
                 Можно оставить ссылку, и добавить переход к объекту в таблице ресурса или к объекту на карте.
-            */ 
+            */
             if (item instanceof Element && item.name === 'a' && upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<>{domToReact(item.children, options)}</>);
@@ -46,10 +48,35 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
             }
         }
     };
-    const data = parse(
+
+    const DescComp = ({ content }) => {
+        return (
+            <>{
+                content.map((item, index) => {
+                    const title = item.type === "layer" ? msgLayer : msgStyle;
+                    return (
+                        <div key={index} className="item-description">
+                            <span className="titleDesc">
+                                <SvgIcon
+                                    className="icon"
+                                    icon={`rescls-${item.cls}`}
+                                    fill="currentColor"
+                                />
+                                <span className="labelDesc">{title}</span>
+                            </span>
+                            {parse(item.description, options)}
+                        </div>
+                    )
+                })
+
+            }</>
+        )
+    }
+
+    const data =
         content === undefined
-        ? display.config.webmapDescription
-        : content, options);
+            ? parse(display.config.webmapDescription, options)
+            : <DescComp content={content} />;
 
     return (
         <div className="ngw-webmap-description-panel">

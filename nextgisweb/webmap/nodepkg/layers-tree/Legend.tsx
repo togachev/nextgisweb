@@ -1,14 +1,9 @@
 import { theme } from "antd";
-
 import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
-
 import type WebmapStore from "../store";
 import type { TreeItem } from "../type/TreeItems";
 import type { DisplayMap } from "../type/DisplayMap";
-
 import { route } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import "./Legend.less";
 
 interface LegendProps {
@@ -45,8 +40,6 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                 .catch(console.error);
         }
     };
-
-    const zoomToFeatureLayer = gettext("Zoom to feature layer");
 
     return (
         <div className="legend-block">

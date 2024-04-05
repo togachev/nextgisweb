@@ -147,6 +147,10 @@ msgstr "Завершить редактирование"
 msgid "Edit"
 msgstr "Редактировать"
 
+#: amd/ngw-webmap/plugin/LayerSettings.js:20
+msgid "Layer settings"
+msgstr "Настройки слоя"
+
 #: amd/ngw-webmap/plugin/StyleSettings.js:20
 msgid "Style settings"
 msgstr "Настройки стиля"
@@ -507,7 +511,7 @@ msgstr "Дополнительные инструменты"
 msgid "Download attached files"
 msgstr "Скачать прикрепленные файлы"
 
-#: nodepkg/layers-tree/IconItem.js:25 nodepkg/layers-tree/Legend.tsx:49
+#: nodepkg/layers-tree/IconItem.js:25
 msgid "Zoom to feature layer"
 msgstr ""
 
@@ -717,13 +721,21 @@ msgstr "Увеличить до объекта"
 msgid "No attribute information available"
 msgstr "Атрибутивная информация отсутсвует"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:48
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:41
 msgid "Maximum uploaded files:"
 msgstr "Максимум загружаемых файлов:"
 
-#: nodepkg/panel/custom-layer/UploadLayer.tsx:54
+#: nodepkg/panel/custom-layer/UploadLayer.tsx:42
 msgid "Maximum files/loaded:"
 msgstr "Максимум файлов/загружено:"
+
+#: nodepkg/panel/description/DescriptionPanel.js:9
+msgid "Layer"
+msgstr "Слой"
+
+#: nodepkg/panel/description/DescriptionPanel.js:10
+msgid "Style"
+msgstr "Стиль"
 
 #: nodepkg/panel/diagram/DiagramPanel.js:16
 msgid "Diagrams"
@@ -1214,3 +1226,4 @@ msgstr "Открыть"
 #: view.py:406
 msgid "Group setting"
 msgstr "Настройка группы"
+

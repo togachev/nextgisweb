@@ -36,15 +36,19 @@ define([
             const pm = this.display.panelsManager;
             const pkey = "resource-description";
             const item = this.display.dumpItem();
-            const data = this.display.get("itemConfig").plugin[this.identity];
+            const data = this.display.get("itemConfig");
             if (data !== undefined) {
-                const content = data.description;
+                const content = [];
+                data.descLayer && content.push({description: data.descLayer, cls: data.layerCls, type: "layer"});
+                data.descStyle && content.push({description: data.descStyle, cls: data.cls, type: "style"});
+                
                 let panel = pm.getPanel(pkey);
+
                 if (panel) {
                     if (panel.app) {
-                        panel.app.update({ content });
+                        panel.app.update(content);
                     } else {
-                        panel.props = { content };
+                        panel.props = content;
                     }
                 } else {
                     const cls = reactPanel(

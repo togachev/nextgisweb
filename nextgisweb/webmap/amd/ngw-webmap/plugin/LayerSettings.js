@@ -16,10 +16,10 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "mdi-image-edit-outline",
-                title: i18n.gettext("Style settings"),
+                icon: "mdi-layers-edit",
+                title: i18n.gettext("Layer settings"),
                 onClick: (item) => {
-                    window.open(api.routeURL("resource.update", { id: item.styleId }), "_blank");
+                    window.open(api.routeURL("resource.update", { id: item.layerId }), "_blank");
                 },
             };
         },
