@@ -126,7 +126,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
         listType: "text",
         name: "file",
         onRemove: (file) => {
-            setFileList(fileList.filter((item) => item.uid !== file.uid));
+            setFileList(fileList.find((item) => item.uid !== file.uid));
             removeItem(file.uid)
         }
     };

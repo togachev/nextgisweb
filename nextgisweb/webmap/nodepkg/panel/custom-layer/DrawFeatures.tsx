@@ -61,20 +61,13 @@ const typeComponentIcon = [
     { key: "Point", component: <CircleIcon />, label: PointLayer }
 ]
 
-const iconTypeGeom = (value) => {
-    return typeComponentIcon.filter(item => item.key === value)[0].component;
-}
-
-const labelLayer = (value) => {
-    return typeComponentIcon.filter(item => item.key === value)[0].label;
-}
-
 const labelTypeGeom = (value, key) => {
+    const item = typeComponentIcon.find(item => item.key === key);
     return (
         <div className="label-type">
             <span className="label">{value}</span>
             <span className="icon">
-                {iconTypeGeom(key)}
+                {item?.component}
             </span>
         </div>
     )
@@ -135,11 +128,12 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     });
 
     const currentTypeGeom = (value) => {
-        return geomTypesInfo.filter(item => item.key === value)[0].key;
+        const item = geomTypesInfo.find(item => item.key === value)
+        return item?.key;
     }
 
     const onChangeSelect = ({ item, value }) => {
-        const itemCurrent = !item ? drawLayer.filter(item => item.key === value)[0] : item;
+        const itemCurrent = !item ? drawLayer.find(item => item.key === value) : item;
         setSelectedValue(value)
         setDrawLayer((items: ItemType[]) => {
             return items.map((item: ItemType) => {
@@ -160,7 +154,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     };
 
     const deselectOnClick = ({ status, value }) => {
-        const itemCurrent = drawLayer.filter(item => item.key === value)[0]
+        const itemCurrent = drawLayer.find(item => item.key === value);
         if (value === selectedValue) {
             setSelectedValue(null);
             setDrawLayer((prev: ItemType[]) => {
@@ -185,11 +179,9 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     const addLayer = (geomType: string) => {
         if (drawLayer.length < maxCount) {
             const layer = addLayerMap(id);
-            const currentItem = { key: layer.ol_uid, change: false, label: labelLayer(geomType) + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
-            setDrawLayer([
-                ...drawLayer,
-                currentItem
-            ])
+            const item = typeComponentIcon.find(item => item.key === geomType);
+            const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
+            setDrawLayer([...drawLayer, currentItem])
 
             if (selectedValue) {
                 deselectOnClick({ status: false, value: selectedValue })
@@ -244,12 +236,12 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     );
 
     const geomTypeFilterIcon = (geomType: string, value: string) => {
-        const label = geomTypesInfo.filter(item => item.key === geomType)[0].label
+        const item = geomTypesInfo.find(item => item.key === geomType);
         const status = value === "save" ? Save : Create
         return (
             <div className="button-operation">
                 <div className="status-operation">{status}</div>
-                {label}
+                {item?.label}
             </div>
         );
     }
@@ -274,14 +266,14 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     const onDeleteLayer = (item: ItemType) => {
         if (readonly) {
             removeItem(item.key);
-            setDrawLayer(drawLayer.filter((x) => x.key !== item.key));
+            setDrawLayer(drawLayer.find((x) => x.key !== item.key));
         }
     }
 
     useEffect(() => {
         itemModal?.geomType === "Polygon" ?
             (
-                setDefaultOp(options.filter(item => item.value !== "application/gpx+xml")[0]),
+                setDefaultOp(options.find(item => item.value !== "application/gpx+xml")),
                 setOptions(options => {
                     return options.map((item) => {
                         if (item.value === "application/gpx+xml") {
@@ -325,7 +317,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
 
     useEffect(() => {
         if (drawLayer) {
-            snapBuild(drawLayer?.filter((x) => x.key === selectedValue)[0])
+            snapBuild(drawLayer.find((x) => x.key === selectedValue))
         }
     }, [drawLayer]);
 
@@ -455,7 +447,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                 </div>
                 {drawLayer.length > 0 ?
                     selectedValue ?
-                        (<ControlSnap item={drawLayer?.filter((x) => x.key === selectedValue)[0]} />) :
+                        (<ControlSnap item={drawLayer.find((x) => x.key === selectedValue)} />) :
                         (<ControlSnap item={itemDefault} />) : null}
                 <Radio.Group className="radio-custom" onChange={(e) => { onChangeSelect({ item: '', value: e.target.value }) }} value={selectedValue} >
                     {drawLayer.map((item: ItemType, index: number) => {
