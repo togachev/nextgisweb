@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Checkbox, Radio, ConfigProvider, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
 import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";
@@ -92,9 +92,9 @@ let id = 0;
 
 export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => {
 
-    const { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer } = useDraw(display);
+    const { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, setSelect, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer } = useDraw(display);
 
-    const maxCount = display.clientSettings.max_count_file_upload;
+    const maxCount = webmapSettings.max_count_file_upload;
 
     const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
     const [selectedValue, setSelectedValue] = useState();
@@ -102,7 +102,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     const [startEdit, setStartEdit] = useState(false);
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
-    const itemDefault = { key: 0, change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false, draw: false, modify: false, select: false };
+    const itemDefault = { key: 0, change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false, draw: false, modify: false };
 
     const [store] = useState(() => new DrawStore({}));
 
@@ -157,6 +157,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         const itemCurrent = drawLayer.find(item => item.key === value);
         if (value === selectedValue) {
             setSelectedValue(null);
+            setSelect(null);
             setDrawLayer((prev: ItemType[]) => {
                 return prev.map((item: ItemType) => {
                     if (status) {
@@ -180,7 +181,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         if (drawLayer.length < maxCount) {
             const layer = addLayerMap(id);
             const item = typeComponentIcon.find(item => item.key === geomType);
-            const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false, select: false };
+            const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
             setDrawLayer([...drawLayer, currentItem])
 
             if (selectedValue) {
@@ -199,7 +200,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         setDrawLayer((prev: ItemType[]) => {
             return prev.map((item: ItemType) => {
                 if (item.key === selectedValue) {
-                    return { ...item, draw: !checked, modify: checked, select: checked }
+                    return { ...item, draw: !checked, modify: checked }
                 };
                 return item;
             })
@@ -219,7 +220,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     };
 
     const onDefaultType = () => {
-        const type = currentTypeGeom(geomTypeDefault);
+        const type = currentTypeGeom(geomTypeDefault) as string;
         if (readonly && !selectedValue) {
             addLayer(type);
         } else if (startEdit && featureCount.includes(selectedValue)) {
@@ -266,7 +267,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     const onDeleteLayer = (item: ItemType) => {
         if (readonly) {
             removeItem(item.key);
-            setDrawLayer(drawLayer.find((x) => x.key !== item.key));
+            setDrawLayer(drawLayer.filter((x) => x.key !== item.key));
         }
     }
 

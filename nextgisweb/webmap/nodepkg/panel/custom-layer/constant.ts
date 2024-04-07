@@ -122,7 +122,7 @@ export const customStyle = new Style({
 
 export const clickStyle = new Style({
     stroke: new Stroke({
-        width: 4,
+        width: 3,
         color: "#FFE900"
     }),
     fill: new Fill({
@@ -142,5 +142,30 @@ export const clickStyle = new Style({
             color: "#FFE900"
         }),
     }),
-    zIndex: 100,
+    zIndex: 2000,
+});
+
+export const selectStyle = new Style({
+    stroke: new Stroke({
+        width: 3,
+        color: "#FFE900"
+    }),
+    fill: new Fill({
+        color: "#C6C6C620",
+    }),
+    image: new Circle({
+        anchor: [0.5, 46],
+        anchorXUnits: "fraction",
+        anchorYUnits: "pixels",
+        stroke: new Stroke({
+            width: 1,
+            color: "#000000"
+        }),
+        radius: 6,
+        fill: new Stroke({
+            width: 1,
+            color: "#FFE900"
+        }),
+    }),
+    zIndex: 2000,
 });

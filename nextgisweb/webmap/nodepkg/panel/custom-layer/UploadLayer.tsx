@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 import "./UploadLayer.less";
-
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 
@@ -46,7 +46,7 @@ let id = 0;
 export function UploadLayer({ display }: UploadLayerProps) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
-    const maxCount = display.clientSettings.max_count_file_upload;
+    const maxCount = webmapSettings.max_count_file_upload;
     const maxCountMesssage = MaxUploadFile + " " + maxCount;
     const [uploadkey, setUploadkey] = useState(Date.now())
 
@@ -62,7 +62,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
                 await getBase64(file, (url) => {
                     const fileName = file.name
                     const extension = fileName.slice(fileName.lastIndexOf("."))
-                    const data = TYPE_FILE.find(e => e.extension === extension);
+                    const data = TYPE_FILE.filter(e => e.extension === extension)[0];
                     setFileList(fileList.map(x => ({ ...x, url: url, label: x.name, value: x.uid, checked: true })));
                     addLayerMap({ id: id++, url: url, format: data?.format, file: file, length: fileList.length })
                 })
@@ -126,7 +126,7 @@ export function UploadLayer({ display }: UploadLayerProps) {
         listType: "text",
         name: "file",
         onRemove: (file) => {
-            setFileList(fileList.find((item) => item.uid !== file.uid));
+            setFileList(fileList.filter((item) => item.uid !== file.uid));
             removeItem(file.uid)
         }
     };

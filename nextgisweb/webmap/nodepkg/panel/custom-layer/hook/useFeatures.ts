@@ -5,7 +5,7 @@ import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
 import { customStyle, clickStyle } from "../constant";
-
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type { DojoDisplay } from "../../type";
 import type { SourceType } from "../type";
 
@@ -52,7 +52,7 @@ export const useFeatures = (display: DojoDisplay) => {
             features.push(feature);
         },
             {
-                hitTolerance: display.clientSettings.identify_radius,
+                hitTolerance: webmapSettings.identify_radius,
                 layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
                     const pref = layer.get("name")?.split("__")[1]
                     if (pref === "upload-layer") {
