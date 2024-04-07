@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { DojoDisplay } from "../../../type";
-import { Draw, Modify, Snap } from "ol/interaction";
+import { Draw, Modify, Select, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
@@ -21,6 +21,7 @@ export const useDraw = (display: DojoDisplay) => {
     const [featureCount, setFeatureCount] = useState([]);
     const [draw, setDraw] = useState();
     const [snap, setSnap] = useState<SnapProps[]>([]);
+    const [select, setSelect] = useState();
     const [modify, setModify] = useState();
     const [propSnap, setPropSnap] = useState();
 
@@ -101,9 +102,11 @@ export const useDraw = (display: DojoDisplay) => {
         }
         if (propSnap?.modify) {
             modify.setActive(true);
+            select.setActive(true);
             draw.setActive(false);
         } else {
             modify.setActive(false);
+            select.setActive(false);
             draw.setActive(true);
         }
 
@@ -111,13 +114,31 @@ export const useDraw = (display: DojoDisplay) => {
 
     const modifyInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
+
+        const select_ = new Select();
+        select_.setActive(item.modify);
+        olmap.addInteraction(select_);
+
         const modify_ = new Modify({
-            source: layer.getSource(),
+            features: select_.getFeatures(),
             deleteCondition: shiftKeyOnly,
         });
         modify_.setActive(item.modify)
         olmap.addInteraction(modify_);
+        
+        setSelect(select_);
         setModify(modify_);
+
+        var deleteFeature = (e) => {
+            if (e.keyCode == 46) {
+                const features = select_.getFeatures();
+                features.forEach((e) => {
+                    layer.getSource().removeFeature(e)
+                })
+                features.clear();
+            }
+        };
+        document.addEventListener('keydown', deleteFeature, false);
     });
 
     const drawInteraction = useCallback((item: ItemType) => {
@@ -141,6 +162,7 @@ export const useDraw = (display: DojoDisplay) => {
 
     const interactionClear = useCallback(() => {
         olmap.removeInteraction(draw);
+        olmap.removeInteraction(select);
         olmap.removeInteraction(modify);
         snap?.map(item => {
 

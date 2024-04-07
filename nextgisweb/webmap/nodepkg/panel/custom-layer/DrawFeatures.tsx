@@ -102,7 +102,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     const [startEdit, setStartEdit] = useState(false);
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
-    const itemDefault = { key: 0, change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false, draw: false, modify: false };
+    const itemDefault = { key: 0, change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false, draw: false, modify: false, select: false };
 
     const [store] = useState(() => new DrawStore({}));
 
@@ -180,7 +180,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         if (drawLayer.length < maxCount) {
             const layer = addLayerMap(id);
             const item = typeComponentIcon.find(item => item.key === geomType);
-            const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
+            const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false, select: false };
             setDrawLayer([...drawLayer, currentItem])
 
             if (selectedValue) {
@@ -199,7 +199,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         setDrawLayer((prev: ItemType[]) => {
             return prev.map((item: ItemType) => {
                 if (item.key === selectedValue) {
-                    return { ...item, draw: !checked, modify: checked }
+                    return { ...item, draw: !checked, modify: checked, select: checked }
                 };
                 return item;
             })
