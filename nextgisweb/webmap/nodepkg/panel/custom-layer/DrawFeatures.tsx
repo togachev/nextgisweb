@@ -92,12 +92,12 @@ let id = 0;
 
 export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => {
 
-    const { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, setSelect, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer } = useDraw(display);
+    const { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, olmap, removeItem, removeItems, selectFeatureInfo, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer } = useDraw(display);
 
     const maxCount = webmapSettings.max_count_file_upload;
 
     const [geomTypeDefault, setGeomTypeDefault] = useState<string>("LineString");
-    const [selectedValue, setSelectedValue] = useState();
+    const [editableLayerKey, setEditableLayerKey] = useState();
 
     const [startEdit, setStartEdit] = useState(false);
     const [open, setOpen] = useState(false);
@@ -134,7 +134,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
 
     const onChangeSelect = ({ item, value }) => {
         const itemCurrent = !item ? drawLayer.find(item => item.key === value) : item;
-        setSelectedValue(value)
+        setEditableLayerKey(value)
         setDrawLayer((items: ItemType[]) => {
             return items.map((item: ItemType) => {
                 if (item.key === value) {
@@ -155,9 +155,8 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
 
     const deselectOnClick = ({ status, value }) => {
         const itemCurrent = drawLayer.find(item => item.key === value);
-        if (value === selectedValue) {
-            setSelectedValue(null);
-            setSelect(null);
+        if (value === editableLayerKey) {
+            setEditableLayerKey(null);
             setDrawLayer((prev: ItemType[]) => {
                 return prev.map((item: ItemType) => {
                     if (status) {
@@ -177,6 +176,13 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         }
     };
 
+    useEffect(() => {
+        olmap.on("click", (e) => {
+            if (e.dragging) return;
+            selectFeatureInfo(e.pixel, editableLayerKey)
+        });
+    }, [editableLayerKey])
+
     const addLayer = (geomType: string) => {
         if (drawLayer.length < maxCount) {
             const layer = addLayerMap(id);
@@ -184,8 +190,8 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
             const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
             setDrawLayer([...drawLayer, currentItem])
 
-            if (selectedValue) {
-                deselectOnClick({ status: false, value: selectedValue })
+            if (editableLayerKey) {
+                deselectOnClick({ status: false, value: editableLayerKey })
                 onChangeSelect({ item: currentItem, value: layer.ol_uid })
             } else {
                 startEdit && onChangeSelect({ item: currentItem, value: layer.ol_uid })
@@ -199,7 +205,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
     const onModify = (checked: boolean) => {
         setDrawLayer((prev: ItemType[]) => {
             return prev.map((item: ItemType) => {
-                if (item.key === selectedValue) {
+                if (item.key === editableLayerKey) {
                     return { ...item, draw: !checked, modify: checked }
                 };
                 return item;
@@ -211,9 +217,9 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         items: geomTypesOptions,
         onClick: (item) => {
             setGeomTypeDefault(item.key)
-            if (readonly && !selectedValue) {
+            if (readonly && !editableLayerKey) {
                 addLayer(item.key);
-            } else if (startEdit && featureCount.includes(selectedValue)) {
+            } else if (startEdit && featureCount.includes(editableLayerKey)) {
                 addLayer(item.key);
             }
         },
@@ -221,9 +227,9 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
 
     const onDefaultType = () => {
         const type = currentTypeGeom(geomTypeDefault) as string;
-        if (readonly && !selectedValue) {
+        if (readonly && !editableLayerKey) {
             addLayer(type);
-        } else if (startEdit && featureCount.includes(selectedValue)) {
+        } else if (startEdit && featureCount.includes(editableLayerKey)) {
             addLayer(type);
         }
     };
@@ -318,7 +324,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
 
     useEffect(() => {
         if (drawLayer) {
-            snapBuild(drawLayer.find((x) => x.key === selectedValue))
+            snapBuild(drawLayer.find((x) => x.key === editableLayerKey))
         }
     }, [drawLayer]);
 
@@ -326,7 +332,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         if (key === "allLayer") {
             setDrawLayer((prev: ItemType[]) => {
                 return prev.map((item: ItemType) => {
-                    if (item.key === selectedValue) {
+                    if (item.key === editableLayerKey) {
                         return { ...item, allLayer: !item.allLayer }
                     };
                     return item;
@@ -335,7 +341,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         } else if (key === "vertex") {
             setDrawLayer((prev: ItemType[]) => {
                 return prev.map((item: ItemType) => {
-                    if (item.key === selectedValue) {
+                    if (item.key === editableLayerKey) {
                         return { ...item, vertex: !item.vertex }
                     };
                     return item;
@@ -344,7 +350,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
         } else if (key === "edge") {
             setDrawLayer((prev: ItemType[]) => {
                 return prev.map((item: ItemType) => {
-                    if (item.key === selectedValue) {
+                    if (item.key === editableLayerKey) {
                         return { ...item, edge: !item.edge }
                     };
                     return item;
@@ -447,10 +453,10 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                     </label>
                 </div>
                 {drawLayer.length > 0 ?
-                    selectedValue ?
-                        (<ControlSnap item={drawLayer.find((x) => x.key === selectedValue)} />) :
+                    editableLayerKey ?
+                        (<ControlSnap item={drawLayer.find((x) => x.key === editableLayerKey)} />) :
                         (<ControlSnap item={itemDefault} />) : null}
-                <Radio.Group className="radio-custom" onChange={(e) => { onChangeSelect({ item: '', value: e.target.value }) }} value={selectedValue} >
+                <Radio.Group className="radio-custom" onChange={(e) => { onChangeSelect({ item: '', value: e.target.value }) }} value={editableLayerKey} >
                     {drawLayer.map((item: ItemType, index: number) => {
                         const statusFeature = featureCount.includes(item.key)
                         return (
@@ -510,7 +516,7 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                                         <Radio
                                             disabled={item.change}
                                             onClick={(e) => { deselectOnClick({ status: true, value: e.target.value }) }} value={item.key}>
-                                            <span title={EditLayer} className={item.key === selectedValue ? "icon-edit icon-symbol icon-red" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
+                                            <span title={EditLayer} className={item.key === editableLayerKey ? "icon-edit icon-symbol icon-red" : !item.change ? "icon-symbol" : "icon-symbol-disable"}>
                                                 <EditIcon />
                                             </span>
                                         </Radio>

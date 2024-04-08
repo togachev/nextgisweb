@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { DojoDisplay } from "../../../type";
-import type { Feature as OlFeature, FeatureLike } from "ol/Feature";
+import type { FeatureLike } from "ol/Feature";
 import Feature from "ol/Feature";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
@@ -141,37 +141,36 @@ export const useDraw = (display: DojoDisplay) => {
 
         setModify(modify_);
 
-        var removeFeature = (e) => {
-            if (e.keyCode == 46 || e.keyCode == 8) {
+        const removeFeature = (e) => {
+            if (e.keyCode === 46 || e.keyCode === 8) {
                 setDeleteFeature({ key: item.key })
             }
         };
         document.addEventListener('keydown', removeFeature, false);
-
-        olmap.on("click", (e) => {
-            if (modify_.getActive()) {
-                setCustomStyle();
-                if (e.dragging) return;
-                const features: FeatureLike[] = []
-                olmap.forEachFeatureAtPixel(e.pixel, (feature: Feature) => {
-                    feature.setStyle(selectStyle);
-                    features.push(feature);
-                },
-                    {
-                        hitTolerance: webmapSettings.identify_radius,
-                        layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
-                            if (layer.get("name") === "drawing-layer" && getUid(layer) === item.key) {
-                                return layer;
-                            }
-                        }
-                    },
-                );
-                setSelect({ key: item.key, value: features });
-            } else {
-                setCustomStyle();
-            }
-        });
     });
+
+    const selectFeatureInfo = (pixel: number[], editableLayerKey: number) => {
+        if (editableLayerKey) {
+            setCustomStyle();
+            const features: FeatureLike[] = []
+            olmap.forEachFeatureAtPixel(pixel, (feature: Feature) => {
+                feature.setStyle(selectStyle);
+                features.push(feature);
+            },
+                {
+                    hitTolerance: webmapSettings.identify_radius,
+                    layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
+                        if (layer.get("name") === "drawing-layer" && getUid(layer) === editableLayerKey) {
+                            return layer;
+                        }
+                    }
+                },
+            );
+            setSelect({ key: editableLayerKey, value: features });
+        } else {
+            setCustomStyle();
+        }
+    }
 
     useEffect(() => {
         if (deleteFeature && Object.keys(deleteFeature).length > 0 && deleteFeature.key === select.key) {
@@ -267,5 +266,5 @@ export const useDraw = (display: DojoDisplay) => {
         download(blob, fileName);
     }
 
-    return { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, removeItem, removeItems, setSelect, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer };
+    return { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, olmap, removeItem, removeItems, selectFeatureInfo, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer };
 };
