@@ -44,7 +44,7 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
             <PanelHeader {...{ title, close }} />
             <Tabs
                 items={items}
-                defaultActiveKey="2"
+                defaultActiveKey="1"
                 type="card"
             />
         </div>
