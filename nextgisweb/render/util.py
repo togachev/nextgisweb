@@ -3,10 +3,6 @@ import struct
 import PIL.ImageStat
 from affine import Affine
 
-from nextgisweb.env import _
-
-from nextgisweb.core.exception import ValidationError
-
 
 def imgcolor(img):
     """Check image color and return color tuple if all pixels have same color"""
@@ -62,35 +58,6 @@ def pack_color(color):
 def unpack_color(value):
     """Unpack color integer value to color tuple."""
     return tuple(iter(struct.pack("!i", value)))
-
-
-def zxy_from_request(request):
-    result = []
-
-    for p in "zxy":
-        try:
-            raw = request.GET[p]
-            val = int(raw)
-            if val < 0:
-                raise ValueError
-            result.append(val)
-        except KeyError:
-            raise ValidationError(message=_("Required parameter '{}' is missing.").format(p))
-        except ValueError:
-            if request.GET[p] == ("{" + p + "}"):
-                raise ValidationError(
-                    message=_("Placeholders {x}, {y} and {z} must be filled with values."),
-                    detail=_(
-                        "It seems you are trying to open an URL template directly "
-                        "in a browser. To test it try adding some values for 'x', "
-                        "'y' and 'z' parameters."
-                    ),
-                )
-            raise ValidationError(
-                message=_("The value of '{}' parameter must be a non-negative integer.").format(p)
-            )
-
-    return result
 
 
 def scale_range_intersection(a, b):

@@ -93,7 +93,7 @@ def derive(struct: ST, *spec) -> ST:
     name = struct.__name__.lstrip("_")  # type: ignore
     name += "".join(s.value for s in spec if s.value)
 
-    return defstruct(name, nsfields, kw_only=True)  # type: ignore
+    return defstruct(name, nsfields, kw_only=True, module=struct.__module__)  # type: ignore
 
 
 def struct_items(struct) -> List[Tuple[str, Any]]:
@@ -110,5 +110,6 @@ Derived = Annotated if TYPE_CHECKING else _Derived
 
 T = TypeVar("T")
 ReadOnly = Annotated[T, Conditional([OP.CREATE, OP.UPDATE], Control.OMIT)]
+CreateOnly = Annotated[T, Conditional([OP.UPDATE], Control.OMIT)]
 Required = Annotated[T, Conditional([OP.UPDATE], Control.MAY)]
 Default = Annotated[T, Conditional([OP.CREATE, OP.UPDATE], Control.MAY)]

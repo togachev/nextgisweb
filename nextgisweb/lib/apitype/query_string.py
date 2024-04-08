@@ -1,11 +1,10 @@
-from functools import cached_property, partial
+from functools import cached_property
 from itertools import groupby
-from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
-from urllib.parse import unquote
+from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
 
-from msgspec import NODEFAULT, ValidationError, convert
+from msgspec import NODEFAULT, ValidationError
 
-from .primitive import StringDecoder
+from .primitive import SequenceDecoder, StringDecoder, unquote_strict
 
 
 class QueryString:
@@ -50,37 +49,7 @@ def primitive(qs: QueryString, *, name: str, default: Any, loads: StringDecoder)
         raise QueryParamInvalidValue(name) from exc
 
 
-def form_list_list(
-    qs: QueryString,
-    *,
-    name: str,
-    type: Any,
-    default: Any,
-    loads: StringDecoder,
-) -> List[Any]:
-    value = qs.last(name)
-    if value is None:
-        if default is NODEFAULT:
-            raise QueryParamRequired(name)
-        return default
-
-    if value == "":
-        return convert([], type)
-
-    try:
-        return convert([loads(unquote_strict(i)) for i in value.split(",")], type)
-    except ValidationError as exc:
-        raise QueryParamInvalidValue(name) from exc
-
-
-def form_list_tuple(
-    qs: QueryString,
-    *,
-    name: str,
-    type: Any,
-    default: Any,
-    loads: Tuple[StringDecoder, ...],
-) -> Tuple[Any, ...]:
+def form_list(qs: QueryString, *, name: str, default: Any, loads: SequenceDecoder) -> Any:
     value = qs.last(name)
     if value is None:
         if default is NODEFAULT:
@@ -88,11 +57,7 @@ def form_list_tuple(
         return default
 
     try:
-        parts = [unquote_strict(i) for i in value.split(",")] if value != "" else []
-        if (pad := len(parts) - len(loads)) > 0:
-            loads = loads + tuple(str for i in range(pad))
-        parsed = [ls(pt) for ls, pt in zip(loads, parts)]
-        return convert(parsed, type)
+        return loads(value)
     except ValidationError as exc:
         raise QueryParamInvalidValue(name) from exc
 
@@ -108,13 +73,10 @@ def deep_dict(qs: QueryString, *, name: str, loadk: StringDecoder, loadv: String
         return {
             loadk(unquote_strict(pn[name_len + 1 : -1])): loadv(unquote_strict(pvs[-1]))
             for pn, pvs in qs.grouped.items()
-            if pn[name_len] == "[" and pn[-1] == "]"
+            if len(pn) > name_len and pn[name_len] == "[" and pn[-1] == "]"
         }
     except ValidationError as exc:
         raise QueryParamInvalidValue(name) from exc
-
-
-unquote_strict = partial(unquote, errors="strict")
 
 
 class QueryParamError(ValueError):

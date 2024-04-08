@@ -16,7 +16,7 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "material-settings_suggest",
+                icon: "mdi-image-edit-outline",
                 title: i18n.gettext("Style settings"),
                 onClick: (item) => {
                     window.open(api.routeURL("resource.update", { id: item.styleId }), "_blank");

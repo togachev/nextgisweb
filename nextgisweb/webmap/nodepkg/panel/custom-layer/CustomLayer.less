@@ -4,7 +4,7 @@
     }
 
     .ant-tabs-content-holder {
-        padding: 0;
+        padding: 1px;
         overflow: hidden;
         flex-grow: 1;
         overflow-y: auto;
@@ -19,21 +19,6 @@
         }
     }
 }
-
-.label-type {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .label {
-        padding: 0 4px 0px 0px;
-    }
-
-    .icon {
-        padding: 0 0 0 4px;
-    }
-}
-
 
 .info-file {
     display: flex;
@@ -60,4 +45,9 @@
     align-items: center;
     flex: 0 0 auto;
     color: #106a90;
+
+    &:hover {
+        background-color: #acacac20;
+        border-radius: 3px;
+    }
 }

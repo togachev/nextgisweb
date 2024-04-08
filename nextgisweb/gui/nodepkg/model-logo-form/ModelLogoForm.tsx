@@ -7,14 +7,14 @@ import { Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ApiError } from "../error/type";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
     component: string;
-    model: RouteName;
+    model: KeysWithMethods<["get", "put"]>;
     settingName: string;
 
     messages?: {
@@ -34,7 +34,7 @@ export function ModelLogoForm({
     model,
     settingName,
     messages = {},
-    accept,
+    accept = ".png, .svg",
 }: ModelLogoFormProps) {
     const [status, setStatus] = useState<"loading" | "saving" | null>(
         "loading"
@@ -48,16 +48,15 @@ export function ModelLogoForm({
         const initLogo = async () => {
             try {
                 const resp = await route(model).get<
-                    Record<string, Record<string, string>>
+                    Record<string, Record<string, [string, string]>>
                 >({
                     query: {
                         [component]: settingName,
                     },
                 });
                 if (resp[component][settingName]) {
-                    setLogo(
-                        "data:image/png;base64," + resp[component][settingName]
-                    );
+                    const [mimeType, file] = resp[component][settingName];
+                    setLogo(`data:${mimeType};base64,` + file);
                 } else {
                     throw new Error("The logo is not set");
                 }

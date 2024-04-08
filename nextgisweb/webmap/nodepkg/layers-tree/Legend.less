@@ -2,14 +2,14 @@
     display: flex;
     row-gap: 2px;
     flex-direction: column;
-    
+
     .legend-item {
         display: flex;
         align-items: center;
         margin-left: 7px;
     }
-
-    .legend-symbol {
+    
+    > .legend-symbol {
         display: flex;
         column-gap: 6px;
         align-items: center;
@@ -17,10 +17,24 @@
         font-size: 13px;
         line-height: 20px;
 
-        .legend-title {
+        > .ant-checkbox-wrapper {
+            align-self: start;
+        }
+
+        > .legend-title {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        .ant-checkbox-checked .ant-checkbox-inner {
+            border-color: #d9d9d9;
+            border: dotted #d9d9d9 0.005em;
+        }
+
+        .ant-checkbox .ant-checkbox-inner {
+            border-color: #d9d9d9;
+            border: dotted #d9d9d9 0.005em;
         }
     }
 }

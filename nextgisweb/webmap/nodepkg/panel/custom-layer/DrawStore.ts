@@ -4,12 +4,17 @@ import { TYPE_FILE } from "./constant";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
+export interface ControlProps {
+    key: number | null;
+    change: boolean;
+}
+
 export class DrawStore {
     options = TYPE_FILE.map(item => {
         return { value: item.value, label: item.label, disabled: item.disabled }
     });
     drawLayer: string[] = [];
-    switchKey: string;
+    checkedKey: ControlProps[] = [];
     readonly = true;
     itemModal: null = null;
 
@@ -37,8 +42,8 @@ export class DrawStore {
         this.setValue("drawLayer", drawLayer);
     };
 
-    setSwitchKey = (switchKey: SetValue<string>) => {
-        this.setValue("switchKey", switchKey);
+    setCheckedKey = (checkedKey: SetValue<string>) => {
+        this.setValue("checkedKey", checkedKey);
     };
 
     setReadonly = (readonly: boolean) => {

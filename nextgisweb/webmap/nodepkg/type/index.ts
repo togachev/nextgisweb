@@ -28,7 +28,7 @@ export interface WebmapItem {
     styleId: number;
     type: string;
     visibility: boolean;
-    filter_by_data: boolean;
+    symbols: string[];
 }
 
 export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
@@ -56,4 +56,6 @@ export interface PanelDojoItem extends DojoItem {
     isFullWidth?: boolean;
     show: () => void;
     hide: () => void;
+
+    applyToTinyMap?: boolean;
 }

@@ -1,92 +1,44 @@
 import { useCallback, useEffect, useState } from "react";
 import type { DojoDisplay } from "../../../type";
+import type { FeatureLike } from "ol/Feature";
+import Feature from "ol/Feature";
 import { Draw, Modify, Snap } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
+import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { primaryAction, shiftKeyOnly, platformModifierKeyOnly } from "ol/events/condition";
-import { Circle, Fill, Stroke, Style } from "ol/style";
-import { TYPE_FILE } from "../constant";
+import type { Vector as OlVectorLayer } from "ol/layer";
+import { primaryAction, shiftKeyOnly } from "ol/events/condition";
+import { selectStyle, TYPE_FILE, style, styleDraw } from "../constant";
+import type { ItemType, ParamsFormat } from "../type";
+import type { Options as SnapOptions } from "ol/interaction/Snap";
+import { getUid } from 'ol/util';
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
-const style = [
-    new Style({
-        stroke: new Stroke({
-            width: 3,
-            color: "#FF2128",
-        }),
-        image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: "fraction",
-            anchorYUnits: "pixels",
-            stroke: new Stroke({
-                width: 1,
-                color: "#000000",
-            }),
-            radius: 5,
-            fill: new Stroke({
-                width: 4,
-                color: "#106a9020",
-            }),
-        }),
-        fill: new Fill({
-            color: "#106a9020",
-        }),
-    }),
-    new Style({
-        image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: "fraction",
-            anchorYUnits: "pixels",
-            stroke: new Stroke({
-                width: 1,
-                color: "#ffffff",
-            }),
-            radius: 6,
-        }),
-    }),
-    new Style({
-        image: new Circle({
-            anchor: [0.5, 46],
-            anchorXUnits: "fraction",
-            anchorYUnits: "pixels",
-            stroke: new Stroke({
-                width: 1,
-                color: "#ffffff",
-            }),
-            radius: 2,
-            fill: new Stroke({
-                width: 2,
-                color: "#fff",
-            }),
-        }),
-    }),
-];
-
-type ItemType = {
+type SnapProps = {
     key: number;
-    change: boolean;
-    label: string;
-    geomType: string;
-};
+    value: SnapOptions;
+}
 
-type ParamsFormat = {
-    value: string;
-    label: string;
-    disabled: boolean;
-};
+type RemoveProps = {
+    key: number;
+}
 
 export const useDraw = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
+
     const [featureCount, setFeatureCount] = useState([]);
-
     const [draw, setDraw] = useState();
-    const [snap, setSnap] = useState();
-    const [snapStatus, setSnapStatus] = useState(false);
+    const [snap, setSnap] = useState<SnapProps[]>([]);
+    const [select, setSelect] = useState();
     const [modify, setModify] = useState();
+    const [propSnap, setPropSnap] = useState();
+    const [deleteFeature, setDeleteFeature] = useState<RemoveProps>();
 
-    const addLayerMap = useCallback(() => {
+    const addLayerMap = useCallback((id) => {
         const source = new VectorSource({ wrapX: false });
         const vector = new VectorLayer({
             source: source,
+            zIndex: 1000 + id,
         });
         vector.setStyle(style);
         vector.set("name", "drawing-layer");
@@ -100,64 +52,166 @@ export const useDraw = (display: DojoDisplay) => {
         return layer;
     })
 
-    useEffect(() => {
-        if (snapStatus) {
-            olmap.getLayers().forEach(layer => {
-                if (layer.get("name") === "drawing-layer") {
+    const snapBuild = useCallback((params: ItemType) => {
+        setPropSnap(params)
+    })
+
+    const snapInteraction = useCallback((params: ItemType, status: boolean) => {
+        if (!status) {
+            const layer = getLayer(params.key);
+            const snap_ = new Snap({
+                source: layer.getSource(),
+                edge: params.edge,
+                vertex: params.vertex,
+            });
+            olmap.addInteraction(snap_)
+            setSnap([...snap, { [layer.ol_uid]: snap_ }])
+        } else {
+            olmap.getLayers().forEach((layer: OlVectorLayer<OlVectorSource>) => {
+                if (layer instanceof VectorLayer) {
                     const snap_ = new Snap({
                         source: layer.getSource(),
-                        edge: false,
-                        vertex: true,
+                        edge: propSnap.edge,
+                        vertex: propSnap.vertex,
                     });
-                    setSnap(s => ({
-                        ...s,
-                        [layer.ol_uid]: snap_
-                    }))
+                    setSnap([...snap, { [layer.ol_uid]: snap_ }])
+                    snap_.setActive(true)
                     olmap.addInteraction(snap_)
                 }
             })
         }
-        setSnapStatus(false)
-    }, [snapStatus])
+
+    });
+
+    useEffect(() => {
+        if (propSnap === undefined) return;
+        if (propSnap?.allLayer) {
+            snapInteraction(propSnap, true)
+        }
+        if (!propSnap?.vertex && !propSnap?.edge) {
+            snap.map((item: SnapProps) => {
+                const key_ = Object.keys(item)[0];
+                const snap_ = Object.values(item)[0];
+                if (key_ === propSnap.key) {
+                    snap_.setActive(false)
+                    snap_.vertex_ = false
+                    snap_.edge_ = false
+                }
+            })
+        } else if (propSnap?.vertex || propSnap?.edge) {
+            snap.map((item: SnapProps) => {
+                const key_ = Object.keys(item)[0];
+                const snap_ = Object.values(item)[0];
+                if (key_ === propSnap.key) {
+                    snap_.setActive(true)
+                    snap_.vertex_ = propSnap?.vertex
+                    snap_.edge_ = propSnap?.edge
+                }
+            })
+        }
+        if (propSnap?.modify) {
+            modify.setActive(true);
+            draw.setActive(false);
+        } else {
+            modify.setActive(false);
+            draw.setActive(true);
+        }
+
+    }, [propSnap])
+
+    const setCustomStyle = () => {
+        olmap.getLayers().forEach((layer: OlVectorLayer<OlVectorSource>) => {
+            if (layer.get("name") === "drawing-layer") {
+                layer.getSource().forEachFeature((e) => {
+                    e.setStyle(style)
+                })
+            }
+        })
+    }
+
+    const modifyInteraction = useCallback((item: ItemType) => {
+        const layer = getLayer(item.key);
+
+        const modify_ = new Modify({
+            source: layer.getSource(),
+            deleteCondition: shiftKeyOnly,
+        });
+        modify_.setActive(item.modify)
+        olmap.addInteraction(modify_);
+
+        setModify(modify_);
+
+        const removeFeature = (e) => {
+            if (e.keyCode === 46 || e.keyCode === 8) {
+                setDeleteFeature({ key: item.key })
+            }
+        };
+        document.addEventListener('keydown', removeFeature, false);
+    });
+
+    const selectFeatureInfo = (pixel: number[], editableLayerKey: number) => {
+        if (editableLayerKey) {
+            setCustomStyle();
+            const features: FeatureLike[] = []
+            olmap.forEachFeatureAtPixel(pixel, (feature: Feature) => {
+                feature.setStyle(selectStyle);
+                features.push(feature);
+            },
+                {
+                    hitTolerance: webmapSettings.identify_radius,
+                    layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
+                        if (layer.get("name") === "drawing-layer" && getUid(layer) === editableLayerKey) {
+                            return layer;
+                        }
+                    }
+                },
+            );
+            setSelect({ key: editableLayerKey, value: features });
+        } else {
+            setCustomStyle();
+        }
+    }
+
+    useEffect(() => {
+        if (deleteFeature && Object.keys(deleteFeature).length > 0 && deleteFeature.key === select.key) {
+            const features = select.value;
+            const layer = getLayer(deleteFeature.key);
+
+            features.map(item => {
+                layer?.getSource().removeFeature(item)
+            })
+        }
+    }, [deleteFeature])
 
     const drawInteraction = useCallback((item: ItemType) => {
         const layer = getLayer(item.key);
-        const source = layer.getSource()
-
-        const modify_ = new Modify({
-            source: source,
-            // deleteCondition: shiftKeyOnly,
-        });
-        olmap.addInteraction(modify_);
-
-        setSnapStatus(true)
-
         const draw_ = new Draw({
-            source: source,
+            source: layer.getSource(),
             type: item.geomType,
-            style: style,
+            style: styleDraw,
             stopClick: true,
             condition: (e) => primaryAction(e),
             snapTolerance: 10,
-            freehandCondition: platformModifierKeyOnly,
         });
+        draw_.setActive(item.draw)
         olmap.addInteraction(draw_);
         setDraw(draw_);
-        setModify(modify_);
 
         draw_.on("drawend", () => {
             setFeatureCount([...featureCount, item.key])
         });
+    });
 
-    })
-
-    const drawInteractionClear = useCallback(() => {
+    const interactionClear = useCallback(() => {
         olmap.removeInteraction(draw);
         olmap.removeInteraction(modify);
-        Object.entries(snap).forEach(([value]) => {
-            olmap.removeInteraction(value);
+        snap?.map(item => {
+            const snap_ = Object.values(item)[0];
+            olmap.removeInteraction(snap_);
         });
-        setSnap(undefined)
+        setSnap([]);
+        setDraw(undefined);
+        setModify(undefined);
     })
 
     const visibleLayer = (checked: boolean, key: number) => {
@@ -212,5 +266,5 @@ export const useDraw = (display: DojoDisplay) => {
         download(blob, fileName);
     }
 
-    return { addLayerMap, drawInteractionClear, drawInteraction, featureCount, removeItem, removeItems, saveLayer, visibleLayer, zoomToLayer };
+    return { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, olmap, removeItem, removeItems, selectFeatureInfo, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer };
 };

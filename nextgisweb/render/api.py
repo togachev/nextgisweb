@@ -1,23 +1,90 @@
-from base64 import b64encode
+from datetime import datetime
 from io import BytesIO
 from itertools import product
 from math import ceil, floor, log
 from pathlib import Path
+from typing import Dict, List, Literal, Union
 
+from msgspec import Meta, Struct
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
+from typing_extensions import Annotated
 
 from nextgisweb.env import _
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, EmptyObject, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
-from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound
 
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
-from .util import af_transform, zxy_from_request
+from .model import SEED_STATUS_ENUM
+from .util import af_transform
+
+RenderResource = Annotated[
+    List[int],
+    Meta(
+        min_length=1,
+        description="Resources to render",
+    ),
+]
+
+TileZ = Annotated[int, Meta(ge=0, le=22, description="Tile zoom level")]
+TileX = Annotated[int, Meta(ge=0, description="Tile X coordinate")]
+TileY = Annotated[int, Meta(ge=0, description="Tile Y coordinate")]
+
+# NOTE: Use lists instead of tuples as Swagger UI doesn't (Redoc does) support
+# arrays containing different types of values.
+RenderExtent = Annotated[
+    List[float],
+    Meta(min_length=4, max_length=4),
+    Meta(description="Rendering extent"),
+]
+ImageSize = Annotated[
+    List[Annotated[int, Meta(ge=1, le=8192)]],
+    Meta(min_length=2, max_length=2),
+    Meta(description="Image size in pixels"),
+]
+
+SymbolRange = Annotated[str, Meta(pattern=r"^[0-9]{1,3}(-[0-9]{1,3})?$")]
+Symbols = Annotated[
+    Dict[int, Annotated[List[SymbolRange], Meta(min_length=1)]],
+    Meta(examples=[dict()]),  # Just to stop Swagger UI make crazy defaults
+]
+
+NoDataStatusCode = Annotated[
+    Literal[200, 204, 404],
+    Meta(description="HTTP status code for empty images"),
+]
+TileCache = Annotated[bool, Meta(description="Use tile cache if available")]
+TileDebugInfo = Annotated[bool, Meta(description="Draw tile debug info")]
+
+RenderResponse = AnyOf[
+    Annotated[Response, ContentType("image/png")],
+    Annotated[Response, StatusCode(204)],
+    Annotated[Response, StatusCode(404), ContentType("application/octet-stream")],
+]
+
+
+class TileCacheSeedStatusResponse(Struct, kw_only=True):
+    tstamp: datetime
+    status: Literal[SEED_STATUS_ENUM]  # type: ignore
+    progress: int
+    total: int
+
+
+class LegendIcon(Struct, kw_only=True):
+    format: Literal["png"]
+    data: bytes
+
+
+class LegendSymbol(Struct, kw_only=True):
+    index: int
+    render: Union[bool, None]
+    display_name: str
+    icon: LegendIcon
 
 
 class InvalidOriginError(UserException):
@@ -61,8 +128,10 @@ image_encoder = image_encoder_factory(FORMAT_PNG, COMPRESSION_FAST)
 
 def image_response(img, empty_code, size):
     if img is None:
-        if empty_code in ("204", "404"):
-            return Response(status=empty_code)
+        if empty_code == 204:
+            return Response(None, status=204, content_type=None)
+        elif empty_code == 404:
+            return Response(b"", status=404, content_type="application/octet-stream")
         elif size == (256, 256):
             return Response(EMPTY_TILE_256x256, content_type="image/png")
         else:
@@ -86,20 +155,40 @@ def check_origin(request):
             raise InvalidOriginError()
 
 
-def tile(request):
+def process_symbols(value: Symbols) -> Dict[int, List[int]]:
+    result = dict()
+    for k, s in value.items():
+        result[k] = seq = list()
+        tail = -1
+        for v in s:
+            p = tuple(int(i) for i in v.split("-", maxsplit=1))
+            f, t = p if len(p) == 2 else (p[0], p[0])
+            if f <= tail:
+                raise ValidationError(_("Invalid symbols sequence"))
+            seq.extend(range(f, t + 1))
+            tail = t
+    return result
+
+
+def tile(
+    request,
+    *,
+    resource: RenderResource,
+    z: TileZ,
+    x: TileX,
+    y: TileY,
+    symbols: Symbols,
+    nd: NoDataStatusCode = 200,
+    cache: TileCache = True,
+) -> RenderResponse:
+    """Render tile from one or more resources"""
     check_origin(request)
 
-    z, x, y = zxy_from_request(request)
-
-    p_resource = map(int, filter(None, request.GET["resource"].split(",")))
-    p_cache = (
-        request.GET.get("cache", "true").lower() in ("true", "yes", "1")
-        and request.env.render.tile_cache_enabled
-    )
-    p_empty_code = request.GET.get("nd", "200")
+    p_symbols = process_symbols(symbols) if symbols else dict()
+    p_cache = cache and request.env.render.tile_cache_enabled
 
     aimg = None
-    for resid in p_resource:
+    for resid in resource:
         obj = Resource.filter_by(id=resid).one_or_none()
 
         if obj is None:
@@ -112,11 +201,13 @@ def tile(request):
 
         rimg = None  # Resulting resource image
 
+        rsymbols = p_symbols.get(resid)
         tcache = obj.tile_cache
 
         # Is requested tile may be cached?
         cache_enabled = (
             p_cache
+            and rsymbols is None
             and tcache is not None
             and tcache.enabled
             and (tcache.max_z is None or z <= tcache.max_z)
@@ -127,7 +218,10 @@ def tile(request):
             cache_exists, rimg = tcache.get_tile((z, x, y))
 
         if not cache_exists:
-            req = obj.render_request(obj.srs)
+            cond = dict()
+            if rsymbols is not None:
+                cond["symbols"] = rsymbols
+            req = obj.render_request(obj.srs, cond=cond)
             rimg = req.render_tile((z, x, y), 256)
 
             if cache_enabled:
@@ -147,32 +241,34 @@ def tile(request):
                     % (obj.id, aimg.mode, rimg.mode)
                 )
 
-    return image_response(aimg, p_empty_code, (256, 256))
+    return image_response(aimg, nd, (256, 256))
 
 
-def image(request):
+def image(
+    request,
+    *,
+    resource: RenderResource,
+    extent: RenderExtent,
+    size: ImageSize,
+    symbols: Symbols,
+    nd: NoDataStatusCode = 200,
+    cache: TileCache = True,
+    tdi: TileDebugInfo = False,
+) -> RenderResponse:
+    """Render image from one or more resources"""
     check_origin(request)
 
-    p_extent = tuple(map(float, request.GET["extent"].split(",")))
-    p_size = tuple(map(int, request.GET["size"].split(",")))
-    p_resource = map(int, filter(None, request.GET["resource"].split(",")))
-    p_cache = (
-        request.GET.get("cache", "true").lower() in ("true", "yes", "1")
-        and request.env.render.tile_cache_enabled
-    )
-    p_empty_code = request.GET.get("nd", "200")
-
-    # Print tile debug info on resulting image
-    tdi = request.GET.get("tdi", "").lower() in ("yes", "true")
+    p_symbols = process_symbols(symbols) if symbols else dict()
+    p_cache = cache and request.env.render.tile_cache_enabled
 
     resolution = (
-        (p_extent[2] - p_extent[0]) / p_size[0],
-        (p_extent[3] - p_extent[1]) / p_size[1],
+        (extent[2] - extent[0]) / size[0],
+        (extent[3] - extent[1]) / size[1],
     )
 
     aimg = None
     zexact = None
-    for resid in p_resource:
+    for resid in resource:
         obj = Resource.filter_by(id=resid).one_or_none()
 
         if obj is None:
@@ -194,11 +290,13 @@ def image(request):
             else:
                 zexact = False
 
+        rsymbols = p_symbols.get(resid)
         tcache = obj.tile_cache
 
         # Is requested image may be cached via tiles?
         cache_enabled = (
             p_cache
+            and rsymbols is None
             and zexact
             and tcache is not None
             and tcache.enabled
@@ -206,8 +304,8 @@ def image(request):
             and (tcache.max_z is None or ztile <= tcache.max_z)
         )
 
-        ext_extent = p_extent
-        ext_size = p_size
+        ext_extent = extent
+        ext_size = size
         ext_offset = (0, 0)
 
         if cache_enabled:
@@ -219,14 +317,14 @@ def image(request):
             at_t2l = ~at_l2t
 
             # Affine transform from layer to image
-            at_l2i = af_transform(p_extent, (0, 0) + tuple(p_size))
+            at_l2i = af_transform(extent, (0, 0) + tuple(size))
 
             # Affine transform from tile to image
             at_t2i = at_l2i * ~at_l2t
 
             # Tile coordinates of render extent
-            t_lb = tuple(at_l2t * p_extent[0:2])
-            t_rt = tuple(at_l2t * p_extent[2:4])
+            t_lb = tuple(at_l2t * extent[0:2])
+            t_rt = tuple(at_l2t * extent[2:4])
 
             tb = (
                 int(floor(t_lb[0]) if t_lb[0] == min(t_lb[0], t_rt[0]) else ceil(t_lb[0])),
@@ -250,12 +348,12 @@ def image(request):
                     break
                 else:
                     if rimg is None:
-                        rimg = Image.new("RGBA", p_size)
+                        rimg = Image.new("RGBA", size)
 
                     if tdi:
                         msg = "CACHED"
                         if timg is None:
-                            timg = Image.new("RGBA", p_size)
+                            timg = Image.new("RGBA", size)
                             msg += " EMPTY"
                         timg = tile_debug_info(
                             timg.convert("RGBA"),
@@ -272,7 +370,10 @@ def image(request):
                     rimg.paste(timg, toffset)
 
         if rimg is None:
-            req = obj.render_request(obj.srs)
+            cond = dict()
+            if rsymbols is not None:
+                cond["symbols"] = rsymbols
+            req = obj.render_request(obj.srs, cond=cond)
             rimg = req.render_extent(ext_extent, ext_size)
 
             empty_image = rimg is None
@@ -317,8 +418,8 @@ def image(request):
                 (
                     ext_offset[0],
                     ext_offset[1],
-                    ext_offset[0] + p_size[0],
-                    ext_offset[1] + p_size[1],
+                    ext_offset[0] + size[0],
+                    ext_offset[1] + size[1],
                 )
             )
 
@@ -333,16 +434,16 @@ def image(request):
                     % (obj.id, aimg.mode, rimg.mode)
                 )
 
-    return image_response(aimg, p_empty_code, p_size)
+    return image_response(aimg, nd, size)
 
 
-def tile_cache_seed_status(request) -> JSONType:
+def tile_cache_seed_status(request) -> AnyOf[TileCacheSeedStatusResponse, EmptyObject]:
     request.resource_permission(PD_READ)
     tc = request.context.tile_cache
     if tc is None:
-        return dict()
+        return
 
-    return dict(
+    return TileCacheSeedStatusResponse(
         tstamp=tc.seed_tstamp,
         status=tc.seed_status,
         progress=tc.seed_progress,
@@ -350,7 +451,8 @@ def tile_cache_seed_status(request) -> JSONType:
     )
 
 
-def legend(request):
+def legend(request) -> Annotated[Response, ContentType("image/png")]:
+    """Get resource legend image"""
     request.resource_permission(PD_READ)
     result = request.context.render_legend()
     return Response(body_file=result, content_type="image/png")
@@ -364,11 +466,13 @@ def legend_symbols_by_resource(resource, icon_size: int):
         s.icon.save(buf, "png", compress_level=3)
 
         result.append(
-            dict(
+            LegendSymbol(
+                index=s.index,
+                render=s.render,
                 display_name=s.display_name,
-                icon=dict(
+                icon=LegendIcon(
                     format="png",
-                    data=b64encode(buf.getvalue()).decode("ascii"),
+                    data=buf.getvalue(),
                 ),
             )
         )
@@ -376,9 +480,9 @@ def legend_symbols_by_resource(resource, icon_size: int):
     return result
 
 
-def legend_symbols(request) -> JSONType:
+def legend_symbols(request, *, icon_size: int = 24) -> AsJSON[List[LegendSymbol]]:
+    """Get resource legend symbols"""
     request.resource_permission(PD_READ)
-    icon_size = int(request.GET.get("icon_size", "24"))
     return legend_symbols_by_resource(request.context, icon_size)
 
 

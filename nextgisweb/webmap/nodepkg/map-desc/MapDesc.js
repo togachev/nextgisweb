@@ -41,9 +41,7 @@ export const MapDesc = ({description, display, upath_info}) => {
     };
     const data = parse(description, options);
     return (
-        <>
-            <div className="descItemMap">{data}</div>
-        </>
+        <div className="descItemMap">{data}</div>
     )
 }
 

@@ -50,4 +50,5 @@ export interface DisplayConfig {
     webmapLegendVisible: string;
     drawOrderEnabled?: any;
     annotations: Annotations;
+    units: string;
 }

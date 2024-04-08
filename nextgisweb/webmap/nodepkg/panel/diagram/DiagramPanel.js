@@ -53,7 +53,7 @@ const LineItem = ({ item }) => {
                 align: 'start',
             },
             legendDistance: {
-                padding: 20 // dictates the space
+                padding: 20,
             },
             title: {
                 display: true,
@@ -62,14 +62,18 @@ const LineItem = ({ item }) => {
                 align: 'start',
                 padding: {
                     top: 5,
-                    bottom: 5
+                    bottom: 5,
                 },
-                text: '#ID' + item.props.id + ',  Номер тествого участка: ' + item.props.fields.tu
+                text: '#ID' + item.props.id + ', Территория: ' + item.props.fields.name,
             },
         },
-        animation: false,
         spanGaps: true,
-        showLine: false,
+        showLine: true,
+        interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false,
+        },
     };
 
     let plugins = [{
@@ -110,7 +114,7 @@ export function DiagramPanel({ value, close, clear }) {
             item.fields[item.column_from_const]
         ).get();
         features.sort(function (a, b) {
-            return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
+            return parseFloat(a.fields.year) - parseFloat(b.fields.year);
         });
 
         var _labelSquare = [];
@@ -127,20 +131,20 @@ export function DiagramPanel({ value, close, clear }) {
         const temperature_ = features.filter((item) => item.fields.type_id === 3);
 
         square_.map(item => {
-            let date = item.fields.date;
-            _labelSquare.push(date.year);
+            let year = item.fields.year;
+            _labelSquare.push(year);
             _square.push(item.fields.value);
         });
 
         precipitation_.map(item => {
-            let date = item.fields.date;
-            _labelPrecipitation.push(date.year);
+            let year = item.fields.year;
+            _labelPrecipitation.push(year);
             _precipitation.push(item.fields.value);
         });
 
         temperature_.map(item => {
-            let date = item.fields.date;
-            _labelTemperature.push(date.year);
+            let year = item.fields.year;
+            _labelTemperature.push(year);
             _temperature.push(item.fields.value);
         });
 
@@ -153,22 +157,22 @@ export function DiagramPanel({ value, close, clear }) {
                         data: _square,
                         label: "Площадь",
                         borderColor: "#FF0060",
-                        fill: true,
-                        lineTension: 0.5
+                        fill: false,
+                        lineTension: 0.5,
                     },
                     {
                         data: _precipitation,
                         label: "Атмосферные осадки",
                         borderColor: "#3E93FF",
-                        fill: true,
-                        lineTension: 0.5
+                        fill: false,
+                        lineTension: 0.5,
                     },
                     {
                         data: _temperature,
                         label: "Температура",
                         borderColor: "#009301",
-                        fill: true,
-                        lineTension: 0.5
+                        fill: false,
+                        lineTension: 0.5,
                     },
                 ],
             },
@@ -188,7 +192,7 @@ export function DiagramPanel({ value, close, clear }) {
         ).get();
 
         features.sort(function (a, b) {
-            return parseFloat(a.fields.date.year) - parseFloat(b.fields.date.year);
+            return parseFloat(a.fields.year) - parseFloat(b.fields.year);
         });
 
         const square_ = features.filter((item) => item.fields.type_id === 1);
@@ -196,15 +200,15 @@ export function DiagramPanel({ value, close, clear }) {
         const temperature_ = features.filter((item) => item.fields.type_id === 3);
 
         const temperature = Object.fromEntries(
-            temperature_.map((item) => [item.fields.date.year, item.fields.value])
+            temperature_.map((item) => [item.fields.year, item.fields.value])
         )
 
         const precipitation = Object.fromEntries(
-            precipitation_.map((item) => [item.fields.date.year, item.fields.value])
+            precipitation_.map((item) => [item.fields.year, item.fields.value])
         )
 
         const square = Object.fromEntries(
-            square_.map((item) => [item.fields.date.year, item.fields.value])
+            square_.map((item) => [item.fields.year, item.fields.value])
         )
         if (type === 'req') {
             let query = {
@@ -275,7 +279,7 @@ export function DiagramPanel({ value, close, clear }) {
         })
     }, [data]);
 
-    const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.tu, item])).values()]
+    const resultUniqueByKey = [...new Map(result.map(item => [item.props.fields.name, item])).values()]
     const lineItems = (
         resultUniqueByKey.map(item => {
             return (

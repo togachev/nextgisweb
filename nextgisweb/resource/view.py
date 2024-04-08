@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _
-from nextgisweb.lib.dynmenu import DynItem, DynMenu, Label, Link
+from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType, viewargs, WebSession
@@ -280,7 +280,7 @@ def resource_export(request):
 
 resource_sections = PageSections("resource_section")
 
-@viewargs(renderer='map_list.mako')
+@viewargs(renderer="map_list.mako")
 def map_list(request):
     return dict(
         title=_("List of maps"),
@@ -288,16 +288,16 @@ def map_list(request):
 
 
 
-@viewargs(renderer='react')
+@viewargs(renderer="react")
 def webmap_group_data(request):
     request.require_administrator()
     result = dict(
-        entrypoint='@nextgisweb/resource/webmap-group-widget',
+        entrypoint="@nextgisweb/resource/webmap-group-widget",
         title=_("Groups of digital web maps"),
         dynmenu=request.env.pyramid.control_panel)
     return result
 
-@viewargs(renderer='react')
+@viewargs(renderer="react")
 def resource_constraint(request):
     request.resource_permission(PERM_UPDATE)
 
@@ -307,7 +307,7 @@ def resource_constraint(request):
     else:
         display_name_const = None
 
-    if (request.context.cls == 'postgis_layer' or request.context.cls == 'nogeom_layer'):
+    if (request.context.cls == "postgis_layer" or request.context.cls == "nogeom_layer"):
         connection_id = request.context.connection.id
         schema = request.context.schema
         table_name = request.context.table
@@ -316,7 +316,7 @@ def resource_constraint(request):
         schema = None
         table_name = None
     return dict(
-        entrypoint='@nextgisweb/resource/resource-constraint',
+        entrypoint="@nextgisweb/resource/resource-constraint",
         props=dict(
             id=request.context.id,
             display_name=request.context.display_name,
@@ -384,6 +384,24 @@ def setup_pyramid(comp, config):
     _resource_route("effective_permissions", r"{id:uint}/permissions", get=effective_permisssions)
     _resource_route("export.page", r"{id:uint}/export", request_method="GET")
 
+    config.add_route(
+        "resource.control_panel.resource_export",
+        "/control-panel/resource-export",
+        get=resource_export,
+    )
+
+    config.add_route(
+        'resource.resource_constraint',
+        '/res_const/{id:uint}/settings',
+        factory=resource_factory,
+    ).add_view(resource_constraint)
+
+    config.add_route(
+        'resource.webmap_group',
+        '/wmgroup',
+        get=webmap_group_data,
+    )
+
     # CRUD
     _resource_route("create", r"{id:uint}/create", get=create)
     _resource_route("update", r"{id:uint}/update", get=update)
@@ -416,140 +434,122 @@ def setup_pyramid(comp, config):
         return dict(links=items) if len(items) > 0 else None
 
     # Actions
-
-    class ResourceMenu(DynItem):
-        def build(self, args):
-            permissions = args.obj.permissions(args.request.user)
-            for ident, cls in Resource.registry._dict.items():
-                if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
-                    continue
-
-                if not cls.check_parent(args.obj):
-                    continue
-
-                # Is current user has permission to manage resource children?
-                if PERM_MCHILDREN not in permissions:
-                    continue
-
-                # Is current user has permission to create child resource?
-                child = cls(parent=args.obj, owner_user=args.request.user)
-                if not child.has_permission(PERM_CREATE, args.request.user):
-                    continue
-
-                # Workaround SAWarning: Object of type ... not in session,
-                # add operation along 'Resource.children' will not proceed
-                child.parent = None
-                if args.obj.cls != 'nogeom_layer':
-                    yield Link(
-                        'create/%s' % ident,
-                        cls.cls_display_name,
-                        self._url(ident),
-                        icon=f"rescls-{cls.identity}")
-
-            if PERM_UPDATE in permissions:
-                yield Link(
-                    "operation/10-update",
-                    _("Update"),
-                    lambda args: args.request.route_url("resource.update", id=args.obj.id),
-                    important=True,
-                    icon="material-edit",
-                )
-
-            if args.obj.cls in ['mapserver_style', 'qgis_vector_style', 'qgis_raster_style', 'wmsclient_layer', 'tmsclient_layer']:
-                if isinstance(args.obj, Resource):
-                    if PERM_UPDATE in permissions:
-                        # проверка наличия маршрута-route
-                        route_intr = args.request.registry.introspector.get('routes', 'file_resource.settings')
-                        if route_intr:
-                            yield Link(
-                                'operation/0-file_resource', _("Add/remove public files"),
-                                lambda args: args.request.route_url(
-                                    'file_resource.settings', id=args.obj.id),
-                                icon='material-attach_file')
-
-            if args.obj.cls in ['vector_layer', 'postgis_layer', 'raster_layer', 'wmsclient_layer', 'tmsclient_layer']:
-                if isinstance(args.obj, Resource):
-                    if PERM_UPDATE in permissions:
-                        yield Link(
-                            'operation/0-resource_constraint', _("Setting up a connection between resources"),
-                            lambda args: args.request.route_url(
-                                'resource.resource_constraint', id=args.obj.id),
-                            icon='material-schema')
-
-            if (
-                PERM_DELETE in permissions
-                and args.obj.id != 0
-                and args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user)
-            ):
-                yield Link(
-                    "operation/20-delete",
-                    _("Delete"),
-                    lambda args: args.request.route_url("resource.delete", id=args.obj.id),
-                    important=True,
-                    icon="material-delete_forever",
-                )
-
-            if PERM_READ in permissions:
-                yield Link(
-                    "extra/json",
-                    _("JSON view"),
-                    lambda args: args.request.route_url("resource.json", id=args.obj.id),
-                    icon="material-data_object",
-                )
-
-                yield Link(
-                    "extra/effective-permissions",
-                    _("User permissions"),
-                    lambda args: args.request.route_url(
-                        "resource.effective_permissions",
-                        id=args.obj.id,
-                    ),
-                    icon="material-key",
-                )
-
-        def _url(self, cls):
-            return lambda args: args.request.route_url(
-                "resource.create", id=args.obj.id, _query=dict(cls=cls)
-            )
-
     Resource.__dynmenu__ = DynMenu(
         Label("create", _("Create resource")),
         Label("operation", _("Action")),
         Label("extra", _("Extra")),
-        ResourceMenu(),
     )
 
-    comp.env.pyramid.control_panel.add(
-        Link(
-            "settings/resource_export",
-            _("Resource export"),
-            lambda args: (args.request.route_url("resource.control_panel.resource_export")),
-        ),
-        Link(
-            'settings/webmap_group', _("Groups of digital web maps"),
-            lambda args: (args.request.route_url('resource.webmap_group'))
-        )
-    )
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        permissions = args.obj.permissions(args.request.user)
 
-    config.add_route(
-        "resource.control_panel.resource_export",
-        "/control-panel/resource-export",
-        get=resource_export,
-    )
+        for ident, cls in Resource.registry._dict.items():
+            if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
+                continue
 
-    config.add_route(
-        'resource.resource_constraint',
-        '/res_const/{id:uint}/settings',
-        factory=resource_factory,
-        ).add_view(resource_constraint)
+            if not cls.check_parent(args.obj):
+                continue
 
-    config.add_route(
-        'resource.webmap_group',
-        '/wmgroup',
-        get=webmap_group_data)
+            # Is current user has permission to manage resource children?
+            if PERM_MCHILDREN not in permissions:
+                continue
 
-    # config.add_route(
-    #     'map_list',
-    #     '/map-list') \
-    #     .add_view(map_list)
+            # Is current user has permission to create child resource?
+            child = cls(parent=args.obj, owner_user=args.request.user)
+            if not child.has_permission(PERM_CREATE, args.request.user):
+                continue
 
+            # Workaround SAWarning: Object of type ... not in session,
+            # add operation along 'Resource.children' will not proceed
+            child.parent = None
+
+            if args.obj.cls != "nogeom_layer":
+                yield Link(
+                    "create/%s" % ident,
+                    cls.cls_display_name,
+                    lambda args, ident=ident: args.request.route_url(
+                        "resource.create",
+                        id=args.obj.id,
+                        _query=dict(cls=ident),
+                    ),
+                    icon=f"rescls-{cls.identity}",
+                )
+
+        if PERM_UPDATE in permissions:
+            yield Link(
+                "operation/10-update",
+                _("Update"),
+                lambda args: args.request.route_url("resource.update", id=args.obj.id),
+                important=True,
+                icon="material-edit",
+            )
+
+        if args.obj.cls in ["mapserver_style", "qgis_vector_style", "qgis_raster_style", "wmsclient_layer", "tmsclient_layer"]:
+            if isinstance(args.obj, Resource):
+                if PERM_UPDATE in permissions:
+                    # проверка наличия маршрута-route
+                    route_intr = args.request.registry.introspector.get("routes", "file_resource.settings")
+                    if route_intr:
+                        yield Link(
+                            "operation/0-file_resource",
+                            _("Add/remove public files"),
+                            lambda args: args.request.route_url("file_resource.settings", id=args.obj.id),
+                            icon="material-attach_file",
+                        )
+
+        if args.obj.cls in ["vector_layer", "postgis_layer", "raster_layer", "wmsclient_layer", "tmsclient_layer"]:
+            if isinstance(args.obj, Resource):
+                if PERM_UPDATE in permissions:
+                    yield Link(
+                        "operation/0-resource_constraint",
+                        _("Setting up a connection between resources"),
+                        lambda args: args.request.route_url("resource.resource_constraint", id=args.obj.id),
+                        icon="material-schema",
+                    )
+
+        if (
+            PERM_DELETE in permissions
+            and args.obj.id != 0
+            and args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user)
+        ):
+            yield Link(
+                "operation/20-delete",
+                _("Delete"),
+                lambda args: args.request.route_url("resource.delete", id=args.obj.id),
+                important=True,
+                icon="material-delete_forever",
+            )
+
+        if PERM_READ in permissions:
+            yield Link(
+                "extra/json",
+                _("JSON view"),
+                lambda args: args.request.route_url("resource.json", id=args.obj.id),
+                icon="material-data_object",
+            )
+
+            yield Link(
+                "extra/effective-permissions",
+                _("User permissions"),
+                lambda args: args.request.route_url(
+                    "resource.effective_permissions",
+                    id=args.obj.id,
+                ),
+                icon="material-key",
+            )
+
+    @comp.env.pyramid.control_panel.add
+    def _control_panel(args):
+        if args.request.user.is_administrator:
+            yield Link(
+                "settings/resource_export",
+                _("Resource export"),
+                lambda args: (args.request.route_url("resource.control_panel.resource_export")),
+            )
+        if args.request.user.is_administrator:
+            yield Link(
+                'settings/webmap_group',
+                _("Groups of digital web maps"),
+                lambda args: (args.request.route_url('resource.webmap_group')),
+            )

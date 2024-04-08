@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast, get_args
 
 import zope.event
 from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
@@ -10,21 +10,23 @@ from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
-from nextgisweb.lib.apitype import EmptyObject, annotate
+from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
 from nextgisweb.core.exception import InsufficientPermissions, ValidationError
-from nextgisweb.pyramid import JSONType
+from nextgisweb.jsrealm import TSExport
+from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
+from .composite import CompositeSerializer
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import HierarchyError, QuotaExceeded
-from .model import Resource, ResourceSerializer, ResourceWebMapGroup, WebMapGroupResource
+from .model import Resource, ResourceWebMapGroup, WebMapGroupResource
 from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
+from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
-from .serialize import CompositeSerializer
 from .view import resource_factory
 
 PERM_READ = ResourceScope.read
@@ -33,91 +35,101 @@ PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
 PERM_UPDATE = ResourceScope.update
 
-class BlueprintResponse(Struct):
-    class Resource(Struct):
-        identity: str
-        label: str
-        base_classes: List[str]
-        interfaces: List[str]
-        scopes: List[str]
-
-    resources: Dict[str, Resource]
-
-    class Scope(Struct):
-        identity: str
-        label: str
-
-        class Permission(Struct):
-            identity: str
-            label: str
-
-        permissions: Dict[str, Permission]
-
-    scopes: Dict[str, Scope]
+class BlueprintResource(Struct):
+    identity: str
+    label: str
+    base_classes: List[str]
+    interfaces: List[str]
+    scopes: List[str]
 
 
-def blueprint(request) -> BlueprintResponse:
+class BlueprintPermission(Struct):
+    identity: str
+    label: str
+
+
+class BlueprintScope(Struct):
+    identity: str
+    label: str
+    permissions: Dict[str, BlueprintPermission]
+
+
+class Blueprint(Struct):
+    resources: Dict[str, BlueprintResource]
+    scopes: Dict[str, BlueprintScope]
+
+
+def blueprint(request) -> Blueprint:
     tr = request.translate
-    SResource = BlueprintResponse.Resource
-
-    resources = {
-        identity: SResource(
-            identity=identity,
-            label=tr(cls.cls_display_name),
-            base_classes=list(
-                reversed(
-                    [bc.identity for bc in cls.__mro__ if (bc != cls and issubclass(bc, Resource))]
-                )
-            ),
-            interfaces=[i.__name__ for i in cls.implemented_interfaces()],
-            scopes=list(cls.scope.keys()),
-        )
-        for identity, cls in Resource.registry.items()
-    }
-
-    SScope = BlueprintResponse.Scope
-    SPermission = BlueprintResponse.Scope.Permission
-
-    scopes = {
-        sid: SScope(
-            identity=sid,
-            label=tr(scope.label),
-            permissions={
-                perm.name: SPermission(
-                    identity=perm.name,
-                    label=tr(perm.label),
-                )
-                for perm in scope.values()
-            },
-        )
-        for sid, scope in Scope.registry.items()
-    }
-
-    return BlueprintResponse(resources=resources, scopes=scopes)
+    return Blueprint(
+        resources={
+            identity: BlueprintResource(
+                identity=identity,
+                label=tr(cls.cls_display_name),
+                base_classes=list(
+                    reversed(
+                        [
+                            bc.identity
+                            for bc in cls.__mro__
+                            if (bc != cls and issubclass(bc, Resource))
+                        ]
+                    )
+                ),
+                interfaces=[i.__name__ for i in cls.implemented_interfaces()],
+                scopes=list(cls.scope.keys()),
+            )
+            for identity, cls in Resource.registry.items()
+        },
+        scopes={
+            sid: BlueprintScope(
+                identity=sid,
+                label=tr(scope.label),
+                permissions={
+                    perm.name: BlueprintPermission(
+                        identity=perm.name,
+                        label=tr(perm.label),
+                    )
+                    for perm in scope.values()
+                },
+            )
+            for sid, scope in Scope.registry.items()
+        },
+    )
 
 
-def item_get(context, request) -> JSONType:
+if TYPE_CHECKING:
+    CompositCreate = Struct
+    CompositeRead = Struct
+    CompositeUpdate = Struct
+else:
+    composite = CompositeSerializer.types()
+    CompositCreate = composite.create
+    CompositeRead = composite.read
+    CompositeUpdate = composite.update
+
+
+def item_get(context, request) -> CompositeRead:
+    """Read resource"""
     request.resource_permission(PERM_READ)
 
-    serializer = CompositeSerializer(context, request.user)
-    serializer.serialize()
-
-    return serializer.data
+    serializer = CompositeSerializer(user=request.user)
+    return serializer.serialize(context, CompositeRead)
 
 
-def item_put(context, request) -> JSONType:
+def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
+    """Update resource"""
     request.resource_permission(PERM_READ)
 
-    serializer = CompositeSerializer(context, request.user, request.json_body)
+    serializer = CompositeSerializer(user=request.user)
     with DBSession.no_autoflush:
-        result = serializer.deserialize()
+        serializer.deserialize(context, body)
 
     zope.event.notify(AfterResourcePut(context, request))
 
-    return result
-
 
 def item_delete(context, request) -> EmptyObject:
+    """Delete resource"""
+
     def delete(obj):
         request.resource_permission(PERM_DELETE, obj)
         request.resource_permission(PERM_MCHILDREN, obj)
@@ -136,10 +148,12 @@ def item_delete(context, request) -> EmptyObject:
     DBSession.flush()
 
 
-def collection_get(request) -> JSONType:
-    parent = request.params.get("parent")
-    parent = int(parent) if parent else None
-
+def collection_get(
+    request,
+    *,
+    parent: Union[int, None] = None,
+) -> AsJSON[List[CompositeRead]]:
+    """Read children resources"""
     query = (
         Resource.query()
         .filter_by(parent_id=parent)
@@ -147,75 +161,75 @@ def collection_get(request) -> JSONType:
         .options(db.subqueryload(Resource.acl))
     )
 
+    serializer = CompositeSerializer(user=request.user)
     result = list()
     for resource in query:
         if resource.has_permission(PERM_READ, request.user):
-            serializer = CompositeSerializer(resource, request.user)
-            serializer.serialize()
-            result.append(serializer.data)
+            result.append(serializer.serialize(resource, CompositeRead))
 
-    return result
+    serializer = CompositeSerializer(user=request.user)
+    check_perm = lambda res, u=request.user: res.has_permission(PERM_READ, u)
+    return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
 
 
-def collection_post(request) -> JSONType:
+def collection_post(
+    request,
+    body: CompositCreate,
+    *,
+    cls: Union[str, UnsetType] = UNSET,
+    parent: Union[int, UnsetType] = UNSET,
+) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
+    """Create resource"""
     request.env.core.check_storage_limit()
 
-    data = dict(request.json_body)
+    if body.resource is UNSET:
+        resource_type = CompositCreate.__annotations__["resource"]
+        resource_struct = get_args(resource_type)[0]
+        body.resource = resource_struct()
 
-    if "resource" not in data:
-        data["resource"] = dict()
+    resource = body.resource
 
-    qparent = request.params.get("parent")
-    if qparent is not None:
-        data["resource"]["parent"] = dict(id=int(qparent))
+    if cls is not UNSET:
+        resource.cls = cls
 
-    cls = request.params.get("cls")
-    if cls is not None:
-        data["resource"]["cls"] = cls
-
-    if "parent" not in data["resource"]:
+    if parent is not UNSET:
+        resource.parent = dict(id=parent)
+    elif resource.parent is UNSET:
         raise ValidationError(_("Resource parent required."))
 
-    if "cls" not in data["resource"]:
+    resource_cls = resource.cls
+
+    if resource_cls is UNSET:
         raise ValidationError(message=_("Resource class required."))
-
-    if data["resource"]["cls"] not in Resource.registry:
-        raise ValidationError(_("Unknown resource class '%s'.") % data["resource"]["cls"])
-
+    elif resource_cls not in Resource.registry:
+        raise ValidationError(_("Unknown resource class '%s'.") % resource_cls)
     elif (
-        data["resource"]["cls"] in request.env.resource.options["disabled_cls"]
-        or request.env.resource.options["disable." + data["resource"]["cls"]]
+        resource_cls in request.env.resource.options["disabled_cls"]
+        or request.env.resource.options["disable." + resource_cls]
     ):
-        raise ValidationError(message=_("Resource class '%s' disabled.") % data["resource"]["cls"])
+        raise ValidationError(_("Resource class '%s' disabled.") % resource_cls)
 
-    cls = Resource.registry[data["resource"]["cls"]]
-    resource = cls(owner_user=request.user)
-
-    serializer = CompositeSerializer(resource, request.user, data)
-    serializer.members["resource"].mark("cls")
+    resource = Resource.registry[resource_cls](owner_user=request.user)
+    serializer = CompositeSerializer(user=request.user)
 
     resource.persist()
     with DBSession.no_autoflush:
-        serializer.deserialize()
+        serializer.deserialize(resource, body)
 
     DBSession.flush()
 
-    result = dict(id=resource.id)
     request.audit_context("resource", resource.id)
-
-    # TODO: Parent is returned only for compatibility
-    result["parent"] = dict(id=resource.parent.id)
-
     zope.event.notify(AfterResourceCollectionPost(resource, request))
 
     request.response.status_code = 201
-    return result
+    parent_ref = ResourceRefOptional(id=resource.parent.id)
+    return ResourceRefWithParent(id=resource.id, parent=parent_ref)
 
 
 if TYPE_CHECKING:
     scope_permissions_struct: Mapping[str, Any] = dict()
 
-    class PermissionResponse(Struct, kw_only=True):
+    class EffectivePermissions(Struct, kw_only=True):
         pass
 
 else:
@@ -228,15 +242,15 @@ else:
                     perm.name,
                     annotate(bool, [Meta(description=f"{scope.label}: {perm.label}")]),
                 )
-                for perm in scope.values(ordered=True)
+                for perm in scope.values()
             ],
             module=scope.__module__,
         )
         struct = annotate(struct, [Meta(description=str(scope.label))])
         scope_permissions_struct[sid] = struct
 
-    PermissionResponse = defstruct(
-        "PermissionResponse",
+    EffectivePermissions = defstruct(
+        "EffectivePermissions",
         [
             ((sid, struct) if sid == "resource" else (sid, Union[(struct, UnsetType)], UNSET))
             for sid, struct in scope_permissions_struct.items()
@@ -248,8 +262,8 @@ def permission(
     resource,
     request,
     *,
-    user: Optional[UserID] = None,
-) -> PermissionResponse:
+    user: Union[UserID, None] = None,
+) -> EffectivePermissions:
     """Get resource effective permissions"""
     request.resource_permission(PERM_READ)
 
@@ -258,7 +272,7 @@ def permission(
         request.resource_permission(PERM_CPERM)
 
     effective = resource.permissions(user_obj)
-    return PermissionResponse(
+    return EffectivePermissions(
         **{
             sid: scope_permissions_struct[sid](
                 **{p.name: (p in effective) for p in scope.values()},
@@ -309,7 +323,7 @@ def permission_explain(request) -> JSONType:
         result = dict()
         for scope_identity, scope in value.resource.scope.items():
             n_scope = result.get(scope_identity)
-            for perm in scope.values(ordered=True):
+            for perm in scope.values():
                 if perm in value._result:
                     if n_scope is None:
                         n_scope = result[scope_identity] = dict()
@@ -359,34 +373,12 @@ def permission_explain(request) -> JSONType:
     return _explain_jsonify(resolver)
 
 
-def quota(request) -> JSONType:
-    quota_limit = request.env.resource.quota_limit
-    quota_resource_cls = request.env.resource.quota_resource_cls
-
-    count = None
-    if quota_limit is not None:
-        query = DBSession.query(db.func.count(Resource.id))
-        if quota_resource_cls is not None:
-            query = query.filter(Resource.cls.in_(quota_resource_cls))
-
-        with DBSession.no_autoflush:
-            count = query.scalar()
-
-    return dict(
-        limit=quota_limit,
-        resource_cls=quota_resource_cls,
-        count=count,
-    )
-
-
-def search(request) -> JSONType:
-    smap = dict(resource=ResourceSerializer, full=CompositeSerializer)
-
-    smode = request.GET.pop("serialization", None)
-    smode = smode if smode in smap else "resource"
+def search(
+    request,
+    *,
+    serialization: Literal["resource", "full"] = "resource",
+) -> AsJSON[List[CompositeRead]]:
     principal_id = request.GET.pop("owner_user__id", None)
-
-    scls = smap.get(smode)
 
     query = DBSession.query(Resource)
     if "parent_id__recursive" in request.GET:
@@ -401,12 +393,6 @@ def search(request) -> JSONType:
                 DBSession.query(Resource.id).filter(Resource.parent_id == rquery.c.id)
             )
             query = query.filter(exists().where(Resource.id == rquery.c.id))
-
-    def serialize(resource, user):
-        serializer = scls(resource, user)
-        serializer.serialize()
-        data = serializer.data
-        return {Resource.identity: data} if smode == "resource" else data
 
     filter_ = []
     for k, v in request.GET.items():
@@ -434,15 +420,13 @@ def search(request) -> JSONType:
         owner = User.filter_by(principal_id=int(principal_id)).one()
         query = query.filter_by(owner_user=owner)
 
-    result = list()
-    for resource in query:
-        if resource.has_permission(PERM_READ, request.user):
-            result.append(serialize(resource, request.user))
-
-    return result
+    cs_keys = None if serialization == "full" else ("resource",)
+    serializer = CompositeSerializer(keys=cs_keys, user=request.user)
+    check_perm = lambda res, u=request.user: res.has_permission(PERM_READ, u)
+    return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
 
 
-class ResourceVolumeResponse(Struct, kw_only=True):
+class ResourceVolume(Struct, kw_only=True):
     volume: Annotated[int, Meta(ge=0, description="Resource volume in bytes")]
 
 
@@ -451,7 +435,7 @@ def resource_volume(
     request,
     *,
     recursive: Annotated[bool, Meta(description="Include children resources")] = True,
-) -> ResourceVolumeResponse:
+) -> ResourceVolume:
     """Get resource data volume"""
     require_storage_enabled()
 
@@ -471,25 +455,52 @@ def resource_volume(
         volume = res.get("", dict()).get("data_volume", 0)
         volume = volume if volume is not None else 0
 
-    return ResourceVolumeResponse(volume=volume)
+    return ResourceVolume(volume=volume)
 
 
-def quota_check(request) -> JSONType:
+QuotaCheckBody = Annotated[
+    Dict[
+        Annotated[str, Meta(examples=["webmap"])],
+        Annotated[int, Meta(ge=0, examples=[1])],
+    ],
+    TSExport("QuotaCheckBody"),
+]
+
+
+class QuotaCheckSuccess(Struct, kw_only=True):
+    success: Annotated[bool, Meta(examples=[True])]
+
+
+class QuotaCheckFailure(Struct, kw_only=True):
+    cls: Union[str, None]
+    required: int
+    available: int
+    message: str
+
+
+def quota_check(
+    request,
+    body: AsJSON[QuotaCheckBody],
+) -> AnyOf[
+    Annotated[QuotaCheckSuccess, StatusCode.OK],
+    Annotated[QuotaCheckFailure, StatusCode(cast(int, QuotaExceeded.http_status_code))],
+]:
+    """Check for resource quota"""
     try:
-        request.env.resource.quota_check(request.json_body)
+        request.env.resource.quota_check(body)
     except QuotaExceeded as exc:
         request.response.status_code = exc.http_status_code
-        return dict(exc.data, message=request.translate(exc.message))
-    return dict(success=True)
+        return QuotaCheckFailure(**exc.data, message=request.translate(exc.message))
+    return QuotaCheckSuccess(success=True)
 
 
 # Component settings
 
-csetting(
-    "resource_export",
+ResourceExport = Annotated[
     Literal["data_read", "data_write", "administrators"],
-    default="data_read",
-)
+    TSExport("ResourceExport"),
+]
+csetting("resource_export", ResourceExport, default="data_read")
 
 def getWebmapGroup(request) -> JSONType:
     request.require_administrator()
@@ -528,7 +539,7 @@ def getMaplist(request) -> JSONType:
 
 def wmgroup_delete(request) -> JSONType:
     request.require_administrator()
-    wmg_id = int(request.matchdict['id'])
+    wmg_id = int(request.matchdict["id"])
     def delete(wmg_id):
         try:
             query = ResourceWebMapGroup.filter_by(id=wmg_id).one()
@@ -548,10 +559,10 @@ def wmgroup_delete(request) -> JSONType:
 
 def wmgroup_update(request) -> JSONType:
     request.require_administrator()
-    wmg_id = int(request.matchdict['id'])
-    wmg_value = str(request.matchdict['wmg']).strip()
-    action_map_value = request.matchdict['action']
-    if wmg_value and wmg_value != '':
+    wmg_id = int(request.matchdict["id"])
+    wmg_value = str(request.matchdict["wmg"]).strip()
+    action_map_value = request.matchdict["action"]
+    if wmg_value and wmg_value != "":
         def update(wmg_id, wmg_value, action_map_value):
             if wmg_id != 0:
                 resource_wmg = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == wmg_id).one()
@@ -568,8 +579,8 @@ def wmgroup_update(request) -> JSONType:
 
 def wmgroup_create(request) -> JSONType:
     request.require_administrator()
-    webmap_group_name = request.json['webmap_group_name'].strip()
-    action_map = request.json['action_map']
+    webmap_group_name = request.json["webmap_group_name"].strip()
+    action_map = request.json["action_map"]
     if webmap_group_name:
         try:
             query = ResourceWebMapGroup(webmap_group_name=webmap_group_name, action_map=action_map)
@@ -580,8 +591,8 @@ def wmgroup_create(request) -> JSONType:
 
 def wmg_item_create(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
-    resource_id = int(request.matchdict['id'])
-    webmap_group_id = int(request.matchdict['webmap_group_id'])
+    resource_id = int(request.matchdict["id"])
+    webmap_group_id = int(request.matchdict["webmap_group_id"])
 
     try:
         query = WebMapGroupResource(resource_id=resource_id, webmap_group_id=webmap_group_id)
@@ -592,8 +603,8 @@ def wmg_item_create(request) -> JSONType:
         
 def wmg_item_delete(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
-    resource_id = int(request.matchdict['id'])
-    webmap_group_id = int(request.matchdict['webmap_group_id'])
+    resource_id = int(request.matchdict["id"])
+    webmap_group_id = int(request.matchdict["webmap_group_id"])
 
     def delete(resource_id, webmap_group_id):
         try:
@@ -615,14 +626,14 @@ def wmg_item_delete_all(request) -> JSONType:
     return None
 
 def tbl_res(request) -> JSONType:
-    clsItems = ['nogeom_layer','postgis_layer', 'vector_layer'];
+    clsItems = ["nogeom_layer", "postgis_layer", "vector_layer"];
     query = DBSession.query(Resource).filter(Resource.cls.in_(clsItems)).all()
     result = list()
     for resource in query:
         if resource.has_permission(PERM_READ, request.user):
             fields=list()
             for idx in resource.fields:
-                fields.append({'value':idx.keyname, 'label':idx.display_name})
+                fields.append({"value": idx.keyname, "label": idx.display_name})
             result.append(dict(
                 id=resource.id,
                 name=resource.display_name,
@@ -634,7 +645,7 @@ def tbl_res(request) -> JSONType:
     return result
 
 def webmap_group_item(request) -> JSONType:
-    id = int(request.matchdict['id'])
+    id = int(request.matchdict["id"])
 
     query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(webmap_group_id=id) \
         .join(Resource, WebMapGroupResource.resource_id == Resource.id) \
@@ -654,7 +665,7 @@ def webmap_group_item(request) -> JSONType:
     return result
 
 def webmap_item(request) -> JSONType:
-    id = int(request.matchdict['id'])
+    id = int(request.matchdict["id"])
 
     query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(resource_id=id) \
         .join(Resource, WebMapGroupResource.resource_id == Resource.id) \
@@ -724,12 +735,6 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "resource.quota",
-        "/api/resource/quota",
-        get=quota,
-    )
-
-    config.add_route(
         "resource.search",
         "/api/resource/search/",
         get=search,
@@ -754,67 +759,80 @@ def setup_pyramid(comp, config):
         "resource.file_download",
         "/api/resource/{id}/file/{name:any}",
         factory=resource_factory,
-        overloaded=True)
+        overloaded=True,
+    )
 
     config.add_route(
-        'resource.tbl_res',
-        '/api/resource/tblres/',
-        get=tbl_res)
+        "resource.tbl_res",
+        "/api/resource/tblres/",
+        get=tbl_res,
+    )
 
     config.add_route(
-        'wmgroup.create',
-        '/api/wmg/create/{id:uint}/{webmap_group_id:uint}/',
+        "wmgroup.create",
+        "/api/wmg/create/{id:uint}/{webmap_group_id:uint}/",
         factory=resource_factory,
-        get=wmg_item_create)
+        get=wmg_item_create,
+    )
 
     config.add_route(
-        'wmgroup.delete',
-        '/api/wmg/delete/{id:uint}/{webmap_group_id:uint}/',
+        "wmgroup.delete",
+        "/api/wmg/delete/{id:uint}/{webmap_group_id:uint}/",
         factory=resource_factory,
-        get=wmg_item_delete)
+        get=wmg_item_delete,
+    )
 
     config.add_route(
-        'wmgroup.delete_all',
-        '/api/wmg/delete_all/{id:uint}',
+        "wmgroup.delete_all",
+        "/api/wmg/delete_all/{id:uint}",
         factory=resource_factory,
-        get=wmg_item_delete_all)
+        get=wmg_item_delete_all,
+    )
 
     config.add_route(
-        'resource.wmgroup.update',
-        '/api/wmgroup/update/{id:uint}/{wmg:str}/{action:str}/',
-        get=wmgroup_update)
+        "resource.wmgroup.update",
+        "/api/wmgroup/update/{id:uint}/{wmg:str}/{action:str}/",
+        get=wmgroup_update,
+    )
 
     config.add_route(
-        'resource.wmgroup.delete',
-        r'/api/wmgroup/delete/{id:uint}/',
-        get=wmgroup_delete)
+        "resource.wmgroup.delete",
+        r"/api/wmgroup/delete/{id:uint}/",
+        get=wmgroup_delete,
+    )
 
     config.add_route(
-        'resource.wmgroup_create',
-        '/api/wmgroup/create',
-        put=wmgroup_create)
+        "resource.wmgroup_create",
+        "/api/wmgroup/create",
+        put=wmgroup_create,
+    )
 
     config.add_route(
-        'resource.mapgroup',
-        '/api/resource/mapgroup/',
-        get=getWebmapGroup)
+        "resource.mapgroup",
+        "/api/resource/mapgroup/",
+        get=getWebmapGroup,
+    )
 
     config.add_route(
-        'resource.maplist',
-        '/api/resource/maplist/',
-        get=getMaplist)
+        "resource.maplist",
+        "/api/resource/maplist/",
+        get=getMaplist,
+    )
 
     config.add_route(
-        'resource.webmap_group_item',
-        '/wmgroup/{id:uint}',
-        get=webmap_group_item)
+        "resource.webmap_group_item",
+        "/wmgroup/{id:uint}",
+        get=webmap_group_item,
+    )
 
     config.add_route(
-        'resource.webmap_item',
-        '/webmap/{id:uint}',
-        get=webmap_item)
+        "resource.webmap_item",
+        "/webmap/{id:uint}",
+        get=webmap_item,
+    )
 
     config.add_route(
-        'resource.feature_diagram',
-        '/api/resource/{id:uint}/feature/?fld_{key_diag:any}={val_diag:any}',
-        get=search)
+        "resource.feature_diagram",
+        "/api/resource/{id:uint}/feature/?fld_{key_diag:any}={val_diag:any}",
+        get=search,
+    )

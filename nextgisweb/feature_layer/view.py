@@ -1,7 +1,7 @@
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import _
-from nextgisweb.lib import dynmenu as dm
+from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.resource import (
@@ -69,6 +69,7 @@ def feature_show(request):
         title=_("Feature #%d") % feature_id,
         feature_id=feature_id,
         ext_mid=ext_mid,
+        dynmenu=False,
     )
 
 
@@ -84,6 +85,7 @@ def feature_update(request):
         props=dict(resourceId=request.context.id, featureId=feature_id),
         title=_("Feature #%d") % feature_id,
         maxheight=True,
+        dynmenu=False,
     )
 
 
@@ -132,7 +134,7 @@ class MVTLink(ExternalAccessLink):
 
     @classmethod
     def is_applicable(cls, obj, request) -> bool:
-        if obj.cls != 'nogeom_layer':
+        if obj.cls != "nogeom_layer":
             return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
 
     @classmethod
@@ -182,35 +184,33 @@ def setup_pyramid(comp, config):
     config.add_route("feature_layer.test_mvt", "/feature_layer/test_mvt").add_view(test_mvt)
 
     # Layer menu extension
-    class LayerMenuExt(dm.DynItem):
-        def build(self, args):
-            if IFeatureLayer.providedBy(args.obj):
-                yield dm.Label("feature_layer", _("Features"))
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        if not IFeatureLayer.providedBy(args.obj):
+            return
 
-                if args.obj.has_permission(PD_READ, args.request.user):
-                    if args.obj.has_permission(PDS_R, args.request.user):
-                        yield dm.Link(
-                            "feature_layer/feature-browse",
-                            _("Table"),
-                            lambda args: args.request.route_url(
-                                "feature_layer.feature.browse", id=args.obj.id
-                            ),
-                            important=True,
-                            icon="mdi-table-large",
-                        )
+        yield Label("feature_layer", _("Features"))
 
-                if args.obj.has_export_permission(args.request.user):
-                    if args.obj.cls != 'nogeom_layer':
-                        yield dm.Link(
-                            "feature_layer/export",
-                            _("Save as"),
-                            lambda args: args.request.route_url(
-                                "resource.export.page", id=args.obj.id
-                            ),
-                            icon="material-save_alt",
-                        )
+        if args.obj.has_permission(PD_READ, args.request.user):
+            if args.obj.has_permission(PDS_R, args.request.user):
+                if args.obj.cls != "nogeom_layer":
+                    yield Link(
+                        "feature_layer/feature-browse",
+                        _("Table"),
+                        lambda args: args.request.route_url(
+                            "feature_layer.feature.browse", id=args.obj.id
+                        ),
+                        important=True,
+                        icon="mdi-table-large",
+                    )
 
-    Resource.__dynmenu__.add(LayerMenuExt())
+        if args.obj.has_export_permission(args.request.user):
+            yield Link(
+                "feature_layer/export",
+                _("Save as"),
+                lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
+                icon="material-save_alt",
+            )
 
     @resource_sections(title=_("Attributes"))
     def resource_section_fields(obj):

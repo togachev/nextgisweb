@@ -54,7 +54,7 @@ class RenderComponent(Component):
     def sys_info(self):
         from .imgcodec import has_fpng
 
-        yield ("Fast PNG", _("Enabled") if has_fpng else _("Disabled"))
+        yield ("WEBP", _("Enabled") if has_fpng else _("Disabled"))
 
     def maintenance(self):
         self.cleanup()

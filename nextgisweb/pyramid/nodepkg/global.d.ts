@@ -7,6 +7,7 @@ declare const ngwConfig: {
     staticKey: string;
     isAdministrator: boolean;
     isGuest: boolean;
+    controlPanel: boolean;
     userId: number;
     userDisplayName: string;
     invitationSession: boolean;
@@ -46,10 +47,5 @@ declare module "@nextgisweb/pyramid/settings!pyramid" {
         lunkwill_enabled: boolean;
     }
     const value: PyramidSettings;
-    export = value;
-}
-
-declare module "@nextgisweb/pyramid/api/load!/api/component/pyramid/route" {
-    const value: Record<string, string[]>;
     export = value;
 }

@@ -4,77 +4,18 @@ import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
-import { Circle, Fill, Stroke, Style } from "ol/style";
-
+import { customStyle, clickStyle } from "../constant";
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type { DojoDisplay } from "../../type";
-
-interface InfoUpload {
-    uid: string;
-    name: string;
-}
-
-type SourceType = {
-    url: string;
-    format: string;
-    file: InfoUpload;
-    length: number;
-};
-
-const customStyle = new Style({
-    stroke: new Stroke({
-        width: 3,
-        color: "#009DFF",
-    }),
-    image: new Circle({
-        anchor: [0.5, 46],
-        anchorXUnits: "fraction",
-        anchorYUnits: "pixels",
-        stroke: new Stroke({
-            width: 2,
-            color: "#fff",
-        }),
-        radius: 5,
-        fill: new Stroke({
-            width: 2,
-            color: "#106a90",
-        }),
-    }),
-    fill: new Fill({
-        color: "#106a9020",
-    }),
-});
-
-const clickStyle = new Style({
-    stroke: new Stroke({
-        width: 4,
-        color: "#FFE900"
-    }),
-    fill: new Fill({
-        color: "rgba(0, 0, 255, 0.5)",
-    }),
-    image: new Circle({
-        anchor: [0.5, 46],
-        anchorXUnits: "fraction",
-        anchorYUnits: "pixels",
-        stroke: new Stroke({
-            width: 1,
-            color: "#000000"
-        }),
-        radius: 6,
-        fill: new Stroke({
-            width: 1,
-            color: "#FFE900"
-        }),
-    }),
-    zIndex: 100,
-});
+import type { SourceType } from "../type";
 
 export const useFeatures = (display: DojoDisplay) => {
     const olmap = display.map.olMap;
-    const addLayerMap = ({ url, format, file, length }: SourceType) => {
+    const addLayerMap = ({ id, url, format, file, length }: SourceType) => {
         const customSource = new VectorSource({ url: url, format: format })
         const customLayer = new VectorLayer({
             source: customSource,
+            zIndex: 100 + id,
         })
         customLayer.setStyle(customStyle);
         customLayer.set("name", file.uid + "__upload-layer");
@@ -111,9 +52,12 @@ export const useFeatures = (display: DojoDisplay) => {
             features.push(feature);
         },
             {
-                hitTolerance: display.clientSettings.identify_radius,
+                hitTolerance: webmapSettings.identify_radius,
                 layerFilter: (layer: OlVectorLayer<OlVectorSource>) => {
-                    return layer.get("name") !== "drawing-layer";
+                    const pref = layer.get("name")?.split("__")[1]
+                    if (pref === "upload-layer") {
+                        return layer;
+                    }
                 }
             },
         );

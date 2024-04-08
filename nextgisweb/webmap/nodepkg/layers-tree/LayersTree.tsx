@@ -13,10 +13,10 @@ import type { DojoDisplay } from "../type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
-import { Desc } from "./Desc";
 import { DropdownFile } from "./DropdownFile";
-import { Legend, LegendAction } from "./Legend";
 import { IconItem } from "./IconItem";
+import { Legend } from "./Legend";
+import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
 
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
@@ -58,7 +58,6 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
-        const [descClickId, setDescClickId] = useState<number>();
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const webmapItems = store.webmapItems as TreeItem[];
@@ -157,10 +156,7 @@ export const LayersTree = observer(
         };
 
         const titleRender = (nodeData: TreeWebmapItem) => {
-            const { title, plugin, description } = nodeData.treeItem;
-            const descStyle = description ? true : false
-            const descLayer = plugin ? (plugin['ngw-webmap/plugin/LayerInfo'].description ? true : false) : false
-
+            const { title } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
 
             let actions;
@@ -187,14 +183,6 @@ export const LayersTree = observer(
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
-
-                        {descStyle || descLayer ?
-                            (<Desc
-                                nodeData={nodeData.treeItem}
-                                setDescClickId={setDescClickId}
-                                descClickId={descClickId}
-                            />) :
-                            null}
                         {dropdownFile}
                         {dropdownAction}
                     </Col>
@@ -215,14 +203,14 @@ export const LayersTree = observer(
                         </Col>
                         {actions}
                     </Row>
-                    {showLegend && <Legend
+                    {showLegend && (<Legend
                         zoomToNgwExtent={(ngwExtent: NgwExtent) => {
                             display.map.zoomToNgwExtent(
                                 ngwExtent,
                                 display.displayProjection
                             );
                         }}
-                        nodeData={nodeData.treeItem} />}
+                        nodeData={nodeData.treeItem} store={store} />)}
                 </>
             );
         };
