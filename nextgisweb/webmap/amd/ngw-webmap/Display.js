@@ -657,7 +657,16 @@ define([
                         return;
                     }
 
-                    var plugin = new plugins[key]({
+                    if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+                        return;
+                    }
+
+                    let pluginInfo = plugins[key];
+                    if (pluginInfo.default) {
+                        pluginInfo = pluginInfo.default;
+                    }
+
+                    var plugin = new pluginInfo({
                         identity: key,
                         display: this,
                         itemStore: plugins ? false : this.itemStore,
@@ -1105,6 +1114,10 @@ define([
             topic.publish("feature.highlight", {
                 olGeometry: geometry,
             });
+        },
+
+        getItemConfig: function () {
+            return Object.assign({}, this._itemConfigById);
         },
 
         getUrlParams: function () {
