@@ -1,5 +1,7 @@
 define([
     "dojo/_base/declare",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/webmap/feature-link",
     "./Base",
     "dojo/_base/lang",
     "dojo/_base/array",
@@ -38,6 +40,8 @@ define([
     "@nextgisweb/feature-layer/feature-editor",
 ], function (
     declare,
+    reactApp,
+    FeatureLinkComp,
     Base,
     lang,
     array,
@@ -232,10 +236,33 @@ define([
                 })
             );
         },
+
         _featureResponse: function (selectValue) {
             var keys = selectValue.split("/");
             return this.response[keys[0]].features[keys[1]];
         },
+
+        _coordinateCopy: function (value) {
+            const coordSwitcher = new CoordinateSwitcher({
+                point: this.coordinates,
+            });
+            coordSwitcher._transformFrom(3857).then((transformedCoord) => {
+                const coordinates = transformedCoord;
+                const tool = this.tool;
+                const span = tool._popup.linkSpan
+                reactApp.default(
+                    FeatureLinkComp.default,
+                    {
+                        featureInfo: value,
+                        zoom: tool.map.position.zoom,
+                        webmapId: tool.display.config.webmapId,
+                        coordinates: coordinates,
+                    },
+                    span
+                );
+            });
+        },
+
         _displayFeature: function (featureInfo) {
             var widget = this,
                 lid = featureInfo.layerId,
@@ -281,6 +308,8 @@ define([
                             compact: true,
                             title: i18n.gettext("Attributes"),
                         });
+
+                        widget._coordinateCopy(featureInfo);
 
                         fwidget.renderValue(feature.fields);
                         fwidget.placeAt(widget.extContainer);
@@ -368,6 +397,8 @@ define([
                 class: "ngwPopup__coordinates",
             });
             this.addChild(this.coordinatePane);
+
+            this._coordinateCopy(null);
 
             const coordSwitcher = new CoordinateSwitcher({
                 point: this.coordinates,
@@ -516,7 +547,7 @@ define([
             response,
             point,
             layerLabels,
-            afterPopupInit
+            afterPopupInit,
         ) {
             if (response.featureCount === 0) {
                 topic.publish("feature.unhighlight");
@@ -549,6 +580,7 @@ define([
             this._popup.setTitle(
                 i18n.gettext("Features") + ": " + response.featureCount
             );
+
             this._popup.setPosition(point);
             if (afterPopupInit && afterPopupInit instanceof Function)
                 afterPopupInit();
@@ -631,6 +663,49 @@ define([
                 identifyDeferred.resolve(true);
             });
 
+            return identifyDeferred.promise;
+        },
+
+        _responsePopupCopyCoords: function (lon, lat) {
+            domClass.add(
+                this._popup.contentDiv,
+                "ngwPopup__content--nofeature"
+            )
+            const coordSwitcher = new CoordinateSwitcher({
+                point: [lon, lat],
+            });
+            coordSwitcher._transformFrom(4326).then((transformedCoord) => {
+                const point = transformedCoord;
+
+                var widget = new Widget({
+                    response: { featureCount: 0 },
+                    tool: this,
+                    popupSize: [this.popupWidth, this.popupHeight],
+                    coordinates: point,
+                    displayProjection: this.display.displayProjection,
+                    lonlatProjection: this.display.lonlatProjection,
+                });
+                this._popup.widget = widget;
+
+                widget.placeAt(this._popup.contentDiv);
+
+                this._popup.setTitle(
+                    i18n.gettext("Features") + ": " + 0
+                );
+                this._popup.setPosition(point);
+                this._popup._closeSpan.onclick = () => {
+                    this._popup.setPosition(undefined);
+                    topic.publish("feature.unhighlight");
+                };
+            })
+        },
+
+        identifyLonLat: function (lon, lat) {
+            const identifyDeferred = new Deferred();
+            all().then(() => {
+                this._responsePopupCopyCoords(lon, lat);
+                identifyDeferred.resolve(true);
+            });
             return identifyDeferred.promise;
         },
     });

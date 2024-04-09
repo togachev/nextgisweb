@@ -6,52 +6,52 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:851
+#: amd/ngw-webmap/Display.js:852 amd/ngw-webmap/Display.js:877
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:852
+#: amd/ngw-webmap/Display.js:853 amd/ngw-webmap/Display.js:878
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:944 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:970 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:955
+#: amd/ngw-webmap/Display.js:981
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:970 nodepkg/panel/custom-layer/CustomLayer.tsx:20
+#: amd/ngw-webmap/Display.js:996 nodepkg/panel/custom-layer/CustomLayer.tsx:20
 msgid "CustomLayer"
 msgstr "Пользовательские слои"
 
-#: amd/ngw-webmap/Display.js:980
+#: amd/ngw-webmap/Display.js:1006
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:994
+#: amd/ngw-webmap/Display.js:1020
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1016 amd/ngw-webmap/plugin/LayerInfo.js:29
+#: amd/ngw-webmap/Display.js:1042 amd/ngw-webmap/plugin/LayerInfo.js:29
 #: nodepkg/panel/description/DescriptionPanel.js:8
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1038
+#: amd/ngw-webmap/Display.js:1064
 msgid "Diagram"
 msgstr ""
 
-#: amd/ngw-webmap/Display.js:1058
+#: amd/ngw-webmap/Display.js:1084
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1110
+#: amd/ngw-webmap/Display.js:1136
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:1155
+#: amd/ngw-webmap/Display.js:1181
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -267,19 +267,19 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:282
+#: amd/ngw-webmap/tool/Identify.js:309
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:294
+#: amd/ngw-webmap/tool/Identify.js:323
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: amd/ngw-webmap/tool/Identify.js:392 amd/ngw-webmap/tool/Identify.js:408
+#: amd/ngw-webmap/tool/Identify.js:423 amd/ngw-webmap/tool/Identify.js:439
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:550
+#: amd/ngw-webmap/tool/Identify.js:581 amd/ngw-webmap/tool/Identify.js:693
 msgid "Features"
 msgstr "Объектов"
 
@@ -442,6 +442,14 @@ msgstr "Клонировать"
 #: nodepkg/clone-webmap/CloneWebmap.tsx:61
 msgid "Resource group"
 msgstr "Группа ресурсов"
+
+#: nodepkg/feature-link/FeatureLink.tsx:26
+msgid "Object reference copied"
+msgstr "Ссылка на объект скопирована"
+
+#: nodepkg/feature-link/FeatureLink.tsx:55
+msgid "Object link"
+msgstr "Ссылка на объект"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:62
 msgid "Radius:"
@@ -1198,31 +1206,4 @@ msgstr "Открыть"
 #: view.py:407
 msgid "Group setting"
 msgstr "Настройка группы"
-
-#~ msgid "Build"
-#~ msgstr "Построить"
-
-#~ msgid "Rebuild"
-#~ msgstr "Перестроить"
-
-#~ msgid "The calculation is performed for the last selected object"
-#~ msgstr "Рассчет производится для последнего выделенного объекта"
-
-#~ msgid "To select objects, press and hold the CTRL key"
-#~ msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
-
-#~ msgid "Forecasting"
-#~ msgstr "Прогнозирование"
-
-#~ msgid "Recovery"
-#~ msgstr "Восстановление"
-
-#~ msgid "Count of trajectories"
-#~ msgstr "Количество траекторий"
-
-#~ msgid "Prediction and recovery"
-#~ msgstr "Прогнозирование и восстановление"
-
-#~ msgid "Graphs based on static data"
-#~ msgstr "Графики на основе статических данных"
 

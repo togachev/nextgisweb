@@ -454,6 +454,7 @@ define([
                 this.mapStates.addState("identifying", this.identify);
                 this.mapStates.setDefaultState("identifying", true);
                 widget._identifyFeatureByAttrValue();
+                widget._identifyLonLat();
             }
 
             topic.publish("/webmap/tools/initialized");
@@ -845,6 +846,31 @@ define([
                     urlParams.hl_val,
                     urlParams.zoom
                 )
+                .then((result) => {
+                    if (result) return;
+                    errorModule.errorModal({
+                        title: gettext("Object not found"),
+                        message: gettext(
+                            "Object from URL parameters not found"
+                        ),
+                    });
+                });
+        },
+
+        _identifyLonLat: function () {
+            const urlParams = this._urlParams;
+            if (
+                !(
+                    "lon" in urlParams &&
+                    "lat" in urlParams &&
+                    "zoom" in urlParams
+                )
+            ) {
+                return;
+            }
+            const { lon, lat } = urlParams;
+            this.identify
+                .identifyLonLat(lon, lat)
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

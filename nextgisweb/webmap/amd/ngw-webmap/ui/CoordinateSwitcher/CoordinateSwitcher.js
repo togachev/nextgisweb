@@ -89,6 +89,25 @@ define([
             return deferred.promise;
         },
 
+        _transformFrom: function (value) {
+            const deferred = new Deferred();
+            api.route("spatial_ref_sys.geom_transform.batch")
+                .post({
+                    json: {
+                        srs_from: value,
+                        srs_to: Object.keys(srsCoordinates).map(Number),
+                        geom: wkt.writeGeometry(new ol.geom.Point(this.point)),
+                    },
+                })
+                .then((transformed) => {
+                    const t = transformed.find(i => i.srs_id !== value)
+                    const wktPoint = wkt.readGeometry(t.geom);
+                    const transformedCoord = wktPoint.getCoordinates();
+                    deferred.resolve(transformedCoord);
+                });
+            return deferred.promise;
+        },
+
         _buildOption: function (formatCoords, srsInfo) {
             const element = put(
                 "span span $ + span.ngwPopup__coordinates-srs-name $ <",
