@@ -1,7 +1,5 @@
 define([
     "dojo/_base/declare",
-    "@nextgisweb/gui/react-app",
-    "@nextgisweb/webmap/panel/diagram",
     "./Base",
     "dojo/_base/lang",
     "dojo/_base/array",
@@ -22,6 +20,7 @@ define([
     "dijit/form/Select",
     "dijit/form/Button",
     "put-selector/put",
+    "ngw-pyramid/route",
     "openlayers/ol",
     "ngw-webmap/ol/Popup",
     "@nextgisweb/pyramid/api",
@@ -39,8 +38,6 @@ define([
     "@nextgisweb/feature-layer/feature-editor",
 ], function (
     declare,
-    reactApp,
-    DiagramComp,
     Base,
     lang,
     array,
@@ -61,6 +58,7 @@ define([
     Select,
     Button,
     put,
+    route,
     ol,
     Popup,
     api,
@@ -84,16 +82,10 @@ define([
     Control.prototype = Object.create(ol.interaction.Interaction.prototype);
     Control.prototype.constructor = Control;
 
-    Control.prototype.handleClickEvent = function (evt) {
-        if (evt.type === "singleclick") {
-            this.tool.execute(evt.pixel);
-            evt.preventDefault();
-        }
-        else if (evt.type == 'pointerup' & evt.originalEvent.ctrlKey === true) {
-            if (this.tool.display.panelsManager._activePanelKey && this.tool.display.panelsManager._activePanelKey == 'diagram') {
-                this.tool.executeDiagram(evt.pixel);
-                evt.preventDefault();
-            }
+    Control.prototype.handleClickEvent = function (e) {
+        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
+            this.tool.execute(e.pixel);
+            e.preventDefault();
         }
         return true;
     };
@@ -404,10 +396,6 @@ define([
         popupWidth: webmapSettings.popup_width,
         popupHeight: webmapSettings.popup_height,
 
-        arrayResponseFeature: [],
-        arrayFeature: [],
-        uniqueArray: [],
-
         constructor: function () {
             this.map = this.display.map;
             this.control = new Control({ tool: this });
@@ -448,180 +436,7 @@ define([
             this._popup.setPosition(undefined);
         },
 
-        executeDiagram: function (pixel) {
-            this._popup.setPosition(undefined);
-            // this._popup_cursor.setPosition(undefined);
-            topic.publish("feature.unhighlight");
-
-            var request = {
-                srs: 3857,
-                geom: this._requestGeomString(pixel),
-                styles: []
-            };
-
-            this.display.getVisibleItems().then(lang.hitch(this, function (items) {
-                var mapResolution = this.display.map.get("resolution");
-                array.forEach(items, (i) => {
-                    var item = this.display._itemConfigById[
-                        this.display.itemStore.getValue(i, "id")];
-                    if (!item.identifiable || mapResolution >= item.maxResolution ||
-                        mapResolution < item.minResolution) {
-                        return;
-                    }
-                    request.styles.push(item.styleId);
-                }, this);
-            }));
-
-            api.route("feature_layer.identifyConst")
-                .post({
-                    body: json.stringify(request),
-                })
-                .then((response) => {
-                    this.response = response;
-
-                    const resourcesId = Object.keys(response)
-                        .map((item) => {
-                            return parseInt(item);
-                        })
-                        .filter((item) => !isNaN(item));
-
-                    if (response.constraint === true && response.featureCount !== 0) {
-                        array.forEach(resourcesId, (item) => {
-                            array.forEach(response[item].features, (feature) => {
-                                this.arrayResponseFeature.push(feature);
-                            })
-                        })
-                        return this.arrayResponseFeature;
-                    } else if (response.constraint === true && response.featureCount === 0) {
-                        this.arrayResponseFeature.length = 0;
-                        topic.publish("feature.unhighlightDiagram");
-                        return false;
-                    }
-                })
-                .then(value => {
-                    this.featurePush(value);
-                });
-        },
-
-        clear: function () {
-            this.arrayFeature.length = 0;
-            this.arrayResponseFeature.length = 0;
-            this.uniqueArray.length = 0;
-            topic.publish("feature.unhighlightDiagram");
-        },
-
-        featureSelectDiagram: function (value) {
-            var display = this.display;
-            var pm = this.display.panelsManager
-
-            var close = () => {
-                pm._closePanel(pm.getPanel(pm._activePanelKey));
-            };
-            var clear = () => {
-                this.arrayFeature.length = 0;
-                this.arrayResponseFeature.length = 0;
-                this.uniqueArray.length = 0;
-                topic.publish("feature.unhighlightDiagram");
-            };
-            var panelsObj = this.display.panelsManager._panels;
-
-            all()
-                .then(function () {
-                    reactApp.default(
-                        DiagramComp.default,
-                        {
-                            display,
-                            value,
-                            close,
-                            clear
-                        },
-                        panelsObj.get('diagram').domNode
-                    );
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-        },
-
-        featurePush: function (value) {
-            var display = this.display;
-            if (value && display.map.target.className
-                !== 'tiny-map') {
-                array.forEach(value, (item) => {
-                    this.arrayFeature.push(item);
-                }, this);
-
-                var _lookup = {};
-                this.uniqueArray = array.filter(this.arrayFeature, (item) => {
-                    var key = item.id;
-                    if (_lookup[key] !== true) {
-                        _lookup[key] = true;
-                        return true;
-                    }
-                    return false;
-                });
-                delete _lookup;
-
-                if (display.featureHighlighterDiagram._source.getFeatures().length === 0) {
-                    this.uniqueArrayHighlight(this.uniqueArray, false);
-                    this.featureSelectDiagram(this.uniqueArray);
-                } else if (display.featureHighlighterDiagram._source.getFeatures().length > 0) {
-                    var arrr = [];
-                    array.forEach(display.featureHighlighterDiagram._source.getFeatures(), (e) => {
-                        arrr.push({ uniqueId: e.getProperties().uniqueId });
-                    })
-                    this.uniqueArrayHighlight(this.uniqueArray, arrr);
-                    this.featureSelectDiagram(this.uniqueArray);
-                }
-            }
-
-            if (value === false) {
-                this.featureSelectDiagram(undefined);
-                this.clear();
-            }
-        },
-
-
-
-        uniqueArrayHighlight: function (value, disable) {
-            if (disable === false) {
-                array.forEach(value, (item) => {
-                    const url = api.routeURL("feature_layer.feature.item", { id: item.layerId, fid: item.id });
-                    const featureHighlightDiagram = xhr.get(url, {
-                        method: "GET",
-                        handleAs: "json"
-                    });
-
-                    featureHighlightDiagram.then(function (feature) {
-                        topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item.layerId / item.id });
-                    });
-                });
-            }
-            else {
-                const findDiff = (arr1, arr2, mapping) =>
-                    arr1.find((item, index) =>
-                        mapping.find((m) => {
-                            if (arr2[index]) {
-                                return false;
-                            } else {
-                                const url = api.routeURL("feature_layer.feature.item", { id: item[m[1]], fid: item[m[0]] });
-                                const featureHighlightDiagram = xhr.get(url, {
-                                    method: "GET",
-                                    handleAs: "json"
-                                });
-
-                                featureHighlightDiagram.then(function (feature) {
-                                    topic.publish("feature.highlightDiagram", { geom: feature.geom }, { uniqueId: item[m[1]] / item[m[0]] });
-                                });
-                            }
-                        }
-                        ));
-                findDiff(value, disable, [["id", "layerId"]]);
-            }
-        },
-
         execute: function (pixel) {
-            this.clear();
             var tool = this,
                 olMap = this.display.map.olMap,
                 point = olMap.getCoordinateFromPixel(pixel);
@@ -751,21 +566,17 @@ define([
             zoom
         ) {
             const identifyDeferred = new Deferred();
-            const getLayerInfo = api
-                .route("resource.item", {
-                    id: layerId,
-                })
-                .get();
+            const urlGetLayerInfo = api.routeURL("resource.item", {
+                id: layerId,
+            });
+            const getLayerInfo = xhr.get(urlGetLayerInfo, { handleAs: "json" });
 
-            const query = {
-                limit: 1,
-            };
+            const query = { limit: 1 };
             query[`fld_${attrName}__eq`] = attrValue;
 
-            const getFeaturesUrl = api.routeURL(
-                "feature_layer.feature.collection",
-                { id: layerId }
-            );
+            const getFeaturesUrl = api.routeURL("feature_layer.feature.collection", {
+                id: layerId,
+            });
             const getFeatures = xhr.get(getFeaturesUrl, {
                 handleAs: "json",
                 query,

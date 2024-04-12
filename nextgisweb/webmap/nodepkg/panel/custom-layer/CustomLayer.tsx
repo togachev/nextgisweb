@@ -8,7 +8,8 @@ import { PanelHeader } from "../header";
 
 import { UploadLayer } from "./UploadLayer";
 import { DrawFeatures } from "./DrawFeatures";
-import type { DojoDisplay, DojoTopic } from "../type";
+import type { DojoDisplay } from "../type";
+import type { DojoTopic } from "../panels-manager/type";
 
 interface CustomLayerProps {
     display: DojoDisplay;

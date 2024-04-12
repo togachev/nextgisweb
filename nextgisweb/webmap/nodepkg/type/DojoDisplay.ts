@@ -70,6 +70,7 @@ export interface DojoDisplayIdentify {
         zoom?: number
     ) => PromiseLike<boolean>;
     reset: () => void;
+    _requestGeomString: (value: number[]) => void;
 }
 
 export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
@@ -104,6 +105,9 @@ export interface DojoDisplay extends dijit._WidgetBase {
      */
     _layers: Record<number, WebmapLayer>;
     _extent: number[];
+
+    _itemConfigById: string[];
+    getVisibleItems: () => Promise<any>;
 }
 
 export interface PluginParams {

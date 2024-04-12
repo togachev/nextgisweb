@@ -1007,7 +1007,11 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/description"),
+                    cls: reactPanel("@nextgisweb/webmap/panel/description", {
+                        props: {
+                            topic: topic,
+                        },
+                    }),
                     params: {
                         title: gettext("Description"),
                         name: "info",
@@ -1025,7 +1029,11 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/diagram"),
+                    cls: reactPanel("@nextgisweb/webmap/panel/diagram", {
+                        props: {
+                            topic: topic,
+                        },
+                    }),
                     params: {
                         title: gettext("Diagram"),
                         name: "diagram",

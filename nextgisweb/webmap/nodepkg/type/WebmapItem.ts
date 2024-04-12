@@ -8,4 +8,6 @@ export interface WebmapItem {
     styleId: number;
     type: string;
     visibility: boolean;
+    maxResolution: number;
+    minResolution: number;
 }

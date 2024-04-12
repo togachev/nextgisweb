@@ -184,6 +184,7 @@ def display(obj, request):
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
+                constraintField=getConstraint(item),
             )
 
             data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid

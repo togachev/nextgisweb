@@ -6,52 +6,52 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:842
+#: amd/ngw-webmap/Display.js:851
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:843
+#: amd/ngw-webmap/Display.js:852
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:935 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:944 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:946
+#: amd/ngw-webmap/Display.js:955
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:961 nodepkg/panel/custom-layer/CustomLayer.tsx:19
+#: amd/ngw-webmap/Display.js:970 nodepkg/panel/custom-layer/CustomLayer.tsx:20
 msgid "CustomLayer"
 msgstr "Пользовательские слои"
 
-#: amd/ngw-webmap/Display.js:971
+#: amd/ngw-webmap/Display.js:980
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:985
+#: amd/ngw-webmap/Display.js:994
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1003 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1016 amd/ngw-webmap/plugin/LayerInfo.js:29
 #: nodepkg/panel/description/DescriptionPanel.js:8
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1021
+#: amd/ngw-webmap/Display.js:1038
 msgid "Diagram"
 msgstr ""
 
-#: amd/ngw-webmap/Display.js:1041
+#: amd/ngw-webmap/Display.js:1058
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1093
+#: amd/ngw-webmap/Display.js:1110
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:1134
+#: amd/ngw-webmap/Display.js:1155
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -70,7 +70,7 @@ msgstr "Учитывать на карте"
 #: amd/ngw-webmap/ItemWidget.js:179
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:37
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:38
 #: nodepkg/settings/SettingsForm.js:331
 msgid "Save"
 msgstr "Сохранить"
@@ -156,7 +156,7 @@ msgid "Style settings"
 msgstr "Настройки стиля"
 
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:25 nodepkg/layers-tree/IconItem.js:24
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:39
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:40
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:38
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -267,19 +267,19 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:290
+#: amd/ngw-webmap/tool/Identify.js:282
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:302
+#: amd/ngw-webmap/tool/Identify.js:294
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: amd/ngw-webmap/tool/Identify.js:400 amd/ngw-webmap/tool/Identify.js:420
+#: amd/ngw-webmap/tool/Identify.js:392 amd/ngw-webmap/tool/Identify.js:408
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:735
+#: amd/ngw-webmap/tool/Identify.js:550
 msgid "Features"
 msgstr "Объектов"
 
@@ -339,7 +339,7 @@ msgid "Cancel"
 msgstr "Отменить"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:119
-#: nodepkg/panel/diagram/DiagramPanel.js:19
+#: nodepkg/panel/diagram/DiagramPanel.tsx:26
 msgid "Delete"
 msgstr "Удалить"
 
@@ -352,7 +352,7 @@ msgid "Create as private"
 msgstr "Создать как приватную"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:36
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:37
 msgid "Create"
 msgstr "Создать"
 
@@ -411,7 +411,7 @@ msgstr "Не сохранять"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:28 model.py:47 view.py:381 view.py:418
+#: model.py:28 model.py:47 view.py:382 view.py:419
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -435,7 +435,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:396
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:397
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -443,59 +443,59 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:59
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:62
 msgid "Radius:"
 msgstr "Радиус"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:60
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:63
 #: nodepkg/utils/format-units.tsx:13
 msgid "m"
 msgstr "м"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:80
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:83
 msgid "Circle"
 msgstr "Окружность"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:87
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:90
 #: nodepkg/panel/annotations/AnnotationsPanel.js:109
 msgid "Line"
 msgstr "Линия"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:93
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:96
 msgid "Rectangle"
 msgstr ""
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:100
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:103
 #: nodepkg/panel/annotations/AnnotationsPanel.js:113
 #: nodepkg/utils/geometry-types.ts:15
 msgid "Polygon"
 msgstr "Полигон"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:118
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:121
 msgid "Hide"
 msgstr "Скрыть"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:118
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:121
 msgid "Show"
 msgstr "Показать"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:123
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:126
 msgid "Zoom to filtering geometry"
 msgstr "Увеличить"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:128
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:131
 msgid "Clear filtering geometry"
 msgstr "Очистить"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:134
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:137
 msgid "Draw filtering geometry"
 msgstr "Нарисовать геометрию для фильтра"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:135
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:138
 msgid "Change filtering geometry"
 msgstr "Изменить геометрию для фильтра"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:136
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:139
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
@@ -613,87 +613,87 @@ msgstr "Мои приватные аннотации"
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:20
+#: nodepkg/panel/custom-layer/CustomLayer.tsx:21
 #: nodepkg/webmap-tabs/WebMapTabs.tsx:16
 msgid "Loading"
 msgstr "Загрузка"
 
-#: nodepkg/panel/custom-layer/CustomLayer.tsx:21
+#: nodepkg/panel/custom-layer/CustomLayer.tsx:22
 msgid "Creation"
 msgstr "Создание"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:38
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:39
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:36
 msgid "Delete Layer"
 msgstr "Удалить слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:40
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:41
 msgid "Edit layer"
 msgstr "Редактировать слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:41
-#: nodepkg/panel/print/PrintPanel.tsx:571
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:42
+#: nodepkg/panel/print/PrintPanel.tsx:572
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:42
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:35
 msgid "Delete all layers"
 msgstr "Удалить все слои"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:43
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:44
 msgid "The limit of created layers has been exceeded"
 msgstr "Превышен лимит созданных слоев"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:44
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:45
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:45
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:46
 msgid "Segment"
 msgstr "Сегмент"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:46
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:47
 msgid "Vertex"
 msgstr "Вершина"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:47
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:48
 msgid "To all layers"
 msgstr "Ко всем слоям"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:48
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:49
 msgid "To current layer"
 msgstr "К текущему слою"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:49
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:50
 msgid "Stick Tool"
 msgstr "Инструмент прилипания"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:50
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:51
 msgid "Enable edit mode after layer creation"
 msgstr "Включить режим редактирования после создания слоя"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:51
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:52
 msgid "Do not enable edit mode after creating a layer"
 msgstr "Не включать режим редактирования после создания слоя"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:52
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
 msgid "Maximum layers/created:"
 msgstr "Максимум слоев/созданно:"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:53
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:54
 msgid "line layer"
 msgstr "линейный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:54
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:55
 msgid "polygon layer"
 msgstr "полигональный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:55
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:56
 msgid "point layer"
 msgstr "точечный слой"
 
-#: nodepkg/panel/custom-layer/DrawFeatures.tsx:56
+#: nodepkg/panel/custom-layer/DrawFeatures.tsx:57
 msgid "Change geometry"
 msgstr "Изменить геометрию"
 
@@ -737,87 +737,59 @@ msgstr "Слой"
 msgid "Style"
 msgstr "Стиль"
 
-#: nodepkg/panel/diagram/DiagramPanel.js:16
+#: nodepkg/panel/diagram/DiagramPanel.tsx:23
+msgid "Font size"
+msgstr "Размер шрифта"
+
+#: nodepkg/panel/diagram/DiagramPanel.tsx:25
 msgid "Diagrams"
 msgstr "Диаграммы"
 
-#: nodepkg/panel/diagram/DiagramPanel.js:17
-msgid "Build"
-msgstr "Построить"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:18
-msgid "Rebuild"
-msgstr "Перестроить"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:20
-msgid "The calculation is performed for the last selected object"
-msgstr "Рассчет производится для последнего выделенного объекта"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:21
-msgid "To select objects, press and hold the CTRL key"
-msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:22
-msgid "Forecasting"
-msgstr "Прогнозирование"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:23
-msgid "Recovery"
-msgstr "Восстановление"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:24
-msgid "Count of trajectories"
-msgstr "Количество траекторий"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:25
-msgid "Prediction and recovery"
-msgstr "Прогнозирование и восстановление"
-
-#: nodepkg/panel/diagram/DiagramPanel.js:26
-msgid "Graphs based on static data"
-msgstr "Графики на основе статических данных"
+#: nodepkg/panel/diagram/DiagramPanel.tsx:27
+msgid "Clear"
+msgstr "Очистить"
 
 #: nodepkg/panel/layers/LayersDropdown.js:12
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/print/PrintPanel.tsx:267
+#: nodepkg/panel/print/PrintPanel.tsx:268
 msgid "Custom scale"
 msgstr ""
 
-#: nodepkg/panel/print/PrintPanel.tsx:468
+#: nodepkg/panel/print/PrintPanel.tsx:469
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:478
+#: nodepkg/panel/print/PrintPanel.tsx:479
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:494
+#: nodepkg/panel/print/PrintPanel.tsx:495
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:510
+#: nodepkg/panel/print/PrintPanel.tsx:511
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:526 nodepkg/panel/print/PrintPanel.tsx:547
+#: nodepkg/panel/print/PrintPanel.tsx:527 nodepkg/panel/print/PrintPanel.tsx:548
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:533
+#: nodepkg/panel/print/PrintPanel.tsx:534
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:542
+#: nodepkg/panel/print/PrintPanel.tsx:543
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:563
+#: nodepkg/panel/print/PrintPanel.tsx:564
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintPanel.tsx:583
+#: nodepkg/panel/print/PrintPanel.tsx:584
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
 
@@ -1207,23 +1179,50 @@ msgstr ""
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:297
+#: view.py:298
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:310
+#: view.py:311
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:332
+#: view.py:333
 msgid "Setting up a web map group"
 msgstr ""
 
-#: view.py:386
+#: view.py:387
 msgid "Display"
 msgstr "Открыть"
 
-#: view.py:406
+#: view.py:407
 msgid "Group setting"
 msgstr "Настройка группы"
+
+#~ msgid "Build"
+#~ msgstr "Построить"
+
+#~ msgid "Rebuild"
+#~ msgstr "Перестроить"
+
+#~ msgid "The calculation is performed for the last selected object"
+#~ msgstr "Рассчет производится для последнего выделенного объекта"
+
+#~ msgid "To select objects, press and hold the CTRL key"
+#~ msgstr "Для выделения объектов нажмите и удерживайте нажатой клавишу CTRL"
+
+#~ msgid "Forecasting"
+#~ msgstr "Прогнозирование"
+
+#~ msgid "Recovery"
+#~ msgstr "Восстановление"
+
+#~ msgid "Count of trajectories"
+#~ msgstr "Количество траекторий"
+
+#~ msgid "Prediction and recovery"
+#~ msgstr "Прогнозирование и восстановление"
+
+#~ msgid "Graphs based on static data"
+#~ msgstr "Графики на основе статических данных"
 

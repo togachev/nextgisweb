@@ -20,7 +20,8 @@ import { useDraw } from "./hook/useDraw";
 import "./DrawFeatures.less";
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
-import type { DojoTopic, DojoDisplay } from "../type";
+import type { DojoDisplay } from "../type";
+import type { DojoTopic } from "../panels-manager/type";
 import type { ItemType, ItemProps } from "./type";
 
 import { DrawStore } from "./DrawStore";
