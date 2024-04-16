@@ -12,10 +12,3 @@
 .ngwPopup .dijitTooltipContainer {
     overflow: hidden;
 }
-.ngwPopup .featureLink {
-    padding: 0 0 0 5px;
-}
-
-.ngwPopup .featureLink--nofeature {
-    display: none;
-}

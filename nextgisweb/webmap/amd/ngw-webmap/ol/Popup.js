@@ -56,15 +56,6 @@ define([
             "last"
         );
 
-        this.linkSpan = domConstruct.create(
-            "span",
-            {
-                class: "featureLink",
-            },
-            this.titleBar,
-            "last"
-        );
-
         // Close button in the header
         this._closeSpan = domConstruct.create(
             "span",

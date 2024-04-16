@@ -13,16 +13,19 @@
 .ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode {
     border-radius: 0;
-    padding: 1px;
-    height: 20px;
+    padding: 0px;
+    height: 24px;
+    font-size: 18px;
+    border: 0;
+    box-shadow: none;
+    width: 40px;
 }
 
 .ngwWebmapToolIdentify-controller
     .dijitToggleButton:first-child
     .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton:first-child .dijitButtonNode {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
+    border-radius: 3px;
 }
 
 .ngwWebmapToolIdentify-controller
@@ -50,6 +53,19 @@
     display: none;
 }
 
+.ngwPopup__coordLinkFeature {
+    display: flex;
+    padding: 0 !important;
+    align-items: center;
+    width: 100%;
+}
+
+.ngwPopup__linkFeature{
+    padding: 0 !important;
+    float: right;
+    overflow: hidden;
+}
+
 .ngwPopup__coordinates,
 .claro .ngwPopup__coordinates {
     box-sizing: border-box;
@@ -72,4 +88,25 @@
 
 .ngwPopup__features {
     border-bottom: 1px solid #efefef;
+}
+
+.dijitHidden {
+    position: absolute;
+    display: none;
+}
+
+.claro .dijitToggleButtonChecked .dijitButtonNode  {
+    background-color: #ffffff00;
+    color: var(--primary);
+}
+
+.claro .dijitToggleButton .dijitButtonNode {
+    background-image: none;
+    background-color: #ffffff00;
+    /* color: var(--icon-color); */
+}
+
+.dijitButton, .dijitComboButton, .dijitDropDownButton, .dijitToggleButton {
+    margin: 0;
+    vertical-align: middle;
 }

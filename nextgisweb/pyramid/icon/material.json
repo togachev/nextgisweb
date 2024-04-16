@@ -1,4 +1,8 @@
 [
     "close",
-    "content_copy"
+    "content_copy",
+    "table_view",
+    "query_stats",
+    "description",
+    "attachment"
 ]

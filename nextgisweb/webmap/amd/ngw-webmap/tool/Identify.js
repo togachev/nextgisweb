@@ -14,6 +14,7 @@ define([
     "dojo/dom-construct",
     "dojo/on",
     "dojo/topic",
+    "@nextgisweb/pyramid/icon",
     "dijit/_WidgetBase",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -54,6 +55,7 @@ define([
     domConstruct,
     on,
     topic,
+    icon,
     _WidgetBase,
     BorderContainer,
     ContentPane,
@@ -249,7 +251,6 @@ define([
             coordSwitcher._transformFrom(3857).then((transformedCoord) => {
                 const coordinates = transformedCoord;
                 const tool = this.tool;
-                const span = tool._popup.linkSpan
                 reactApp.default(
                     FeatureLinkComp.default,
                     {
@@ -258,7 +259,7 @@ define([
                         webmapId: tool.display.config.webmapId,
                         coordinates: coordinates,
                     },
-                    span
+                    this.linkFeaturePane.domNode
                 );
             });
         },
@@ -306,7 +307,7 @@ define([
                             resourceId: lid,
                             featureId: fid,
                             compact: true,
-                            title: i18n.gettext("Attributes"),
+                            title: icon.html({ glyph: "table_view" }),
                         });
 
                         widget._coordinateCopy(featureInfo);
@@ -320,7 +321,7 @@ define([
                             resourceId: lid,
                             featureId: fid,
                             compact: true,
-                            title: i18n.gettext("Geometry"),
+                            title: icon.html({ glyph: "query_stats" }),
                         });
                         geometryWidget.renderValue(lid, fid);
                         geometryWidget.placeAt(widget.extContainer);
@@ -392,11 +393,22 @@ define([
         },
 
         _displayCoordinates: function () {
-            this.coordinatePane = new ContentPane({
+            this.coordLinkPane = new ContentPane({
                 region: "bottom",
+                class: "ngwPopup__coordLinkFeature",
+            });
+            this.addChild(this.coordLinkPane);
+            this.coordinatePane = new ContentPane({
+                region: "left",
                 class: "ngwPopup__coordinates",
             });
-            this.addChild(this.coordinatePane);
+            this.coordLinkPane.addChild(this.coordinatePane);
+
+            this.linkFeaturePane = new ContentPane({
+                region: "right",
+                class: "ngwPopup__linkFeature",
+            });
+            this.coordLinkPane.addChild(this.linkFeaturePane);
 
             this._coordinateCopy(null);
 

@@ -4,9 +4,10 @@ define([
     "ngw-feature-layer/DisplayWidget",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/feature-attachment/attachment-table",
-], function (declare, { gettext }, DisplayWidget, reactApp, AttachmentTable) {
+    "@nextgisweb/pyramid/icon",
+], function (declare, { gettext }, DisplayWidget, reactApp, AttachmentTable, icon) {
     return declare([DisplayWidget], {
-        title: gettext("Attachments"),
+        title: icon.html({ glyph: "attachment" }),
 
         renderValue: function (value) {
             if (!value) {
