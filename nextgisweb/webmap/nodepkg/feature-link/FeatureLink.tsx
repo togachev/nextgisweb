@@ -1,7 +1,7 @@
 import { Button, message } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api/route";
-import ContentCopyIcon from "@nextgisweb/icon/material/content_copy";
+import LinkIcon from "@nextgisweb/icon/mdi/link";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./FeatureLink.less";
 
@@ -49,12 +49,11 @@ export const FeatureLink = ({ featureInfo, zoom, webmapId, coordinates }: Featur
         <>
             {contextHolder}
             <Button
-                style={{ width: 16 }}
                 size="small"
                 type="link"
                 title={gettext("Object link")}
                 className="copy-to-clipboard"
-                icon={<ContentCopyIcon />}
+                icon={<LinkIcon />}
                 onClick={() => {
                     copyLink();
                 }}
