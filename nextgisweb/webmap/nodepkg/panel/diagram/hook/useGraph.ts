@@ -1,35 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
-import type { DojoTopic } from "@nextgisweb/webmap/panels-manager/type";
-
 import { context, params } from "../constant";
-
-interface GraphProps {
-    display: DojoDisplay;
-    topic: DojoTopic;
-}
-
-interface RequestProps {
-    srs: number;
-    geom: string;
-    styles: string[];
-}
-
-interface AxisProps {
-    x: number;
-    y: number;
-}
-
-interface ContextItemProps {
-    label: string;
-    pointBorderColor: string;
-    backgroundColor: string;
-    borderColor: string;
-    data: AxisProps[];
-    labels: string[];
-}
+import type { GraphProps, RequestProps, ContextItemProps } from "./type";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 
 export const useGraph = ({ display, topic }: GraphProps) => {
     const olmap = display.map.olMap;
@@ -39,7 +12,7 @@ export const useGraph = ({ display, topic }: GraphProps) => {
         olmap.getLayers().forEach(layer => {
             if (layer.get("name") === "highlightDiagram") {
                 const uniqueId = value.resource_id / value.id
-                let status = layer.getSource().getFeatures().some(item => item.getProperties().uniqueId === uniqueId)
+                const status = layer.getSource().getFeatures().some(item => item.getProperties().uniqueId === uniqueId)
 
                 if (!status) {
                     topic.publish("feature.highlightDiagram",
@@ -60,7 +33,7 @@ export const useGraph = ({ display, topic }: GraphProps) => {
 
     useEffect(() => {
         if (Object.keys(featInfo).length > 0) {
-            Object.entries(featInfo).map(([key, value], i) => {
+            Object.entries(featInfo).map(([, value]) => {
                 checkSelect(value, false);
             })
         } else {
@@ -121,8 +94,8 @@ export const useGraph = ({ display, topic }: GraphProps) => {
                 })
         });
     });
-
-    const features = useCallback(async (value) => {
+    
+    const features = useCallback(async (value: FeatureItem) => {
         const feature = await route("resource.feature_diagram",
             value.column_key,
             value.column_constraint,
@@ -132,7 +105,7 @@ export const useGraph = ({ display, topic }: GraphProps) => {
         feature.sort(function (a, b) {
             return parseFloat(a.fields.year) - parseFloat(b.fields.year);
         });
-        let data: ContextItemProps[] = [];
+        const data: ContextItemProps[] = [];
         Object.keys(context).map(item => {
             const copy: ContextItemProps = structuredClone(context[item]);
             feature.map(i => {

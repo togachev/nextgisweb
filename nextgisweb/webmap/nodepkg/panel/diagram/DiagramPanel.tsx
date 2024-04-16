@@ -5,8 +5,7 @@ import { Scatter } from "react-chartjs-2";
 import { Chart, Title, registerables } from "chart.js";
 
 import type { InputNumberProps, SliderSingleProps } from "@nextgisweb/gui/antd";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
-import type { DojoTopic } from "@nextgisweb/webmap/panels-manager/type";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 Chart.register(...registerables);
 Chart.register(Title);
 
@@ -26,11 +25,11 @@ const title = gettext("Diagrams")
 const Delete = gettext("Delete");
 const Clear = gettext("Clear");
 
-interface DiagramProps {
-    display: DojoDisplay;
-    topic: DojoTopic;
-    close: () => void;
-}
+import type { DiagramProps } from "./type";
+
+type Entries<T> = {
+    [K in keyof T]: [K, T[K]];
+}[keyof T][];
 
 export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) => {
     const { checkSelect, displayFeatureInfo, features, featInfo, olmap, setFeatInfo } = useGraph({ display, topic });
@@ -48,7 +47,7 @@ export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) =
         olmap.on("click", (e) => {
             if (e.dragging) return;
             if (e.originalEvent.ctrlKey === true) {
-                if (display.panelsManager._activePanelKey && display.panelsManager._activePanelKey == "diagram") {
+                if (display.panelsManager._activePanelKey && display.panelsManager._activePanelKey === "diagram") {
                     displayFeatureInfo(e.pixel)
                 }
             }
@@ -63,25 +62,12 @@ export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) =
             }))
         }
         else {
-            console.log(Object.keys(featInfo).length);
             setSelected({})
             setResult({})
         }
     }, [featInfo]);
 
-
-    let plugins = [{
-        id: "legendDistance",
-        beforeInit(chart, args, opts) {
-            const originalFit = chart.legend.fit;
-            chart.legend.fit = function fit() {
-                originalFit.bind(chart.legend)();
-                this.height += opts.padding || 0;
-            }
-        }
-    }]
-
-    const build = (item) => {
+    const build = (item: FeatureItem) => {
         features(item).then((i) => {
             const obj = { props: i.props, data: { datasets: i.data } }
             setResult(prev => ({
@@ -91,20 +77,25 @@ export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) =
         })
     }
 
-    const clear = (key) => {
-        const { [key]: tmp, ...rest } = result;
-        setResult(rest);
+    const clear = (key: string) => {
+        const item = { ...result };
+        delete item[key];
+        setResult({ ...item });
     }
 
-    const remove = (key) => {
-        const { [key]: _r, ...r } = result;
-        setResult(r);
-        const { [key]: _s, ...s } = selected;
-        setSelected(s);
-        const { [key]: _f, ...f } = featInfo;
-        setFeatInfo(f);
+    const remove = (key: string) => {
+        clear(key)
+
+        const s = { ...selected };
+        delete s[key];
+        setSelected({ ...s });
+
+        const f = { ...featInfo };
+        delete f[key];
+        setFeatInfo({ ...f });
     }
-    const onChange: InputNumberProps["onChange"] = (value) => {
+
+    const onChange: InputNumberProps["onChange"] = (value: number) => {
         setSizeFont(value)
     };
 
@@ -117,7 +108,7 @@ export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) =
             )}
             {
                 Object.keys(selected).length > 0 &&
-                Object.entries(selected).map(
+                (Object.entries(selected) as Entries<typeof selected>).map(
                     ([key, value], i) => {
                         return (
                             <div key={i} className="item-graph">
@@ -153,9 +144,9 @@ export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) =
             }
             {
                 result && Object.keys(result).length > 0 &&
-                Object.entries(result).map(
-                    ([key, value], i) => {
-                        let options = {
+                (Object.entries(result) as Entries<typeof result>).map(
+                    ([, value], i) => {
+                        const options = {
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
@@ -232,7 +223,6 @@ export const DiagramPanel = observer(({ display, close, topic }: DiagramProps) =
                                     ref={chartRef}
                                     type="scatter"
                                     options={options}
-                                    plugins={plugins}
                                     data={value?.data}
                                 />
                             </div>
