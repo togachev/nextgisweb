@@ -68,7 +68,7 @@ define([
     ol,
     Popup,
     api,
-    i18n,
+    { gettext },
     FieldsDisplayWidget,
     GeometryInfoWidget,
     CoordinateSwitcher,
@@ -307,7 +307,7 @@ define([
                             resourceId: lid,
                             featureId: fid,
                             compact: true,
-                            title: icon.html({ glyph: "table_view" }),
+                            title: `<div class="custom-popup-button" title="${gettext("Attributes")}">` + icon.html({ glyph: "table_view" }) + `</div>`,
                         });
 
                         widget._coordinateCopy(featureInfo);
@@ -321,7 +321,7 @@ define([
                             resourceId: lid,
                             featureId: fid,
                             compact: true,
-                            title: icon.html({ glyph: "query_stats" }),
+                            title: `<div class="custom-popup-button" title="${gettext("Geometry")}">` + icon.html({ glyph: "query_stats" }) + `</div>`,
                         });
                         geometryWidget.renderValue(lid, fid);
                         geometryWidget.placeAt(widget.extContainer);
@@ -356,7 +356,8 @@ define([
                         }
 
                         widget.editButton = new Button({
-                            iconClass: "dijitIconEdit",
+                            innerHTML: `<div title="${gettext("Edit")}">` + icon.html({ glyph: "edit_note" }) + `</div>`,
+                            class:"custom-popup-button",
                             showLabel: true,
                             onClick: () =>
                                 openFeatureEditorTab({
@@ -432,7 +433,7 @@ define([
     });
 
     return declare(Base, {
-        label: i18n.gettext("Identify"),
+        label: gettext("Identify"),
         iconClass: "iconIdentify",
 
         pixelRadius: webmapSettings.identify_radius,
@@ -448,7 +449,7 @@ define([
             this._bindEvents();
 
             this._popup = new Popup({
-                title: i18n.gettext("Identify"),
+                title: gettext("Identify"),
                 size: [this.popupWidth, this.popupHeight],
             });
             this.display.map.olMap.addOverlay(this._popup);
@@ -590,7 +591,7 @@ define([
             widget.placeAt(this._popup.contentDiv);
 
             this._popup.setTitle(
-                i18n.gettext("Features") + ": " + response.featureCount
+                gettext("Features") + ": " + response.featureCount
             );
 
             this._popup.setPosition(point);
@@ -702,7 +703,7 @@ define([
                 widget.placeAt(this._popup.contentDiv);
 
                 this._popup.setTitle(
-                    i18n.gettext("Features") + ": " + 0
+                    gettext("Features") + ": " + 0
                 );
                 this._popup.setPosition(point);
                 this._popup._closeSpan.onclick = () => {

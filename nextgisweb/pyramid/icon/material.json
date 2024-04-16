@@ -4,5 +4,6 @@
     "table_view",
     "query_stats",
     "description",
-    "attachment"
+    "attachment",
+    "edit_note"
 ]

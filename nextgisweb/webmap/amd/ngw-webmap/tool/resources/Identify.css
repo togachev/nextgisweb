@@ -21,30 +21,20 @@
     width: 40px;
 }
 
-.ngwWebmapToolIdentify-controller
-    .dijitToggleButton:first-child
-    .dijitButtonNode,
+.ngwWebmapToolIdentify-controller .dijitToggleButton:first-child .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton:first-child .dijitButtonNode {
     border-radius: 3px;
 }
 
-.ngwWebmapToolIdentify-controller
-    .dijitToggleButton:last-child
-    .dijitButtonNode,
+.ngwWebmapToolIdentify-controller .dijitToggleButton:last-child .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton:last-child .dijitButtonNode {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
-.ngwWebmapToolIdentify-controller
-    .dijitToggleButton
-    .dijitButtonNode
-    .dijitButtonText,
-.ngwWebmapToolIdentify-controller
-    .dijitButton
-    .dijitButtonNode
-    .dijitButtonText {
-    padding: 1px 2px;
+.ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode .dijitButtonText,
+.ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode .dijitButtonText {
+    padding: 0;
 }
 
 /* На кнопках без подписи прячем элемент подписи совсем */
@@ -60,7 +50,7 @@
     width: 100%;
 }
 
-.ngwPopup__linkFeature{
+.ngwPopup__linkFeature {
     padding: 0 !important;
     float: right;
     overflow: hidden;
@@ -95,7 +85,7 @@
     display: none;
 }
 
-.claro .dijitToggleButtonChecked .dijitButtonNode  {
+.claro .dijitToggleButtonChecked .dijitButtonNode {
     background-color: #ffffff00;
     color: var(--primary);
 }
@@ -103,10 +93,43 @@
 .claro .dijitToggleButton .dijitButtonNode {
     background-image: none;
     background-color: #ffffff00;
-    /* color: var(--icon-color); */
 }
 
-.dijitButton, .dijitComboButton, .dijitDropDownButton, .dijitToggleButton {
+.dijitButton,
+.dijitComboButton,
+.dijitDropDownButton,
+.dijitToggleButton {
     margin: 0;
     vertical-align: middle;
+}
+
+.claro .dijitButton .dijitButtonNode {
+    background-color: #ffffff00;
+    background-image: none;
+}
+
+.claro .dijitButtonHover .dijitButtonNode {
+    background-color: #ffffff00;
+    background-image: none;
+}
+
+.custom-popup-button {
+    background-color: #ffffff00;
+    width: 40px;
+    height: 24px;
+}
+
+.custom-popup-button:hover {
+    background-color: #acacac20;
+    border-radius: 3px;
+}
+
+.ngwWebmapToolIdentify-controller .dijitToggleButton:hover {
+    background-color: #ffffff00;
+    border-radius: 3px;
+}
+
+.nextgis.claro .dijitButton:hover:before {
+    background-color: #ffffff00;
+    opacity: 0;
 }

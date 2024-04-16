@@ -7,7 +7,7 @@ define([
     "@nextgisweb/pyramid/icon",
 ], function (declare, { gettext }, DisplayWidget, reactApp, AttachmentTable, icon) {
     return declare([DisplayWidget], {
-        title: icon.html({ glyph: "attachment" }),
+        title: `<div class="custom-popup-button" title="${gettext("Attachments")}">` + icon.html({ glyph: "attachment" }) + `</div>`,
 
         renderValue: function (value) {
             if (!value) {
