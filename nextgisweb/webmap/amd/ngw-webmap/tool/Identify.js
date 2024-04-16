@@ -101,7 +101,6 @@ define([
             featureEditorModal
         ) => {
             featureEditorModal.showFeatureEditorModal({
-                bodyStyle: { height: "100%" },
                 editorOptions: {
                     featureId,
                     resourceId,
