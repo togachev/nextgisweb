@@ -134,7 +134,7 @@ export const useGraph = ({ display, topic }: GraphProps) => {
         });
         let data: ContextItemProps[] = [];
         Object.keys(context).map(item => {
-            const copy: ContextItemProps = { ...context[item] };
+            const copy: ContextItemProps = structuredClone(context[item]);
             feature.map(i => {
                 if (item === i.fields.type) {
                     Object.assign(copy, { key: i.fields.type });
