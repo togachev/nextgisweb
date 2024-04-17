@@ -12,11 +12,18 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export const MapDesc = ({description, display, upath_info}) => {
+export const MapDesc = ({ description, display, upath_info }) => {
     const options = {
         replace: item => {
             if (item instanceof Element && item.attribs && item.name === 'img') {
-                return <Image src={item.attribs.src}>item</Image>;
+                return (<span className="img-style">
+                    <span className="img-item">
+                        <Image src={item.attribs.src}>item</Image>
+                    </span>
+                </span>);
+            }
+            if (item instanceof Element && item.attribs && item.name === 'p') {
+                return <span className="p-padding">{domToReact(item.children, options)}</span>;
             }
             if (item instanceof Element && item.name === 'a' && !upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
@@ -31,7 +38,7 @@ export const MapDesc = ({description, display, upath_info}) => {
             /*
                 Если открыты свойства ресурса, ссылка на объект удаляется, остается заголовок.
                 Можно оставить ссылку, и добавить переход к объекту в таблице ресурса или к объекту на карте.
-            */ 
+            */
             if (item instanceof Element && item.name === 'a' && upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<>{domToReact(item.children, options)}</>);

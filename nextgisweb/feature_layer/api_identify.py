@@ -39,6 +39,7 @@ def identify(request) -> JSONType:
                 dict(
                     id=f.id,
                     layerId=layer.id,
+                    styleId=style.id,
                     label=f.label,
                     fields=f.fields,
                 )

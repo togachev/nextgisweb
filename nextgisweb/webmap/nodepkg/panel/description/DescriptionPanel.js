@@ -22,7 +22,11 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
     const options = {
         replace: item => {
             if (item instanceof Element && item.attribs && item.name === 'img') {
-                return <Image className="image-background" src={item.attribs.src}>item</Image>;
+                return (<span className="img-style">
+                    <span className="img-item">
+                        <Image src={item.attribs.src}>item</Image>
+                    </span>
+                </span>);
             }
             if (item instanceof Element && item.attribs && item.name === 'p') {
                 return <span className="p-padding">{domToReact(item.children, options)}</span>;
