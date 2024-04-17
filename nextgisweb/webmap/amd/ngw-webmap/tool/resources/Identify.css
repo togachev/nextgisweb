@@ -133,3 +133,12 @@
     background-color: #ffffff00;
     opacity: 0;
 }
+
+
+.other-style {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: space-evenly;
+    border-bottom: solid #eeeeee 0.005em;
+}

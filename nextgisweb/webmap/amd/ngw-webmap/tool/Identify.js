@@ -295,7 +295,7 @@ define([
                     });
                     domClass.add(
                         widget.extController.domNode,
-                        "ngwWebmapToolIdentify-controller"
+                        "ngwWebmapToolIdentify-controller other-style"
                     );
 
                     widget.featureContainer.addChild(widget.extController);
