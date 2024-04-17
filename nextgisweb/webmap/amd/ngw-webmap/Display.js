@@ -26,6 +26,7 @@ define([
     "./ui/react-webmap-tabs",
     // tools
     "@nextgisweb/webmap/map-controls",
+    "@nextgisweb/webmap/identify-module",
     // Tiny display
     "ngw-webmap/controls/LinkToMainMap",
     // panels
@@ -68,6 +69,7 @@ define([
     reactPanel,
     ReactWebMapTabs,
     MapControls,
+    IdentifyModule,
     LinkToMainMap,
     LayersPanelModule,
     URL,
@@ -447,6 +449,8 @@ define([
             });
 
             const controlsReady = MapControls.buildControls(this);
+            
+            this.identifyModule = new IdentifyModule.default(this);
 
             if (controlsReady.has("id")) {
                 const { control } = controlsReady.get("id");
