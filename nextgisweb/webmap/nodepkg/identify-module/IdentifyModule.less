@@ -1,25 +1,35 @@
 .icon-position {
-    right: -0.507em;
-    top: -0.78em;
+    right: -10px;
+    top: -10px;
     position: absolute;
-    font-size: 14px;
-    color: #ff0000;
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
     pointer-events: none;
+    line-height: 0;
 }
 
 .context-position {
     left: 0;
     top: 0;
     position: absolute;
-    height: 200px;
-    width: 200px;
+    padding: 0;
+    min-width: 150px;
     background-color: white;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 2px;
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
+    border-radius: 2px;
     box-shadow: 0 0 0 0.01em #106a90;
     user-select: text;
-    z-index: 9990;
     pointer-events: auto;
+
+    .context-item {
+        cursor: pointer;
+        padding: 5px;
+        user-select: none;
+        
+        &:hover {
+            background-color: #F5F5F5;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    }
 }

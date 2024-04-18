@@ -7,10 +7,3 @@ export function html({ collection, glyph, variant }) {
         (variant && variant !== "baseline" ? `-${variant}` : "");
     return `<svg class="icon" fill="currentColor"><use xlink:href="#${id}"/></svg>`;
 }
-
-export function mdi({ collection, glyph, variant }) {
-    const id =
-        `icon-${collection || "mdi"}-${glyph}` +
-        (variant && variant !== "baseline" ? `-${variant}` : "");
-    return `<svg class="icon" fill="currentColor"><use xlink:href="#${id}"/></svg>`;
-}
