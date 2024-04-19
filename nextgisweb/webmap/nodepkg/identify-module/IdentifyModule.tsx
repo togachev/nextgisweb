@@ -6,8 +6,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./IdentifyModule.less";
 import { createRoot } from 'react-dom/client';
 import { Component } from 'react';
+import PopupArrow from "./popup_arrow.svg";
 
-const pointClick = `<svg role="presentation" viewBox="0 0 14 14"><g>
+const PointClick = `<svg role="presentation" viewBox="0 0 14 14"><g>
         <path d="m7 0c-3.864 0-7 3.136-7 7s3.136 7 7 7 7-3.136 7-7-3.136-7-7-7" fill="#106a90"/>
         <path d="m7 12.6c-3.094 0-5.6-2.506-5.6-5.6s2.506-5.6 5.6-5.6 5.6 2.506 5.6 5.6-2.506 5.6-5.6 5.6" fill="#fff"/>
         <path d="m7 3.5c-1.932 0-3.5 1.568-3.5 3.5s1.568 3.5 3.5 3.5 3.5-1.568 3.5-3.5-1.568-3.5-3.5-3.5" fill="#ff7b00"/>
@@ -26,6 +27,7 @@ const ContextContent = ({ title }: ContextContentProp) => {
     ]
     return (
         <div className="context-position">
+            <span className="icon-position-popup"><PopupArrow /></span>
             <div className="context-title">{title}</div>
             {
                 array.map(item => {
@@ -68,7 +70,7 @@ export class IdentifyModule extends Component {
 
     pointPosition = () => {
         const point = document.createElement("div");
-        point.innerHTML = `<span class="icon-position">${pointClick}</span>`;
+        point.innerHTML = `<span class="icon-position">${PointClick}</span>`;
 
         this.olmap.on(["contextmenu", "singleclick"], (e) => {
             if (e.dragging) return;

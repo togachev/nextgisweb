@@ -1,12 +1,22 @@
 .icon-position {
-    right: -10px;
-    top: -10px;
+    right: -9px;
+    top: -9px;
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     color: var(--primary);
     pointer-events: none;
     line-height: 0;
+}
+
+.icon-position-popup {
+    left: -5px;
+    top: -5px;
+    position: absolute;
+    pointer-events: none;
+    line-height: 0;
+    color: white;
+    font-size: 9px;
 }
 
 .context-position {
@@ -16,8 +26,11 @@
     padding: 0;
     min-width: 150px;
     background-color: white;
-    border-radius: 2px;
-    box-shadow: 0 0 0 0.01em #106a90;
+    border-top-left-radius: 0;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border: solid 1px #106a90;
     user-select: text;
     pointer-events: auto;
 
