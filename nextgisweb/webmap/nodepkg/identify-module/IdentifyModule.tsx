@@ -7,6 +7,7 @@ import "./IdentifyModule.less";
 import { createRoot } from 'react-dom/client';
 import { Component } from 'react';
 import PopupArrow from "./popup_arrow.svg";
+import { createPortal } from 'react-dom';
 
 const PointClick = `<svg role="presentation" viewBox="0 0 14 14"><g>
         <path d="m7 0c-3.864 0-7 3.136-7 7s3.136 7 7 7 7-3.136 7-7-3.136-7-7-7" fill="#106a90"/>
@@ -42,6 +43,15 @@ const ContextContent = ({ title }: ContextContentProp) => {
     )
 }
 
+const Popup = () => {
+    return (
+        createPortal(
+            <div style={{ padding: '5px', borderRadius: '3px', right: '10px', top: '50px', background: '#fff', position: 'absolute', width: 250, height: 250 }}>This child is placed in the document body.</div>,
+            document.body
+        )
+    )
+}
+
 export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: OlMap;
@@ -71,12 +81,15 @@ export class IdentifyModule extends Component {
     pointPosition = () => {
         const point = document.createElement("div");
         point.innerHTML = `<span class="icon-position">${PointClick}</span>`;
+        const popup = document.createElement("div");
+        const root = createRoot(popup);
 
         this.olmap.on(["contextmenu", "singleclick"], (e) => {
             if (e.dragging) return;
             if (e.type === "singleclick" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
                 this.setContext(point)
                 this.overlay.setPosition(e.coordinate);
+                root.render(<Popup />);
             }
         });
     }
