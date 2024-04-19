@@ -450,7 +450,11 @@ define([
 
             const controlsReady = MapControls.buildControls(this);
             
-            this.identifyModule = new IdentifyModule.default(this);
+
+            if (controlsReady.has("im")) {
+                const { control } = controlsReady.get("im");
+                this.identify_module = control;
+            }
 
             if (controlsReady.has("id")) {
                 const { control } = controlsReady.get("id");
@@ -843,22 +847,22 @@ define([
                 return;
             }
 
-            this.identify
-                .identifyFeatureByAttrValue(
-                    urlParams.hl_lid,
-                    urlParams.hl_attr,
-                    urlParams.hl_val,
-                    urlParams.zoom
-                )
-                .then((result) => {
-                    if (result) return;
-                    errorModule.errorModal({
-                        title: gettext("Object not found"),
-                        message: gettext(
-                            "Object from URL parameters not found"
-                        ),
-                    });
-                });
+            // this.identify
+            //     .identifyFeatureByAttrValue(
+            //         urlParams.hl_lid,
+            //         urlParams.hl_attr,
+            //         urlParams.hl_val,
+            //         urlParams.zoom
+            //     )
+            //     .then((result) => {
+            //         if (result) return;
+            //         errorModule.errorModal({
+            //             title: gettext("Object not found"),
+            //             message: gettext(
+            //                 "Object from URL parameters not found"
+            //             ),
+            //         });
+            //     });
         },
 
         _identifyLonLat: function () {
@@ -873,17 +877,17 @@ define([
                 return;
             }
             const { lon, lat } = urlParams;
-            this.identify
-                .identifyLonLat(lon, lat)
-                .then((result) => {
-                    if (result) return;
-                    errorModule.errorModal({
-                        title: gettext("Object not found"),
-                        message: gettext(
-                            "Object from URL parameters not found"
-                        ),
-                    });
-                });
+            // this.identify
+            //     .identifyLonLat(lon, lat)
+            //     .then((result) => {
+            //         if (result) return;
+            //         errorModule.errorModal({
+            //             title: gettext("Object not found"),
+            //             message: gettext(
+            //                 "Object from URL parameters not found"
+            //             ),
+            //         });
+            //     });
         },
 
         _handleTinyDisplayMode: function () {

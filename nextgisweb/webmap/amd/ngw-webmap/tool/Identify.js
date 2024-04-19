@@ -89,7 +89,7 @@ define([
     Control.prototype.constructor = Control;
 
     Control.prototype.handleClickEvent = function (e) {
-        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === true) {
             this.tool.execute(e.pixel);
             e.preventDefault();
         }
