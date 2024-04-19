@@ -847,22 +847,22 @@ define([
                 return;
             }
 
-            // this.identify
-            //     .identifyFeatureByAttrValue(
-            //         urlParams.hl_lid,
-            //         urlParams.hl_attr,
-            //         urlParams.hl_val,
-            //         urlParams.zoom
-            //     )
-            //     .then((result) => {
-            //         if (result) return;
-            //         errorModule.errorModal({
-            //             title: gettext("Object not found"),
-            //             message: gettext(
-            //                 "Object from URL parameters not found"
-            //             ),
-            //         });
-            //     });
+            this.identify
+                .identifyFeatureByAttrValue(
+                    urlParams.hl_lid,
+                    urlParams.hl_attr,
+                    urlParams.hl_val,
+                    urlParams.zoom
+                )
+                .then((result) => {
+                    if (result) return;
+                    errorModule.errorModal({
+                        title: gettext("Object not found"),
+                        message: gettext(
+                            "Object from URL parameters not found"
+                        ),
+                    });
+                });
         },
 
         _identifyLonLat: function () {
@@ -877,17 +877,17 @@ define([
                 return;
             }
             const { lon, lat } = urlParams;
-            // this.identify
-            //     .identifyLonLat(lon, lat)
-            //     .then((result) => {
-            //         if (result) return;
-            //         errorModule.errorModal({
-            //             title: gettext("Object not found"),
-            //             message: gettext(
-            //                 "Object from URL parameters not found"
-            //             ),
-            //         });
-            //     });
+            this.identify
+                .identifyLonLat(lon, lat)
+                .then((result) => {
+                    if (result) return;
+                    errorModule.errorModal({
+                        title: gettext("Object not found"),
+                        message: gettext(
+                            "Object from URL parameters not found"
+                        ),
+                    });
+                });
         },
 
         _handleTinyDisplayMode: function () {
