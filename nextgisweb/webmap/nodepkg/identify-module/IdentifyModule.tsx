@@ -6,47 +6,45 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./IdentifyModule.less";
 import { createRoot } from 'react-dom/client';
 import { Component } from 'react';
-import PopupArrow from "./popup_arrow.svg";
+import { pointClick } from "./icons/icon";
 import { createPortal } from 'react-dom';
+import { usePointPopup } from "./hook/usePointPopup";
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
-const PointClick = `<svg role="presentation" viewBox="0 0 14 14"><g>
-        <path d="m7 0c-3.864 0-7 3.136-7 7s3.136 7 7 7 7-3.136 7-7-3.136-7-7-7" fill="#106a90"/>
-        <path d="m7 12.6c-3.094 0-5.6-2.506-5.6-5.6s2.506-5.6 5.6-5.6 5.6 2.506 5.6 5.6-2.506 5.6-5.6 5.6" fill="#fff"/>
-        <path d="m7 3.5c-1.932 0-3.5 1.568-3.5 3.5s1.568 3.5 3.5 3.5 3.5-1.568 3.5-3.5-1.568-3.5-3.5-3.5" fill="#ff7b00"/>
-        </g></svg>`;
-
-interface ContextContentProp {
-    title?: string;
+const Popup = ({ coordinate, settings }) => {
+    return (
+        createPortal(
+            <div className="popup-position" style={{ border: 'solid #106a90 1px', padding: '5px', borderRadius: '3px', right: '10px', top: '50px', background: '#fff', position: 'absolute', width: settings.popup_width, height: settings.popup_height }}>{coordinate[0]}</div>,
+            document.body
+        )
+    )
 }
 
-const ContextContent = ({ title }: ContextContentProp) => {
+const PopupContext = ({ event }) => {
+    const { positionPopup } = usePointPopup();
+    const [ width, height ] = [250, 250];
+    const pos = positionPopup(event, width, height)
     const array = [
         { key: 1, title: 'title 1', result: 'content 1' },
         { key: 2, title: 'title 2', result: 'content 2' },
         { key: 3, title: 'title 3', result: 'content 3' },
         { key: 4, title: 'title 4', result: 'content 4' },
     ]
-    return (
-        <div className="context-position">
-            <span className="icon-position-popup"><PopupArrow /></span>
-            <div className="context-title">{title}</div>
-            {
-                array.map(item => {
-                    return (
-                        <div className="context-item" key={item.key} onClick={() => { console.log(item.result) }} >
-                            <span>{item.title}</span>
-                        </div>
-                    )
-                })
-            }
-        </div>
-    )
-}
 
-const Popup = () => {
     return (
         createPortal(
-            <div style={{ padding: '5px', borderRadius: '3px', right: '10px', top: '50px', background: '#fff', position: 'absolute', width: 250, height: 250 }}>This child is placed in the document body.</div>,
+            <div className="context-position" style={{ width: width, height: height, left: pos[0] + 'px', top: pos[1] + 'px' }}>
+                <span className="context-title">{pos[2]}</span>
+                {
+                    array.map(item => {
+                        return (
+                            <div className="context-item" key={item.key} onClick={() => { console.log(item.result) }} >
+                                <span>{item.title}</span>
+                            </div>
+                        )
+                    })
+                }
+            </div>,
             document.body
         )
     )
@@ -56,11 +54,12 @@ export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: OlMap;
     private overlay: OlOverlay;
-
+    private settings: object;
     constructor(props: DojoDisplay) {
         super(props)
 
         this.display = props;
+        this.settings = webmapSettings;
         this.olmap = this.display.map.olMap;
         this.overlay = new Overlay({
             autoPan: true,
@@ -80,31 +79,30 @@ export class IdentifyModule extends Component {
 
     pointPosition = () => {
         const point = document.createElement("div");
-        point.innerHTML = `<span class="icon-position">${PointClick}</span>`;
+        point.innerHTML = `<span class="icon-position">${pointClick}</span>`;
         const popup = document.createElement("div");
         const root = createRoot(popup);
 
-        this.olmap.on(["contextmenu", "singleclick"], (e) => {
+        this.olmap.on("singleclick", (e) => {
             if (e.dragging) return;
             if (e.type === "singleclick" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
                 this.setContext(point)
                 this.overlay.setPosition(e.coordinate);
-                root.render(<Popup />);
+                root.render(<Popup settings={this.settings} coordinate={e.coordinate} />);
             }
         });
     }
 
     contextPopup = () => {
         const context = document.createElement("div");
-        context.title = gettext("Context menu right click map");
         const root = createRoot(context);
-
         this.olmap.on("contextmenu", (e) => {
             if (e.dragging) return;
             if (e.type === "contextmenu" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
                 this.setContext(context)
+
+                root.render(<PopupContext event={e} />);
                 this.overlay.setPosition(e.coordinate);
-                root.render(<ContextContent title={context.title} />);
             }
             e.preventDefault();
         });
