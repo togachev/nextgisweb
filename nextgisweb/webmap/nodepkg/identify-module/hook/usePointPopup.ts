@@ -1,33 +1,35 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const usePointPopup = () => {
-    const positionPopup = useCallback((event, width, height) => {
-        if (
-            event.originalEvent.layerX + width <= event.originalEvent.srcElement.clientWidth
-            && event.originalEvent.layerY + height <= event.originalEvent.srcElement.clientHeight
-        ) {
-            return [event.originalEvent.clientX, event.originalEvent.clientY, 'верхний левый']
-        }
-        
-        if (
-            event.originalEvent.layerX + width > event.originalEvent.srcElement.clientWidth
-            && event.originalEvent.layerY + height < event.originalEvent.srcElement.clientHeight
-        ) {
-            return [event.originalEvent.clientX - width, event.originalEvent.clientY, 'верхний правый']
-        }
 
+    const positionPopup = useCallback((e, width, height) => {
+        /*top left*/
         if (
-            event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth - width
-            && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
+            e.pixel[0] + width <= e.originalEvent.srcElement.clientWidth
+            && e.pixel[1] + height <= e.originalEvent.srcElement.clientHeight
         ) {
-            return [event.originalEvent.clientX, event.originalEvent.clientY - height, 'нижний левый']
+            return [0, 0]
         }
-
-        if (
-            event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth
-            && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
+        /*top right*/
+        else if (
+            e.pixel[0] + width > e.originalEvent.srcElement.clientWidth
+            && e.pixel[1] + height < e.originalEvent.srcElement.clientHeight
         ) {
-            return [event.originalEvent.clientX - width, event.originalEvent.clientY - height, 'нижний правый']
+            return [-width, 0]
+        }
+        /*bottom left*/
+        else if (
+            e.pixel[0] < e.originalEvent.srcElement.clientWidth - width
+            && e.pixel[1] < e.originalEvent.srcElement.clientHeight
+        ) {
+            return [0, -height]
+        }
+        /*bottom right*/
+        else if (
+            e.pixel[0] < e.originalEvent.srcElement.clientWidth
+            && e.pixel[1] < e.originalEvent.srcElement.clientHeight
+        ) {
+            return [-width, -height]
         }
     })
 

@@ -449,12 +449,6 @@ define([
             });
 
             const controlsReady = MapControls.buildControls(this);
-            
-
-            if (controlsReady.has("im")) {
-                const { control } = controlsReady.get("im");
-                this.identify_module = control;
-            }
 
             if (controlsReady.has("id")) {
                 const { control } = controlsReady.get("id");

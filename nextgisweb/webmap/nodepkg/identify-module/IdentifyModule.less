@@ -9,10 +9,33 @@
     line-height: 0;
 }
 
-popup-container {
+.popup-position {
+    border-radius: 3px;
+    border: solid 1px var(--primary);
+    background: #fff;
     position: absolute;
-    width: 300px;
-    height: 300px;
+
+    .title{
+        font-weight: 500;
+        display: flex;
+        padding: 0px 5px;
+        justify-content: center;
+        align-items: center;
+        border-bottom: solid var(--divider-color) 1px;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
+
+    .content {
+        font-weight: 500;
+        display: flex;
+        padding: 0px 5px;
+        justify-content: center;
+        align-items: center;
+        border-bottom: solid var(--divider-color) 1px;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
 }
 
 .icon-position-popup {
@@ -26,9 +49,9 @@ popup-container {
 }
 
 .context-position {
-    position: absolute;
+    overflow: auto;
     padding: 0;
-    min-width: 150px;
+    min-width: 100px;
     background: #ffffff;
     border-radius: 3px;
     border: solid 0px #106a90;
@@ -36,11 +59,14 @@ popup-container {
     pointer-events: auto;
 
     .context-title {
-        font-weight: 600;
+        font-weight: 500;
         display: flex;
-        padding: 5px;
+        padding: 0px 5px;
         justify-content: center;
         align-items: center;
+        border-bottom: solid var(--divider-color) 1px;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
     }
 
     .context-item {
