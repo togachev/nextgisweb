@@ -5,16 +5,17 @@ import type OlOverlay from 'ol/Overlay.js';
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./IdentifyModule.less";
 import { createRoot } from 'react-dom/client';
-import { Component } from 'react';
+import { Component, createRef, forwardRef, RefObject } from 'react';
 import { pointClick, popupPoint } from "./icons/icon";
-import { createPortal } from 'react-dom';
+import { createPortal, unmountComponentAtNode } from 'react-dom';
 import { usePointPopup } from "./hook/usePointPopup";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
-const Popup = ({ element, coordinate, settings }) => {
+const PopupComponent = forwardRef((props, ref) => {
+    const { element, coordinate, settings } = props;
     return (
         createPortal(
-            <div className="popup-position"
+            <div ref={ref} className="popup-position"
                 style={{
                     right: 10,
                     top: 50,
@@ -29,7 +30,7 @@ const Popup = ({ element, coordinate, settings }) => {
             document.body
         )
     )
-}
+});
 
 const PopupContext = ({ element, e }) => {
     const { positionPopup } = usePointPopup();
@@ -72,78 +73,60 @@ const PopupContext = ({ element, e }) => {
 export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: OlMap;
-    private overlay_context: OlOverlay;
-    private overlay_popup: OlOverlay;
+    private overlay: OlOverlay;
     private settings: object;
+    private refPopup: RefObject<HTMLInputElement>;
     constructor(props: DojoDisplay) {
         super(props)
 
         this.display = props;
         this.settings = webmapSettings;
         this.olmap = this.display.map.olMap;
-        this.addOverlayContext();
-        this.addOverlayPopup();
-        this.pointPosition();
-        this.contextPopup();
-        
+        this.addOverlay();
+        this.position();
+
+        this.refPopup = createRef();
     }
 
-    setContext = (value: HTMLElement) => {
-        this.overlay_context.setElement(value);
-    }
-    setPopup = (value: HTMLElement) => {
-        this.overlay_popup.setElement(value);
+    setValue = (value: HTMLElement) => {
+        this.overlay.setElement(value);
     }
 
-    addOverlayContext = () => {
-        this.overlay_context = new Overlay({
+    addOverlay = () => {
+        this.overlay = new Overlay({
             autoPan: true,
             stopEvent: true,
             autoPanAnimation: {
                 duration: 250,
             },
         });
-        this.olmap.addOverlay(this.overlay_context);
+        this.olmap.addOverlay(this.overlay);
     }
 
-    addOverlayPopup = () => {
-        this.overlay_popup = new Overlay({
-            autoPan: true,
-            stopEvent: true,
-            autoPanAnimation: {
-                duration: 250,
-            },
-        });
-        this.olmap.addOverlay(this.overlay_popup);
-    }
-    pointPosition = () => {
+    position = () => {
         const point = document.createElement("div");
         point.innerHTML = `<span class="icon-position">${pointClick}</span>`;
         const popup = document.createElement("div");
-        const root = createRoot(popup);
-        this.olmap.on("singleclick", (e) => {
+        const root_popup = createRoot(popup);
+
+        this.olmap.on(["singleclick", "contextmenu"], (e) => {
             if (e.dragging) return;
             if (e.type === "singleclick" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
-
-
-                this.setPopup(point)
-                root.render(<Popup element={this.overlay_popup.element} settings={this.settings} coordinate={e.coordinate} />);
-                this.overlay_popup.setPosition(e.coordinate);
+                this.setValue(point);
+                root_popup.render(<PopupComponent ref={this.refPopup} element={this.overlay.element} settings={this.settings} coordinate={e.coordinate} />);
+                this.overlay.setPosition(e.coordinate);
             }
-        });
-    }
-
-    contextPopup = () => {
-        this.olmap.on("contextmenu", (e) => {
-            if (e.dragging) return;
             if (e.type === "contextmenu" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
+                if (this.refPopup.current) {
+                    root_popup.unmount();
+                }
                 const context = document.createElement("div");
-                const root = createRoot(context);
-                this.setContext(context)
-                root.render(<PopupContext element={this.overlay_context.element} coordinate={e.coordinate} e={e} />);
-                this.overlay_context.setPosition(e.coordinate);
+                const root_context = createRoot(context);
+                this.setValue(context)
+                root_context.render(<PopupContext element={this.overlay.element} coordinate={e.coordinate} e={e} />);
+                this.overlay.setPosition(e.coordinate);
+                e.preventDefault();
             }
-            e.preventDefault();
         });
     }
 }
