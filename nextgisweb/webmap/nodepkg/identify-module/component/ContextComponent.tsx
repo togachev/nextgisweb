@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePointPopup } from "../hook/usePointPopup";
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useGeom } from "../hook/useGeom";
+import MapBrowserEvent from 'ol/MapBrowserEvent';
 
 interface PositionProps {
     x: number;
@@ -13,8 +14,7 @@ interface ContextProps {
     coordinate: number[];
     width: number;
     height: number;
-    visible: boolean;
-    event: EventTarget;
+    event: MapBrowserEvent;
     opened: boolean;
 }
 
@@ -26,7 +26,7 @@ export const ContextComponent = forwardRef<HTMLInputElement>((props: ContextProp
     const { toWGS84 } = useGeom();
 
     useEffect(() => {
-        toWGS84(event).then(item => setSoords(item))
+        toWGS84(event, 3857).then(item => setSoords(item))
     }, [event]);
 
     const pos = positionPopup(event, width, height) as PositionProps;

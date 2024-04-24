@@ -2,22 +2,34 @@ import { forwardRef, RefObject, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { useGeom } from "../hook/useGeom";
+import MapBrowserEvent from 'ol/MapBrowserEvent';
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+
+interface VisibleProps {
+    portal: boolean;
+    overlay: boolean | undefined;
+    key: string;
+}
 
 interface PopupProps {
     width: number;
     height: number;
-    event: EventTarget;
-    visible: (portal: boolean, overlay: boolean | undefined) => void;
+    event: MapBrowserEvent;
+    visible: ({ portal, overlay, key }: VisibleProps) => void;
+    display: DojoDisplay;
 }
+
 
 export const PopupComponent = forwardRef<HTMLInputElement>((props: PopupProps, ref: RefObject<HTMLInputElement>) => {
     const [coords, setSoords] = useState(undefined);
 
-    const { width, height, event, visible } = props;
-    const { toWGS84 } = useGeom();
-
+    const { width, height, event, visible, tool } = props;
+    const { displayFeatureInfo, toWGS84 } = useGeom(tool);
+    // const { displayFeatureInfo } = useGraph();
     useEffect(() => {
-        toWGS84(event).then(item => setSoords(item))
+        toWGS84(event, 3857).then(item => setSoords(item))
+        displayFeatureInfo(event.pixel);
+        
     }, [event]);
 
     return (
@@ -31,7 +43,7 @@ export const PopupComponent = forwardRef<HTMLInputElement>((props: PopupProps, r
                 <div className="title">
                     <div className="title-name">Атрибутивные данные объекта</div>
                     <span className="icon-symbol"
-                        onClick={() => { visible(true, undefined) }}
+                        onClick={() => { visible({ portal: true, overlay: undefined, key: "popup" }) }}
                     ><CloseIcon /></span>
                 </div>
                 <div className="content">data</div>
