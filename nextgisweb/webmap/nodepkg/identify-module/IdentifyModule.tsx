@@ -27,7 +27,6 @@ Control.prototype = Object.create(Interaction.prototype);
 Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e) {
-    if (e.dragging) return;
     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
         this.tool._popup(e);
         e.preventDefault();
@@ -130,11 +129,12 @@ export class IdentifyModule extends Component {
     _popup = (e) => {
         this._visibleContext(true, undefined)
         this._setValuePopup(this.point);
-        this.root_popup.render(<PopupComponent visible={this._visiblePopup} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} coordinate={e.coordinate} />);
+        this.root_popup.render(<PopupComponent visible={this._visiblePopup} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} coordinate={e.coordinate} event={e} />);
         this._visiblePopup(false, e.coordinate);
     }
 
     _context = (e) => {
+        
         this._setValueContext(this.context)
         this.root_context.render(<ContextComponent opened={true} ref={this.refContext} width={settings.context_width} height={settings.context_height} coordinate={e.coordinate} event={e} />);
         this._visibleContext(false, e.coordinate)
