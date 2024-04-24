@@ -1,7 +1,8 @@
-import { forwardRef, RefObject } from 'react';
+import { forwardRef, RefObject, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePointPopup } from "../hook/usePointPopup";
 import { useOutsideClick } from "../hook/useOutsideClick";
+import { useGeom } from "../hook/useGeom";
 
 interface PositionProps {
     x: number;
@@ -18,9 +19,15 @@ interface ContextProps {
 }
 
 export const ContextComponent = forwardRef<HTMLInputElement>((props: ContextProps, ref: RefObject<HTMLInputElement>) => {
-    const { width, height, coordinate, event, opened } = props;
+    const [coords, setSoords] = useState(undefined);
+    const { width, height, event, opened } = props;
     const { positionPopup } = usePointPopup();
     useOutsideClick(ref, opened);
+    const { toWGS84 } = useGeom();
+
+    useEffect(() => {
+        toWGS84(event).then(item => setSoords(item))
+    }, [event]);
 
     const pos = positionPopup(event, width, height) as PositionProps;
     const array = [
@@ -42,7 +49,7 @@ export const ContextComponent = forwardRef<HTMLInputElement>((props: ContextProp
                 <div
                     onClick={() => { alert("Координаты скопированы") }}
                     className="context-coords"
-                >{coordinate[0] + ", " + coordinate[1]}</div>
+                >{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
                 {
                     array.map(item => {
                         return (

@@ -3,37 +3,28 @@ import { useCallback, useState } from 'react';
 import { route } from "@nextgisweb/pyramid/api";
 import { WKT } from "ol/format";
 import { Point } from "ol/geom";
-import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
 
 export const useGeom = () => {
 
-    const transformFrom = async (event, value: number) => {
+    const toWGS84 = useCallback(async (event) => {
         const wkt = new WKT();
         const point = event.coordinate;
-
-        const srsCoordinates = {};
-        if (spatialRefSysList) {
-            spatialRefSysList.forEach((srsInfo) => {
-                srsCoordinates[srsInfo.id] = srsInfo;
-            });
-        }
 
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
-                    srs_from: value,
-                    srs_to: Object.keys(srsCoordinates).map(Number),
+                    srs_from: 3857,
+                    srs_to: [4326],
                     geom: wkt.writeGeometry(new Point(point)),
                 },
             })
             .then((transformed) => {
-                const t = transformed.find(i => i.srs_id !== value)
-                const wktPoint = wkt.readGeometry(t.geom);
+                const wktPoint = wkt.readGeometry(transformed[0].geom);
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
             });
         return coords;
-    }
+    })
 
-    return { transformFrom };
+    return { toWGS84 };
 };

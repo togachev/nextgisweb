@@ -129,14 +129,14 @@ export class IdentifyModule extends Component {
     _popup = (e) => {
         this._visibleContext(true, undefined)
         this._setValuePopup(this.point);
-        this.root_popup.render(<PopupComponent visible={this._visiblePopup} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} coordinate={e.coordinate} event={e} />);
+        this.root_popup.render(<PopupComponent visible={this._visiblePopup} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} event={e} />);
         this._visiblePopup(false, e.coordinate);
     }
 
     _context = (e) => {
         
         this._setValueContext(this.context)
-        this.root_context.render(<ContextComponent opened={true} ref={this.refContext} width={settings.context_width} height={settings.context_height} coordinate={e.coordinate} event={e} />);
+        this.root_context.render(<ContextComponent opened={true} ref={this.refContext} width={settings.context_width} height={settings.context_height} event={e} />);
         this._visibleContext(false, e.coordinate)
     }
 }

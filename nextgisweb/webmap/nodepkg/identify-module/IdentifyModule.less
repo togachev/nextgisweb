@@ -17,6 +17,9 @@
     position: absolute;
     right: 10px;
     top: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .title {
         display: flex;
@@ -50,11 +53,15 @@
             }
         }
     }
-
     .content {
+        padding: 5px;
         display: flex;
-        padding: 0px 5px;
         justify-content: center;
+    }
+    .footer-popup {
+        display: flex;
+        padding: 0 5px;
+        justify-content: flex-start;
         align-items: center;
         border-bottom: solid var(--divider-color) 1px;
         border-top-left-radius: 3px;
