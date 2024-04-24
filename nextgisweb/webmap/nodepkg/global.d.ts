@@ -50,6 +50,9 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         legend_symbols: unknown;
         hide_nav_menu: boolean;
         max_count_file_upload: number;
+        idetify_module: boolean;
+        context_width: number;
+        context_height: number;
     }
 
     const value: Config;

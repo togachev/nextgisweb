@@ -290,6 +290,9 @@ csetting("measurement_srid", int, default=4326)
 csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
 csetting("max_count_file_upload", float, default=10)
+csetting("idetify_module", bool, default=False)
+csetting("context_width", int, default=170)
+csetting("context_height", int, default=210)
 
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)

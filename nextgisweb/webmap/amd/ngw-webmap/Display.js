@@ -450,13 +450,22 @@ define([
 
             const controlsReady = MapControls.buildControls(this);
 
-            if (controlsReady.has("id")) {
-                const { control } = controlsReady.get("id");
-                this.identify = control;
-                this.mapStates.addState("identifying", this.identify);
-                this.mapStates.setDefaultState("identifying", true);
-                widget._identifyFeatureByAttrValue();
-                widget._identifyLonLat();
+            if (settings.idetify_module) {
+                if (controlsReady.has("im")) {
+                    const { control } = controlsReady.get("im");
+                    this.identify_module = control;
+                    this.mapStates.addState("identify_module", this.identify_module);
+                    this.mapStates.setDefaultState("identify_module", true);
+                }
+            } else {
+                if (controlsReady.has("id")) {
+                    const { control } = controlsReady.get("id");
+                    this.identify = control;
+                    this.mapStates.addState("identifying", this.identify);
+                    this.mapStates.setDefaultState("identifying", true);
+                    widget._identifyFeatureByAttrValue();
+                    widget._identifyLonLat();
+                }
             }
 
             topic.publish("/webmap/tools/initialized");

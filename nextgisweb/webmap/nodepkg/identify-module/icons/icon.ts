@@ -1,5 +1,5 @@
 export const pointClick =
-    `<svg role="presentation" viewBox="0 0 14 14">
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="icon-point-click">
         <g>
             <path d="m7 0c-3.864 0-7 3.136-7 7s3.136 7 7 7 7-3.136 7-7-3.136-7-7-7" fill="#106a90"/>
             <path d="m7 12.6c-3.094 0-5.6-2.506-5.6-5.6s2.506-5.6 5.6-5.6 5.6 2.506 5.6 5.6-2.506 5.6-5.6 5.6" fill="#fff"/>
@@ -8,7 +8,7 @@ export const pointClick =
     </svg>`
 
 export const popupPoint =
-    `<svg version="1.1" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+    `<svg version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <g stroke-width=".7">
             <path d="m7 0c-3.864 0-7 3.136-7 7s3.136 7 7 7 7-3.136 7-7-3.136-7-7-7" fill="#106a90"/>
             <path d="m7 12.6c-3.094 0-5.6-2.506-5.6-5.6s2.506-5.6 5.6-5.6 5.6 2.506 5.6 5.6-2.506 5.6-5.6 5.6" fill="#fff"/>

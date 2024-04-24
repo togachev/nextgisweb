@@ -1,37 +1,50 @@
-import { useCallback, useEffect, useState } from "react";
-
 export const usePointPopup = () => {
 
-    const positionPopup = useCallback((e, width, height) => {
+    const positionPopup = (event, width, height) => {
         /*top left*/
         if (
-            e.pixel[0] + width <= e.originalEvent.srcElement.clientWidth
-            && e.pixel[1] + height <= e.originalEvent.srcElement.clientHeight
+            event.originalEvent.layerX + width <= event.originalEvent.srcElement.clientWidth
+            && event.originalEvent.layerY + height <= event.originalEvent.srcElement.clientHeight
         ) {
-            return [0, 0]
+            return {
+                x: event.originalEvent.clientX,
+                y: event.originalEvent.clientY,
+            }
         }
+
         /*top right*/
-        else if (
-            e.pixel[0] + width > e.originalEvent.srcElement.clientWidth
-            && e.pixel[1] + height < e.originalEvent.srcElement.clientHeight
+        if (
+            event.originalEvent.layerX + width > event.originalEvent.srcElement.clientWidth
+            && event.originalEvent.layerY + height < event.originalEvent.srcElement.clientHeight
         ) {
-            return [-width, 0]
+            return {
+                x: event.originalEvent.clientX - width,
+                y: event.originalEvent.clientY,
+            }
         }
+
         /*bottom left*/
-        else if (
-            e.pixel[0] < e.originalEvent.srcElement.clientWidth - width
-            && e.pixel[1] < e.originalEvent.srcElement.clientHeight
+        if (
+            event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth - width
+            && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
         ) {
-            return [0, -height]
+            return {
+                x: event.originalEvent.clientX,
+                y: event.originalEvent.clientY - height,
+            }
         }
+
         /*bottom right*/
-        else if (
-            e.pixel[0] < e.originalEvent.srcElement.clientWidth
-            && e.pixel[1] < e.originalEvent.srcElement.clientHeight
+        if (
+            event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth
+            && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
         ) {
-            return [-width, -height]
+            return {
+                x: event.originalEvent.clientX - width,
+                y: event.originalEvent.clientY - height,
+            }
         }
-    })
+    }
 
     return { positionPopup };
 };

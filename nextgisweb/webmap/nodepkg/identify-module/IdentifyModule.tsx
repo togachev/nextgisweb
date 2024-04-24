@@ -1,132 +1,142 @@
+import { React, Component, createRef, RefObject } from 'react';
+import { createRoot } from 'react-dom/client';
+import { pointClick } from "./icons/icon";
 import type { DojoDisplay } from "../type";
 import type OlMap from "ol/Map";
 import Overlay from "ol/Overlay.js";
 import type OlOverlay from 'ol/Overlay.js';
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import "./IdentifyModule.less";
-import { createRoot } from 'react-dom/client';
-import { Component, createRef, forwardRef, RefObject } from 'react';
-import { pointClick, popupPoint } from "./icons/icon";
-import { createPortal, unmountComponentAtNode } from 'react-dom';
-import { usePointPopup } from "./hook/usePointPopup";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import { Interaction } from "ol/interaction";
+import type { Control as OlControl } from "ol/control";
 
-const PopupComponent = forwardRef((props, ref) => {
-    const { element, coordinate, settings } = props;
-    return (
-        createPortal(
-            <div ref={ref} className="popup-position"
-                style={{
-                    right: 10,
-                    top: 50,
-                    width: settings.popup_width,
-                    height: settings.popup_height,
-                    position: 'absolute'
-                }}
-            >
-                <span className="title">Popup</span>
-                <span className="content">{coordinate[0] + ", " + coordinate[1]}</span>
-            </div>,
-            document.body
-        )
-    )
-});
+import { PopupComponent } from "./component/PopupComponent";
+import { ContextComponent } from "./component/ContextComponent";
 
-const PopupContext = ({ element, e }) => {
-    const { positionPopup } = usePointPopup();
-    const width = 150;
-    const height = 150;
-    const pos = positionPopup(e, width, height)
+import "./IdentifyModule.less";
 
-    const array = [
-        { key: 1, title: 'title 1', result: 'content 1' },
-        { key: 2, title: 'title 2', result: 'content 2' },
-        { key: 3, title: 'title 3', result: 'content 3' },
-        { key: 4, title: 'title 4', result: 'content 4' },
-    ]
+const settings = webmapSettings;
 
-    return (
-        createPortal(
-            <div className="context-position" style={{
-                width: width,
-                height: height,
-                left: pos[0],
-                top: pos[1],
-                position: "absolute",
-            }}>
-                <span className="context-title">Контекстное меню</span>
-                {
-                    array.map(item => {
-                        return (
-                            <div className="context-item" key={item.key} onClick={() => { console.log(item.result) }} >
-                                <span>{item.title}</span>
-                            </div>
-                        )
-                    })
-                }
-            </div>,
-            element
-        )
-    )
-}
+const Control = function (options) {
+    this.tool = options.tool;
+    Interaction.call(this, {
+        handleEvent: Control.prototype.handleClickEvent,
+    });
+};
+
+Control.prototype = Object.create(Interaction.prototype);
+Control.prototype.constructor = Control;
+
+Control.prototype.handleClickEvent = function (e) {
+    if (e.dragging) return;
+    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
+        this.tool._popup(e);
+        e.preventDefault();
+    } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false) {
+        this.tool._context(e);
+        e.preventDefault();
+    }
+    return true;
+};
 
 export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: OlMap;
-    private overlay: OlOverlay;
-    private settings: object;
+    private overlay_popup: OlOverlay;
+    private overlay_context: OlOverlay;
+    private control: OlControl;
+    private popup: HTMLDivElement;
+    private point: HTMLDivElement;
+    private context: HTMLDivElement;
+    private root_popup: React.ReactElement;
+    private root_context: React.ReactElement;
     private refPopup: RefObject<HTMLInputElement>;
+    private refContext: RefObject<HTMLInputElement>;
+
     constructor(props: DojoDisplay) {
         super(props)
 
         this.display = props;
-        this.settings = webmapSettings;
         this.olmap = this.display.map.olMap;
-        this.addOverlay();
-        this.position();
+        this.control = new Control({ tool: this });
+        this.control.setActive(false);
+        this.olmap.addInteraction(this.control);
+
+        this._addOverlayPopup();
+        this._addOverlayContext();
+
+        this.popup = document.createElement("div");
+        this.point = document.createElement("div");
+        this.point.innerHTML = `<span class="icon-position">${pointClick}</span>`;
+        this.root_popup = createRoot(this.popup);
+        this.context = document.createElement("div");
+        this.root_context = createRoot(this.context);
 
         this.refPopup = createRef();
+        this.refContext = createRef();
     }
 
-    setValue = (value: HTMLElement) => {
-        this.overlay.setElement(value);
+    activate = () => {
+        this.control.setActive(true);
     }
 
-    addOverlay = () => {
-        this.overlay = new Overlay({
+    deactivate = () => {
+        this.control.setActive(false);
+    }
+
+    _setValuePopup = (value: HTMLElement) => {
+        this.overlay_popup.setElement(value);
+    }
+
+    _setValueContext = (value: HTMLElement) => {
+        this.overlay_context.setElement(value);
+    }
+
+    _addOverlayPopup = () => {
+        this.overlay_popup = new Overlay({
             autoPan: true,
             stopEvent: true,
             autoPanAnimation: {
                 duration: 250,
             },
         });
-        this.olmap.addOverlay(this.overlay);
+        this.olmap.addOverlay(this.overlay_popup);
     }
 
-    position = () => {
-        const point = document.createElement("div");
-        point.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-        const popup = document.createElement("div");
-        const root_popup = createRoot(popup);
-
-        this.olmap.on(["singleclick", "contextmenu"], (e) => {
-            if (e.dragging) return;
-            if (e.type === "singleclick" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
-                this.setValue(point);
-                root_popup.render(<PopupComponent ref={this.refPopup} element={this.overlay.element} settings={this.settings} coordinate={e.coordinate} />);
-                this.overlay.setPosition(e.coordinate);
-            }
-            if (e.type === "contextmenu" && e.originalEvent.shiftKey === false && e.originalEvent.ctrlKey === false) {
-                if (this.refPopup.current) {
-                    root_popup.unmount();
-                }
-                const context = document.createElement("div");
-                const root_context = createRoot(context);
-                this.setValue(context)
-                root_context.render(<PopupContext element={this.overlay.element} coordinate={e.coordinate} e={e} />);
-                this.overlay.setPosition(e.coordinate);
-                e.preventDefault();
-            }
+    _addOverlayContext = () => {
+        this.overlay_context = new Overlay({
+            autoPan: true,
+            stopEvent: true,
+            autoPanAnimation: {
+                duration: 250,
+            },
         });
+        this.olmap.addOverlay(this.overlay_context);
+    }
+
+    _visiblePopup = (portal, overlay) => {
+        if (this.refPopup.current) {
+            this.refPopup.current.hidden = portal
+        }
+        this.overlay_popup.setPosition(overlay);
+    }
+
+    _visibleContext = (portal, overlay) => {
+        if (this.refContext.current) {
+            this.refContext.current.hidden = portal
+        }
+        this.overlay_context.setPosition(overlay);
+    }
+
+    _popup = (e) => {
+        this._visibleContext(true, undefined)
+        this._setValuePopup(this.point);
+        this.root_popup.render(<PopupComponent visible={this._visiblePopup} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} coordinate={e.coordinate} />);
+        this._visiblePopup(false, e.coordinate);
+    }
+
+    _context = (e) => {
+        this._setValueContext(this.context)
+        this.root_context.render(<ContextComponent opened={true} ref={this.refContext} width={settings.context_width} height={settings.context_height} coordinate={e.coordinate} event={e} />);
+        this._visibleContext(false, e.coordinate)
     }
 }

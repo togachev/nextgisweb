@@ -165,6 +165,51 @@ export const SettingsForm = ({
                 </Col>
             </Row>
 
+            <Title level={4}>{gettext("Identify module")}</Title>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item>
+                        <Space direction="horizontal">
+                            <Form.Item
+                                noStyle
+                                name="idetify_module"
+                                valuePropName="checked"
+                            >
+                                <Switch />
+                            </Form.Item>
+                            {gettext("Idetify module")}
+                        </Space>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        name="context_width"
+                        label={gettext("Width context, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        name="context_height"
+                        label={gettext("Height context, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
+                    </Form.Item>
+                </Col>
+            </Row>
+
             <Title level={4}>{gettext("Measurement")}</Title>
 
             <Row gutter={[16, 16]}>

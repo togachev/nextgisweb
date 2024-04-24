@@ -133,7 +133,7 @@ export const ControlsInfo: ControlInfo[] = [
         },
         key: "id",
         mapStateKey: "identifying",
-        embeddedShowMode: "customize",
+        embeddedShowMode: "always",
         olMapControl: false,
     },
     {
@@ -142,7 +142,7 @@ export const ControlsInfo: ControlInfo[] = [
         ctor: (display) => {
             return new IdentifyModule(display);
         },
-        mapStateKey: "identifying_module",
+        mapStateKey: "identify_module",
         embeddedShowMode: "customize",
         olMapControl: false,
     },
