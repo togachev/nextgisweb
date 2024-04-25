@@ -1,11 +1,9 @@
-import { useCallback, useState } from 'react';
-
 import { route } from "@nextgisweb/pyramid/api";
 import { WKT } from "ol/format";
 import { Point } from "ol/geom";
 import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/"
 import MapBrowserEvent from 'ol/MapBrowserEvent';
-
+import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 const srsCoordinates = {};
 if (spatialRefSysList) {
     spatialRefSysList.forEach((srsInfo) => {
@@ -15,7 +13,7 @@ if (spatialRefSysList) {
 
 export const useGeom = (tool) => {
 
-    const toWGS84 = async (event: MapBrowserEvent, value: number) => {
+    const transformFrom = async (event: MapBrowserEvent, value: number) => {
         const wkt = new WKT();
         const point = event.coordinate;
 
@@ -72,7 +70,7 @@ export const useGeom = (tool) => {
 
     };
 
-    return { displayFeatureInfo, toWGS84 };
+    return { displayFeatureInfo, transformFrom };
 };
 
 

@@ -9,8 +9,8 @@ import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
 
-import { PopupComponent } from "./component/PopupComponent";
-import { ContextComponent } from "./component/ContextComponent";
+import PopupComponent from "./component/PopupComponent";
+import ContextComponent from "./component/ContextComponent";
 
 import "./IdentifyModule.less";
 
@@ -33,10 +33,13 @@ Control.prototype = Object.create(Interaction.prototype);
 Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
-    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
+    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
         this.tool._popup(e);
         e.preventDefault();
-    } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false) {
+    } else if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === true) {
+        this.tool._popupMultiple(e);
+        e.preventDefault();
+    } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
         this.tool._context(e);
         e.preventDefault();
     }
@@ -128,7 +131,16 @@ export class IdentifyModule extends Component {
             }
             this.overlay_context.setPosition(overlay);
         }
+    }
 
+    _popupMultiple = (e: MapBrowserEvent) => {
+        alert(e.pixel)
+        // this._visible({ portal: true, overlay: undefined, key: "context" })
+        // this._setValue(this.point, "popup");
+        // this.root_popup.render(
+        //     <PopupComponent tool={this} visible={this._visible} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} event={e} />
+        // );
+        // this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
     }
 
     _popup = (e: MapBrowserEvent) => {
@@ -143,7 +155,7 @@ export class IdentifyModule extends Component {
     _context = (e: MapBrowserEvent) => {
         this._setValue(this.context, "context")
         this.root_context.render(
-            <ContextComponent opened={true} ref={this.refContext} width={settings.context_width} height={settings.context_height} event={e} />
+            <ContextComponent tool={this} ref={this.refContext} width={settings.context_width} height={settings.context_height} event={e} />
         );
         this._visible({ portal: false, overlay: e.coordinate, key: "context" });
     }

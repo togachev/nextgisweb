@@ -31,34 +31,51 @@
         border-bottom: solid var(--divider-color) 1px;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
-
+        
         .title-name {
             font-weight: 500;
             padding: 0 5px;
-            user-select: none;
+            width: 100%;
+            cursor: move;
         }
 
         .icon-symbol {
-            font-size: 18px;
-            width: 24px;
-            height: 24px;
+            font-size: 14px;
+            width: 16px;
+            height: 16px;
             display: flex;
             justify-items: center;
             justify-content: center;
             align-items: center;
             flex: 0 0 auto;
-            color: #106a90;
+            color: var(--primary);
+            margin: 0 4px 0 4px;
+            cursor: pointer;
 
             &:hover {
                 background-color: #acacac20;
-                border-radius: 3px;
+                border-radius: 50%;
             }
         }
     }
     .content {
-        padding: 5px;
-        display: flex;
-        justify-content: center;
+        top: 25px;
+        position: absolute;
+        width: 100%;
+
+        .ant-tabs-top >.ant-tabs-nav {
+            margin: 0 5px;
+        }
+
+        .ant-tabs-small >.ant-tabs-nav .ant-tabs-tab {
+            padding: 4px 0;
+            font-size: 14px;
+        }
+
+        .item-content {
+            display: flex;
+            padding: 2px;
+        }
     }
     .footer-popup {
         display: flex;
@@ -91,6 +108,7 @@
     user-select: text;
     pointer-events: auto;
     box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    z-index: 1;
 
     .context-coords {
         font-weight: 500;

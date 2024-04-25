@@ -6,10 +6,7 @@ export const usePointPopup = () => {
             event.originalEvent.layerX + width <= event.originalEvent.srcElement.clientWidth
             && event.originalEvent.layerY + height <= event.originalEvent.srcElement.clientHeight
         ) {
-            return {
-                x: event.originalEvent.clientX,
-                y: event.originalEvent.clientY,
-            }
+            return { x: event.originalEvent.clientX, y: event.originalEvent.clientY }
         }
 
         /*top right*/
@@ -17,10 +14,7 @@ export const usePointPopup = () => {
             event.originalEvent.layerX + width > event.originalEvent.srcElement.clientWidth
             && event.originalEvent.layerY + height < event.originalEvent.srcElement.clientHeight
         ) {
-            return {
-                x: event.originalEvent.clientX - width,
-                y: event.originalEvent.clientY,
-            }
+            return { x: event.originalEvent.clientX - width, y: event.originalEvent.clientY }
         }
 
         /*bottom left*/
@@ -28,10 +22,7 @@ export const usePointPopup = () => {
             event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth - width
             && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
         ) {
-            return {
-                x: event.originalEvent.clientX,
-                y: event.originalEvent.clientY - height,
-            }
+            return { x: event.originalEvent.clientX, y: event.originalEvent.clientY - height }
         }
 
         /*bottom right*/
@@ -39,10 +30,7 @@ export const usePointPopup = () => {
             event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth
             && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
         ) {
-            return {
-                x: event.originalEvent.clientX - width,
-                y: event.originalEvent.clientY - height,
-            }
+            return { x: event.originalEvent.clientX - width, y: event.originalEvent.clientY - height }
         }
     }
 

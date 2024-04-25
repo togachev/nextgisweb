@@ -42,9 +42,11 @@ export const useGraph = ({ display, topic }: GraphProps) => {
     }, [featInfo])
 
     const displayFeatureInfo = useCallback(async (pixel: number[]) => {
+        console.log(display);
+        
         const request: RequestProps = {
             srs: 3857,
-            geom: display.identify._requestGeomString(pixel),
+            geom: display.identify_module._requestGeomString(pixel),
             styles: [],
         };
         display.getVisibleItems().then(items => {
@@ -70,7 +72,7 @@ export const useGraph = ({ display, topic }: GraphProps) => {
                 .then((response) => {
                     const feat = response[0]; /* To use objects from different layers, you must use the entire array */
                     if (feat) {
-                        display.identify._popup.setPosition(undefined);
+                        display.identify_module._visible({ portal: true, overlay: undefined, key: "popup" });
                         topic.publish("feature.unhighlight");
 
                         const obj = {

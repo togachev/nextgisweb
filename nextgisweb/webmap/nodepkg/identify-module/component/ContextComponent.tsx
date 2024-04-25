@@ -15,18 +15,18 @@ interface ContextProps {
     width: number;
     height: number;
     event: MapBrowserEvent;
-    opened: boolean;
+    tool: string;
 }
 
-export const ContextComponent = forwardRef<HTMLInputElement>((props: ContextProps, ref: RefObject<HTMLInputElement>) => {
+export default forwardRef<HTMLInputElement>(function ContextComponent(props: ContextProps, ref: RefObject<HTMLInputElement>) {
     const [coords, setSoords] = useState(undefined);
-    const { width, height, event, opened } = props;
+    const { width, height, event, tool } = props;
     const { positionPopup } = usePointPopup();
-    useOutsideClick(ref, opened);
-    const { toWGS84 } = useGeom();
+    useOutsideClick(ref, true);
+    const { transformFrom } = useGeom(tool);
 
     useEffect(() => {
-        toWGS84(event, 3857).then(item => setSoords(item))
+        transformFrom(event, 3857).then(item => setSoords(item))
     }, [event]);
 
     const pos = positionPopup(event, width, height) as PositionProps;
@@ -64,4 +64,3 @@ export const ContextComponent = forwardRef<HTMLInputElement>((props: ContextProp
         )
     )
 });
-ContextComponent.displayName = "ContextComponent";
