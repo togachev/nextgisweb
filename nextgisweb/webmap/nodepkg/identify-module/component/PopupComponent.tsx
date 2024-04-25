@@ -9,23 +9,44 @@ import type { DraggableData, DraggableEvent } from 'react-draggable';
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
 import EditNote from "@nextgisweb/icon/material/edit_note";
-import { Tabs } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Tabs, Tooltip } from "@nextgisweb/gui/antd";
 
 const FeatureComponent: FC = () => (
-    <Tabs
-        size="small"
-        defaultActiveKey="1"
-        items={[Info, QueryStats, EditNote].map((Icon, i) => {
-            const id = String(i + 1);
-            return {
-                key: id,
-                children: <div className="item-content">
-                    Content {id}
-                </div>,
-                icon: <Icon />,
-            };
-        })}
-    />
+    <ConfigProvider
+        theme={{
+            components: {
+                Tabs: {
+                    inkBarColor: "#106a90",
+                    itemSelectedColor: "#106a90",
+                    itemHoverColor: "#106a9080",
+                    paddingXS: '0 10',
+                    horizontalItemGutter: 10,
+                    horizontalMargin: '0 5px 5px 5px',
+                },
+                Tooltip: {
+                    colorTextLightSolid: '#000',
+                    borderRadius: 3,
+                }
+            },
+        }}
+    >
+        <Tabs
+            size="small"
+            defaultActiveKey="1"
+            items={[Info, QueryStats, EditNote].map((Icon, i) => {
+                const id = String(i + 1);
+                return {
+                    key: id,
+                    children: <div className="item-content">
+                        Content {id}
+                    </div>,
+                    icon: <Tooltip title="prompt text" color="#fff" >
+                        <Icon />
+                    </Tooltip>,
+                };
+            })}
+        />
+    </ConfigProvider>
 );
 
 
@@ -60,7 +81,7 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
         bottom: 0,
         right: 0,
     });
-
+    
     const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
         const { clientWidth, clientHeight } = window.document.documentElement;
         const targetRect = ref.current?.getBoundingClientRect();
