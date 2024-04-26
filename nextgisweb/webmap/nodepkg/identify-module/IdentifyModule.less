@@ -8,9 +8,11 @@
     pointer-events: none;
     line-height: 0;
 }
+
 [hidden] {
     display: none !important;
 }
+
 .popup-position {
     border-radius: 3px;
     border: solid var(--divider-color) 1px;
@@ -19,10 +21,11 @@
     position: absolute;
     right: 10px;
     top: 50px;
+    content: "";
     display: flex;
+    clear: both;
     flex-direction: column;
-    justify-content: space-between;
-
+    
     .title {
         display: flex;
         padding: 0;
@@ -31,7 +34,7 @@
         border-bottom: solid var(--divider-color) 1px;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
-        
+
         .title-name {
             font-weight: 500;
             padding: 0 5px;
@@ -58,22 +61,22 @@
             }
         }
     }
-    .content {
-        top: 25px;
-        position: absolute;
-        width: 100%;
 
+    .content {
+        overflow: hidden;
         .item-content {
             display: flex;
-            padding: 2px;
+            padding: 5px;
+            word-break: break-word;
+            overflow: auto;
         }
     }
+
     .footer-popup {
         display: flex;
         padding: 0 5px;
         justify-content: flex-start;
         align-items: center;
-        border-bottom: solid var(--divider-color) 1px;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
     }

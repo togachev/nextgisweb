@@ -55,19 +55,18 @@ export const useGeom = (tool) => {
                     ) {
                         return;
                     }
-                    layerLabels[item.layerId] = item.label
-                    request.styles.push(item.styleId);
+                    request.styles.push({id: item.styleId, label: item.label});
                 });
             })
 
-        await route("feature_layer.identify")
+        const response = await route("feature_layer.identify_module")
             .post({
                 json: request,
             })
             .then((response) => {
-                console.log(response, point, layerLabels);
+                return response
             })
-
+        return response;
     };
 
     return { displayFeatureInfo, transformFrom };

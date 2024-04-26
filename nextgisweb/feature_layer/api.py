@@ -167,7 +167,7 @@ def serialize(feat, keys=None, geom_format="wkt", dt_format="obj", label=False, 
             fval = val
 
         result["fields"][fld.keyname] = fval
-        result["resource_id"] = feat.layer.id
+        
     result["extensions"] = dict()
     for identity, ext in extensions:
         result["extensions"][identity] = ext.serialize(feat)
