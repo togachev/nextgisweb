@@ -1,4 +1,4 @@
-import { forwardRef, RefObject, useEffect, useState } from 'react';
+import { forwardRef, RefObject, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePointPopup } from "../hook/usePointPopup";
 import { useOutsideClick } from "../hook/useOutsideClick";
@@ -23,12 +23,12 @@ export default forwardRef<HTMLInputElement>(function ContextComponent(props: Con
     const { width, height, event, tool } = props;
     const { positionPopup } = usePointPopup();
     useOutsideClick(ref, true);
-    const { transformFrom } = useGeom(tool);
+    const { displayFeatureInfo } = useGeom(tool);
 
-    useEffect(() => {
-        transformFrom(event, 3857).then(item => setSoords(item))
+    useMemo(() => {
+        displayFeatureInfo(event, 3857, "context").then(item => setSoords(item.coords));
     }, [event]);
-
+    
     const pos = positionPopup(event, width, height) as PositionProps;
     const array = [
         { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено' },

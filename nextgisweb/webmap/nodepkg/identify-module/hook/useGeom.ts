@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { route } from "@nextgisweb/pyramid/api";
 import { WKT } from "ol/format";
 import { Point } from "ol/geom";
@@ -13,10 +14,9 @@ if (spatialRefSysList) {
 
 export const useGeom = (tool) => {
 
-    const transformFrom = async (event: MapBrowserEvent, value: number) => {
+    const displayFeatureInfo = async (event: MapBrowserEvent, value: number, op: string) => {
         const wkt = new WKT();
         const point = event.coordinate;
-
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
@@ -31,45 +31,46 @@ export const useGeom = (tool) => {
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
             });
-        return coords;
+
+        if (op === "context") {
+            return { coords };
+        } else {
+            const pixel = event.pixel;
+            const request: RequestProps = {
+                srs: 3857,
+                geom: tool._requestGeomString(pixel),
+                styles: [],
+            };
+
+            tool.display.getVisibleItems()
+                .then(items => {
+                    const itemConfig = tool.display.getItemConfig();
+                    const mapResolution = tool.olmap.getView().getResolution();
+                    items.map(i => {
+                        const item = itemConfig[i.id];
+                        if (
+                            !item.identifiable ||
+                            mapResolution >= item.maxResolution ||
+                            mapResolution < item.minResolution
+                        ) {
+                            return;
+                        }
+                        request.styles.push({ id: item.styleId, label: item.label });
+                    });
+                })
+            const response = await route("feature_layer.identify_module")
+                .post({
+                    json: request,
+                })
+                .then((response) => {
+                    return response
+                })
+
+            return { response, coords };
+        }
     };
 
-    const displayFeatureInfo = async (pixel: number[]) => {
-        const point = tool.olmap.getCoordinateFromPixel(pixel);
-        const request: RequestProps = {
-            srs: 3857,
-            geom: tool._requestGeomString(pixel),
-            styles: [],
-        };
-        const layerLabels = {};
-        tool.display.getVisibleItems()
-            .then(items => {
-                const itemConfig = tool.display.getItemConfig();
-                const mapResolution = tool.olmap.getView().getResolution();
-                items.map(i => {
-                    const item = itemConfig[i.id];
-                    if (
-                        !item.identifiable ||
-                        mapResolution >= item.maxResolution ||
-                        mapResolution < item.minResolution
-                    ) {
-                        return;
-                    }
-                    request.styles.push({id: item.styleId, label: item.label});
-                });
-            })
-
-        const response = await route("feature_layer.identify_module")
-            .post({
-                json: request,
-            })
-            .then((response) => {
-                return response
-            })
-        return response;
-    };
-
-    return { displayFeatureInfo, transformFrom };
+    return { displayFeatureInfo };
 };
 
 

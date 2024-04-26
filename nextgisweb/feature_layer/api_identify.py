@@ -135,7 +135,8 @@ def identify_module(request) -> JSONType:
                 ))
             if len(features):
                 result[layer_id_str] = dict(
-                    label=[x["label"] for x in data["styles"] if x["id"] == style.id][0], features=features,
+                    label=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                    features=features,
                     featureCount=len(features),
                 )
             feature_count += len(features)

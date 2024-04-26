@@ -1,4 +1,4 @@
-import { FC, forwardRef, RefObject, useEffect, useState } from 'react';
+import { FC, forwardRef, RefObject, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { useGeom } from "../hook/useGeom";
@@ -17,9 +17,10 @@ interface FeaturesProps {
 }
 
 const FeatureComponent: FC = ({ features, width, height }) => {
-    features && (Object.entries<FeaturesProps>(features)).forEach(([key, value]) => {
-        console.log(key, value);
-    });
+    // features && (Object.entries<FeaturesProps>(features)).forEach(([key, value]) => {
+    //     console.log(key, value);
+    // });
+    console.log(features);
 
     return (
         <ConfigProvider
@@ -81,17 +82,15 @@ interface PopupProps {
 }
 
 export default forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
-    const [coords, setSoords] = useState(undefined);
-    const [features, setFeatures] = useState();
+    const [values, setValues] = useState();
 
     const { width, height, event, visible, tool } = props;
-    const { displayFeatureInfo, transformFrom } = useGeom(tool);
+    const { displayFeatureInfo } = useGeom(tool);
 
-    useEffect(() => {
-        transformFrom(event, 3857).then(item => setSoords(item));
-        displayFeatureInfo(event.pixel).then(item => setFeatures(item));
-
+    useMemo(() => {
+        displayFeatureInfo(event, 3857, "popup").then(item => setValues(item));
     }, [event]);
+    console.log(values);
 
     const [bounds, setBounds] = useState({
         left: 0,
@@ -129,15 +128,17 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
                     }}
                 >
                     <div className="title">
-                        <div className="title-name">Объектов: {features?.featureCount}</div>
+                        <div className="title-name">Объектов: {values?.response?.featureCount}</div>
                         <span className="icon-symbol"
                             onClick={() => { visible({ portal: true, overlay: undefined, key: "popup" }) }}
-                        ><CloseIcon /></span>
+                        >
+                            <CloseIcon />
+                        </span>
                     </div>
                     <div className="content">
-                        <FeatureComponent features={features} width={width} height={height} />
+                        <FeatureComponent features={values?.response} width={width} height={height} />
                     </div>
-                    <div className="footer-popup">{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
+                    <div className="footer-popup">{values?.coords && values?.coords[0].toFixed(6) + ", " + values?.coords[1].toFixed(6)}</div>
                 </div>
             </Draggable>,
             document.body
