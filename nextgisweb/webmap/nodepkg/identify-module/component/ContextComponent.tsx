@@ -1,9 +1,6 @@
-import { forwardRef, RefObject, useMemo, useState } from 'react';
+import { forwardRef, RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { usePointPopup } from "../hook/usePointPopup";
 import { useOutsideClick } from "../hook/useOutsideClick";
-import { useGeom } from "../hook/useGeom";
-import MapBrowserEvent from 'ol/MapBrowserEvent';
 
 interface PositionProps {
     x: number;
@@ -11,25 +8,17 @@ interface PositionProps {
 }
 
 interface ContextProps {
-    coordinate: number[];
     width: number;
     height: number;
-    event: MapBrowserEvent;
-    tool: string;
+    coords: number[];
+    pos: PositionProps;
 }
 
 export default forwardRef<HTMLInputElement>(function ContextComponent(props: ContextProps, ref: RefObject<HTMLInputElement>) {
-    const [coords, setSoords] = useState(undefined);
-    const { width, height, event, tool } = props;
-    const { positionPopup } = usePointPopup();
-    useOutsideClick(ref, true);
-    const { displayFeatureInfo } = useGeom(tool);
 
-    useMemo(() => {
-        displayFeatureInfo(event, 3857, "context").then(item => setSoords(item.coords));
-    }, [event]);
-    
-    const pos = positionPopup(event, width, height) as PositionProps;
+    const { width, height, coords, pos } = props;
+    useOutsideClick(ref, true);
+
     const array = [
         { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено' },
         { key: 2, title: 'Действие 2', result: 'Действие 2 выполнено' },

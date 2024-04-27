@@ -53,6 +53,7 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         idetify_module: boolean;
         context_width: number;
         context_height: number;
+        offset_point: number;
     }
 
     const value: Config;

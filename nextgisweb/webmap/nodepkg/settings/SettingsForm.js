@@ -208,6 +208,19 @@ export const SettingsForm = ({
                         <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
                     </Form.Item>
                 </Col>
+                <Col span={8}>
+                    <Form.Item
+                        name="offset_point"
+                        label={gettext("Offset, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="0" max="50" style={INPUT_DEFAULT_WIDTH} />
+                    </Form.Item>
+                </Col>
             </Row>
 
             <Title level={4}>{gettext("Measurement")}</Title>

@@ -293,6 +293,7 @@ csetting("max_count_file_upload", float, default=10)
 csetting("idetify_module", bool, default=False)
 csetting("context_width", int, default=170)
 csetting("context_height", int, default=210)
+csetting("offset_point", int, default=0)
 
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
