@@ -1,4 +1,4 @@
-import { FC, forwardRef, RefObject, useState, useEffect } from 'react';
+import { FC, forwardRef, RefObject, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 
@@ -19,7 +19,6 @@ const FeatureComponent: FC = ({ response, height }) => {
     // features && (Object.entries<FeaturesProps>(features)).forEach(([key, value]) => {
     //     console.log(key, value);
     // });
-    console.log(response);
 
     return (
         <ConfigProvider
@@ -67,7 +66,6 @@ const FeatureComponent: FC = ({ response, height }) => {
     )
 };
 
-
 interface VisibleProps {
     portal: boolean;
     overlay: boolean | undefined;
@@ -77,15 +75,23 @@ interface ResponseProps {
     featureCount: number;
     y: number;
 }
+
+interface PosProps {
+    x: number;
+    y: number;
+}
+
 interface PopupProps {
     width: number;
     height: number;
     visible: ({ portal, overlay, key }: VisibleProps) => void;
     coords: number[];
     response: ResponseProps;
+    pos: PosProps;
 }
+import { observer } from "mobx-react-lite";
 
-export default forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
+export default observer(forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
 
     const { width, height, visible, coords, response, pos } = props;
     const [bounds, setBounds] = useState({
@@ -94,16 +100,17 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
         bottom: 0,
         right: 0,
     })
+    console.log(response);
 
     const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    useMemo(() => {
+        setPosition({ x: 0, y: 0 })
+    }, [pos])
 
     const onDrag = (e, data) => {
         setPosition({ x: data.x, y: data.y })
     };
-
-    useEffect(() => {
-        setPosition({ x: 0, y: 0 })
-    }, [pos])
 
     const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
         const { clientWidth, clientHeight } = window.document.documentElement;
@@ -156,4 +163,4 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
             document.body
         )
     )
-});
+}));
