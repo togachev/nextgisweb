@@ -42,7 +42,6 @@ Control.prototype = Object.create(Interaction.prototype);
 Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
-    // if (e.dragging) return;
     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
         this.tool._popup(e);
         e.preventDefault();
@@ -153,37 +152,46 @@ export class IdentifyModule extends Component {
         // this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
     }
 
-    positionContext = (event, width, height, offset) => {
+    positionContext = (event, _width, _height, offset, op) => {
+        const width = _width + offset;
+        const height = _height + offset;
+        let vw = event.originalEvent.srcElement.clientWidth;
+        let vh = event.originalEvent.srcElement.clientHeight;
+        
+        const p = op === "context" ?
+            { x: event.originalEvent.clientX, y: event.originalEvent.clientY } :
+            { x: 0, y: 0 };
+
         /*top left*/
         if (
-            event.originalEvent.layerX + width <= event.originalEvent.srcElement.clientWidth
-            && event.originalEvent.layerY + height <= event.originalEvent.srcElement.clientHeight
+            event.originalEvent.layerX + width <= vw
+            && event.originalEvent.layerY + height <= vh
         ) {
-            return { x: event.originalEvent.clientX + offset, y: event.originalEvent.clientY + offset }
+            return { x: p.x + offset, y: p.y + offset }
         }
 
         /*top right*/
         if (
-            event.originalEvent.layerX + width > event.originalEvent.srcElement.clientWidth
-            && event.originalEvent.layerY + height < event.originalEvent.srcElement.clientHeight
+            event.originalEvent.layerX + width > vw
+            && event.originalEvent.layerY + height < vh
         ) {
-            return { x: event.originalEvent.clientX - width, y: event.originalEvent.clientY + offset }
+            return { x: p.x - width, y: p.y + offset }
         }
 
         /*bottom left*/
         if (
-            event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth - width
-            && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
+            event.originalEvent.layerX < vw - width
+            && event.originalEvent.layerY < vh
         ) {
-            return { x: event.originalEvent.clientX + offset, y: event.originalEvent.clientY - height }
+            return { x: p.x + offset, y: p.y - height }
         }
 
         /*bottom right*/
         if (
-            event.originalEvent.layerX < event.originalEvent.srcElement.clientWidth
-            && event.originalEvent.layerY < event.originalEvent.srcElement.clientHeight
+            event.originalEvent.layerX < vw
+            && event.originalEvent.layerY < vh
         ) {
-            return { x: event.originalEvent.clientX - width, y: event.originalEvent.clientY - height }
+            return { x: p.x - width, y: p.y - height }
         }
     }
 
@@ -204,7 +212,6 @@ export class IdentifyModule extends Component {
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
             });
-
 
         const pixel = event.pixel;
         const request: RequestProps = {
@@ -236,16 +243,25 @@ export class IdentifyModule extends Component {
             .then((response) => {
                 return response
             })
-        
+
         const width = op === "popup" ? settings.popup_width : settings.context_width;
-        const height = response.featureCount > 0 && op === "popup" ? settings.popup_height : op === "context" ? settings.context_height : 50;
+
+        let height;
+        if (response.featureCount > 0 && op === "popup") {
+            height = settings.popup_height;
+        } else if (response.featureCount === 0 && op === "popup") {
+            height = 44;
+        } else if (op === "context") {
+            height = settings.context_height;
+        }
+
         const offset = op === "popup" ? settings.offset_point : 0;
-        const pos = this.positionContext(event, width + offset, height + offset, offset);
+        const position = this.positionContext(event, width, height, offset, op);
 
         if (op === "context") {
-            return { coords, pos, width, height };
+            return { coords, position, width, height };
         } else {
-            return { response, coords, pos, width, height };
+            return { response, coords, position, width, height };
         }
     };
 
@@ -254,7 +270,7 @@ export class IdentifyModule extends Component {
             this._visible({ portal: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
             this.root_popup.render(
-                <PopupComponent pos={item.pos} coords={item.coords} response={item.response} visible={this._visible} ref={this.refPopup} width={item.width} height={item.height} />
+                <PopupComponent element={this.overlay_popup.element} position={item.position} coords={item.coords} response={item.response} visible={this._visible} ref={this.refPopup} width={item.width} height={item.height} />
             );
             this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
         });
@@ -265,7 +281,7 @@ export class IdentifyModule extends Component {
         this.displayFeatureInfo(e, 3857, "context").then(item => {
             this._setValue(this.point_context, "context")
             this.root_context.render(
-                <ContextComponent pos={item.pos} coords={item.coords} ref={this.refContext} width={item.width} height={item.height} />
+                <ContextComponent position={item.position} coords={item.coords} ref={this.refContext} width={item.width} height={item.height} />
             );
             this._visible({ portal: false, overlay: e.coordinate, key: "context" });
         })

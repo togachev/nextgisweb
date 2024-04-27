@@ -1,9 +1,11 @@
-import { FC, forwardRef, RefObject, useState, useMemo } from 'react';
+import { FC, forwardRef, RefObject, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 
 import Draggable from 'react-draggable';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
+
+import { Rnd } from "react-rnd";
 
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -16,53 +18,15 @@ import { ConfigProvider, Tabs, Tooltip } from "@nextgisweb/gui/antd";
 // }
 
 const FeatureComponent: FC = ({ response, height }) => {
+    const itemHeight = height - 60
     // features && (Object.entries<FeaturesProps>(features)).forEach(([key, value]) => {
     //     console.log(key, value);
     // });
-
+    // console.log(response, height);
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Tabs: {
-                        inkBarColor: "#106a90",
-                        itemSelectedColor: "#106a90",
-                        itemHoverColor: "#106a9080",
-                        paddingXS: '0 10',
-                        horizontalItemGutter: 10,
-                        horizontalMargin: '0 5px 5px 5px',
-                    },
-                    Tooltip: {
-                        colorTextLightSolid: '#000',
-                        borderRadius: 3,
-                    }
-                },
-            }}
-        >
-            {response?.featureCount === 0 ?
-                undefined :
-                (<Tabs
-                    size="small"
-                    defaultActiveKey="1"
-                    items={[Info, QueryStats, EditNote].map((Icon, i) => {
-                        const id = String(i + 1);
-                        const itemHeight = height - 80
-                        return {
-                            key: id,
-                            children: <div className="item-content"
-                                style={{ height: itemHeight }}
-                            >
-                                {response?.featureCount}
-                            </div>,
-                            icon: <Tooltip title="prompt text" color="#fff" >
-                                <Icon />
-                            </Tooltip>,
-                        };
-                    })}
-                />)
-            }
-
-        </ConfigProvider>
+        <div className="item-content" style={{ height: itemHeight }} >
+            {response?.featureCount}
+        </div>
     )
 };
 
@@ -87,80 +51,63 @@ interface PopupProps {
     visible: ({ portal, overlay, key }: VisibleProps) => void;
     coords: number[];
     response: ResponseProps;
-    pos: PosProps;
+    position: PosProps;
+    element: HTMLElement;
 }
-import { observer } from "mobx-react-lite";
 
-export default observer(forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
+export default forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
 
-    const { width, height, visible, coords, response, pos } = props;
-    const [bounds, setBounds] = useState({
-        left: 0,
-        top: 0,
-        bottom: 0,
-        right: 0,
-    })
-    console.log(response);
+    const { width, height, visible, coords, response, position, element } = props;
 
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [state, setState] = useState({
+        width: width,
+        height: height,
+        x: position.x,
+        y: position.y,
+    });
 
-    useMemo(() => {
-        setPosition({ x: 0, y: 0 })
-    }, [pos])
-
-    const onDrag = (e, data) => {
-        setPosition({ x: data.x, y: data.y })
-    };
-
-    const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
-        const { clientWidth, clientHeight } = window.document.documentElement;
-
-        const targetRect = ref.current?.getBoundingClientRect();
-        if (!targetRect) {
-            return;
-        }
-
-        setBounds({
-            left: -targetRect.left + uiData.x,
-            right: clientWidth - (targetRect.right - uiData.x),
-            top: -targetRect.top + uiData.y,
-            bottom: clientHeight - (targetRect.bottom - uiData.y),
-        });
-    };
+    useEffect(() => {
+        setState({ x: position.x, y: position.y, width: width, height: height })
+    }, [position])
 
     return (
         createPortal(
-            <Draggable
-                position={position}
-                onDrag={onDrag}
+            <Rnd
+                // scale={scale}
+                dragHandleClassName="title-name"
+                bounds="canvas"
+                minWidth={width}
+                minHeight={height}
                 allowAnyClick={true}
-                handle=".title-name"
-                bounds={bounds}
-                onStart={(event: DraggableEvent, uiData: DraggableData) => onStart(event, uiData)}
+                enableResizing={response?.featureCount > 0 ? true : false}
+                position={{ x: state.x, y: state.y }}
+                size={{ width: state.width, height: state.height }}
+                onDragStop={(e, d) => {
+                    setState(prev => ({ ...prev, x: d.x, y: d.y }));
+                }}
+                onResize={(e, direction, ref, delta, position) => {
+                    setState(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight }));
+                }}
+                ref={ref}
             >
-                <div ref={ref} className="popup-position"
-                    style={{
-                        width: width,
-                        height: height,
-                        left: pos.x,
-                        top: pos.y,
-                    }}
-                >
+                <div className="popup-position" >
                     <div className="title">
                         <div className="title-name">Объектов: {response?.featureCount}</div>
-                        <span className="icon-symbol"
-                            onClick={() => { visible({ portal: true, overlay: undefined, key: "popup" }) }}
-                        >
+                        <span
+                            className="icon-symbol"
+                            onClick={() => { visible({ portal: true, overlay: undefined, key: "popup" }) }} >
                             <CloseIcon />
                         </span>
                     </div>
-                    <div className="content">
-                        <FeatureComponent response={response} height={height} />
-                    </div>
+                    {response?.featureCount > 0 && (
+                        <div className="content">
+                            <FeatureComponent response={response} height={state.height} />
+                        </div>
+                    )}
                     <div className="footer-popup">{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
                 </div>
-            </Draggable>,
-            document.body
+            </Rnd>,
+            element
         )
     )
-}));
+});

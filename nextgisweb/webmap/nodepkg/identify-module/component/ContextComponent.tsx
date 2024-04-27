@@ -11,12 +11,12 @@ interface ContextProps {
     width: number;
     height: number;
     coords: number[];
-    pos: PositionProps;
+    position: PositionProps;
 }
 
 export default forwardRef<HTMLInputElement>(function ContextComponent(props: ContextProps, ref: RefObject<HTMLInputElement>) {
 
-    const { width, height, coords, pos } = props;
+    const { width, height, coords, position } = props;
     useOutsideClick(ref, true);
 
     const array = [
@@ -31,8 +31,8 @@ export default forwardRef<HTMLInputElement>(function ContextComponent(props: Con
             <div ref={ref} className="context-position" style={{
                 width: width,
                 height: height,
-                left: pos.x,
-                top: pos.y,
+                left: position.x,
+                top: position.y,
                 position: "absolute",
             }}>
                 <div

@@ -14,18 +14,19 @@
 }
 
 .popup-position {
+    height: 100%;
+    width: 100%;
+    justify-content: space-between;
     border-radius: 3px;
     border: solid var(--divider-color) 1px;
     box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-    background: #fff;
     position: absolute;
-    // right: 10px;
-    // top: 50px;
     content: "";
     display: flex;
     clear: both;
     flex-direction: column;
-    
+    background: #fff;
+
     .title {
         display: flex;
         padding: 0;
@@ -56,14 +57,18 @@
             cursor: pointer;
 
             &:hover {
-                background-color: #acacac20;
-                border-radius: 50%;
+                background-color: var(--divider-color);
+                border-radius: 3px;
             }
         }
     }
 
     .content {
         overflow: hidden;
+        position: absolute;
+        top: 25px;
+        border-bottom: solid var(--divider-color) 1px;
+        width: 100%;
         .item-content {
             display: flex;
             padding: 5px;
@@ -75,10 +80,8 @@
     .footer-popup {
         display: flex;
         padding: 0 5px;
-        justify-content: flex-start;
-        align-items: center;
-        border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
     }
 }
 
