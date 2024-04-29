@@ -15,6 +15,7 @@ import ContextComponent from "./component/ContextComponent";
 import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
+import { identifyStore } from "./IdentifyStore";
 
 interface VisibleProps {
     portal: boolean;
@@ -152,44 +153,42 @@ export class IdentifyModule extends Component {
         // this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
     }
 
-    positionContext = (event, _width, _height, offset, op) => {
+    positionContext = (event, _width, _height, offset) => {
         const width = _width + offset;
         const height = _height + offset;
-        let vw = event.originalEvent.srcElement.clientWidth;
-        let vh = event.originalEvent.srcElement.clientHeight;
-        
-        const p = op === "context" ?
-            { x: event.originalEvent.clientX, y: event.originalEvent.clientY } :
-            { x: 0, y: 0 };
+
+        let cw = event.originalEvent.target.clientWidth;
+        let ch = event.originalEvent.target.clientHeight;
+        const p = { x: event.originalEvent.clientX, y: event.originalEvent.clientY };
 
         /*top left*/
         if (
-            event.originalEvent.layerX + width <= vw
-            && event.originalEvent.layerY + height <= vh
+            event.originalEvent.layerX + width <= cw
+            && event.originalEvent.layerY + height <= ch
         ) {
             return { x: p.x + offset, y: p.y + offset }
         }
 
         /*top right*/
         if (
-            event.originalEvent.layerX + width > vw
-            && event.originalEvent.layerY + height < vh
+            event.originalEvent.layerX + width > cw
+            && event.originalEvent.layerY + height < ch
         ) {
             return { x: p.x - width, y: p.y + offset }
         }
 
         /*bottom left*/
         if (
-            event.originalEvent.layerX < vw - width
-            && event.originalEvent.layerY < vh
+            event.originalEvent.layerX < cw - width
+            && event.originalEvent.layerY < ch
         ) {
             return { x: p.x + offset, y: p.y - height }
         }
 
         /*bottom right*/
         if (
-            event.originalEvent.layerX < vw
-            && event.originalEvent.layerY < vh
+            event.originalEvent.layerX < cw
+            && event.originalEvent.layerY < ch
         ) {
             return { x: p.x - width, y: p.y - height }
         }
@@ -241,6 +240,7 @@ export class IdentifyModule extends Component {
                 json: request,
             })
             .then((response) => {
+                identifyStore.setAttrFeature(response)
                 return response
             })
 
@@ -256,7 +256,7 @@ export class IdentifyModule extends Component {
         }
 
         const offset = op === "popup" ? settings.offset_point : 0;
-        const position = this.positionContext(event, width, height, offset, op);
+        const position = this.positionContext(event, width, height, offset);
 
         if (op === "context") {
             return { coords, position, width, height };
@@ -270,7 +270,9 @@ export class IdentifyModule extends Component {
             this._visible({ portal: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
             this.root_popup.render(
-                <PopupComponent element={this.overlay_popup.element} position={item.position} coords={item.coords} response={item.response} visible={this._visible} ref={this.refPopup} width={item.width} height={item.height} />
+                <PopupComponent position={item.position} coords={item.coords} 
+                // response={item.response} 
+                visible={this._visible} ref={this.refPopup} width={item.width} height={item.height} />
             );
             this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
         });
