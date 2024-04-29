@@ -1,43 +1,7 @@
 import { FC, forwardRef, RefObject, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
-
-import Draggable from 'react-draggable';
-import type { DraggableData, DraggableEvent } from 'react-draggable';
-
 import { Rnd } from "react-rnd";
-
-import Info from "@nextgisweb/icon/material/info/outline";
-import QueryStats from "@nextgisweb/icon/material/query_stats";
-import EditNote from "@nextgisweb/icon/material/edit_note";
-import { ConfigProvider, Tabs, Tooltip } from "@nextgisweb/gui/antd";
-
-import { identifyStore } from "../IdentifyStore";
-
-interface FeaturesProps {
-    key: number | string;
-    value: object;
-}
-
-const FeatureComponent: FC = ({ response, height }) => {
-    const itemHeight = height - 60
-    // const count = response.featureCount;
-    const filter = Object.keys(response).reduce(function (r, e) {
-        if (e !== "featureCount") r[e] = response[e]
-        return r;
-    }, {})
-    console.log(response, filter);
-    
-
-    return (
-        <div className="item-content"
-            style={{ height: itemHeight }}
-        >
-            {response?.featureCount}
-            ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-        </div>
-    )
-};
 
 interface VisibleProps {
     portal: boolean;
@@ -46,7 +10,7 @@ interface VisibleProps {
 }
 interface ResponseProps {
     featureCount: number;
-    y: number;
+    data: string;
 }
 
 interface PosProps {
@@ -61,13 +25,11 @@ interface PopupProps {
     coords: number[];
     response: ResponseProps;
     position: PosProps;
-    element: HTMLElement;
 }
 
 export default forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
 
-    const { width, height, visible, coords, position } = props;
-    const response = identifyStore.attrFeature.response;
+    const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
     const [state, setState] = useState({
         width: width,
@@ -75,7 +37,7 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
         x: position.x,
         y: position.y,
     });
-
+    
     const [refRnd, setRefRnd] = useState();
 
     useEffect(() => {
@@ -100,8 +62,8 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
                     setState(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
                 }}
                 ref={c => {
-                    setRefRnd(c);
                     if (c) {
+                        setRefRnd(c);
                         c.resizableElement.current.hidden = false;
                     }
                 }}
@@ -120,7 +82,7 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
                     </div>
                     {count > 0 && (
                         <div className="content">
-                            <FeatureComponent response={response} height={state.height} />
+                            <FeatureComponent data={response.data} height={state.height} />
                         </div>
                     )}
                     <div className="footer-popup">{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
@@ -130,3 +92,16 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
         )
     )
 });
+
+const FeatureComponent: FC = ({ data, height }) => {
+    const itemHeight = height - 60
+    const label = data[0].features[0].label
+
+    return (
+        <div className="item-content"
+            style={{ height: itemHeight }}
+        >
+            {label}
+        </div>
+    )
+};

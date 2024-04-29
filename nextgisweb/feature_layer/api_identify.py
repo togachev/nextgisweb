@@ -1,6 +1,5 @@
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
-from nextgisweb.env import _
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
@@ -105,6 +104,7 @@ def identify_module(request) -> JSONType:
     srs = int(data['srs'])
     geom = Geometry.from_wkt(data['geom'], srid=srs)
     result = dict()
+    data_ = []
     style_list = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in data["styles"]]))
     feature_count = 0
 
@@ -127,19 +127,22 @@ def identify_module(request) -> JSONType:
             features = []
             for f in query():
                 features.append(dict(
-                    serialize(f, **srlz_params),
+                    # serialize(f, **srlz_params),
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,
                     fields=f.fields,
+                    label=f.label,
                 ))
             if len(features):
-                result[layer_id_str] = dict(
+                data_.append(dict(
                     label=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                    id=layer_id_str,
                     features=features,
                     featureCount=len(features),
-                )
+                ))
             feature_count += len(features)
+    result["data"] = data_
     result["featureCount"] = feature_count
     return result
 

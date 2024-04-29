@@ -15,7 +15,6 @@ import ContextComponent from "./component/ContextComponent";
 import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
-import { identifyStore } from "./IdentifyStore";
 
 interface VisibleProps {
     portal: boolean;
@@ -159,6 +158,7 @@ export class IdentifyModule extends Component {
 
         let cw = event.originalEvent.target.clientWidth;
         let ch = event.originalEvent.target.clientHeight;
+
         const p = { x: event.originalEvent.clientX, y: event.originalEvent.clientY };
 
         /*top left*/
@@ -240,8 +240,7 @@ export class IdentifyModule extends Component {
                 json: request,
             })
             .then((response) => {
-                identifyStore.setAttrFeature(response)
-                return response
+                return response;
             })
 
         const width = op === "popup" ? settings.popup_width : settings.context_width;
@@ -261,7 +260,7 @@ export class IdentifyModule extends Component {
         if (op === "context") {
             return { coords, position, width, height };
         } else {
-            return { response, coords, position, width, height };
+            return { coords, position, width, height, response };
         }
     };
 
@@ -270,9 +269,7 @@ export class IdentifyModule extends Component {
             this._visible({ portal: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
             this.root_popup.render(
-                <PopupComponent position={item.position} coords={item.coords} 
-                // response={item.response} 
-                visible={this._visible} ref={this.refPopup} width={item.width} height={item.height} />
+                <PopupComponent response={item.response} position={item.position} coords={item.coords} visible={this._visible} ref={this.refPopup} width={item.width} height={item.height} />
             );
             this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
         });
