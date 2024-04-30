@@ -70,9 +70,15 @@
         height: 100%;
         .item-content {
             display: flex;
-            padding: 5px 0px 5px 5px;
+            padding: 0;
             word-break: break-word;
             overflow: auto;
+            flex-direction: column;
+            height: 100%;
+
+            .item {
+                padding: 5px;
+            }
         }
     }
 

@@ -1,9 +1,11 @@
-import { FC, forwardRef, RefObject, useState, useEffect } from 'react';
+import { forwardRef, RefObject, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
 import { IdentifyStore } from "../IdentifyStore"
 import { observer } from "mobx-react-lite";
+
+import { FeatureComponent } from "./FeatureComponent"
 
 interface VisibleProps {
     portal: boolean;
@@ -91,16 +93,3 @@ export default observer(forwardRef<HTMLInputElement>(function PopupComponent(pro
         )
     )
 }));
-
-const FeatureComponent: FC = ({ data }) => {
-    data.map(item => {
-        console.log(item);
-        
-    })
-    return (
-        <div className="item-content">
-            {data[0].layer_name}
-            {data[0].fields.data}
-        </div>
-    )
-};
