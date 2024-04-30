@@ -10,7 +10,6 @@ export interface StateProps {
 }
 
 export class IdentifyStore {
-
     valueRnd: StateProps = {
         x: 0,
         y: 0,
@@ -18,12 +17,27 @@ export class IdentifyStore {
         height: 0,
     };
 
-    constructor() {
-        makeAutoObservable(this);
+    selected: object;
+
+    constructor({ selected, ...props }) {
+        this.selected = selected;
+        for (const key in props) {
+            const k = key;
+            const prop = (props)[k];
+            if (prop !== undefined) {
+                Object.assign(this, { [k]: prop });
+            }
+        }
+
+        makeAutoObservable(this, {});
     }
 
     setValueRnd = (valueRnd: SetValue<StateProps>) => {
         this.setValue("valueRnd", valueRnd);
+    };
+
+    setSelected = (selected: object) => {
+        this.selected = selected;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

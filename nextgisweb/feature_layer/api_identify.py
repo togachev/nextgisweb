@@ -106,7 +106,7 @@ def identify_module(request) -> JSONType:
     result = dict()
     style_list = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in data["styles"]]))
     feature_count = 0
-    features = []
+    options = []
     for style in style_list:
         layer = style.parent
         layer_id_str = str(layer.id)
@@ -121,16 +121,17 @@ def identify_module(request) -> JSONType:
             query.limit(100)
             
             for f in query():
-                features.append(dict(
+                options.append(dict(
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,
                     fields=f.fields,
                     label=f.label,
+                    value=f.id,
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
-            feature_count += len(features)
-    result["data"] = features
+    feature_count += len(options)
+    result["data"] = options
     result["featureCount"] = feature_count
     return result
 
