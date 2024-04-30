@@ -2,6 +2,8 @@ import { FC, forwardRef, RefObject, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
+import { IdentifyStore } from "../IdentifyStore"
+import { observer } from "mobx-react-lite";
 
 interface VisibleProps {
     portal: boolean;
@@ -27,21 +29,18 @@ interface PopupProps {
     position: PosProps;
 }
 
-export default forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
+export default observer(forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
 
     const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
-    const [state, setState] = useState({
-        width: width,
-        height: height,
-        x: position.x,
-        y: position.y,
-    });
-    
+
+    const [store] = useState(() => new IdentifyStore());
     const [refRnd, setRefRnd] = useState();
 
+    console.log(response);
+
     useEffect(() => {
-        setState({ x: position.x, y: position.y, width: width, height: height })
+        store.setValueRnd({ x: position.x, y: position.y, width: width, height: height })
     }, [position])
 
     return (
@@ -53,13 +52,13 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
                 minHeight={height}
                 allowAnyClick={true}
                 enableResizing={count > 0 ? true : false}
-                position={{ x: state.x, y: state.y }}
-                size={{ width: state.width, height: state.height }}
+                position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
+                size={{ width: store.valueRnd.width, height: store.valueRnd.height }}
                 onDragStop={(e, d) => {
-                    setState(prev => ({ ...prev, x: d.x, y: d.y }));
+                    store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
                 }}
                 onResize={(e, direction, ref, delta, position) => {
-                    setState(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                    store.setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
                 }}
                 ref={c => {
                     if (c) {
@@ -82,7 +81,7 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
                     </div>
                     {count > 0 && (
                         <div className="content">
-                            <FeatureComponent data={response.data} height={state.height} />
+                            <FeatureComponent data={response.data} />
                         </div>
                     )}
                     <div className="footer-popup">{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
@@ -91,17 +90,17 @@ export default forwardRef<HTMLInputElement>(function PopupComponent(props: Popup
             document.body
         )
     )
-});
+}));
 
-const FeatureComponent: FC = ({ data, height }) => {
-    const itemHeight = height - 60
-    const label = data[0].features[0].label
-
+const FeatureComponent: FC = ({ data }) => {
+    data.map(item => {
+        console.log(item);
+        
+    })
     return (
-        <div className="item-content"
-            style={{ height: itemHeight }}
-        >
-            {label}
+        <div className="item-content">
+            {data[0].layer_name}
+            {data[0].fields.data}
         </div>
     )
 };

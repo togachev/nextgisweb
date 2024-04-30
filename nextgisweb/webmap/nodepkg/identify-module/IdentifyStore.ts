@@ -1,26 +1,42 @@
 import { makeAutoObservable } from "mobx";
 
-export interface AttrProps {
-    response?: string;
+export type SetValue<T> = ((prevValue: T) => T) | T;
+
+export interface StateProps {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
-export interface ResponseProps {
-    response?: string;
-}
+export class IdentifyStore {
 
-class IdentifyStore {
-    attrFeature = {
-        response: undefined,
+    valueRnd: StateProps = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
     };
 
     constructor() {
         makeAutoObservable(this);
     }
 
-    setAttrFeature(response): void {
-        this.attrFeature = { response };
+    setValueRnd = (valueRnd: SetValue<StateProps>) => {
+        this.setValue("valueRnd", valueRnd);
+    };
+
+    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
+        const isUpdaterFunction = (
+            input: unknown
+        ): input is (prevValue: T) => T => {
+            return typeof input === "function";
+        };
+
+        const newValue = isUpdaterFunction(valueOrUpdater)
+            ? valueOrUpdater(this[property] as T)
+            : valueOrUpdater;
+
+        Object.assign(this, { [property]: newValue });
     }
-
 }
-
-export const identifyStore = new IdentifyStore();

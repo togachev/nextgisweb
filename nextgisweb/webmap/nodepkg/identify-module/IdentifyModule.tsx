@@ -1,4 +1,4 @@
-import { React, Component, createRef, RefObject } from "react";
+import React, { Component, createRef, RefObject } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
@@ -54,6 +54,11 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
     }
     return true;
 };
+
+interface ResponseProps {
+    data: object;
+    featureCount: number;
+}
 
 export class IdentifyModule extends Component {
     private display: DojoDisplay

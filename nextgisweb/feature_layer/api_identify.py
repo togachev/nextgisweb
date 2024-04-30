@@ -4,7 +4,7 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
-from .api import _extensions, serialize
+from .api import serialize
 
 def identify(request) -> JSONType:
     data = request.json_body
@@ -104,10 +104,9 @@ def identify_module(request) -> JSONType:
     srs = int(data['srs'])
     geom = Geometry.from_wkt(data['geom'], srid=srs)
     result = dict()
-    data_ = []
     style_list = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in data["styles"]]))
     feature_count = 0
-
+    features = []
     for style in style_list:
         layer = style.parent
         layer_id_str = str(layer.id)
@@ -116,33 +115,22 @@ def identify_module(request) -> JSONType:
         elif not IFeatureLayer.providedBy(layer):
             result[layer_id_str] = dict(error="Not implemented")
         else:
-            srlz_params = dict(
-                geom_format=request.GET.get("geom_format", "wkt").lower(),
-                extensions=_extensions(request.GET.get("extensions"), layer),
-            )
             query = layer.feature_query()
             query.geom()
             query.intersects(geom)
             query.limit(100)
-            features = []
+            
             for f in query():
                 features.append(dict(
-                    # serialize(f, **srlz_params),
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,
                     fields=f.fields,
                     label=f.label,
-                ))
-            if len(features):
-                data_.append(dict(
-                    label=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
-                    id=layer_id_str,
-                    features=features,
-                    featureCount=len(features),
+                    layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
             feature_count += len(features)
-    result["data"] = data_
+    result["data"] = features
     result["featureCount"] = feature_count
     return result
 
