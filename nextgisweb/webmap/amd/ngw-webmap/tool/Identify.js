@@ -531,6 +531,7 @@ define([
                             body: json.stringify(request),
                         })
                         .then(function (response) {
+                            console.log(response);
                             tool._responsePopup(response, point, layerLabels);
                         });
                 })

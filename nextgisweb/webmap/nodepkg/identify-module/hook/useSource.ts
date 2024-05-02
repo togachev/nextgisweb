@@ -1,8 +1,6 @@
-import { useEffect } from "react";
 import { route } from "@nextgisweb/pyramid/api";
 
 export const useSource = () => {
-
 
     const resourceItem = async (layerId, fid) => {
         await route("feature_layer.feature.item", {

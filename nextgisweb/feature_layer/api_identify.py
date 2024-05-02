@@ -130,6 +130,15 @@ def identify_module(request) -> JSONType:
                     value=f.id,
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
+
+            # Add name of parent resource to identification results,
+            # if there is no way to get layer name by id on the client
+            allow = layer.parent.has_permission(ResourceScope.read, request.user)
+
+            if allow:
+                for feature in options:
+                    feature["parent"] = layer.parent.display_name
+
     feature_count += len(options)
     result["data"] = options
     result["featureCount"] = feature_count

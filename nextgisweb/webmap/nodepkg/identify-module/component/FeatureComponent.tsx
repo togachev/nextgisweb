@@ -15,13 +15,12 @@ const settings = webmapSettings;
 
 export const FeatureComponent: FC = ({ data, store }) => {
     const { resourceItem } = useSource();
-
+    
     const onChange = (value: string) => {
         let val = data.find(item => item.id === value);
         store.setSelected(val);
     };
     const onChangeTabs = (e) => {
-        console.log(e);
         resourceItem(store.selected.layerId, store.selected.id);
     };
     const operations = (
@@ -35,24 +34,9 @@ export const FeatureComponent: FC = ({ data, store }) => {
         />
     );
 
-    const Content = (key) => {
-        getContent(key)
-        return (
-            <>
-                {Object.keys(store.selected.fields).map((key) => (
-                    <div key={key} className="item-fields">
-                        <div className="label">{key}</div>
-                        <div className="padding-item"></div>
-                        <div className="value text-ellipsis" title={store.selected.fields[key]}>{store.selected.fields[key] ? store.selected.fields[key] : gettext("N/A")}</div>
-                    </div>
-                ))}
-            </>
-        )
-    }
-
     const tabsItems = [
         {
-            title: gettext("Attributes"), key: "attribute", visible: true, icon: <Info title={gettext("Attributes")} />, children: store.selected && Object.keys(store.selected.fields).map((key) => (
+            title: gettext("Attributes"), key: "attribute", visible: settings.identify_attributes, icon: <Info title={gettext("Attributes")} />, children: store.selected && Object.keys(store.selected.fields).map((key) => (
                 <div key={key} className="item-fields">
                     <div className="label">{key}</div>
                     <div className="padding-item"></div>
