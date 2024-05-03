@@ -71,8 +71,8 @@ export class IdentifyModule extends Component {
     private point_context: HTMLDivElement;
     private root_popup: React.ReactElement;
     private root_context: React.ReactElement;
-    private refPopup: RefObject<HTMLInputElement>;
-    private refContext: RefObject<HTMLInputElement>;
+    private refPopup: RefObject<Element>;
+    private refContext: RefObject<Element>;
 
     constructor(props: DojoDisplay) {
         super(props)

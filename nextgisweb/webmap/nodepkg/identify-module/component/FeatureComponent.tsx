@@ -7,22 +7,28 @@ import Description from "@nextgisweb/icon/material/description";
 import Attachment from "@nextgisweb/icon/material/attachment";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import { useSource } from "../hook/useSource";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
 
 const settings = webmapSettings;
 
 export const FeatureComponent: FC = ({ data, store }) => {
-    console.log(data);
+    const { fieldsAttribute, resourceItem, fields } = useSource();
     
-    const onChange = (id: string) => {
-        let val = data.find(item => item.value === id);
+    const onChange = (value: number) => {
+        let val = data.find(item => item.value === value);
         store.setSelected(val);
     };
 
     const onChangeTabs = () => {
         console.log(store.selected);
     };
+
+    useEffect(() => {
+        store.setSelected(data[0]);
+        fieldsAttribute(store.selected).then(item => console.log(item))
+    }, [data])
 
     const operations = (
         <Button
@@ -34,7 +40,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
             }}
         />
     );
-    console.log(store.selected);
+
     const tabsItems = [
         {
             title: gettext("Attributes"),
@@ -52,9 +58,9 @@ export const FeatureComponent: FC = ({ data, store }) => {
             //         )
             //     }) :
             //     (<Empty style={{marginBlock: 10}} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
-            children: <Empty style={{marginBlock: 10}} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            children: <>{store.selected && (<>{store.selected.id}</>)}</>
         },
-        { title: gettext("Geometry"), key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.value} />) },
+        { title: gettext("Geometry"), key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />) },
         { title: gettext("Description"), key: "description", visible: true, icon: <Description /> },
         { title: gettext("Attachments"), key: "attachment", visible: true, icon: <Attachment /> },
     ];
@@ -76,7 +82,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
         >
             <div className="item-content">
                 <div className="item">
-                    {/* <Select
+                    <Select
                         optionFilterProp="children"
                         filterOption={(input, option) => (option?.label ?? "").includes(input)}
                         filterSort={(optionA, optionB) =>
@@ -88,7 +94,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
                         style={{ width: "100%" }}
                         onChange={onChange}
                         options={data}
-                    /> */}
+                    />
                     <Tabs
                         size="small"
                         onChange={onChangeTabs}

@@ -14,7 +14,7 @@ interface ContextProps {
     position: PositionProps;
 }
 
-export default forwardRef<HTMLInputElement>(function ContextComponent(props: ContextProps, ref: RefObject<HTMLInputElement>) {
+export default forwardRef<Element>(function ContextComponent(props: ContextProps, ref: RefObject<Element>) {
 
     const { width, height, coords, position } = props;
     useOutsideClick(ref, true);

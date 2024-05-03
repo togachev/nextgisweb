@@ -70,7 +70,7 @@ define([
                                     }
                                 }
                             );
-
+                            console.log(value, fieldmap);
                             fieldsCache[this.resourceId] = fieldmap;
                             all(deferreds).then(
                                 lang.hitch(this, function () {
@@ -91,7 +91,6 @@ define([
             for (var k in value) {
                 var val = value[k];
                 var field = fieldmap[k];
-
                 if (this.compact && !fieldmap[k].grid_visibility) {
                     continue;
                 }

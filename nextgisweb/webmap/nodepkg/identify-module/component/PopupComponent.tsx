@@ -6,7 +6,6 @@ import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { Tooltip } from "@nextgisweb/gui/antd";
 import { FeatureComponent } from "./FeatureComponent";
-import { useSource } from "../hook/useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 
 interface VisibleProps {
@@ -24,6 +23,14 @@ interface PosProps {
     y: number;
 }
 
+interface RndProps {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+
 interface PopupProps {
     width: number;
     height: number;
@@ -33,22 +40,25 @@ interface PopupProps {
     position: PosProps;
 }
 
-export default observer(forwardRef<HTMLInputElement>(function PopupComponent(props: PopupProps, ref: RefObject<HTMLInputElement>) {
+export default observer(forwardRef<Element>(function PopupComponent(props: PopupProps, ref: RefObject<Element>) {
 
     const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
-    const { fieldsAttribute, resourceItem } = useSource();
-
 
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
     }));
 
     const [refRnd, setRefRnd] = useState();
+    const [valueRnd, setValueRnd] = useState<RndProps>({
+        x: position.x,
+        y: position.y,
+        width: width,
+        height: height,
+    });
 
     useEffect(() => {
-        store.setValueRnd({ x: position.x, y: position.y, width: width, height: height });
-        store.setSelected(response.data[0]);
+        setValueRnd({ x: position.x, y: position.y, width: width, height: height });
     }, [position])
 
 
@@ -76,13 +86,13 @@ export default observer(forwardRef<HTMLInputElement>(function PopupComponent(pro
                 minHeight={height}
                 allowAnyClick={true}
                 enableResizing={count > 0 ? true : false}
-                position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
-                size={{ width: store.valueRnd.width, height: store.valueRnd.height }}
+                position={{ x: valueRnd.x, y: valueRnd.y }}
+                size={{ width: valueRnd.width, height: valueRnd.height }}
                 onDragStop={(e, d) => {
-                    store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                    setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
                 }}
                 onResize={(e, direction, ref, delta, position) => {
-                    store.setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                    setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
                 }}
                 ref={c => {
                     if (c) {
