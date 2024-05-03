@@ -1,7 +1,7 @@
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceScope
+from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 from .api import serialize
@@ -110,7 +110,7 @@ def identify_module(request) -> JSONType:
     for style in style_list:
         layer = style.parent
         layer_id_str = str(layer.id)
-        if not layer.has_permission(DataScope.read, request.user):
+        if not layer.has_permission(DataStructureScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
         elif not IFeatureLayer.providedBy(layer):
             result[layer_id_str] = dict(error="Not implemented")
@@ -122,22 +122,22 @@ def identify_module(request) -> JSONType:
             
             for f in query():
                 options.append(dict(
-                    id=f.id,
+                    # id=f.id,
                     layerId=layer.id,
                     styleId=style.id,
-                    fields=f.fields,
+                    # fields=f.fields,
                     label=f.label,
                     value=f.id,
-                    layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                    # layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
 
             # Add name of parent resource to identification results,
             # if there is no way to get layer name by id on the client
-            allow = layer.parent.has_permission(ResourceScope.read, request.user)
+            # allow = layer.parent.has_permission(ResourceScope.read, request.user)
 
-            if allow:
-                for feature in options:
-                    feature["parent"] = layer.parent.display_name
+            # if allow:
+            #     for feature in options:
+            #         feature["parent"] = layer.parent.display_name
 
     feature_count += len(options)
     result["data"] = options

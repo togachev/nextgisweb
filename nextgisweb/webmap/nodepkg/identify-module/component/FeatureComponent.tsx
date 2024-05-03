@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { Button, ConfigProvider, Segmented, Select, Tabs, Tooltip } from "@nextgisweb/gui/antd";
+import { FC, useEffect } from "react";
+import { Button, ConfigProvider, Empty, Segmented, Select, Tabs, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -7,22 +7,23 @@ import Description from "@nextgisweb/icon/material/description";
 import Attachment from "@nextgisweb/icon/material/attachment";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
-import { useSource } from "../hook/useSource";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
 
 const settings = webmapSettings;
 
 export const FeatureComponent: FC = ({ data, store }) => {
-    const { resourceItem } = useSource();
+    console.log(data);
     
-    const onChange = (value: string) => {
-        let val = data.find(item => item.id === value);
+    const onChange = (id: string) => {
+        let val = data.find(item => item.value === id);
         store.setSelected(val);
     };
-    const onChangeTabs = (e) => {
-        resourceItem(store.selected.layerId, store.selected.id);
+
+    const onChangeTabs = () => {
+        console.log(store.selected);
     };
+
     const operations = (
         <Button
             type="text"
@@ -33,23 +34,30 @@ export const FeatureComponent: FC = ({ data, store }) => {
             }}
         />
     );
-
+    console.log(store.selected);
     const tabsItems = [
         {
-            title: gettext("Attributes"), key: "attribute", visible: settings.identify_attributes, icon: <Info title={gettext("Attributes")} />, children: store.selected && Object.keys(store.selected.fields).map((key) => (
-                <div key={key} className="item-fields">
-                    <div className="label">{key}</div>
-                    <div className="padding-item"></div>
-                    <div className="value text-ellipsis" title={store.selected.fields[key]}>{store.selected.fields[key] ? store.selected.fields[key] : gettext("N/A")}</div>
-                </div>
-            ))
+            title: gettext("Attributes"),
+            key: "attributes",
+            visible: settings.identify_attributes,
+            icon: <Info title={gettext("Attributes")} />,
+            // children: store.selected && Object.keys(store.selected.fields).length > 0 ?
+            //     Object.keys(store.selected.fields).map((key) => {
+            //         return (
+            //             <div key={key} className="item-fields">
+            //                 <div className="label">{key}</div>
+            //                 <div className="padding-item"></div>
+            //                 <div className="value text-ellipsis" title={store.selected.fields[key]}>{store.selected.fields[key] ? store.selected.fields[key] : gettext("N/A")}</div>
+            //             </div>
+            //         )
+            //     }) :
+            //     (<Empty style={{marginBlock: 10}} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+            children: <Empty style={{marginBlock: 10}} image={Empty.PRESENTED_IMAGE_SIMPLE} />
         },
-        { title: gettext("Geometry"), key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />) },
+        { title: gettext("Geometry"), key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.value} />) },
         { title: gettext("Description"), key: "description", visible: true, icon: <Description /> },
         { title: gettext("Attachments"), key: "attachment", visible: true, icon: <Attachment /> },
     ];
-
-
 
     return (
         <ConfigProvider
@@ -68,7 +76,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
         >
             <div className="item-content">
                 <div className="item">
-                    <Select
+                    {/* <Select
                         optionFilterProp="children"
                         filterOption={(input, option) => (option?.label ?? "").includes(input)}
                         filterSort={(optionA, optionB) =>
@@ -80,18 +88,18 @@ export const FeatureComponent: FC = ({ data, store }) => {
                         style={{ width: "100%" }}
                         onChange={onChange}
                         options={data}
-                    />
+                    /> */}
                     <Tabs
                         size="small"
                         onChange={onChangeTabs}
                         tabBarExtraContent={operations}
                         items={tabsItems.map((item, i) => {
                             return item.visible ?
-                            {
-                                key: item.key,
-                                children: item.children,
-                                icon: item.icon,
-                            } : null
+                                {
+                                    key: item.key,
+                                    children: item.children,
+                                    icon: item.icon,
+                                } : null
                         })}
                     />
                 </div>

@@ -1,11 +1,13 @@
-import { forwardRef, RefObject, useState, useEffect } from 'react';
+import { forwardRef, RefObject, useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
-import { IdentifyStore } from "../IdentifyStore"
+import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { Tooltip } from "@nextgisweb/gui/antd";
-import { FeatureComponent } from "./FeatureComponent"
+import { FeatureComponent } from "./FeatureComponent";
+import { useSource } from "../hook/useSource";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 
 interface VisibleProps {
     portal: boolean;
@@ -35,6 +37,7 @@ export default observer(forwardRef<HTMLInputElement>(function PopupComponent(pro
 
     const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
+    const { fieldsAttribute, resourceItem } = useSource();
 
 
     const [store] = useState(() => new IdentifyStore({
@@ -45,9 +48,23 @@ export default observer(forwardRef<HTMLInputElement>(function PopupComponent(pro
 
     useEffect(() => {
         store.setValueRnd({ x: position.x, y: position.y, width: width, height: height });
-
         store.setSelected(response.data[0]);
     }, [position])
+
+
+    // useMemo(() => {
+    //     if (store.selected) {
+    //         console.log(store.selected);
+            
+    //         // fieldsAttribute(store.selected.layerId, store.selected.id);
+    //         // const iurl = routeURL("feature_layer.feature.item", {
+    //         //     id: store.selected.layerId,
+    //         //     fid: store.selected.id,
+    //         // });
+    //         // console.log(iurl);
+    //     }
+    // }, [store.selected])
+
 
     return (
         createPortal(
