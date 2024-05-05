@@ -186,6 +186,33 @@ def query_feature_or_not_found(query, resource_id, feature_id):
 
     raise FeatureNotFound(resource_id, feature_id)
 
+def iget_iso(resource, request) -> JSONType:
+    request.resource_permission(PERM_DATA_READ)
+
+    geom_skip = request.GET.get("geom", "yes").lower() == "no"
+    srs = request.GET.get("srs")
+
+    srlz_params = dict(
+        geom_format=request.GET.get("geom_format", "wkt").lower(),
+        dt_format=request.GET.get("dt_format", "iso"),
+        extensions=_extensions(request.GET.get("extensions"), resource),
+    )
+
+    query = resource.feature_query()
+
+    if resource.cls != 'nogeom_layer':
+        if not geom_skip:
+            if srs is not None:
+                query.srs(SRS.filter_by(id=int(srs)).one())
+            query.geom()
+            if srlz_params["geom_format"] == "wkt":
+                query.geom_format("WKT")
+
+    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
+
+    result = serialize(feature, **srlz_params)
+
+    return result
 
 def iget(resource, request) -> JSONType:
     request.resource_permission(PERM_DATA_READ)
@@ -540,6 +567,14 @@ def setup_pyramid(comp, config):
         get=iget,
         put=iput,
     ).delete(idelete, context=IWritableFeatureLayer)
+
+    config.add_route(
+        "feature_layer.feature.item_iso",
+        "/api/resource/{id}/feature_iso/{fid}",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=iget_iso,
+    )
 
     config.add_route(
         "feature_layer.feature.item_extent",

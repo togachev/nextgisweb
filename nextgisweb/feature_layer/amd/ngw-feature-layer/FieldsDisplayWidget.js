@@ -70,7 +70,6 @@ define([
                                     }
                                 }
                             );
-                            console.log(value, fieldmap);
                             fieldsCache[this.resourceId] = fieldmap;
                             all(deferreds).then(
                                 lang.hitch(this, function () {

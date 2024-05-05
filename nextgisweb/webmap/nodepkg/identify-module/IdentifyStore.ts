@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 
 export interface SelectedProps {
     id: number;

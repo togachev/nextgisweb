@@ -119,9 +119,10 @@ def identify_module(request) -> JSONType:
             query.geom()
             query.intersects(geom)
             query.limit(100)
-            
+
             for f in query():
                 options.append(dict(
+                    fields=f.fields,
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,

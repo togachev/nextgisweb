@@ -16,6 +16,7 @@ interface VisibleProps {
 interface ResponseProps {
     featureCount: number;
     data: object;
+    fields: object;
 }
 
 interface PosProps {
@@ -44,7 +45,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
 
     const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
-
+    
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
     }));
@@ -65,7 +66,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
     // useMemo(() => {
     //     if (store.selected) {
     //         console.log(store.selected);
-            
+
     //         // fieldsAttribute(store.selected.layerId, store.selected.id);
     //         // const iurl = routeURL("feature_layer.feature.item", {
     //         //     id: store.selected.layerId,

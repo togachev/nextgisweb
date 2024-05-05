@@ -179,7 +179,6 @@ define([
                     class: "ngwPopup__features",
                 }).placeAt(this.domNode);
                 setTimeout(lang.hitch(this, this.resize), 50);
-                console.log(this.response);
                 this._displayFeature(
                     this._featureResponse(this.select.get("value"))
                 );
@@ -282,7 +281,6 @@ define([
             });
 
             iurlXHR.then(function (feature) {
-                console.log(feature);
                 widget.extWidgetClassesDeferred.then(function () {
                     widget.extContainer = new StackContainer({
                         region: "center",
@@ -533,7 +531,6 @@ define([
                             body: json.stringify(request),
                         })
                         .then(function (response) {
-                            console.log(response);
                             tool._responsePopup(response, point, layerLabels);
                         });
                 })
