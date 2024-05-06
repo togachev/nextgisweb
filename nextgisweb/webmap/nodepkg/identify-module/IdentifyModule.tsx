@@ -153,46 +153,92 @@ export class IdentifyModule extends Component {
     }
 
     positionContext = (event, _width, _height, offset) => {
-        const width = _width + offset;
-        const height = _height + offset;
-        
-        
-        const cw = event.originalEvent.target.clientWidth;
-        const ch = event.originalEvent.target.clientHeight;
-        
-        const p = { x: event.originalEvent.clientX, y: event.originalEvent.clientY };
-        console.log(width, cw, event.originalEvent.view.innerWidth);
-        /*top left*/
+        const width = _width;
+        const height = _height;
+
+        const minW = width * 2;
+        const minH = height * 2;
+
+        const px = event.originalEvent.layerX;
+        const py = event.originalEvent.layerY;
+        const offHP = 40; //header/panel
+        const inx = event.originalEvent.view.innerWidth;
+        const iny = event.originalEvent.view.innerHeight;
+
+        console.log(width, 'px', px, inx);
+        console.log(height, 'py', py, iny);
+
+
         if (
-            event.originalEvent.layerX + width <= cw
-            && event.originalEvent.layerY + height <= ch
+            height === iny
         ) {
-            return { x: p.x + offset, y: p.y + offset }
+            console.log(1);
+            return { x: inx - width, y: offHP }
         }
 
-        /*top right*/
         if (
-            event.originalEvent.layerX + width > cw
-            && event.originalEvent.layerY + height < ch
+            height <= iny && width <= inx && width / 2 >= px && height / 2 >= py
         ) {
-            return { x: p.x - width, y: p.y + offset }
+            console.log(2);
+            return { x: px + offHP + offset, y: py + offHP + offset }
         }
 
-        /*bottom left*/
         if (
-            event.originalEvent.layerX < cw - width
-            && event.originalEvent.layerY < ch
+            height <= iny && width <= inx && width + offset <= px && height + offset <= py
         ) {
-            return { x: p.x + offset, y: p.y - height }
+            console.log(3);
+            return { x: px + offHP - width - offset, y: py + offHP - height - offset }
         }
 
-        /*bottom right*/
         if (
-            event.originalEvent.layerX < cw
-            && event.originalEvent.layerY < ch
+            height <= iny && width <= inx && width + offset <= px && height / 2 >= py
         ) {
-            return { x: p.x - width, y: p.y - height }
+            console.log(4);
+            return { x: px + offHP - width - offset, y: py + offHP + offset }
         }
+
+        if (
+            height <= iny && width <= inx && width / 2 >= px && height + offset <= py
+        ) {
+            console.log(5);
+            return { x: px + offHP + offset, y: py + offHP - height - offset }
+        }
+
+        if (
+            height <= iny && width <= inx && width > px && height / 2 > py
+        ) {
+            console.log(6);
+            return { x: px + offHP - width / 2, y: py + offHP + offset }
+        }
+
+        if (
+            height <= iny && width <= inx && width / 2 > px && height > py
+        ) {
+            console.log(7);
+            return { x: px + offHP + offset, y: py + offHP - height / 2 }
+        }
+
+        if (
+            height <= iny && width <= inx && width > px && height > py
+        ) {
+            console.log(8);
+            return { x: px + offHP - width / 2, y: py + offHP - height / 2 }
+        }
+
+        if (
+            height <= iny && width <= inx && width + offset < px && height / 2 < py
+        ) {
+            console.log(9);
+            return { x: px + offHP - width - offset, y: py + offHP - height / 2 }
+        }
+
+        if (
+            height <= iny && width <= inx && width / 2 < px && height < py
+        ) {
+            console.log(10);
+            return { x: px + offHP - width / 2, y: py + offHP - height - offset }
+        }
+
     }
 
     displayFeatureInfo = async (event: MapBrowserEvent, value: number, op: string) => {

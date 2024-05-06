@@ -71,7 +71,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
                 minWidth={width}
                 minHeight={height}
                 allowAnyClick={true}
-                enableResizing={count > 0 ? true : false}
+                // enableResizing={count > 0 ? true : false}
+                enableResizing={false}
                 position={{ x: valueRnd.x, y: valueRnd.y }}
                 size={{ width: valueRnd.width, height: valueRnd.height }}
                 onDragStop={(e, d) => {
