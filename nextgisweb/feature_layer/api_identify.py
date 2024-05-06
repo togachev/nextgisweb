@@ -20,7 +20,7 @@ def identify(request) -> JSONType:
     for style in style_list:
         layer = style.parent
         layer_id_str = str(layer.id)
-        if not layer.has_permission(DataScope.read, request.user):
+        if not layer.has_permission(DataStructureScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
 
         elif not IFeatureLayer.providedBy(layer):
@@ -122,7 +122,6 @@ def identify_module(request) -> JSONType:
 
             for f in query():
                 options.append(dict(
-                    fields=f.fields,
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,

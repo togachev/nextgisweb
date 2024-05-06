@@ -38,7 +38,6 @@
             font-weight: 500;
             padding: 0 5px;
             width: 100%;
-            cursor: move;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -73,12 +72,14 @@
         }
     }
 
-
-
     .content {
         overflow: hidden;
         width: 100%;
         height: 100%;
+
+        .select-feature {
+            padding: 2px 2px 0 2px;
+        }
 
         .ant-tabs-nav {
             margin: 0px;
@@ -118,19 +119,23 @@
                         display: flex;
                         padding: 0 10px 0 0;
                         align-items: center;
-                    }
-
-                    .padding-item {
-                        background-color: antiquewhite;
+                        min-width: min-content;
+                        width: 40%;                   
                     }
 
                     .value {
-                        max-width: 75%;
+                        max-width: max-content;
+                    }
+
+                    .value-email {
+                        max-width: 60%;
+                        text-align: right;
+                        cursor: pointer;
+                        color: var(--primary);
                     }
 
                     .text-ellipsis {
-                        display: flex;
-                        word-break: break-all;
+                        text-align: right;
                     }
                 }
             }
@@ -148,6 +153,9 @@
         padding: 0 5px;
         border-bottom-left-radius: 3px;
         border-bottom-right-radius: 3px;
+        border-top: solid var(--divider-color) 1px;
+        cursor: pointer;
+        color: var(--primary);
     }
 }
 

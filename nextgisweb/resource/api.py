@@ -115,6 +115,12 @@ def item_get(context, request) -> CompositeRead:
     serializer = CompositeSerializer(user=request.user)
     return serializer.serialize(context, CompositeRead)
 
+def item_fields(context, request) -> CompositeRead:
+    """Read resource"""
+    request.resource_permission(PERM_READ)
+
+    serializer = CompositeSerializer(user=request.user)
+    return serializer.serialize(context, CompositeRead).feature_layer["fields"]
 
 def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
     """Update resource"""
@@ -705,7 +711,12 @@ def setup_pyramid(comp, config):
         put=item_put,
         delete=item_delete,
     )
-
+    config.add_route(
+        "resource.fields",
+        "/api/resource/{id}/fields",
+        factory=resource_factory,
+        get=item_fields,
+    )
     config.add_route(
         "resource.collection",
         "/api/resource/",

@@ -17,14 +17,14 @@ export const useSource = () => {
         const fieldsCache = {};
         const fieldmap = resourceId in fieldsCache ?
             fieldsCache[resourceId] :
-            await route("resource.item", { id: resourceId })
+            await route("resource.fields", { id: resourceId })
                 .get({
                     cache: true,
                 })
                 .then(data => {
                     const deferreds: string[] = [];
-                    let fieldmap = {};
-                    data.feature_layer.fields.map(itm => {
+                    const fieldmap = {};
+                    data.map(itm => {
                         fieldmap[itm.keyname] = itm;
                         if (itm.lookup_table !== null) {
                             deferreds.push(
@@ -36,7 +36,7 @@ export const useSource = () => {
                     })
                     fieldsCache[resourceId] = fieldmap;
                     return Promise.all(deferreds).then(
-                        item => {
+                        () => {
                             const value = feature.fields;
                             const rename = (renameKeys, currentObject) => {
                                 return Object.keys(currentObject).reduce(
@@ -49,7 +49,7 @@ export const useSource = () => {
                             };
                             const renameKeys = {};
                             for (const k in value) {
-                                let val = value[k];
+                                const val = value[k];
                                 const field = fieldmap[k];
 
                                 if (!fieldmap[k].grid_visibility) {
@@ -57,7 +57,7 @@ export const useSource = () => {
                                 }
 
                                 if (field.lookup_table !== null) {
-                                    var lval = lookupTableCached.lookup(
+                                    const lval = lookupTableCached.lookup(
                                         field.lookup_table.id,
                                         val
                                     );

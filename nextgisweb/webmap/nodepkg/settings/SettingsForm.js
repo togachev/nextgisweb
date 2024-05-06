@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import {
+    Affix,
     Button,
     Col,
     Form,
@@ -373,21 +374,23 @@ export const SettingsForm = ({
 
             <Row className="row-submit">
                 <Col>
-                    <Button
-                        htmlType="submit"
-                        type={"primary"}
-                        danger={status === "saved-error"}
-                        icon={
-                            status === "saved-error" ? (
-                                <WarningOutlined />
-                            ) : (
-                                <SaveOutlined />
-                            )
-                        }
-                        loading={status === "saving"}
-                    >
-                        {gettext("Save")}
-                    </Button>
+                    <Affix style={{ position: 'fixed', bottom: "20px", right: "20px", zIndex: 100 }}>
+                        <Button
+                            htmlType="submit"
+                            type={"primary"}
+                            danger={status === "saved-error"}
+                            icon={
+                                status === "saved-error" ? (
+                                    <WarningOutlined />
+                                ) : (
+                                    <SaveOutlined />
+                                )
+                            }
+                            loading={status === "saving"}
+                        >
+                            {gettext("Save")}
+                        </Button>
+                    </Affix>
                 </Col>
             </Row>
         </Form>

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Button, ConfigProvider, Empty, Segmented, Select, Tabs, Tooltip, Typography } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Empty, Select, Tabs, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -8,14 +8,15 @@ import Attachment from "@nextgisweb/icon/material/attachment";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { useSource } from "../hook/useSource";
-import lookupTableCached from "ngw-lookup-table/cached";
+import { useCopy } from "@nextgisweb/webmap/useCopy";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
 
-const { Link, Text } = Typography;
+const { Link } = Typography;
 const settings = webmapSettings;
 
 export const FeatureComponent: FC = ({ data, store }) => {
     const { getFeature } = useSource();
+    const { copyValue, contextHolder } = useCopy();
 
     const [feature, setFeature] = useState();
 
@@ -60,13 +61,17 @@ export const FeatureComponent: FC = ({ data, store }) => {
     const RenderValue = (value) => {
 
         for (const k in value) {
-            let val = value[k];
+            const val = value[k];
 
             if (val !== null) {
                 if (urlRegex.test(val)) {
-                    return (<Link style={{ maxWidth: '75%' }} ellipsis={true} href={val} target="_blank">{val}</Link>)
+                    return (<Link style={{ maxWidth: "60%" }} ellipsis={true} href={val} target="_blank">{val}</Link>)
                 } else if (emailRegex.test(val)) {
-                    return (<Text style={{ maxWidth: '75%' }} ellipsis={true} copyable>{val}</Text>)
+                    return (<div className="value-email" onClick={() => {
+                        copyValue(val, gettext("Email address copied"));
+                        console.log(val);
+                        
+                    }} >{val}</div>)
                 } else {
                     return (<div className="value text-ellipsis">{val}</div>)
                 }
@@ -84,14 +89,10 @@ export const FeatureComponent: FC = ({ data, store }) => {
                 (<div className="item">
                     {Object.keys(feature).map((key) => {
                         return (
-
                             <div key={key} className="item-fields">
                                 <div className="label">{key}</div>
-                                <div className="padding-item"></div>
-                                {/* <div className="value text-ellipsis" title={feature[key]}>{feature[key]}</div> */}
                                 <RenderValue value={feature[key]} />
                             </div>
-
                         )
                     })}
                 </div>) :
@@ -110,32 +111,41 @@ export const FeatureComponent: FC = ({ data, store }) => {
                         inkBarColor: "#106a90",
                         itemSelectedColor: "#106a90",
                         itemHoverColor: "#106a9080",
-                        paddingXS: '0 10',
+                        paddingXS: "0 10",
                         horizontalItemGutter: 10,
-                        horizontalMargin: '0 5px 5px 5px',
+                        horizontalMargin: "0 5px 5px 5px",
                     },
+                    Select: {
+                        optionLineHeight: 1,
+                        optionHeight: 24,
+                        optionSelectedBg: "var(--divider-color)"
+                    }
                 },
             }}
         >
-            <Select
-                optionFilterProp="children"
-                filterOption={(input, option) => (option?.label ?? "").includes(input)}
-                filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
-                }
-                showSearch
-                size="small"
-                value={store.selected}
-                style={{ width: "100%" }}
-                onChange={onChange}
-                options={data}
-            />
+            {contextHolder}
+            <div className="select-feature">
+                <Select
+                    optionFilterProp="children"
+                    filterOption={(input, option) => (option?.label ?? "").includes(input)}
+                    filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                    }
+                    showSearch
+                    size="small"
+                    value={store.selected}
+                    style={{ width: "100%" }}
+                    onChange={onChange}
+                    options={data}
+                />
+            </div>
+
             <Tabs
                 size="small"
                 onChange={onChangeTabs}
                 tabBarExtraContent={operations}
                 className="content-tabs"
-                items={tabsItems.map((item, i) => {
+                items={tabsItems.map(item => {
                     return item.visible ?
                         {
                             key: item.key,

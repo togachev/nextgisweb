@@ -1,12 +1,12 @@
-import { forwardRef, RefObject, useState, useEffect, useMemo } from 'react';
+import { forwardRef, RefObject, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
-import { Tooltip } from "@nextgisweb/gui/antd";
 import { FeatureComponent } from "./FeatureComponent";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useCopy } from "@nextgisweb/webmap/useCopy";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 interface VisibleProps {
     portal: boolean;
@@ -31,7 +31,6 @@ interface RndProps {
     height: number;
 }
 
-
 interface PopupProps {
     width: number;
     height: number;
@@ -42,10 +41,10 @@ interface PopupProps {
 }
 
 export default observer(forwardRef<Element>(function PopupComponent(props: PopupProps, ref: RefObject<Element>) {
-
+    const { copyValue, contextHolder } = useCopy();
     const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
-    
+
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
     }));
@@ -62,24 +61,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
         setValueRnd({ x: position.x, y: position.y, width: width, height: height });
     }, [position])
 
-
-    // useMemo(() => {
-    //     if (store.selected) {
-    //         console.log(store.selected);
-
-    //         // fieldsAttribute(store.selected.layerId, store.selected.id);
-    //         // const iurl = routeURL("feature_layer.feature.item", {
-    //         //     id: store.selected.layerId,
-    //         //     fid: store.selected.id,
-    //         // });
-    //         // console.log(iurl);
-    //     }
-    // }, [store.selected])
-
+    const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
     return (
         createPortal(
-
             <Rnd
                 dragHandleClassName="title-name"
                 bounds="window"
@@ -102,15 +87,18 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
                     }
                 }}
             >
+                {contextHolder}
                 <div ref={ref} className="popup-position" >
                     <div className="title">
                         <div className="title-name">
                             <span className="object-select">Объектов: {count}</span>
-                            <span
-                                title={store.selected?.layer_name}
-                                className="layer-name">
-                                {store.selected?.layer_name}
-                            </span>
+                            {count > 0 && (
+                                <span
+                                    title={store.selected?.layer_name}
+                                    className="layer-name">
+                                    {store.selected?.layer_name}
+                                </span>
+                            )}
                         </div>
                         <span
                             className="icon-symbol"
@@ -126,7 +114,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
                             <FeatureComponent store={store} position={position} data={response.data} />
                         </div>
                     )}
-                    <div className="footer-popup">{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
+                    <div className="footer-popup" onClick={() => { copyValue(coordValue, gettext("Coordinates copied")) }} >{coordValue}</div>
                 </div>
             </Rnd>,
             document.body

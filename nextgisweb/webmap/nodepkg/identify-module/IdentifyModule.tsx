@@ -55,11 +55,6 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
     return true;
 };
 
-interface ResponseProps {
-    data: object;
-    featureCount: number;
-}
-
 export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: Map;
@@ -160,12 +155,13 @@ export class IdentifyModule extends Component {
     positionContext = (event, _width, _height, offset) => {
         const width = _width + offset;
         const height = _height + offset;
-
-        let cw = event.originalEvent.target.clientWidth;
-        let ch = event.originalEvent.target.clientHeight;
-
+        
+        
+        const cw = event.originalEvent.target.clientWidth;
+        const ch = event.originalEvent.target.clientHeight;
+        
         const p = { x: event.originalEvent.clientX, y: event.originalEvent.clientY };
-
+        console.log(width, cw, event.originalEvent.view.innerWidth);
         /*top left*/
         if (
             event.originalEvent.layerX + width <= cw
