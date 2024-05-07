@@ -155,15 +155,30 @@ export class IdentifyModule extends Component {
     positionContext = (event, _width, _height, offset) => {
         const width = _width;
         const height = _height;
+        const offHP = 40; //header/panel
+
+
+        console.log(event,
+            event.pixel_
+        );
+        const _activePanelKey = this.display.panelsManager._activePanelKey;
+
+        const w = this.display.panelsManager._domElements.leftPanel.w;
+
+        const inx = _activePanelKey ?
+            event.originalEvent.view.innerWidth - w - offHP :
+            event.originalEvent.view.innerWidth - offHP;
+
+        const iny = event.originalEvent.view.innerHeight - offHP;
+
+        const px = _activePanelKey ?
+            event.originalEvent.clientX - w - offHP:
+            event.originalEvent.clientX - offHP;
+
+        const py = event.originalEvent.clientY - offHP;
 
         const minW = width * 2;
         const minH = height * 2;
-
-        const px = event.originalEvent.layerX;
-        const py = event.originalEvent.layerY;
-        const offHP = 40; //header/panel
-        const inx = event.originalEvent.view.innerWidth;
-        const iny = event.originalEvent.view.innerHeight;
 
         console.log(width, 'px', px, inx);
         console.log(height, 'py', py, iny);
