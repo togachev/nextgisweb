@@ -5,6 +5,8 @@ import { useOutsideClick } from "../hook/useOutsideClick";
 interface PositionProps {
     x: number;
     y: number;
+    width: number;
+    height: number;
 }
 
 interface ContextProps {
@@ -29,8 +31,8 @@ export default forwardRef<Element>(function ContextComponent(props: ContextProps
     return (
         createPortal(
             <div ref={ref} className="context-position" style={{
-                width: width,
-                height: height,
+                width: position.width,
+                height: position.height,
                 left: position.x,
                 top: position.y,
                 position: "absolute",

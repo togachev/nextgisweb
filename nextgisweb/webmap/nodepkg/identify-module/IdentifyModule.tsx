@@ -152,17 +152,33 @@ export class IdentifyModule extends Component {
         // this._visible({ portal: false, overlay: e.coordinate, key: "popup" });
     }
 
-    positionContext = (event, _width, _height, offset) => {
-        const width = _width;
-        const height = _height;
+    positionContext = (event, _width, _height, offset, op, count) => {
 
+        const activePanelKey = this.display.panelsManager._activePanelKey;
         const W = document.documentElement.clientWidth;
         const H = document.documentElement.clientHeight;
-
         const px = event.originalEvent.clientX;
         const py = event.originalEvent.clientY;
+        const context_height = settings.context_height;
+        const context_width = settings.context_width;
+        const popup_height = settings.popup_height;
+        const popup_width = settings.popup_width;
+        const coords_not_count_w = 250;
+        const coords_not_count_h = 44;
+        const offHP = 40;
+        const minHW = 680;
 
-        const offHP = 40
+        const width = popup_width >= W || W <= minHW && H <= minHW && activePanelKey === undefined && op !== "context" ? W * .5 :
+            popup_width >= W || W <= minHW && H <= minHW && activePanelKey !== undefined && op !== "context" ? W * .5 :
+                op === "context" ? context_width :
+                    count === 0 ? coords_not_count_w :
+                        popup_width;
+
+        const height = popup_height >= H || H <= minHW && W <= minHW && activePanelKey === undefined && op !== "context" ? H * .5 :
+            popup_height >= W || W <= minHW && H <= minHW && activePanelKey !== undefined && op !== "context" ? W * .5 :
+                op === "context" ? context_height :
+                    count === 0 ? coords_not_count_h :
+                        popup_height;
 
         if (width * 2 < W - offHP && height * 2 < H - offHP) {
             /*top left*/
@@ -170,8 +186,7 @@ export class IdentifyModule extends Component {
                 H - height - offset >= py
                 && W - width - offset >= px
             ) {
-                console.log("top left");
-                return { x: px + offset, y: py + offset }
+                return { x: px + offset, y: py + offset, width: width, height: height }
             }
 
             /*top right*/
@@ -179,8 +194,7 @@ export class IdentifyModule extends Component {
                 H - height - offset >= py
                 && W - width - offset < px
             ) {
-                console.log("top right");
-                return { x: px - width - offset, y: py + offset }
+                return { x: px - width - offset, y: py + offset, width: width, height: height }
             }
 
             /*bottom left*/
@@ -188,7 +202,7 @@ export class IdentifyModule extends Component {
                 H - height - offset < py
                 && W - width >= px
             ) {
-                return { x: px + offset, y: py - height - offset }
+                return { x: px + offset, y: py - height - offset, width: width, height: height }
             }
 
             /*bottom right*/
@@ -196,7 +210,7 @@ export class IdentifyModule extends Component {
                 W - width - offset < px
                 && H - height - offset < py
             ) {
-                return { x: px - width - offset, y: py - height - offset }
+                return { x: px - width - offset, y: py - height - offset, width: width, height: height }
             }
         } else {
             /*bottom left*/
@@ -204,8 +218,7 @@ export class IdentifyModule extends Component {
                 width / 2 + offHP >= px
                 && (H - height / 2) < py
             ) {
-                console.log("bottom left");
-                return { x: px + offset, y: py - height - offset }
+                return { x: px + offset, y: py - height - offset, width: width, height: height }
             }
 
             /* bottom */
@@ -214,8 +227,7 @@ export class IdentifyModule extends Component {
                 && width / 2 + offHP <= px
                 && (H - height / 2) <= py
             ) {
-                console.log("bottom");
-                return { x: px - width / 2, y: py - height - offset }
+                return { x: px - width / 2, y: py - height - offset, width: width, height: height }
             }
 
             /* bottom right */
@@ -223,8 +235,7 @@ export class IdentifyModule extends Component {
                 (W - width / 2) <= px
                 && (H - height / 2) <= py
             ) {
-                console.log("bottom right");
-                return { x: px - width - offset, y: py - height - offset }
+                return { x: px - width - offset, y: py - height - offset, width: width, height: height }
             }
 
             /* top left */
@@ -232,8 +243,7 @@ export class IdentifyModule extends Component {
                 height / 2 + offHP >= py
                 && width / 2 + offHP >= px
             ) {
-                console.log("top left");
-                return { x: px + offset, y: py + offset }
+                return { x: px + offset, y: py + offset, width: width, height: height }
             }
 
             /* top */
@@ -242,8 +252,7 @@ export class IdentifyModule extends Component {
                 && (width / 2) < px
                 && (W - width / 2) > px
             ) {
-                console.log("top");
-                return { x: px - width / 2, y: py + offset }
+                return { x: px - width / 2, y: py + offset, width: width, height: height }
             }
 
             /* top right */
@@ -251,8 +260,7 @@ export class IdentifyModule extends Component {
                 height / 2 + offHP >= py
                 && (W - width / 2) <= px
             ) {
-                console.log("top right");
-                return { x: px - offset - width, y: py + offset }
+                return { x: px - offset - width, y: py + offset, width: width, height: height }
             }
 
             /* left */
@@ -261,8 +269,7 @@ export class IdentifyModule extends Component {
                 && (H - height / 2) > py
                 && width / 2 + offHP > px
             ) {
-                console.log("left");
-                return { x: px + offset, y: py + offset - height / 2 }
+                return { x: px + offset, y: py + offset - height / 2, width: width, height: height }
             }
 
             /* right */
@@ -271,8 +278,7 @@ export class IdentifyModule extends Component {
                 && (H - height / 2) > py
                 && (W - width / 2) <= px
             ) {
-                console.log("right");
-                return { x: px - offset - width, y: py + offset - height / 2 }
+                return { x: px - offset - width, y: py + offset - height / 2, width: width, height: height }
             }
 
             /* center */
@@ -282,8 +288,7 @@ export class IdentifyModule extends Component {
                 && width / 2 + offHP < px
                 && (W - width / 2) > px
             ) {
-                console.log("center");
-                return { x: px - width / 2, y: py - height / 2 }
+                return { x: px - width / 2, y: py - height / 2, width: width, height: height }
             }
         }
     }
@@ -337,19 +342,11 @@ export class IdentifyModule extends Component {
                 return response;
             })
 
-        const width = op === "popup" ? settings.popup_width : settings.context_width;
-
-        let height;
-        if (response.featureCount > 0 && op === "popup") {
-            height = settings.popup_height;
-        } else if (response.featureCount === 0 && op === "popup") {
-            height = 44;
-        } else if (op === "context") {
-            height = settings.context_height;
-        }
+        const width = settings.popup_width;
+        const height = settings.popup_height;
 
         const offset = op === "popup" ? settings.offset_point : 0;
-        const position = this.positionContext(event, width, height, offset);
+        const position = this.positionContext(event, width, height, offset, op, response.featureCount);
 
         if (op === "context") {
             return { coords, position, width, height };

@@ -22,6 +22,8 @@ interface ResponseProps {
 interface PosProps {
     x: number;
     y: number;
+    width: number;
+    height: number;
 }
 
 interface RndProps {
@@ -44,7 +46,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
     const { copyValue, contextHolder } = useCopy();
     const { width, height, visible, coords, position, response } = props;
     const count = response.featureCount;
-
+    console.log(position);
+    
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
     }));
@@ -53,12 +56,12 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
     const [valueRnd, setValueRnd] = useState<RndProps>({
         x: position.x,
         y: position.y,
-        width: width,
-        height: height,
+        width: position.width,
+        height: position.height,
     });
 
     useEffect(() => {
-        setValueRnd({ x: position.x, y: position.y, width: width, height: height });
+        setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
     }, [position])
 
     const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
@@ -68,8 +71,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
             <Rnd
                 dragHandleClassName="title-name"
                 // bounds="window"
-                minWidth={width}
-                minHeight={height}
+                minWidth={position.width}
+                minHeight={position.height}
                 allowAnyClick={true}
                 enableResizing={count > 0 ? true : false}
                 position={{ x: valueRnd.x, y: valueRnd.y }}
