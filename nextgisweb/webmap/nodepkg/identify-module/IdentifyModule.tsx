@@ -155,105 +155,137 @@ export class IdentifyModule extends Component {
     positionContext = (event, _width, _height, offset) => {
         const width = _width;
         const height = _height;
-        const offHP = 40; //header/panel
 
+        const W = document.documentElement.clientWidth;
+        const H = document.documentElement.clientHeight;
 
-        console.log(event,
-            event.pixel_
-        );
-        const _activePanelKey = this.display.panelsManager._activePanelKey;
+        const px = event.originalEvent.clientX;
+        const py = event.originalEvent.clientY;
 
-        const w = this.display.panelsManager._domElements.leftPanel.w;
+        const offHP = 40
 
-        const inx = _activePanelKey ?
-            event.originalEvent.view.innerWidth - w - offHP :
-            event.originalEvent.view.innerWidth - offHP;
+        if (width * 2 < W - offHP && height * 2 < H - offHP) {
+            /*top left*/
+            if (
+                H - height - offset >= py
+                && W - width - offset >= px
+            ) {
+                console.log("top left");
+                return { x: px + offset, y: py + offset }
+            }
 
-        const iny = event.originalEvent.view.innerHeight - offHP;
+            /*top right*/
+            if (
+                H - height - offset >= py
+                && W - width - offset < px
+            ) {
+                console.log("top right");
+                return { x: px - width - offset, y: py + offset }
+            }
 
-        const px = _activePanelKey ?
-            event.originalEvent.clientX - w - offHP:
-            event.originalEvent.clientX - offHP;
+            /*bottom left*/
+            if (
+                H - height - offset < py
+                && W - width >= px
+            ) {
+                return { x: px + offset, y: py - height - offset }
+            }
 
-        const py = event.originalEvent.clientY - offHP;
+            /*bottom right*/
+            if (
+                W - width - offset < px
+                && H - height - offset < py
+            ) {
+                return { x: px - width - offset, y: py - height - offset }
+            }
+        } else {
+            /*bottom left*/
+            if (
+                width / 2 + offHP >= px
+                && (H - height / 2) < py
+            ) {
+                console.log("bottom left");
+                return { x: px + offset, y: py - height - offset }
+            }
 
-        const minW = width * 2;
-        const minH = height * 2;
+            /* bottom */
+            if (
+                (W - width / 2) > px
+                && width / 2 + offHP <= px
+                && (H - height / 2) <= py
+            ) {
+                console.log("bottom");
+                return { x: px - width / 2, y: py - height - offset }
+            }
 
-        console.log(width, 'px', px, inx);
-        console.log(height, 'py', py, iny);
+            /* bottom right */
+            if (
+                (W - width / 2) <= px
+                && (H - height / 2) <= py
+            ) {
+                console.log("bottom right");
+                return { x: px - width - offset, y: py - height - offset }
+            }
 
+            /* top left */
+            if (
+                height / 2 + offHP >= py
+                && width / 2 + offHP >= px
+            ) {
+                console.log("top left");
+                return { x: px + offset, y: py + offset }
+            }
 
-        if (
-            height === iny
-        ) {
-            console.log(1);
-            return { x: inx - width, y: offHP }
+            /* top */
+            if (
+                height / 2 + offHP >= py
+                && (width / 2) < px
+                && (W - width / 2) > px
+            ) {
+                console.log("top");
+                return { x: px - width / 2, y: py + offset }
+            }
+
+            /* top right */
+            if (
+                height / 2 + offHP >= py
+                && (W - width / 2) <= px
+            ) {
+                console.log("top right");
+                return { x: px - offset - width, y: py + offset }
+            }
+
+            /* left */
+            if (
+                height / 2 + offHP < py
+                && (H - height / 2) > py
+                && width / 2 + offHP > px
+            ) {
+                console.log("left");
+                return { x: px + offset, y: py + offset - height / 2 }
+            }
+
+            /* right */
+            if (
+                height / 2 + offHP < py
+                && (H - height / 2) > py
+                && (W - width / 2) <= px
+            ) {
+                console.log("right");
+                return { x: px - offset - width, y: py + offset - height / 2 }
+            }
+
+            /* center */
+            if (
+                height / 2 + offHP < py
+                && (H - height / 2) > py
+                && width / 2 + offHP < px
+                && (W - width / 2) > px
+            ) {
+                console.log("center");
+                return { x: px - width / 2, y: py - height / 2 }
+            }
         }
-
-        if (
-            height <= iny && width <= inx && width / 2 >= px && height / 2 >= py
-        ) {
-            console.log(2);
-            return { x: px + offHP + offset, y: py + offHP + offset }
-        }
-
-        if (
-            height <= iny && width <= inx && width + offset <= px && height + offset <= py
-        ) {
-            console.log(3);
-            return { x: px + offHP - width - offset, y: py + offHP - height - offset }
-        }
-
-        if (
-            height <= iny && width <= inx && width + offset <= px && height / 2 >= py
-        ) {
-            console.log(4);
-            return { x: px + offHP - width - offset, y: py + offHP + offset }
-        }
-
-        if (
-            height <= iny && width <= inx && width / 2 >= px && height + offset <= py
-        ) {
-            console.log(5);
-            return { x: px + offHP + offset, y: py + offHP - height - offset }
-        }
-
-        if (
-            height <= iny && width <= inx && width > px && height / 2 > py
-        ) {
-            console.log(6);
-            return { x: px + offHP - width / 2, y: py + offHP + offset }
-        }
-
-        if (
-            height <= iny && width <= inx && width / 2 > px && height > py
-        ) {
-            console.log(7);
-            return { x: px + offHP + offset, y: py + offHP - height / 2 }
-        }
-
-        if (
-            height <= iny && width <= inx && width > px && height > py
-        ) {
-            console.log(8);
-            return { x: px + offHP - width / 2, y: py + offHP - height / 2 }
-        }
-
-        if (
-            height <= iny && width <= inx && width + offset < px && height / 2 < py
-        ) {
-            console.log(9);
-            return { x: px + offHP - width - offset, y: py + offHP - height / 2 }
-        }
-
-        if (
-            height <= iny && width <= inx && width / 2 < px && height < py
-        ) {
-            console.log(10);
-            return { x: px + offHP - width / 2, y: py + offHP - height - offset }
-        }
-
     }
 
     displayFeatureInfo = async (event: MapBrowserEvent, value: number, op: string) => {

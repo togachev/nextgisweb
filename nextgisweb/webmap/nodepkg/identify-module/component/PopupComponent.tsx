@@ -67,12 +67,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
         createPortal(
             <Rnd
                 dragHandleClassName="title-name"
-                bounds="window"
+                // bounds="window"
                 minWidth={width}
                 minHeight={height}
                 allowAnyClick={true}
-                // enableResizing={count > 0 ? true : false}
-                enableResizing={false}
+                enableResizing={count > 0 ? true : false}
                 position={{ x: valueRnd.x, y: valueRnd.y }}
                 size={{ width: valueRnd.width, height: valueRnd.height }}
                 onDragStop={(e, d) => {
