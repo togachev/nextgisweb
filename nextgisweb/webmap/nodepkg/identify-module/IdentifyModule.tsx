@@ -378,7 +378,7 @@ export class IdentifyModule extends Component {
             this._setValue(this.point_popup, "popup");
 
             this.root_popup.render(
-                <PopupComponent params={item} visible={this._visible} ref={this.refPopup} />
+                <PopupComponent  key={new Date} params={item} visible={this._visible} ref={this.refPopup} />
             );
             this._visible({ hidden: false, overlay: e.coordinate, key: "popup" });
         });

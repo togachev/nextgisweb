@@ -149,7 +149,6 @@ export const FeatureComponent: FC = ({ data, store }) => {
                 />
             </div>
             <Tabs
-                // key={new Date} //настроить!!!
                 defaultActiveKey="attributes"
                 tabPosition="left"
                 size="small"

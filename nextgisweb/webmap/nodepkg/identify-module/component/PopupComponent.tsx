@@ -1,5 +1,5 @@
-import { forwardRef, RefObject, useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { forwardRef, RefObject, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
 import { IdentifyStore } from "../IdentifyStore";
@@ -33,10 +33,6 @@ interface Rnd {
     height: number;
 }
 
-// interface Overlay {
-//     visible: ({ hidden, overlay, key }: Visible) => void;
-// }
-
 interface Props {
     coordValue: string;
     response: Response;
@@ -46,6 +42,15 @@ interface Props {
 interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
+}
+
+export type HandleStyles = {
+    bottom?: -10,
+    left?: -10,
+    width?: 15,
+    heght?: 15,
+    right?: -10,
+    top?: -10,
 }
 
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
@@ -74,8 +79,18 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     return (
         createPortal(
             <Rnd
-                cancel=".content,.coordinate-value"
-                // bounds="window"
+                resizeHandleClasses={{
+                    right: "hover-right",
+                    left: "hover-left",
+                    top: "hover-top",
+                    bottom: "hover-bottom",
+                    bottomRight: "hover-angle",
+                    bottomLeft: "hover-angle",
+                    topRight: "hover-angle",
+                    topLeft: "hover-angle",
+                }}
+                cancel=".select-feature,.ant-tabs-nav,.ant-tabs-content-holder,.icon-symbol,.coordinate-value"
+                bounds="window"
                 minWidth={position.width}
                 minHeight={position.height}
                 allowAnyClick={true}

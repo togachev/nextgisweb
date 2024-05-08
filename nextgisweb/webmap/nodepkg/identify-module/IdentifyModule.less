@@ -13,6 +13,53 @@
     display: none !important;
 }
 
+.hover-right {
+    width: 15px !important;
+    right: -10px !important;
+
+    &:hover {
+        background-color: #106a9040;
+        border-radius: 4px;
+    }
+}
+
+.hover-left {
+    left: -10px !important;
+    width: 15px !important;
+
+    &:hover {
+        background-color: #106a9040;
+        border-radius: 4px;
+    }
+}
+
+.hover-top {
+    height: 15px !important;
+    top: -10px !important;
+
+    &:hover {
+        background-color: #106a9040;
+        border-radius: 4px;
+    }
+}
+
+.hover-bottom {
+    bottom: -10px !important;
+    height: 15px !important;
+
+    &:hover {
+        background-color: #106a9040;
+        border-radius: 4px;
+    }
+}
+
+.hover-angle {
+    &:hover {
+        background-color: #106a9040;
+        border-radius: 4px;
+    }
+}
+
 .popup-position {
     width: 100%;
     height: 100%;
@@ -42,6 +89,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: move;
+
             .object-select {
                 padding: 0 16px 0 0;
             }
@@ -53,17 +101,18 @@
         }
 
         .icon-symbol {
-            font-size: 16px;
-            width: 16px;
-            height: 16px;
+            font-size: 21px;
+            width: 22px;
+            height: 22px;
             display: flex;
             justify-items: center;
             justify-content: center;
             align-items: center;
             flex: 0 0 auto;
-            margin: 0 4px 0 4px;
+            margin: 0 4px 0px 4px;
             cursor: pointer;
             color: var(--text-secondary);
+            z-index: 1000;
 
             &:hover {
                 background-color: var(--divider-color);
@@ -82,15 +131,18 @@
         .select-feature {
             padding: 2px 2px 0 2px;
         }
+
         .ant-tabs-nav .ant-tabs-nav-list {
             display: flex;
             align-items: flex-start;
         }
+
         .ant-tabs-nav {
             margin: 0px;
             height: 100%;
             width: 20px;
         }
+
         .ant-btn {
             font-size: 14px;
             line-height: 1;
@@ -99,6 +151,7 @@
             border-radius: 3px;
             margin: 0 0 5px 0;
         }
+
         .ant-tabs-nav .ant-tabs-nav-more {
             position: relative;
             padding: 5px;
@@ -106,6 +159,7 @@
             border: 0;
             color: rgba(0, 0, 0, 0.88);
         }
+
         .content-tabs {
             overflow: hidden;
             border-bottom: solid var(--divider-color) 1px;
@@ -122,12 +176,12 @@
             }
 
             .item {
-                padding: 5px;
+                padding: 0;
 
                 .item-fields {
                     display: flex;
                     justify-content: space-between;
-                    padding: 2px;
+                    padding: 2px 5px;
                     border-bottom: solid var(--divider-color) 0.005em;
                     align-items: center;
 
@@ -141,7 +195,7 @@
                         padding: 0 10px 0 0;
                         align-items: center;
                         min-width: min-content;
-                        width: 40%;                   
+                        width: 40%;
                     }
 
                     .value {
@@ -177,7 +231,7 @@
         border-top: solid var(--divider-color) 1px;
         cursor: move;
         color: var(--primary);
-        
+
 
         .coordinate-value {
             padding: 0 5px;
