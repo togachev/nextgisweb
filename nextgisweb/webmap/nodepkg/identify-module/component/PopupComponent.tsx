@@ -8,52 +8,59 @@ import { FeatureComponent } from "./FeatureComponent";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-interface VisibleProps {
-    portal: boolean;
+interface Visible {
+    hidden: boolean;
     overlay: boolean | undefined;
     key: string;
 }
-interface ResponseProps {
+interface Response {
     featureCount: number;
     data: object;
     fields: object;
 }
 
-interface PosProps {
+interface Position {
     x: number;
     y: number;
     width: number;
     height: number;
 }
 
-interface RndProps {
+interface Rnd {
     x: number;
     y: number;
     width: number;
     height: number;
 }
 
-interface PopupProps {
-    width: number;
-    height: number;
-    visible: ({ portal, overlay, key }: VisibleProps) => void;
-    coords: number[];
-    response: ResponseProps;
-    position: PosProps;
+// interface Overlay {
+//     visible: ({ hidden, overlay, key }: Visible) => void;
+// }
+
+interface Props {
+    coordValue: string;
+    response: Response;
+    position: Position;
 }
 
-export default observer(forwardRef<Element>(function PopupComponent(props: PopupProps, ref: RefObject<Element>) {
-    const { copyValue, contextHolder } = useCopy();
-    const { width, height, visible, coords, position, response } = props;
+interface Params {
+    params: Props;
+    visible: ({ hidden, overlay, key }: Visible) => void;
+}
+
+export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
+
+    const { params, visible } = props;
+    const { coordValue, position, response } = params;
     const count = response.featureCount;
-    console.log(position);
-    
+    const { copyValue, contextHolder } = useCopy();
+
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
     }));
 
     const [refRnd, setRefRnd] = useState();
-    const [valueRnd, setValueRnd] = useState<RndProps>({
+    const [valueRnd, setValueRnd] = useState<Rnd>({
         x: position.x,
         y: position.y,
         width: position.width,
@@ -64,12 +71,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
         setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
     }, [position])
 
-    const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
-
     return (
         createPortal(
             <Rnd
-                dragHandleClassName="title-name"
+                cancel=".content,.coordinate-value"
                 // bounds="window"
                 minWidth={position.width}
                 minHeight={position.height}
@@ -106,7 +111,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
                         <span
                             className="icon-symbol"
                             onClick={() => {
-                                visible({ portal: true, overlay: undefined, key: "popup" })
+                                visible({ hidden: true, overlay: undefined, key: "popup" })
                                 refRnd.resizableElement.current.hidden = true;
                             }} >
                             <CloseIcon />
@@ -117,7 +122,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Popup
                             <FeatureComponent store={store} position={position} data={response.data} />
                         </div>
                     )}
-                    <div className="footer-popup" onClick={() => { copyValue(coordValue, gettext("Coordinates copied")) }} >{coordValue}</div>
+                    <div className="footer-popup"  >
+                        <span className="coordinate-value" title={gettext("Copy coordinates")} onClick={() => { copyValue(coordValue, gettext("Coordinates copied")) }}>{coordValue}</span>
+                    </div>
                 </div>
             </Rnd>,
             document.body

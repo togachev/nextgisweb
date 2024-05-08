@@ -22,7 +22,7 @@ export const IconItem = ({ item, single, zoomToNgwExtent }) => {
     };
 
     const zoomToLayer = gettext("Zoom to layer");
-    const zoomToFeatureLayer = gettext("Zoom to feature layer");
+    const zoomToFeatureLayer = gettext("Zoom to vector layer object");
 
     return item?.legendInfo.symbols.map((s, idx) => (
 

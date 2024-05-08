@@ -12,7 +12,9 @@ export const useCopy = () => {
     };
 
     const copyValue = async (value, text) => {
-        await navigator.clipboard.writeText(value);
+        if(navigator.clipboard) {
+            await navigator.clipboard.writeText(value);
+        }
         messageInfo(text);
     };
 

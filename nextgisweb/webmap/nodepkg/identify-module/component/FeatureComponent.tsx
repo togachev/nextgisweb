@@ -49,6 +49,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
 
     const operations = (
         <Button
+            style={{width:20}}
             type="text"
             title={gettext("Edit")}
             icon={<EditNote />}
@@ -69,12 +70,13 @@ export const FeatureComponent: FC = ({ data, store }) => {
                 } else if (emailRegex.test(val)) {
                     return (<div className="value-email" onClick={() => {
                         copyValue(val, gettext("Email address copied"));
-                        console.log(val);
-                        
                     }} >{val}</div>)
                 } else {
                     return (<div className="value text-ellipsis">{val}</div>)
                 }
+            }
+            if (val === null) {
+                return (<>{gettext("N/A")}</>)
             }
         }
     };
@@ -82,6 +84,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
     const tabsItems = [
         {
             title: gettext("Attributes"),
+            label: "Attributes",
             key: "attributes",
             visible: settings.identify_attributes,
             icon: <Info title={gettext("Attributes")} />,
@@ -98,9 +101,9 @@ export const FeatureComponent: FC = ({ data, store }) => {
                 </div>) :
                 (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
         },
-        { title: gettext("Geometry"), key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />) },
-        { title: gettext("Description"), key: "description", visible: true, icon: <Description /> },
-        { title: gettext("Attachments"), key: "attachment", visible: true, icon: <Attachment /> },
+        { title: gettext("Geometry"), label: "Geometry", key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />) },
+        { title: gettext("Description"), label: "Description", key: "description", visible: true, icon: <Description /> },
+        { title: gettext("Attachments"), label: "Attachments", key: "attachment", visible: true, icon: <Attachment /> },
     ];
 
     return (
@@ -111,20 +114,26 @@ export const FeatureComponent: FC = ({ data, store }) => {
                         inkBarColor: "#106a90",
                         itemSelectedColor: "#106a90",
                         itemHoverColor: "#106a9080",
-                        paddingXS: "0 10",
-                        horizontalItemGutter: 10,
-                        horizontalMargin: "0 5px 5px 5px",
+                        paddingXS: "0 0",
+                        horizontalItemGutter: 0,
+                        horizontalMargin: "0 0 0 0",
+                        verticalItemMargin: 0, /*.ant-tabs-nav .ant-tabs-tab+.ant-tabs-tab*/
+                        verticalItemPadding: "5px 0px 5px 8px", /*.ant-tabs-nav .ant-tabs-tab*/
+                        controlHeight: 24,
+                        paddingLG:0, /*.ant-tabs-nav .ant-tabs-tab*/
+
+
                     },
                     Select: {
                         optionLineHeight: 1,
-                        optionHeight: 24,
+                        optionHeight: 0,
                         optionSelectedBg: "var(--divider-color)"
                     }
                 },
             }}
         >
             {contextHolder}
-            <div className="select-feature">
+            <div className="select-feature" >
                 <Select
                     optionFilterProp="children"
                     filterOption={(input, option) => (option?.label ?? "").includes(input)}
@@ -139,8 +148,10 @@ export const FeatureComponent: FC = ({ data, store }) => {
                     options={data}
                 />
             </div>
-
             <Tabs
+                // key={new Date} //настроить!!!
+                defaultActiveKey="attributes"
+                tabPosition="left"
                 size="small"
                 onChange={onChangeTabs}
                 tabBarExtraContent={operations}
@@ -149,6 +160,7 @@ export const FeatureComponent: FC = ({ data, store }) => {
                     return item.visible ?
                         {
                             key: item.key,
+                            label:item.label,
                             children: item.children,
                             icon: item.icon,
                         } : null

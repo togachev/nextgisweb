@@ -1,25 +1,30 @@
 import { forwardRef, RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
+import { useCopy } from "@nextgisweb/webmap/useCopy";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-interface PositionProps {
+interface Position {
     x: number;
     y: number;
     width: number;
     height: number;
 }
 
-interface ContextProps {
-    width: number;
-    height: number;
-    coords: number[];
-    position: PositionProps;
+interface Item {
+    coordValue: string;
+    position: Position;
 }
 
-export default forwardRef<Element>(function ContextComponent(props: ContextProps, ref: RefObject<Element>) {
+interface Context {
+    params: Item;
+}
 
-    const { width, height, coords, position } = props;
+export default forwardRef<Element>(function ContextComponent(props: Context, ref: RefObject<Element>) {
+    const { params } = props;
+    const { coordValue, position } = params;
     useOutsideClick(ref, true);
+    const { copyValue, contextHolder } = useCopy();
 
     const array = [
         { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено' },
@@ -30,21 +35,24 @@ export default forwardRef<Element>(function ContextComponent(props: ContextProps
 
     return (
         createPortal(
-            <div ref={ref} className="context-position" style={{
+            <div key={new Date} ref={ref} className="context-position" style={{
                 width: position.width,
                 height: position.height,
                 left: position.x,
                 top: position.y,
                 position: "absolute",
             }}>
+                {contextHolder}
                 <div
-                    onClick={() => { alert("Координаты скопированы") }}
+                    
+                    title={gettext("Copy coordinates")}
+                    onClick={() => { copyValue(coordValue, gettext("Coordinates copied")) }}
                     className="context-coords"
-                >{coords && coords[0].toFixed(6) + ", " + coords[1].toFixed(6)}</div>
+                >{coordValue}</div>
                 {
                     array.map(item => {
                         return (
-                            <div className="context-item" key={item.key} onClick={() => { alert(item.result) }} >
+                            <div className="context-item" key={item.key} onClick={() => { console.log(item.result) }} >
                                 <span>{item.title}</span>
                             </div>
                         )
