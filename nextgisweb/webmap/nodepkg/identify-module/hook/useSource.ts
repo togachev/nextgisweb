@@ -1,9 +1,192 @@
 import { route } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+
+const settings = webmapSettings;
 
 export const useSource = () => {
 
-    const getFeature = async (res) => {
+    const positionContext = (event, offset, op, count) => {
+        const W = document.documentElement.clientWidth;
+        const H = document.documentElement.clientHeight;
+        const px = event.originalEvent.clientX;
+        const py = event.originalEvent.clientY;
+        const context_height = settings.context_height;
+        const context_width = settings.context_width;
+        const popup_height = settings.popup_height;
+        const popup_width = settings.popup_width;
+        const coords_not_count_w = 250;
+        const coords_not_count_h = 44;
+        const offHP = 40;
+
+        let width;
+        let height;
+
+        if (count === undefined && op === "context") {
+            width = context_width;
+            height = context_height;
+        }
+        else if (count === 0 && op !== "context") {
+            width = coords_not_count_w;
+            height = coords_not_count_h;
+        }
+        else if (popup_width >= W / 2 || popup_height >= H / 2) {
+            width = W / 2;
+            height = H / 2;
+        }
+        else {
+            width = popup_width;
+            height = popup_height;
+        }
+
+        if (H <= (context_height) * 2) {
+            if (op === "context") {
+                width = context_width;
+                height = (H - offHP) <= context_height ? (H - offHP) * .8 : context_height;
+                return { x: W - width, y: 0 + offHP, width: width, height: height }
+            }
+        }
+
+        if (height >= H / 2 || width >= W / 2) {
+            /*bottom left*/
+            if (
+                width / 2 + offHP >= px
+                && (H - height / 2) < py
+            ) {
+                return { x: px + offset, y: py - height - offset, width: width, height: height }
+            }
+
+            /* bottom */
+            if (
+                (W - width / 2) > px
+                && width / 2 + offHP <= px
+                && (H - height / 2) <= py
+            ) {
+                return { x: px - width / 2, y: py - height - offset, width: width, height: height }
+            }
+
+            /* bottom right */
+            if (
+                (W - width / 2) <= px
+                && (H - height / 2) <= py
+            ) {
+                return { x: px - width - offset, y: py - height - offset, width: width, height: height }
+            }
+
+            /* top left */
+            if (
+                height / 2 + offHP >= py
+                && width / 2 + offHP >= px
+            ) {
+                return { x: px + offset, y: py + offset, width: width, height: height }
+            }
+
+            /* top */
+            if (
+                height / 2 + offHP >= py
+                && (width / 2) < px
+                && (W - width / 2) > px
+            ) {
+                return { x: px - width / 2, y: py + offset, width: width, height: height }
+            }
+
+            /* top right */
+            if (
+                height / 2 + offHP >= py
+                && (W - width / 2) <= px
+            ) {
+                return { x: px - offset - width, y: py + offset, width: width, height: height }
+            }
+
+            /* left */
+            if (
+                height / 2 + offHP < py
+                && (H - height / 2) > py
+                && width / 2 + offHP > px
+            ) {
+                return { x: px + offset, y: py - height / 2, width: width, height: height }
+            }
+
+            /* right */
+            if (
+                height / 2 + offHP < py
+                && (H - height / 2) > py
+                && (W - width / 2) <= px
+            ) {
+                return { x: px - offset - width, y: py - height / 2, width: width, height: height }
+            }
+
+            /* center */
+            if (
+                height / 2 + offHP < py
+                && (H - height / 2) > py
+                && width / 2 + offHP < px
+                && (W - width / 2) > px
+            ) {
+                return { x: px - width / 2, y: py - height / 2, width: width, height: height }
+            }
+        }
+
+        if (height < H / 2 || width < W / 2) {
+            /*top left*/
+            if (
+                H - height - offset >= py
+                && W - width - offset >= px
+            ) {
+                return { x: px + offset, y: py + offset, width: width, height: height }
+            }
+
+            /*top right*/
+            if (
+                H - height - offset >= py
+                && W - width - offset < px
+            ) {
+                return { x: px - width - offset, y: py + offset, width: width, height: height }
+            }
+
+            /*bottom left*/
+            if (
+                H - height - offset < py
+                && W - width >= px
+            ) {
+                return { x: px + offset, y: py - height - offset, width: width, height: height }
+            }
+
+            /*bottom right*/
+            if (
+                W - width - offset < px
+                && H - height - offset < py
+            ) {
+                return { x: px - width - offset, y: py - height - offset, width: width, height: height }
+            }
+        }
+    };
+
+    const eventHighlight = (props, type, display) => {
+        const { layerId, feature } = props;
+        let e;
+        if (type === "feature.highlight") {
+            e = new CustomEvent(type, {
+                detail: {
+                    geom: feature?.geom,
+                    featureId: feature?.id,
+                    layerId: layerId,
+                    featureInfo: feature?.fields,
+                    featureHighlighter: display.featureHighlighter,
+                }
+            });
+            window.dispatchEvent(e);
+        } else if (type === "feature.unhighlight") {
+            e = new CustomEvent(type, {
+                detail: {
+                    featureHighlighter: display.featureHighlighter,
+                }
+            });
+            window.dispatchEvent(e);
+        }
+    }
+
+    const getAttribute = async (res) => {
         const resourceId = res.layerId;
         const feature = await route("feature_layer.feature.item_iso", {
             id: res.layerId,
@@ -14,66 +197,66 @@ export const useSource = () => {
                 return item;
             });
 
-        const fieldsCache = {};
-        const fieldmap = resourceId in fieldsCache ?
-            fieldsCache[resourceId] :
-            await route("resource.fields", { id: resourceId })
-                .get({
-                    cache: true,
+        const fieldmap = await route("resource.fields", { id: resourceId })
+            .get({
+                cache: true,
+            })
+            .then(data => {
+                const deferreds: string[] = [];
+                const fieldmap = {};
+                data.map(itm => {
+                    fieldmap[itm.keyname] = itm;
+                    if (itm.lookup_table !== null) {
+                        deferreds.push(
+                            lookupTableCached.load(
+                                itm.lookup_table.id
+                            )
+                        );
+                    }
                 })
-                .then(data => {
-                    const deferreds: string[] = [];
-                    const fieldmap = {};
-                    data.map(itm => {
-                        fieldmap[itm.keyname] = itm;
-                        if (itm.lookup_table !== null) {
-                            deferreds.push(
-                                lookupTableCached.load(
-                                    itm.lookup_table.id
-                                )
+
+                return Promise.all(deferreds).then(
+                    () => {
+                        const value = feature.fields;
+                        const rename = (renameKeys, currentObject) => {
+                            return Object.keys(currentObject).reduce(
+                                (acc, key) => ({
+                                    ...acc,
+                                    ...{ [renameKeys[key] || key]: currentObject[key] },
+                                }),
+                                {}
                             );
-                        }
-                    })
-                    fieldsCache[resourceId] = fieldmap;
-                    return Promise.all(deferreds).then(
-                        () => {
-                            const value = feature.fields;
-                            const rename = (renameKeys, currentObject) => {
-                                return Object.keys(currentObject).reduce(
-                                    (acc, key) => ({
-                                        ...acc,
-                                        ...{ [renameKeys[key] || key]: currentObject[key] },
-                                    }),
-                                    {}
-                                );
-                            };
-                            const renameKeys = {};
-                            for (const k in value) {
-                                const val = value[k];
-                                const field = fieldmap[k];
+                        };
+                        const renameKeys = {};
+                        for (const k in value) {
+                            const val = value[k];
+                            const field = fieldmap[k];
 
-                                if (!fieldmap[k].grid_visibility) {
-                                    continue;
-                                }
-
-                                if (field.lookup_table !== null) {
-                                    const lval = lookupTableCached.lookup(
-                                        field.lookup_table.id,
-                                        val
-                                    );
-                                    if (lval !== null) {
-                                        value[k] = lval;
-                                    }
-                                }
-                                Object.assign(renameKeys, { [k]: fieldmap[k].display_name })
+                            if (!fieldmap[k].grid_visibility) {
+                                continue;
                             }
-                            return rename(renameKeys, value);
-                        }
-                    );
 
-                })
+                            if (field.lookup_table !== null) {
+
+
+                                const lval = lookupTableCached.lookup(
+                                    field.lookup_table.id,
+                                    val
+                                );
+                                if (lval !== null) {
+                                    value[k] = lval;
+                                }
+                            }
+                            Object.assign(renameKeys, { [k]: fieldmap[k].display_name })
+                        }
+                        const _fieldmap = rename(renameKeys, value)
+                        return { _fieldmap, feature };
+                    }
+                );
+
+            })
         return fieldmap;
     }
 
-    return { getFeature };
+    return { eventHighlight, getAttribute, positionContext };
 };

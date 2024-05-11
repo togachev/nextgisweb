@@ -59,7 +59,13 @@ export function WebMapFeatureGridTab({
                 cleanSelectedOnFilter: false,
                 onDelete: reloadLayer,
                 onSave: () => {
-                    display.current.identify._popup.widget?.reset();
+                    if (display.current.hasOwnProperty("identify")) {
+                        display.current.identify._popup.widget?.reset();
+                    } else if (display.current.hasOwnProperty("identify_module")) {
+                        const identify_module = display.current.identify_module;
+                        identify_module._popup(identify_module.mapEvent);
+                    }
+
                     reloadLayer();
                 },
 

@@ -16,6 +16,8 @@ import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatia
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
 
+import { useSource } from "./hook/useSource";
+
 interface VisibleProps {
     hidden: boolean;
     overlay: boolean | undefined;
@@ -23,6 +25,8 @@ interface VisibleProps {
 }
 
 const settings = webmapSettings;
+
+const { positionContext } = useSource();
 
 const srsCoordinates = {};
 if (spatialRefSysList) {
@@ -42,10 +46,10 @@ Control.prototype = Object.create(Interaction.prototype);
 Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
-    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
         this.tool._popup(e);
         e.preventDefault();
-    } else if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === true) {
+    } else if (e.type === "singleclick" && e.originalEvent.ctrlKey === true) {
         this.tool._popupMultiple(e);
         e.preventDefault();
     } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
@@ -58,6 +62,7 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
 export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: Map;
+    private mapEvent: MapBrowserEvent;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
     private control: Interaction;
@@ -90,21 +95,21 @@ export class IdentifyModule extends Component {
 
         this.refPopup = createRef();
         this.refContext = createRef();
-    }
+    };
 
     activate = () => {
         this.control.setActive(true);
-    }
+    };
 
     deactivate = () => {
         this.control.setActive(false);
-    }
+    };
 
     _setValue = (value: HTMLElement, key: string) => {
         key === "popup" ?
             this.overlay_popup.setElement(value) :
             this.overlay_context.setElement(value)
-    }
+    };
 
     _addOverlayPopup = () => {
         this.overlay_popup = new Overlay({
@@ -115,7 +120,7 @@ export class IdentifyModule extends Component {
             },
         });
         this.olmap.addOverlay(this.overlay_popup);
-    }
+    };
 
     _addOverlayContext = () => {
         this.overlay_context = new Overlay({
@@ -126,7 +131,7 @@ export class IdentifyModule extends Component {
             },
         });
         this.olmap.addOverlay(this.overlay_context);
-    }
+    };
 
     _visible = ({ hidden, overlay, key }: VisibleProps) => {
         if (key === "popup") {
@@ -140,173 +145,15 @@ export class IdentifyModule extends Component {
             }
             this.overlay_context.setPosition(overlay);
         }
-    }
+    };
+
+    _render = () => {
+        this.display.identify_module.root_popup.render();
+    };
 
     _popupMultiple = (e: MapBrowserEvent) => {
-        alert(e.pixel)
-        // this._visible({ hidden: true, overlay: undefined, key: "context" })
-        // this._setValue(this.point_popup, "popup");
-        // this.root_popup.render(
-        //     <PopupComponent tool={this} visible={this._visible} ref={this.refPopup} width={settings.popup_width} height={settings.popup_height} event={e} />
-        // );
-        // this._visible({ hidden: false, overlay: e.coordinate, key: "popup" });
-    }
-
-    positionContext = (event, _width, _height, offset, op, count) => {
-
-        const W = document.documentElement.clientWidth;
-        const H = document.documentElement.clientHeight;
-        const px = event.originalEvent.clientX;
-        const py = event.originalEvent.clientY;
-        const context_height = settings.context_height;
-        const context_width = settings.context_width;
-        const popup_height = settings.popup_height;
-        const popup_width = settings.popup_width;
-        const coords_not_count_w = 250;
-        const coords_not_count_h = 44;
-        const offHP = 40;
-
-        let width;
-        let height;
-
-        if (count === undefined && op === "context") {
-            width = context_width;
-            height = context_height;
-        }
-        else if (count === 0 && op !== "context") {
-            width = coords_not_count_w;
-            height = coords_not_count_h;
-        }
-        else if (popup_width>= W/2 || popup_height >= H/2) {
-            width = W/2;
-            height = H/2;
-        }
-        else {
-            width = popup_width;
-            height = popup_height;
-        }
-
-        if (H <= (context_height) * 2) {
-            if (op === "context") {
-                width = context_width;
-                height = (H - offHP) <= context_height ? (H - offHP) * .8 : context_height;
-                return { x: W - width, y: 0 + offHP, width: width, height: height }
-            }
-        }
-        
-        if (height >= H / 2 || width >= W / 2) {
-            /*bottom left*/
-            if (
-                width / 2 + offHP >= px
-                && (H - height / 2) < py
-            ) {
-                return { x: px + offset, y: py - height - offset, width: width, height: height }
-            }
-
-            /* bottom */
-            if (
-                (W - width / 2) > px
-                && width / 2 + offHP <= px
-                && (H - height / 2) <= py
-            ) {
-                return { x: px - width / 2, y: py - height - offset, width: width, height: height }
-            }
-
-            /* bottom right */
-            if (
-                (W - width / 2) <= px
-                && (H - height / 2) <= py
-            ) {
-                return { x: px - width - offset, y: py - height - offset, width: width, height: height }
-            }
-
-            /* top left */
-            if (
-                height / 2 + offHP >= py
-                && width / 2 + offHP >= px
-            ) {
-                return { x: px + offset, y: py + offset, width: width, height: height }
-            }
-
-            /* top */
-            if (
-                height / 2 + offHP >= py
-                && (width / 2) < px
-                && (W - width / 2) > px
-            ) {
-                return { x: px - width / 2, y: py + offset, width: width, height: height }
-            }
-
-            /* top right */
-            if (
-                height / 2 + offHP >= py
-                && (W - width / 2) <= px
-            ) {
-                return { x: px - offset - width, y: py + offset, width: width, height: height }
-            }
-
-            /* left */
-            if (
-                height / 2 + offHP < py
-                && (H - height / 2) > py
-                && width / 2 + offHP > px
-            ) {
-                return { x: px + offset, y: py - height / 2, width: width, height: height }
-            }
-
-            /* right */
-            if (
-                height / 2 + offHP < py
-                && (H - height / 2) > py
-                && (W - width / 2) <= px
-            ) {
-                return { x: px - offset - width, y: py - height / 2, width: width, height: height }
-            }
-
-            /* center */
-            if (
-                height / 2 + offHP < py
-                && (H - height / 2) > py
-                && width / 2 + offHP < px
-                && (W - width / 2) > px
-            ) {
-                return { x: px - width / 2, y: py - height / 2, width: width, height: height }
-            }
-        }
-        if (height < H / 2 || width < W / 2) {
-            /*top left*/
-            if (
-                H - height - offset >= py
-                && W - width - offset >= px
-            ) {
-                return { x: px + offset, y: py + offset, width: width, height: height }
-            }
-
-            /*top right*/
-            if (
-                H - height - offset >= py
-                && W - width - offset < px
-            ) {
-                return { x: px - width - offset, y: py + offset, width: width, height: height }
-            }
-
-            /*bottom left*/
-            if (
-                H - height - offset < py
-                && W - width >= px
-            ) {
-                return { x: px + offset, y: py - height - offset, width: width, height: height }
-            }
-
-            /*bottom right*/
-            if (
-                W - width - offset < px
-                && H - height - offset < py
-            ) {
-                return { x: px - width - offset, y: py - height - offset, width: width, height: height }
-            }
-        }
-    }
+        alert(e.pixel);
+    };
 
     displayFeatureInfo = async (event: MapBrowserEvent, value: number, op: string) => {
         const wkt = new WKT();
@@ -355,14 +202,10 @@ export class IdentifyModule extends Component {
             })
             .then((response) => {
                 return response;
-            })
-
-        const width = settings.popup_width;
-        const height = settings.popup_height;
+            });
 
         const offset = op === "popup" ? settings.offset_point : 0;
-        const position = this.positionContext(event, width, height, offset, op, response.featureCount);
-
+        const position = positionContext(event, offset, op, response.featureCount);
         const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
         if (op === "context") {
@@ -372,18 +215,29 @@ export class IdentifyModule extends Component {
         }
     };
 
+    _isEditEnabled = (display, config) => {
+        const pluginName = "ngw-webmap/plugin/FeatureLayer";
+
+        if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
+            return false;
+        }
+
+        const configLayerPlugin = config.plugin[pluginName];
+        const readOnly = configLayerPlugin.readonly;
+        return !readOnly;
+    };
+
     _popup = (e: MapBrowserEvent) => {
+        this.mapEvent = e;
         this.displayFeatureInfo(e, 3857, "popup").then(item => {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-
             this.root_popup.render(
-                <PopupComponent  key={new Date} params={item} visible={this._visible} ref={this.refPopup} />
+                <PopupComponent key={new Date} params={item} display={this.display} visible={this._visible} ref={this.refPopup} />
             );
             this._visible({ hidden: false, overlay: e.coordinate, key: "popup" });
         });
-
-    }
+    };
 
     _context = (e: MapBrowserEvent) => {
         this.displayFeatureInfo(e, 3857, "context").then(item => {
@@ -393,7 +247,7 @@ export class IdentifyModule extends Component {
             );
             this._visible({ hidden: false, overlay: e.coordinate, key: "context" });
         })
-    }
+    };
 
     _requestGeomString = (pixel: number[]) => {
         const pixelRadius = settings.identify_radius;
@@ -412,5 +266,5 @@ export class IdentifyModule extends Component {
                 ])
             )
         )
-    }
+    };
 }

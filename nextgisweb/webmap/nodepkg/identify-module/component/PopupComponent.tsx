@@ -7,6 +7,8 @@ import { observer } from "mobx-react-lite";
 import { FeatureComponent } from "./FeatureComponent";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { DojoDisplay } from "../../type";
+import { useSource } from "../hook/useSource";
 
 interface Visible {
     hidden: boolean;
@@ -42,6 +44,7 @@ interface Props {
 interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
+    display: DojoDisplay;
 }
 
 export type HandleStyles = {
@@ -54,11 +57,13 @@ export type HandleStyles = {
 }
 
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
-
-    const { params, visible } = props;
+    const { params, visible, display } = props;
     const { coordValue, position, response } = params;
     const count = response.featureCount;
     const { copyValue, contextHolder } = useCopy();
+    const { eventHighlight } = useSource();
+
+    count === 0 && eventHighlight({ layerId: null, feature: null }, "feature.unhighlight", display);
 
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
@@ -128,13 +133,14 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             onClick={() => {
                                 visible({ hidden: true, overlay: undefined, key: "popup" })
                                 refRnd.resizableElement.current.hidden = true;
+                                eventHighlight({ layerId: null, feature: null }, "feature.unhighlight", display);
                             }} >
                             <CloseIcon />
                         </span>
                     </div>
                     {count > 0 && (
                         <div className="content">
-                            <FeatureComponent store={store} position={position} data={response.data} />
+                            <FeatureComponent display={display} store={store} position={position} data={response.data} />
                         </div>
                     )}
                     <div className="footer-popup"  >

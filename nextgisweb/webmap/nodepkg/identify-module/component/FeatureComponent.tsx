@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, ConfigProvider, Empty, Select, Tabs, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Info from "@nextgisweb/icon/material/info/outline";
@@ -11,53 +11,103 @@ import { useSource } from "../hook/useSource";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
 
+import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
+
+
+import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
+import showModal from "@nextgisweb/gui/showModal";
+
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const FeatureComponent: FC = ({ data, store }) => {
-    const { getFeature } = useSource();
+export const FeatureComponent: FC = ({ data, store, display }) => {
+    const { eventHighlight, getAttribute } = useSource();
     const { copyValue, contextHolder } = useCopy();
 
+    const imodule = display.identify_module
+    
+    const { id, layerId, styleId } = store?.selected;
+
+    const [attribute, setAttr] = useState();
+    const [keyTabs, setKeyTabs] = useState();
     const [feature, setFeature] = useState();
+
+    eventHighlight({ layerId, feature }, "feature.highlight", display);
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
 
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
 
     const onChange = (value: number) => {
-
         const selected = data.find(item => item.value === value);
         store.setSelected(selected);
-
-        getFeature(selected)
+        setKeyTabs(selected.id)
+        getAttribute(selected)
             .then(item => {
-                setFeature(item);
+                setAttr(item._fieldmap);
+                setFeature(item.feature);
             });
     };
 
-    const onChangeTabs = () => {
+    const reloadLayer = useCallback(() => {
+        const layer = display?.webmapStore.getLayer(store.selected.layerId);
+        layer?.reload();
+    }, [layerId]);
+
+    const onSave = () => {
+        if (display.hasOwnProperty("identify_module")) {
+            imodule._popup(imodule.mapEvent);
+        }
+        reloadLayer();
+    }
+
+    const onChangeTabs = (key) => {
         console.log(store.selected);
     };
 
     useEffect(() => {
         store.setSelected(data[0]);
-        getFeature(data[0])
+        getAttribute(data[0])
             .then(item => {
-                setFeature(item);
+                setAttr(item._fieldmap);
+                setFeature(item.feature);
             });
     }, [data])
 
-    const operations = (
-        <Button
-            style={{width:20}}
-            type="text"
-            title={gettext("Edit")}
-            icon={<EditNote />}
-            onClick={(e) => {
-                console.log(e);
-            }}
-        />
-    );
+
+    let operations;
+
+    Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
+        if (
+            config.layerId !== layerId ||
+            config.styleId !== styleId ||
+            !imodule._isEditEnabled(display, config)
+        ) {
+            return;
+        }
+        operations = (
+            <Button
+                style={{ width: 20 }}
+                type="text"
+                title={gettext("Edit")}
+                icon={<EditNote />}
+                onClick={() => {
+                    const featureId = id;
+                    showModal(FeatureEditorModal, {
+                        editorOptions: {
+                            featureId,
+                            resourceId: layerId,
+                            onSave: () => {
+                                if (onSave) {
+                                    onSave();
+                                }
+                            },
+                        },
+                    });
+                }}
+            />
+        );
+    })
 
     const RenderValue = (value) => {
 
@@ -88,13 +138,13 @@ export const FeatureComponent: FC = ({ data, store }) => {
             key: "attributes",
             visible: settings.identify_attributes,
             icon: <Info title={gettext("Attributes")} />,
-            children: feature && Object.keys(feature).length > 0 ?
+            children: attribute && Object.keys(attribute).length > 0 ?
                 (<div className="item">
-                    {Object.keys(feature).map((key) => {
+                    {Object.keys(attribute).map((key) => {
                         return (
                             <div key={key} className="item-fields">
                                 <div className="label">{key}</div>
-                                <RenderValue value={feature[key]} />
+                                <RenderValue value={attribute[key]} />
                             </div>
                         )
                     })}
@@ -105,6 +155,20 @@ export const FeatureComponent: FC = ({ data, store }) => {
         { title: gettext("Description"), label: "Description", key: "description", visible: true, icon: <Description /> },
         { title: gettext("Attachments"), label: "Attachments", key: "attachment", visible: true, icon: <Attachment /> },
     ];
+
+    const items = useMemo(
+        () =>
+            tabsItems.map(item => {
+                return item.visible ?
+                    {
+                        key: item.key,
+                        label: item.label,
+                        children: item.children,
+                        icon: item.icon,
+                    } : null
+            }),
+        [attribute]
+    );
 
     return (
         <ConfigProvider
@@ -118,9 +182,9 @@ export const FeatureComponent: FC = ({ data, store }) => {
                         horizontalItemGutter: 0,
                         horizontalMargin: "0 0 0 0",
                         verticalItemMargin: 0, /*.ant-tabs-nav .ant-tabs-tab+.ant-tabs-tab*/
-                        verticalItemPadding: "5px 0px 5px 8px", /*.ant-tabs-nav .ant-tabs-tab*/
+                        verticalItemPadding: "5px 0px 5px 7px", /*.ant-tabs-nav .ant-tabs-tab*/
                         controlHeight: 24,
-                        paddingLG:0, /*.ant-tabs-nav .ant-tabs-tab*/
+                        paddingLG: 0, /*.ant-tabs-nav .ant-tabs-tab*/
 
 
                     },
@@ -149,21 +213,14 @@ export const FeatureComponent: FC = ({ data, store }) => {
                 />
             </div>
             <Tabs
+                key={keyTabs}
                 defaultActiveKey="attributes"
                 tabPosition="left"
                 size="small"
                 onChange={onChangeTabs}
                 tabBarExtraContent={operations}
                 className="content-tabs"
-                items={tabsItems.map(item => {
-                    return item.visible ?
-                        {
-                            key: item.key,
-                            label:item.label,
-                            children: item.children,
-                            icon: item.icon,
-                        } : null
-                })}
+                items={items}
             />
         </ConfigProvider>
     )

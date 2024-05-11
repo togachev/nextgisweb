@@ -56,6 +56,17 @@ define([
                 "feature.unhighlight",
                 lang.hitch(this, this._unhighlightFeature)
             );
+
+            window.addEventListener("feature.highlight", function (e) {
+                const featureHighlighter = e.detail.featureHighlighter;
+                featureHighlighter._highlightFeature(e.detail);
+            });
+
+            window.addEventListener("feature.unhighlight", function (e) {
+                const featureHighlighter = e.detail.featureHighlighter;
+                const { filter } = e.detail;
+                featureHighlighter._unhighlightFeature(filter);
+            });
         },
 
         _highlightFeature: function (e) {
