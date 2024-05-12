@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { DojoDisplay } from "../../type";
 
 interface Position {
     x: number;
@@ -16,12 +17,19 @@ interface Item {
     position: Position;
 }
 
+interface Visible {
+    hidden: boolean;
+    overlay: boolean | undefined;
+    key: string;
+}
+
 interface Context {
     params: Item;
+    visible: ({ hidden, overlay, key }: Visible) => void;
 }
 
 export default forwardRef<Element>(function ContextComponent(props: Context, ref: RefObject<Element>) {
-    const { params } = props;
+    const { params, visible } = props;
     const { coordValue, position } = params;
     useOutsideClick(ref, true);
     const { copyValue, contextHolder } = useCopy();
@@ -44,15 +52,23 @@ export default forwardRef<Element>(function ContextComponent(props: Context, ref
             }}>
                 {contextHolder}
                 <div
-                    
+
                     title={gettext("Copy coordinates")}
-                    onClick={() => { copyValue(coordValue, gettext("Coordinates copied")) }}
+                    onClick={() => {
+                        copyValue(coordValue, gettext("Coordinates copied"))
+                        visible({ hidden: true, overlay: undefined, key: "context" });
+                    }}
                     className="context-coords"
-                >{coordValue}</div>
+                >
+                    {coordValue}
+                </div>
                 {
                     array.map(item => {
                         return (
-                            <div className="context-item" key={item.key} onClick={() => { console.log(item.result) }} >
+                            <div className="context-item" key={item.key} onClick={() => {
+                                console.log(item.result);
+                                visible({ hidden: true, overlay: undefined, key: "context" });
+                            }} >
                                 <span>{item.title}</span>
                             </div>
                         )

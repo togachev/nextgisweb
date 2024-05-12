@@ -243,7 +243,7 @@ export class IdentifyModule extends Component {
         this.displayFeatureInfo(e, 3857, "context").then(item => {
             this._setValue(this.point_context, "context")
             this.root_context.render(
-                <ContextComponent params={item} ref={this.refContext} />
+                <ContextComponent params={item} visible={this._visible} ref={this.refContext} />
             );
             this._visible({ hidden: false, overlay: e.coordinate, key: "context" });
         })

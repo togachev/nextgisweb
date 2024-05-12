@@ -89,7 +89,7 @@ define([
     Control.prototype.constructor = Control;
 
     Control.prototype.handleClickEvent = function (e) {
-        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
+        if (!webmapSettings.idetify_module && e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
             this.tool.execute(e.pixel);
             e.preventDefault();
         }

@@ -13,7 +13,7 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
 
 import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
 
-
+// import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import showModal from "@nextgisweb/gui/showModal";
 
@@ -25,15 +25,27 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
     const { copyValue, contextHolder } = useCopy();
 
     const imodule = display.identify_module
-    
+
     const { id, layerId, styleId } = store?.selected;
 
     const [attribute, setAttr] = useState();
     const [keyTabs, setKeyTabs] = useState();
     const [feature, setFeature] = useState();
 
-    eventHighlight({ layerId, feature }, "feature.highlight", display);
+    const reloadLayer = useCallback(() => {
+        const layer = display?.webmapStore.getLayer(store.selected.layerId);
+        layer?.reload();
+    }, [layerId]);
 
+    // const [featureGridStore] = useState(() => new FeatureGridStore({
+    //     id: layerId,
+    //     readonly: true,
+    //     onDelete: reloadLayer,
+    // }))
+
+    eventHighlight({ layerId, feature }, "feature.highlight", display);
+    // console.log(featureGridStore);
+    
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
 
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
@@ -49,10 +61,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
             });
     };
 
-    const reloadLayer = useCallback(() => {
-        const layer = display?.webmapStore.getLayer(store.selected.layerId);
-        layer?.reload();
-    }, [layerId]);
+
 
     const onSave = () => {
         if (display.hasOwnProperty("identify_module")) {

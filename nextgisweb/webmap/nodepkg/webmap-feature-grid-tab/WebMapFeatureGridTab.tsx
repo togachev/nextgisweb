@@ -36,6 +36,7 @@ export function WebMapFeatureGridTab({
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
+    const identify_module = display.current.identify_module;
     const itemConfig = useRef<DisplayItemConfig>(
         display.current.get("itemConfig") as DisplayItemConfig
     );
@@ -62,10 +63,8 @@ export function WebMapFeatureGridTab({
                     if (display.current.hasOwnProperty("identify")) {
                         display.current.identify._popup.widget?.reset();
                     } else if (display.current.hasOwnProperty("identify_module")) {
-                        const identify_module = display.current.identify_module;
                         identify_module._popup(identify_module.mapEvent);
                     }
-
                     reloadLayer();
                 },
 
@@ -88,6 +87,8 @@ export function WebMapFeatureGridTab({
                                 );
                             });
                     } else {
+                        identify_module?._render();
+                        identify_module?._visible({ hidden: true, overlay: undefined, key: "popup" })
                         display.current.featureHighlighter.unhighlightFeature(
                             (f) => f?.getProperties?.()?.layerId === layerId
                         );
@@ -198,7 +199,6 @@ export function WebMapFeatureGridTab({
 
     useEffect(() => {
         subscribe();
-
         const highlightedFeatures =
             display.current.featureHighlighter.getHighlighted();
         const selected: number[] = highlightedFeatures
@@ -206,7 +206,6 @@ export function WebMapFeatureGridTab({
             .map((f) => f.getProperties().featureId);
 
         store.setSelectedIds(selected);
-
         return unsubscribe;
     }, [subscribe, layerId, store]);
 
