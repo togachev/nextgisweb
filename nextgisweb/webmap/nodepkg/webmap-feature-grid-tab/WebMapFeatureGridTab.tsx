@@ -36,7 +36,7 @@ export function WebMapFeatureGridTab({
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
-    const identify_module = display.current.identify_module;
+    const imodule = display.current.identify_module;
     const itemConfig = useRef<DisplayItemConfig>(
         display.current.get("itemConfig") as DisplayItemConfig
     );
@@ -60,10 +60,15 @@ export function WebMapFeatureGridTab({
                 cleanSelectedOnFilter: false,
                 onDelete: reloadLayer,
                 onSave: () => {
-                    if (display.current.hasOwnProperty("identify")) {
+                    if (Object.prototype.hasOwnProperty.call(display.current, "identify")) {
                         display.current.identify._popup.widget?.reset();
-                    } else if (display.current.hasOwnProperty("identify_module")) {
-                        identify_module._popup(identify_module.mapEvent);
+                    }
+                    if (Object.prototype.hasOwnProperty.call(display.current, "identify_module")) {
+                        // imodule.mapEvent && imodule._popup(imodule.mapEvent);
+                        console.log(imodule.refPopup.current?.getAttribute("data-custom-attr"));
+                        // imodule.root_popup.render()
+                        console.log(imodule.mapEven);
+                        imodule.refPopup.current?.focus()
                     }
                     reloadLayer();
                 },
@@ -87,8 +92,8 @@ export function WebMapFeatureGridTab({
                                 );
                             });
                     } else {
-                        identify_module?._render();
-                        identify_module?._visible({ hidden: true, overlay: undefined, key: "popup" })
+                        imodule?._render();
+                        imodule?._visible({ hidden: true, overlay: undefined, key: "popup" })
                         display.current.featureHighlighter.unhighlightFeature(
                             (f) => f?.getProperties?.()?.layerId === layerId
                         );
@@ -153,12 +158,12 @@ export function WebMapFeatureGridTab({
     const featureHighlightedEvent = useCallback(
         ({
             featureId,
-            layerId: eventLayerId,
+            layerId,
         }: {
             featureId: number;
             layerId: number;
         }) => {
-            if (featureId !== undefined && eventLayerId === layerId) {
+            if (featureId !== undefined && layerId === layerId) {
                 store.setSelectedIds([featureId]);
             } else {
                 store.setSelectedIds([]);
@@ -199,6 +204,7 @@ export function WebMapFeatureGridTab({
 
     useEffect(() => {
         subscribe();
+
         const highlightedFeatures =
             display.current.featureHighlighter.getHighlighted();
         const selected: number[] = highlightedFeatures
@@ -206,6 +212,7 @@ export function WebMapFeatureGridTab({
             .map((f) => f.getProperties().featureId);
 
         store.setSelectedIds(selected);
+
         return unsubscribe;
     }, [subscribe, layerId, store]);
 

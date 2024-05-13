@@ -26,7 +26,6 @@ define([
     "./ui/react-webmap-tabs",
     // tools
     "@nextgisweb/webmap/map-controls",
-    "@nextgisweb/webmap/identify-module",
     // Tiny display
     "ngw-webmap/controls/LinkToMainMap",
     // panels
@@ -69,7 +68,6 @@ define([
     reactPanel,
     ReactWebMapTabs,
     MapControls,
-    IdentifyModule,
     LinkToMainMap,
     LayersPanelModule,
     URL,

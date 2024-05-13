@@ -16,7 +16,7 @@ import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatia
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
 
-import { useSource } from "./hook/useSource";
+import { positionContext } from "./positionContext"
 
 interface VisibleProps {
     hidden: boolean;
@@ -25,8 +25,6 @@ interface VisibleProps {
 }
 
 const settings = webmapSettings;
-
-const { positionContext } = useSource();
 
 const srsCoordinates = {};
 if (spatialRefSysList) {
@@ -205,7 +203,7 @@ export class IdentifyModule extends Component {
             });
 
         const offset = op === "popup" ? settings.offset_point : 0;
-        const position = positionContext(event, offset, op, response.featureCount);
+        const position = positionContext(event, offset, op, response.featureCount, settings);
         const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
         if (op === "context") {

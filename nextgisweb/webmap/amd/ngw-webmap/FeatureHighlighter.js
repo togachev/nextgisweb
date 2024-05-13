@@ -7,7 +7,7 @@ define([
     "@nextgisweb/pyramid/api",
     "ngw-webmap/ol/layer/Vector",
     "openlayers/ol",
-    "@nextgisweb/webmap/identify-module/hook",
+    "@nextgisweb/webmap/identify-module",
 ], function (declare, lang, xhr, topic, Deferred, api, Vector, ol, topics) {
     return declare("ngw-webmap.FeatureHighlighter", [], {
         _map: null,
@@ -57,17 +57,6 @@ define([
                 "feature.unhighlight",
                 lang.hitch(this, this._unhighlightFeature)
             );
-
-            topics.subscribe("feature.highlight", (e) => {
-                const featureHighlighter = e.detail.featureHighlighter;
-                featureHighlighter._highlightFeature(e.detail);
-            });
-
-            topics.subscribe("feature.unhighlight", (e) => {
-                const featureHighlighter = e.detail.featureHighlighter;
-                const { filter } = e.detail;
-                featureHighlighter._unhighlightFeature(filter);
-            });
         },
 
         _highlightFeature: function (e) {

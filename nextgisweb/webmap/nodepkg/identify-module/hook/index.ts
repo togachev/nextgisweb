@@ -1,2 +1,0 @@
-/** @entrypoint */
-export * from "./topics";

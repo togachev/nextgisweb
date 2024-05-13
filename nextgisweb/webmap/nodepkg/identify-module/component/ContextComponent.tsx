@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { DojoDisplay } from "../../type";
 
 interface Position {
     x: number;

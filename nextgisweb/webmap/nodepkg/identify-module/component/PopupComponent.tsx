@@ -8,8 +8,8 @@ import { FeatureComponent } from "./FeatureComponent";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { DojoDisplay } from "../../type";
-import { publish } from "../hook/topics"
 
+import topic from "dojo/topic";
 interface Visible {
     hidden: boolean;
     overlay: boolean | undefined;
@@ -62,9 +62,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const count = response.featureCount;
     const { copyValue, contextHolder } = useCopy();
 
-    count === 0 && publish("feature.unhighlight", {
-        featureHighlighter: display.featureHighlighter,
-    });
+    useEffect(() => {
+        count === 0 &&
+            topic.publish("feature.unhighlight");
+    }, [response])
 
     const [store] = useState(() => new IdentifyStore({
         selected: response.data[0],
@@ -134,9 +135,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             onClick={() => {
                                 visible({ hidden: true, overlay: undefined, key: "popup" })
                                 refRnd.resizableElement.current.hidden = true;
-                                publish("feature.unhighlight", {
-                                    featureHighlighter: display.featureHighlighter,
-                                });
+                                topic.publish("feature.unhighlight");
                             }} >
                             <CloseIcon />
                         </span>

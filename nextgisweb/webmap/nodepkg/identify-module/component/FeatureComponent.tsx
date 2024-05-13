@@ -10,7 +10,8 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { useSource } from "../hook/useSource";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
-import { publish } from "../hook/topics"
+
+import topic from "dojo/topic";
 import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
 
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
@@ -25,7 +26,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
 
     const imodule = display.identify_module
 
-    const { id, layerId, styleId } = store?.selected;
+    const { id, layerId, styleId } = store.selected;
 
     const [attribute, setAttr] = useState();
     const [keyTabs, setKeyTabs] = useState();
@@ -36,13 +37,15 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
         layer?.reload();
     }, [layerId]);
 
-    publish("feature.highlight", {
-        geom: feature?.geom,
-        featureId: feature?.id,
-        layerId: layerId,
-        featureInfo: feature?.fields,
-        featureHighlighter: display.featureHighlighter,
-    });
+    useEffect(() => {
+        if (feature) {
+            topic.publish("feature.highlight", {
+                geom: feature.geom,
+                featureId: feature.id,
+                layerId: layerId,
+            });
+        }
+    }, [feature])
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
 
@@ -60,13 +63,13 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
     };
 
     const onSave = () => {
-        if (display.hasOwnProperty("identify_module")) {
+        if (Object.prototype.hasOwnProperty.call(display, "identify_module")) {
             imodule._popup(imodule.mapEvent);
         }
         reloadLayer();
     }
 
-    const onChangeTabs = (key) => {
+    const onChangeTabs = () => {
         console.log(store.selected);
     };
 
@@ -98,10 +101,11 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                 icon={<EditNote />}
                 onClick={() => {
                     const featureId = id;
+                    const resourceId = layerId;
                     showModal(FeatureEditorModal, {
                         editorOptions: {
                             featureId,
-                            resourceId: layerId,
+                            resourceId: resourceId,
                             onSave: () => {
                                 if (onSave) {
                                     onSave();
@@ -109,6 +113,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                             },
                         },
                     });
+
                 }}
             />
         );
