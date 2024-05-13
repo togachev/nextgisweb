@@ -162,30 +162,6 @@ export const useSource = () => {
         }
     };
 
-    const eventHighlight = (props, type, display) => {
-        const { layerId, feature } = props;
-        let e;
-        if (type === "feature.highlight") {
-            e = new CustomEvent(type, {
-                detail: {
-                    geom: feature?.geom,
-                    featureId: feature?.id,
-                    layerId: layerId,
-                    featureInfo: feature?.fields,
-                    featureHighlighter: display.featureHighlighter,
-                }
-            });
-            window.dispatchEvent(e);
-        } else if (type === "feature.unhighlight") {
-            e = new CustomEvent(type, {
-                detail: {
-                    featureHighlighter: display.featureHighlighter,
-                }
-            });
-            window.dispatchEvent(e);
-        }
-    }
-
     const getAttribute = async (res) => {
         const resourceId = res.layerId;
         const feature = await route("feature_layer.feature.item_iso", {
@@ -258,5 +234,5 @@ export const useSource = () => {
         return fieldmap;
     }
 
-    return { eventHighlight, getAttribute, positionContext };
+    return { getAttribute, positionContext };
 };

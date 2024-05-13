@@ -10,10 +10,9 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { useSource } from "../hook/useSource";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
-
+import { publish } from "../hook/topics"
 import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
 
-// import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import showModal from "@nextgisweb/gui/showModal";
 
@@ -21,7 +20,7 @@ const { Link } = Typography;
 const settings = webmapSettings;
 
 export const FeatureComponent: FC = ({ data, store, display }) => {
-    const { eventHighlight, getAttribute } = useSource();
+    const { getAttribute } = useSource();
     const { copyValue, contextHolder } = useCopy();
 
     const imodule = display.identify_module
@@ -37,15 +36,14 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
         layer?.reload();
     }, [layerId]);
 
-    // const [featureGridStore] = useState(() => new FeatureGridStore({
-    //     id: layerId,
-    //     readonly: true,
-    //     onDelete: reloadLayer,
-    // }))
+    publish("feature.highlight", {
+        geom: feature?.geom,
+        featureId: feature?.id,
+        layerId: layerId,
+        featureInfo: feature?.fields,
+        featureHighlighter: display.featureHighlighter,
+    });
 
-    eventHighlight({ layerId, feature }, "feature.highlight", display);
-    // console.log(featureGridStore);
-    
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
 
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
@@ -60,8 +58,6 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                 setFeature(item.feature);
             });
     };
-
-
 
     const onSave = () => {
         if (display.hasOwnProperty("identify_module")) {

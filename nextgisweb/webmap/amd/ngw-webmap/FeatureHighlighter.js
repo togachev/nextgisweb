@@ -7,7 +7,8 @@ define([
     "@nextgisweb/pyramid/api",
     "ngw-webmap/ol/layer/Vector",
     "openlayers/ol",
-], function (declare, lang, xhr, topic, Deferred, api, Vector, ol) {
+    "@nextgisweb/webmap/identify-module/hook",
+], function (declare, lang, xhr, topic, Deferred, api, Vector, ol, topics) {
     return declare("ngw-webmap.FeatureHighlighter", [], {
         _map: null,
         _source: null,
@@ -57,12 +58,12 @@ define([
                 lang.hitch(this, this._unhighlightFeature)
             );
 
-            window.addEventListener("feature.highlight", function (e) {
+            topics.subscribe("feature.highlight", (e) => {
                 const featureHighlighter = e.detail.featureHighlighter;
                 featureHighlighter._highlightFeature(e.detail);
             });
 
-            window.addEventListener("feature.unhighlight", function (e) {
+            topics.subscribe("feature.unhighlight", (e) => {
                 const featureHighlighter = e.detail.featureHighlighter;
                 const { filter } = e.detail;
                 featureHighlighter._unhighlightFeature(filter);
@@ -134,9 +135,9 @@ define([
 
         highlightFeatureById: function (featureId, layerId) {
             var get_feature_item_url = api.routeURL(
-                    "feature_layer.feature.item",
-                    { id: layerId, fid: featureId }
-                ),
+                "feature_layer.feature.item",
+                { id: layerId, fid: featureId }
+            ),
                 highlightedDeferred = new Deferred();
 
             xhr.get(get_feature_item_url, {
