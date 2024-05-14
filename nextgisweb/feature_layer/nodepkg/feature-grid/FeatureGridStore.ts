@@ -5,7 +5,7 @@ import type { SizeType } from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureLayerField } from "../type";
-
+import { MapBrowserEvent } from "ol";
 import { KEY_FIELD_ID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type { ActionProps, FeatureGridProps, SetValue } from "./type";
@@ -18,6 +18,7 @@ export class FeatureGridStore {
     readonly = true;
     queryParams: QueryParams | null = null;
     selectedIds: number[] = [];
+    mapEvent: MapBrowserEvent | null = null;
     editOnNewPage = false;
     cleanSelectedOnFilter? = true;
     settingsOpen = false;
@@ -46,6 +47,10 @@ export class FeatureGridStore {
 
     setId = (id: number) => {
         this.id = id;
+    };
+
+    setMapEvent = (mapEvent: MapBrowserEvent) => {
+        this.mapEvent = mapEvent;
     };
 
     setFields = (fields: FeatureLayerField[]) => {

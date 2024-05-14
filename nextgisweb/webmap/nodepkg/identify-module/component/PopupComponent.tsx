@@ -47,29 +47,18 @@ interface Params {
     display: DojoDisplay;
 }
 
-export type HandleStyles = {
-    bottom?: -10,
-    left?: -10,
-    width?: 15,
-    heght?: 15,
-    right?: -10,
-    top?: -10,
-}
-
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display } = props;
     const { coordValue, position, response } = params;
     const count = response.featureCount;
     const { copyValue, contextHolder } = useCopy();
 
-    useEffect(() => {
-        count === 0 &&
-            topic.publish("feature.unhighlight");
-    }, [response])
+    const [store] = useState(() => new IdentifyStore({}));
 
-    const [store] = useState(() => new IdentifyStore({
-        selected: response.data[0],
-    }));
+    useEffect(() => {
+        count === 0 && topic.publish("feature.unhighlight");
+        response.data[0] && store.setSelected(response.data[0]);
+    }, [response.data[0]])
 
     const [refRnd, setRefRnd] = useState();
     const [valueRnd, setValueRnd] = useState<Rnd>({
@@ -91,10 +80,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     left: "hover-left",
                     top: "hover-top",
                     bottom: "hover-bottom",
-                    bottomRight: "hover-angle",
-                    bottomLeft: "hover-angle",
-                    topRight: "hover-angle",
-                    topLeft: "hover-angle",
+                    bottomRight: "hover-angle-bottom-right",
+                    bottomLeft: "hover-angle-bottom-left",
+                    topRight: "hover-angle-top-right",
+                    topLeft: "hover-angle-top-left",
                 }}
                 cancel=".select-feature,.ant-tabs-nav,.ant-tabs-content-holder,.icon-symbol,.coordinate-value"
                 bounds="window"
@@ -122,7 +111,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     <div className="title">
                         <div className="title-name">
                             <span className="object-select">Объектов: {count}</span>
-                            {count > 0 && (
+                            {count > 0 && store.selected && (
                                 <span
                                     title={store.selected?.layer_name}
                                     className="layer-name">
@@ -140,7 +129,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             <CloseIcon />
                         </span>
                     </div>
-                    {count > 0 && (
+                    {count > 0 && store.selected && (
                         <div className="content">
                             <FeatureComponent display={display} store={store} position={position} data={response.data} />
                         </div>

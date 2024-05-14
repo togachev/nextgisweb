@@ -25,7 +25,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
     const { copyValue, contextHolder } = useCopy();
 
     const imodule = display.identify_module
-
+    
     const { id, layerId, styleId } = store.selected;
 
     const [attribute, setAttr] = useState();
@@ -36,6 +36,15 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
         const layer = display?.webmapStore.getLayer(store.selected.layerId);
         layer?.reload();
     }, [layerId]);
+
+    useEffect(() => {
+        store.setSelected(data[0]);
+        getAttribute(data[0])
+            .then(item => {
+                setAttr(item._fieldmap);
+                setFeature(item.feature);
+            });
+    }, [data]);
 
     useEffect(() => {
         if (feature) {
@@ -73,14 +82,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
         console.log(store.selected);
     };
 
-    useEffect(() => {
-        store.setSelected(data[0]);
-        getAttribute(data[0])
-            .then(item => {
-                setAttr(item._fieldmap);
-                setFeature(item.feature);
-            });
-    }, [data])
+
 
 
     let operations;

@@ -15,13 +15,17 @@ import ContextComponent from "./component/ContextComponent";
 import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
-
 import { positionContext } from "./positionContext"
 
 interface VisibleProps {
     hidden: boolean;
-    overlay: boolean | undefined;
+    overlay: number[] | undefined;
     key: string;
+}
+
+interface EventProps {
+    request: RequestProps | undefined;
+    point: number[];
 }
 
 const settings = webmapSettings;
@@ -60,6 +64,7 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
 export class IdentifyModule extends Component {
     private display: DojoDisplay
     private olmap: Map;
+    private params: EventProps;
     private mapEvent: MapBrowserEvent;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
@@ -145,23 +150,18 @@ export class IdentifyModule extends Component {
         }
     };
 
-    _render = () => {
-        this.display.identify_module.root_popup.render();
-    };
-
     _popupMultiple = (e: MapBrowserEvent) => {
         alert(e.pixel);
     };
 
-    displayFeatureInfo = async (event: MapBrowserEvent, value: number, op: string) => {
+    displayFeatureInfo = async (params: EventProps, event: MapBrowserEvent, value: number, op: string) => {
         const wkt = new WKT();
-        const point = event.coordinate;
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
                     srs_from: value,
                     srs_to: Object.keys(srsCoordinates).map(Number),
-                    geom: wkt.writeGeometry(new Point(point)),
+                    geom: wkt.writeGeometry(new Point(params.point)),
                 },
             })
             .then((transformed) => {
@@ -170,46 +170,50 @@ export class IdentifyModule extends Component {
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
             });
-
-        const pixel = event.pixel;
-        const request: RequestProps = {
-            srs: 3857,
-            geom: this._requestGeomString(pixel),
-            styles: [],
-        };
-
-        this.display.getVisibleItems()
-            .then(items => {
-                const itemConfig = this.display.getItemConfig();
-                const mapResolution = this.olmap.getView().getResolution();
-                items.map(i => {
-                    const item = itemConfig[i.id];
-                    if (
-                        !item.identifiable ||
-                        mapResolution >= item.maxResolution ||
-                        mapResolution < item.minResolution
-                    ) {
-                        return;
-                    }
-                    request.styles.push({ id: item.styleId, label: item.label });
+        let count;
+        let response
+        if (params.request !== null) {
+            this.display.getVisibleItems()
+                .then(items => {
+                    const itemConfig = this.display.getItemConfig();
+                    const mapResolution = this.olmap.getView().getResolution();
+                    items.map(i => {
+                        const item = itemConfig[i.id];
+                        if (
+                            !item.identifiable ||
+                            mapResolution >= item.maxResolution ||
+                            mapResolution < item.minResolution
+                        ) {
+                            return;
+                        }
+                        params.request.styles.push({ id: item.styleId, label: item.label });
+                    });
+                })
+            response = op === "popup" && await route("feature_layer.identify_module")
+                .post({
+                    json: params.request,
+                })
+                .then((response) => {
+                    return response;
                 });
-            })
-        const response = op === "popup" && await route("feature_layer.identify_module")
-            .post({
-                json: request,
-            })
-            .then((response) => {
-                return response;
-            });
+            count = response.featureCount;
+        } else {
+            count = 0;
+        }
 
         const offset = op === "popup" ? settings.offset_point : 0;
-        const position = positionContext(event, offset, op, response.featureCount, settings);
+        const position = positionContext(event, offset, op, count, settings);
         const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
         if (op === "context") {
-            return { coordValue, position };
+            this._setValue(this.point_context, "context")
+            this.root_context.render(<ContextComponent params={{ coordValue, position, event }} visible={this._visible} ref={this.refContext} />);
+            this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         } else {
-            return { coordValue, position, response };
+            this._visible({ hidden: true, overlay: undefined, key: "context" })
+            this._setValue(this.point_popup, "popup");
+            this.root_popup.render(<PopupComponent params={{ coordValue, position, response, event }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+            this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         }
     };
 
@@ -225,26 +229,30 @@ export class IdentifyModule extends Component {
         return !readOnly;
     };
 
+    _render = () => {
+        this.display.identify_module.root_popup.render();
+    };
+
     _popup = (e: MapBrowserEvent) => {
-        this.mapEvent = e;
-        this.displayFeatureInfo(e, 3857, "popup").then(item => {
-            this._visible({ hidden: true, overlay: undefined, key: "context" })
-            this._setValue(this.point_popup, "popup");
-            this.root_popup.render(
-                <PopupComponent key={new Date} params={item} display={this.display} visible={this._visible} ref={this.refPopup} />
-            );
-            this._visible({ hidden: false, overlay: e.coordinate, key: "popup" });
-        });
+        this.mapEvent = e === null ? this.mapEvent : e;
+        this.params = {
+            point: this.mapEvent.coordinate,
+            request: {
+                srs: 3857,
+                geom: this._requestGeomString(this.mapEvent.pixel),
+                styles: [],
+            }
+        }
+        this.displayFeatureInfo(this.params, this.mapEvent, 3857, "popup");
     };
 
     _context = (e: MapBrowserEvent) => {
-        this.displayFeatureInfo(e, 3857, "context").then(item => {
-            this._setValue(this.point_context, "context")
-            this.root_context.render(
-                <ContextComponent params={item} visible={this._visible} ref={this.refContext} />
-            );
-            this._visible({ hidden: false, overlay: e.coordinate, key: "context" });
-        })
+        this.mapEvent = e === null ? this.mapEvent : e;
+        this.params = {
+            point: e.coordinate,
+            request: null,
+        }
+        this.displayFeatureInfo(this.params, this.mapEvent, 3857, "context");
     };
 
     _requestGeomString = (pixel: number[]) => {

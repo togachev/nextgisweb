@@ -14,7 +14,7 @@ const positionContext = (event, offset, op, count, settings) => {
     let width;
     let height;
 
-    if (count === undefined && op === "context") {
+    if (count === 0 && op === "context") {
         width = context_width;
         height = context_height;
     }

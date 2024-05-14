@@ -64,11 +64,7 @@ export function WebMapFeatureGridTab({
                         display.current.identify._popup.widget?.reset();
                     }
                     if (Object.prototype.hasOwnProperty.call(display.current, "identify_module")) {
-                        // imodule.mapEvent && imodule._popup(imodule.mapEvent);
-                        console.log(imodule.refPopup.current?.getAttribute("data-custom-attr"));
-                        // imodule.root_popup.render()
-                        console.log(imodule.mapEven);
-                        imodule.refPopup.current?.focus()
+                        imodule.displayFeatureInfo(imodule.params, imodule.mapEvent, 3857, "popup")
                     }
                     reloadLayer();
                 },
