@@ -14,6 +14,7 @@ export interface SelectedProps {
 export class IdentifyStore {
 
     selected: SelectedProps | null = null;
+    styleContent = true;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -29,6 +30,10 @@ export class IdentifyStore {
 
     setSelected = (selected: SetValue<SelectedProps | null>) => {
         this.setValue("selected", selected);
+    };
+
+    setStyleContent = (styleContent: boolean) => {
+        this.setValue("styleContent", styleContent);
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

@@ -25,7 +25,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
     const { copyValue, contextHolder } = useCopy();
 
     const imodule = display.identify_module
-    
+
     const { id, layerId, styleId } = store.selected;
 
     const [attribute, setAttr] = useState();
@@ -82,9 +82,6 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
         console.log(store.selected);
     };
 
-
-
-
     let operations;
 
     Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
@@ -128,7 +125,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
 
             if (val !== null) {
                 if (urlRegex.test(val)) {
-                    return (<Link style={{ maxWidth: "60%" }} ellipsis={true} href={val} target="_blank">{val}</Link>)
+                    return (<Link className="value-link" ellipsis={true} href={val} target="_blank">{val}</Link>)
                 } else if (emailRegex.test(val)) {
                     return (<div className="value-email" onClick={() => {
                         copyValue(val, gettext("Email address copied"));
@@ -150,20 +147,31 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
             key: "attributes",
             visible: settings.identify_attributes,
             icon: <Info title={gettext("Attributes")} />,
-            children: attribute && Object.keys(attribute).length > 0 ?
-                (<div className="item">
-                    {Object.keys(attribute).map((key) => {
-                        return (
-                            <div key={key} className="item-fields">
-                                <div className="label">{key}</div>
-                                <RenderValue value={attribute[key]} />
-                            </div>
-                        )
-                    })}
-                </div>) :
-                (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+            children:
+                <span
+                    onMouseEnter={(e) => { console.log(e.type); e.type === 'mouseenter' && store.setStyleContent(false) }}
+                    onTouchMove={(e) => { console.log(e.type); e.type === 'touchmove' && store.setStyleContent(true) }}
+                >
+                    {attribute && Object.keys(attribute).length > 0 ?
+                        (<div className="item"
+
+                        >
+                            {Object.keys(attribute).map((key) => {
+                                return (
+                                    <div key={key} className="item-fields">
+                                        <div className="label">{key}</div>
+                                        <RenderValue value={attribute[key]} />
+                                    </div>
+                                )
+                            })}
+                        </div>) :
+                        (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)}
+                </span>
         },
-        { title: gettext("Geometry"), label: "Geometry", key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />, children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />) },
+        {
+            title: gettext("Geometry"), label: "Geometry", key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />,
+            children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />)
+        },
         { title: gettext("Description"), label: "Description", key: "description", visible: true, icon: <Description /> },
         { title: gettext("Attachments"), label: "Attachments", key: "attachment", visible: true, icon: <Attachment /> },
     ];
@@ -171,13 +179,14 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
     const items = useMemo(
         () =>
             tabsItems.map(item => {
-                return item.visible ?
-                    {
+                if (item.visible) {
+                    return {
                         key: item.key,
                         label: item.label,
                         children: item.children,
                         icon: item.icon,
-                    } : null
+                    }
+                }
             }),
         [attribute]
     );

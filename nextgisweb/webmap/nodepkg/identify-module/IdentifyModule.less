@@ -14,7 +14,7 @@
 }
 
 .hover-right {
-    width: 12px !important;
+    width: 8px !important;
     right: -8px !important;
 
     &:hover {
@@ -25,7 +25,7 @@
 
 .hover-left {
     left: -8px !important;
-    width: 12px !important;
+    width: 8px !important;
 
     &:hover {
         background-color: #106a9040;
@@ -34,7 +34,7 @@
 }
 
 .hover-top {
-    height: 12px !important;
+    height: 8px !important;
     top: -8px !important;
 
     &:hover {
@@ -45,7 +45,7 @@
 
 .hover-bottom {
     bottom: -8px !important;
-    height: 12px !important;
+    height: 8px !important;
 
     &:hover {
         background-color: #106a9040;
@@ -54,8 +54,8 @@
 }
 
 .hover-angle-bottom-right {
-    width: 12px !important;
-    height: 12px !important;
+    width: 8px !important;
+    height: 8px !important;
     right: -8px !important;
     bottom: -8px !important;
     &:hover {
@@ -65,8 +65,8 @@
 }
 
 .hover-angle-bottom-left {
-    width: 12px !important;
-    height: 12px !important;
+    width: 8px !important;
+    height: 8px !important;
     left: -8px !important;
     bottom: -8px !important;
     &:hover {
@@ -76,8 +76,8 @@
 }
 
 .hover-angle-top-left {
-    width: 12px !important;
-    height: 12px !important;
+    width: 8px !important;
+    height: 8px !important;
     left: -8px !important;
     top: -8px !important;
     &:hover {
@@ -87,8 +87,8 @@
 }
 
 .hover-angle-top-right {
-    width: 12px !important;
-    height: 12px !important;
+    width: 8px !important;
+    height: 8px !important;
     right: -8px !important;
     top: -8px !important;
     &:hover {
@@ -211,7 +211,10 @@
                 flex-direction: column;
                 height: 100%;
             }
-
+            .content-move {
+                height: 100%;
+                width: 100%;
+            }
             .item {
                 padding: 0;
 
@@ -237,6 +240,10 @@
 
                     .value {
                         max-width: max-content;
+                    }
+
+                    .value-link {
+                        max-width: 60%;
                     }
 
                     .value-email {

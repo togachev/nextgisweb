@@ -72,6 +72,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
     }, [position])
 
+    const moveClass = store.styleContent === false ? ",.ant-tabs-content-holder" : "";
+
     return (
         createPortal(
             <Rnd
@@ -85,7 +87,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     topRight: "hover-angle-top-right",
                     topLeft: "hover-angle-top-left",
                 }}
-                cancel=".select-feature,.ant-tabs-nav,.ant-tabs-content-holder,.icon-symbol,.coordinate-value"
+                cancel={".select-feature,.ant-tabs-nav,.icon-symbol,.coordinate-value" + moveClass}
                 bounds="window"
                 minWidth={position.width}
                 minHeight={position.height}
