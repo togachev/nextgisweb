@@ -126,7 +126,7 @@ def identify_module(request) -> JSONType:
                     layerId=layer.id,
                     styleId=style.id,
                     label=f.label,
-                    value=f.id/layer.id,
+                    value=str(f.id) + "/" + str(layer.id),
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
 

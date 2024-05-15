@@ -20,45 +20,43 @@ import showModal from "@nextgisweb/gui/showModal";
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const FeatureComponent: FC = ({ data, store, display }) => {
+export const FeatureComponent: FC = ({ store, display }) => {
     const { getAttribute } = useSource();
     const { copyValue, contextHolder } = useCopy();
 
     const imodule = display.identify_module
-
+    console.log(store.selected);
+    
     const { id, layerId, styleId } = store.selected;
 
-    const [attribute, setAttr] = useState();
+    // const [attribute, setAttr] = useState();
     const [keyTabs, setKeyTabs] = useState();
-    const [feature, setFeature] = useState();
+    // const [feature, setFeature] = useState();
 
-    console.log(data, store);
-    
     useEffect(() => {
         // store.setSelected(data[0]);
         getAttribute(store.selected)
             .then(item => {
-                setAttr(item._fieldmap);
-                // setFeature(item);
+                store.setAttribute({ [item.feature.id + "/" + item.resourceId]: item._fieldmap });
                 topic.publish("feature.highlight", {
                     geom: item.feature.geom,
                     featureId: item.feature.id,
                     layerId: item.resourceId,
                 });
             });
-    }, [data]);
+    }, [store.data]);
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
 
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
 
     const onChange = (value: number) => {
-        const selected = data.find(item => item.value === value);
+        const selected = store.data.find(item => item.value === value);
         store.setSelected(selected);
         setKeyTabs(selected.id)
         getAttribute(selected)
             .then(item => {
-                setAttr(item._fieldmap);
+                store.setAttribute({ [item.feature.id + "/" + item.resourceId]: item._fieldmap });
                 // setFeature(item);
                 topic.publish("feature.highlight", {
                     geom: item.feature.geom,
@@ -140,7 +138,9 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
             }
         }
     };
-
+    const currentAttribute = store.attribute && store.attribute[store.selected.value];
+    console.log(currentAttribute);
+    
     const tabsItems = [
         {
             title: gettext("Attributes"),
@@ -153,15 +153,15 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                     onMouseEnter={(e) => { console.log(e.type); e.type === 'mouseenter' && store.setStyleContent(false) }}
                     onTouchMove={(e) => { console.log(e.type); e.type === 'touchmove' && store.setStyleContent(true) }}
                 >
-                    {attribute && Object.keys(attribute).length > 0 ?
+                    {currentAttribute && Object.keys(currentAttribute).length > 0 ?
                         (<div className="item"
 
                         >
-                            {Object.keys(attribute).map((key) => {
+                            {Object.keys(currentAttribute).map((key) => {
                                 return (
                                     <div key={key} className="item-fields">
                                         <div className="label">{key}</div>
-                                        <RenderValue value={attribute[key]} />
+                                        <RenderValue value={currentAttribute[key]} />
                                     </div>
                                 )
                             })}
@@ -189,7 +189,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                     }
                 }
             }),
-        [attribute]
+        [store.attribute]
     );
 
     return (
@@ -231,7 +231,7 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                     value={store.selected}
                     style={{ width: "100%" }}
                     onChange={onChange}
-                    options={data}
+                    options={store.data}
                 />
             </div>
             <div className="content" >

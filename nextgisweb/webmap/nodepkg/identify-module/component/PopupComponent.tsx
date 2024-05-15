@@ -7,7 +7,7 @@ import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureComponent } from "./FeatureComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
-import { useCopy } from "@nextgisweb/webmap/useCopy";
+import { useSource } from "../hook/useSource";
 import type { DojoDisplay } from "../../type";
 
 import topic from "dojo/topic";
@@ -51,15 +51,6 @@ interface Params {
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display } = props;
     const { coordValue, position, response } = params;
-    const count = response.featureCount;
-    const { copyValue, contextHolder } = useCopy();
-
-    const [store] = useState(() => new IdentifyStore({}));
-
-    useEffect(() => {
-        count === 0 && topic.publish("feature.unhighlight");
-        response.data[0] && store.setSelected(response.data[0]);
-    }, [response.data[0]])
 
     const [refRnd, setRefRnd] = useState();
     const [valueRnd, setValueRnd] = useState<Rnd>({
@@ -69,11 +60,49 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         height: position.height,
     });
 
+    const { getAttribute } = useSource();
+
+    const count = response.featureCount;
+
+    const [store] = useState(() => new IdentifyStore({}));
+
     useEffect(() => {
         setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
-    }, [position])
+        count > 0 ?
+            (
+                store.setData(response.data),
+                store.setSelected(response.data[0]),
+                getAttribute(response.data[0])
+                    .then(item => {
+                        console.log(item)
+                        store.setAttribute({ [item.feature.id + "/" + item.resourceId]: item._fieldmap });
+                        store.setFeature({
+                            geom: item.feature.geom,
+                            featureId: item.feature.id,
+                            layerId: item.resourceId,
+                        });
+                        topic.publish("feature.highlight", {
+                            geom: item.feature.geom,
+                            featureId: item.feature.id,
+                            layerId: item.resourceId,
+                        })
+                    })
+            ) :
+            (
+                store.setData(null),
+                store.setAttribute(null),
+                store.setFeature(null),
+                topic.publish("feature.unhighlight")
+            )
+    }, [count, position]);
 
     const moveClass = store.styleContent === false ? ",.ant-tabs-content-holder" : "";
+    const currentLayer = store.data && store.data.length > 0 && store.data?.find(item => {
+        if (store.attribute !== null && item.value === Object.keys(store.attribute)[0]) {
+            return item
+        }
+    })
+    console.log(count);
 
     return (
         createPortal(
@@ -109,16 +138,15 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     }
                 }}
             >
-                {contextHolder}
                 <div ref={ref} className="popup-position" >
                     <div className="title">
                         <div className="title-name">
                             <span className="object-select">Объектов: {count}</span>
-                            {count > 0 && store.selected && (
+                            {count > 0 && (
                                 <span
-                                    title={store.selected?.layer_name}
+                                    title={currentLayer?.layer_name}
                                     className="layer-name">
-                                    {store.selected?.layer_name}
+                                    {currentLayer?.layer_name}
                                 </span>
                             )}
                         </div>
@@ -132,9 +160,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             <CloseIcon />
                         </span>
                     </div>
-                    {count > 0 && store.selected ? (
+                    {count > 0 && store.data && store.data.length > 0 ? (
                         <>
-                            <FeatureComponent display={display} store={store} position={position} data={response.data} />
+                            <FeatureComponent display={display} store={store} position={position} />
                             <Divider style={{ margin: 0 }} />
                         </>
                     ) : <Divider style={{ margin: 0 }} />}
