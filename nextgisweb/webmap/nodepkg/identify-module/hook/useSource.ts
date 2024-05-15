@@ -67,7 +67,7 @@ export const useSource = () => {
                             Object.assign(renameKeys, { [k]: fieldmap[k].display_name })
                         }
                         const _fieldmap = rename(renameKeys, value)
-                        return { _fieldmap, feature };
+                        return { _fieldmap, feature, resourceId };
                     }
                 );
 

@@ -32,29 +32,21 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
     const [keyTabs, setKeyTabs] = useState();
     const [feature, setFeature] = useState();
 
-    const reloadLayer = useCallback(() => {
-        const layer = display?.webmapStore.getLayer(store.selected.layerId);
-        layer?.reload();
-    }, [layerId]);
-
+    console.log(data, store);
+    
     useEffect(() => {
-        store.setSelected(data[0]);
-        getAttribute(data[0])
+        // store.setSelected(data[0]);
+        getAttribute(store.selected)
             .then(item => {
                 setAttr(item._fieldmap);
-                setFeature(item.feature);
+                // setFeature(item);
+                topic.publish("feature.highlight", {
+                    geom: item.feature.geom,
+                    featureId: item.feature.id,
+                    layerId: item.resourceId,
+                });
             });
     }, [data]);
-
-    useEffect(() => {
-        if (feature) {
-            topic.publish("feature.highlight", {
-                geom: feature.geom,
-                featureId: feature.id,
-                layerId: layerId,
-            });
-        }
-    }, [feature])
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
 
@@ -67,15 +59,24 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
         getAttribute(selected)
             .then(item => {
                 setAttr(item._fieldmap);
-                setFeature(item.feature);
+                // setFeature(item);
+                topic.publish("feature.highlight", {
+                    geom: item.feature.geom,
+                    featureId: item.feature.id,
+                    layerId: item.resourceId,
+                });
             });
     };
 
     const onSave = () => {
         if (Object.prototype.hasOwnProperty.call(display, "identify_module")) {
-            imodule._popup(imodule.mapEvent);
+            imodule.displayFeatureInfo(imodule.params, imodule.mapEvent, "popup");
         }
-        reloadLayer();
+
+        topic.publish("feature.updated", {
+            resourceId: layerId,
+            featureId: store.selected.id,
+        });
     }
 
     const onChangeTabs = () => {
@@ -233,16 +234,18 @@ export const FeatureComponent: FC = ({ data, store, display }) => {
                     options={data}
                 />
             </div>
-            <Tabs
-                key={keyTabs}
-                defaultActiveKey="attributes"
-                tabPosition="left"
-                size="small"
-                onChange={onChangeTabs}
-                tabBarExtraContent={operations}
-                className="content-tabs"
-                items={items}
-            />
+            <div className="content" >
+                <Tabs
+                    key={keyTabs}
+                    defaultActiveKey="attributes"
+                    tabPosition="left"
+                    size="small"
+                    onChange={onChangeTabs}
+                    tabBarExtraContent={operations}
+                    className="content-tabs"
+                    items={items}
+                />
+            </div>
         </ConfigProvider>
     )
 };

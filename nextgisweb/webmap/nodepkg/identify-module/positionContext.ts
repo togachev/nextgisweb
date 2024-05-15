@@ -8,7 +8,7 @@ const positionContext = (event, offset, op, count, settings) => {
     const popup_height = settings.popup_height;
     const popup_width = settings.popup_width;
     const coords_not_count_w = 250;
-    const coords_not_count_h = 44;
+    const coords_not_count_h = 47;
     const offHP = 40;
 
     let width;

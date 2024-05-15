@@ -49,20 +49,21 @@ Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
-        this.tool._popup(e);
+        this.tool._overlayInfo(e, "popup");
         e.preventDefault();
     } else if (e.type === "singleclick" && e.originalEvent.ctrlKey === true) {
         this.tool._popupMultiple(e);
         e.preventDefault();
     } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-        this.tool._context(e);
+        this.tool._overlayInfo(e, "context");
         e.preventDefault();
     }
     return true;
 };
 
 export class IdentifyModule extends Component {
-    private display: DojoDisplay
+    private display: DojoDisplay;
+    private displaySrid: number;
     private olmap: Map;
     private params: EventProps;
     private mapEvent: MapBrowserEvent;
@@ -81,13 +82,13 @@ export class IdentifyModule extends Component {
         super(props)
 
         this.display = props;
+        this.displaySrid = 3857;
         this.olmap = this.display.map.olMap;
         this.control = new Control({ tool: this });
         this.control.setActive(false);
         this.olmap.addInteraction(this.control);
 
-        this._addOverlayPopup();
-        this._addOverlayContext();
+        this._addOverlay();
 
         this.popup = document.createElement("div");
         this.point_popup = document.createElement("div");
@@ -114,7 +115,7 @@ export class IdentifyModule extends Component {
             this.overlay_context.setElement(value)
     };
 
-    _addOverlayPopup = () => {
+    _addOverlay = () => {
         this.overlay_popup = new Overlay({
             autoPan: true,
             stopEvent: true,
@@ -123,9 +124,7 @@ export class IdentifyModule extends Component {
             },
         });
         this.olmap.addOverlay(this.overlay_popup);
-    };
 
-    _addOverlayContext = () => {
         this.overlay_context = new Overlay({
             autoPan: true,
             stopEvent: true,
@@ -154,18 +153,18 @@ export class IdentifyModule extends Component {
         alert(e.pixel);
     };
 
-    displayFeatureInfo = async (params: EventProps, event: MapBrowserEvent, value: number, op: string) => {
+    displayFeatureInfo = async (params: EventProps, event: MapBrowserEvent, op: string) => {
         const wkt = new WKT();
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
-                    srs_from: value,
+                    srs_from: this.displaySrid,
                     srs_to: Object.keys(srsCoordinates).map(Number),
                     geom: wkt.writeGeometry(new Point(params.point)),
                 },
             })
             .then((transformed) => {
-                const t = transformed.find(i => i.srs_id !== value)
+                const t = transformed.find(i => i.srs_id !== this.displaySrid)
                 const wktPoint = wkt.readGeometry(t.geom);
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
@@ -208,12 +207,12 @@ export class IdentifyModule extends Component {
         if (op === "context") {
             this._setValue(this.point_context, "context")
             this.root_context.render(<ContextComponent params={{ coordValue, position, event }} visible={this._visible} ref={this.refContext} />);
-            this._visible({ hidden: false, overlay: this.params.point, key: "context" });
+            this._visible({ hidden: false, overlay: params.point, key: "context" });
         } else {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
             this.root_popup.render(<PopupComponent params={{ coordValue, position, response, event }} display={this.display} visible={this._visible} ref={this.refPopup} />);
-            this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
+            this._visible({ hidden: false, overlay: params.point, key: "popup" });
         }
     };
 
@@ -233,26 +232,17 @@ export class IdentifyModule extends Component {
         this.display.identify_module.root_popup.render();
     };
 
-    _popup = (e: MapBrowserEvent) => {
+    _overlayInfo = (e: MapBrowserEvent, op: string) => {
         this.mapEvent = e === null ? this.mapEvent : e;
         this.params = {
             point: this.mapEvent.coordinate,
-            request: {
-                srs: 3857,
+            request: op === "popup" ? {
+                srs: this.displaySrid,
                 geom: this._requestGeomString(this.mapEvent.pixel),
                 styles: [],
-            }
+            } : null
         }
-        this.displayFeatureInfo(this.params, this.mapEvent, 3857, "popup");
-    };
-
-    _context = (e: MapBrowserEvent) => {
-        this.mapEvent = e === null ? this.mapEvent : e;
-        this.params = {
-            point: e.coordinate,
-            request: null,
-        }
-        this.displayFeatureInfo(this.params, this.mapEvent, 3857, "context");
+        this.displayFeatureInfo(this.params, this.mapEvent, op);
     };
 
     _requestGeomString = (pixel: number[]) => {

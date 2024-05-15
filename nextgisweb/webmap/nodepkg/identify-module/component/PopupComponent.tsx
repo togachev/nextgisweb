@@ -2,11 +2,12 @@ import { forwardRef, RefObject, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
+import { Divider } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureComponent } from "./FeatureComponent";
+import { CoordinateComponent } from "./CoordinateComponent";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { DojoDisplay } from "../../type";
 
 import topic from "dojo/topic";
@@ -131,13 +132,14 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             <CloseIcon />
                         </span>
                     </div>
-                    {count > 0 && store.selected && (
-                        <div className="content">
+                    {count > 0 && store.selected ? (
+                        <>
                             <FeatureComponent display={display} store={store} position={position} data={response.data} />
-                        </div>
-                    )}
-                    <div className="footer-popup"  >
-                        <span className="coordinate-value" title={gettext("Copy coordinates")} onClick={() => { copyValue(coordValue, gettext("Coordinates copied")) }}>{coordValue}</span>
+                            <Divider style={{ margin: 0 }} />
+                        </>
+                    ) : <Divider style={{ margin: 0 }} />}
+                    <div className="footer-popup">
+                        <CoordinateComponent coordValue={coordValue} />
                     </div>
                 </div>
             </Rnd>,

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { CoordinateComponent } from "./CoordinateComponent";
 
 interface Position {
     x: number;
@@ -50,17 +51,9 @@ export default forwardRef<Element>(function ContextComponent(props: Context, ref
                 position: "absolute",
             }}>
                 {contextHolder}
-                <div
-
-                    title={gettext("Copy coordinates")}
-                    onClick={() => {
-                        copyValue(coordValue, gettext("Coordinates copied"))
-                        visible({ hidden: true, overlay: undefined, key: "context" });
-                    }}
-                    className="context-coords"
-                >
-                    {coordValue}
-                </div>
+                <span onClick={() => { visible({ hidden: true, overlay: undefined, key: "context" }); }}>
+                    <CoordinateComponent coordValue={coordValue} />
+                </span>
                 {
                     array.map(item => {
                         return (
