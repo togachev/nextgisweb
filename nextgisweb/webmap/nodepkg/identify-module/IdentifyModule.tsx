@@ -29,6 +29,7 @@ interface EventProps {
 }
 
 const settings = webmapSettings;
+const wkt = new WKT();
 
 const srsCoordinates = {};
 if (spatialRefSysList) {
@@ -154,7 +155,6 @@ export class IdentifyModule extends Component {
     };
 
     displayFeatureInfo = async (params: EventProps, event: MapBrowserEvent, op: string) => {
-        const wkt = new WKT();
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
@@ -223,7 +223,7 @@ export class IdentifyModule extends Component {
             return false;
         }
 
-        const configLayerPlugin = config.plugin[pluginName];
+        const configLayerPlugin = config.plugin["ngw-webmap/plugin/FeatureLayer"];
         const readOnly = configLayerPlugin.readonly;
         return !readOnly;
     };

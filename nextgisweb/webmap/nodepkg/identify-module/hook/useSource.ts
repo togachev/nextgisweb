@@ -2,7 +2,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
 
 export const useSource = () => {
-
+    
     const getAttribute = async (res) => {
         const resourceId = res.layerId;
         const feature = await route("feature_layer.feature.item_iso", {

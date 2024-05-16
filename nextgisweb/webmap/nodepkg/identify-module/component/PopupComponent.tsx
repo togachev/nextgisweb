@@ -2,7 +2,7 @@ import { forwardRef, RefObject, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
-import { Divider } from "@nextgisweb/gui/antd";
+import { Select } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureComponent } from "./FeatureComponent";
@@ -51,7 +51,7 @@ interface Params {
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display } = props;
     const { coordValue, position, response } = params;
-
+    const imodule = display.identify_module
     const [refRnd, setRefRnd] = useState();
     const [valueRnd, setValueRnd] = useState<Rnd>({
         x: position.x,
@@ -64,45 +64,85 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     const count = response.featureCount;
 
-    const [store] = useState(() => new IdentifyStore({}));
+    const [store] = useState(() => new IdentifyStore({
+        data: response.data,
+    }));
+    imodule.identifyStore = store;
+
+    useEffect(() => {
+        if (store.update)
+            getAttribute(store.selected)
+                .then(item => {
+                    store.setAttribute(item._fieldmap);
+                    store.setFeature({
+                        geom: item.feature.geom,
+                        featureId: item.feature.id,
+                        layerId: item.resourceId,
+                    });
+                    topic.publish("feature.highlight", {
+                        geom: item.feature.geom,
+                        featureId: item.feature.id,
+                        layerId: item.resourceId,
+                    })
+                    store.setUpdate(false);
+                });
+    }, [store.update]);
 
     useEffect(() => {
         setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
-        count > 0 ?
-            (
-                store.setData(response.data),
-                store.setSelected(response.data[0]),
-                getAttribute(response.data[0])
-                    .then(item => {
-                        console.log(item)
-                        store.setAttribute({ [item.feature.id + "/" + item.resourceId]: item._fieldmap });
-                        store.setFeature({
-                            geom: item.feature.geom,
-                            featureId: item.feature.id,
-                            layerId: item.resourceId,
-                        });
-                        topic.publish("feature.highlight", {
-                            geom: item.feature.geom,
-                            featureId: item.feature.id,
-                            layerId: item.resourceId,
-                        })
+        if (count > 0) {
+            store.setData(response.data);
+            store.setSelected(response.data[0]);
+            getAttribute(response.data[0])
+                .then(item => {
+                    store.setAttribute(item._fieldmap);
+                    store.setFeature({
+                        geom: item.feature.geom,
+                        featureId: item.feature.id,
+                        layerId: item.resourceId,
+                    });
+                    topic.publish("feature.highlight", {
+                        geom: item.feature.geom,
+                        featureId: item.feature.id,
+                        layerId: item.resourceId,
                     })
-            ) :
-            (
-                store.setData(null),
-                store.setAttribute(null),
-                store.setFeature(null),
-                topic.publish("feature.unhighlight")
-            )
-    }, [count, position]);
+                });
+        } else {
 
-    const moveClass = store.styleContent === false ? ",.ant-tabs-content-holder" : "";
+            store.setData([]);
+            store.setAttribute(null);
+            store.setFeature(null);
+            topic.publish("feature.unhighlight");
+        }
+    }, [response]);
+
     const currentLayer = store.data && store.data.length > 0 && store.data?.find(item => {
         if (store.attribute !== null && item.value === Object.keys(store.attribute)[0]) {
             return item
         }
     })
-    console.log(count);
+
+    const onChange = (value: number) => {
+        const selectedValue = store.data.find(item => item.value === value);
+
+        store.setSelected(selectedValue);
+        getAttribute(selectedValue)
+            .then(item => {
+                store.setAttribute(item._fieldmap);
+                store.setFeature({
+                    geom: item.feature.geom,
+                    featureId: item.feature.id,
+                    layerId: item.resourceId,
+                });
+
+                topic.publish("feature.highlight", {
+                    geom: item.feature.geom,
+                    featureId: item.feature.id,
+                    layerId: item.resourceId,
+                })
+            });
+    };
+    const moveClass = store.styleContent === false ? ",.ant-tabs-content-holder" : "";
 
     return (
         createPortal(
@@ -117,7 +157,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     topRight: "hover-angle-top-right",
                     topLeft: "hover-angle-top-left",
                 }}
-                cancel={".select-feature,.ant-tabs-nav,.icon-symbol,.coordinate-value" + moveClass}
+                cancel={".select-feature,.ant-tabs-nav,.value-link,.value-email,.ant-tabs-nav,.icon-symbol,.coordinate-value" + moveClass}
                 bounds="window"
                 minWidth={position.width}
                 minHeight={position.height}
@@ -160,12 +200,34 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             <CloseIcon />
                         </span>
                     </div>
-                    {count > 0 && store.data && store.data.length > 0 ? (
+                    {count > 0 && store.selected !== null && (
                         <>
-                            <FeatureComponent display={display} store={store} position={position} />
+                            <div className="select-feature" >
+                                <Select
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) => (option?.label ?? "").includes(input)}
+                                    filterSort={(optionA, optionB) =>
+                                        (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                                    }
+                                    showSearch
+                                    size="small"
+                                    value={store.selected}
+                                    style={{ width: "100%" }}
+                                    onChange={onChange}
+                                    options={store.data}
+                                />
+                            </div>
+                            <div className="content">
+                                <FeatureComponent display={display} store={store} attribute={store.attribute} />
+                            </div>
+                        </>
+                    )}
+                    {/* {count > 0 && store.data && store.data.length > 0 ? (
+                        <>
+                            <FeatureComponent display={display} data={store.data} position={position} />
                             <Divider style={{ margin: 0 }} />
                         </>
-                    ) : <Divider style={{ margin: 0 }} />}
+                    ) : <Divider style={{ margin: 0 }} />} */}
                     <div className="footer-popup">
                         <CoordinateComponent coordValue={coordValue} />
                     </div>

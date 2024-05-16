@@ -64,7 +64,7 @@ export function WebMapFeatureGridTab({
                         display.current.identify._popup.widget?.reset();
                     }
                     if (Object.prototype.hasOwnProperty.call(display.current, "identify_module")) {
-                        imodule.displayFeatureInfo(imodule.params, imodule.mapEvent, "popup")
+                        imodule.identifyStore.setUpdate(true);
                     }
                     reloadLayer();
                 },
@@ -88,8 +88,8 @@ export function WebMapFeatureGridTab({
                                 );
                             });
                     } else {
-                        imodule?._render();
-                        imodule?._visible({ hidden: true, overlay: undefined, key: "popup" })
+                        // imodule?._render();
+                        // imodule?._visible({ hidden: true, overlay: undefined, key: "popup" })
                         display.current.featureHighlighter.unhighlightFeature(
                             (f) => f?.getProperties?.()?.layerId === layerId
                         );
@@ -170,8 +170,6 @@ export function WebMapFeatureGridTab({
 
     const featureUpdatedEvent = useCallback(
         ({ resourceId }: { resourceId: number }) => {
-            console.log(resourceId);
-            
             if (layerId === resourceId) {
                 store.bumpVersion();
                 reloadLayer();

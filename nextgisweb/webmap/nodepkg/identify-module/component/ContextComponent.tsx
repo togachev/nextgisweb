@@ -2,7 +2,6 @@ import { forwardRef, RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 import { CoordinateComponent } from "./CoordinateComponent";
 
 interface Position {
@@ -32,7 +31,7 @@ export default forwardRef<Element>(function ContextComponent(props: Context, ref
     const { params, visible } = props;
     const { coordValue, position } = params;
     useOutsideClick(ref, true);
-    const { copyValue, contextHolder } = useCopy();
+    const { contextHolder } = useCopy();
 
     const array = [
         { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено' },

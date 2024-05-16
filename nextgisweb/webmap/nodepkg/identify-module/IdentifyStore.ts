@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import { RefObject } from "react";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
@@ -15,12 +14,14 @@ export interface DataProps {
 export class IdentifyStore {
     layerName: string | null = null;
     data: DataProps[] = [];
-    selected: DataProps | null = null;
+    selected: string | null = null;
     attribute: object | null = null;
     feature: object | null = null;
     styleContent = true;
+    update = false;
 
-    constructor({ ...props }) {
+    constructor({ data, ...props }) {
+        this.data = data
         for (const key in props) {
             const k = key;
             const prop = (props)[k];
@@ -40,8 +41,8 @@ export class IdentifyStore {
         this.data = data;
     };
 
-    setSelected = (selected: DataProps) => {
-        this.selected = selected;
+    setSelected = (selected: SetValue<string | null>) => {
+        this.setValue("selected", selected);
     };
 
     setAttribute = (attribute: SetValue<object | null>) => {
@@ -54,6 +55,10 @@ export class IdentifyStore {
 
     setStyleContent = (styleContent: boolean) => {
         this.setValue("styleContent", styleContent);
+    };
+
+    setUpdate = (update: boolean) => {
+        this.setValue("update", update);
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
