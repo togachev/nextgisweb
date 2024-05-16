@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { Button, ConfigProvider, Empty, Tabs, Typography } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Empty, Tabs, Tooltip, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -18,17 +18,12 @@ import showModal from "@nextgisweb/gui/showModal";
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const FeatureComponent: FC = ({ display, store, attribute }) => {
+export const FeatureComponent: FC = ({ display, store, attribute, position }) => {
 
     const { copyValue, contextHolder } = useCopy();
-
     const imodule = display.identify_module
-
-
-    const { id, layerId, styleId } = store.selected;
-
+    const { id, layerId, styleId, value } = store.selected;
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
-
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
 
     const onSave = () => {
@@ -54,32 +49,33 @@ export const FeatureComponent: FC = ({ display, store, attribute }) => {
             return;
         }
         operations = (
-            <Button
-                type="text"
-                title={gettext("Edit")}
-                icon={<EditNote />}
-                onClick={() => {
-                    const featureId = id;
-                    const resourceId = layerId;
-                    showModal(FeatureEditorModal, {
-                        editorOptions: {
-                            featureId,
-                            resourceId: resourceId,
-                            onSave: () => {
-                                if (onSave) {
-                                    onSave();
-                                }
+            <Tooltip title={gettext("Edit")}>
+                <Button
+                    type="text"
+                    className="edit-button"
+                    icon={<EditNote />}
+                    onClick={() => {
+                        const featureId = id;
+                        const resourceId = layerId;
+                        showModal(FeatureEditorModal, {
+                            editorOptions: {
+                                featureId,
+                                resourceId: resourceId,
+                                onSave: () => {
+                                    if (onSave) {
+                                        onSave();
+                                    }
+                                },
                             },
-                        },
-                    });
+                        });
 
-                }}
-            />
+                    }}
+                />
+            </Tooltip>
         );
     })
 
     const RenderValue = (value) => {
-
         for (const k in value) {
             const val = value[k];
 
@@ -99,18 +95,16 @@ export const FeatureComponent: FC = ({ display, store, attribute }) => {
             }
         }
     };
-    
+
     const tabsItems = [
         {
-            title: gettext("Attributes"),
-            label: "Attributes",
+            label: <Tooltip title={gettext("Attributes")}><Info title={gettext("Attributes")} /></Tooltip>,
             key: "attributes",
             visible: settings.identify_attributes,
-            icon: <Info title={gettext("Attributes")} />,
             children:
                 <span
-                onMouseEnter={(e) => { e.type === 'mouseenter' && store.setStyleContent(false) }}
-                onTouchMove={(e) => { e.type === 'touchmove' && store.setStyleContent(true) }}
+                    onMouseEnter={(e) => { e.type === 'mouseenter' && store.setStyleContent(false) }}
+                    onTouchMove={(e) => { e.type === 'touchmove' && store.setStyleContent(true) }}
                 >
                     {attribute && Object.keys(attribute).length > 0 ?
                         (<div className="item"
@@ -118,7 +112,7 @@ export const FeatureComponent: FC = ({ display, store, attribute }) => {
                         >
                             {Object.keys(attribute).map((key) => {
                                 return (
-                                    <div onTouchEnd={() => { copyValue(key + ": " + attribute[key], gettext("Rows copied"))}} key={key} className="item-fields">
+                                    <div onTouchEnd={() => { copyValue(key + ": " + attribute[key], gettext("Rows copied")) }} key={key} className="item-fields">
                                         <div className="label">{key}</div>
                                         <RenderValue value={attribute[key]} />
                                     </div>
@@ -129,21 +123,32 @@ export const FeatureComponent: FC = ({ display, store, attribute }) => {
                 </span>
         },
         {
-            title: gettext("Geometry"), label: "Geometry", key: "geom_info", visible: settings.show_geometry_info, icon: <QueryStats />,
+            label: <Tooltip title={gettext("Geometry info")}><QueryStats /></Tooltip>,
+            key: "geom_info",
+            visible: settings.show_geometry_info,
             children: store.selected && (<GeometryInfo layerId={store.selected.layerId} featureId={store.selected.id} />)
         },
-        { title: gettext("Description"), label: "Description", key: "description", visible: true, icon: <Description /> },
-        { title: gettext("Attachments"), label: "Attachments", key: "attachment", visible: true, icon: <Attachment /> },
+        {
+            label: <Tooltip title={gettext("Description")}><Description /></Tooltip>,
+            key: "description",
+            visible: true
+        },
+        {
+            label: <Tooltip title={gettext("Attachments")}><Attachment /></Tooltip>,
+            key: "attachment",
+            visible: true
+        },
     ];
 
     const items = useMemo(
         () =>
-            tabsItems.map(item => {
+            tabsItems.map((item, i) => {
                 if (item.visible) {
+                    const id = String(i + 1);
                     return {
                         key: item.key,
                         children: item.children,
-                        icon: item.icon,
+                        label: item.label,
                     }
                 }
             }),
@@ -158,31 +163,32 @@ export const FeatureComponent: FC = ({ display, store, attribute }) => {
                         inkBarColor: "#106a90",
                         itemSelectedColor: "#106a90",
                         itemHoverColor: "#106a9080",
-                        paddingXS: 0,
-                        horizontalItemGutter: 12,
-                        horizontalMargin: 0,
+                        paddingXS: 1,
+                        horizontalItemGutter: 2,
+                        horizontalMargin: 3,
                         verticalItemMargin: 0, /*.ant-tabs-nav .ant-tabs-tab+.ant-tabs-tab*/
                         paddingLG: 0, /*.ant-tabs-nav .ant-tabs-tab*/
-                        horizontalItemPaddingSM: "0px 16px",
-                        controlHeight: 24,
+                        horizontalItemPaddingSM: 6,
+                        controlHeight: 0,
+                        verticalItemPadding: "10px 10px",
+                        cardHeight: 9,
+
                     },
-                    Select: {
-                        optionLineHeight: 1,
-                        optionHeight: 0,
-                        optionSelectedBg: "var(--divider-color)"
-                    }
                 },
             }}
         >
             {contextHolder}
             <Tabs
-                moreIcon={false}
+                popupClassName="more-tabs"
+                key={value}
+                style={{ height: position.height - 70, width: position.width }}
                 defaultActiveKey="attributes"
                 size="small"
                 onChange={onChangeTabs}
                 tabBarExtraContent={{ right: operations }}
                 className="content-tabs"
                 items={items}
+                tabPosition="left"
             />
         </ConfigProvider>
     )

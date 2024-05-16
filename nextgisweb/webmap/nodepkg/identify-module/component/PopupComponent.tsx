@@ -2,13 +2,13 @@ import { forwardRef, RefObject, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { Rnd } from "react-rnd";
-import { Select } from "@nextgisweb/gui/antd";
+import { Select, Tooltip } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureComponent } from "./FeatureComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
-import type { DojoDisplay } from "../../type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
 import topic from "dojo/topic";
 interface Visible {
@@ -108,7 +108,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     })
                 });
         } else {
-
             store.setData([]);
             store.setAttribute(null);
             store.setFeature(null);
@@ -116,11 +115,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         }
     }, [response]);
 
-    const currentLayer = store.data && store.data.length > 0 && store.data?.find(item => {
-        if (store.attribute !== null && item.value === Object.keys(store.attribute)[0]) {
-            return item
-        }
-    })
+    const currentLayer = store.selected !== null ? store.selected.layer_name : undefined
 
     const onChange = (value: number) => {
         const selectedValue = store.data.find(item => item.value === value);
@@ -183,11 +178,13 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         <div className="title-name">
                             <span className="object-select">Объектов: {count}</span>
                             {count > 0 && (
-                                <span
-                                    title={currentLayer?.layer_name}
-                                    className="layer-name">
-                                    {currentLayer?.layer_name}
-                                </span>
+                                <Tooltip title={currentLayer}>
+                                    <span
+                                        title={currentLayer}
+                                        className="layer-name">
+                                        {currentLayer}
+                                    </span>
+                                </Tooltip>
                             )}
                         </div>
                         <span
@@ -204,6 +201,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         <>
                             <div className="select-feature" >
                                 <Select
+                                    placement="topLeft"
                                     optionFilterProp="children"
                                     filterOption={(input, option) => (option?.label ?? "").includes(input)}
                                     filterSort={(optionA, optionB) =>
@@ -218,16 +216,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 />
                             </div>
                             <div className="content">
-                                <FeatureComponent display={display} store={store} attribute={store.attribute} />
+                                <FeatureComponent display={display} store={store} attribute={store.attribute} position={valueRnd} />
                             </div>
                         </>
                     )}
-                    {/* {count > 0 && store.data && store.data.length > 0 ? (
-                        <>
-                            <FeatureComponent display={display} data={store.data} position={position} />
-                            <Divider style={{ margin: 0 }} />
-                        </>
-                    ) : <Divider style={{ margin: 0 }} />} */}
                     <div className="footer-popup">
                         <CoordinateComponent coordValue={coordValue} />
                     </div>

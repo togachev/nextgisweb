@@ -78,6 +78,7 @@ export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
     identify: DojoDisplayIdentify;
+    identify_module: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;

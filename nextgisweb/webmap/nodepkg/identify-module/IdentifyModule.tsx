@@ -67,7 +67,6 @@ export class IdentifyModule extends Component {
     private displaySrid: number;
     private olmap: Map;
     private params: EventProps;
-    private mapEvent: MapBrowserEvent;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
     private control: Interaction;
@@ -233,16 +232,15 @@ export class IdentifyModule extends Component {
     };
 
     _overlayInfo = (e: MapBrowserEvent, op: string) => {
-        this.mapEvent = e === null ? this.mapEvent : e;
         this.params = {
-            point: this.mapEvent.coordinate,
+            point: e.coordinate,
             request: op === "popup" ? {
                 srs: this.displaySrid,
-                geom: this._requestGeomString(this.mapEvent.pixel),
+                geom: this._requestGeomString(e.pixel),
                 styles: [],
             } : null
         }
-        this.displayFeatureInfo(this.params, this.mapEvent, op);
+        this.displayFeatureInfo(this.params, e, op);
     };
 
     _requestGeomString = (pixel: number[]) => {
