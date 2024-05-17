@@ -8,10 +8,10 @@ import Attachment from "@nextgisweb/icon/material/attachment";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
-import GeometryInfo from "@nextgisweb/feature-layer/geometry-info"
+import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import topic from "dojo/topic";
 import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
-
+import { RadioButtonComponent } from "./RadioButtonComponent";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import showModal from "@nextgisweb/gui/showModal";
 
@@ -142,9 +142,8 @@ export const FeatureComponent: FC = ({ display, store, attribute, position }) =>
 
     const items = useMemo(
         () =>
-            tabsItems.map((item, i) => {
+            tabsItems.map(item => {
                 if (item.visible) {
-                    const id = String(i + 1);
                     return {
                         key: item.key,
                         children: item.children,
@@ -163,33 +162,34 @@ export const FeatureComponent: FC = ({ display, store, attribute, position }) =>
                         inkBarColor: "#106a90",
                         itemSelectedColor: "#106a90",
                         itemHoverColor: "#106a9080",
-                        paddingXS: 1,
-                        horizontalItemGutter: 2,
-                        horizontalMargin: 3,
-                        verticalItemMargin: 0, /*.ant-tabs-nav .ant-tabs-tab+.ant-tabs-tab*/
+                        // paddingXS: 1,
+                        // horizontalItemGutter: 2,
+                        // horizontalMargin: 3,
+                        // verticalItemMargin: 0, /*.ant-tabs-nav .ant-tabs-tab+.ant-tabs-tab*/
                         paddingLG: 0, /*.ant-tabs-nav .ant-tabs-tab*/
-                        horizontalItemPaddingSM: 6,
-                        controlHeight: 0,
-                        verticalItemPadding: "10px 10px",
-                        cardHeight: 9,
+                        // horizontalItemPaddingSM: 6,
+                        // controlHeight: 0,
+                        // verticalItemPadding: "10px 10px",
+                        // cardHeight: 9,
 
                     },
                 },
             }}
         >
             {contextHolder}
-            <Tabs
+            <RadioButtonComponent display={display} attribute={attribute} store={store} position={position} />
+            {/* <Tabs
                 popupClassName="more-tabs"
                 key={value}
                 style={{ height: position.height - 70, width: position.width }}
                 defaultActiveKey="attributes"
                 size="small"
                 onChange={onChangeTabs}
-                tabBarExtraContent={{ right: operations }}
+                // tabBarExtraContent={{ right: operations }}
                 className="content-tabs"
                 items={items}
                 tabPosition="left"
-            />
+            /> */}
         </ConfigProvider>
     )
 };

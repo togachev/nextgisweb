@@ -6,6 +6,7 @@ import { Select, Tooltip } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureComponent } from "./FeatureComponent";
+import { RadioButtonComponent } from "./RadioButtonComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
@@ -216,7 +217,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 />
                             </div>
                             <div className="content">
-                                <FeatureComponent display={display} store={store} attribute={store.attribute} position={valueRnd} />
+                                <RadioButtonComponent display={display} store={store} attribute={store.attribute} position={valueRnd} />
                             </div>
                         </>
                     )}
