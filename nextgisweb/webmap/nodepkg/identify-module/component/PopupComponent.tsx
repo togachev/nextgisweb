@@ -4,7 +4,7 @@ import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import { Rnd } from "react-rnd";
-import { Button, Select, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Select, Tooltip } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
@@ -196,117 +196,156 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     return (
         createPortal(
-            <Rnd
-                resizeHandleClasses={{
-                    right: "hover-right",
-                    left: "hover-left",
-                    top: "hover-top",
-                    bottom: "hover-bottom",
-                    bottomRight: "hover-angle-bottom-right",
-                    bottomLeft: "hover-angle-bottom-left",
-                    topRight: "hover-angle-top-right",
-                    topLeft: "hover-angle-top-left",
-                }}
-                cancel={".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value" + moveClass}
-                bounds="window"
-                minWidth={position.width}
-                minHeight={position.height}
-                allowAnyClick={true}
-                enableResizing={count > 0 ? true : false}
-                position={{ x: valueRnd.x, y: valueRnd.y }}
-                size={{ width: valueRnd.width, height: valueRnd.height }}
-                onDragStop={(e, d) => {
-                    setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
-                }}
-                onResize={(e, direction, ref, delta, position) => {
-                    setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
-                }}
-                ref={c => {
-                    if (c) {
-                        setRefRnd(c);
-                        c.resizableElement.current.hidden = false;
+            <ConfigProvider
+                theme={{
+                    components: {
+                        Dropdown: {
+                            paddingBlock: 5,
+                            controlPaddingHorizontal: 5,
+                            controlItemBgActiveHover: "var(--divider-color)",
+                            colorPrimary: "var(--primary)",
+                            lineHeight: 1,
+                        },
+                        Radio: {
+                            buttonPaddingInline: 3,
+                            buttonSolidCheckedBg: "var(--primary)",
+                            buttonSolidCheckedHoverBg: "#106a9080",
+                            colorPrimary: "var(--primary)",
+                            colorBorder: "var(--divider-color)",
+                            borderRadius: 4,
+                            controlHeight: 24,
+                            fontSize: 16,
+                            lineWidth: 1,
+                            lineHeight: 1,
+                            paddingXS: 50
+                        },
+                        Tooltip: {
+                            colorBgSpotlight: "#fff",
+                            colorTextLightSolid: "#000",
+                            borderRadius: 3,
+                        },
+                        Select: {
+                            optionSelectedBg: "var(--divider-color)",
+                            colorPrimaryHover: "var(--divider-color)",
+                            colorPrimary: "var(--text-secondary)",
+                            controlOutline: "var(--divider-color)",
+                            colorBorder: "var(--divider-color)",
+                        }
                     }
                 }}
             >
-                <div ref={ref} className="popup-position" >
-                    <div className="title">
-                        <div className="title-name"
-                            onClick={(e) => {
-                                if (count > 0 && e.detail === 2) {
-                                    setTimeout(() => {
-                                        if (valueRnd.width > position.width || valueRnd.height > position.height) {
-                                            setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                        } else {
-                                            setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
-                                        }
-                                        if (valueRnd.x === 0 && valueRnd.y === H - 22) {
-                                            setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                        }
-                                    }, 200)
-                                }
-                            }}
-                        >
-                            <span className="object-select">Объектов: {count}</span>
-                            {count > 0 && (
-                                // <Tooltip title={currentLayer}>
+                <Rnd
+                    resizeHandleClasses={{
+                        right: "hover-right",
+                        left: "hover-left",
+                        top: "hover-top",
+                        bottom: "hover-bottom",
+                        bottomRight: "hover-angle-bottom-right",
+                        bottomLeft: "hover-angle-bottom-left",
+                        topRight: "hover-angle-top-right",
+                        topLeft: "hover-angle-top-left",
+                    }}
+                    cancel={".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value" + moveClass}
+                    bounds="window"
+                    minWidth={position.width}
+                    minHeight={position.height}
+                    allowAnyClick={true}
+                    enableResizing={count > 0 ? true : false}
+                    position={{ x: valueRnd.x, y: valueRnd.y }}
+                    size={{ width: valueRnd.width, height: valueRnd.height }}
+                    onDragStop={(e, d) => {
+                        setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                    }}
+                    onResize={(e, direction, ref, delta, position) => {
+                        setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                    }}
+                    ref={c => {
+                        if (c) {
+                            setRefRnd(c);
+                            c.resizableElement.current.hidden = false;
+                        }
+                    }}
+                >
+                    <div ref={ref} className="popup-position" >
+                        <div className="title">
+                            <div className="title-name"
+                                onClick={(e) => {
+                                    if (count > 0 && e.detail === 2) {
+                                        setTimeout(() => {
+                                            if (valueRnd.width > position.width || valueRnd.height > position.height) {
+                                                setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                            } else {
+                                                setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
+                                            }
+                                            if (valueRnd.x === 0 && valueRnd.y === H - 22) {
+                                                setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                            }
+                                        }, 200)
+                                    }
+                                }}
+                            >
+                                <span className="object-select">Объектов: {count}</span>
+                                {count > 0 && (
+                                    // <Tooltip title={currentLayer}>
                                     <span
                                         title={currentLayer}
                                         className="layer-name">
                                         {currentLayer}
                                     </span>
-                                // </Tooltip>
-                            )}
-                        </div>
-                        {count > 0 && (<span
-                            className="icon-symbol"
-                            onClick={() => {
-                                if (valueRnd.width > position.width || valueRnd.height > position.height) {
-                                    setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                } else {
-                                    setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
-                                }
-                            }} >
-                            <OpenInFull />
-                        </span>)}
-                        <span
-                            className="icon-symbol"
-                            onClick={() => {
-                                visible({ hidden: true, overlay: undefined, key: "popup" })
-                                refRnd.resizableElement.current.hidden = true;
-                                topic.publish("feature.unhighlight");
-                            }} >
-                            <CloseIcon />
-                        </span>
-                    </div>
-                    {count > 0 && store.selected !== null && (
-                        <>
-                            <div className="select-feature" >
-                                <Select
-                                    placement="topLeft"
-                                    optionFilterProp="children"
-                                    filterOption={(input, option) => (option?.label ?? "").includes(input)}
-                                    filterSort={(optionA, optionB) =>
-                                        (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                                    // </Tooltip>
+                                )}
+                            </div>
+                            {count > 0 && (<span
+                                className="icon-symbol"
+                                onClick={() => {
+                                    if (valueRnd.width > position.width || valueRnd.height > position.height) {
+                                        setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                    } else {
+                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
                                     }
-                                    showSearch
-                                    size="small"
-                                    value={store.selected}
-                                    style={{ width: operations ? "calc(100% - 24px)" : "100%" }}
-                                    onChange={onChange}
-                                    options={store.data}
-                                />
-                                {operations}
-                            </div>
-                            <div className="content">
-                                <ContentComponent store={store} attribute={store.attribute} position={valueRnd} />
-                            </div>
-                        </>
-                    )}
-                    <div className="footer-popup">
-                        <CoordinateComponent coordValue={coordValue} />
+                                }} >
+                                <OpenInFull />
+                            </span>)}
+                            <span
+                                className="icon-symbol"
+                                onClick={() => {
+                                    visible({ hidden: true, overlay: undefined, key: "popup" })
+                                    refRnd.resizableElement.current.hidden = true;
+                                    topic.publish("feature.unhighlight");
+                                }} >
+                                <CloseIcon />
+                            </span>
+                        </div>
+                        {count > 0 && store.selected !== null && (
+                            <>
+                                <div className="select-feature" >
+                                    <Select
+                                        placement="topLeft"
+                                        optionFilterProp="children"
+                                        filterOption={(input, option) => (option?.label ?? "").includes(input)}
+                                        filterSort={(optionA, optionB) =>
+                                            (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                                        }
+                                        showSearch
+                                        size="small"
+                                        value={store.selected}
+                                        style={{ width: operations ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
+                                        onChange={onChange}
+                                        options={store.data}
+                                    />
+                                    {operations}
+                                </div>
+                                <div className="content">
+                                    <ContentComponent store={store} attribute={store.attribute} position={valueRnd} />
+                                </div>
+                            </>
+                        )}
+                        <div className="footer-popup">
+                            <CoordinateComponent coordValue={coordValue} />
+                        </div>
                     </div>
-                </div>
-            </Rnd >,
+                </Rnd >
+            </ConfigProvider>,
             document.body
         )
     )

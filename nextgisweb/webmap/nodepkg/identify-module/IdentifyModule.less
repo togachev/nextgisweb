@@ -142,7 +142,7 @@
         }
 
         .icon-symbol {
-            font-size: 21px;
+            font-size: 16px;
             width: 22px;
             height: 22px;
             display: flex;
@@ -164,28 +164,26 @@
     }
 
     .select-feature {
-        padding: 0;
+        padding: 2px 0 0 0;
         width: 100%;
         display: inline-flex;
 
         .edit-symbol {
-            font-size: 14px;
+            font-size: 16px;
             width: 24px;
             height: 24px;
             display: flex;
-            justify-items: center;
-            justify-content: center;
-            align-items: center;
-            flex: 0 0 auto;
-            margin: 0;
+            padding: 0 0 0 0;
+            margin: 0 2px 0 0;
             cursor: pointer;
-            color: var(--text-secondary);
-            z-index: 1000;
+            border: 1px solid var(--divider-color);
+            border-radius: 4px;
+            align-items: center;
+            justify-content: center;
 
             &:hover {
-                background-color: var(--divider-color);
+                background-color: #ffffff00;
                 color: var(--primary);
-                border-radius: 3px;
             }
         }
     }
@@ -200,7 +198,6 @@
     .content {
         padding: 0;
         cursor: auto;
-        // position: absolute;
         top: 46px;
         display: flex;
         overflow: hidden;
@@ -210,6 +207,7 @@
         .radio-block {
             display: flex;
             width: 30px;
+            border-right: solid rgba(0, 0, 0, 0.04) 1px;
 
             .radio-group {
                 overflow: hidden;
@@ -222,7 +220,7 @@
             }
 
             .dropdown-block {
-                padding: 3px;
+                padding: 2px;
 
                 .drop-down-icon {
                     font-size: 14px;
@@ -242,9 +240,8 @@
                     border-radius: 4px;
 
                     &:hover {
-                        background-color: var(--divider-color);
+                        background-color: #ffffff00;
                         color: var(--primary);
-                        border-radius: 4px;
                     }
                 }
             }
@@ -258,7 +255,7 @@
             border-bottom: solid var(--divider-color) 0.005em;
             height: 100%;
             padding: 3px 0 0 0;
-            
+
             .content-move {
                 height: 100%;
                 width: 100%;
@@ -274,7 +271,6 @@
 
                 &:hover {
                     background-color: rgba(0, 0, 0, 0.025);
-                    border-radius: 3px;
                 }
 
                 .label {
@@ -328,6 +324,7 @@
         justify-content: space-between;
         align-items: center;
         height: 24px;
+        border-top: solid rgba(0, 0, 0, 0.04) 1px;
     }
 }
 
@@ -403,9 +400,4 @@
 
 .ant-tooltip {
     pointer-events: none !important;
-}
-
-.more-tabs {
-    width: 40px;
-    color: aqua;
 }

@@ -1,5 +1,5 @@
 import { FC, useMemo, useState, useEffect, useRef } from "react";
-import { ConfigProvider, Dropdown, Empty, Radio, Space, Tooltip, Typography } from "@nextgisweb/gui/antd";
+import { Dropdown, Empty, Radio, Space, Tooltip, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -127,73 +127,46 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
     }
 
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Radio: {
-                        buttonPaddingInline: 3,
-                        buttonSolidCheckedBg: "var(--primary)",
-                        buttonSolidCheckedHoverBg: "#106a9080",
-                        colorPrimary: "var(--primary)",
-                        colorBorder: "#106a9080",
-                        borderRadius: 4,
-                        controlHeight: 24,
-                        fontSize: 16,
-                        lineWidth: 1,
-                        lineHeight: 1,
-                        paddingXS: 50
-                    },
-                    Dropdown: {
-                        paddingBlock: 5,
-                        controlPaddingHorizontal: 5,
-                        controlItemBgActiveHover: "#106a9080",
-                        colorPrimary: "var(--primary)",
-                        lineHeight: 1,
-                    }
-                }
-            }}
-        >
+        <>
             {contextHolder}
-            <>
-                <div className="radio-block">
-                    {
-                        heightPanel > heightRadio ?
-                            (
-                                <div ref={panelRef} className="radio-group" >
-                                    <Radio.Group buttonStyle="solid" onChange={onValuesChange} value={contentItem.value} className="radio-component" >
-                                        <Space direction="vertical" style={{ rowGap: 3, padding: 3 }} >
-                                            {
-                                                options.map((item, i) => {
-                                                    if (!item.hidden) {
-                                                        return (
-                                                            <Tooltip placement="left" key={i} title={item.title}>
-                                                                <Radio.Button value={item.value}>{item.label}</Radio.Button>
-                                                            </Tooltip>
-                                                        )
-                                                    }
-                                                })
-                                            }
-                                        </Space>
-                                    </Radio.Group>
-                                </div>
-                            ) :
-                            (
-                                <div className="dropdown-block">
-                                    <Dropdown placement="bottomLeft"
-                                        menu={{
-                                            items,
-                                            onClick
-                                        }} trigger={["click", "hover"]} >
-                                        <Tooltip placement="left" title={options.filter(item => item.key === contentItem.value)[0].title}>
-                                            <span className="drop-down-icon">{options.filter(item => item.key === contentItem.value)[0].label}</span>
-                                        </Tooltip>
-                                    </Dropdown>
-                                </div>
-                            )
-                    }
-                </div>
-                <div className="content-item">{contentItem.children}</div>
-            </>
-        </ConfigProvider >
+            <div className="radio-block">
+                {
+                    heightPanel > heightRadio ?
+                        (
+                            <div ref={panelRef} className="radio-group" >
+                                <Radio.Group buttonStyle="solid" onChange={onValuesChange} value={contentItem.value} className="radio-component" >
+                                    <Space direction="vertical" style={{ rowGap: 2, padding: 2 }} >
+                                        {
+                                            options.map((item, i) => {
+                                                if (!item.hidden) {
+                                                    return (
+                                                        <Tooltip placement="left" key={i} title={item.title}>
+                                                            <Radio.Button value={item.value}>{item.label}</Radio.Button>
+                                                        </Tooltip>
+                                                    )
+                                                }
+                                            })
+                                        }
+                                    </Space>
+                                </Radio.Group>
+                            </div>
+                        ) :
+                        (
+                            <div className="dropdown-block">
+                                <Dropdown placement="bottomLeft"
+                                    menu={{
+                                        items,
+                                        onClick
+                                    }} trigger={["click", "hover"]} >
+                                    <Tooltip placement="left" title={options.filter(item => item.key === contentItem.value)[0].title}>
+                                        <span className="drop-down-icon">{options.filter(item => item.key === contentItem.value)[0].label}</span>
+                                    </Tooltip>
+                                </Dropdown>
+                            </div>
+                        )
+                }
+            </div>
+            <div className="content-item">{contentItem.children}</div>
+        </>
     )
 };
