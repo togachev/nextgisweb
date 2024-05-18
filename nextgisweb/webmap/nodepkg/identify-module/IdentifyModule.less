@@ -14,7 +14,7 @@
 }
 
 .hover-right {
-    width: 8px !important;
+    width: 12px !important;
     right: -8px !important;
 
     &:hover {
@@ -25,7 +25,7 @@
 
 .hover-left {
     left: -8px !important;
-    width: 8px !important;
+    width: 12px !important;
 
     &:hover {
         background-color: #106a9040;
@@ -34,7 +34,7 @@
 }
 
 .hover-top {
-    height: 8px !important;
+    height: 12px !important;
     top: -8px !important;
 
     &:hover {
@@ -45,7 +45,7 @@
 
 .hover-bottom {
     bottom: -8px !important;
-    height: 8px !important;
+    height: 12px !important;
 
     &:hover {
         background-color: #106a9040;
@@ -54,8 +54,8 @@
 }
 
 .hover-angle-bottom-right {
-    width: 8px !important;
-    height: 8px !important;
+    width: 12px !important;
+    height: 12px !important;
     right: -8px !important;
     bottom: -8px !important;
 
@@ -66,8 +66,8 @@
 }
 
 .hover-angle-bottom-left {
-    width: 8px !important;
-    height: 8px !important;
+    width: 12px !important;
+    height: 12px !important;
     left: -8px !important;
     bottom: -8px !important;
 
@@ -90,8 +90,8 @@
 }
 
 .hover-angle-top-right {
-    width: 8px !important;
-    height: 8px !important;
+    width: 12px !important;
+    height: 12px !important;
     right: -8px !important;
     top: -8px !important;
 
@@ -165,9 +165,8 @@
 
     .select-feature {
         padding: 0;
-        position: absolute;
         width: 100%;
-        top: 22px;
+        display: inline-flex;
 
         .edit-symbol {
             font-size: 14px;
@@ -201,170 +200,120 @@
     .content {
         padding: 0;
         cursor: auto;
-        position: absolute;
+        // position: absolute;
         top: 46px;
+        display: flex;
+        overflow: hidden;
         width: 100%;
+        height: 100%;
 
         .radio-block {
             display: flex;
+            width: 30px;
 
             .radio-group {
                 overflow: hidden;
 
                 .radio-component {
-                    padding: 3px;
                     overflow: auto;
                     height: 100%;
                 }
+
             }
 
-            .content-item{
-                width: 100%;
+            .dropdown-block {
                 padding: 3px;
-                overflow: auto;
-                height: 100%;
-                padding: 2px;
-            }
 
-            .drop-down-icon {
-                font-size: 14px;
-                width: 22px;
-                height: 22px;
-                display: flex;
-                justify-items: center;
-                justify-content: center;
-                align-items: center;
-                flex: 0 0 auto;
-                margin: 0;
-                cursor: pointer;
-                color: var(--text-secondary);
-                z-index: 1000;
-                border: solid var(--divider-color) 0.005em;
-                border-radius: 4px;
-
-                &:hover {
-                    background-color: var(--divider-color);
+                .drop-down-icon {
+                    font-size: 14px;
+                    width: 23px;
+                    height: 23px;
+                    display: flex;
+                    justify-items: center;
+                    justify-content: center;
+                    align-items: center;
+                    flex: 0 0 auto;
+                    margin: 0;
+                    padding: 0;
+                    cursor: pointer;
                     color: var(--primary);
+                    z-index: 1000;
+                    border: solid var(--divider-color) 1px;
                     border-radius: 4px;
+
+                    &:hover {
+                        background-color: var(--divider-color);
+                        color: var(--primary);
+                        border-radius: 4px;
+                    }
                 }
             }
+
+
         }
 
-
-        // .ant-btn.ant-btn-icon-only {
-        //     width: 24px;
-        //     padding-inline-start: 0;
-        //     padding-inline-end: 0;
-        // }
-
-        // .ant-tabs>.ant-tabs-nav .ant-tabs-nav-more {
-        //     position: relative;
-        //     padding: 10px 10px;
-        //     background: transparent;
-        //     border: 0;
-        //     color: rgba(0, 0, 0, 0.88);
-        // }
-
-        // .ant-tabs >.ant-tabs-nav {
-        //     position: relative;
-        //     display: flex;
-        //     flex: none;
-        //     align-items: center;
-        //     width: 32px;
-        //     font-size: 14px;
-        // }
-
-        // .ant-tabs-left >.ant-tabs-nav .ant-tabs-tab {
-        //     padding: 5px 0 5px 0;
-        //     text-align: center;
-        // }
-
-        // .ant-tabs >.ant-tabs-nav .ant-tabs-nav-list {
-        //     position: relative;
-        //     display: flex;
-        //     transition: opacity 0.3s;
-        //     align-items: center;
-        // }
-
-        // .ant-btn {
-        //     font-size: 14px;
-        //     line-height: 1.5714285714285714;
-        //     height: 24px;
-        //     padding: 0;
-        //     border-radius: 3px;
-        // }
-
-        .edit-button {
-
-            &:hover {
-                color: #106a9080;
-                background-color: #106a9000;
-            }
-        }
-
-        .content-tabs {
-            overflow: hidden;
-            border-bottom: solid var(--divider-color) 1px;
+        .content-item {
+            width: 100%;
+            overflow: overlay;
+            border-bottom: solid var(--divider-color) 0.005em;
             height: 100%;
-
+            padding: 3px 0 0 0;
+            
             .content-move {
                 height: 100%;
                 width: 100%;
             }
 
-            .item {
-                padding: 0;
+            .item-fields {
+                height: 100%;
+                display: flex;
+                justify-content: space-between;
+                padding: 2px;
+                border-bottom: solid var(--divider-color) 0.005em;
+                align-items: center;
 
-                .item-fields {
-                    height: 100%;
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.025);
+                    border-radius: 3px;
+                }
+
+                .label {
                     display: flex;
-                    justify-content: space-between;
-                    padding: 2px 5px;
-                    border-bottom: solid var(--divider-color) 0.005em;
+                    padding: 0 10px 0 0;
                     align-items: center;
+                    min-width: min-content;
+                    width: 40%;
+                }
 
-                    &:hover {
-                        background-color: rgba(0, 0, 0, 0.025);
-                        border-radius: 3px;
-                    }
+                .value {
+                    max-width: max-content;
+                }
 
-                    .label {
-                        display: flex;
-                        padding: 0 10px 0 0;
-                        align-items: center;
-                        min-width: min-content;
-                        width: 40%;
-                    }
+                .value-link {
+                    max-width: 60%;
+                }
 
-                    .value {
-                        max-width: max-content;
-                    }
+                .value-email {
+                    max-width: 60%;
+                    text-align: right;
+                    cursor: pointer;
+                    color: var(--primary);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
 
-                    .value-link {
-                        max-width: 60%;
-                    }
-
-                    .value-email {
-                        max-width: 60%;
-                        text-align: right;
-                        cursor: pointer;
-                        color: var(--primary);
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-
-                    .text-ellipsis {
-                        text-align: right;
-                    }
+                .text-ellipsis {
+                    text-align: right;
                 }
             }
 
             .ant-empty-image {
                 height: 20px;
             }
-        }
 
+
+        }
 
     }
 

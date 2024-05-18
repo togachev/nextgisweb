@@ -6,53 +6,53 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:863 amd/ngw-webmap/Display.js:888
+#: amd/ngw-webmap/Display.js:861 amd/ngw-webmap/Display.js:886
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:864 amd/ngw-webmap/Display.js:889
+#: amd/ngw-webmap/Display.js:862 amd/ngw-webmap/Display.js:887
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:981 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:979 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:992
+#: amd/ngw-webmap/Display.js:990
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:1007 nodepkg/panel/custom-layer/CustomLayer.tsx:20
+#: amd/ngw-webmap/Display.js:1005 nodepkg/panel/custom-layer/CustomLayer.tsx:20
 msgid "CustomLayer"
 msgstr "Пользовательские слои"
 
-#: amd/ngw-webmap/Display.js:1017
+#: amd/ngw-webmap/Display.js:1015
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:1031
+#: amd/ngw-webmap/Display.js:1029
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1053 amd/ngw-webmap/plugin/LayerInfo.js:29
-#: nodepkg/identify-module/component/FeatureComponent.tsx:103
+#: amd/ngw-webmap/Display.js:1051 amd/ngw-webmap/plugin/LayerInfo.js:29
+#: nodepkg/identify-module/component/ContentComponent.tsx:88
 #: nodepkg/panel/description/DescriptionPanel.js:8
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1075
+#: amd/ngw-webmap/Display.js:1073
 msgid "Diagram"
 msgstr ""
 
-#: amd/ngw-webmap/Display.js:1095
+#: amd/ngw-webmap/Display.js:1093
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1147
+#: amd/ngw-webmap/Display.js:1145
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:1192
+#: amd/ngw-webmap/Display.js:1190
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -144,7 +144,7 @@ msgid "Stop editing"
 msgstr "Завершить редактирование"
 
 #: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/identify-module/component/FeatureComponent.tsx:53
+#: nodepkg/identify-module/component/PopupComponent.tsx:171
 #: nodepkg/panel/annotations/AnnotationsPanel.js:86
 msgid "Edit"
 msgstr "Редактировать"
@@ -501,36 +501,33 @@ msgstr "Изменить геометрию для фильтра"
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
-#: nodepkg/identify-module/component/ContextComponent.tsx:47
-#: nodepkg/identify-module/component/PopupComponent.tsx:127
-msgid "Copy coordinates"
-msgstr "Скопировать координаты"
-
-#: nodepkg/identify-module/component/ContextComponent.tsx:48
-#: nodepkg/identify-module/component/PopupComponent.tsx:127
-msgid "Coordinates copied"
-msgstr "Координаты скопированы"
-
-#: nodepkg/identify-module/component/FeatureComponent.tsx:71
+#: nodepkg/identify-module/component/ContentComponent.tsx:37
 msgid "Email address copied"
 msgstr "Адрес электронной почты скопирован"
 
-#: nodepkg/identify-module/component/FeatureComponent.tsx:78
+#: nodepkg/identify-module/component/ContentComponent.tsx:44
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/identify-module/component/FeatureComponent.tsx:85
-#: nodepkg/identify-module/component/FeatureComponent.tsx:88
+#: nodepkg/identify-module/component/ContentComponent.tsx:54
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/identify-module/component/FeatureComponent.tsx:102
-msgid "Geometry"
-msgstr "Геометрия"
+#: nodepkg/identify-module/component/ContentComponent.tsx:80
+msgid "Geometry info"
+msgstr "Информация о геометрии"
 
-#: nodepkg/identify-module/component/FeatureComponent.tsx:104
+#: nodepkg/identify-module/component/ContentComponent.tsx:95
 msgid "Attachments"
 msgstr "Вложения"
+
+#: nodepkg/identify-module/component/CoordinateComponent.tsx:9
+msgid "Copy coordinates"
+msgstr ""
+
+#: nodepkg/identify-module/component/CoordinateComponent.tsx:9
+msgid "Coordinates copied"
+msgstr ""
 
 #: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
 msgid "Opacity"
@@ -546,7 +543,7 @@ msgstr "Скачать прикрепленные файлы"
 
 #: nodepkg/layers-tree/IconItem.js:25
 msgid "Zoom to vector layer object"
-msgstr "Приблизиться к объекту векторного слоя"
+msgstr ""
 
 #: nodepkg/layers-tree/LegendAction.tsx:10
 msgid "Show legend"
@@ -1255,4 +1252,3 @@ msgstr "Открыть"
 #: view.py:407
 msgid "Group setting"
 msgstr "Настройка группы"
-

@@ -1,12 +1,17 @@
 import { forwardRef, RefObject, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseIcon from "@nextgisweb/icon/material/close";
+import EditNote from "@nextgisweb/icon/material/edit_note";
 import { Rnd } from "react-rnd";
-import { Select, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Select, Tooltip } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
-import { FeatureComponent } from "./FeatureComponent";
-import { RadioButtonComponent } from "./RadioButtonComponent";
+import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
+import showModal from "@nextgisweb/gui/showModal";
+import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
@@ -65,9 +70,13 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     const count = response.featureCount;
 
+    const W = document.documentElement.clientWidth;
+    const H = document.documentElement.clientHeight;
+
     const [store] = useState(() => new IdentifyStore({
         data: response.data,
     }));
+
     imodule.identifyStore = store;
 
     useEffect(() => {
@@ -138,7 +147,52 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                 })
             });
     };
-    const moveClass = store.styleContent === false ? ",.ant-tabs-content-holder" : "";
+
+    const moveClass = store.styleContent === false ? ",.content-item" : "";
+
+    let operations;
+    count > 0 && store.selected && Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
+        const { id, layerId, styleId } = store.selected;
+        if (
+            config.layerId !== layerId ||
+            config.styleId !== styleId ||
+            !imodule._isEditEnabled(display, config)
+        ) {
+            return;
+        }
+        const onSave = () => {
+            store.setUpdate(true);
+            topic.publish("feature.updated", {
+                resourceId: layerId,
+                featureId: id,
+            });
+        }
+        operations = (
+            <Tooltip title={gettext("Edit")}>
+                <Button
+                    type="text"
+                    className="edit-symbol"
+                    icon={<EditNote />}
+                    onClick={() => {
+                        const featureId = id;
+                        const resourceId = layerId;
+                        showModal(FeatureEditorModal, {
+                            editorOptions: {
+                                featureId,
+                                resourceId: resourceId,
+                                onSave: () => {
+                                    if (onSave) {
+                                        onSave();
+                                    }
+                                },
+                            },
+                        });
+
+                    }}
+                />
+            </Tooltip>
+        );
+    })
 
     return (
         createPortal(
@@ -153,7 +207,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     topRight: "hover-angle-top-right",
                     topLeft: "hover-angle-top-left",
                 }}
-                cancel={".select-feature,.ant-tabs-nav,.value-link,.value-email,.ant-tabs-nav,.icon-symbol,.coordinate-value" + moveClass}
+                cancel={".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value" + moveClass}
                 bounds="window"
                 minWidth={position.width}
                 minHeight={position.height}
@@ -176,18 +230,44 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             >
                 <div ref={ref} className="popup-position" >
                     <div className="title">
-                        <div className="title-name">
+                        <div className="title-name"
+                            onClick={(e) => {
+                                if (count > 0 && e.detail === 2) {
+                                    setTimeout(() => {
+                                        if (valueRnd.width > position.width || valueRnd.height > position.height) {
+                                            setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                        } else {
+                                            setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
+                                        }
+                                        if (valueRnd.x === 0 && valueRnd.y === H - 22) {
+                                            setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                        }
+                                    }, 200)
+                                }
+                            }}
+                        >
                             <span className="object-select">Объектов: {count}</span>
                             {count > 0 && (
-                                <Tooltip title={currentLayer}>
+                                // <Tooltip title={currentLayer}>
                                     <span
                                         title={currentLayer}
                                         className="layer-name">
                                         {currentLayer}
                                     </span>
-                                </Tooltip>
+                                // </Tooltip>
                             )}
                         </div>
+                        {count > 0 && (<span
+                            className="icon-symbol"
+                            onClick={() => {
+                                if (valueRnd.width > position.width || valueRnd.height > position.height) {
+                                    setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                } else {
+                                    setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
+                                }
+                            }} >
+                            <OpenInFull />
+                        </span>)}
                         <span
                             className="icon-symbol"
                             onClick={() => {
@@ -211,13 +291,14 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                     showSearch
                                     size="small"
                                     value={store.selected}
-                                    style={{ width: "100%" }}
+                                    style={{ width: operations ? "calc(100% - 24px)" : "100%" }}
                                     onChange={onChange}
                                     options={store.data}
                                 />
+                                {operations}
                             </div>
                             <div className="content">
-                                <RadioButtonComponent display={display} store={store} attribute={store.attribute} position={valueRnd} />
+                                <ContentComponent store={store} attribute={store.attribute} position={valueRnd} />
                             </div>
                         </>
                     )}
@@ -225,7 +306,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         <CoordinateComponent coordValue={coordValue} />
                     </div>
                 </div>
-            </Rnd>,
+            </Rnd >,
             document.body
         )
     )

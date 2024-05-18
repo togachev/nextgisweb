@@ -33,5 +33,7 @@
     "playlist_add",
     "upload",
     "draw",
-    "upload_file"
+    "upload_file",
+    "close_fullscreen",
+    "open_in_full"
 ]
