@@ -454,6 +454,8 @@ define([
                     this.identify_module = control;
                     this.mapStates.addState("identify_module", this.identify_module);
                     this.mapStates.setDefaultState("identify_module", true);
+                    widget._identifyModuleUrlParams();
+                    // widget._identifyModuleFeatureByAttrValue();
                 }
             } else {
                 if (controlsReady.has("id")) {
@@ -880,6 +882,38 @@ define([
             const { lon, lat } = urlParams;
             this.identify
                 .identifyLonLat(lon, lat)
+                .then((result) => {
+                    if (result) return;
+                    errorModule.errorModal({
+                        title: gettext("Object not found"),
+                        message: gettext(
+                            "Object from URL parameters not found"
+                        ),
+                    });
+                });
+        },
+
+        _identifyModuleUrlParams: function () {
+            const urlParams = this._urlParams;
+            if (
+                !(
+                    (
+                        "lon" in urlParams &&
+                        "lat" in urlParams &&
+                        "zoom" in urlParams &&
+                        "attribute" in urlParams
+                    ) ||
+                    (
+                        "lid" in urlParams &&
+                        "fid" in urlParams
+                    )
+                )
+            ) {
+                return;
+            }
+            const { lon, lat, attribute, lid, fid } = urlParams;
+            this.identify_module
+                .identifyModuleUrlParams(lon, lat, attribute, lid, fid)
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

@@ -54,10 +54,7 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
             title: gettext("Attributes"),
             hidden: !settings.identify_attributes,
             children:
-                (<div
-                    onMouseEnter={(e) => { e.type === "mouseenter" && store.setStyleContent(false) }}
-                    onTouchMove={(e) => { e.type === "touchmove" && store.setStyleContent(true) }}
-                >
+                (<div>
                     {attribute && Object.keys(attribute).length > 0 ?
                         (<>
                             {Object.keys(attribute).map((key) => {

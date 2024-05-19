@@ -148,8 +148,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             });
     };
 
-    const moveClass = store.styleContent === false ? ",.content-item" : "";
-
     let operations;
     count > 0 && store.selected && Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
         const { id, layerId, styleId } = store.selected;
@@ -245,7 +243,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         topRight: "hover-angle-top-right",
                         topLeft: "hover-angle-top-left",
                     }}
-                    cancel={".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value" + moveClass}
+                    cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
                     bounds="window"
                     minWidth={position.width}
                     minHeight={position.height}

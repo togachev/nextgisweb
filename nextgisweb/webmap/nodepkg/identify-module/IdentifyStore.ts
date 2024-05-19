@@ -17,7 +17,6 @@ export class IdentifyStore {
     selected: string | null = null;
     attribute: object | null = null;
     feature: object | null = null;
-    styleContent = true;
     update = false;
 
     constructor({ data, ...props }) {
@@ -51,10 +50,6 @@ export class IdentifyStore {
 
     setFeature = (feature: SetValue<object | null>) => {
         this.setValue("feature", feature);
-    };
-
-    setStyleContent = (styleContent: boolean) => {
-        this.setValue("styleContent", styleContent);
     };
 
     setUpdate = (update: boolean) => {
