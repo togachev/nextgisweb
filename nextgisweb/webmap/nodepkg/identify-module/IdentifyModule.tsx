@@ -176,6 +176,7 @@ export class IdentifyModule extends Component {
             });
         let count;
         let response
+        const isNumeric = (string) => Number.isFinite(+string);
         if (this.params.request !== null) {
             this.display.getVisibleItems()
                 .then(items => {
@@ -201,14 +202,25 @@ export class IdentifyModule extends Component {
                     return response;
                 });
             count = response.featureCount;
+            console.log(response);
+            
+        } else if (fparams && isNumeric(fparams.value.lid) && isNumeric(fparams.value.fid)) {
+            count = 1;
+            response = { data: [{
+                "id": 1,
+                "layerId": 52,
+                "styleId": 53,
+                "label": "#1",
+                "value": "1/52",
+                "layer_name": "Векторный слой 6"
+            }], featureCount: 1 }
         } else {
             count = 0;
             response = { data: [], featureCount: 0 }
         }
 
-        const offset = op === "popup" && fparams === undefined ?
-            settings.offset_point : op === "popup" && fparams && fparams.value === "false" ?
-                10 : 0;
+        const offset = (op === "popup" && fparams === undefined) || (op === "popup" && fparams && fparams.value) ?
+            settings.offset_point : 0;
         const position = positionContext(event, offset, op, count, settings, fparams);
         const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
@@ -265,11 +277,11 @@ export class IdentifyModule extends Component {
         }
 
         this.params = {
-            point: fparams && fparams.value === "false" ? simulateEvent.coordinate : e.coordinate,
-            request: fparams && fparams.value === "false" ? null : op === "context" ? null : request,
+            point: fparams && fparams.value ? simulateEvent.coordinate : e.coordinate,
+            request: fparams && fparams.value ? null : op === "context" ? null : request,
         }
-
-        const event = fparams && fparams.value === "false" ? simulateEvent : e;
+        
+        const event = fparams && fparams.value ? simulateEvent : e;
         this.displayFeatureInfo(event, op, fparams);
     };
 
@@ -295,7 +307,8 @@ export class IdentifyModule extends Component {
     identifyModuleUrlParams = async (lon, lat, attribute, lid, fid) => {
         if (attribute && attribute === "false") {
             this._responseContext(lon, lat, attribute);
-        } else {
+        }
+        else if (attribute && attribute === "true") {
             this._responseContext(lon, lat, { lid, fid });
         }
         return true;

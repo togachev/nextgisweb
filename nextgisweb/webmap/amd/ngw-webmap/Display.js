@@ -455,7 +455,6 @@ define([
                     this.mapStates.addState("identify_module", this.identify_module);
                     this.mapStates.setDefaultState("identify_module", true);
                     widget._identifyModuleUrlParams();
-                    // widget._identifyModuleFeatureByAttrValue();
                 }
             } else {
                 if (controlsReady.has("id")) {
