@@ -18,6 +18,7 @@ export class IdentifyStore {
     attribute: object | null = null;
     feature: object | null = null;
     update = false;
+    fullscreen = false;
 
     constructor({ data, ...props }) {
         this.data = data
@@ -54,6 +55,10 @@ export class IdentifyStore {
 
     setUpdate = (update: boolean) => {
         this.setValue("update", update);
+    };
+
+    setFullscreen = (fullscreen: boolean) => {
+        this.fullscreen = fullscreen;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

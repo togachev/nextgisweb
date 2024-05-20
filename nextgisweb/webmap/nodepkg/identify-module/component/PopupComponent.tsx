@@ -1,6 +1,7 @@
 import { forwardRef, RefObject, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
+import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import { Rnd } from "react-rnd";
@@ -69,9 +70,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { getAttribute } = useSource();
 
     const count = response.featureCount;
-
-    const W = document.documentElement.clientWidth;
-    const H = document.documentElement.clientHeight;
 
     const [store] = useState(() => new IdentifyStore({
         data: response.data,
@@ -192,6 +190,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         );
     })
 
+    const W = display.mapNode.clientWidth - 20;
+    const H = display.mapNode.clientHeight - 20;
+    const fX = display.panelsManager._activePanelKey ? display.leftPanelPane.w + 40 + 10 : 40 + 10;
+    const fY = 40 + 10;
+
     return (
         createPortal(
             <ConfigProvider
@@ -253,6 +256,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     size={{ width: valueRnd.width, height: valueRnd.height }}
                     onDragStop={(e, d) => {
                         setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                        if (valueRnd.width === W && valueRnd.height === H) {
+                            setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                            store.setFullscreen(true);
+                        }                       
                     }}
                     onResize={(e, direction, ref, delta, position) => {
                         setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
@@ -272,11 +279,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                         setTimeout(() => {
                                             if (valueRnd.width > position.width || valueRnd.height > position.height) {
                                                 setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                                store.setFullscreen(false)
                                             } else {
-                                                setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
-                                            }
-                                            if (valueRnd.x === 0 && valueRnd.y === H - 22) {
-                                                setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                                setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                store.setFullscreen(true)
                                             }
                                         }, 200)
                                     }
@@ -284,27 +290,33 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             >
                                 <span className="object-select">Объектов: {count}</span>
                                 {count > 0 && (
-                                    // <Tooltip title={currentLayer}>
                                     <span
                                         title={currentLayer}
                                         className="layer-name">
                                         {currentLayer}
                                     </span>
-                                    // </Tooltip>
                                 )}
                             </div>
                             {count > 0 && (<span
+                                title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
                                 className="icon-symbol"
                                 onClick={() => {
                                     if (valueRnd.width > position.width || valueRnd.height > position.height) {
                                         setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                        store.setFullscreen(false)
                                     } else {
-                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: 0, y: 0 }));
+                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                        store.setFullscreen(true)
+                                    }
+                                    if (valueRnd.width < W && valueRnd.width > position.width || valueRnd.height < H && valueRnd.height > position.height) {
+                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                        store.setFullscreen(true)
                                     }
                                 }} >
-                                <OpenInFull />
+                                {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
                             </span>)}
                             <span
+                                title={gettext("Close")}
                                 className="icon-symbol"
                                 onClick={() => {
                                     visible({ hidden: true, overlay: undefined, key: "popup" })
