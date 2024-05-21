@@ -1,9 +1,9 @@
-const positionContext = (event, offset, op, count, settings, fparams) => {
+const positionContext = (event, offset, op, count, settings, p) => {
     const W = window.innerWidth;
     const H = window.innerHeight;
 
-    const px = fparams && fparams.value ? event.pixel[0] : event.originalEvent.clientX;
-    const py = fparams && fparams.value ? event.pixel[1] : event.originalEvent.clientY;
+    const px = p && p.value ? event.pixel[0] : event.originalEvent.clientX;
+    const py = p && p.value ? event.pixel[1] : event.originalEvent.clientY;
 
     const context_height = settings.context_height;
     const context_width = settings.context_width;
@@ -22,7 +22,7 @@ const positionContext = (event, offset, op, count, settings, fparams) => {
     } else if (count === 0 && op !== "context") {
         width = coords_not_count_w;
         height = coords_not_count_h;
-    } else if (fparams && fparams.value === "false") {
+    } else if (p && p.value.attribute === false) {
         width = coords_not_count_w;
         height = coords_not_count_h;
     } else if (popup_width >= W / 2 || popup_height >= H / 2) {

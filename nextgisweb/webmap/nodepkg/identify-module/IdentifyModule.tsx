@@ -8,7 +8,7 @@ import { Interaction } from "ol/interaction";
 import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import { Point } from "ol/geom";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
@@ -52,13 +52,13 @@ Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
-        this.tool._overlayInfo(e, "popup", undefined);
+        this.tool._overlayInfo(e, "popup", false);
         e.preventDefault();
     } else if (e.type === "singleclick" && e.originalEvent.ctrlKey === true) {
         this.tool._popupMultiple(e);
         e.preventDefault();
     } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-        this.tool._overlayInfo(e, "context", undefined);
+        this.tool._overlayInfo(e, "context", false);
         e.preventDefault();
     }
     return true;
@@ -158,7 +158,9 @@ export class IdentifyModule extends Component {
         alert(e.pixel);
     };
 
-    displayFeatureInfo = async (event: MapBrowserEvent, op: string, fparams) => {
+    isNumeric = (string) => Number.isFinite(+string)
+
+    displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
 
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
@@ -176,7 +178,7 @@ export class IdentifyModule extends Component {
             });
         let count;
         let response
-        const isNumeric = (string) => Number.isFinite(+string);
+
         if (this.params.request !== null) {
             this.display.getVisibleItems()
                 .then(items => {
@@ -194,44 +196,35 @@ export class IdentifyModule extends Component {
                         this.params.request.styles.push({ id: item.styleId, label: item.label });
                     });
                 })
-            response = op === "popup" && await route("feature_layer.identify_module")
+            response = await route("feature_layer.identify_module")
                 .post({
                     json: this.params.request,
                 })
                 .then((response) => {
+                    console.log(this.params.request, response);
+
                     return response;
                 });
             count = response.featureCount;
-            console.log(response);
-            
-        } else if (fparams && isNumeric(fparams.value.lid) && isNumeric(fparams.value.fid)) {
-            count = 1;
-            response = { data: [{
-                "id": 1,
-                "layerId": 52,
-                "styleId": 53,
-                "label": "#1",
-                "value": "1/52",
-                "layer_name": "Векторный слой 6"
-            }], featureCount: 1 }
         } else {
             count = 0;
             response = { data: [], featureCount: 0 }
         }
 
-        const offset = (op === "popup" && fparams === undefined) || (op === "popup" && fparams && fparams.value) ?
-            settings.offset_point : 0;
-        const position = positionContext(event, offset, op, count, settings, fparams);
+        const offset = op === "context" ? 0 : settings.offset_point;
+        console.log(offset);
+
+        const position = positionContext(event, offset, op, count, settings, p);
         const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
         if (op === "context") {
             this._setValue(this.point_context, "context")
-            this.root_context.render(<ContextComponent params={{ coordValue, position, event }} visible={this._visible} ref={this.refContext} />);
+            this.root_context.render(<ContextComponent params={{ coordValue, position }} visible={this._visible} ref={this.refContext} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         } else {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-            this.root_popup.render(<PopupComponent params={{ coordValue, position, response, event }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+            this.root_popup.render(<PopupComponent params={{ coordValue, position, response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         }
     };
@@ -252,37 +245,35 @@ export class IdentifyModule extends Component {
         this.display.identify_module.root_popup.render();
     };
 
-    _overlayInfo = (e: MapBrowserEvent, op: string, fparams) => {
-        const offHP = 40;
-        const W = this.display.panelsManager._activePanelKey ?
-            (window.innerWidth + this.display.leftPanelPane.w + 40) / 2 :
-            (window.innerWidth + offHP) / 2;
-        const H = (window.innerHeight + offHP) / 2;
-
-        let simulateEvent = {
-            coordinate: fparams && fparams.coordinate,
-            map: this.olmap,
-            target: 'map',
-            pixel: [W, H],
-            type: 'singleclick'
-        };
-
+    _overlayInfo = (e: MapBrowserEvent, op: string, p) => {
         let request;
-        if (op === "popup" && fparams === undefined) {
+        if (op === "popup" && p === false) {
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
                 styles: [],
             }
         }
+        else if (op === "popup" && p.value.attribute === true) {
+            request = {
+                srs: this.displaySrid,
+                geom: this._requestGeomString(e.pixel),
+                styles: [],
+            }
+        }
+        else if (op === "popup" && p.value.attribute === false) {
+            request = null;
+        }
+        else if (op === "context" && p === false) {
+            request = null;
+        }
 
         this.params = {
-            point: fparams && fparams.value ? simulateEvent.coordinate : e.coordinate,
-            request: fparams && fparams.value ? null : op === "context" ? null : request,
+            point: e.coordinate,
+            request: request,
         }
-        
-        const event = fparams && fparams.value ? simulateEvent : e;
-        this.displayFeatureInfo(event, op, fparams);
+
+        this.displayFeatureInfo(e, op, p);
     };
 
     _requestGeomString = (pixel: number[]) => {
@@ -306,10 +297,10 @@ export class IdentifyModule extends Component {
 
     identifyModuleUrlParams = async (lon, lat, attribute, lid, fid) => {
         if (attribute && attribute === "false") {
-            this._responseContext(lon, lat, attribute);
+            this._responseContext(lon, lat, { attribute: false });
         }
-        else if (attribute && attribute === "true") {
-            this._responseContext(lon, lat, { lid, fid });
+        else if (this.isNumeric(lid) && this.isNumeric(fid)) {
+            this._responseContext(lon, lat, { attribute: true, lid, fid });
         }
         return true;
     };
@@ -320,8 +311,19 @@ export class IdentifyModule extends Component {
         });
 
         coordSwitcher._transformFrom(4326).then((transformedCoord) => {
-            const fparams = { value, coordinate: transformedCoord };
-            this._overlayInfo(null, "popup", fparams)
+            const p = { value, coordinate: transformedCoord };
+            const offHP = 0;
+            const W = this.display.panelsManager._activePanelKey ? (window.innerWidth + this.display.leftPanelPane.w + offHP) / 2 :
+                (window.innerWidth + offHP) / 2;
+            const H = (window.innerHeight + offHP) / 2;
+            const simulateEvent = {
+                coordinate: p && p.coordinate,
+                map: this.olmap,
+                target: 'map',
+                pixel: [W, H],
+                type: 'singleclick'
+            };
+            this._overlayInfo(simulateEvent, "popup", p)
         })
 
     }
