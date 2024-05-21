@@ -904,15 +904,16 @@ define([
                     ) ||
                     (
                         "lid" in urlParams &&
-                        "fid" in urlParams
+                        "fid" in urlParams &&
+                        "sid" in urlParams
                     )
                 )
             ) {
                 return;
             }
-            const { lon, lat, attribute, lid, fid } = urlParams;
+            const { lon, lat, attribute, lid, fid, sid } = urlParams;
             this.identify_module
-                .identifyModuleUrlParams(lon, lat, attribute, lid, fid)
+                .identifyModuleUrlParams(lon, lat, attribute, lid, fid, sid)
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

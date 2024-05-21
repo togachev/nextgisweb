@@ -25,6 +25,13 @@ interface VisibleProps {
     key: string;
 }
 
+interface SelectedFeatureProps {
+    layerId: number;
+    featureId: number;
+    styleId: number;
+    label: string;
+}
+
 interface EventProps {
     request: RequestProps | undefined;
     point: number[];
@@ -69,6 +76,7 @@ export class IdentifyModule extends Component {
     private displaySrid: number;
     private olmap: Map;
     private params: EventProps;
+    private paramsSelected: SelectedFeatureProps;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
     private control: Interaction;
@@ -158,10 +166,9 @@ export class IdentifyModule extends Component {
         alert(e.pixel);
     };
 
-    isNumeric = (string) => Number.isFinite(+string)
+    isNumeric = (string) => Number.isFinite(+string);
 
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
-
         const coords = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
@@ -176,6 +183,7 @@ export class IdentifyModule extends Component {
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
             });
+
         let count;
         let response
 
@@ -196,24 +204,52 @@ export class IdentifyModule extends Component {
                         this.params.request.styles.push({ id: item.styleId, label: item.label });
                     });
                 })
+
             response = await route("feature_layer.identify_module")
                 .post({
                     json: this.params.request,
                 })
                 .then((response) => {
-                    console.log(this.params.request, response);
-
                     return response;
                 });
             count = response.featureCount;
+
+        } else if (op === "popup" && p.value.attribute === true) {
+            this.display.getVisibleItems()
+                .then(items => {
+                    const itemConfig = this.display.getItemConfig();
+                    const mapResolution = this.olmap.getView().getResolution();
+                    items.map(i => {
+                        const item = itemConfig[i.id];
+                        if (item.styleId === Number(p.value.sid)) {
+                            if (
+                                !item.identifiable ||
+                                mapResolution >= item.maxResolution ||
+                                mapResolution < item.minResolution
+                            ) {
+                                return;
+                            }
+                            this.paramsSelected.label = item.label;
+                        }
+                    });
+                })
+
+            response = await route("feature_layer.feature_selected")
+                .post({
+                    json: this.paramsSelected,
+                })
+                .then((item) => {
+                    const response = { data: [item.data], featureCount: 1 };
+                    return response;
+                });
+            count = response.featureCount;
+
         } else {
             count = 0;
             response = { data: [], featureCount: 0 }
         }
 
         const offset = op === "context" ? 0 : settings.offset_point;
-        console.log(offset);
-
         const position = positionContext(event, offset, op, count, settings, p);
         const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
@@ -253,19 +289,17 @@ export class IdentifyModule extends Component {
                 geom: this._requestGeomString(e.pixel),
                 styles: [],
             }
+        } else {
+            request = null;
         }
-        else if (op === "popup" && p.value.attribute === true) {
-            request = {
-                srs: this.displaySrid,
-                geom: this._requestGeomString(e.pixel),
-                styles: [],
+
+        if (op === "popup" && p && p.value.attribute === true) {
+            this.paramsSelected = {
+                layerId: p.value.lid,
+                styleId: p.value.sid,
+                featureId: p.value.fid,
+                label: "",
             }
-        }
-        else if (op === "popup" && p.value.attribute === false) {
-            request = null;
-        }
-        else if (op === "context" && p === false) {
-            request = null;
         }
 
         this.params = {
@@ -295,27 +329,27 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async (lon, lat, attribute, lid, fid) => {
+    identifyModuleUrlParams = async (lon, lat, attribute, lid, fid, sid) => {
         if (attribute && attribute === "false") {
             this._responseContext(lon, lat, { attribute: false });
-        }
-        else if (this.isNumeric(lid) && this.isNumeric(fid)) {
-            this._responseContext(lon, lat, { attribute: true, lid, fid });
+        } else if (this.isNumeric(lid) && this.isNumeric(fid) && this.isNumeric(sid)) {
+            this._responseContext(lon, lat, { attribute: true, lid, fid, sid });
         }
         return true;
     };
 
     _responseContext = (lon, lat, value) => {
-        const coordSwitcher = new CoordinateSwitcher({
-            point: [lon, lat],
-        });
+        const coordSwitcher = new CoordinateSwitcher({ point: [lon, lat] });
 
         coordSwitcher._transformFrom(4326).then((transformedCoord) => {
             const p = { value, coordinate: transformedCoord };
-            const offHP = 0;
-            const W = this.display.panelsManager._activePanelKey ? (window.innerWidth + this.display.leftPanelPane.w + offHP) / 2 :
+
+            const offHP = 40;
+            const W = this.display.panelsManager._activePanelKey ?
+                (window.innerWidth + this.display.leftPanelPane.w + offHP) / 2 :
                 (window.innerWidth + offHP) / 2;
             const H = (window.innerHeight + offHP) / 2;
+
             const simulateEvent = {
                 coordinate: p && p.coordinate,
                 map: this.olmap,
@@ -325,6 +359,5 @@ export class IdentifyModule extends Component {
             };
             this._overlayInfo(simulateEvent, "popup", p)
         })
-
-    }
+    };
 }
