@@ -44,7 +44,6 @@ interface Rnd {
 }
 
 interface Props {
-    coordValue: string;
     response: Response;
     position: Position;
 }
@@ -57,8 +56,8 @@ interface Params {
 
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display } = props;
-    const { coordValue, position, response } = params;
-    const imodule = display.identify_module
+    const { position, response } = params;
+    const imodule = display.identify_module;
     const [refRnd, setRefRnd] = useState();
     const [valueRnd, setValueRnd] = useState<Rnd>({
         x: position.x,
@@ -67,7 +66,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         height: position.height,
     });
 
-    const { getAttribute } = useSource();
+    const { generateUrl, getAttribute } = useSource();
 
     const count = response.featureCount;
 
@@ -101,6 +100,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         if (count > 0) {
             store.setData(response.data);
             store.setSelected(response.data[0]);
+            store.setContextUrl(generateUrl(display, { res: response.data[0] }));
             getAttribute(response.data[0])
                 .then(item => {
                     store.setAttribute(item._fieldmap);
@@ -116,6 +116,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     })
                 });
         } else {
+            store.setContextUrl(generateUrl(display, { res: null }));
             store.setData([]);
             store.setAttribute(null);
             store.setFeature(null);
@@ -127,8 +128,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     const onChange = (value: number) => {
         const selectedValue = store.data.find(item => item.value === value);
-
         store.setSelected(selectedValue);
+        store.setContextUrl(generateUrl(display, { res: selectedValue }));
         getAttribute(selectedValue)
             .then(item => {
                 store.setAttribute(item._fieldmap);
@@ -190,10 +191,16 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         );
     })
 
-    const W = display.mapNode.clientWidth - 20;
-    const H = display.mapNode.clientHeight - 20;
-    const fX = display.panelsManager._activePanelKey ? display.leftPanelPane.w + 40 + 10 : 40 + 10;
-    const fY = 40 + 10;
+    const offHP = 40;
+    const offset = display.clientSettings.offset_point;
+
+    const W = display.mapNode.clientWidth - offset * 2;
+    const H = display.mapNode.clientWidth - offset * 2;
+
+    const fX = display.panelsManager._activePanelKey ?
+        display.leftPanelPane.w + offHP + offset :
+        offHP + offset;
+    const fY = offHP + offset;
 
     return (
         createPortal(
@@ -259,7 +266,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         if (valueRnd.width === W && valueRnd.height === H) {
                             setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
                             store.setFullscreen(true);
-                        }                       
+                        }
                     }}
                     onResize={(e, direction, ref, delta, position) => {
                         setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
@@ -351,7 +358,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             </>
                         )}
                         <div className="footer-popup">
-                            <CoordinateComponent coordValue={coordValue} />
+                            <CoordinateComponent display={display} link={store.contextUrl} count={count} op="popup" />
                         </div>
                     </div>
                 </Rnd >

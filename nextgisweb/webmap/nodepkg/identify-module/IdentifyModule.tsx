@@ -16,7 +16,6 @@ import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatia
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
 import { positionContext } from "./positionContext"
-import URL from "ngw-webmap/utils/URL";
 import CoordinateSwitcher from "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher";
 
 interface VisibleProps {
@@ -74,6 +73,7 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
 export class IdentifyModule extends Component {
     private display: DojoDisplay;
     private displaySrid: number;
+    private lonlat: number[];
     private olmap: Map;
     private params: EventProps;
     private paramsSelected: SelectedFeatureProps;
@@ -87,7 +87,6 @@ export class IdentifyModule extends Component {
     private root_context: React.ReactElement;
     private refPopup: RefObject<Element>;
     private refContext: RefObject<Element>;
-    private _urlParams: string;
 
     constructor(props: DojoDisplay) {
         super(props)
@@ -98,8 +97,6 @@ export class IdentifyModule extends Component {
         this.control = new Control({ tool: this });
         this.control.setActive(false);
         this.olmap.addInteraction(this.control);
-
-        this._urlParams = URL.getURLParams();
 
         this._addOverlay();
 
@@ -169,7 +166,7 @@ export class IdentifyModule extends Component {
     isNumeric = (string) => Number.isFinite(+string);
 
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
-        const coords = await route("spatial_ref_sys.geom_transform.batch")
+        this.lonlat = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
                     srs_from: this.displaySrid,
@@ -184,8 +181,7 @@ export class IdentifyModule extends Component {
                 return transformedCoord;
             });
 
-        let count;
-        let response
+        let count, response;
 
         if (this.params.request !== null) {
             this.display.getVisibleItems()
@@ -251,16 +247,15 @@ export class IdentifyModule extends Component {
 
         const offset = op === "context" ? 0 : settings.offset_point;
         const position = positionContext(event, offset, op, count, settings, p);
-        const coordValue = coords && coords[1].toFixed(6) + ", " + coords[0].toFixed(6);
 
         if (op === "context") {
             this._setValue(this.point_context, "context")
-            this.root_context.render(<ContextComponent params={{ coordValue, position }} visible={this._visible} ref={this.refContext} />);
+            this.root_context.render(<ContextComponent params={{ position }} display={this.display} visible={this._visible} ref={this.refContext} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         } else {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-            this.root_popup.render(<PopupComponent params={{ coordValue, position, response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+            this.root_popup.render(<PopupComponent params={{ position, response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         }
     };
@@ -331,32 +326,33 @@ export class IdentifyModule extends Component {
 
     identifyModuleUrlParams = async (lon, lat, attribute, lid, fid, sid) => {
         if (attribute && attribute === "false") {
-            this._responseContext(lon, lat, { attribute: false });
+            this._responseContext({ lon, lat, attribute: false });
         } else if (this.isNumeric(lid) && this.isNumeric(fid) && this.isNumeric(sid)) {
-            this._responseContext(lon, lat, { attribute: true, lid, fid, sid });
+            this._responseContext({ lon, lat, attribute: true, lid, fid, sid });
         }
         return true;
     };
 
-    _responseContext = (lon, lat, value) => {
-        const coordSwitcher = new CoordinateSwitcher({ point: [lon, lat] });
-
+    _responseContext = (value) => {
+        const coordSwitcher = new CoordinateSwitcher({ point: [value.lon, value.lat] });
         coordSwitcher._transformFrom(4326).then((transformedCoord) => {
             const p = { value, coordinate: transformedCoord };
-
             const offHP = 40;
-            const W = this.display.panelsManager._activePanelKey ?
-                (window.innerWidth + this.display.leftPanelPane.w + offHP) / 2 :
-                (window.innerWidth + offHP) / 2;
-            const H = (window.innerHeight + offHP) / 2;
+
+            const W = window.innerWidth;
+            const H = window.innerHeight;
 
             const simulateEvent = {
                 coordinate: p && p.coordinate,
                 map: this.olmap,
                 target: 'map',
-                pixel: [W, H],
+                pixel: [
+                    this.display.panelsManager._activePanelKey ? (W + this.display.leftPanelPane.w + offHP) / 2 : (W + offHP) / 2,
+                    (H + offHP) / 2
+                ],
                 type: 'singleclick'
             };
+
             this._overlayInfo(simulateEvent, "popup", p)
         })
     };

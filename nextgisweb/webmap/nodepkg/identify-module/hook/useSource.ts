@@ -1,8 +1,31 @@
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
 
 export const useSource = () => {
-    
+
+    const generateUrl = (display, { res }) => {
+        const imodule = display.identify_module;
+        const lon = imodule.lonlat[0];
+        const lat = imodule.lonlat[1];
+        const webmapId = display.config.webmapId
+        const zoom = display.map.position.zoom;
+
+        const obj = res !== null ?
+            { attribute: true, lat, lon, lid: res.layerId, fid: res.id, sid: res.styleId, zoom } :
+            { attribute: false, lat, lon, zoom }
+
+        const paramsUrl = new URLSearchParams();
+
+        Object.entries(obj)?.map(([key, value]) => {
+            paramsUrl.append(key, value);
+        })
+
+        const url = routeURL("webmap.display", webmapId);
+        const link = origin + url + '?' + paramsUrl.toString();
+
+        return link
+    };
+
     const getAttribute = async (res) => {
         const resourceId = res.layerId;
         const feature = await route("feature_layer.feature.item_iso", {
@@ -75,5 +98,5 @@ export const useSource = () => {
         return fieldmap;
     }
 
-    return { getAttribute };
+    return { generateUrl, getAttribute };
 };

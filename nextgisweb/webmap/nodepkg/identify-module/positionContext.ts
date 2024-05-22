@@ -1,6 +1,7 @@
 const positionContext = (event, offset, op, count, settings, p) => {
     const W = window.innerWidth;
     const H = window.innerHeight;
+    const offHP = 40;
 
     const px = p && p.value ? event.pixel[0] : event.originalEvent.clientX;
     const py = p && p.value ? event.pixel[1] : event.originalEvent.clientY;
@@ -11,7 +12,7 @@ const positionContext = (event, offset, op, count, settings, p) => {
     const popup_width = settings.popup_width;
     const coords_not_count_w = 250;
     const coords_not_count_h = 47;
-    const offHP = 40;
+
 
     let width;
     let height;

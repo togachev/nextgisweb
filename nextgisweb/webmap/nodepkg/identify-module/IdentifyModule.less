@@ -328,28 +328,57 @@
     }
 }
 
-.coordinate-value {
-    padding: 0;
-    cursor: pointer;
+.footer-coordinate-component {
     display: flex;
     align-items: center;
-    line-height: normal;
-    height: 24px;
-    border-radius: 0 0 3px 3px;
+    width: 100%;
+    justify-content: space-between;
 
-    &:hover {
-        color: var(--primary);
-    }
-
-    .icon-symbol {
-        padding: 0 5px;
-        font-size: 10px;
-    }
-
-    .coords {
+    .coordinate-value {
         padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        line-height: normal;
+        height: 24px;
+        border-radius: 0 0 3px 3px;
+
+        &:hover {
+            color: var(--primary);
+        }
+
+        .icon-symbol {
+            padding: 0 5px;
+            font-size: 10px;
+        }
+
+        .coords {
+            padding: 0;
+        }
+    }
+
+    .copy-to-clipboard {
+        height: 20px;
+        padding: 0 2px;
+        display: flex;
+        align-items: center;
+
+        .ant-btn-icon {
+            margin-inline-end: 0 !important;
+        }
+
+        button {
+            width: 24px;
+        }
+
+        svg.icon {
+            margin: 0;
+            height: 18px;
+            width: 18px;
+        }
     }
 }
+
 
 .icon-position-popup {
     left: -5px;

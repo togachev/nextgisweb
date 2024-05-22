@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { CoordinateComponent } from "./CoordinateComponent";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
 interface Position {
     x: number;
@@ -11,8 +12,8 @@ interface Position {
     height: number;
 }
 
-interface Item {
-    coordValue: string;
+interface Props {
+    response: Response;
     position: Position;
 }
 
@@ -22,14 +23,15 @@ interface Visible {
     key: string;
 }
 
-interface Context {
-    params: Item;
+interface Params {
+    params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
+    display: DojoDisplay;
 }
 
-export default forwardRef<Element>(function ContextComponent(props: Context, ref: RefObject<Element>) {
-    const { params, visible } = props;
-    const { coordValue, position } = params;
+export default forwardRef<Element>(function ContextComponent(props: Params, ref: RefObject<Element>) {
+    const { params, visible, display } = props;
+    const { position } = params;
     useOutsideClick(ref, true);
     const { contextHolder } = useCopy();
 
@@ -51,7 +53,7 @@ export default forwardRef<Element>(function ContextComponent(props: Context, ref
             }}>
                 {contextHolder}
                 <span onClick={() => { visible({ hidden: true, overlay: undefined, key: "context" }); }}>
-                    <CoordinateComponent coordValue={coordValue} />
+                    <CoordinateComponent display={display} op="context" />
                 </span>
                 {
                     array.map(item => {

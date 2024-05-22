@@ -19,6 +19,7 @@ export class IdentifyStore {
     feature: object | null = null;
     update = false;
     fullscreen = false;
+    contextUrl: string | null = null;
 
     constructor({ data, ...props }) {
         this.data = data
@@ -60,6 +61,11 @@ export class IdentifyStore {
     setFullscreen = (fullscreen: boolean) => {
         this.fullscreen = fullscreen;
     };
+
+    setContextUrl = (contextUrl: SetValue<string | null>) => {
+        this.setValue("contextUrl", contextUrl);
+    };
+
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
         const isUpdaterFunction = (
