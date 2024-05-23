@@ -126,8 +126,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     const currentLayer = store.selected !== null ? store.selected.layer_name : undefined
 
-    const onChange = (value: number) => {
-        const selectedValue = store.data.find(item => item.value === value);
+    const onChange = (value: { value: number; label: string }) => {
+        const selectedValue = store.data.find(item => item.value === value.value);
         store.setSelected(selectedValue);
         store.setContextUrl(generateUrl(display, { res: selectedValue }));
         getAttribute(selectedValue)
@@ -147,6 +147,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             });
     };
 
+    const filterOption = (input: string, option?: { label: string; value: string; layer_name: string }) =>
+        (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
+        (option?.layer_name ?? '').toLowerCase().includes(input.toLowerCase());
+    
     let operations;
     count > 0 && store.selected && Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
         const { id, layerId, styleId } = store.selected;
@@ -195,7 +199,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const offset = display.clientSettings.offset_point;
 
     const W = display.mapNode.clientWidth - offset * 2;
-    const H = display.mapNode.clientWidth - offset * 2;
+    const H = display.mapNode.clientHeight - offset * 2;
 
     const fX = display.panelsManager._activePanelKey ?
         display.leftPanelPane.w + offHP + offset :
@@ -211,13 +215,13 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             paddingBlock: 5,
                             controlPaddingHorizontal: 5,
                             controlItemBgActiveHover: "var(--divider-color)",
-                            colorPrimary: "var(--primary)",
+                            colorPrimary: "var(--text-base)",
                             lineHeight: 1,
                         },
                         Radio: {
                             buttonPaddingInline: 3,
-                            buttonSolidCheckedBg: "var(--primary)",
-                            buttonSolidCheckedHoverBg: "#106a9080",
+                            buttonSolidCheckedBg: "var(--icon-color)",
+                            buttonSolidCheckedHoverBg: "var(--text-secondary)",
                             colorPrimary: "var(--primary)",
                             colorBorder: "var(--divider-color)",
                             borderRadius: 4,
@@ -238,6 +242,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             colorPrimary: "var(--text-secondary)",
                             controlOutline: "var(--divider-color)",
                             colorBorder: "var(--divider-color)",
+                        },
+                        Button: {
+                            colorLink: "var(--text-base)",
+                            colorLinkHover: "var(--primary)",
+                            defaultHoverColor: "var(--primary)",
                         }
                     }
                 }}
@@ -254,7 +263,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         topLeft: "hover-angle-top-left",
                     }}
                     cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
-                    bounds="window"
+                    bounds={valueRnd.width === W ? undefined : "window"}
                     minWidth={position.width}
                     minHeight={position.height}
                     allowAnyClick={true}
@@ -337,9 +346,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             <>
                                 <div className="select-feature" >
                                     <Select
+                                        labelInValue
                                         placement="topLeft"
                                         optionFilterProp="children"
-                                        filterOption={(input, option) => (option?.label ?? "").includes(input)}
+                                        filterOption={filterOption}
                                         filterSort={(optionA, optionB) =>
                                             (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
                                         }
@@ -349,6 +359,20 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                         style={{ width: operations ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
                                         onChange={onChange}
                                         options={store.data}
+                                        optionRender={(option) => (
+                                            <div className="label-select">
+                                                <Tooltip title={option.data.label}>
+                                                    <div className="label-feature">
+                                                        {option.data.label}
+                                                    </div>
+                                                </Tooltip>
+                                                <Tooltip title={option.data.layer_name}>
+                                                    <div className="label-style">
+                                                        {option.data.layer_name}
+                                                    </div>
+                                                </Tooltip>
+                                            </div>
+                                        )}
                                     />
                                     {operations}
                                 </div>

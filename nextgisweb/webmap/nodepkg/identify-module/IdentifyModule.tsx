@@ -225,6 +225,8 @@ export class IdentifyModule extends Component {
                             ) {
                                 return;
                             }
+                            console.log(item.label);
+                            
                             this.paramsSelected.label = item.label;
                         }
                     });

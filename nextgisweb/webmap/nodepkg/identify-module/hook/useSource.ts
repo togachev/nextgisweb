@@ -77,8 +77,6 @@ export const useSource = () => {
                             }
 
                             if (field.lookup_table !== null) {
-
-
                                 const lval = lookupTableCached.lookup(
                                     field.lookup_table.id,
                                     val
