@@ -100,8 +100,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         if (count > 0) {
             store.setData(response.data);
             store.setSelected(response.data[0]);
-            response.data[0] && store.setContextUrl(generateUrl(display, { res: response.data[0] }));
-            response.data[0] && getAttribute(response.data[0])
+            store.setContextUrl(generateUrl(display, { res: response.data[0] }));
+            getAttribute(response.data[0])
                 .then(item => {
                     store.setAttribute(item._fieldmap);
                     store.setFeature({
@@ -124,7 +124,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         }
     }, [response]);
 
-    const currentLayer = store.selected && store.selected !== null ? store.selected.layer_name : undefined
+    const currentLayer = store.selected !== null ? store.selected.layer_name : undefined
 
     const onChange = (value: { value: number; label: string }) => {
         const selectedValue = store.data.find(item => item.value === value.value);
@@ -208,7 +208,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     return (
         createPortal(
-            store.selected && (
                 <ConfigProvider
                     theme={{
                         components: {
@@ -389,7 +388,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             </div>
                         </div>
                     </Rnd >
-                </ConfigProvider>),
+                </ConfigProvider>,
             document.body
         )
     )

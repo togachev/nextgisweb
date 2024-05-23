@@ -205,11 +205,17 @@ export class IdentifyModule extends Component {
                 .post({
                     json: this.params.request,
                 })
-                .then((response) => {
-                    return response;
+                .then(item => {
+                    const data = item.data.filter(x => {
+                        if (x.error === "Forbidden" || x.error === "Not implemented") {
+                            return;
+                        } else {
+                            return x;
+                        }
+                    });
+                    return { data: data, featureCount: item.featureCount };
                 });
             count = response.featureCount;
-
         } else if (op === "popup" && p.value.attribute === true) {
             this.display.getVisibleItems()
                 .then(items => {
@@ -225,8 +231,6 @@ export class IdentifyModule extends Component {
                             ) {
                                 return;
                             }
-                            console.log(item.label);
-                            
                             this.paramsSelected.label = item.label;
                         }
                     });
@@ -236,12 +240,16 @@ export class IdentifyModule extends Component {
                 .post({
                     json: this.paramsSelected,
                 })
-                .then((item) => {
-                    const response = { data: [item.data], featureCount: 1 };
-                    return response;
+                .then(item => {
+                    let res;
+                    if (item.data.error === "Forbidden" || item.data.error === "Not implemented") {
+                        res = { data: [], featureCount: 0 };
+                    } else {
+                        res = { data: [item.data], featureCount: 1 };
+                    }
+                    return res;
                 });
             count = response.featureCount;
-
         } else {
             count = 0;
             response = { data: [], featureCount: 0 }
@@ -250,15 +258,15 @@ export class IdentifyModule extends Component {
         const offset = op === "context" ? 0 : settings.offset_point;
         const position = positionContext(event, offset, op, count, settings, p);
 
-        if (op === "context") {
-            this._setValue(this.point_context, "context")
-            this.root_context.render(<ContextComponent params={{ position }} display={this.display} visible={this._visible} ref={this.refContext} />);
-            this._visible({ hidden: false, overlay: this.params.point, key: "context" });
-        } else {
+        if (op === "popup") {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
             this.root_popup.render(<PopupComponent params={{ position, response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
+        } else {
+            this._setValue(this.point_context, "context")
+            this.root_context.render(<ContextComponent params={{ position }} display={this.display} visible={this._visible} ref={this.refContext} />);
+            this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         }
     };
 

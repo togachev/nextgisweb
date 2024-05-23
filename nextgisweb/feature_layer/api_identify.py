@@ -109,11 +109,10 @@ def identify_module(request) -> JSONType:
     options = []
     for style in style_list:
         layer = style.parent
-        layer_id_str = str(layer.id)
         if not layer.has_permission(DataStructureScope.read, request.user):
-            result[layer_id_str] = dict(error="Forbidden")
+            options.append(dict(error="Forbidden"))
         elif not IFeatureLayer.providedBy(layer):
-            result[layer_id_str] = dict(error="Not implemented")
+            options.append(dict(error="Not implemented"))
         else:
             query = layer.feature_query()
             query.geom()
@@ -129,8 +128,8 @@ def identify_module(request) -> JSONType:
                     value=str(f.id) + "/" + str(layer.id),
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
+                feature_count += 1
 
-    feature_count += len(options)
     result["data"] = options
     result["featureCount"] = feature_count
     return result
@@ -142,11 +141,10 @@ def feature_selected(request) -> JSONType:
     featureId = int(data["featureId"])
     layer = Resource.filter_by(id=layerId).one()
     result = dict()
-    layer_id_str = str(layer.id)
     if not layer.has_permission(DataStructureScope.read, request.user):
-        result[layer_id_str] = dict(error="Forbidden")
+        result["data"] = dict(error="Forbidden")
     elif not IFeatureLayer.providedBy(layer):
-        result[layer_id_str] = dict(error="Not implemented")
+        result["data"] = dict(error="Not implemented")
     else:
         query = layer.feature_query()
         for f in query():
