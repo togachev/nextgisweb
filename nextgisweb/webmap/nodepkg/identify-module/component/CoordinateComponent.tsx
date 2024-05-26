@@ -10,7 +10,7 @@ export const CoordinateComponent: FC = ({ display, link, count, op }) => {
     const imodule = display.identify_module;
     const lon = imodule.lonlat[0];
     const lat = imodule.lonlat[1];
-
+    
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
 
@@ -21,7 +21,7 @@ export const CoordinateComponent: FC = ({ display, link, count, op }) => {
                 <span className="icon-symbol"><Location /></span>
                 <span className="coords">{coordsVisible}</span>
             </span>
-            {op === "popup" && (
+            {op === "popup" && link !== null && (
                 <Button
                     size="small"
                     type="link"

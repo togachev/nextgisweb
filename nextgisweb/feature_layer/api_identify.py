@@ -142,7 +142,7 @@ def feature_selected(request) -> JSONType:
     layer = Resource.filter_by(id=layerId).one()
     result = dict()
     if not layer.has_permission(DataStructureScope.read, request.user):
-        result["data"] = dict(error="Forbidden")
+        result["data"] = dict(value="Forbidden")
     elif not IFeatureLayer.providedBy(layer):
         result["data"] = dict(error="Not implemented")
     else:

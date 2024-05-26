@@ -59,16 +59,20 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { position, response } = params;
     const imodule = display.identify_module;
     const [refRnd, setRefRnd] = useState();
+    
+    const count = response.featureCount;
+    const selectedItem = response.data[0];
+
+    const heightForbidden = selectedItem && selectedItem.value.includes("Forbidden") ? 75 : position.height;
+
     const [valueRnd, setValueRnd] = useState<Rnd>({
         x: position.x,
         y: position.y,
         width: position.width,
-        height: position.height,
+        height: heightForbidden,
     });
 
     const { generateUrl, getAttribute } = useSource();
-
-    const count = response.featureCount;
 
     const [store] = useState(() => new IdentifyStore({
         data: response.data,
@@ -96,12 +100,12 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     }, [store.update]);
 
     useEffect(() => {
-        setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
-        if (count > 0) {
+        setValueRnd({ x: position.x, y: position.y, width: position.width, height: heightForbidden });
+        if (count > 0 && !selectedItem.value.includes("Forbidden")) {
             store.setData(response.data);
-            store.setSelected(response.data[0]);
-            store.setContextUrl(generateUrl(display, { res: response.data[0] }));
-            getAttribute(response.data[0])
+            store.setSelected(selectedItem);
+            store.setContextUrl(generateUrl(display, { res: selectedItem }));
+            getAttribute(selectedItem)
                 .then(item => {
                     store.setAttribute(item._fieldmap);
                     store.setFeature({
@@ -115,6 +119,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         layerId: item.resourceId,
                     })
                 });
+        } else if (count > 0 && selectedItem.value.includes("Forbidden")) {
+            setValueRnd(prev => ({ ...prev, height: 75 }));
         } else {
             store.setContextUrl(generateUrl(display, { res: null }));
             store.setData([]);
@@ -208,187 +214,196 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     return (
         createPortal(
-                <ConfigProvider
-                    theme={{
-                        components: {
-                            Dropdown: {
-                                paddingBlock: 5,
-                                controlPaddingHorizontal: 5,
-                                controlItemBgActiveHover: "var(--divider-color)",
-                                colorPrimary: "var(--text-base)",
-                                lineHeight: 1,
-                            },
-                            Radio: {
-                                buttonPaddingInline: 3,
-                                buttonSolidCheckedBg: "var(--icon-color)",
-                                buttonSolidCheckedHoverBg: "var(--text-secondary)",
-                                colorPrimary: "var(--primary)",
-                                colorBorder: "var(--divider-color)",
-                                borderRadius: 4,
-                                controlHeight: 24,
-                                fontSize: 16,
-                                lineWidth: 1,
-                                lineHeight: 1,
-                                paddingXS: 50
-                            },
-                            Tooltip: {
-                                colorBgSpotlight: "#fff",
-                                colorTextLightSolid: "#000",
-                                borderRadius: 3,
-                            },
-                            Select: {
-                                optionSelectedBg: "var(--divider-color)",
-                                colorPrimaryHover: "var(--divider-color)",
-                                colorPrimary: "var(--text-secondary)",
-                                controlOutline: "var(--divider-color)",
-                                colorBorder: "var(--divider-color)",
-                            },
-                            Button: {
-                                colorLink: "var(--text-base)",
-                                colorLinkHover: "var(--primary)",
-                                defaultHoverColor: "var(--primary)",
+            <ConfigProvider
+                theme={{
+                    components: {
+                        Dropdown: {
+                            paddingBlock: 5,
+                            controlPaddingHorizontal: 5,
+                            controlItemBgActiveHover: "var(--divider-color)",
+                            colorPrimary: "var(--text-base)",
+                            lineHeight: 1,
+                        },
+                        Radio: {
+                            buttonPaddingInline: 3,
+                            buttonSolidCheckedBg: "var(--icon-color)",
+                            buttonSolidCheckedHoverBg: "var(--text-secondary)",
+                            colorPrimary: "var(--primary)",
+                            colorBorder: "var(--divider-color)",
+                            borderRadius: 4,
+                            controlHeight: 24,
+                            fontSize: 16,
+                            lineWidth: 1,
+                            lineHeight: 1,
+                            paddingXS: 50
+                        },
+                        Tooltip: {
+                            colorBgSpotlight: "#fff",
+                            colorTextLightSolid: "#000",
+                            borderRadius: 3,
+                        },
+                        Select: {
+                            optionSelectedBg: "var(--divider-color)",
+                            colorPrimaryHover: "var(--divider-color)",
+                            colorPrimary: "var(--text-secondary)",
+                            controlOutline: "var(--divider-color)",
+                            colorBorder: "var(--divider-color)",
+                        },
+                        Button: {
+                            colorLink: "var(--text-base)",
+                            colorLinkHover: "var(--primary)",
+                            defaultHoverColor: "var(--primary)",
+                        }
+                    }
+                }}
+            >
+                <Rnd
+                    resizeHandleClasses={{
+                        right: "hover-right",
+                        left: "hover-left",
+                        top: "hover-top",
+                        bottom: "hover-bottom",
+                        bottomRight: "hover-angle-bottom-right",
+                        bottomLeft: "hover-angle-bottom-left",
+                        topRight: "hover-angle-top-right",
+                        topLeft: "hover-angle-top-left",
+                    }}
+                    cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
+                    bounds={valueRnd.width === W ? undefined : "window"}
+                    minWidth={position.width}
+                    minHeight={heightForbidden}
+                    allowAnyClick={true}
+                    enableResizing={count > 0 ? true : false}
+                    position={{ x: valueRnd.x, y: valueRnd.y }}
+                    size={{ width: valueRnd.width, height: valueRnd.height }}
+                    onDragStop={(e, d) => {
+                        if (valueRnd.x !== d.x || valueRnd.y !== d.y) {
+                            setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                            if (valueRnd.width === W && valueRnd.height === H) {
+                                setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                store.setFullscreen(true);
                             }
                         }
                     }}
+                    onResize={(e, direction, ref, delta, position) => {
+                        setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                    }}
+                    ref={c => {
+                        if (c) {
+                            setRefRnd(c);
+                            c.resizableElement.current.hidden = false;
+                        }
+                    }}
                 >
-                    <Rnd
-                        resizeHandleClasses={{
-                            right: "hover-right",
-                            left: "hover-left",
-                            top: "hover-top",
-                            bottom: "hover-bottom",
-                            bottomRight: "hover-angle-bottom-right",
-                            bottomLeft: "hover-angle-bottom-left",
-                            topRight: "hover-angle-top-right",
-                            topLeft: "hover-angle-top-left",
-                        }}
-                        cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
-                        bounds={valueRnd.width === W ? undefined : "window"}
-                        minWidth={position.width}
-                        minHeight={position.height}
-                        allowAnyClick={true}
-                        enableResizing={count > 0 ? true : false}
-                        position={{ x: valueRnd.x, y: valueRnd.y }}
-                        size={{ width: valueRnd.width, height: valueRnd.height }}
-                        onDragStop={(e, d) => {
-                            setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
-                            if (valueRnd.width === W && valueRnd.height === H) {
-                                setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                store.setFullscreen(true);
-                            }
-                        }}
-                        onResize={(e, direction, ref, delta, position) => {
-                            setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
-                        }}
-                        ref={c => {
-                            if (c) {
-                                setRefRnd(c);
-                                c.resizableElement.current.hidden = false;
-                            }
-                        }}
-                    >
-                        <div ref={ref} className="popup-position" >
-                            <div className="title">
-                                <div className="title-name"
-                                    onClick={(e) => {
-                                        if (count > 0 && e.detail === 2) {
-                                            setTimeout(() => {
-                                                if (valueRnd.width > position.width || valueRnd.height > position.height) {
-                                                    setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                                    store.setFullscreen(false)
-                                                } else {
-                                                    setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                                    store.setFullscreen(true)
-                                                }
-                                            }, 200)
-                                        }
-                                    }}
-                                >
-                                    <span className="object-select">Объектов: {count}</span>
-                                    {count > 0 && (
-                                        <span
-                                            title={currentLayer}
-                                            className="layer-name">
-                                            {currentLayer}
-                                        </span>
-                                    )}
-                                </div>
-                                {count > 0 && (<span
-                                    title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
-                                    className="icon-symbol"
-                                    onClick={() => {
-                                        if (valueRnd.width > position.width || valueRnd.height > position.height) {
-                                            setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                            store.setFullscreen(false)
-                                        } else {
-                                            setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                            store.setFullscreen(true)
-                                        }
-                                        if (valueRnd.width < W && valueRnd.width > position.width || valueRnd.height < H && valueRnd.height > position.height) {
-                                            setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                            store.setFullscreen(true)
-                                        }
-                                    }} >
-                                    {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
-                                </span>)}
-                                <span
-                                    title={gettext("Close")}
-                                    className="icon-symbol"
-                                    onClick={() => {
-                                        visible({ hidden: true, overlay: undefined, key: "popup" })
-                                        refRnd.resizableElement.current.hidden = true;
-                                        topic.publish("feature.unhighlight");
-                                    }} >
-                                    <CloseIcon />
-                                </span>
-                            </div>
-                            {count > 0 && store.selected !== null && (
-                                <>
-                                    <div className="select-feature" >
-                                        <Select
-                                            labelInValue
-                                            placement="topLeft"
-                                            optionFilterProp="children"
-                                            filterOption={filterOption}
-                                            filterSort={(optionA, optionB) =>
-                                                (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                    <div ref={ref} className="popup-position" >
+                        <div className="title">
+                            <div className="title-name"
+                                onClick={(e) => {
+                                    if (count > 0 && e.detail === 2) {
+                                        setTimeout(() => {
+                                            if (valueRnd.width > position.width || valueRnd.height > heightForbidden) {
+                                                setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                                store.setFullscreen(false)
+                                            } else {
+                                                setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                store.setFullscreen(true)
                                             }
-                                            showSearch
-                                            size="small"
-                                            value={store.selected}
-                                            style={{ width: operations ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
-                                            onChange={onChange}
-                                            options={store.data}
-                                            optionRender={(option) => (
-                                                <div className="label-select">
-                                                    <Tooltip title={option.data.label}>
-                                                        <div className="label-feature">
-                                                            {option.data.label}
-                                                        </div>
-                                                    </Tooltip>
-                                                    <Tooltip title={option.data.layer_name}>
-                                                        <div className="label-style">
-                                                            {option.data.layer_name}
-                                                        </div>
-                                                    </Tooltip>
-                                                </div>
-                                            )}
-                                        />
-                                        {operations}
-                                    </div>
-
-                                    <div className="content">
-                                        <ContentComponent store={store} attribute={store.attribute} position={valueRnd} />
-                                    </div>
-
-                                </>
-                            )}
-                            <div className="footer-popup">
-                                <CoordinateComponent display={display} link={store.contextUrl} count={count} op="popup" />
+                                        }, 200)
+                                    } else {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                            >
+                                <span className="object-select">Объектов: {count}</span>
+                                {count > 0 && (
+                                    <span
+                                        title={currentLayer}
+                                        className="layer-name">
+                                        {currentLayer}
+                                    </span>
+                                )}
                             </div>
+                            {count > 0 && (<span
+                                title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
+                                className="icon-symbol"
+                                onClick={() => {
+                                    if (valueRnd.width > position.width || valueRnd.height > heightForbidden) {
+                                        setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                        store.setFullscreen(false)
+                                    } else {
+                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                        store.setFullscreen(true)
+                                    }
+                                    if (valueRnd.width < W && valueRnd.width > position.width || valueRnd.height < H && valueRnd.height > heightForbidden) {
+                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                        store.setFullscreen(true)
+                                    }
+                                }} >
+                                {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
+                            </span>)}
+                            <span
+                                title={gettext("Close")}
+                                className="icon-symbol"
+                                onClick={() => {
+                                    visible({ hidden: true, overlay: undefined, key: "popup" })
+                                    refRnd.resizableElement.current.hidden = true;
+                                    topic.publish("feature.unhighlight");
+                                }} >
+                                <CloseIcon />
+                            </span>
                         </div>
-                    </Rnd >
-                </ConfigProvider>,
+                        {count > 0 && store.selected !== null && (
+                            <>
+                                <div className="select-feature" >
+                                    <Select
+                                        labelInValue
+                                        placement="topLeft"
+                                        optionFilterProp="children"
+                                        filterOption={filterOption}
+                                        filterSort={(optionA, optionB) =>
+                                            (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                                        }
+                                        showSearch
+                                        size="small"
+                                        value={store.selected}
+                                        style={{ width: operations ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
+                                        onChange={onChange}
+                                        options={store.data}
+                                        optionRender={(option) => (
+                                            <div className="label-select">
+                                                <Tooltip title={option.data.label}>
+                                                    <div className="label-feature">
+                                                        {option.data.label}
+                                                    </div>
+                                                </Tooltip>
+                                                <Tooltip title={option.data.layer_name}>
+                                                    <div className="label-style">
+                                                        {option.data.layer_name}
+                                                    </div>
+                                                </Tooltip>
+                                            </div>
+                                        )}
+                                    />
+                                    {operations}
+                                </div>
+
+                                <div className="content">
+                                    <ContentComponent store={store} attribute={store.attribute} position={valueRnd} />
+                                </div>
+
+                            </>
+                        )}
+                        {count > 0 && selectedItem.value.includes("Forbidden") && (
+                            <div className="error-component">
+                                {gettext("Insufficient permissions")}
+                            </div>
+                        )}
+                        <div className="footer-popup">
+                            <CoordinateComponent display={display} link={store.contextUrl} count={count} op="popup" />
+                        </div>
+                    </div>
+                </Rnd >
+            </ConfigProvider>,
             document.body
         )
     )

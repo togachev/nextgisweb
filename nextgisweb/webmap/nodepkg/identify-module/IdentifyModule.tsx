@@ -241,20 +241,14 @@ export class IdentifyModule extends Component {
                     json: this.paramsSelected,
                 })
                 .then(item => {
-                    let res;
-                    if (item.data.error === "Forbidden" || item.data.error === "Not implemented") {
-                        res = { data: [], featureCount: 0 };
-                    } else {
-                        res = { data: [item.data], featureCount: 1 };
-                    }
-                    return res;
+                    return { data: [item.data], featureCount: 1 };
                 });
             count = response.featureCount;
         } else {
             count = 0;
             response = { data: [], featureCount: 0 }
         }
-
+        
         const offset = op === "context" ? 0 : settings.offset_point;
         const position = positionContext(event, offset, op, count, settings, p);
 
