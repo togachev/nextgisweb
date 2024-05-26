@@ -1,10 +1,12 @@
-.descItemMap{
+.descItemMap {
     width: 100%;
     padding: 0;
+
     span {
         display: block;
         overflow-wrap: break-word;
     }
+
     a {
         color: #106a90;
     }
@@ -13,7 +15,7 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        
+
         .img-item {
             width: 50%;
         }
@@ -26,5 +28,24 @@
         margin-inline-start: 5px;
         margin-inline-end: 5px;
         margin: 5px;
+    }
+
+    figure {
+        margin: 5px;
+    }
+
+    table,
+    tbody,
+    tr,
+    td {
+        border: 0.005em solid var(--divider-color);
+        border-collapse: collapse;
+        text-align: center;
+
+        tr,
+        td {
+            border-spacing: 0;
+            padding: 0 5px 0 5px;
+        }
     }
 }

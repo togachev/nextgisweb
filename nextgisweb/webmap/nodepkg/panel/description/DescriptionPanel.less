@@ -16,15 +16,17 @@
     .imgDesc {
         height: auto;
     }
+
     .img-style {
         width: 100%;
         display: flex;
         justify-content: center;
-        
+
         .img-item {
             width: 50%;
         }
     }
+
     .image {
         display: block;
         margin-block-start: 0em;
@@ -75,6 +77,25 @@
                 display: flex;
                 align-items: center;
             }
+        }
+    }
+
+    figure {
+        margin: 5px;
+    }
+
+    table,
+    tbody,
+    tr,
+    td {
+        border: 0.005em solid var(--divider-color);
+        border-collapse: collapse;
+        text-align: center;
+
+        tr,
+        td {
+            border-spacing: 0;
+            padding: 0 5px 0 5px;
         }
     }
 }
