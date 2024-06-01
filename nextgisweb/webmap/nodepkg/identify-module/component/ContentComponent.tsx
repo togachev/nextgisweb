@@ -29,19 +29,14 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
     const RenderValue = (value) => {
         for (const k in value) {
             const val = value[k];
-            if (val !== null) {
-                if (urlRegex.test(val)) {
-                    return (<Link title={val} className="value-link" ellipsis={true} href={val} target="_blank">{val}</Link>)
-                } else if (emailRegex.test(val)) {
-                    return (<div title={val} className="value-email" onClick={() => {
-                        copyValue(val, gettext("Email address copied"));
-                    }} >{val}</div>)
-                } else {
-                    return (<div className="value text-ellipsis">{val}</div>)
-                }
-            }
-            if (val === null) {
-                return (<>{gettext("N/A")}</>)
+            if (urlRegex.test(val)) {
+                return (<Link title={val} className="value-link" ellipsis={true} href={val} target="_blank">{val}</Link>)
+            } else if (emailRegex.test(val)) {
+                return (<div title={val} className="value-email" onClick={() => {
+                    copyValue(val, gettext("Email address copied"));
+                }} >{val}</div>)
+            } else {
+                return (<div className="value text-ellipsis">{val}</div>)
             }
         }
     };
@@ -58,12 +53,13 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
                     {attribute && Object.keys(attribute).length > 0 ?
                         (<>
                             {Object.keys(attribute).map((key) => {
-                                return (
-                                    <div key={key} className="item-fields">
-                                        <div className="label">{key}</div>
-                                        <RenderValue value={attribute[key]} />
-                                    </div>
-                                )
+                                if (attribute[key])
+                                    return (
+                                        <div key={key} className="item-fields">
+                                            <div className="label">{key}</div>
+                                            <RenderValue value={attribute[key]} />
+                                        </div>
+                                    )
                             })}
                         </>) :
                         (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)

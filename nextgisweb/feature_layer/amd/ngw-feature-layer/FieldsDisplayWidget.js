@@ -130,7 +130,9 @@ define([
                     );
                 }
 
-                if (val !== null) {
+                if (val) {
+                    // убираем пустые значения
+                    // if (val !== null) {
                     if (this.urlRegex.test(val)) {
                         const match = val.match(this.urlRegex);
                         const urlSimiliar = match[1];
@@ -167,14 +169,16 @@ define([
                             val
                         );
                     }
-                } else {
-                    put(
-                        tbody,
-                        "tr th.display_name $ < td.value span.null $",
-                        fieldmap[k].display_name,
-                        i18n.gettext("N/A")
-                    );
                 }
+                // убираем полностью поля с "N/A"
+                // else {
+                //     put(
+                //         tbody,
+                //         "tr th.display_name $ < td.value span.null $",
+                //         fieldmap[k].display_name,
+                //         i18n.gettext("N/A")
+                //     );
+                // }
             }
         },
     });
