@@ -1,11 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { Form } from "@nextgisweb/gui/antd";
 
 import { FormItem } from "./FormItem";
 import type { FieldsFormProps, FormProps } from "./type";
 
-export function FieldsForm({
+export function FieldsForm<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    P extends Record<string, any> = Record<string, any>,
+>({
     form,
     fields = [],
     children,
@@ -13,7 +16,7 @@ export function FieldsForm({
     whenReady,
     initialValues,
     ...formProps
-}: FieldsFormProps) {
+}: FieldsFormProps<P>) {
     const localForm = Form.useForm(form)[0];
     const readyRef = useRef(whenReady);
 
@@ -35,7 +38,7 @@ export function FieldsForm({
             }
         }
         if (onChange) {
-            onChange({ isValid, value });
+            onChange({ isValid, value: value as P });
         }
     };
 
@@ -49,7 +52,12 @@ export function FieldsForm({
         ...(onChange && { onFieldsChange }),
     };
 
-    const includedFormItems = fields.filter((f) => f.included ?? true);
+    const formItems = useMemo(() => {
+        const includedFormItems = fields.filter((f) => f.included ?? true);
+        return includedFormItems.map((f) => {
+            return <FormItem key={f.name} {...f} />;
+        });
+    }, [fields]);
 
     return (
         <Form
@@ -58,9 +66,7 @@ export function FieldsForm({
             {...modifiedFormProps}
             className="fields-form"
         >
-            {includedFormItems.map((f) => (
-                <FormItem key={f.name} {...f} />
-            ))}
+            {formItems}
             {children}
         </Form>
     );

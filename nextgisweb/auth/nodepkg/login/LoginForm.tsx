@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
-import { Alert, Button, Form } from "@nextgisweb/gui/antd";
+import { Alert, Button, Form, Input } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
@@ -28,17 +28,16 @@ export const LoginForm = observer((props: LoginFormProps) => {
     const queryParams = new URLSearchParams(location.search);
     const nextQueryParam = queryParams.get("next");
 
-    const fields = useMemo<FormField[]>(
+    const fields = useMemo<FormField<keyof Credentials>[]>(
         () => [
             {
                 name: "login",
-                placeholder: gettext("Login"),
+                formItem: <Input placeholder={gettext("Login")} />,
                 required: true,
             },
             {
                 name: "password",
-                placeholder: gettext("Password"),
-                widget: "password",
+                formItem: <Input.Password placeholder={gettext("Password")} />,
                 required: true,
             },
         ],
@@ -71,7 +70,7 @@ export const LoginForm = observer((props: LoginFormProps) => {
         }
     };
 
-    useKeydownListener("enter", () => login());
+    useKeydownListener("enter", login);
 
     const oauthUrl =
         routeURL("auth.oauth") +

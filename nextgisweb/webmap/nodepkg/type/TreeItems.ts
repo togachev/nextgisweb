@@ -13,6 +13,7 @@ export interface RootItem extends BaseItem {
 export interface GroupItem extends BaseItem {
     type: "group";
     expanded: boolean;
+    exclusive: boolean;
     children: TreeItem[];
 }
 
@@ -20,7 +21,7 @@ interface Icon {
     format: string;
     data: string;
 }
-interface SymbolInfo {
+export interface SymbolInfo {
     index: number;
     render: boolean;
     display_name: string;

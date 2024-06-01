@@ -1,6 +1,14 @@
 Changes
 =======
 
+4.8.0
+-----
+
+- Per-webmap measurement SRS configuration.
+- Exclusive layers groups on webmaps.
+- Extent information in PostGIS layer diagnostics.
+
+
 4.7.0
 -----
 

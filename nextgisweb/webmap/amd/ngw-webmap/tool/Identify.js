@@ -347,15 +347,12 @@ define([
                     );
 
                     const display = widget.tool.display;
-
-                    Object.values(display._itemConfigById).forEach((config) => {
-                        if (
-                            config.layerId !== lid ||
-                            config.styleId !== sid ||
-                            !widget._isEditEnabled(display, config)
-                        ) {
-                            return;
-                        }
+                    const configs = Object.values(display._itemConfigById);
+                    configs.some((c) => {
+                        const editEnabled =
+                            c.layerId === lid &&
+                            widget._isEditEnabled(display, c);
+                        if (!editEnabled) return false;
 
                         widget.editButton = new Button({
                             innerHTML: `<div title="${gettext("Edit")}">` + icon.html({ glyph: "edit_note" }) + `</div>`,
@@ -369,6 +366,8 @@ define([
                                 }),
                         }).placeAt(widget.extController, "last");
                         domClass.add(widget.editButton.domNode, "no-label");
+
+                        return true;
                     });
 
                     widget.resize();

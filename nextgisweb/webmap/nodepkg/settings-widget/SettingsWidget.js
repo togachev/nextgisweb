@@ -1,6 +1,10 @@
 import { observer } from "mobx-react-lite";
+import { useCallback, useEffect, useState } from "react";
 
 import { Checkbox, Select } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
+import { route } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
 
@@ -8,14 +12,109 @@ import "./SettingsWidget.less";
 
 const { Option } = Select;
 
+const activeOptions = [
+    {
+        value: "layers", label: gettext("Layers")
+    },
+    {
+        value: "search", label: gettext("Search")
+    },
+    {
+        value: "custom-layer", label: gettext("CustomLayer")
+    },
+    {
+        value: "print", label: gettext("Print map")
+    },
+    {
+        value: "bookmark", label: gettext("Bookmarks")
+    },
+    {
+        value: "info", label: gettext("Description")
+    },
+    {
+        value: "diagram", label: gettext("Diagram")
+    },
+    {
+        value: "share", label: gettext("Share")
+    },
+    {
+        value: "annotation", label: gettext("Annotations")
+    }
+];
+
 const disabledStyle = {
     color: "rgba(0, 0, 0, 0.25)",
     cursor: "not-allowed",
 };
 
+const srsListToOptions = (srsList) => {
+    return srsList.map((srs) => {
+        return {
+            label: srs.display_name,
+            value: srs.id,
+        };
+    });
+};
+
+const SrsSelect = ({ srsId, onChange }) => {
+    const [srsOptions, setSrsOptions] = useState([]);
+    const [status, setStatus] = useState("init");
+    const { makeSignal } = useAbortController();
+
+    const loadSrs = useCallback(async () => {
+        try {
+            const signal = makeSignal();
+            const srsInfo = await route("spatial_ref_sys.collection").get({
+                signal,
+            });
+            setSrsOptions(srsListToOptions(srsInfo));
+        } catch (err) {
+            errorModal(err);
+        } finally {
+            setStatus("loaded");
+        }
+    }, [makeSignal]);
+
+    const onChangeSelect = useCallback(
+        (value) => {
+            if (onChange) {
+                onChange(value);
+            }
+        },
+        [onChange]
+    );
+
+    useEffect(() => {
+        loadSrs();
+    }, []);
+
+    const disabled = status !== "loaded";
+    return (
+        <Select
+            disabled={disabled}
+            options={srsOptions}
+            value={srsId}
+            onChange={(v) => onChangeSelect(v)}
+            placeholder={gettext("Default")}
+            allowClear={true}
+            style={{ maxWidth: "15em" }}
+        ></Select>
+    );
+};
+
 export const SettingsWidget = observer(({ store }) => {
     return (
         <div className="ngw-webmap-settings-widget">
+            <label>{gettext("Active panel")}</label>
+            <Select
+                style={{ maxWidth: "15em" }}
+                value={store.active_panel || ""}
+                onChange={(value) => {
+                    store.update({ active_panel: value });
+                }}
+                options={activeOptions}
+            />
+
             <Checkbox
                 disabled={!editing}
                 checked={store.editable}
@@ -51,6 +150,16 @@ export const SettingsWidget = observer(({ store }) => {
                 <Option value="yes">{gettext("Yes")}</Option>
                 <Option value="messages">{gettext("With messages")}</Option>
             </Select>
+
+
+
+            <label>{gettext("Measurement SRS")}</label>
+            <SrsSelect
+                srsId={store.measureSrs}
+                onChange={(v) => {
+                    store.update({ measureSrs: v });
+                }}
+            />
 
             <label>{gettext("Legend")}</label>
             <Select

@@ -102,24 +102,6 @@ def resource_breadcrumb(obj, request):
             parent=obj.parent,
         )
 
-class SessionResources:
-    prop_session_resource = dict()
-    def __init__(self, params_session):
-        self.params_session = params_session
-
-    def set_prop_session(self):
-        self.prop_session_resource.update(self.params_session)
-
-    def get_prop_session(self):
-        return self.prop_session_resource
-
-def update_sid(request):
-    if "ngw_sid" in request.cookies:
-        ngw_sid=request.cookies["ngw_sid"]
-        session_params = dict(ngw_sid=ngw_sid)
-        c = SessionResources(session_params)
-        c.set_prop_session()
-
 @viewargs(renderer="nextgisweb:pyramid/template/psection.mako")
 def show(request):
     request.resource_permission(PERM_READ)

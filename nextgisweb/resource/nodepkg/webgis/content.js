@@ -21,8 +21,7 @@ const { Text, Link } = Typography;
 const MapTile = (props) => {
     const { id, display_name, preview_fileobj_id } = props.item;
     const preview = routeURL('resource.preview', id)
-
-    const urlWebmap = routeURL('webmap.display', id) + '?panel=layers'
+    const urlWebmap = routeURL('webmap.display', id)
 
     return (
         <Card
@@ -71,29 +70,32 @@ const MapTile = (props) => {
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
-        const resourceUrl = routeURL("resource.show", {
-            id: resource.id,
-        });
+        const resourceUrl = routeURL('webmap.display', resource.id)
 
         return {
-            value: `${resource.display_name}`,
             key: `${resource.id}`,
-            url: resourceUrl + '/display?panel=layers',
-            target: '_self',
             label: (
                 <div
                     className="item"
                     style={{
                         display: "inline-flex",
                         alignItems: "center",
+                        width: '100%'
                     }}
                 >
-                    <svg className="icon">
-                        <use xlinkHref={`#icon-rescls-${resource.cls}`} />
-                    </svg>
-                    <span className="title" title={resource.display_name}>
-                        {resource.display_name}
-                    </span>
+                    <a
+                        style={{ float: 'right', width: '100%' }}
+                        href={resourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg className="icon">
+                            <use xlinkHref={`#icon-rescls-${resource.cls}`} />
+                        </svg>
+                        <span className="title" title={resource.display_name}>
+                            {resource.display_name}
+                        </span>
+                    </a>
                 </div>
             ),
         };
@@ -105,7 +107,7 @@ export const Content = ({ onChanges, ...rest }) => {
     const [listMaps, setListMaps] = useState([]); // список карт
     const [groupMaps, setGroupMaps] = useState([]); // группы карт
     const [itemsMaps, setItemsMaps] = useState([]); // вывод карт при выборе конкретной группы
-    
+
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");

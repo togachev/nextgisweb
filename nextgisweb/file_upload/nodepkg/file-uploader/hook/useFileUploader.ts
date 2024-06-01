@@ -1,5 +1,5 @@
 import type { UploadFile } from "antd/lib/upload/interface";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
@@ -16,26 +16,27 @@ import { fileUploader } from "../util/fileUploader";
 
 const msgProgress = gettext("{} uploaded...");
 
-export function useFileUploader({
+export function useFileUploader<M extends boolean = false>({
     accept,
     fileMeta: initMeta,
-    multiple = false,
+    multiple = false as M,
     onChange,
     inputProps = {},
     setFileMeta: setInitMeta,
     showUploadList = false,
     openFileDialogOnClick = true,
     showProgressInDocTitle = false,
-}: UseFileUploaderProps) {
+}: UseFileUploaderProps<M>) {
     const { makeSignal, abort } = useAbortController();
 
-    const [docTitle] = useState(document.title);
+    const docTitle = useRef(document.title);
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+    const [progress, setProgress] = useState<string>();
     const [progressText, setProgressText] = useState<string | null>(null);
     const [uploading, setUploading] = useState<boolean>(false);
-    const [meta, setMeta] = useState<UploaderMeta | undefined>(initMeta);
+    const [meta, setMeta] = useState<UploaderMeta<M> | undefined>(initMeta);
 
     useEffect(() => {
         if (setInitMeta) {
@@ -44,23 +45,26 @@ export function useFileUploader({
         if (onChange) {
             onChange(meta);
         }
-    }, [meta]);
+    }, [meta, onChange, setInitMeta]);
+
+    useEffect(() => {
+        setProgressText(progress ? msgProgress.replace("{}", progress) : null);
+        if (showProgressInDocTitle && progress !== undefined) {
+            document.title = progress + " | " + docTitle.current;
+        } else if (document.title !== docTitle.current) {
+            document.title = docTitle.current;
+        }
+    }, [progress, showProgressInDocTitle]);
 
     useEffect(() => {
         setMeta(initMeta);
     }, [initMeta]);
 
-    const onProgress = useCallback(
-        (evt: Progress) => {
-            if (evt.type === "progress") {
-                setProgressText(msgProgress.replace("{}", evt.percent));
-                if (showProgressInDocTitle) {
-                    document.title = evt.percent + " | " + docTitle;
-                }
-            }
-        },
-        [docTitle, showProgressInDocTitle]
-    );
+    const onProgress = useCallback((evt: Progress) => {
+        if (evt.type === "progress") {
+            setProgress(evt.percent);
+        }
+    }, []);
 
     const fileUploaderWrapper = useCallback(
         (options: FileUploaderOptions) => {
@@ -82,17 +86,17 @@ export function useFileUploader({
                     f._file = files[i];
                 });
                 if (multiple) {
-                    setMeta(uploadedFiles.filter(Boolean));
+                    setMeta(uploadedFiles.filter(Boolean) as UploaderMeta<M>);
                 } else {
                     const uploadedFile = uploadedFiles && uploadedFiles[0];
                     if (uploadedFile) {
-                        setMeta(uploadedFile);
+                        setMeta(uploadedFile as UploaderMeta<M>);
                     }
                 }
             } catch (er) {
                 console.log(er);
             } finally {
-                setProgressText(null);
+                setProgress(undefined);
                 setUploading(false);
             }
         },

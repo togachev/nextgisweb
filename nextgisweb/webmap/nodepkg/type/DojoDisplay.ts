@@ -75,12 +75,18 @@ export interface DojoDisplayIdentify {
 
 export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
 
+export type WebmapAdapter = any;
+
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
     identify: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;
+    prepareItem: (item: WebmapItem) => WebmapItem;
+    _installPlugins: (plugins: Record<string, WebmapPlugin>) => void;
+    _onNewStoreItem: (item: WebmapItem | any) => void;
+    _mapAddLayer: (id: number) => void;
 
     itemStore: CustomItemFileWriteStore;
     getItemConfig: () => ItemConfigById;
@@ -93,7 +99,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
 
     mapToolbar: MapToolbar;
     _mapAddControls: (controls: MapControl[]) => void;
-    _plugins: WebmapPlugin[];
+    _plugins: Record<string, WebmapPlugin>;
 
     leftTopControlPane: HTMLDivElement;
     leftBottomControlPane: HTMLDivElement;
@@ -108,6 +114,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
 
     _itemConfigById: string[];
     getVisibleItems: () => Promise<any>;
+    _adapters: Record<string, WebmapAdapter>;
 }
 
 export interface PluginParams {

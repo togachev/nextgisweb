@@ -343,12 +343,19 @@ define([
         startup: function () {
             this.inherited(arguments);
 
-            if (settings.hide_nav_menu && ngwConfig.isGuest) {
-                const navMenu = document.querySelector("#header #menu");
-                navMenu.style.display = "none";
-            }
+            this._hideNavMenuForGuest();
 
             this._startupDeferred.resolve();
+        },
+
+        _hideNavMenuForGuest: function () {
+            if (!settings.hide_nav_menu || !ngwConfig.isGuest) {
+                return;
+            }
+
+            const navMenu = document.querySelector("#header #menu");
+            if (!navMenu) return;
+            navMenu.style.display = "none";
         },
 
         prepareItem: function (item) {
@@ -730,7 +737,7 @@ define([
 
         _getActiveBasemapKey: function () {
             if (!this._baseLayer || !this._baseLayer.name) {
-                return undefined;
+                return "blank";
             }
             return this._baseLayer.name;
         },
@@ -920,7 +927,13 @@ define([
         },
 
         _buildPanelsManager: function () {
-            const activePanelKey = this._urlParams[this.modeURLParam];
+            let activePanelKey;
+            if (this._urlParams[this.modeURLParam] === undefined) {
+                activePanelKey = this.config.active_panel
+            } else if (this._urlParams[this.modeURLParam] !== this.config.active_panel) {
+                activePanelKey = this._urlParams[this.modeURLParam]
+            }
+
             const onChangePanel = (panel) => {
                 if (panel) {
                     URL.setURLParam(this.modeURLParam, panel.name);
@@ -961,6 +974,9 @@ define([
 
         _makePanels: function () {
             const panels = [];
+
+            // const activePanel = this.config.active_panel;
+            // console.log(panels, activePanel);
 
             panels.push({
                 cls: reactPanel(LayersPanelModule.default, {

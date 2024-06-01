@@ -7,7 +7,7 @@ import FolderClosedIcon from "./icons/folder.svg";
 import FolderOpenIcon from "./icons/folder_open.svg";
 
 import type WebmapStore from "../store";
-import type { LayerItem, TreeItem } from "../type/TreeItems";
+import type { TreeItem } from "../type/TreeItems";
 import type { WebmapPlugin } from "../type/WebmapPlugin";
 import type { DojoDisplay } from "../type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
@@ -18,8 +18,12 @@ import { IconItem } from "./IconItem";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
-
-import EditIcon from "@nextgisweb/icon/material/edit/outline";
+import {
+    keyInMutuallyExclusiveGroupDeep,
+    prepareWebMapItems,
+    updateKeysForGroup,
+    updateKeysForMutualExclusivity,
+} from "./util/treeItems";
 
 import "./LayersTree.less";
 
@@ -60,7 +64,7 @@ export const LayersTree = observer(
         const [moreClickId, setMoreClickId] = useState<number>();
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
-        const webmapItems = store.webmapItems as TreeItem[];
+        const webmapItems = store.webmapItems;
 
         const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
             const { key, title } = webMapItem;
@@ -143,9 +147,39 @@ export const LayersTree = observer(
             setAutoExpandParent(false);
         };
 
-        const onCheck: TreeProps["onCheck"] = (val) => {
-            const checkedKeysValue = Array.isArray(val) ? val : val.checked;
-            store.handleCheckChanged(checkedKeysValue.map(Number));
+        const onCheck: TreeProps<TreeWebmapItem>["onCheck"] = (
+            checkedKeysValue,
+            event
+        ) => {
+            const checkedItem = event.node;
+            const checkedKeys = (
+                Array.isArray(checkedKeysValue)
+                    ? checkedKeysValue
+                    : checkedKeysValue.checked
+            ).map(Number);
+
+            const mutuallyExclusiveParents = keyInMutuallyExclusiveGroupDeep(
+                checkedItem.treeItem.key,
+                treeItems.map((t) => t.treeItem)
+            );
+
+            let updatedCheckedKeys = checkedKeys;
+
+            if (mutuallyExclusiveParents) {
+                updatedCheckedKeys = updateKeysForMutualExclusivity(
+                    checkedItem,
+                    mutuallyExclusiveParents,
+                    checkedKeys
+                );
+            } else if (checkedItem.treeItem.type === "group") {
+                updatedCheckedKeys = updateKeysForGroup(
+                    checkedItem,
+                    checkedKeys,
+                    store.checked
+                );
+            }
+
+            store.handleCheckChanged(updatedCheckedKeys);
         };
 
 

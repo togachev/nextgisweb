@@ -5,10 +5,12 @@ import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
 export class SettingStore {
     identity = "webmap";
 
+    active_panel = "layers";
     editable = false;
     annotationEnabled = false;
     annotationDefault = "no";
     legendSymbols = null;
+    measureSrs = null;
 
     dirty = false;
 
@@ -17,10 +19,12 @@ export class SettingStore {
     }
 
     load(value) {
+        this.active_panel = value.active_panel;
         this.editable = value.editable;
         this.annotationEnabled = !!value.annotation_enabled;
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
+        this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
 
         this.dirty = false;
     }
@@ -29,7 +33,9 @@ export class SettingStore {
         if (!this.dirty) return;
         const result = {
             legend_symbols: this.legendSymbols ? this.legendSymbols : null,
+            measure_srs: this.measureSrs ? { id: this.measureSrs } : null,
         };
+        result.active_panel = this.active_panel;
         if (editing) result.editable = this.editable;
         if (annotation) {
             result.annotation_enabled = this.annotationEnabled;

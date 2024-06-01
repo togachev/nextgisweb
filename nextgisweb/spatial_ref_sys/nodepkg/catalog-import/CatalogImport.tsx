@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { Button, Form } from "@nextgisweb/gui/antd";
+import { Button, Form, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
@@ -9,6 +9,7 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { SRSCatalogItem } from "@nextgisweb/spatial-ref-sys/type/api";
 
 interface CatalogImportProps {
     url: string;
@@ -23,21 +24,17 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
         params: { id },
     });
 
-    const fields = useMemo<FormField[]>(
+    const fields = useMemo<FormField<keyof SRSCatalogItem>[]>(
         () => [
             {
                 name: "display_name",
                 label: gettext("Display name"),
-                inputProps: {
-                    readOnly: true,
-                },
+                formItem: <Input readOnly />,
             },
             {
                 name: "wkt",
                 label: gettext("OGC WKT definition"),
-                readOnly: true,
-                widget: "text",
-                rows: 4,
+                formItem: <Input.TextArea readOnly rows={4} />,
                 style: { margin: "0" },
             },
         ],

@@ -209,12 +209,15 @@ def display(obj, request):
 
         elif item.item_type in ("root", "group"):
             expanded = item.group_expanded
+            exclusive = item.group_exclusive
             if expanded:
                 items_states.get("expanded").append(item.id)
             # Recursively run all elements excluding those
             # with no permissions
             data.update(
-                expanded=expanded, children=list(filter(None, map(traverse, item.children)))
+                expanded=expanded,
+                exclusive=exclusive,
+                children=list(filter(None, map(traverse, item.children))),
             )
             # Hide empty groups
             if (item.item_type in "group") and not data["children"]:
@@ -248,6 +251,7 @@ def display(obj, request):
         rootItem=traverse(obj.root_item),
         itemsStates=items_states,
         constraintField=getConstraint(obj.root_item),
+        active_panel=obj.active_panel,
         infomap=dict(
             resource=request.route_url('resource.show', id=0),
             link=request.route_url('resource.show', id=obj.id),
@@ -267,6 +271,7 @@ def display(obj, request):
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
+        measureSrsId=obj.measure_srs_id,
     )
 
     if request.env.webmap.options["annotation"]:

@@ -86,27 +86,18 @@ PC_CONNECT = ConnectionScope.connect
 def calculate_extent(layer, where=None, geomcol=None):
     tab = layer._sa_table(True)
 
-    if not (where is None and geomcol is None) and len(where) > 0:
-        bbox = (
-            sql.select(
-                st_extent(
-                    st_transform(
-                        st_setsrid(cast(st_force2d(geomcol), ga.Geometry), layer.srs_id), 4326
-                    )
-                )
-            )
-            .where(db.and_(True, *where))
-            .label("bbox")
-        )
-    else:
-        geomcol = getattr(tab.columns, layer.column_geom)
-        bbox = st_extent(
-            st_transform(
-                st_setsrid(cast(st_force2d(geomcol), ga.Geometry), layer.geometry_srid), 4326
-            )
-        ).label("bbox")
+    where_geom_exist = not (where is None and geomcol is None) and len(where) > 0
+    geomcol = geomcol if where_geom_exist else getattr(tab.columns, layer.column_geom)
+    extent_func = st_extent(
+        st_transform(st_setsrid(cast(st_force2d(geomcol), ga.Geometry), layer.geometry_srid), 4326)
+    )
 
-    sq = select(bbox).alias("t")
+    if where_geom_exist:
+        bbox = sql.select(extent_func).where(db.and_(True, *where)).label("bbox")
+    else:
+        bbox = extent_func.label("bbox")
+
+    sq = select(bbox).subquery()
 
     fields = (
         st_xmax(sq.c.bbox),
@@ -728,13 +719,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append(db.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects:
-            reproject = (
-                self._intersects.srid is not None
-                and self._intersects.srid != self.layer.geometry_srid
-            )
-            int_srs = (
-                SRS.filter_by(id=self._intersects.srid).one() if reproject else self.layer.srs
-            )
+            int_srid = self._intersects.srid
+            if int_srid is None:
+                int_srid = self.layer.srs_id
+
+            reproject = int_srid != self.layer.geometry_srid
+            int_srs = SRS.filter_by(id=int_srid).one() if reproject else self.layer.srs
 
             int_geom = func.st_geomfromtext(self._intersects.wkt)
             if int_srs.is_geographic:

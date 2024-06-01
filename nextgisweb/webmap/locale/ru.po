@@ -6,52 +6,43 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:852 amd/ngw-webmap/Display.js:877
+#: amd/ngw-webmap/Display.js:853
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:853 amd/ngw-webmap/Display.js:878
+#: amd/ngw-webmap/Display.js:854
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:970 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:946 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:981
+#: amd/ngw-webmap/Display.js:957
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:996 nodepkg/panel/custom-layer/CustomLayer.tsx:20
-msgid "CustomLayer"
-msgstr "Пользовательские слои"
-
-#: amd/ngw-webmap/Display.js:1006
+#: amd/ngw-webmap/Display.js:968
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:1020
+#: amd/ngw-webmap/Display.js:982
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1042 amd/ngw-webmap/plugin/LayerInfo.js:29
-#: nodepkg/panel/description/DescriptionPanel.js:8
+#: amd/ngw-webmap/Display.js:1000 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1064
-msgid "Diagram"
-msgstr ""
-
-#: amd/ngw-webmap/Display.js:1084
+#: amd/ngw-webmap/Display.js:1019
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1136
+#: amd/ngw-webmap/Display.js:1071
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:1181
+#: amd/ngw-webmap/Display.js:1116
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -84,31 +75,32 @@ msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:7
-#: nodepkg/settings-widget/SettingsWidget.js:55
-#: nodepkg/settings/SettingsForm.js:295
+#: nodepkg/settings-widget/SettingsWidget.js:124
+#: nodepkg/settings/SettingsForm.js:277
 msgid "Legend"
 msgstr "Легенда"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:9
-#: nodepkg/settings-widget/SettingsWidget.js:61
+#: nodepkg/settings-widget/SettingsWidget.js:68
+#: nodepkg/settings-widget/SettingsWidget.js:130
 #: nodepkg/settings/select-options.js:92
 msgid "Default"
 msgstr "По умолчанию"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:10
-#: nodepkg/settings-widget/SettingsWidget.js:65
+#: nodepkg/settings-widget/SettingsWidget.js:134
 #: nodepkg/settings/select-options.js:93
 msgid "Expand"
 msgstr "Развернуть"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:11
-#: nodepkg/settings-widget/SettingsWidget.js:66
+#: nodepkg/settings-widget/SettingsWidget.js:135
 #: nodepkg/settings/select-options.js:94
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:12
-#: nodepkg/settings-widget/SettingsWidget.js:67
+#: nodepkg/settings-widget/SettingsWidget.js:136
 #: nodepkg/settings/select-options.js:95
 msgid "Disable"
 msgstr "Отключить"
@@ -170,14 +162,14 @@ msgid "Bookmark resource"
 msgstr "Ресурс закладок"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:12
-msgid "Web map will start at this extent"
-msgstr "Веб-карта будет открываться с этим охватом"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:12
 #: nodepkg/map-controls/map-controls.ts:107
 #: nodepkg/map-controls/map-controls.ts:110
 msgid "Initial extent"
 msgstr "Начальный охват"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:12
+msgid "Web map will start at this extent"
+msgstr "Веб-карта будет открываться с этим охватом"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:14
 #: amd/ngw-webmap/template/ExtentWidget.hbs:41
@@ -231,7 +223,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
 #: amd/ngw-webmap/template/ItemWidget.hbs:128
-#: nodepkg/clone-webmap/CloneWebmap.tsx:74
+#: nodepkg/clone-webmap/CloneWebmap.tsx:75
 msgid "Display name"
 msgstr "Наименование"
 
@@ -267,7 +259,11 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:309
+#: amd/ngw-webmap/template/ItemWidget.hbs:136
+msgid "Exclusive"
+msgstr "Взаимоисключающая"
+
+#: amd/ngw-webmap/tool/Identify.js:277
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -291,7 +287,7 @@ msgstr "Измерение расстояния"
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:224
+#: amd/ngw-webmap/tool/Measure.js:235
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -411,45 +407,37 @@ msgstr "Не сохранять"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:28 model.py:47 view.py:382 view.py:419
+#: model.py:29 model.py:48 view.py:323 view.py:350
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:30
+#: model.py:31
 msgctxt "permission"
 msgid "Display"
 msgstr "Открытие"
 
-#: model.py:31
+#: model.py:32
 msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: model.py:32
+#: model.py:33
 msgctxt "permission"
 msgid "Draw annotations"
 msgstr "Рисование аннотаций"
 
-#: model.py:33
+#: model.py:34
 msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:397
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:338
 msgid "Clone"
 msgstr "Клонировать"
 
 #: nodepkg/clone-webmap/CloneWebmap.tsx:61
 msgid "Resource group"
 msgstr "Группа ресурсов"
-
-#: nodepkg/feature-link/FeatureLink.tsx:26
-msgid "Object reference copied"
-msgstr "Ссылка на объект скопирована"
-
-#: nodepkg/feature-link/FeatureLink.tsx:55
-msgid "Object link"
-msgstr "Ссылка на объект"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:62
 msgid "Radius:"
@@ -510,18 +498,6 @@ msgstr "Остановить рисование"
 #: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
 msgid "Opacity"
 msgstr "Непрозрачность"
-
-#: nodepkg/layers-tree/DropdownActions.tsx:11
-msgid "Additional tools"
-msgstr "Дополнительные инструменты"
-
-#: nodepkg/layers-tree/DropdownFile.js:8
-msgid "Download attached files"
-msgstr "Скачать прикрепленные файлы"
-
-#: nodepkg/layers-tree/IconItem.js:25
-msgid "Zoom to feature layer"
-msgstr ""
 
 #: nodepkg/layers-tree/LegendAction.tsx:10
 msgid "Show legend"
@@ -586,22 +562,22 @@ msgid "Annotations layer"
 msgstr "Слой аннотаций"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:138
-#: nodepkg/settings-widget/SettingsWidget.js:40
+#: nodepkg/settings-widget/SettingsWidget.js:99
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:144
-#: nodepkg/settings-widget/SettingsWidget.js:50
+#: nodepkg/settings-widget/SettingsWidget.js:109
 msgid "No"
 msgstr "Нет"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:145
-#: nodepkg/settings-widget/SettingsWidget.js:51
+#: nodepkg/settings-widget/SettingsWidget.js:110
 msgid "Yes"
 msgstr "Да"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:148
-#: nodepkg/settings-widget/SettingsWidget.js:52
+#: nodepkg/settings-widget/SettingsWidget.js:111
 msgid "With messages"
 msgstr "С сообщениями"
 
@@ -797,6 +773,10 @@ msgstr "Масштабная линейка"
 msgid "Print"
 msgstr "Печать"
 
+#: nodepkg/panel/print/PrintPanel.tsx:572
+msgid "Save as"
+msgstr "Сохранить как"
+
 #: nodepkg/panel/print/PrintPanel.tsx:584
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
@@ -927,15 +907,20 @@ msgstr "Копировать код"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: nodepkg/settings-widget/SettingsWidget.js:26
+#: nodepkg/settings-widget/SettingsWidget.js:85
 msgid "Enable layers editing"
 msgstr "Разрешить редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.js:36
+#: nodepkg/settings-widget/SettingsWidget.js:95
 msgid "Enable annotations"
 msgstr "Разрешить аннотирование"
 
-#: nodepkg/settings-widget/SettingsWidget.js:73
+#: nodepkg/settings-widget/SettingsWidget.js:116
+#: nodepkg/settings/SettingsForm.js:189
+msgid "Measurement SRS"
+msgstr "Система координат для измерений"
+
+#: nodepkg/settings-widget/SettingsWidget.js:142
 msgid "Settings"
 msgstr "Настройки"
 
@@ -991,11 +976,7 @@ msgstr "Единицы площади"
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: nodepkg/settings/SettingsForm.js:207
-msgid "Measurement SRID"
-msgstr "Система координат для расчётов"
-
-#: nodepkg/settings/SettingsForm.js:217
+#: nodepkg/settings/SettingsForm.js:199
 msgid "Address search"
 msgstr "Адресный поиск"
 
@@ -1187,19 +1168,15 @@ msgstr ""
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:298
+#: view.py:264
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:311
+#: view.py:277
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:333
-msgid "Setting up a web map group"
-msgstr ""
-
-#: view.py:387
+#: view.py:328
 msgid "Display"
 msgstr "Открыть"
 
@@ -1207,3 +1184,34 @@ msgstr "Открыть"
 msgid "Group setting"
 msgstr "Настройка группы"
 
+#: amd/ngw-webmap/Display.js:996 nodepkg/panel/custom-layer/CustomLayer.tsx:20
+msgid "CustomLayer"
+msgstr "Пользовательские слои"
+
+#: amd/ngw-webmap/Display.js:996 nodepkg/panel/custom-layer/CustomLayer.tsx:20
+msgid "CustomLayer"
+msgstr "Пользовательские слои"
+
+#: nodepkg/feature-link/FeatureLink.tsx:26
+msgid "Object reference copied"
+msgstr "Ссылка на объект скопирована"
+
+#: nodepkg/feature-link/FeatureLink.tsx:55
+msgid "Object link"
+msgstr "Ссылка на объект"
+
+#: nodepkg/layers-tree/DropdownActions.tsx:11
+msgid "Additional tools"
+msgstr "Дополнительные инструменты"
+
+#: nodepkg/layers-tree/DropdownFile.js:8
+msgid "Download attached files"
+msgstr "Скачать прикрепленные файлы"
+
+#: nodepkg/layers-tree/IconItem.js:25
+msgid "Zoom to feature layer"
+msgstr ""
+
+#: view.py:333
+msgid "Setting up a web map group"
+msgstr ""

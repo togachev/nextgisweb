@@ -1,7 +1,7 @@
 /** @testentry react */
 import { useState } from "react";
 
-import { Space } from "@nextgisweb/gui/antd";
+import { Checkbox, Space } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
 import { FieldsForm } from "../../fields-form";
@@ -16,21 +16,24 @@ function CodeTest() {
         lang: "json",
         readOnly: true,
     });
-    const propFields: FormField[] = [
+    const propFields: FormField<keyof CodeProps>[] = [
         {
             name: "fold",
             label: "fold",
-            widget: "checkbox",
+            valuePropName: "checked",
+            formItem: <Checkbox />,
         },
         {
             name: "readOnly",
             label: "readOnly",
-            widget: "checkbox",
+            valuePropName: "checked",
+            formItem: <Checkbox />,
         },
         {
             name: "lineNumbers",
             label: "lineNumbers",
-            widget: "checkbox",
+            valuePropName: "checked",
+            formItem: <Checkbox />,
         },
     ];
 
