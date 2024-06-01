@@ -35,7 +35,7 @@ def image_encoder_factory(
             p_kwargs["compress_level"] = 6
         elif compression == COMPRESSION_FAST:
             if has_fpng:
-                p_format = "WEBP"
+                p_format = "fpng"
             else:
                 p_kwargs["compress_level"] = 3
         elif compression == COMPRESSION_BEST:
@@ -63,12 +63,12 @@ def image_encoder_factory(
 
 
 def _has_fpng():
-    # try:
-    #     import pillow_fpng  # noqa: F401
-    # except ModuleNotFoundError:
-    #     return False
-    # else:
-    return True
+    try:
+        import pillow_fpng  # noqa: F401
+    except ModuleNotFoundError:
+        return False
+    else:
+        return True
 
 
 has_fpng = _has_fpng()

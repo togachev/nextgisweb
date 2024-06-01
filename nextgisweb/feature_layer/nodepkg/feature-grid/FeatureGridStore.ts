@@ -5,7 +5,6 @@ import type { SizeType } from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureLayerField } from "../type";
-
 import { KEY_FIELD_ID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type { ActionProps, FeatureGridProps, SetValue } from "./type";

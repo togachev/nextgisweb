@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import {
+    Affix,
     Button,
     Col,
     Form,
@@ -165,6 +166,64 @@ export const SettingsForm = ({
                 </Col>
             </Row>
 
+            <Title level={4}>{gettext("Identify module")}</Title>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item>
+                        <Space direction="horizontal">
+                            <Form.Item
+                                noStyle
+                                name="idetify_module"
+                                valuePropName="checked"
+                            >
+                                <Switch />
+                            </Form.Item>
+                            {gettext("Idetify module")}
+                        </Space>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        name="context_width"
+                        label={gettext("Width context, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        name="context_height"
+                        label={gettext("Height context, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        name="offset_point"
+                        label={gettext("Offset, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="0" max="50" style={INPUT_DEFAULT_WIDTH} />
+                    </Form.Item>
+                </Col>
+            </Row>
+
             <Title level={4}>{gettext("Measurement")}</Title>
 
             <Row gutter={[16, 16]}>
@@ -315,21 +374,23 @@ export const SettingsForm = ({
 
             <Row className="row-submit">
                 <Col>
-                    <Button
-                        htmlType="submit"
-                        type={"primary"}
-                        danger={status === "saved-error"}
-                        icon={
-                            status === "saved-error" ? (
-                                <WarningOutlined />
-                            ) : (
-                                <SaveOutlined />
-                            )
-                        }
-                        loading={status === "saving"}
-                    >
-                        {gettext("Save")}
-                    </Button>
+                    <Affix style={{ position: 'fixed', bottom: "20px", right: "20px", zIndex: 100 }}>
+                        <Button
+                            htmlType="submit"
+                            type={"primary"}
+                            danger={status === "saved-error"}
+                            icon={
+                                status === "saved-error" ? (
+                                    <WarningOutlined />
+                                ) : (
+                                    <SaveOutlined />
+                                )
+                            }
+                            loading={status === "saving"}
+                        >
+                            {gettext("Save")}
+                        </Button>
+                    </Affix>
                 </Col>
             </Row>
         </Form>

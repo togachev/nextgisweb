@@ -43,6 +43,7 @@ export function GeometryInfo({
             fid: featureId,
         },
         options: {
+            cache: true,
             query: {
                 srs: webmapSettings.measurement_srid,
             },

@@ -80,6 +80,7 @@ export type WebmapAdapter = any;
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
     identify: DojoDisplayIdentify;
+    identify_module: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;

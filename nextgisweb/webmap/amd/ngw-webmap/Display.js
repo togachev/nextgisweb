@@ -455,13 +455,23 @@ define([
 
             const controlsReady = MapControls.buildControls(this);
 
-            if (controlsReady.has("id")) {
-                const { control } = controlsReady.get("id");
-                this.identify = control;
-                this.mapStates.addState("identifying", this.identify);
-                this.mapStates.setDefaultState("identifying", true);
-                widget._identifyFeatureByAttrValue();
-                widget._identifyLonLat();
+            if (settings.idetify_module) {
+                if (controlsReady.has("im")) {
+                    const { control } = controlsReady.get("im");
+                    this.identify_module = control;
+                    this.mapStates.addState("identify_module", this.identify_module);
+                    this.mapStates.setDefaultState("identify_module", true);
+                    widget._identifyModuleUrlParams();
+                }
+            } else {
+                if (controlsReady.has("id")) {
+                    const { control } = controlsReady.get("id");
+                    this.identify = control;
+                    this.mapStates.addState("identifying", this.identify);
+                    this.mapStates.setDefaultState("identifying", true);
+                    widget._identifyFeatureByAttrValue();
+                    widget._identifyLonLat();
+                }
             }
 
             topic.publish("/webmap/tools/initialized");
@@ -889,6 +899,39 @@ define([
                 });
         },
 
+        _identifyModuleUrlParams: function () {
+            const urlParams = this._urlParams;
+            if (
+                !(
+                    (
+                        "lon" in urlParams &&
+                        "lat" in urlParams &&
+                        "zoom" in urlParams &&
+                        "attribute" in urlParams
+                    ) ||
+                    (
+                        "lid" in urlParams &&
+                        "fid" in urlParams &&
+                        "sid" in urlParams
+                    )
+                )
+            ) {
+                return;
+            }
+            const { lon, lat, attribute, lid, fid, sid } = urlParams;
+            this.identify_module
+                .identifyModuleUrlParams(lon, lat, attribute, lid, fid, sid)
+                .then((result) => {
+                    if (result) return;
+                    errorModule.errorModal({
+                        title: gettext("Object not found"),
+                        message: gettext(
+                            "Object from URL parameters not found"
+                        ),
+                    });
+                });
+        },
+
         _handleTinyDisplayMode: function () {
             if (!this.isTinyMode()) {
                 return;
@@ -927,11 +970,14 @@ define([
         },
 
         _buildPanelsManager: function () {
+            console.log(this._urlParams[this.modeURLParam]);
             let activePanelKey;
             if (this._urlParams[this.modeURLParam] === undefined) {
                 activePanelKey = this.config.active_panel
             } else if (this._urlParams[this.modeURLParam] !== this.config.active_panel) {
                 activePanelKey = this._urlParams[this.modeURLParam]
+            } else {
+                activePanelKey = this.config.active_panel
             }
 
             const onChangePanel = (panel) => {

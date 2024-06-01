@@ -20,6 +20,8 @@ export async function updateFeaturesValue({
         cache: true,
     });
     const featureLayer = res.feature_layer as FeatureLayer;
+    console.log(featureLayer);
+    
     if (!featureLayer) {
         throw new Error("");
     }
@@ -27,7 +29,7 @@ export async function updateFeaturesValue({
     for (const item of data) {
         const newItem: Item = {};
         for (const [key, value] of Object.entries(item)) {
-            const field = featureLayer.fields.find((f) => f.keyname === key);
+            const field = Object.keys(featureLayer).length > 0 && featureLayer.fields.find((f) => f.keyname === key);
             if (field) {
                 newItem[key] = (await getFeatureFieldValue(value, field, {
                     signal,

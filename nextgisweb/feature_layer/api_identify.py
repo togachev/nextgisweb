@@ -1,8 +1,7 @@
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
-
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceScope
+from nextgisweb.resource import DataStructureScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 from .api import serialize
@@ -21,7 +20,7 @@ def identify(request) -> JSONType:
     for style in style_list:
         layer = style.parent
         layer_id_str = str(layer.id)
-        if not layer.has_permission(DataScope.read, request.user):
+        if not layer.has_permission(DataStructureScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
 
         elif not IFeatureLayer.providedBy(layer):
@@ -70,8 +69,8 @@ def query_feature_intersects(query, geom):
 
 def identify_layer(request) -> JSONType:
     data = request.json_body
-    srs = int(data['srs'])
-    geom = Geometry.from_wkt(data['geom'], srid=srs)
+    srs = int(data["srs"])
+    geom = Geometry.from_wkt(data["geom"], srid=srs)
     styles = map(int, data["styles"])
     result = []
     style_list = DBSession.query(Resource).filter(Resource.id.in_(styles))
@@ -100,6 +99,66 @@ def identify_layer(request) -> JSONType:
 
     return result
 
+def identify_module(request) -> JSONType:
+    data = request.json_body
+    srs = int(data["srs"])
+    geom = Geometry.from_wkt(data["geom"], srid=srs)
+    result = dict()
+    style_list = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in data["styles"]]))
+    feature_count = 0
+    options = []
+    for style in style_list:
+        layer = style.parent
+        if not layer.has_permission(DataStructureScope.read, request.user):
+            options.append(dict(error="Forbidden"))
+        elif not IFeatureLayer.providedBy(layer):
+            options.append(dict(error="Not implemented"))
+        else:
+            query = layer.feature_query()
+            query.geom()
+            query.intersects(geom)
+            query.limit(100)
+
+            for f in query():
+                options.append(dict(
+                    id=f.id,
+                    layerId=layer.id,
+                    styleId=style.id,
+                    label=f.label,
+                    value=str(f.id) + "/" + str(layer.id),
+                    layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                ))
+                feature_count += 1
+
+    result["data"] = options
+    result["featureCount"] = feature_count
+    return result
+
+def feature_selected(request) -> JSONType:
+    data = request.json_body
+    layerId = int(data["layerId"])
+    styleId = int(data["styleId"])
+    featureId = int(data["featureId"])
+    layer = Resource.filter_by(id=layerId).one()
+    result = dict()
+    if not layer.has_permission(DataStructureScope.read, request.user):
+        result["data"] = dict(value="Forbidden")
+    elif not IFeatureLayer.providedBy(layer):
+        result["data"] = dict(error="Not implemented")
+    else:
+        query = layer.feature_query()
+        for f in query():
+            if f.id == featureId:
+                result["data"] = dict(
+                    id=f.id,
+                    layerId=layerId,
+                    styleId=styleId,
+                    label=f.label,
+                    value=str(f.id) + "/" + str(layer.id),
+                    layer_name=data["label"],
+                )
+    return result
+
 def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.identify",
@@ -111,4 +170,16 @@ def setup_pyramid(comp, config):
         "feature_layer.identify_layer",
         "/api/feature_layer/identify_layer",
         post=identify_layer,
+    )
+
+    config.add_route(
+        "feature_layer.identify_module",
+        "/api/feature_layer/identify_module",
+        post=identify_module,
+    )
+
+    config.add_route(
+        "feature_layer.feature_selected",
+        "/api/feature_layer/feature_selected",
+        post=feature_selected,
     )
