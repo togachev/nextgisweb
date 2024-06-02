@@ -1,7 +1,7 @@
 define([
     "dojo/_base/declare",
     "@nextgisweb/gui/react-app",
-    "@nextgisweb/webmap/map-desc",
+    "@nextgisweb/webmap/panel/description",
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     "@nextgisweb/pyramid/icon",
@@ -17,7 +17,8 @@ define([
             reactApp.default(
                 DescComp.default,
                 {
-                    description: value,
+                    content: value,
+                    type: "feature",
                 },
                 this.domNode
             );

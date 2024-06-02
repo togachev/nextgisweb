@@ -535,7 +535,7 @@ def getMaplist(request) -> JSONType:
         if res_wmg.id != 0:
             if res.has_permission(PERM_READ, request.user):
                 result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
-                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id, action_map=res_wmg.action_map,
+                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id, position_map_group=wmg.position_map_group, action_map=res_wmg.action_map,
                 preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
                 preview_description=None if res_social == None else res_social.preview_description))
 

@@ -10,6 +10,7 @@ const msgLayer = gettext("Layer");
 const msgStyle = gettext("Style");
 
 const zoomToFeature = (display, resourceId, featureId) => {
+    console.log(display, resourceId, featureId);
     display.featureHighlighter
         .highlightFeatureById(featureId, resourceId)
         .then((feature) => {
@@ -17,7 +18,8 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export function DescriptionPanel({ display, close, content, upath_info }) {
+export function DescriptionPanel(props) {
+    const { display, type, upath_info, content, close, visible } = props
 
     const options = {
         replace: item => {
@@ -28,10 +30,16 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
                     </span>
                 </span>);
             }
+
             if (item instanceof Element && item.attribs && item.name === 'p') {
                 return <span className="p-padding">{domToReact(item.children, options)}</span>;
             }
-            if (item instanceof Element && item.name === 'a' && !upath_info) {
+
+            if (item instanceof Element && item.name === 'a') {
+                item.attribs.target = '_blank'
+            }
+
+            if (item instanceof Element && item.name === 'a' && !upath_info && type !== "feature") {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<a onClick={
                         () => {
@@ -47,7 +55,12 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
             */
             if (item instanceof Element && item.name === 'a' && upath_info) {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
-                    return (<>{domToReact(item.children, options)}</>);
+                    return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
+                }
+            }
+            if (item instanceof Element && item.name === 'a' && type === "feature") {
+                if (/^\d+:\d+$/.test(item.attribs.href)) {
+                    return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
                 }
             }
         }
@@ -61,15 +74,18 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
                     return (
                         <div key={index} className="item-description">
                             <span className="titleDesc">
-                                <SvgIconLink
-                                    className="desc-link"
-                                    href={item.permissions ? item.url : undefined}
-                                    icon={`rescls-${item.cls}`}
-                                    fill="currentColor"
-                                    target="_blank"
-                                >
-                                    <span className="labelDesc">{title}</span>
-                                </SvgIconLink>
+                                {item.permissions ?
+                                    (<SvgIconLink
+                                        className="desc-link"
+                                        href={item.url}
+                                        icon={`rescls-${item.cls}`}
+                                        fill="currentColor"
+                                        target="_blank"
+                                    >
+                                        <span className="labelDesc">{title}</span>
+                                    </SvgIconLink>)
+                                    : (<span className="labelDesc">{title}</span>)
+                                }
                             </span>
                             {parse(item.description, options)}
                         </div >
@@ -79,15 +95,20 @@ export function DescriptionPanel({ display, close, content, upath_info }) {
             }</>
         )
     }
-
-    const data =
-        content === undefined
-            ? parse(display.config.webmapDescription, options)
-            : <DescComp content={content} />;
+    let data;
+    if (content === undefined && type === "map") {
+        data = parse(display.config.webmapDescription, options)
+    }
+    else if (content instanceof Array && type === "map") {
+        data = (<DescComp content={content} />)
+    }
+    else if (type === "resource" || type === "feature") {
+        data = parse(content, options)
+    }
 
     return (
         <div className="ngw-webmap-description-panel">
-            <PanelHeader {...{ title, close }} />
+            {type === "map" && (<PanelHeader {...{ title, close }} />)}
             {data}
         </div>
     )

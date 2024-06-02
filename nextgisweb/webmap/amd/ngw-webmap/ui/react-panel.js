@@ -42,6 +42,7 @@ define([
                 all(waitFor).then(() => {
                     const props = {
                         display: this.display,
+                        type: "map",
                         title: this.title,
                         close: () => {
                             pm._closePanel(pm.getPanel(pm._activePanelKey));

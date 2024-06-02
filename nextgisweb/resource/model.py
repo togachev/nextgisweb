@@ -100,7 +100,8 @@ class WebMapGroupResource(Base):
             'webmap_group_id', db.Integer,
             db.ForeignKey('resource_wmg.id'),
             primary_key=True
-        )
+        ),
+        db.Column('position_map_group', db.JSONB)
     )
 
 ResourceScopeType = Union[Tuple[Type[Scope], ...], Type[Scope]]

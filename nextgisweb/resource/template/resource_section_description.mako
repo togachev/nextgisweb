@@ -10,19 +10,22 @@
 
 <script type="text/javascript">
     require([
-        "@nextgisweb/webmap/map-desc",
+        "@nextgisweb/webmap/panel/description",
         "@nextgisweb/gui/react-app",
     ], function (comp, reactApp) {
         
         var props = ${
-            json_js(dict(description = obj.description,
-            upath_info = request.upath_info))
+            json_js(dict(
+                content = obj.description,
+                upath_info = request.upath_info,
+                type="resource",
+            )),
         };
 
         reactApp.default(
             comp.default,
             props,
-            document.getElementById('desc-data')
+            document.getElementById("desc-data")
         );
     });
 </script>

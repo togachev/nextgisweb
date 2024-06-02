@@ -1,7 +1,9 @@
 .ngw-webmap-description-panel {
     span {
         display: block;
-        overflow-wrap: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     a {
@@ -53,21 +55,27 @@
         margin: 5px;
     }
 
+    .label-delete-link {
+        color: var(--text-secondary);
+    }
+
     .item-description {
-        margin: 0px 5px 10px 5px;
+        margin: 0;
 
         .titleDesc {
             display: flex;
             align-items: center;
-            padding: 2px;
+            padding: 5px;
             border-bottom: dotted #eee 0.005em;
+            background: #eeeeee80;
 
             .icon {
-                width: 14px;
+                font-size: 14px;
+                padding: 0 5px 0 0;
             }
 
             .labelDesc {
-                padding: 0 0 0 10px;
+                padding: 0;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;

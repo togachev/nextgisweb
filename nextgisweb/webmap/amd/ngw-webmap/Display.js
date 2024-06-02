@@ -970,9 +970,9 @@ define([
         },
 
         _buildPanelsManager: function () {
-            console.log(this._urlParams[this.modeURLParam]);
             let activePanelKey;
-            if (this._urlParams[this.modeURLParam] === undefined) {
+            console.log(this._urlParams[this.modeURLParam], this.config.active_panel);
+            if (!this._urlParams[this.modeURLParam]) {
                 activePanelKey = this.config.active_panel
             } else if (this._urlParams[this.modeURLParam] !== this.config.active_panel) {
                 activePanelKey = this._urlParams[this.modeURLParam]
@@ -1095,11 +1095,7 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/description", {
-                        props: {
-                            topic: topic,
-                        },
-                    }),
+                    cls: reactPanel("@nextgisweb/webmap/panel/description"),
                     params: {
                         title: gettext("Description"),
                         name: "info",
