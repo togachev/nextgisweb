@@ -165,7 +165,6 @@ export const Content = ({ onChanges, ...rest }) => {
         (async () => {
             try {
                 const maplist = await route('resource.maplist').get(); // список карт
-                console.log(maplist);
                 const maplist_action_map = maplist.result.filter(item => item.action_map === true);
 
                 setListMaps(maplist_action_map);

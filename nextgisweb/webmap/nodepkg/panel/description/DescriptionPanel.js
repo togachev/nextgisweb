@@ -10,7 +10,6 @@ const msgLayer = gettext("Layer");
 const msgStyle = gettext("Style");
 
 const zoomToFeature = (display, resourceId, featureId) => {
-    console.log(display, resourceId, featureId);
     display.featureHighlighter
         .highlightFeatureById(featureId, resourceId)
         .then((feature) => {

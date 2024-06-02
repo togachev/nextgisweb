@@ -971,7 +971,6 @@ define([
 
         _buildPanelsManager: function () {
             let activePanelKey;
-            console.log(this._urlParams[this.modeURLParam], this.config.active_panel);
             if (!this._urlParams[this.modeURLParam]) {
                 activePanelKey = this.config.active_panel
             } else if (this._urlParams[this.modeURLParam] !== this.config.active_panel) {
@@ -1020,9 +1019,6 @@ define([
 
         _makePanels: function () {
             const panels = [];
-
-            // const activePanel = this.config.active_panel;
-            // console.log(panels, activePanel);
 
             panels.push({
                 cls: reactPanel(LayersPanelModule.default, {
