@@ -2,6 +2,7 @@ import warnings
 from dataclasses import dataclass
 
 import zope.event
+import zope.event.classhandler
 from msgspec import Meta
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.threadlocal import get_current_request
@@ -12,6 +13,7 @@ from typing_extensions import Annotated
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
+from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType, viewargs, WebSession
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
@@ -535,3 +537,8 @@ def setup_pyramid(comp, config):
                 _("Groups of digital web maps"),
                 lambda args: (args.request.route_url('resource.webmap_group')),
             )
+
+    if comp.options["home.enabled"]:
+        from .home import on_user_login
+
+        zope.event.classhandler.handler(OnUserLogin)(on_user_login)

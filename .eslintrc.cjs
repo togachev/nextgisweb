@@ -29,7 +29,8 @@ const config = {
                 args: "after-used",
                 vars: "all",
                 ignoreRestSiblings: true,
-                varsIgnorePattern: "^_+$",
+                varsIgnorePattern: "^_",
+                argsIgnorePattern: "^_",
             },
         ],
         "no-use-before-define": "warn",
@@ -138,6 +139,8 @@ const config = {
             ],
             rules: {
                 "prettier/prettier": "warn",
+                "react/prop-types": "off", // Use TypeScript instead
+                "react/jsx-no-target-blank": "off", // Unsupported browsers
                 "@typescript-eslint/no-explicit-any": "warn",
                 "@typescript-eslint/no-unused-vars": [
                     "error",
@@ -146,7 +149,8 @@ const config = {
                         destructuredArrayIgnorePattern: "^_",
                         vars: "all",
                         ignoreRestSiblings: true,
-                        varsIgnorePattern: "^_+$",
+                        varsIgnorePattern: "^_",
+                        argsIgnorePattern: "^_",
                     },
                 ],
             },

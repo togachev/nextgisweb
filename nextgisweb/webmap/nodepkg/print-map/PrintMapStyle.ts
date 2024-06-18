@@ -22,11 +22,6 @@ export const buildPrintStyle = (params: PrintStyleParams): string => {
       padding: 0;
     }
 
-    .print-map-page .print-map div.ol-viewport {
-        width: ${params.widthMap}px !important;
-        height: ${params.heightMap}px !important;
-    }
-
     .print-map-page .print-map img.map-logo {
         position: absolute;
         z-index: 9999999;
@@ -42,6 +37,13 @@ export const buildPrintStyle = (params: PrintStyleParams): string => {
         margin: ${params.margin}px;
         top: 0;
         left: 0;
+    }
+
+    .print-olmap {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+        height: 100%;
     }
 
     @page {

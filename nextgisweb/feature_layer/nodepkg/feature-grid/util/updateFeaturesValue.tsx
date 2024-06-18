@@ -20,7 +20,6 @@ export async function updateFeaturesValue({
         cache: true,
     });
     const featureLayer = res.feature_layer as FeatureLayer;
-    console.log(featureLayer);
     
     if (!featureLayer) {
         throw new Error("");

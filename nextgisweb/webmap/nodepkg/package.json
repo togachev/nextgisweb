@@ -3,7 +3,8 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "html-to-image": "^1.11.11",
+        "html-to-image": "1.11.11",
+        "react-rnd": "10.3.7",
         "html-react-parser": "^5.0.4",
         "react-chartjs-2": "^5.2.0",
         "chart.js": "^4.1.1",

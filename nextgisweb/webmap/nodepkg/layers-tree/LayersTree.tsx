@@ -3,8 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
-import FolderClosedIcon from "./icons/folder.svg";
-import FolderOpenIcon from "./icons/folder_open.svg";
 
 import type WebmapStore from "../store";
 import type { TreeItem } from "../type/TreeItems";
@@ -14,13 +12,13 @@ import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
 import { DropdownFile } from "./DropdownFile";
-import { IconItem } from "./IconItem";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
 import {
     keyInMutuallyExclusiveGroupDeep,
-    prepareWebMapItems,
+    // prepareWebMapItems,
+    prepareWebMapItemsCustom,
     updateKeysForGroup,
     updateKeysForMutualExclusivity,
 } from "./util/treeItems";
@@ -42,8 +40,17 @@ interface LayersTreeProps {
     setLayerZIndex: (id: number, zIndex: number) => void;
     getWebmapPlugins: () => Record<string, WebmapPlugin>;
     onReady?: () => void;
+    onFilterItems?: (
+        store: WebmapStore,
+        layersItems: TreeWebmapItem[]
+    ) => TreeWebmapItem[];
     showLegend?: boolean;
     showDropdown?: boolean;
+    expandable?: boolean;
+    checkable?: boolean;
+    draggable?: boolean;
+    selectable?: boolean;
+    showLine?: boolean;
     display: DojoDisplay;
 }
 
@@ -54,87 +61,37 @@ export const LayersTree = observer(
         setLayerZIndex,
         getWebmapPlugins,
         onReady,
+        onFilterItems,
         showLegend = true,
         showDropdown = true,
+        checkable = true,
+        expandable = true,
+        draggable = true,
+        selectable = true,
+        showLine = true,
         display,
     }: LayersTreeProps) => {
-        const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
-        const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const webmapItems = store.webmapItems;
 
-        const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
-            const { key, title } = webMapItem;
-            const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-            if (item.treeItem.type === "root" || item.treeItem.type === "group") {
-                item.icon = ({ expanded }) =>
-                    expanded ? <FolderOpenIcon className="close-open-icon" /> :
-                        <FolderClosedIcon className="close-open-icon" />;
-
-            } else if (item.treeItem.type === "layer") {
-                item.isLeaf = true;
-
-                if ("legendInfo" in item.treeItem) {
-                    const { legendInfo } = item.treeItem;
-                    if (legendInfo && legendInfo.visible && legendInfo.single) {
-                        item.legendIcon = (
-                            <div className="colSingleIconLegend">
-                                <IconItem
-                                    single={legendInfo.single}
-                                    item={item.treeItem}
-                                    zoomToNgwExtent={(ngwExtent: NgwExtent) => {
-                                        display.map.zoomToNgwExtent(
-                                            ngwExtent,
-                                            display.displayProjection
-                                        );
-                                    }}
-                                />
-                            </div>
-
-                        );
-                    }
-                }
-
-                item.icon = (item_) => {
-                    const item = item_ as TreeWebmapItem;
-                    if ((item.treeItem as LayerItem).editable === true) {
-                        return <EditIcon />;
-                    } else {
-                        if (item.legendIcon) {
-                            return item.legendIcon;
-                        }
-                    }
-                };
-            }
-
-            if ("children" in webMapItem) {
-                item.children = webMapItem.children.map(handleWebMapItem);
-            }
-            return item;
-        };
-
-        const prepareWebMapItems = (webMapItems: TreeItem[]) => {
-            return webMapItems.map(handleWebMapItem);
-        };
-
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
-        const treeItems = useMemo(
-            () => prepareWebMapItems(webmapItems),
+        const treeItems = useMemo(() => {
+            // let _webmapItems = prepareWebMapItems(webmapItems);
+            let _webmapItems = prepareWebMapItemsCustom(webmapItems);
+            if (onFilterItems) {
+                _webmapItems = onFilterItems(store, _webmapItems);
+            }
+            return _webmapItems;
+        }, [webmapItems]);
+
+        const hasGroups = useMemo(
+            () => webmapItems.some((item) => item.type === "group"),
             [webmapItems]
         );
-
-        const hasGroups = useMemo(() => {
-            for (const itm of webmapItems) {
-                if (itm.type === "group") {
-                    return true;
-                }
-            }
-            return false;
-        }, [webmapItems]);
 
         useEffect(() => {
             if (onReady) {
@@ -143,8 +100,8 @@ export const LayersTree = observer(
         }, [onReady]);
 
         const onExpand = (expandedKeysValue: React.Key[]) => {
+            if (!expandable) return;
             store.setExpanded(expandedKeysValue.map(Number));
-            setAutoExpandParent(false);
         };
 
         const onCheck: TreeProps<TreeWebmapItem>["onCheck"] = (
@@ -237,31 +194,39 @@ export const LayersTree = observer(
                         </Col>
                         {actions}
                     </Row>
-                    {showLegend && (<Legend
-                        zoomToNgwExtent={(ngwExtent: NgwExtent) => {
-                            display.map.zoomToNgwExtent(
-                                ngwExtent,
-                                display.displayProjection
-                            );
-                        }}
-                        nodeData={nodeData.treeItem} store={store} />)}
+                    {showLegend && (
+                        <Legend
+                            checkable={checkable}
+                            zoomToNgwExtent={(ngwExtent: NgwExtent) => {
+                                display.map.zoomToNgwExtent(
+                                    ngwExtent,
+                                    display.displayProjection
+                                );
+                            }}
+                            nodeData={nodeData.treeItem}
+                            store={store}
+                        />
+                    )}
                 </>
             );
         };
 
+        const shouldShowLine = showLine && hasGroups;
+
         return (
             <Tree
                 className={
-                    "ngw-webmap-layers-tree" + (!hasGroups ? " flat" : "")
+                    "ngw-webmap-layers-tree" + (!shouldShowLine ? " flat" : "")
                 }
                 virtual={false}
                 motion={false}
-                checkable
+                checkable={checkable}
+                selectable={selectable}
                 showIcon
-                showLine={hasGroups}
+                showLine={shouldShowLine}
                 onExpand={onExpand}
                 expandedKeys={store.expanded}
-                autoExpandParent={autoExpandParent}
+                autoExpandParent={false}
                 onCheck={onCheck}
                 checkedKeys={store.checked}
                 onSelect={_onSelect}

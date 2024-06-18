@@ -10,18 +10,18 @@ interface LegendProps {
     nodeData: TreeItem;
     zoomToNgwExtent: DisplayMap;
     store: WebmapStore;
+    checkable: boolean;
 }
 
 const { useToken } = theme;
 
-export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
+export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendProps) {
     const { token } = useToken();
 
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
     if (!nodeData || !legendInfo || !legendInfo.open) {
         return <></>;
     }
-
     const asyncFunc = async (id, name, zoomToNgwExtent) => {
         if (name) {
             const query = { ilike: name }
@@ -40,9 +40,9 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                 .catch(console.error);
         }
     };
-
+    const blockClassName = checkable ? "checkable" : "uncheckable";
     return (
-        <div className="legend-block">
+        <div className={`legend-block ${blockClassName}`}>
             <ConfigProvider
                 theme={{
                     components: {
@@ -59,6 +59,27 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;
                     const title = s.display_name ? s.display_name : nodeData.title;
+                    let checkbox;
+                    if (checkable) {
+                        checkbox =
+                            s.render !== null ? (
+                                <Checkbox
+                                    style={{ width: "16px" }}
+                                    defaultChecked={render}
+                                    onChange={(e) => {
+                                        store.setLayerLegendSymbol(
+                                            id,
+                                            s.index,
+                                            e.target.checked
+                                        );
+                                    }}
+                                    onClick={(evt) => evt.stopPropagation()}
+                                />
+                            ) : (
+                                <div style={{ width: "16px" }} />
+                            );
+                    }
+
                     return (
                         <div
                             key={idx}
@@ -66,17 +87,7 @@ export function Legend({ nodeData, zoomToNgwExtent, store }: LegendProps) {
                             title={s.display_name}
                             onClick={() => asyncFunc(nodeData.layerId, title, zoomToNgwExtent)}
                         >
-                            <Checkbox
-                                defaultChecked={render}
-                                onChange={(e) => {
-                                    store.setLayerLegendSymbol(
-                                        id,
-                                        s.index,
-                                        e.target.checked
-                                    );
-                                }}
-                                onClick={(evt) => evt.stopPropagation()}
-                            />
+                            {checkbox}
                             <img
                                 className="icon-list"
                                 width={20}
