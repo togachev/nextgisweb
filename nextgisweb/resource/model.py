@@ -84,25 +84,6 @@ class ResourceWebMapGroup(Base):
 
     webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
         backref="resource_wmg")
-class WebMapGroupResource(Base):
-    __tablename__ = 'wmg_resource'
-
-    identity = 'wmg_resource'
-
-    tab_wmg_resource = db.Table(
-        'wmg_resource', Base.metadata,
-        db.Column(
-            'resource_id', db.Integer,
-            db.ForeignKey('resource.id'),
-            primary_key=True
-        ),
-        db.Column(
-            'webmap_group_id', db.Integer,
-            db.ForeignKey('resource_wmg.id'),
-            primary_key=True
-        ),
-        db.Column('position_map_group', db.JSONB)
-    )
 
 ResourceScopeType = Union[Tuple[Type[Scope], ...], Type[Scope]]
 
@@ -348,6 +329,14 @@ class Resource(Base, metaclass=ResourceMeta):
             if not q.scalar():
                 return c
 
+
+class WebMapGroupResource(Base):
+    __tablename__ = 'wmg_resource'
+    identity = 'wmg_resource'
+
+    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
+    webmap_group_id = db.Column(db.ForeignKey(ResourceWebMapGroup.id), primary_key=True)
+    position_map_group = db.Column(db.JSONB, nullable=True)
 
 @event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):

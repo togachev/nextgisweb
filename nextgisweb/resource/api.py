@@ -7,7 +7,7 @@ from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..postgis.exception import ExternalDatabaseError
-
+import json
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
@@ -606,7 +606,22 @@ def wmg_item_create(request) -> JSONType:
         DBSession.flush()
     except SQLAlchemyError as exc:
         raise ExternalDatabaseError(message=_("ERROR: Error not create."), sa_error=exc)
-        
+
+def wmg_item_update(request) -> JSONType:
+    request.require_administrator()
+    resource_id = int(request.matchdict["res_id"])
+    wmg_id = int(request.matchdict["wmg_id"])
+    pmg = json.loads(request.matchdict["pmg"])
+    def update(resource_id, wmg_id, pmg):
+        wmg_resource = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.resource_id == resource_id, WebMapGroupResource.webmap_group_id == wmg_id).one()
+        wmg_resource.position_map_group = pmg
+
+    with DBSession.no_autoflush:
+        update(resource_id, wmg_id, pmg)
+    DBSession.flush()
+    return dict(resource_id=resource_id, wmg_id=wmg_id, pmg=pmg)
+
+
 def wmg_item_delete(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
     resource_id = int(request.matchdict["id"])
@@ -784,6 +799,12 @@ def setup_pyramid(comp, config):
         "/api/wmg/create/{id:uint}/{webmap_group_id:uint}/",
         factory=resource_factory,
         get=wmg_item_create,
+    )
+
+    config.add_route(
+        "wmgroup.update",
+        "/api/wmg/update/{res_id:uint}/{wmg_id:str}/{pmg:str}/",
+        get=wmg_item_update,
     )
 
     config.add_route(

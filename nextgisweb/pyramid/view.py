@@ -174,6 +174,11 @@ def webgis(request):
         custom_layout=True
     )
 
+@viewargs(renderer='web_gis.mako')
+def web_gis(request):
+    return dict(
+        custom_layout=True
+    )
 
 @viewargs(renderer="mako")
 @inject()
@@ -529,6 +534,10 @@ def setup_pyramid(comp, config):
         'webgis',
         '/map-list') \
         .add_view(webgis)
+    config.add_route(
+        'web_gis',
+        '/map-list-new') \
+        .add_view(web_gis)
 
     config.add_route("pyramid.control_panel.custom_css", "/control-panel/custom-css").add_view(
         custom_css

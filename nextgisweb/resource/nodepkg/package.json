@@ -6,6 +6,7 @@
         "react-bootstrap": "^2.7.0",
         "react-select": "^5.7.0",
         "@fontsource/montserrat": "^5.0.8",
-        "@fontsource/forum": "^5.0.12"
+        "@fontsource/forum": "^5.0.12",
+        "react-grid-layout": "^1.4.4"
     }
 }
