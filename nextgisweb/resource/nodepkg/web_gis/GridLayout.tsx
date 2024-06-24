@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import { Checkbox } from "@nextgisweb/gui/antd";
+import { Button, Checkbox } from "@nextgisweb/gui/antd";
 import "./GridLayout.less";
 import { route } from "@nextgisweb/pyramid/api";
 
@@ -20,13 +20,11 @@ export function GridLayout({ store }) {
 	});
 	// let a = store.layout.i;
 	// let arr = a.split('/');
-	console.log(store.layout);
-	
-	// const updatePosition = useRef(
-    //     async ({ query: q }) => {
-    //         await route("wmgroup.update").get({ query: q, signal: makeSignal() })
-    //     }
-    // );
+
+	const updatePosition = async (res_id, wmg_id, pmg ) => {
+		await route("wmgroup.update", res_id, wmg_id, pmg).get()
+	};
+
 
 	useEffect(() => {
 		store.setlayout((prev) => {
@@ -34,9 +32,23 @@ export function GridLayout({ store }) {
 				return { ...item, static: staticPosition };
 			});
 		});
-		staticPosition === false
-			? setSource({ coeff: 0.322580645, width: "500px" })
-			: setSource({ coeff: 1, width: "100%" });
+		if (staticPosition === false) {
+			setSource({ coeff: 0.322580645, width: "500px" });
+		} else {
+			setSource({ coeff: 1, width: "100%" });
+			store.layout.map(item => {
+				let res_id = Number(item.i.split("/")[0]);
+				let wmg_id = Number(item.i.split("/")[1]);
+				let pmg = {
+					x: item.x,
+					y: item.y,
+					w: item.w,
+					h: item.h,
+					static: true,
+				}
+				updatePosition(res_id, wmg_id, JSON.stringify(pmg));
+			});
+		}
 	}, [staticPosition]);
 
 	return (
@@ -44,7 +56,7 @@ export function GridLayout({ store }) {
 			className="grid-content"
 			style={{ overflow: !staticPosition ? "hidden" : undefined }}
 		>
-			<div className="left-block">left</div>
+			{/* <div className="left-block">left</div> */}
 			<div className="grid-block" key={source.coeff}>
 				<Checkbox
 					checked={staticPosition}
@@ -56,6 +68,23 @@ export function GridLayout({ store }) {
 						? "Включить режим редактирования"
 						: "Отключить режим редактирования"}
 				</Checkbox>
+				{/* {!staticPosition && (<Button
+					onClick={() => {
+						store.layout.map(item => {
+							let res_id = Number(item.i.split("/")[0]);
+							let wmg_id = Number(item.i.split("/")[1]);
+							let pmg = {
+								x: item.x,
+								y: item.y,
+								w: item.w,
+								h: item.h,
+								static: true,
+							}
+							updatePosition(res_id, wmg_id, JSON.stringify(pmg));
+						});
+						setStaticPosition(true);
+					}}
+				>Сохранить</Button>)} */}
 				<ResponsiveReactGridLayout
 					style={{
 						width: source.width,
@@ -82,8 +111,11 @@ export function GridLayout({ store }) {
 					onLayoutChange={(layout) => {
 						!staticPosition && store.setlayout(layout);
 					}}
+					onDragStop={(e) => {
+						store.setlayout(e);
+					}}
 				>
-					{store.layout.map((itm, i) => (
+					{store.layout.map((itm) => (
 						<div key={itm.i} data-grid={itm} className="block">
 							<span
 								style={{
@@ -100,7 +132,7 @@ export function GridLayout({ store }) {
 					))}
 				</ResponsiveReactGridLayout>
 			</div>
-			<div className="right-block">right</div>
+			{/* <div className="right-block">right</div> */}
 		</div>
 	);
 }

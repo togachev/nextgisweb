@@ -161,6 +161,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
         
         const options = listMaps.filter(item => item.webmap_group_id === parseInt(e.key)).map((item) => {
             return {
+                name: item.display_name,
                 i: item.id + "/" + item.webmap_group_id,
                 x: item.position_map_group.x,
                 y: item.position_map_group.y,
@@ -196,6 +197,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
 
                 const options = maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)).map((item) => {
                     return {
+                        name: item.display_name,
                         i: item.id + "/" + item.webmap_group_id,
                         x: item.position_map_group.x,
                         y: item.position_map_group.y,
