@@ -619,7 +619,7 @@ def wmg_item_update(request) -> JSONType:
     with DBSession.no_autoflush:
         update(resource_id, wmg_id, pmg)
     DBSession.flush()
-    return dict(resource_id=resource_id, wmg_id=wmg_id, pmg=pmg)
+    # return dict(resource_id=resource_id, wmg_id=wmg_id, pmg=pmg)
 
 
 def wmg_item_delete(request) -> JSONType:

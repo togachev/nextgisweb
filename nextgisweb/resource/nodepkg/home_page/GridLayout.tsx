@@ -14,10 +14,6 @@ export function GridLayout({ store }) {
 		[]
 	);
 	const [staticPosition, setStaticPosition] = useState(true);
-	const [source, setSource] = useState({
-		coeff: 1,
-		width: undefined,
-	});
 
 	const updatePosition = async (res_id, wmg_id, pmg) => {
 		await route("wmgroup.update", res_id, wmg_id, pmg).get()
@@ -31,9 +27,9 @@ export function GridLayout({ store }) {
 			});
 		});
 		if (staticPosition === false) {
-			setSource({ coeff: 0.322580645, width: "500px" });
+			store.setSource({ coeff: 0.322580645, width: "500px" });
 		} else {
-			setSource({ coeff: 1, width: "100%" });
+			store.setSource({ coeff: 1, width: "100%" });
 			store.layout.map(item => {
 				let res_id = Number(item.i.split("/")[0]);
 				let wmg_id = Number(item.i.split("/")[1]);
@@ -63,11 +59,11 @@ export function GridLayout({ store }) {
 
 	return (
 		<div
+			key={store.source.coeff}
 			className="grid-content"
 			style={{ overflow: !staticPosition ? "hidden" : undefined }}
 		>
-			{/* <div className="left-block">left</div> */}
-			<div className="grid-block" key={source.coeff}>
+			<div className="grid-block">
 				<Checkbox
 					checked={staticPosition}
 					onChange={(e) => {
@@ -80,7 +76,7 @@ export function GridLayout({ store }) {
 				</Checkbox>
 				<ResponsiveReactGridLayout
 					style={{
-						width: source.width,
+						width: store.source.width,
 						// height: !staticPosition ? "100vh" : undefined,
 						alignItems: "start",
 					}}
@@ -90,13 +86,13 @@ export function GridLayout({ store }) {
 					autoSize={true}
 					useCSSTransforms={true}
 					margin={[0, 0]}
-					rowHeight={Height * source.coeff}
+					rowHeight={Height * store.source.coeff}
 					isResizable={false}
 					breakpoints={{
-						lg: 1550 * source.coeff,
-						md: 1240 * source.coeff,
-						sm: 930 * source.coeff,
-						xs: 620 * source.coeff,
+						lg: 1550 * store.source.coeff,
+						md: 1240 * store.source.coeff,
+						sm: 930 * store.source.coeff,
+						xs: 620 * store.source.coeff,
 						xxs: 0,
 					}}
 					cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 1 }}
@@ -108,21 +104,40 @@ export function GridLayout({ store }) {
 						store.setlayout(e);
 					}}
 				>
-					{store.layout.map((itm) => (
+					{/* {store.layout.map((itm) => (
 						<div key={itm.i} data-grid={itm} className="block">
 							<span
 								style={{
 									width: !staticPosition ? undefined : Width,
 									height: !staticPosition ? undefined : Height,
-									maxHeight: !staticPosition ? Height * source.coeff : Height,
-									maxWidth: !staticPosition ? Width * source.coeff : Width,
+									maxHeight: !staticPosition ? Height * store.source.coeff : Height,
+									maxWidth: !staticPosition ? Width * store.source.coeff : Width,
 								}}
 								className={staticPosition ? "content-block" : "edit-block"}
 							>
 								{itm.i}
 							</span>
 						</div>
-					))}
+					))} */}
+					{store.layout.map((itm) => {
+						let item = store.listMaps.filter(item => item.id + "/" + item.webmap_group_id === itm.i)[0];
+
+						return (
+							<div key={itm.i} data-grid={itm} className="block">
+								<span
+									style={{
+										width: !staticPosition ? undefined : Width,
+										height: !staticPosition ? undefined : Height,
+										maxHeight: !staticPosition ? Height * store.source.coeff : Height,
+										maxWidth: !staticPosition ? Width * store.source.coeff : Width,
+									}}
+									className={staticPosition ? "content-block" : "edit-block"}
+								>
+									{item.display_name}
+								</span>
+							</div>
+						)
+					})}
 				</ResponsiveReactGridLayout>
 			</div>
 		</div>

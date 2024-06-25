@@ -168,14 +168,20 @@ def swagger(request):
         props=dict(url=request.route_url("pyramid.openapi_json")),
     )
 
-@viewargs(renderer='webgis.mako')
+@viewargs(renderer="webgis.mako")
 def webgis(request):
     return dict(
         custom_layout=True
     )
 
-@viewargs(renderer='web_gis.mako')
+@viewargs(renderer="web_gis.mako")
 def web_gis(request):
+    return dict(
+        custom_layout=True
+    )
+
+@viewargs(renderer="home_page.mako")
+def home_page(request):
     return dict(
         custom_layout=True
     )
@@ -531,13 +537,17 @@ def setup_pyramid(comp, config):
     ).add_view(cors)
 
     config.add_route(
-        'webgis',
-        '/map-list') \
+        "webgis",
+        "/map-list") \
         .add_view(webgis)
     config.add_route(
-        'web_gis',
-        '/map-list-new') \
+        "web_gis",
+        "/map-list-new") \
         .add_view(web_gis)
+    config.add_route(
+        "home_page",
+        "/home-page") \
+        .add_view(home_page)
 
     config.add_route("pyramid.control_panel.custom_css", "/control-panel/custom-css").add_view(
         custom_css
