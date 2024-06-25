@@ -39,9 +39,11 @@ export interface ListMapProps {
 }
 
 export class HomeStore {
+    staticPosition = true;
     source: SourceProps; // список карт
     listMaps: ListMapProps[] = []; // список карт
     groupMaps: GroupMapProps[] = []; // группы карт
+    itemsMapsGroup: ListMapProps[] = []; // группы карт
     layout: MapProps[] = [];
 
     constructor({ ...props }) {
@@ -56,6 +58,10 @@ export class HomeStore {
         makeAutoObservable(this, {});
     }
 
+    setStaticPosition = (staticPosition: boolean) => {
+        this.staticPosition = staticPosition;
+    };
+
     setSource = (source: SetValue<string>) => {
         this.setValue("source", source);
     };
@@ -66,6 +72,10 @@ export class HomeStore {
 
     setGroupMaps = (groupMaps: SetValue<string>) => {
         this.setValue("groupMaps", groupMaps);
+    };
+
+    setItemsMapsGroup = (itemsMapsGroup: SetValue<string>) => {
+        this.setValue("itemsMapsGroup", itemsMapsGroup);
     };
 
     setlayout = (layout: SetValue<string>) => {

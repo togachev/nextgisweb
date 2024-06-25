@@ -61,7 +61,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
             width: undefined,
         }
     }));
-
+    const refGrid = useRef([]);
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
@@ -110,22 +110,10 @@ export const Content = observer(({ onChanges, ...rest }) => {
     };
 
     const onClickGroupMaps = (e) => {
-        console.log(e, store);
-        
-        const options_ = store.listMaps.filter(item => item.webmap_group_id === parseInt(e.key)).map((item) => {
-            return {
-                i: item.id + "/" + item.webmap_group_id,
-                x: item.position_map_group.x,
-                y: item.position_map_group.y,
-                w: item.position_map_group.w,
-                h: item.position_map_group.h,
-                static: item.position_map_group.static,
-            }
-        });
-        store.setlayout(options_)
+        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === parseInt(e.key)));
     }
 
-    var firstValueSort = 'Открытые данные';
+    const firstValueSort = 'Открытые данные';
 
     useMemo(() => {
         (async () => {
@@ -149,27 +137,14 @@ export const Content = observer(({ onChanges, ...rest }) => {
                     items.push({ type: 'divider' });
                 })
                 store.setGroupMaps(items);
-
-                // setItemsMaps(maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)));
-
-                const options_ = maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)).map((item) => {
-                    return {
-                        i: item.id + "/" + item.webmap_group_id,
-                        x: item.position_map_group.x,
-                        y: item.position_map_group.y,
-                        w: item.position_map_group.w,
-                        h: item.position_map_group.h,
-                        static: item.position_map_group.static,
-                    }
-                });
-                store.setlayout(options_)
-
+                store.setItemsMapsGroup(maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)));
             } catch {
                 // ignore error
             }
         })();
     }, [])
 
+    
     return (
         <>
             <ConfigProvider
@@ -224,7 +199,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
                                 />
                             </div>
                             <div className="content-maps-grid">
-                                {store.layout.length > 0 && <GridLayout store={store} />}
+                                {store.itemsMapsGroup.length > 0 && <GridLayout ref={refGrid} store={store} />}
                             </div>
                         </div>
                     </div>
@@ -233,6 +208,5 @@ export const Content = observer(({ onChanges, ...rest }) => {
                 <Footer />
             </ConfigProvider>
         </>
-
     )
 });
