@@ -1,11 +1,17 @@
-import React, { forwardRef, useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import { Button, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Tooltip, Empty, Typography, Card } from "@nextgisweb/gui/antd";
 import "./GridLayout.less";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Edit from "@nextgisweb/icon/material/edit";
 import Save from "@nextgisweb/icon/material/save";
+import MapIcon from "@nextgisweb/icon/material/map";
+
+const openMap = gettext("открыть карту");
+
+const { Meta } = Card;
+const { Text, Link } = Typography;
 
 const editPosition = gettext("Изменить местоположение");
 const savePosition = gettext("Сохранить изменения");
@@ -13,16 +19,63 @@ const savePosition = gettext("Сохранить изменения");
 const Width = 300;
 const Height = 320;
 
+const MapTile = (props) => {
+    const { id, display_name, preview_fileobj_id } = props.item;
+    const preview = routeURL('resource.preview', id)
+    const urlWebmap = routeURL('webmap.display', id)
+
+    return (
+        <Card
+            style={{
+                width: 300,
+                margin: 20,
+                height: 320
+            }}
+            hoverable
+            cover={preview_fileobj_id ?
+                <Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
+                    <div className="img_preview"
+                        style={{ background: `url(${preview}) center center / cover no-repeat` }}
+                    ></div>
+                </Link>
+                :
+                <Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
+                    <div className="img_preview_none">
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    </div>
+                </Link>
+            }
+        >
+            <Meta
+                style={{
+                    fontWeight: 500,
+                    height: 125
+                }}
+                title={
+                    <Tooltip placement="top" title={display_name} >
+                        {display_name}
+                    </Tooltip>
+                }
+
+                description={
+                    <Link href={urlWebmap} target="_blank">
+                        <Text className="open-map" underline>{openMap}</Text>
+                        <span className="icon-open-map"><MapIcon /></span>
+                    </Link>
+                }
+            />
+        </Card>
+    )
+}
+
 export const GridLayout = (props) => {
-	const { store } = props;
+	const { store, config } = props;
+	console.log(config);
 
 	const [layout, setlayout] = useState(store.itemsMapsGroup.map(x => (x.position_map_group)))
 	const [staticPosition, setStaticPosition] = useState(true);
 
-	const ResponsiveReactGridLayout = useMemo(
-		() => WidthProvider(Responsive),
-		[]
-	);
+	const ResponsiveReactGridLayout = useMemo(() => WidthProvider(Responsive), []);
 
 	useMemo(() => {
 		setStaticPosition(true)
@@ -43,24 +96,25 @@ export const GridLayout = (props) => {
 			store.setSource({ coeff: 0.322580645, minWidth: "419px" });
 		} else {
 			store.setSource({ coeff: 1, width: "100%" });
-			layout.map(item => {
-				let res_id = Number(item.i.split(":")[0]);
-				let wmg_id = Number(item.i.split(":")[1]);
-				let pmg = {
-					i: item.i,
-					x: item.x,
-					y: item.y,
-					w: item.w,
-					h: item.h,
-					static: true,
-				}
-				updatePosition(res_id, wmg_id, JSON.stringify(pmg));
-			});
+
 		}
 	}, [staticPosition]);
 
 	const savePositionMap = () => {
 		setStaticPosition(!staticPosition);
+		layout.map(item => {
+			let res_id = Number(item.i.split(":")[0]);
+			let wmg_id = Number(item.i.split(":")[1]);
+			let pmg = {
+				i: item.i,
+				x: item.x,
+				y: item.y,
+				w: item.w,
+				h: item.h,
+				static: true,
+			}
+			updatePosition(res_id, wmg_id, JSON.stringify(pmg));
+		});
 	};
 
 	return (
@@ -68,14 +122,14 @@ export const GridLayout = (props) => {
 			key={store.source.coeff}
 			style={{ overflow: !staticPosition ? "hidden" : undefined }}
 		>
-
 			<div className="grid-block">
-				<span className="save-button">
-					<Tooltip placement="topLeft" title={staticPosition ? editPosition : savePosition}>
-						<Button type="text" icon={staticPosition ? <Edit /> : <Save />} size="small" onClick={savePositionMap} />
-					</Tooltip>
-				</span>
-
+				{config.isAdministrator === true && (
+					<span className="save-button">
+						<Tooltip placement="topLeft" title={staticPosition ? editPosition : savePosition}>
+							<Button type="text" icon={staticPosition ? <Edit /> : <Save />} size="small" onClick={savePositionMap} />
+						</Tooltip>
+					</span>
+				)}
 				<ResponsiveReactGridLayout
 					className={staticPosition ? undefined : "layout-map-edit"}
 					style={{
@@ -102,7 +156,7 @@ export const GridLayout = (props) => {
 						setlayout(e);
 					}}
 				>
-					{layout.map((p) => {
+					{layout.map((p, index) => {
 						const item = store.itemsMapsGroup?.find(x => x.position_map_group.i === p.i);
 						return (
 							<div key={p.i} data-grid={p} className={`block ${staticPosition ? "static" : "edit"}`} >
@@ -115,7 +169,8 @@ export const GridLayout = (props) => {
 									}}
 									className={staticPosition ? "content-block" : "edit-block"}
 								>
-									{item?.display_name}
+									{/* {item?.display_name} */}
+									<MapTile key={index} item={item} />
 								</span>
 							</div>
 						)

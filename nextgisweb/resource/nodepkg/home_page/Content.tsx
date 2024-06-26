@@ -1,8 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { SearchOutlined } from '@ant-design/icons';
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { Input, AutoComplete, Empty, Menu, Typography, Card, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { Input, AutoComplete, Menu, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -12,12 +11,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { HomeStore } from "./HomeStore";
 import "./Content.less";
 import { useSource } from "./hook/useSource";
-import MapIcon from "@nextgisweb/icon/material/map";
 
-const openMap = gettext("открыть карту");
-
-const { Meta } = Card;
-const { Text, Link } = Typography;
 
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
@@ -54,7 +48,7 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-export const Content = observer(({ onChanges, ...rest }) => {
+export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore({
         source: {
             coeff: 1,
@@ -63,7 +57,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
     }));
     
     const { getListMap } = useSource();
-
+    
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
@@ -200,7 +194,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
                                 />
                             </div>
                             <div className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 && <GridLayout store={store} />}
+                                {store.itemsMapsGroup.length > 0 && <GridLayout config={config} store={store} />}
                             </div>
                         </div>
                     </div>
