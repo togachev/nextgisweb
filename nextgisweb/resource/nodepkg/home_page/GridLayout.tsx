@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import { Button, Tooltip, Empty, Typography, Card } from "@nextgisweb/gui/antd";
+import { Button, Tooltip, ConfigProvider, Empty, Typography, Card } from "@nextgisweb/gui/antd";
 import "./GridLayout.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -20,57 +20,67 @@ const Width = 300;
 const Height = 320;
 
 const MapTile = (props) => {
-    const { id, display_name, preview_fileobj_id } = props.item;
-    const preview = routeURL('resource.preview', id)
-    const urlWebmap = routeURL('webmap.display', id)
+	const { id, display_name, preview_fileobj_id } = props.item;
+	const preview = routeURL('resource.preview', id)
+	const urlWebmap = routeURL('webmap.display', id)
 
-    return (
-        <Card
-            style={{
-                width: 300,
-                margin: 20,
-                height: 320
-            }}
-            hoverable
-            cover={preview_fileobj_id ?
-                <Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
-                    <div className="img_preview"
-                        style={{ background: `url(${preview}) center center / cover no-repeat` }}
-                    ></div>
-                </Link>
-                :
-                <Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
-                    <div className="img_preview_none">
-                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                    </div>
-                </Link>
-            }
-        >
-            <Meta
-                style={{
-                    fontWeight: 500,
-                    height: 125
-                }}
-                title={
-                    <Tooltip placement="top" title={display_name} >
-                        {display_name}
-                    </Tooltip>
-                }
-
-                description={
-                    <Link href={urlWebmap} target="_blank">
-                        <Text className="open-map" underline>{openMap}</Text>
-                        <span className="icon-open-map"><MapIcon /></span>
-                    </Link>
-                }
-            />
-        </Card>
-    )
+	return (
+		<ConfigProvider
+			theme={{
+				components: {
+					Card: {
+						paddingLG: 0,
+						colorBorderSecondary: "var(--divider-color)"
+					},
+				},
+			}}
+		>
+			<Card
+				style={{
+					width: Width,
+					height: Height,
+					background: "transparent",
+				}}
+				hoverable
+				cover={
+					<Link style={{ padding: 0, display: 'contents' }} href={urlWebmap} target="_blank">
+						{
+							preview_fileobj_id ?
+								(<div className="img_preview"
+									style={{ background: `url(${preview}) center center / cover no-repeat` }}
+								></div>) :
+								(<div className="img_preview_none">
+									<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+								</div>)
+						}
+					</Link>
+				}
+			>
+				<Meta
+					className="meta-card"
+					style={{
+						fontWeight: 500,
+						height: 125
+					}}
+					title={
+						<Tooltip placement="top" title={display_name} >
+							<span className="grid-card-meta-title">{display_name}</span>
+						</Tooltip>
+					}
+					description={
+						<Link href={urlWebmap} target="_blank">
+							<Text className="open-map" underline>{openMap}</Text>
+							<span className="icon-open-map"><MapIcon /></span>
+						</Link>
+					}
+				/>
+			</Card>
+		</ConfigProvider>
+	)
 }
 
 export const GridLayout = (props) => {
 	const { store, config } = props;
-	console.log(config);
 
 	const [layout, setlayout] = useState(store.itemsMapsGroup.map(x => (x.position_map_group)))
 	const [staticPosition, setStaticPosition] = useState(true);
@@ -138,7 +148,7 @@ export const GridLayout = (props) => {
 					compactType={"horizontal"}
 					autoSize={true}
 					useCSSTransforms={true}
-					margin={staticPosition ? [30, 30] : [5, 5]}
+					margin={staticPosition ? [10, 40] : [5, 5]}
 					rowHeight={Height * store.source.coeff}
 					isResizable={false}
 					breakpoints={{
@@ -162,22 +172,17 @@ export const GridLayout = (props) => {
 							<div key={p.i} data-grid={p} className={`block ${staticPosition ? "static" : "edit"}`} >
 								<span
 									style={{
-										width: !staticPosition ? undefined : Width,
 										height: !staticPosition ? undefined : Height,
 										maxHeight: !staticPosition ? Height * store.source.coeff : Height,
-										maxWidth: !staticPosition ? Width * store.source.coeff : Width,
 									}}
 									className={staticPosition ? "content-block" : "edit-block"}
 								>
-									{/* {item?.display_name} */}
-									<MapTile key={index} item={item} />
+									{staticPosition ? (<MapTile key={index} item={item} />) : item?.display_name}
 								</span>
 							</div>
 						)
 					})}
-
 				</ResponsiveReactGridLayout>
-
 			</div>
 		</div>
 	);

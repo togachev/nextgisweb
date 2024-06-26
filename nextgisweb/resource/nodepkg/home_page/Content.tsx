@@ -12,12 +12,10 @@ import { HomeStore } from "./HomeStore";
 import "./Content.less";
 import { useSource } from "./hook/useSource";
 
-
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
         const resourceUrl = routeURL('webmap.display', resource.id)
-
         return {
             key: `${resource.id}`,
             label: (
@@ -156,6 +154,11 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             lineType: "solid",
                             lineWidth: 1,
                         },
+                        Tooltip: {
+                            colorBgSpotlight: "#fff",
+                            colorTextLightSolid: "#000",
+                            borderRadius: 3,
+                        },
                     },
                 }}
             >
@@ -181,7 +184,6 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                 />
                             </AutoComplete>
                         </div>
-
                         <div className="menu-maps">
                             <div className="menu-list">
                                 <Menu
