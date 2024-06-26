@@ -5,6 +5,7 @@ export type SetValue<T> = ((prevValue: T) => T) | T;
 export interface SourceProps {
     coeff: number;
     width: string;
+    minWidth: string;
 }
 
 export interface GroupMapProps {

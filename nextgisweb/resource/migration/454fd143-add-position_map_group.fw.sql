@@ -7,4 +7,4 @@
 ALTER TABLE wmg_resource ADD COLUMN position_map_group jsonb null;
 
 UPDATE wmg_resource SET
-    position_map_group = '{"i": "", "h": 1,"w": 1,"x": 0,"y": 0,"static": true}';
+    position_map_group = ('{"i": "'::text || (resource_id || ':'::text|| webmap_group_id)::text || '", "h": 1,"w": 1,"x": 0,"y": 0,"static": true}')::jsonb;

@@ -1,45 +1,49 @@
 import React, { forwardRef, useState, useEffect, useMemo } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import { Checkbox } from "@nextgisweb/gui/antd";
+import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import "./GridLayout.less";
 import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import Edit from "@nextgisweb/icon/material/edit";
+import Save from "@nextgisweb/icon/material/save";
+
+const editPosition = gettext("Изменить местоположение");
+const savePosition = gettext("Сохранить изменения");
 
 const Width = 300;
 const Height = 320;
 
-export const GridLayout = forwardRef((props, ref) => {
+export const GridLayout = (props) => {
 	const { store } = props;
+
+	const [layout, setlayout] = useState(store.itemsMapsGroup.map(x => (x.position_map_group)))
+	const [staticPosition, setStaticPosition] = useState(true);
+
 	const ResponsiveReactGridLayout = useMemo(
 		() => WidthProvider(Responsive),
 		[]
 	);
-	const [staticPosition, setStaticPosition] = useState(true);
-	console.log(store.itemsMapsGroup.map(x => (x.position_map_group)));
-
-	useMemo(() => {
-		store.setlayout(store.itemsMapsGroup.map(x => (x.position_map_group)))
-	}, [])
 
 	useMemo(() => {
 		setStaticPosition(true)
-		store.setlayout(store.itemsMapsGroup.map(x => (x.position_map_group)))
+		setlayout(store.itemsMapsGroup.map(x => (x.position_map_group)))
 	}, [store.itemsMapsGroup])
 
 	const updatePosition = async (res_id, wmg_id, pmg) => {
 		await route("wmgroup.update", res_id, wmg_id, pmg).get()
 	};
 
-	useMemo(() => {
-		store.setlayout((prev) => {
+	useEffect(() => {
+		setlayout((prev) => {
 			return prev.map((item) => {
 				return { ...item, static: staticPosition };
 			});
 		});
 		if (staticPosition === false) {
-			store.setSource({ coeff: 0.322580645, width: "500px" });
+			store.setSource({ coeff: 0.322580645, minWidth: "419px" });
 		} else {
 			store.setSource({ coeff: 1, width: "100%" });
-			store.layout.map(item => {
+			layout.map(item => {
 				let res_id = Number(item.i.split(":")[0]);
 				let wmg_id = Number(item.i.split(":")[1]);
 				let pmg = {
@@ -54,57 +58,54 @@ export const GridLayout = forwardRef((props, ref) => {
 			});
 		}
 	}, [staticPosition]);
-	
+
+	const savePositionMap = () => {
+		setStaticPosition(!staticPosition);
+	};
+
 	return (
 		<div
-			key={staticPosition}
-			className="grid-content"
+			key={store.source.coeff}
 			style={{ overflow: !staticPosition ? "hidden" : undefined }}
 		>
+
 			<div className="grid-block">
-				<Checkbox
-					checked={staticPosition}
-					onChange={(e) => {
-						setStaticPosition(e.target.checked);
-					}}
-				>
-					{staticPosition
-						? "Включить режим редактирования"
-						: "Отключить режим редактирования"}
-				</Checkbox>
+				<span className="save-button">
+					<Tooltip placement="topLeft" title={staticPosition ? editPosition : savePosition}>
+						<Button type="text" icon={staticPosition ? <Edit /> : <Save />} size="small" onClick={savePositionMap} />
+					</Tooltip>
+				</span>
+
 				<ResponsiveReactGridLayout
-					innerRef={ref}
+					className={staticPosition ? undefined : "layout-map-edit"}
 					style={{
-						width: store.source.width,
-						alignItems: "start",
+						minWidth: store.source.minWidth,
 					}}
-					allowOverlap={true}
 					compactType={"horizontal"}
-					isBounded={true}
 					autoSize={true}
 					useCSSTransforms={true}
-					margin={[0, 0]}
+					margin={staticPosition ? [30, 30] : [5, 5]}
 					rowHeight={Height * store.source.coeff}
 					isResizable={false}
 					breakpoints={{
-						lg: 1550 * store.source.coeff,
 						md: 1240 * store.source.coeff,
 						sm: 930 * store.source.coeff,
 						xs: 620 * store.source.coeff,
 						xxs: 0,
 					}}
-					cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 1 }}
-					layouts={{ lg: store.layout }}
+					cols={{ md: 4, sm: 3, xs: 2, xxs: 1 }}
+					layouts={{ md: layout }}
 					onLayoutChange={(layout) => {
-						!staticPosition && store.setlayout(layout);
+						!staticPosition && setlayout(layout);
 					}}
 					onDragStop={(e) => {
-						store.setlayout(e);
+						setlayout(e);
 					}}
 				>
-					{store.layout.map((itm) => {
+					{layout.map((p) => {
+						const item = store.itemsMapsGroup?.find(x => x.position_map_group.i === p.i);
 						return (
-							<div key={itm.i} data-grid={itm} className="block">
+							<div key={p.i} data-grid={p} className={`block ${staticPosition ? "static" : "edit"}`} >
 								<span
 									style={{
 										width: !staticPosition ? undefined : Width,
@@ -114,14 +115,15 @@ export const GridLayout = forwardRef((props, ref) => {
 									}}
 									className={staticPosition ? "content-block" : "edit-block"}
 								>
-									{itm.i}
+									{item?.display_name}
 								</span>
 							</div>
 						)
 					})}
-					
+
 				</ResponsiveReactGridLayout>
+
 			</div>
 		</div>
 	);
-})
+};

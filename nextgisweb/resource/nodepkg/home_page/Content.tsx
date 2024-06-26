@@ -11,7 +11,7 @@ import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
 import "./Content.less";
-
+import { useSource } from "./hook/useSource";
 import MapIcon from "@nextgisweb/icon/material/map";
 
 const openMap = gettext("открыть карту");
@@ -61,7 +61,9 @@ export const Content = observer(({ onChanges, ...rest }) => {
             width: undefined,
         }
     }));
-    const refGrid = useRef([]);
+    
+    const { getListMap } = useSource();
+
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
@@ -108,7 +110,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
             onChanges(v, opt);
         }
     };
-
+    
     const onClickGroupMaps = (e) => {
         store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === parseInt(e.key)));
     }
@@ -116,35 +118,34 @@ export const Content = observer(({ onChanges, ...rest }) => {
     const firstValueSort = 'Открытые данные';
 
     useMemo(() => {
-        (async () => {
-            try {
-                const maplist = await route('resource.maplist').get(); // список карт
-                const maplist_action_map = maplist.result.filter(item => item.action_map === true);
-
-                store.setListMaps(maplist_action_map);
-
-                const data = [...new Map(maplist_action_map.map(item =>
-                    [item.webmap_group_id, item])).values()]; // группы карт
-
-                let items = []
-                data.sort((x, y) => {
-                    return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
-                }).map((item) => {
-                    items.push({
-                        key: item.webmap_group_id,
-                        label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip>
-                    });
-                    items.push({ type: 'divider' });
-                })
-                store.setGroupMaps(items);
-                store.setItemsMapsGroup(maplist_action_map.filter(item => item.webmap_group_id === parseInt(items[0].key)));
-            } catch {
-                // ignore error
-            }
-        })();
+        getListMap()
+        .then(itm => {
+            store.setListMaps(itm);
+            const data = [...new Map(itm.map(x => [x.webmap_group_id, x])).values()]; // группы карт
+            let items = []
+            data.sort((x, y) => {
+                return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
+            }).map((item) => {
+                items.push({
+                    key: item.webmap_group_id,
+                    label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip>
+                });
+                items.push({ type: 'divider' });
+            })
+            store.setGroupMaps(items);
+            store.setItemsMapsGroup(itm.filter(item => item.webmap_group_id === parseInt(items[0].key)));
+        });
     }, [])
 
-    
+    useEffect(() => {
+        if (store.source.coeff === 1) {
+            getListMap()
+                .then(item => {
+                    store.setListMaps(item);
+                });
+        }
+    }, [store.source.coeff]);
+
     return (
         <>
             <ConfigProvider
@@ -199,7 +200,7 @@ export const Content = observer(({ onChanges, ...rest }) => {
                                 />
                             </div>
                             <div className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 && <GridLayout ref={refGrid} store={store} />}
+                                {store.itemsMapsGroup.length > 0 && <GridLayout store={store} />}
                             </div>
                         </div>
                     </div>
