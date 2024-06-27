@@ -23,11 +23,11 @@ const info = [
         list: [
             {
                 key: "lesnyeresursy", label: i18n.gettext("Космический мониторинг лесных ресурсов"),
-                value: 'https://uriit.ru/services/122-kosmicheskiy-monitoring-lesnykh-resursov/'
+                value: "https://uriit.ru/services/122-kosmicheskiy-monitoring-lesnykh-resursov/"
             },
             {
                 key: "vodnyeresursy", label: i18n.gettext("Расчет площади рыбоводного участка"),
-                value: 'https://uriit.ru/services/123-razrabotka-tsifrovoy-karty-rybovodnogo-uchastka/'
+                value: "https://uriit.ru/services/123-razrabotka-tsifrovoy-karty-rybovodnogo-uchastka/"
             },
         ]
     },
@@ -35,13 +35,13 @@ const info = [
 
 export const Footer = () => {
     return (
-        <div className="footer-webgis">
+        <div className="footer-home-page">
             <div className="footer-info">
                 <LogoUriitComp />
                 <div className="block-info">
                     <div className="content-services">
                         <div className="services-a">{info.find((e) => e.key === "services").value}</div>
-                        <div className="services-b">{info.find((e) => e.key === 'services').list.map(item => {
+                        <div className="services-b">{info.find((e) => e.key === "services").list.map(item => {
                             return (
                                 <span key={item.key}><Link href={item.value} target="_blank"><RightOutlined />{item.label}</Link></span>
                             )
@@ -50,7 +50,7 @@ export const Footer = () => {
                     <Divider />
                     <div className="content-info">
                         <div className="info-a">{info.find((e) => e.key === "address").value}</div>
-                        <div className="info-b">{info.filter((e) => e.key !== 'address' && e.key !== "services").map(item => {
+                        <div className="info-b">{info.filter((e) => e.key !== "address" && e.key !== "services").map(item => {
                             return (
                                 <div key={item.key} className="info-b-item">
                                     <div className="item-c">{item.label}</div>

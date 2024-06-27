@@ -60,10 +60,12 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
         this.tool._overlayInfo(e, "popup", false);
         e.preventDefault();
-    } else if (e.type === "singleclick" && e.originalEvent.ctrlKey === true) {
-        this.tool._popupMultiple(e);
-        e.preventDefault();
-    } else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+    }
+    // else if (e.type === "singleclick" && e.originalEvent.ctrlKey === true) {
+    //     this.tool._popupMultiple(e);
+    //     e.preventDefault();
+    // }
+    else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
         this.tool._overlayInfo(e, "context", false);
         e.preventDefault();
     }
@@ -159,9 +161,9 @@ export class IdentifyModule extends Component {
         }
     };
 
-    _popupMultiple = (e: MapBrowserEvent) => {
-        alert(e.pixel);
-    };
+    // _popupMultiple = (e: MapBrowserEvent) => {
+    //     alert(e.pixel);
+    // };
 
     isNumeric = (string) => Number.isFinite(+string);
 

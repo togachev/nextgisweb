@@ -596,26 +596,26 @@ msgstr "Связь с ресурсом"
 msgid "Web map group"
 msgstr "Группа веб-карты"
 
-#: nodepkg/webgis/Avatar.js:12
+#: nodepkg/home_page/Avatar.js:12
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/webgis/Avatar.js:21
+#: nodepkg/home_page/Avatar.js:21
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/webgis/Avatar.js:24 view.py:495
+#: nodepkg/home_page/Avatar.js:24 view.py:495
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/webgis/Avatar.js:26
+#: nodepkg/home_page/Avatar.js:26
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/webgis/content.js:26
+#: nodepkg/home_page/content.js:26
 msgid "Enter card name"
 msgstr "Введите название карты"
 
-#: nodepkg/webgis/header.js:93
+#: nodepkg/home_page/header.js:93
 msgid "Resources"
 msgstr "Ресурсы"

@@ -43,7 +43,7 @@ export const Header = observer(() => {
         <Divider type="vertical" style={{ height: "24px", borderColor: "#fff" }} />
     )
 
-    const header_image = routeURL('pyramid.asset.header_image')
+    const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
     return (

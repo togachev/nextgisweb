@@ -69,9 +69,9 @@ def asset_favicon(request, *, pyramid: PyramidComponent):
 
 @inject()
 def asset_header_image(request, *, pyramid: PyramidComponent):
-    fn_header_image = request.env.pyramid.options['header_image']
+    fn_header_image = request.env.pyramid.options["header_image"]
     if os.path.isfile(fn_header_image):
-        return FileResponse(fn_header_image, request=request, content_type='image/png')
+        return FileResponse(fn_header_image, request=request, content_type="image/png")
     else:
         raise HTTPNotFound()
 
@@ -166,18 +166,6 @@ def swagger(request):
         title=_("HTTP API documentation"),
         entrypoint="@nextgisweb/pyramid/swagger-ui",
         props=dict(url=request.route_url("pyramid.openapi_json")),
-    )
-
-@viewargs(renderer="webgis.mako")
-def webgis(request):
-    return dict(
-        custom_layout=True
-    )
-
-@viewargs(renderer="web_gis.mako")
-def web_gis(request):
-    return dict(
-        custom_layout=True
     )
 
 @viewargs(renderer="home_page.mako")
@@ -537,16 +525,8 @@ def setup_pyramid(comp, config):
     ).add_view(cors)
 
     config.add_route(
-        "webgis",
-        "/map-list") \
-        .add_view(webgis)
-    config.add_route(
-        "web_gis",
-        "/map-list-new") \
-        .add_view(web_gis)
-    config.add_route(
         "home_page",
-        "/home-page") \
+        "/map-list") \
         .add_view(home_page)
 
     config.add_route("pyramid.control_panel.custom_css", "/control-panel/custom-css").add_view(
@@ -729,7 +709,7 @@ def _setup_pyramid_debugtoolbar(comp, config):
     settings = config.registry.settings
     if hosts := dt_opt.get("hosts", "0.0.0.0/0" if comp.env.core.debug else None):
         settings["debugtoolbar.hosts"] = hosts
-    settings["debugtoolbar.exclude_prefixes"] = ["/static/", "/favicon.ico", '/header_image.png']
+    settings["debugtoolbar.exclude_prefixes"] = ["/static/", "/favicon.ico", "/header_image.png"]
     settings["debugtoolbar.show_on_exc_only"] = True
     settings["debugtoolbar.max_visible_requests"] = 25
     config.include(pyramid_debugtoolbar)
@@ -748,7 +728,7 @@ def _setup_pyramid_tm(comp, config):
     skip_tm_path_info = (
         "/static/",
         "/favicon.ico",
-        '/header_image.png',
+        "/header_image.png",
         "/api/component/pyramid/route",
         "/_debug_toolbar/",
     )

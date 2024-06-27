@@ -69,9 +69,10 @@
 	padding: 0;
 	border-top-right-radius: 4px;
 	border-top-left-radius: 4px;
-	width: 100%;
-	z-index: -1;
-	position: relative;
+	border-top: 1px solid var(--icon-color);
+	border-left: 1px solid var(--icon-color);
+	border-right: 1px solid var(--icon-color);
+	box-sizing: border-box;
 }
 
 .img_preview_none {
@@ -117,6 +118,9 @@
 
 		.ant-card-meta-description {
 			margin: 0 0 10px 0;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 
 			.icon-open-map {
 				margin: 0 0 0 10px;
@@ -125,6 +129,16 @@
 				padding: 0;
 				border-radius: 2px;
 				line-height: 1;
+			}
+
+			.icon-info-map {
+				line-height: 1;
+				font-size: 24px;
+				padding: 0 10px 0 0;
+
+				svg {
+					color: #b5bcc7;
+				}
 			}
 
 			a {

@@ -251,7 +251,6 @@ def widget(request) -> JSONType:
         suggested_display_name=suggested_display_name,
     )
 
-
 @viewargs(renderer="react")
 def resource_export(request):
     request.require_administrator()
@@ -261,16 +260,7 @@ def resource_export(request):
         dynmenu=request.env.pyramid.control_panel,
     )
 
-
 resource_sections = PageSections("resource_section")
-
-@viewargs(renderer="map_list.mako")
-def map_list(request):
-    return dict(
-        title=_("List of maps"),
-    )
-
-
 
 @viewargs(renderer="react")
 def webmap_group_data(request):
@@ -375,14 +365,14 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        'resource.resource_constraint',
-        '/res_const/{id:uint}/settings',
+        "resource.resource_constraint",
+        "/res_const/{id:uint}/settings",
         factory=resource_factory,
     ).add_view(resource_constraint)
 
     config.add_route(
-        'resource.webmap_group',
-        '/wmgroup',
+        "resource.webmap_group",
+        "/wmgroup",
         get=webmap_group_data,
     )
 
@@ -533,9 +523,9 @@ def setup_pyramid(comp, config):
             )
         if args.request.user.is_administrator:
             yield Link(
-                'settings/webmap_group',
+                "settings/webmap_group",
                 _("Groups of digital web maps"),
-                lambda args: (args.request.route_url('resource.webmap_group')),
+                lambda args: (args.request.route_url("resource.webmap_group")),
             )
 
     if comp.options["home.enabled"]:

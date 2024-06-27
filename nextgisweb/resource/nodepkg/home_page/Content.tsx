@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined } from "@ant-design/icons";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { Input, AutoComplete, Menu, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
@@ -15,7 +15,7 @@ import { useSource } from "./hook/useSource";
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
-        const resourceUrl = routeURL('webmap.display', resource.id)
+        const resourceUrl = routeURL("webmap.display", resource.id)
         return {
             key: `${resource.id}`,
             label: (
@@ -24,11 +24,11 @@ const resourcesToOptions = (resourcesInfo) => {
                     style={{
                         display: "inline-flex",
                         alignItems: "center",
-                        width: '100%'
+                        width: "100%"
                     }}
                 >
                     <a
-                        style={{ float: 'right', width: '100%' }}
+                        style={{ float: "right", width: "100%" }}
                         href={resourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -66,7 +66,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             const q = "";
             if (search) {
                 const query = {
-                    display_name__ilike: `%${search}%`, cls: 'webmap'
+                    display_name__ilike: `%${search}%`, cls: "webmap"
                 };
                 return query;
             }
@@ -107,14 +107,14 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === parseInt(e.key)));
     }
 
-    const firstValueSort = 'Открытые данные';
+    const firstValueSort = "Открытые данные";
 
     useMemo(() => {
         getListMap()
         .then(itm => {
             store.setListMaps(itm);
             const data = [...new Map(itm.map(x => [x.webmap_group_id, x])).values()]; // группы карт
-            let items = []
+            const items = []
             data.sort((x, y) => {
                 return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
             }).map((item) => {
@@ -122,7 +122,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     key: item.webmap_group_id,
                     label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip>
                 });
-                items.push({ type: 'divider' });
+                items.push({ type: "divider" });
             })
             store.setGroupMaps(items);
             store.setItemsMapsGroup(itm.filter(item => item.webmap_group_id === parseInt(items[0].key)));
@@ -167,7 +167,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     <div className="content">
                         <div className="search-block">
                             <AutoComplete
-                                popupClassName="webgis-map-filter-dropdown"
+                                popupClassName="home-page-map-filter-dropdown"
                                 style={{ width: "100%" }}
                                 onSelect={onSelect}
                                 options={options}
@@ -191,8 +191,8 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                     theme="light"
                                     items={store.groupMaps}
                                     onClick={onClickGroupMaps}
-                                    defaultSelectedKeys={['1']}
-                                    defaultOpenKeys={['sub1']}
+                                    defaultSelectedKeys={["1"]}
+                                    defaultOpenKeys={["sub1"]}
                                 />
                             </div>
                             <div className="content-maps-grid">

@@ -19,7 +19,7 @@ import { observer } from "mobx-react-lite";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ClearIcon from "@nextgisweb/icon/mdi/broom";
 
-const formatter: NonNullable<SliderSingleProps['tooltip']>['formatter'] = (value) => gettext("Font size") + ` ${value}`;
+const formatter: NonNullable<SliderSingleProps["tooltip"]>["formatter"] = (value) => gettext("Font size") + ` ${value}`;
 
 const title = gettext("Diagrams")
 const Delete = gettext("Delete");
