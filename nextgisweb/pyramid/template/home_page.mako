@@ -17,7 +17,7 @@
 <script>
     require([
         "@nextgisweb/gui/react-app",
-        "@nextgisweb/resource/home_page",
+        "@nextgisweb/resource/home-page",
     ], function (reactApp, home_page) {
         const config = ${json_js(config)};
 
