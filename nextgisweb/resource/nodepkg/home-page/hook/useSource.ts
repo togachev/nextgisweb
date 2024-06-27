@@ -8,5 +8,11 @@ export const useSource = () => {
         return maplist_action_map;
     }
 
-    return { getListMap };
+    const getGroupMap = async () => {
+        const groupMaps = await route("resource.mapgroup").get(); // список групп
+        const groupMaps_action_map = groupMaps?.filter(item => item.action_map === true);
+        return groupMaps_action_map;
+    }
+
+    return { getListMap, getGroupMap };
 };

@@ -81,7 +81,7 @@ class ResourceWebMapGroup(Base):
     id = db.Column(db.Integer, primary_key=True)
     webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
     action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
-
+    position_group = db.Column(db.JSONB, nullable=False)
     webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
         backref="resource_wmg")
 

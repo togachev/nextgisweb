@@ -510,16 +510,17 @@ csetting("resource_export", ResourceExport, default="data_read")
 
 def getWebmapGroup(request) -> JSONType:
     request.require_administrator()
-
     query = DBSession.query(ResourceWebMapGroup)
-
     result = list()
     for resource_wmg in query:
-        result.append(dict(
-            id=resource_wmg.id,
-            webmap_group_name=resource_wmg.webmap_group_name,
-            action_map=resource_wmg.action_map))
-                    
+        result.append(
+            dict(
+                id=resource_wmg.id,
+                webmap_group_name=resource_wmg.webmap_group_name,
+                action_map=resource_wmg.action_map,
+                position_group=resource_wmg.position_group
+            )
+        )
     return result
 
 def getMaplist(request) -> JSONType:
@@ -583,6 +584,18 @@ def wmgroup_update(request) -> JSONType:
     else:
         raise HierarchyError("Введено некорректное имя группы")
 
+def wmgroup_update_position(request) -> JSONType:
+    request.require_administrator()
+    wmg_id = int(request.matchdict["wmg_id"])
+    pos_group = json.loads(request.matchdict["pos_group"])
+    def update(wmg_id, pos_group):
+        resource_wmg = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == wmg_id).one()
+        resource_wmg.position_group = pos_group
+    with DBSession.no_autoflush:
+        update(wmg_id, pos_group)
+    DBSession.flush()
+    return dict(wmg_id=wmg_id, pos_group=pos_group)
+
 def wmgroup_create(request) -> JSONType:
     request.require_administrator()
     webmap_group_name = request.json["webmap_group_name"].strip()
@@ -619,8 +632,6 @@ def wmg_item_update(request) -> JSONType:
     with DBSession.no_autoflush:
         update(resource_id, wmg_id, pmg)
     DBSession.flush()
-    # return dict(resource_id=resource_id, wmg_id=wmg_id, pmg=pmg)
-
 
 def wmg_item_delete(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
@@ -825,6 +836,12 @@ def setup_pyramid(comp, config):
         "resource.wmgroup.update",
         "/api/wmgroup/update/{id:uint}/{wmg:str}/{action:str}/",
         get=wmgroup_update,
+    )
+
+    config.add_route(
+        "resource.wmgroup.update_position",
+        "/api/wmgroup/update_position/{wmg_id:uint}/{pos_group:str}/",
+        get=wmgroup_update_position,
     )
 
     config.add_route(

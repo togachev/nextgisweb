@@ -1,0 +1,58 @@
+.left-menu-panel {
+	.grid-content {
+		display: flex;
+		flex-flow: row wrap;
+		min-width: 0;
+	}
+
+	.block {
+		border-bottom: 1px solid #ff0000;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0;
+		user-select: none;
+		cursor: pointer;
+	}
+
+	.static {
+		border-bottom: 1px solid #d3d3d3;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	.static:hover {
+		box-shadow: 0 0 3px 3px #d3d3d357;
+	}
+
+	.content-block {
+		margin: 5px;
+		overflow: hidden;
+		white-space: initial;
+		text-overflow: ellipsis;
+		text-align: left;
+		letter-spacing: normal;
+		-webkit-line-clamp: 2;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+	}
+
+	.edit-block {
+		margin: 5px;
+		overflow: hidden;
+		white-space: initial;
+		text-overflow: ellipsis;
+		text-align: left;
+		letter-spacing: normal;
+		-webkit-line-clamp: 2;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+	}
+
+	.react-grid-layout {
+		position: relative;
+	}
+}

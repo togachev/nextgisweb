@@ -15,7 +15,7 @@ const Height = 320;
 
 export const GridLayout = (props) => {
 	const { store, config } = props;
-
+	
 	const [layout, setlayout] = useState(store.itemsMapsGroup.map(x => (x.position_map_group)))
 	const [staticPosition, setStaticPosition] = useState(true);
 
@@ -40,27 +40,28 @@ export const GridLayout = (props) => {
 			store.setSource({ coeff: 0.322580645, minWidth: "419px" });
 		} else {
 			store.setSource({ coeff: 1, width: "100%" });
-
 		}
 	}, [staticPosition]);
 
 	const savePositionMap = () => {
 		setStaticPosition(!staticPosition);
-		layout.map(item => {
-			const res_id = Number(item.i.split(":")[0]);
-			const wmg_id = Number(item.i.split(":")[1]);
-			const pmg = {
-				i: item.i,
-				x: item.x,
-				y: item.y,
-				w: item.w,
-				h: item.h,
-				static: true,
-			}
-			updatePosition(res_id, wmg_id, JSON.stringify(pmg));
-		});
+		if (staticPosition === false) {
+			layout.map(item => {
+				const res_id = Number(item.i.split(":")[0]);
+				const wmg_id = Number(item.i.split(":")[1]);
+				const pmg = {
+					i: item.i,
+					x: item.x,
+					y: item.y,
+					w: item.w,
+					h: item.h,
+					static: true,
+				}
+				updatePosition(res_id, wmg_id, JSON.stringify(pmg));
+			});
+		}
 	};
-
+	
 	return (
 		<div
 			key={store.source.coeff}

@@ -8,16 +8,23 @@ export interface SourceProps {
     minWidth: string;
 }
 
-export interface GroupMapProps {
+export interface GroupMapsProps {
     key: number;
     label: string;
     type: string;
 }
 
 export interface MapProps {
-    res_id: number;
-    wmg: number;
-    id: string;
+    i: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    static: boolean;
+}
+
+export interface GroupProps {
+    i: string;
     x: number;
     y: number;
     w: number;
@@ -39,13 +46,22 @@ export interface ListMapProps {
     webmap_group_name: string;
 }
 
+export interface GroupMapsGridProps {
+    id: number;
+    webmap_group_name: string;
+    action_map: boolean;
+    position_group: GroupProps;
+}
+
 export class HomeStore {
     staticPosition = true;
     source: SourceProps; // список карт
     listMaps: ListMapProps[] = []; // список карт
-    groupMaps: GroupMapProps[] = []; // группы карт
+    groupMaps: GroupMapsProps[] = []; // группы карт
+    groupMapsGrid: GroupMapsGridProps[] = []; // группы карт
     itemsMapsGroup: ListMapProps[] = []; // группы карт
     layout: MapProps[] = [];
+    defaultValueMenu: string;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -58,6 +74,10 @@ export class HomeStore {
 
         makeAutoObservable(this, {});
     }
+
+    setDefaultValueMenu = (defaultValueMenu: SetValue<string>) => {
+        this.setValue("defaultValueMenu", defaultValueMenu);
+    };
 
     setStaticPosition = (staticPosition: boolean) => {
         this.staticPosition = staticPosition;
@@ -73,6 +93,10 @@ export class HomeStore {
 
     setGroupMaps = (groupMaps: SetValue<string>) => {
         this.setValue("groupMaps", groupMaps);
+    };
+
+    setGroupMapsGrid = (groupMapsGrid: SetValue<string>) => {
+        this.setValue("groupMapsGrid", groupMapsGrid);
     };
 
     setItemsMapsGroup = (itemsMapsGroup: SetValue<string>) => {

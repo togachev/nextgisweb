@@ -6,6 +6,7 @@ import i18n from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { GridLayout } from "./GridLayout";
+import { GridLeftMenu } from "./GridLeftMenu";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
@@ -53,9 +54,9 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             width: undefined,
         }
     }));
-    
-    const { getListMap } = useSource();
-    
+
+    const { getListMap, getGroupMap } = useSource();
+
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
@@ -102,31 +103,41 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             onChanges(v, opt);
         }
     };
-    
+
     const onClickGroupMaps = (e) => {
         store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === parseInt(e.key)));
     }
 
     const firstValueSort = "Открытые данные";
-
+    console.log(store.defaultValueMenu);
+    
     useMemo(() => {
         getListMap()
-        .then(itm => {
-            store.setListMaps(itm);
-            const data = [...new Map(itm.map(x => [x.webmap_group_id, x])).values()]; // группы карт
-            const items = []
-            data.sort((x, y) => {
-                return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
-            }).map((item) => {
-                items.push({
-                    key: item.webmap_group_id,
-                    label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip>
-                });
-                items.push({ type: "divider" });
-            })
-            store.setGroupMaps(items);
-            store.setItemsMapsGroup(itm.filter(item => item.webmap_group_id === parseInt(items[0].key)));
-        });
+            .then(itm => {
+                store.setListMaps(itm);
+                
+                const data = [...new Map(itm.map(x => [x.webmap_group_id, x])).values()]; // группы карт
+                console.log(itm, data);
+
+                const items = [];
+                data.sort((x, y) => {
+                    return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
+                }).map((item) => {
+                    items.push({
+                        key: item.webmap_group_id,
+                        label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip>
+                    });
+                    items.push({ type: "divider" });
+                })
+                store.setGroupMaps(items);
+                store.setItemsMapsGroup(itm.filter(item => item.webmap_group_id === parseInt(items[0].key)));
+            });
+        getGroupMap()
+            .then(itm => {               
+                store.setGroupMapsGrid(itm.sort((x, y) => {
+                    return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
+                }));
+            });
     }, [])
 
     useEffect(() => {
@@ -185,7 +196,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             </AutoComplete>
                         </div>
                         <div className="menu-maps">
-                            <div className="menu-list">
+                            {/* <div className="menu-list">
                                 <Menu
                                     mode="inline"
                                     theme="light"
@@ -194,6 +205,9 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                     defaultSelectedKeys={["1"]}
                                     defaultOpenKeys={["sub1"]}
                                 />
+                            </div> */}
+                            <div className="menu-list">
+                            {store.groupMapsGrid.length > 0 && <GridLeftMenu store={store} />}
                             </div>
                             <div className="content-maps-grid">
                                 {store.itemsMapsGroup.length > 0 && <GridLayout config={config} store={store} />}
