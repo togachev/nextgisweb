@@ -20,24 +20,28 @@
 
 %>
 <div id="header" class="ngw-pyramid-layout-header">
-    <a href="${return_url if return_url else request.application_url}">
-        %if return_url:
-            <img src="${request.static_url('asset/pyramid/return-button.svg')}"/>
-        %elif request.env.core.settings_exists('pyramid', 'logo'):
-            <% ckey = request.env.core.settings_get('pyramid', 'logo.ckey') %>
-            <img src="${request.route_url('pyramid.asset.hlogo', _query=dict(ckey=ckey))}"/>
-        %else:
-            <%
-                global svglogo
-                if svglogo is None:
-                    logo_path = Path(request.env.pyramid.options["logo"])
-                    svglogo = Markup(logo_path.read_text())
-            %>
-            ${svglogo}
-        %endif
-    </a>
-    <div id="link-resource"></div>
-    <div class="text">${title}</div>
+
+    <div class="panel-text">
+        <a href="${return_url if return_url else request.application_url}">
+            %if return_url:
+                <img src="${request.static_url('asset/pyramid/return-button.svg')}"/>
+            %elif request.env.core.settings_exists('pyramid', 'logo'):
+                <% ckey = request.env.core.settings_get('pyramid', 'logo.ckey') %>
+                <img src="${request.route_url('pyramid.asset.hlogo', _query=dict(ckey=ckey))}"/>
+            %else:
+                <%
+                    global svglogo
+                    if svglogo is None:
+                        logo_path = Path(request.env.pyramid.options["logo"])
+                        svglogo = Markup(logo_path.read_text())
+                %>
+                ${svglogo}
+            %endif
+        </a>
+        <div id="link-resource"></div>
+        <div class="text">${title}</div>
+    </div>
+
     <div class="container">
         %if not hide_resource_filter:
             <div class="header-resources-filter" id="resourcesFilter"></div>
