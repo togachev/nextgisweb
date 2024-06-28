@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { Input, AutoComplete, Menu, FloatButton, Tooltip, ConfigProvider, } from "@nextgisweb/gui/antd";
+import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -49,9 +49,11 @@ const resourcesToOptions = (resourcesInfo) => {
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore({
-        source: {
+        sourceMaps: {
             coeff: 1,
-            width: undefined,
+        },
+        sourceGroup: {
+            update: false,
         }
     }));
 
@@ -104,50 +106,39 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         }
     };
 
-    const onClickGroupMaps = (e) => {
-        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === parseInt(e.key)));
+    const updateGridPosition = (key) => {
+        if (key === "all") {
+            getGroupMap()
+            .then(group => {
+                const groupId = group.find(g => g.position_group.x === 0 && g.position_group.y === 0).id;
+                getListMap()
+                    .then(maps => {
+                        store.setListMaps(maps);
+                        store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId));
+                        store.setGroupMapsGrid(group.sort((x, y) => {
+                            return x.id === groupId ? -1 : y.id === groupId ? 1 : 0;
+                        }));
+                    });
+            });            
+        } else {
+            getListMap()
+            .then(item => {
+                store.setListMaps(item);
+            });
+        }
     }
 
-    const firstValueSort = "Открытые данные";
-    console.log(store.defaultValueMenu);
-    
     useMemo(() => {
-        getListMap()
-            .then(itm => {
-                store.setListMaps(itm);
-                
-                const data = [...new Map(itm.map(x => [x.webmap_group_id, x])).values()]; // группы карт
-                console.log(itm, data);
-
-                const items = [];
-                data.sort((x, y) => {
-                    return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
-                }).map((item) => {
-                    items.push({
-                        key: item.webmap_group_id,
-                        label: <Tooltip placement="topLeft" title={item.webmap_group_name}>{item.webmap_group_name}</Tooltip>
-                    });
-                    items.push({ type: "divider" });
-                })
-                store.setGroupMaps(items);
-                store.setItemsMapsGroup(itm.filter(item => item.webmap_group_id === parseInt(items[0].key)));
-            });
-        getGroupMap()
-            .then(itm => {               
-                store.setGroupMapsGrid(itm.sort((x, y) => {
-                    return x.webmap_group_name === firstValueSort ? -1 : y.webmap_group_name === firstValueSort ? 1 : 0;
-                }));
-            });
+        updateGridPosition("all")
     }, [])
 
     useEffect(() => {
-        if (store.source.coeff === 1) {
-            getListMap()
-                .then(item => {
-                    store.setListMaps(item);
-                });
-        }
-    }, [store.source.coeff]);
+        (store.sourceGroup.update === true) && updateGridPosition("all");
+    }, [store.sourceGroup.update]);
+
+    useEffect(() => {
+        (store.sourceMaps.coeff !== 1) && updateGridPosition("maps");
+    }, [store.sourceMaps.coeff]);
 
     return (
         <>
@@ -171,6 +162,34 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             borderRadius: 3,
                         },
                     },
+                    // Radio: {
+                    //     buttonBg: "#ffffff",
+                    //     buttonCheckedBg: "#106a90",
+                    //     buttonCheckedBgDisabled	: "#000000",
+                    //     buttonCheckedColorDisabled: "#EF2929",
+                    //     buttonColor: "#106a90",
+                    //     buttonPaddingInline: 5,
+                    //     buttonSolidCheckedActiveBg: "#C17D11",
+                    //     buttonSolidCheckedBg: "#8EBE47",
+                    //     buttonSolidCheckedColor: "#4E9A06",
+                    //     buttonSolidCheckedHoverBg: "#FCAF3E",
+                    //     dotColorDisabled: "#4E9A06",
+                    //     colorBgContainer: "#FCAF3E",
+                    //     colorBgContainerDisabled: "#A40000",
+                    //     colorBorder: "#CE5C00",
+                    //     colorPrimary: "#C4A000",
+                    //     colorPrimaryActive: "#4E9A06",
+                    //     colorPrimaryBorder: "#204A87",
+                    //     colorPrimaryHover: "#5C3566",
+                    //     colorText: "#8F5902",
+                    //     colorTextDisabled: "#2E3436",
+                    //     borderRadius: 4,
+                    //     controlHeight: 24,
+                    //     fontSize:16, //
+                    //     lineType: 'dotted', //
+                    //     lineWidth: 1, //
+                    //     lineHeight: 1, //
+                    //   }
                 }}
             >
                 <Header />
@@ -196,20 +215,11 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             </AutoComplete>
                         </div>
                         <div className="menu-maps">
-                            {/* <div className="menu-list">
-                                <Menu
-                                    mode="inline"
-                                    theme="light"
-                                    items={store.groupMaps}
-                                    onClick={onClickGroupMaps}
-                                    defaultSelectedKeys={["1"]}
-                                    defaultOpenKeys={["sub1"]}
-                                />
-                            </div> */}
                             <div className="menu-list">
-                            {store.groupMapsGrid.length > 0 && <GridLeftMenu store={store} />}
+                                {store.groupMapsGrid.length > 0 && <GridLeftMenu config={config} store={store} />}
                             </div>
-                            <div className="content-maps-grid">
+                            <div
+                                className="content-maps-grid">
                                 {store.itemsMapsGroup.length > 0 && <GridLayout config={config} store={store} />}
                             </div>
                         </div>

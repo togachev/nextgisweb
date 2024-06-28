@@ -2,12 +2,14 @@ import { makeAutoObservable } from "mobx";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
-export interface SourceProps {
+export interface SourceMapsProps {
     coeff: number;
-    width: string;
     minWidth: string;
 }
+export interface SourceGroupProps {
+    update: boolean;
 
+}
 export interface GroupMapsProps {
     key: number;
     label: string;
@@ -55,8 +57,9 @@ export interface GroupMapsGridProps {
 
 export class HomeStore {
     staticPosition = true;
-    source: SourceProps; // список карт
-    listMaps: ListMapProps[] = []; // список карт
+    sourceMaps: SourceMapsProps; 
+    sourceGroup: SourceGroupProps; 
+    listMaps: ListMapProps[] = []; 
     groupMaps: GroupMapsProps[] = []; // группы карт
     groupMapsGrid: GroupMapsGridProps[] = []; // группы карт
     itemsMapsGroup: ListMapProps[] = []; // группы карт
@@ -83,8 +86,12 @@ export class HomeStore {
         this.staticPosition = staticPosition;
     };
 
-    setSource = (source: SetValue<string>) => {
-        this.setValue("source", source);
+    setSourceMaps = (sourceMaps: SetValue<string>) => {
+        this.setValue("sourceMaps", sourceMaps);
+    };
+
+    setSourceGroup = (sourceGroup: SetValue<string>) => {
+        this.setValue("sourceGroup", sourceGroup);
     };
 
     setListMaps = (listMaps: SetValue<string>) => {

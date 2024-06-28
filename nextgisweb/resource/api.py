@@ -509,18 +509,18 @@ ResourceExport = Annotated[
 csetting("resource_export", ResourceExport, default="data_read")
 
 def getWebmapGroup(request) -> JSONType:
-    request.require_administrator()
     query = DBSession.query(ResourceWebMapGroup)
     result = list()
     for resource_wmg in query:
-        result.append(
-            dict(
-                id=resource_wmg.id,
-                webmap_group_name=resource_wmg.webmap_group_name,
-                action_map=resource_wmg.action_map,
-                position_group=resource_wmg.position_group
+        if resource_wmg.action_map:
+            result.append(
+                dict(
+                    id=resource_wmg.id,
+                    webmap_group_name=resource_wmg.webmap_group_name,
+                    action_map=resource_wmg.action_map,
+                    position_group=resource_wmg.position_group
+                )
             )
-        )
     return result
 
 def getMaplist(request) -> JSONType:

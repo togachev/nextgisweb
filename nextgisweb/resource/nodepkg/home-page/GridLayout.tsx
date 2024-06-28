@@ -8,7 +8,7 @@ import Edit from "@nextgisweb/icon/material/edit";
 import Save from "@nextgisweb/icon/material/save";
 import { MapTile } from "./MapTile";
 
-const editPosition = gettext("Изменить местоположение");
+const editPosition = gettext("Изменить");
 const savePosition = gettext("Сохранить изменения");
 
 const Height = 320;
@@ -37,9 +37,9 @@ export const GridLayout = (props) => {
 			});
 		});
 		if (staticPosition === false) {
-			store.setSource({ coeff: 0.322580645, minWidth: "419px" });
+			store.setSourceMaps({ coeff: 0.322580645, minWidth: "419px" });
 		} else {
-			store.setSource({ coeff: 1, width: "100%" });
+			store.setSourceMaps({ coeff: 1, width: "100%" });
 		}
 	}, [staticPosition]);
 
@@ -64,32 +64,34 @@ export const GridLayout = (props) => {
 	
 	return (
 		<div
-			key={store.source.coeff}
+			className="map-grid-panel"
+			key={store.sourceMaps.coeff}
 			style={{ overflow: !staticPosition ? "hidden" : undefined }}
 		>
 			<div className="grid-block">
 				{config.isAdministrator === true && (
 					<span className="save-button">
 						<Tooltip placement="topLeft" title={staticPosition ? editPosition : savePosition}>
-							<Button type="text" icon={staticPosition ? <Edit /> : <Save />} size="small" onClick={savePositionMap} />
+							<Button icon={staticPosition ? <Edit /> : <Save />} size="small" onClick={savePositionMap} />
 						</Tooltip>
 					</span>
 				)}
 				<ResponsiveReactGridLayout
 					className={staticPosition ? undefined : "layout-map-edit"}
 					style={{
-						minWidth: store.source.minWidth,
+						minWidth: store.sourceMaps.minWidth,
 					}}
+					// isBounded={true}
 					compactType={"horizontal"}
 					autoSize={true}
 					useCSSTransforms={true}
-					margin={staticPosition ? [10, 40] : [5, 5]}
-					rowHeight={Height * store.source.coeff}
+					margin={staticPosition ? [10, 40] : [10, 10]}
+					rowHeight={Height * store.sourceMaps.coeff}
 					isResizable={false}
 					breakpoints={{
-						md: 1240 * store.source.coeff,
-						sm: 930 * store.source.coeff,
-						xs: 620 * store.source.coeff,
+						md: 1240 * store.sourceMaps.coeff,
+						sm: 930 * store.sourceMaps.coeff,
+						xs: 620 * store.sourceMaps.coeff,
 						xxs: 0,
 					}}
 					cols={{ md: 4, sm: 3, xs: 2, xxs: 1 }}
@@ -108,7 +110,7 @@ export const GridLayout = (props) => {
 								<span
 									style={{
 										height: !staticPosition ? undefined : Height,
-										maxHeight: !staticPosition ? Height * store.source.coeff : Height,
+										maxHeight: !staticPosition ? Height * store.sourceMaps.coeff : Height,
 									}}
 									className={staticPosition ? "content-block" : "edit-block"}
 								>

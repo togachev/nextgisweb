@@ -6,26 +6,33 @@
 	}
 
 	.block {
-		border-bottom: 1px solid #ff0000;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0;
 		user-select: none;
 		cursor: pointer;
-	}
 
+	}
+	.edit {
+		border: var(--divider-color) solid 1px;
+		box-sizing: border-box;
+		border-radius: 3px;
+		box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+		cursor: move;
+	}
 	.static {
-		border-bottom: 1px solid #d3d3d3;
+		// border: 1px solid var(--icon-color);
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0;
 		box-sizing: border-box;
+		// border-radius: 4px;
 	}
 
 	.static:hover {
-		box-shadow: 0 0 3px 3px #d3d3d357;
+		// box-shadow: 0 0 3px 3px #d3d3d357;
 	}
 
 	.content-block {
@@ -41,6 +48,7 @@
 	}
 
 	.edit-block {
+
 		margin: 5px;
 		overflow: hidden;
 		white-space: initial;
@@ -52,6 +60,18 @@
 		-webkit-box-orient: vertical;
 	}
 
+	.layout-map-edit {
+		border: 1px solid var(--divider-color);
+		padding: 0;
+		min-height: calc(100vh - 489px) !important;
+		margin: 0;
+		border-radius: 3px;
+	}
+	.save-button {
+		height: 26px;
+		display: flex;
+		position: inherit;
+	}
 	.react-grid-layout {
 		position: relative;
 	}
