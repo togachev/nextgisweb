@@ -594,7 +594,6 @@ def wmgroup_update_position(request) -> JSONType:
     with DBSession.no_autoflush:
         update(wmg_id, pos_group)
     DBSession.flush()
-    return dict(wmg_id=wmg_id, pos_group=pos_group)
 
 def wmgroup_create(request) -> JSONType:
     request.require_administrator()

@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import { Button, Flex, Radio, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Radio, Space, Tooltip } from "@nextgisweb/gui/antd";
 import Edit from "@nextgisweb/icon/material/edit";
 import Save from "@nextgisweb/icon/material/save";
-import DragHandle from "@nextgisweb/icon/material/drag_handle";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./GridLeftMenu.less";
@@ -15,16 +14,18 @@ export const GridLeftMenu = (props) => {
 	const { store, config } = props;
 	const [layout, setlayout] = useState(store.groupMapsGrid.map(x => (x.position_group)));
 	const [staticPosition, setStaticPosition] = useState(true);
+	const [radioValue, setRadioValue] = useState(layout.find(g => g.x === 0 && g.y === 0).i);
 
 	const ResponsiveReactGridLayout = useMemo(() => WidthProvider(Responsive), []);
 
 	useMemo(() => {
 		setStaticPosition(true)
 		setlayout(store.groupMapsGrid.map(x => (x.position_group)))
+		setRadioValue(layout.find(g => g.x === 0 && g.y === 0).i);
 	}, [store.groupMapsGrid])
 
 	const updatePosition = async (wmg_id, position_group) => {
-		await route("resource.wmgroup.update_position", wmg_id, position_group).get()
+		await route("resource.wmgroup.update_position", wmg_id, position_group).get();
 	};
 
 	useEffect(() => {
@@ -56,7 +57,7 @@ export const GridLeftMenu = (props) => {
 					h: item.h,
 					static: true,
 				}
-				updatePosition(wmg_id, JSON.stringify(position_group));
+				updatePosition(wmg_id, JSON.stringify(position_group))
 			});
 		}
 	};
@@ -64,19 +65,13 @@ export const GridLeftMenu = (props) => {
 	const onClickGroupMapsGrid = (id) => {
 		store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === parseInt(id)));
 	}
-	const [radioValue, setRadioValue] = useState('Apple');
 
-	const onChange3 = (e) => {
-		console.log(e);
-		//  setRadioValue(value);
-	};
 	return (
 		<div
 			className="left-menu-panel grid-content"
 			style={{ overflow: !staticPosition ? "hidden" : undefined }}
 		>
 			<div>
-
 				{config.isAdministrator === true && (
 					<span className="save-button">
 						<Tooltip placement="topLeft" title={staticPosition ? editPosition : savePosition}>
@@ -88,7 +83,7 @@ export const GridLeftMenu = (props) => {
 						</Tooltip>
 					</span>
 				)}
-				<Radio.Group defaultValue={radioValue} buttonStyle="solid">
+				<Radio.Group onChange={(e) => { setRadioValue(e.target.value) }} value={radioValue}>
 					<Space direction="vertical">
 						<ResponsiveReactGridLayout
 							className={staticPosition ? undefined : "layout-map-edit"}
@@ -118,13 +113,7 @@ export const GridLeftMenu = (props) => {
 										data-grid={p}
 										className={`block ${staticPosition ? "static" : "edit"}`}
 									>
-										<Radio.Button
-											onChange={onChange3} value={p.i}
-											style={{
-												width: "100%",
-												height: "100%",
-											}}
-										>
+										<Radio.Button value={p.i} style={{ width: "100%", height: "100%" }}>
 											{!staticPosition ?
 												(<span className={staticPosition ? "content-block" : "edit-block"}>
 													{item.webmap_group_name}
@@ -141,23 +130,10 @@ export const GridLeftMenu = (props) => {
 											}
 										</Radio.Button>
 									</span>
-									// <div
-									// 	key={p.i}
-									// 	data-grid={p}
-									// 	className={`block ${staticPosition ? "static" : "edit"}`}
-									// 	title={item.webmap_group_name}
-									// 	onClick={() => onClickGroupMapsGrid(p.i)}
-									// 	style={!staticPosition && { pointerEvents: "none" }}
-									// >
-									// 	<span className={staticPosition ? "content-block" : "edit-block"}>
-									// 		{item.webmap_group_name}
-									// 	</span>
-									// </div>
 								)
 							})}
-
-
-						</ResponsiveReactGridLayout>				</Space>
+						</ResponsiveReactGridLayout>
+					</Space>
 				</Radio.Group>
 			</div>
 		</div>

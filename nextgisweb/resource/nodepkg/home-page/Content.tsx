@@ -109,22 +109,23 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     const updateGridPosition = (key) => {
         if (key === "all") {
             getGroupMap()
-            .then(group => {
-                const groupId = group.find(g => g.position_group.x === 0 && g.position_group.y === 0).id;
-                getListMap()
-                    .then(maps => {
-                        store.setListMaps(maps);
-                        store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId));
-                        store.setGroupMapsGrid(group.sort((x, y) => {
-                            return x.id === groupId ? -1 : y.id === groupId ? 1 : 0;
-                        }));
-                    });
-            });            
+                .then(group => {
+                    const groupId = group.find(g => g.position_group.x === 0 && g.position_group.y === 0).id;
+
+                    getListMap()
+                        .then(maps => {
+                            store.setListMaps(maps);
+                            store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId));
+                            store.setGroupMapsGrid(group.sort((x, y) => {
+                                return x.id === groupId ? -1 : y.id === groupId ? 1 : 0;
+                            }));
+                        });
+                });
         } else {
             getListMap()
-            .then(item => {
-                store.setListMaps(item);
-            });
+                .then(item => {
+                    store.setListMaps(item);
+                });
         }
     }
 
@@ -162,34 +163,6 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             borderRadius: 3,
                         },
                     },
-                    // Radio: {
-                    //     buttonBg: "#ffffff",
-                    //     buttonCheckedBg: "#106a90",
-                    //     buttonCheckedBgDisabled	: "#000000",
-                    //     buttonCheckedColorDisabled: "#EF2929",
-                    //     buttonColor: "#106a90",
-                    //     buttonPaddingInline: 5,
-                    //     buttonSolidCheckedActiveBg: "#C17D11",
-                    //     buttonSolidCheckedBg: "#8EBE47",
-                    //     buttonSolidCheckedColor: "#4E9A06",
-                    //     buttonSolidCheckedHoverBg: "#FCAF3E",
-                    //     dotColorDisabled: "#4E9A06",
-                    //     colorBgContainer: "#FCAF3E",
-                    //     colorBgContainerDisabled: "#A40000",
-                    //     colorBorder: "#CE5C00",
-                    //     colorPrimary: "#C4A000",
-                    //     colorPrimaryActive: "#4E9A06",
-                    //     colorPrimaryBorder: "#204A87",
-                    //     colorPrimaryHover: "#5C3566",
-                    //     colorText: "#8F5902",
-                    //     colorTextDisabled: "#2E3436",
-                    //     borderRadius: 4,
-                    //     controlHeight: 24,
-                    //     fontSize:16, //
-                    //     lineType: 'dotted', //
-                    //     lineWidth: 1, //
-                    //     lineHeight: 1, //
-                    //   }
                 }}
             >
                 <Header />

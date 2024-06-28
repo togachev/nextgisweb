@@ -8,24 +8,9 @@ export interface SourceMapsProps {
 }
 export interface SourceGroupProps {
     update: boolean;
-
-}
-export interface GroupMapsProps {
-    key: number;
-    label: string;
-    type: string;
 }
 
-export interface MapProps {
-    i: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    static: boolean;
-}
-
-export interface GroupProps {
+export interface LayoutProps {
     i: string;
     x: number;
     y: number;
@@ -40,7 +25,7 @@ export interface ListMapProps {
     id: number;
     label: string;
     owner: boolean;
-    position_map_group: MapProps;
+    position_map_group: LayoutProps;
     preview_description: string;
     preview_fileobj_id: number;
     value: number;
@@ -52,19 +37,15 @@ export interface GroupMapsGridProps {
     id: number;
     webmap_group_name: string;
     action_map: boolean;
-    position_group: GroupProps;
+    position_group: LayoutProps;
 }
 
 export class HomeStore {
-    staticPosition = true;
     sourceMaps: SourceMapsProps; 
     sourceGroup: SourceGroupProps; 
     listMaps: ListMapProps[] = []; 
-    groupMaps: GroupMapsProps[] = []; // группы карт
-    groupMapsGrid: GroupMapsGridProps[] = []; // группы карт
-    itemsMapsGroup: ListMapProps[] = []; // группы карт
-    layout: MapProps[] = [];
-    defaultValueMenu: string;
+    groupMapsGrid: GroupMapsGridProps[] = [];
+    itemsMapsGroup: ListMapProps[] = [];
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -78,14 +59,6 @@ export class HomeStore {
         makeAutoObservable(this, {});
     }
 
-    setDefaultValueMenu = (defaultValueMenu: SetValue<string>) => {
-        this.setValue("defaultValueMenu", defaultValueMenu);
-    };
-
-    setStaticPosition = (staticPosition: boolean) => {
-        this.staticPosition = staticPosition;
-    };
-
     setSourceMaps = (sourceMaps: SetValue<string>) => {
         this.setValue("sourceMaps", sourceMaps);
     };
@@ -98,20 +71,12 @@ export class HomeStore {
         this.setValue("listMaps", listMaps);
     };
 
-    setGroupMaps = (groupMaps: SetValue<string>) => {
-        this.setValue("groupMaps", groupMaps);
-    };
-
     setGroupMapsGrid = (groupMapsGrid: SetValue<string>) => {
         this.setValue("groupMapsGrid", groupMapsGrid);
     };
 
     setItemsMapsGroup = (itemsMapsGroup: SetValue<string>) => {
         this.setValue("itemsMapsGroup", itemsMapsGroup);
-    };
-
-    setlayout = (layout: SetValue<string>) => {
-        this.setValue("layout", layout);
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

@@ -15,7 +15,7 @@ const Height = 320;
 
 export const GridLayout = (props) => {
 	const { store, config } = props;
-	
+
 	const [layout, setlayout] = useState(store.itemsMapsGroup.map(x => (x.position_map_group)))
 	const [staticPosition, setStaticPosition] = useState(true);
 
@@ -27,7 +27,7 @@ export const GridLayout = (props) => {
 	}, [store.itemsMapsGroup])
 
 	const updatePosition = async (res_id, wmg_id, pmg) => {
-		await route("wmgroup.update", res_id, wmg_id, pmg).get()
+		await route("wmgroup.update", res_id, wmg_id, pmg).get();
 	};
 
 	useEffect(() => {
@@ -57,11 +57,11 @@ export const GridLayout = (props) => {
 					h: item.h,
 					static: true,
 				}
-				updatePosition(res_id, wmg_id, JSON.stringify(pmg));
+				updatePosition(res_id, wmg_id, JSON.stringify(pmg))
 			});
 		}
 	};
-	
+
 	return (
 		<div
 			className="map-grid-panel"
@@ -78,10 +78,7 @@ export const GridLayout = (props) => {
 				)}
 				<ResponsiveReactGridLayout
 					className={staticPosition ? undefined : "layout-map-edit"}
-					style={{
-						minWidth: store.sourceMaps.minWidth,
-					}}
-					// isBounded={true}
+					style={{ minWidth: store.sourceMaps.minWidth }}
 					compactType={"horizontal"}
 					autoSize={true}
 					useCSSTransforms={true}
@@ -96,12 +93,8 @@ export const GridLayout = (props) => {
 					}}
 					cols={{ md: 4, sm: 3, xs: 2, xxs: 1 }}
 					layouts={{ md: layout }}
-					onLayoutChange={(layout) => {
-						!staticPosition && setlayout(layout);
-					}}
-					onDragStop={(e) => {
-						setlayout(e);
-					}}
+					onLayoutChange={(layout) => { !staticPosition && setlayout(layout); }}
+					onDragStop={(e) => { setlayout(e); }}
 				>
 					{layout.map((p, index) => {
 						const item = store.itemsMapsGroup?.find(x => x.position_map_group.i === p.i);
