@@ -5,7 +5,8 @@ import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gu
 import i18n from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { ContainerMenu } from "./Container";
+import { ContainerMenu } from "./ContainerMenu";
+import { ContainerMaps } from "./ContainerMaps";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
@@ -110,13 +111,13 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             getGroupMap()
                 .then(group => {
                     store.setGroupMapsGrid(group.sort((a, b) => a.id_pos - b.id_pos))
+                    const groupId = group.sort((a, b) => a.id_pos - b.id_pos)[0].id
                     getListMap()
                         .then(maps => {
+                            console.log(maps);
+                            
                             store.setListMaps(maps);
-                            store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId));
-                            store.setGroupMapsGrid(group.sort((x, y) => {
-                                return x.id === groupId ? -1 : y.id === groupId ? 1 : 0;
-                            }));
+                            store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
                         });
                 });
         }
@@ -133,8 +134,8 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     }, [])
 
     // useEffect(() => {
-    //     (store.sourceGroup.update === true) && updateGridPosition("all");
-    // }, [store.sourceGroup.update]);
+    //     updateGridPosition("all");
+    // }, [store.itemsMapsGroup]);
 
     // useEffect(() => {
     //     (store.sourceMaps.coeff !== 1) && updateGridPosition("maps");
@@ -194,6 +195,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             </AutoComplete>
                         </div>
                         {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} />}
+                        {store.itemsMapsGroup.length > 0 && <ContainerMaps config={config} store={store} />}
                         {/* <div className="menu-maps">
                             <div className="menu-list">
                                 {store.groupMapsGrid.length > 0 && <GridLeftMenu config={config} store={store} />}

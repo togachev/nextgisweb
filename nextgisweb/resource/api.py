@@ -542,7 +542,8 @@ def getMaplist(request) -> JSONType:
             if res.has_permission(PERM_READ, request.user):
                 result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name, description=res.description,
                 webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id,
-                # position_map_group=wmg.position_map_group,
+                idx=wmg.id,
+                id_pos=wmg.id_pos,
                 action_map=res_wmg.action_map,
                 preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
                 preview_description=None if res_social == None else res_social.preview_description))
@@ -627,18 +628,18 @@ def wmg_item_create(request) -> JSONType:
     except SQLAlchemyError as exc:
         raise ExternalDatabaseError(message=_("ERROR: Error not create."), sa_error=exc)
 
-# def wmg_item_update(request) -> JSONType:
-#     request.require_administrator()
-#     resource_id = int(request.matchdict["res_id"])
-#     wmg_id = int(request.matchdict["wmg_id"])
-#     pmg = json.loads(request.matchdict["pmg"])
-#     def update(resource_id, wmg_id, pmg):
-#         wmg_resource = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.resource_id == resource_id, WebMapGroupResource.webmap_group_id == wmg_id).one()
-#         wmg_resource.position_map_group = pmg
+def wmg_item_update(request) -> JSONType:
+    request.require_administrator()
+    id = int(request.matchdict["id"])
+    id_pos = int(request.matchdict["id_pos"])
+    def update(id, id_pos):
+        wmg_resource = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.id == id).one()
+        wmg_resource.id_pos = id_pos
 
-#     with DBSession.no_autoflush:
-#         update(resource_id, wmg_id, pmg)
-#     DBSession.flush()
+    with DBSession.no_autoflush:
+        update(id, id_pos)
+    DBSession.flush()
+    return(dict(id=id, id_pos=id_pos))
 
 def wmg_item_delete(request) -> JSONType:
     request.resource_permission(PERM_UPDATE)
@@ -819,11 +820,11 @@ def setup_pyramid(comp, config):
         get=wmg_item_create,
     )
 
-    # config.add_route(
-    #     "wmgroup.update",
-    #     "/api/wmg/update/{res_id:uint}/{wmg_id:str}/{pmg:str}/",
-    #     get=wmg_item_update,
-    # )
+    config.add_route(
+        "wmgroup.update",
+        "/api/wmg/update/{id:uint}/{id_pos:uint}/",
+        get=wmg_item_update,
+    )
 
     config.add_route(
         "wmgroup.delete",

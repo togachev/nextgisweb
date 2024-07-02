@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import { Radio, Space } from "@nextgisweb/gui/antd";
+import { Radio } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import {
     DndContext,
@@ -16,7 +16,8 @@ import {
 
 import "./Container.less";
 
-const SortableItem = (props) => {
+const SortableMenu = (props) => {
+    const { id, name, store, disable } = props;
     const {
         attributes,
         listeners,
@@ -24,7 +25,7 @@ const SortableItem = (props) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: props.id, disabled: props.disable });
+    } = useSortable({ id: id, disabled: disable });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -33,14 +34,26 @@ const SortableItem = (props) => {
         height: 40,
         zIndex: isDragging ? "100" : "auto",
         opacity: isDragging ? 0.3 : 1,
-        cursor: props.disable ? "pointer" : "move",
+        cursor: disable ? "pointer" : "move",
     };
 
+    const onClickGroupMapsGrid = (id) => {
+        // console.log(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.id_pos - b.id_pos));
+        
+        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.id_pos - b.id_pos));
+    }
+
     return (
-        <div {...listeners} {...attributes} ref={setNodeRef} style={style} className="menu-item" title={props.name}>
-            <div className="menu-item-content">
-                {props.name}
-            </div>
+        <div {...listeners} {...attributes} ref={setNodeRef}>
+            <Radio.Button
+                title={name}
+                className="menu-item"
+                style={style}
+                key={id}
+                value={id}
+                onClick={() => onClickGroupMapsGrid(id)}>
+                <div className="menu-item-content">{name}</div>
+            </Radio.Button>
         </div>
     );
 };
@@ -80,9 +93,7 @@ export const ContainerMenu = (props) => {
         }
     }, [disable]);
 
-    const onClickGroupMapsGrid = (id) => {
-		store.setItemsMapsGroup(store.listMaps.filter(item => item.id === id));
-	}
+
 
     return (
         <div className="dnd-container">
@@ -92,25 +103,22 @@ export const ContainerMenu = (props) => {
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                 >
-                    <Radio.Group onChange={(e) => { setRadioValue(e.target.value) }} value={radioValue}>
-                        <SortableContext
-                            items={itemIds}
-                            strategy={verticalListSortingStrategy}
-                        >
+                    <SortableContext
+                        items={itemIds}
+                        strategy={verticalListSortingStrategy}
+                    ><Radio.Group onChange={(e) => { setRadioValue(e.target.value) }} value={radioValue}>
                             {store.groupMapsGrid.map((item) => (
-                                <Radio.Button key={item.id} value={item.id}>
-                                    <SortableItem
-                                        key={item.id}
-                                        id={item.id}
-                                        name={item.webmap_group_name}
-                                        handle={true}
-                                        disable={disable}
-                                        onClick={() => onClickGroupMapsGrid(item.id)}
-                                    />
-                                </Radio.Button>
+                                <SortableMenu
+                                    key={item.id}
+                                    id={item.id}
+                                    name={item.webmap_group_name}
+                                    handle={true}
+                                    disable={disable}
+                                    store={store}
+                                />
                             ))}
-                        </SortableContext>
-                    </Radio.Group>
+                        </Radio.Group>
+                    </SortableContext>
                 </DndContext>
             </div>
         </div>

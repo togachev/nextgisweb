@@ -23,6 +23,7 @@ export interface ListMapProps {
     action_map: boolean;
     display_name: string;
     id: number;
+    idx: number;
     label: string;
     owner: boolean;
     position_map_group: LayoutProps;
