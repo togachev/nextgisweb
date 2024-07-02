@@ -28,13 +28,15 @@
 	}
 
 	.content-block {
-		position: absolute;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		box-sizing: border-box;
-		padding: 0;
-		border-radius: 3px;
+		margin: 5px;
+		overflow: hidden;
+		white-space: initial;
+		text-overflow: ellipsis;
+		text-align: left;
+		letter-spacing: normal;
+		-webkit-line-clamp: 1;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
 	}
 
 	.edit-block {
@@ -47,18 +49,13 @@
 		height: 100%;
 	}
 
-	.layout-map-edit {
-		border: 1px solid var(--divider-color);
-		padding: 0;
-		min-height: calc(100vh - 489px) !important;
-		margin: 0;
-		border-radius: 3px;
-	}
-
 	.save-button {
 		height: 26px;
 		display: flex;
-		position: inherit;
+		position: absolute;
+		left: 0;
+		top: 0;
+		z-index: 1;
 	}
 
 	.img_preview {
@@ -193,5 +190,84 @@
 
 	.react-grid-layout {
 		position: relative;
+	}
+}
+
+.left-menu-panel {
+	position: relative;
+
+	.grid-content {
+		display: flex;
+		flex-flow: row wrap;
+		min-width: 0;
+	}
+
+	.block {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0;
+		user-select: none;
+		cursor: pointer;
+
+	}
+
+	.edit {
+		box-sizing: border-box;
+		border-radius: 4px;
+		cursor: move;
+		border: 1px solid var(--divider-color);
+	}
+
+	.static {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		box-sizing: content-box;
+		border-bottom: 1px solid var(--divider-color);
+		padding: 5px;
+		font-weight: 500;
+	}
+
+	.content-block {
+		margin: 5px;
+		overflow: hidden;
+		white-space: initial;
+		text-overflow: ellipsis;
+		text-align: left;
+		letter-spacing: normal;
+		-webkit-line-clamp: 1;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+	}
+
+	.edit-block {
+		margin: 5px;
+		overflow: hidden;
+		white-space: initial;
+		text-overflow: ellipsis;
+		text-align: left;
+		letter-spacing: normal;
+		-webkit-line-clamp: 1;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+	}
+
+	.save-button {
+		height: 26px;
+		display: flex;
+		position: absolute;
+		left: 0;
+		top: 0;
+		z-index: 1;
+	}
+
+	.react-grid-layout {
+		position: relative;
+	}
+
+	label:first-of-type {
+		border-radius: 4px;
+		border-color: #ffffff00 !important;
 	}
 }

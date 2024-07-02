@@ -5,8 +5,7 @@ import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gu
 import i18n from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { GridLayout } from "./GridLayout";
-import { GridLeftMenu } from "./GridLeftMenu";
+import { ContainerMenu } from "./Container";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
@@ -110,8 +109,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         if (key === "all") {
             getGroupMap()
                 .then(group => {
-                    const groupId = group.find(g => g.position_group.x === 0 && g.position_group.y === 0).id;
-
+                    store.setGroupMapsGrid(group.sort((a, b) => a.id_pos - b.id_pos))
                     getListMap()
                         .then(maps => {
                             store.setListMaps(maps);
@@ -121,25 +119,26 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             }));
                         });
                 });
-        } else {
-            getListMap()
-                .then(item => {
-                    store.setListMaps(item);
-                });
         }
+        // else {
+        //     getListMap()
+        //         .then(item => {
+        //             store.setListMaps(item);
+        //         });
+        // }
     }
 
     useMemo(() => {
         updateGridPosition("all")
     }, [])
 
-    useEffect(() => {
-        (store.sourceGroup.update === true) && updateGridPosition("all");
-    }, [store.sourceGroup.update]);
+    // useEffect(() => {
+    //     (store.sourceGroup.update === true) && updateGridPosition("all");
+    // }, [store.sourceGroup.update]);
 
-    useEffect(() => {
-        (store.sourceMaps.coeff !== 1) && updateGridPosition("maps");
-    }, [store.sourceMaps.coeff]);
+    // useEffect(() => {
+    //     (store.sourceMaps.coeff !== 1) && updateGridPosition("maps");
+    // }, [store.sourceMaps.coeff]);
 
     return (
         <>
@@ -162,6 +161,13 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             colorTextLightSolid: "#000",
                             borderRadius: 3,
                         },
+                        Radio: {
+                            colorBgContainer: "#ffffff00",
+                            buttonCheckedBg: "#2a398c0d",
+                        },
+                        Button: {
+                            defaultBg: "#ffffff20",
+                        }
                     },
                 }}
             >
@@ -187,7 +193,8 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                 />
                             </AutoComplete>
                         </div>
-                        <div className="menu-maps">
+                        {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} />}
+                        {/* <div className="menu-maps">
                             <div className="menu-list">
                                 {store.groupMapsGrid.length > 0 && <GridLeftMenu config={config} store={store} />}
                             </div>
@@ -195,7 +202,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                 className="content-maps-grid">
                                 {store.itemsMapsGroup.length > 0 && <GridLayout config={config} store={store} />}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                     <FloatButton.BackTop />
                 </div>

@@ -91,7 +91,9 @@ export const MapTile = (props) => {
                     }
                 />
             </Card>
-            <Modal centered title={display_name} footer={null} open={isModalOpen} onCancel={handleCancel}>
+            <Modal
+            className="modal-desc-home-page"
+            centered title={display_name} footer={null} open={isModalOpen} onCancel={handleCancel}>
                 <DescMapTile type={type} upath_info={upath_info} content={description} />
             </Modal>
         </ConfigProvider>

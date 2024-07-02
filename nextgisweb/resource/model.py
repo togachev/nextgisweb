@@ -73,17 +73,7 @@ class ResourceMeta(db.DeclarativeMeta):
 
         resource_registry.register(cls)
 
-class ResourceWebMapGroup(Base):
-    __tablename__ = 'resource_wmg'
 
-    identity = 'resource_wmg'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
-    action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
-    position_group = db.Column(db.JSONB, nullable=False)
-    webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
-        backref="resource_wmg")
 
 ResourceScopeType = Union[Tuple[Type[Scope], ...], Type[Scope]]
 
@@ -329,14 +319,31 @@ class Resource(Base, metaclass=ResourceMeta):
             if not q.scalar():
                 return c
 
+# def pos_group(context):
+#     return dict(i=str(context.get_current_parameters()["id"]), x=0, y=0, h=1, w=1, static=True)
+
+# def pos_map(context):
+#     return dict(i=str(context.get_current_parameters()["resource_id"]) + ":" + str(context.get_current_parameters()["webmap_group_id"]), x=0, y=0, h=1, w=1, static=True)
+
+class ResourceWebMapGroup(Base):
+    __tablename__ = 'resource_wmg'
+
+    identity = 'resource_wmg'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
+    action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
+    id_pos = db.Column(db.Integer, nullable=True)
+    webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
+        backref="resource_wmg")
 
 class WebMapGroupResource(Base):
     __tablename__ = 'wmg_resource'
     identity = 'wmg_resource'
-
+    id = db.Column(db.Integer, primary_key=True)
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     webmap_group_id = db.Column(db.ForeignKey(ResourceWebMapGroup.id), primary_key=True)
-    position_map_group = db.Column(db.JSONB, nullable=True)
+    id_pos = db.Column(db.Integer, nullable=True)
 
 @event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):
