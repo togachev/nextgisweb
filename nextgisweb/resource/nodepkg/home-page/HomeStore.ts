@@ -3,8 +3,7 @@ import { makeAutoObservable } from "mobx";
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export interface SourceMapsProps {
-    coeff: number;
-    minWidth: string;
+    update: boolean;
 }
 export interface SourceGroupProps {
     update: boolean;

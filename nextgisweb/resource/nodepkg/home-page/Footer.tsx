@@ -43,7 +43,7 @@ export const Footer = () => {
                         <div className="services-a">{info.find((e) => e.key === "services").value}</div>
                         <div className="services-b">{info.find((e) => e.key === "services").list.map(item => {
                             return (
-                                <span key={item.key}><Link href={item.value} target="_blank"><RightOutlined />{item.label}</Link></span>
+                                <span key={item.key}><a href={item.value} target="_blank"><RightOutlined />{item.label}</a></span>
                             )
                         })}</div>
                     </div>
@@ -62,7 +62,7 @@ export const Footer = () => {
                     </div>
                 </div>
             </div>
-            <Text className="uriit-footer-name">© 2002-{new Date().getFullYear()} АУ «Югорский НИИ информационных технологий»</Text>
+            <div className="uriit-footer-name">© 2002-{new Date().getFullYear()} АУ «Югорский НИИ информационных технологий»</div>
         </div>
     );
 }

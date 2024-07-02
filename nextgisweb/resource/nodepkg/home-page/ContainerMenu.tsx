@@ -14,8 +14,6 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-import "./Container.less";
-
 const SortableMenu = (props) => {
     const { id, name, store, disable } = props;
     const {
@@ -38,19 +36,18 @@ const SortableMenu = (props) => {
     };
 
     const onClickGroupMapsGrid = (id) => {
-        // console.log(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.id_pos - b.id_pos));
-        
         store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.id_pos - b.id_pos));
     }
 
     return (
-        <div {...listeners} {...attributes} ref={setNodeRef}>
+        <div className="menu-item" {...listeners} {...attributes} ref={setNodeRef}>
             <Radio.Button
                 title={name}
-                className="menu-item"
+                className="menu-content"
                 style={style}
                 key={id}
                 value={id}
+                checked={id === 0}
                 onClick={() => onClickGroupMapsGrid(id)}>
                 <div className="menu-item-content">{name}</div>
             </Radio.Button>
@@ -64,7 +61,7 @@ export const ContainerMenu = (props) => {
 
     const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
 
-    const [radioValue, setRadioValue] = useState(itemIds);
+    const [radioValue, setRadioValue] = useState(itemIds[0]);
 
     const updatePosition = async (id, id_pos) => {
         await route("resource.wmgroup.update_position", id, id_pos).get();
@@ -86,17 +83,20 @@ export const ContainerMenu = (props) => {
     };
 
     useEffect(() => {
-        if (disable) {
+        if (disable === true && store.sourceGroup.update === true) {
             store.groupMapsGrid.map((item, index) => {
                 updatePosition(item.id, index)
             })
+            store.setSourceGroup({ update: false });
+            
+            setRadioValue(itemIds[0])
+        } else {
+            store.setSourceGroup({ update: true });
         }
     }, [disable]);
 
-
-
     return (
-        <div className="dnd-container">
+        <div className="dnd-container-menu">
             {config.isAdministrator === true && (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)}
             <div className="menu-group">
                 <DndContext
@@ -106,7 +106,11 @@ export const ContainerMenu = (props) => {
                     <SortableContext
                         items={itemIds}
                         strategy={verticalListSortingStrategy}
-                    ><Radio.Group onChange={(e) => { setRadioValue(e.target.value) }} value={radioValue}>
+                    >
+                        <Radio.Group
+                            onChange={(e) => { setRadioValue(e.target.value) }}
+                            value={radioValue}
+                        >
                             {store.groupMapsGrid.map((item) => (
                                 <SortableMenu
                                     key={item.id}

@@ -47,10 +47,12 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
+const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
+
 export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore({
         sourceMaps: {
-            coeff: 1,
+            update: false,
         },
         sourceGroup: {
             update: false,
@@ -114,32 +116,30 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     const groupId = group.sort((a, b) => a.id_pos - b.id_pos)[0].id
                     getListMap()
                         .then(maps => {
-                            console.log(maps);
-                            
                             store.setListMaps(maps);
                             store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
                         });
                 });
         }
-        // else {
-        //     getListMap()
-        //         .then(item => {
-        //             store.setListMaps(item);
-        //         });
-        // }
+        else {
+            getListMap()
+                .then(item => {
+                    store.setListMaps(item);
+                });
+        }
     }
 
     useMemo(() => {
         updateGridPosition("all")
     }, [])
 
-    // useEffect(() => {
-    //     updateGridPosition("all");
-    // }, [store.itemsMapsGroup]);
+    useEffect(() => {
+        (store.sourceGroup.update === false) && updateGridPosition("all");
+    }, [store.sourceGroup.update]);
 
-    // useEffect(() => {
-    //     (store.sourceMaps.coeff !== 1) && updateGridPosition("maps");
-    // }, [store.sourceMaps.coeff]);
+    useEffect(() => {
+        (store.sourceMaps.update === false) && updateGridPosition("maps");
+    }, [store.sourceMaps.update]);
 
     return (
         <>
@@ -168,7 +168,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                         },
                         Button: {
                             defaultBg: "#ffffff20",
-                        }
+                        },
                     },
                 }}
             >
@@ -194,22 +194,19 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                 />
                             </AutoComplete>
                         </div>
-                        {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} />}
-                        {store.itemsMapsGroup.length > 0 && <ContainerMaps config={config} store={store} />}
-                        {/* <div className="menu-maps">
+                        <div className="menu-maps">
                             <div className="menu-list">
-                                {store.groupMapsGrid.length > 0 && <GridLeftMenu config={config} store={store} />}
+                                {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} />}
                             </div>
-                            <div
-                                className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 && <GridLayout config={config} store={store} />}
+                            <div className="content-maps-grid">
+                                {store.itemsMapsGroup.length > 0 && <ContainerMaps config={config} size={size} store={store} />}
                             </div>
-                        </div> */}
+                        </div>
                     </div>
                     <FloatButton.BackTop />
                 </div>
                 <Footer />
-            </ConfigProvider>
+            </ConfigProvider >
         </>
     )
 });
