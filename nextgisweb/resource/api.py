@@ -510,22 +510,16 @@ csetting("resource_export", ResourceExport, default="data_read")
 
 def getWebmapGroup(request) -> JSONType:
     query = DBSession.query(ResourceWebMapGroup)
-    # query = DBSession.query(ResourceWebMapGroup, WebMapGroupResource, Resource) \
-    #     .join(WebMapGroupResource, Resource.id == WebMapGroupResource.resource_id) \
-    #     .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id)
     result = list()
-    # for resource_wmg, wmg, res in query:
     for resource_wmg in query:
-        # if resource_wmg.action_map:
-            # if res.has_permission(PERM_READ, request.user):
-                result.append(
-                    dict(
-                        id=resource_wmg.id,
-                        webmap_group_name=resource_wmg.webmap_group_name,
-                        action_map=resource_wmg.action_map,
-                        id_pos=resource_wmg.id_pos
-                    )
-                )
+        result.append(
+            dict(
+                id=resource_wmg.id,
+                webmap_group_name=resource_wmg.webmap_group_name,
+                action_map=resource_wmg.action_map,
+                id_pos=resource_wmg.id_pos
+            )
+        )
     return result
 
 def getMaplist(request) -> JSONType:

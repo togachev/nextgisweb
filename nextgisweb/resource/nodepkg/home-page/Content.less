@@ -168,10 +168,29 @@
 							.drag-item {
 								box-sizing: border-box;
 								border-radius: 4px;
-								background: var(--divider-color);
 								padding: 5px;
-								overflow: auto;
 								height: 100%;
+								background: #b3b9be14;
+
+								.content-drag {
+									margin: 0;
+									color: #000000;
+									overflow: hidden;
+									white-space: initial;
+									text-overflow: ellipsis;
+									line-height: 20.7px;
+									text-align: left;
+									letter-spacing: normal;
+									-webkit-line-clamp: 2;
+									display: -webkit-box;
+									-webkit-box-orient: vertical;
+									height: 45px;
+								}
+
+								.ant-empty-normal {
+									margin-block: 0;
+									color: rgba(0, 0, 0, 0.25);
+								}
 							}
 
 							.maps-item {

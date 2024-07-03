@@ -1,10 +1,8 @@
-import { Typography, Divider } from "@nextgisweb/gui/antd";
+import { Divider } from "@nextgisweb/gui/antd";
 import LogoUriit from "./icons/uriit_logo.svg";
 import { RightOutlined } from "@ant-design/icons";
 import i18n from "@nextgisweb/pyramid/i18n";
 import "./Footer.less";
-
-const { Text, Link } = Typography;
 
 const LogoUriitComp = () => (
     <span className="uriit-logo">

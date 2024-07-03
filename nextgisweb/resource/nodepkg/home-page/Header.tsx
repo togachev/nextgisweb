@@ -32,7 +32,7 @@ export const Header = observer(() => {
 
     const showLoginModal = () => {
         if (oauth.enabled && oauth.default) {
-            const qs = new URLSearchParams([["next", window.location]]);
+            const qs = new URLSearchParams([["next", window.location.href]]);
             window.open(routeURL("auth.oauth") + "?" + qs.toString(), "_self");
         } else {
             authStore.showModal();

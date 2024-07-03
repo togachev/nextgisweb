@@ -1,13 +1,14 @@
-import React, { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
+import { Empty } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { MapTile } from "./MapTile";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import {
     DndContext,
     closestCenter,
-    DragOverlay,
 } from "@dnd-kit/core";
 import {
     arrayMove,
@@ -35,7 +36,7 @@ const SortableMaps = (props) => {
         zIndex: isDragging ? "100" : "auto",
         cursor: disable ? "pointer" : "move",
     };
-
+    const preview = routeURL("resource.preview", item.id)
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
             <div
@@ -43,7 +44,17 @@ const SortableMaps = (props) => {
                 style={style}
             >
                 {disable ? (<MapTile config={config} item={item} />) :
-                    (<div className="drag-item">{item?.display_name}</div>)}
+                    (<div className="drag-item"><div className="content-drag">
+                        {item?.display_name}
+                    </div>
+                    {item.preview_fileobj_id ?
+                            (<div
+                                style={{
+                                    bottom: 0, borderRadius: 4, height: 95, background: `url(${preview}) center center / cover no-repeat`,
+                                }}
+                            ></div>) :
+                            (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)}
+                    </div>)}
             </div>
         </div>
     );
@@ -89,8 +100,6 @@ export const ContainerMaps = (props) => {
         }
     }, [disable]);
 
-
-
     return (
         <div className="dnd-container-maps">
             {config.isAdministrator === true && (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)}
@@ -132,13 +141,6 @@ export const ContainerMaps = (props) => {
                                 />
                             )
                         })}
-                        <DragOverlay>
-                            {activeId ?
-                                (<div
-                                    style={disable ? { width: size.maxW, height: size.maxH } : { width: size.minW, height: size.minH }}
-                                    className="drag-item" />) :
-                                null}
-                        </DragOverlay>
                     </SortableContext>
                 </DndContext>
             </div>

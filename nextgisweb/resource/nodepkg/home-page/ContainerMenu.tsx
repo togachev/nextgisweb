@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
@@ -33,6 +33,7 @@ const SortableMenu = (props) => {
         zIndex: isDragging ? "100" : "auto",
         opacity: isDragging ? 0.3 : 1,
         cursor: disable ? "pointer" : "move",
+        border: disable ? "none" : "1px solid var(--divider-color)",
     };
 
     const onClickGroupMapsGrid = (id) => {
@@ -88,7 +89,7 @@ export const ContainerMenu = (props) => {
                 updatePosition(item.id, index)
             })
             store.setSourceGroup({ update: false });
-            
+
             setRadioValue(itemIds[0])
         } else {
             store.setSourceGroup({ update: true });
