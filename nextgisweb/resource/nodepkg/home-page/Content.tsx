@@ -50,14 +50,7 @@ const resourcesToOptions = (resourcesInfo) => {
 const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
-    const [store] = useState(() => new HomeStore({
-        sourceMaps: {
-            update: false,
-        },
-        sourceGroup: {
-            update: false,
-        }
-    }));
+    const [store] = useState(() => new HomeStore({}));
 
     const { getListMap, getGroupMap } = useSource();
 
@@ -135,12 +128,12 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     }, [])
 
     useEffect(() => {
-        (store.sourceGroup.update === false) && updateGridPosition("all");
-    }, [store.sourceGroup.update]);
+        (store.sourceGroup === false) && updateGridPosition("all");
+    }, [store.sourceGroup]);
 
     useEffect(() => {
-        (store.sourceMaps.update === false) && updateGridPosition("maps");
-    }, [store.sourceMaps.update]);
+        (store.sourceMaps === false) && updateGridPosition("maps");
+    }, [store.sourceMaps]);
 
     return (
         <>

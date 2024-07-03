@@ -2,13 +2,6 @@ import { makeAutoObservable } from "mobx";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
-export interface SourceMapsProps {
-    update: boolean;
-}
-export interface SourceGroupProps {
-    update: boolean;
-}
-
 export interface LayoutProps {
     i: string;
     x: number;
@@ -41,8 +34,8 @@ export interface GroupMapsGridProps {
 }
 
 export class HomeStore {
-    sourceMaps: SourceMapsProps; 
-    sourceGroup: SourceGroupProps; 
+    sourceMaps = false; 
+    sourceGroup = false; 
     listMaps: ListMapProps[] = []; 
     groupMapsGrid: GroupMapsGridProps[] = [];
     itemsMapsGroup: ListMapProps[] = [];
@@ -59,12 +52,12 @@ export class HomeStore {
         makeAutoObservable(this, {});
     }
 
-    setSourceMaps = (sourceMaps: SetValue<string>) => {
-        this.setValue("sourceMaps", sourceMaps);
+    setSourceMaps = (sourceMaps: boolean) => {
+        this.sourceMaps = sourceMaps;
     };
 
-    setSourceGroup = (sourceGroup: SetValue<string>) => {
-        this.setValue("sourceGroup", sourceGroup);
+    setSourceGroup = (sourceGroup: boolean) => {
+        this.sourceGroup = sourceGroup;
     };
 
     setListMaps = (listMaps: SetValue<string>) => {

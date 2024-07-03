@@ -93,24 +93,29 @@ export const ContainerMaps = (props) => {
     };
 
     useEffect(() => {
-        if (disable === true && store.sourceMaps.update === true) {
+        if (disable === true && store.sourceMaps === true) {
             store.itemsMapsGroup.map((item, index) => {
                 updatePosition(item.idx, index);
             })
-            store.setSourceMaps({ update: false });
+            store.setSourceMaps(false);
         } else {
-            store.setSourceMaps({ update: true });
+            store.setSourceMaps(true);
         }
     }, [disable]);
 
     return (
         <div className="dnd-container-maps">
-            {config.isAdministrator === true && (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)}
+            {config.isAdministrator === true &&
+                (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)
+            }
             <div
-
-                className="maps-group" style={disable ?
+                className="maps-group"
+                style={disable ?
                     { gridTemplateColumns: `repeat(auto-fill, minmax(${size.maxW}px, 1fr))` } :
-                    { gridTemplateColumns: `repeat(auto-fill, minmax(${size.minW}px, 1fr))` }
+                    {
+                        gridTemplateColumns: `repeat(auto-fill, minmax(${size.minW}px, 1fr))`, boxShadow: "inset 0 0 3px 0",
+                        borderRadius: 3, padding: 5
+                    }
                 }>
                 <DndContext
                     collisionDetection={closestCenter}

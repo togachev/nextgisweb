@@ -84,22 +84,26 @@ export const ContainerMenu = (props) => {
     };
 
     useEffect(() => {
-        if (disable === true && store.sourceGroup.update === true) {
+        if (disable === true && store.sourceGroup === true) {
             store.groupMapsGrid.map((item, index) => {
                 updatePosition(item.id, index)
             })
-            store.setSourceGroup({ update: false });
-
+            store.setSourceGroup(false);
             setRadioValue(itemIds[0])
         } else {
-            store.setSourceGroup({ update: true });
+            store.setSourceGroup(true);
         }
     }, [disable]);
 
     return (
         <div className="dnd-container-menu">
-            {config.isAdministrator === true && (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)}
-            <div className="menu-group">
+            {config.isAdministrator === true &&
+                (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)
+            }
+            <div
+                className="menu-group"
+                style={disable ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
+            >
                 <DndContext
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
