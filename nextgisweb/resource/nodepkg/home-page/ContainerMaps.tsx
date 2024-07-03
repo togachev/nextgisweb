@@ -51,7 +51,7 @@ const SortableMaps = (props) => {
                             (<div
                                 style={{
                                     bottom: 0,
-                                    // borderRadius: 4,
+                                    borderRadius: 3,
                                     height: 95,
                                     background: `url(${preview}) center center / cover no-repeat`,
                                 }}
