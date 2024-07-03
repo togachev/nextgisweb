@@ -281,7 +281,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
                             if (valueRnd.width === W && valueRnd.height === H) {
                                 setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
-                                store.setFullscreen(true);
+                                store.setFullscreen(false);
                             }
                         }
                     }}
