@@ -110,21 +110,22 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
 
     const updateGridPosition = (key) => {
         if (key === "all") {
-            getGroupMap()
-                .then(group => {
-                    store.setGroupMapsGrid(group.sort((a, b) => a.id_pos - b.id_pos))
-                    const groupId = group.sort((a, b) => a.id_pos - b.id_pos)[0].id
-                    getListMap()
-                        .then(maps => {
-                            store.setListMaps(maps);
+            getListMap()
+                .then(maps => {
+                    store.setListMaps(maps);
+                    getGroupMap()
+                        .then(group => {
+                            const result = group.filter(({id}) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
+                            store.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
+                            const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0].id
                             store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
-                        });
+                        })
                 });
         }
         else {
             getListMap()
-                .then(item => {
-                    store.setListMaps(item);
+                .then(maps => {
+                    store.setListMaps(maps);
                 });
         }
     }
