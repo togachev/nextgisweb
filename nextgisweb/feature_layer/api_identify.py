@@ -105,7 +105,6 @@ def identify_module(request) -> JSONType:
     geom = Geometry.from_wkt(data["geom"], srid=srs)
     result = dict()
     style_list = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in data["styles"]]))
-    feature_count = 0
     options = []
     for style in style_list:
         layer = style.parent
@@ -125,13 +124,12 @@ def identify_module(request) -> JSONType:
                     layerId=layer.id,
                     styleId=style.id,
                     label=f.label,
-                    value=str(f.id) + "/" + str(style.id),
+                    value=str(f.id) + "/" + str(layer.id),
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
-                feature_count += 1
-
-    result["data"] = options
-    result["featureCount"] = feature_count
+    arr = list({value["value"]: value for value in options}.values())
+    result["data"] = arr
+    result["featureCount"] = len(arr)
     return result
 
 def feature_selected(request) -> JSONType:
