@@ -47,10 +47,13 @@ const SortableMaps = (props) => {
                     (<div className="drag-item"><div className="content-drag">
                         {item?.display_name}
                     </div>
-                    {item.preview_fileobj_id ?
+                        {item.preview_fileobj_id ?
                             (<div
                                 style={{
-                                    bottom: 0, borderRadius: 4, height: 95, background: `url(${preview}) center center / cover no-repeat`,
+                                    bottom: 0,
+                                    // borderRadius: 4,
+                                    height: 95,
+                                    background: `url(${preview}) center center / cover no-repeat`,
                                 }}
                             ></div>) :
                             (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)}
