@@ -1,5 +1,5 @@
 import { FC, useMemo, useState, useEffect, useRef } from "react";
-import { Dropdown, Empty, Radio, Space, Tooltip, Typography } from "@nextgisweb/gui/antd";
+import { Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -133,9 +133,7 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
                                             options.map((item, i) => {
                                                 if (!item.hidden) {
                                                     return (
-                                                        <Tooltip placement="left" key={i} title={item.title}>
-                                                            <Radio.Button value={item.value}>{item.label}</Radio.Button>
-                                                        </Tooltip>
+                                                        <Radio.Button key={i} title={item.title} value={item.value}>{item.label}</Radio.Button>
                                                     )
                                                 }
                                             })
@@ -151,9 +149,7 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
                                         items,
                                         onClick
                                     }} trigger={["click", "hover"]} >
-                                    <Tooltip placement="left" title={options.filter(item => item.key === contentItem.value)[0].title}>
-                                        <span className="drop-down-icon">{options.filter(item => item.key === contentItem.value)[0].label}</span>
-                                    </Tooltip>
+                                    <span title={options.filter(item => item.key === contentItem.value)[0].title} className="drop-down-icon">{options.filter(item => item.key === contentItem.value)[0].label}</span>
                                 </Dropdown>
                             </div>
                         )

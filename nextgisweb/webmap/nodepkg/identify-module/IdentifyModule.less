@@ -113,6 +113,8 @@
     clear: both;
     flex-direction: column;
     background: #fff;
+    border: 1px solid var(--icon-color);
+    box-sizing: border-box;
 
     .title {
         display: flex;
@@ -393,7 +395,8 @@
     min-width: 100px;
     background: #ffffff;
     border-radius: 3px;
-    border: solid var(--divider-color) 0.005em;
+    border: solid var(--divider-color) 1px;
+    box-sizing: border-box;
     user-select: text;
     pointer-events: auto;
     box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
@@ -415,6 +418,7 @@
         cursor: pointer;
         padding: 5px;
         user-select: none;
+        height: 24px;
 
         &:hover {
             background-color: #F5F5F5;
@@ -422,10 +426,6 @@
             border-radius: 3px;
         }
     }
-}
-
-.ant-tooltip {
-    pointer-events: none !important;
 }
 
 .label-select {

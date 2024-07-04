@@ -1,13 +1,14 @@
-const positionContext = (event, offset, op, count, settings, p) => {
+const positionContext = (event, offset, op, count, settings, p, array_context) => {
     const W = window.innerWidth;
     const H = window.innerHeight;
     const offHP = 40;
-
+    const context_item = 34;
+    const length = array_context.filter(item => item.visible === true).length
     const px = p && p.value ? event.pixel[0] : event.originalEvent.clientX;
     const py = p && p.value ? event.pixel[1] : event.originalEvent.clientY;
-
-    const context_height = settings.context_height;
-    const context_width = settings.context_width;
+    
+    const context_height = 24 + context_item * length;
+    const context_width = 170;
     const popup_height = settings.popup_height;
     const popup_width = settings.popup_width;
     const coords_not_count_w = 250;

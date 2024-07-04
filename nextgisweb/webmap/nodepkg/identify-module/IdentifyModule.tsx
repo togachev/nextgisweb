@@ -252,7 +252,15 @@ export class IdentifyModule extends Component {
         }
         
         const offset = op === "context" ? 0 : settings.offset_point;
-        const position = positionContext(event, offset, op, count, settings, p);
+
+        const array_context = [ //для создания кнопок в контекстном меню
+            { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено', visible: false },
+            { key: 2, title: 'Действие 2', result: 'Действие 2 выполнено', visible: false },
+            { key: 3, title: 'Действие 3', result: 'Действие 3 выполнено', visible: false },
+            { key: 4, title: 'Действие 4', result: 'Действие 4 выполнено', visible: false },
+        ];
+
+        const position = positionContext(event, offset, op, count, settings, p, array_context);
 
         if (op === "popup") {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
@@ -261,7 +269,7 @@ export class IdentifyModule extends Component {
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
             this._setValue(this.point_context, "context")
-            this.root_context.render(<ContextComponent params={{ position }} display={this.display} visible={this._visible} ref={this.refContext} />);
+            this.root_context.render(<ContextComponent array_context={array_context} params={{ position }} display={this.display} visible={this._visible} ref={this.refContext} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         }
     };

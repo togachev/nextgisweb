@@ -185,32 +185,6 @@ export const SettingsForm = ({
                 </Col>
                 <Col span={8}>
                     <Form.Item
-                        name="context_width"
-                        label={gettext("Width context, px")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        name="context_height"
-                        label={gettext("Height context, px")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
                         name="offset_point"
                         label={gettext("Offset, px")}
                         rules={[

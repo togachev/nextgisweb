@@ -1,7 +1,7 @@
-define(["dojo/Deferred", "dojo/request/xhr", "ngw-pyramid/route"], function (
+define(["dojo/Deferred", "dojo/request/xhr", "@nextgisweb/pyramid/api"], function (
     Deferred,
     xhr,
-    route
+    api
 ) {
     var cache = {};
 
@@ -14,7 +14,7 @@ define(["dojo/Deferred", "dojo/request/xhr", "ngw-pyramid/route"], function (
                 return result;
             }
 
-            var url = route.resource.item({ id: resourceId });
+            const url = api.routeURL("resource.item", { id: resourceId });
 
             return xhr.get(url, { handleAs: "json" }).then(
                 function (payload) {

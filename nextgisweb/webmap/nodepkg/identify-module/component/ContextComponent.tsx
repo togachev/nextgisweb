@@ -17,6 +17,13 @@ interface Props {
     position: Position;
 }
 
+interface ContextProps {
+    key: string;
+    title: string;
+    result: string;
+    visible: boolean;
+}
+
 interface Visible {
     hidden: boolean;
     overlay: boolean | undefined;
@@ -27,26 +34,18 @@ interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: DojoDisplay;
+    array_context: ContextProps[];
 }
 
 export default forwardRef<Element>(function ContextComponent(props: Params, ref: RefObject<Element>) {
-    const { params, visible, display } = props;
+    const { params, visible, display, array_context } = props;
     const { position } = params;
     useOutsideClick(ref, true);
     const { contextHolder } = useCopy();
-
-    const array = [
-        { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено', visible: false },
-        { key: 2, title: 'Действие 2', result: 'Действие 2 выполнено', visible: false },
-        { key: 3, title: 'Действие 3', result: 'Действие 3 выполнено', visible: false },
-        { key: 4, title: 'Действие 4', result: 'Действие 4 выполнено', visible: false },
-    ]
-
     return (
         createPortal(
             <div key={new Date} ref={ref} className="context-position" style={{
                 width: position.width,
-                height: position.height,
                 left: position.x,
                 top: position.y,
                 position: "absolute",
@@ -56,8 +55,8 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
                     <CoordinateComponent display={display} op="context" />
                 </span>
                 {
-                    array.map(item => {
-                        if (item.visible)
+                    array_context.map(item => {
+                        if (item.visible) {
                             return (
                                 <div className="context-item" key={item.key} onClick={() => {
                                     console.log(item.result);
@@ -66,6 +65,7 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
                                     <span>{item.title}</span>
                                 </div>
                             )
+                        }
                     })
                 }
             </div>,

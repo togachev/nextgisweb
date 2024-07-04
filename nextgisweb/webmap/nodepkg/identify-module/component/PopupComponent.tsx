@@ -5,7 +5,7 @@ import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import { Rnd } from "react-rnd";
-import { Button, ConfigProvider, Select, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
@@ -59,7 +59,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { position, response } = params;
     const imodule = display.identify_module;
     const [refRnd, setRefRnd] = useState();
-    
+
     const count = response.featureCount;
     const selectedItem = response.data[0];
 
@@ -175,7 +175,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             });
         }
         operations = (
-            <Tooltip title={gettext("Edit")}>
+            <div title={gettext("Edit")}>
                 <Button
                     type="text"
                     className="edit-symbol"
@@ -197,7 +197,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
                     }}
                 />
-            </Tooltip>
+            </div>
         );
     })
 
@@ -236,11 +236,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             lineWidth: 1,
                             lineHeight: 1,
                             paddingXS: 50
-                        },
-                        Tooltip: {
-                            colorBgSpotlight: "#fff",
-                            colorTextLightSolid: "#000",
-                            borderRadius: 3,
                         },
                         Select: {
                             optionSelectedBg: "var(--divider-color)",
@@ -346,8 +341,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 className="icon-symbol"
                                 onClick={() => {
                                     visible({ hidden: true, overlay: undefined, key: "popup" })
-                                    refRnd.resizableElement.current.hidden = true;
                                     topic.publish("feature.unhighlight");
+                                    store.setFullscreen(false)
+                                    setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
                                 }} >
                                 <CloseIcon />
                             </span>
@@ -371,16 +367,12 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                         options={store.data}
                                         optionRender={(option) => (
                                             <div className="label-select">
-                                                <Tooltip title={option.data.label}>
-                                                    <div className="label-feature">
-                                                        {option.data.label}
-                                                    </div>
-                                                </Tooltip>
-                                                <Tooltip title={option.data.layer_name}>
-                                                    <div className="label-style">
-                                                        {option.data.layer_name}
-                                                    </div>
-                                                </Tooltip>
+                                                <div title={option.data.label} className="label-feature">
+                                                    {option.data.label}
+                                                </div>
+                                                <div title={option.data.layer_name} className="label-style">
+                                                    {option.data.layer_name}
+                                                </div>
                                             </div>
                                         )}
                                     />
