@@ -58,11 +58,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { params, visible, display } = props;
     const { position, response } = params;
     const imodule = display.identify_module;
-    const [refRnd, setRefRnd] = useState();
 
     const count = response.featureCount;
     const selectedItem = response.data[0];
-
+    
     const heightForbidden = selectedItem && selectedItem.value.includes("Forbidden") ? 75 : position.height;
 
     const [valueRnd, setValueRnd] = useState<Rnd>({
@@ -104,7 +103,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         if (count > 0 && !selectedItem.value.includes("Forbidden")) {
             store.setData(response.data);
             store.setSelected(selectedItem);
-            store.setContextUrl(generateUrl(display, { res: selectedItem }));
+            const noSelectedItem = store.data.filter(item => item.value !== selectedItem.value)
+            store.setContextUrl(generateUrl(display, { res: selectedItem, all: noSelectedItem }));
             getAttribute(selectedItem)
                 .then(item => {
                     store.setAttribute(item._fieldmap);
@@ -282,12 +282,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     }}
                     onResize={(e, direction, ref, delta, position) => {
                         setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
-                    }}
-                    ref={c => {
-                        if (c) {
-                            setRefRnd(c);
-                            c.resizableElement.current.hidden = false;
-                        }
                     }}
                 >
                     <div ref={ref} className="popup-position" >

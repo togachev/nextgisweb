@@ -1,18 +1,31 @@
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
-
+import type { StoreItem } from "@nextgisweb/webmap/type";
 export const useSource = () => {
 
-    const generateUrl = (display, { res }) => {
+    const generateUrl = (display, { res, all }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
         const webmapId = display.config.webmapId
         const zoom = display.map.position.zoom;
+        const styles: string[] = [];
+        Object.entries(display.webmapStore._layers).find(item => {
+            const itm: StoreItem = item[1];
+            if (itm._visibility === true) {
+                styles.push(itm.itemConfig.styleId);
+            }
+        });
 
+        const selected = [res.layerId + ":" + res.styleId + ":" + res.id];
+        all?.map(i => {
+            selected.push(i.layerId + ":" + i.styleId + ":" + i.id)
+        })
+        
+        const panel = display._urlParams.panel;
         const obj = res !== null ?
-            { attribute: true, lat, lon, lid: res.layerId, fid: res.id, sid: res.styleId, zoom } :
-            { attribute: false, lat, lon, zoom }
+            { attribute: true, lat, lon, lid: res.layerId, fid: res.id, sid: res.styleId, zoom, styles: styles, panel, lsf: selected } :
+            { attribute: false, lat, lon, zoom, styles: styles, panel }
 
         const paramsUrl = new URLSearchParams();
 

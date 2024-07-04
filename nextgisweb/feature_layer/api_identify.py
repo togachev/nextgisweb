@@ -127,35 +127,38 @@ def identify_module(request) -> JSONType:
                     value=str(f.id) + "/" + str(layer.id),
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
-    arr = list({value["value"]: value for value in options}.values())
-    result["data"] = arr
-    result["featureCount"] = len(arr)
+    # arr = list({value["value"]: value for value in options}.values())
+    result["data"] = options
+    result["featureCount"] = len(options)
     return result
 
 def feature_selected(request) -> JSONType:
     data = request.json_body
-    layerId = int(data["layerId"])
-    styleId = int(data["styleId"])
-    featureId = int(data["featureId"])
-    layer = Resource.filter_by(id=layerId).one()
-    result = dict()
-    if not layer.has_permission(DataStructureScope.read, request.user):
-        result["data"] = dict(value="Forbidden")
-    elif not IFeatureLayer.providedBy(layer):
-        result["data"] = dict(error="Not implemented")
-    else:
-        query = layer.feature_query()
-        for f in query():
-            if f.id == featureId:
-                result["data"] = dict(
-                    id=f.id,
-                    layerId=layerId,
-                    styleId=styleId,
-                    label=f.label,
-                    value=str(f.id) + "/" + str(layer.id),
-                    layer_name=data["label"],
-                )
-    return result
+    options = []
+    for p in data:
+        layerId = int(p["layerId"])
+        styleId = int(p["styleId"])
+        featureId = int(p["featureId"])
+        layer = Resource.filter_by(id=layerId).one()
+        result = dict()
+        if not layer.has_permission(DataStructureScope.read, request.user):
+            result["data"] = dict(value="Forbidden")
+        elif not IFeatureLayer.providedBy(layer):
+            result["data"] = dict(error="Not implemented")
+        else:
+            query = layer.feature_query()
+            for f in query():
+                if f.id == featureId:
+                    result["data"] = dict(
+                        id=f.id,
+                        layerId=layerId,
+                        styleId=styleId,
+                        label=f.label,
+                        value=str(f.id) + "/" + str(layer.id),
+                        layer_name=p["label"],
+                    )
+        options.append(result["data"])
+    return options
 
 def setup_pyramid(comp, config):
     config.add_route(

@@ -78,7 +78,7 @@ export class IdentifyModule extends Component {
     private lonlat: number[];
     private olmap: Map;
     private params: EventProps;
-    private paramsSelected: SelectedFeatureProps;
+    private paramsSelected: SelectedFeatureProps[] = [];
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
     private control: Interaction;
@@ -219,31 +219,12 @@ export class IdentifyModule extends Component {
                 });
             count = response.featureCount;
         } else if (op === "popup" && p.value.attribute === true) {
-            this.display.getVisibleItems()
-                .then(items => {
-                    const itemConfig = this.display.getItemConfig();
-                    const mapResolution = this.olmap.getView().getResolution();
-                    items.map(i => {
-                        const item = itemConfig[i.id];
-                        if (item.styleId === Number(p.value.sid)) {
-                            if (
-                                !item.identifiable ||
-                                mapResolution >= item.maxResolution ||
-                                mapResolution < item.minResolution
-                            ) {
-                                return;
-                            }
-                            this.paramsSelected.label = item.label;
-                        }
-                    });
-                })
-
             response = await route("feature_layer.feature_selected")
                 .post({
                     json: this.paramsSelected,
                 })
                 .then(item => {
-                    return { data: [item.data], featureCount: 1 };
+                    return { data: item, featureCount: item.length };
                 });
             count = response.featureCount;
         } else {
@@ -303,12 +284,7 @@ export class IdentifyModule extends Component {
         }
 
         if (op === "popup" && p && p.value.attribute === true) {
-            this.paramsSelected = {
-                layerId: p.value.lid,
-                styleId: p.value.sid,
-                featureId: p.value.fid,
-                label: "",
-            }
+            this.paramsSelected = p.value.params
         }
 
         this.params = {
@@ -338,18 +314,40 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async (lon, lat, attribute, lid, fid, sid) => {
+    identifyModuleUrlParams = async (lon, lat, attribute, lid, fid, sid, lsf) => {
+        const lsf_ = new String(lsf);
         if (attribute && attribute === "false") {
             this._responseContext({ lon, lat, attribute: false });
-        } else if (this.isNumeric(lid) && this.isNumeric(fid) && this.isNumeric(sid)) {
-            this._responseContext({ lon, lat, attribute: true, lid, fid, sid });
+        } else if (this.isNumeric(lid) && this.isNumeric(fid) && this.isNumeric(sid) && lsf_ instanceof String) {
+            this._responseContext({ lon, lat, attribute: true, lid, fid, sid, lsf });
         }
         return true;
     };
 
-    _responseContext = (value) => {
-        const coordSwitcher = new CoordinateSwitcher({ point: [value.lon, value.lat] });
+    _responseContext = (val) => {
+
+        const coordSwitcher = new CoordinateSwitcher({ point: [val.lon, val.lat] });
         coordSwitcher._transformFrom(4326).then((transformedCoord) => {
+            const params: SelectedFeatureProps[] = [];
+            val.lsf.split(",").map(i => {
+                params.push({
+                    layerId: Number(i.split(":")[0]),
+                    styleId: Number(i.split(":")[1]),
+                    featureId: Number(i.split(":")[2]),
+                    label: "",
+                });
+            })
+
+            const value = {
+                attribute: val.attribute,
+                fid: val.fid,
+                lat: val.lat,
+                lon: val.lon,
+                lid: val.lid,
+                sid: val.sid,
+                params,
+            }
+
             const p = { value, coordinate: transformedCoord };
             const offHP = 40;
 
