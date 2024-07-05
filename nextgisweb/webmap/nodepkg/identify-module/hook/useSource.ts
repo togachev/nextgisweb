@@ -16,13 +16,15 @@ export const useSource = () => {
                 styles.push(itm.itemConfig.styleId);
             }
         });
-
-        const selected = [res.layerId + ":" + res.styleId + ":" + res.id];
-        all?.map(i => {
-            selected.push(i.layerId + ":" + i.styleId + ":" + i.id)
-        })
+        console.log(styles);
         
-        const panel = display._urlParams.panel;
+        const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+        all?.map(i => {
+            selected.push(i.styleId + ":" + i.layerId + ":" + i.id)
+        })
+        console.log(display);
+        
+        const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
             { attribute: true, lat, lon, lid: res.layerId, fid: res.id, sid: res.styleId, zoom, styles: styles, panel, lsf: selected } :
             { attribute: false, lat, lon, zoom, styles: styles, panel }
@@ -40,17 +42,25 @@ export const useSource = () => {
     };
 
     const getAttribute = async (res) => {
-        const resourceId = res.layerId;
-        const feature = await route("feature_layer.feature.item_iso", {
+        const resourceId = res.label !== "Forbidden" ? res.layerId : -1;
+        const feature = res.label !== "Forbidden" ? await route("feature_layer.feature.item_iso", {
             id: res.layerId,
             fid: res.id,
         })
             .get()
             .then(item => {
                 return item;
-            });
+            }) :
+            {
+                id: -1,
+                geom: "POINT EMPTY",
+                fields: {
+                    Forbidden: "Forbidden"
+                },
+                extensions: null
+            }
 
-        const fieldmap = await route("resource.fields", { id: resourceId })
+        const fieldmap = res.label !== "Forbidden" ? await route("resource.fields", { id: resourceId })
             .get({
                 cache: true,
             })
@@ -105,7 +115,7 @@ export const useSource = () => {
                     }
                 );
 
-            })
+            }) : { _fieldmap: { Forbidden: 'Forbidden' }, feature: feature, resourceId: -1 };
         return fieldmap;
     }
 

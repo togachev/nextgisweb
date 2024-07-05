@@ -18,6 +18,11 @@ import "./IdentifyModule.less";
 import { positionContext } from "./positionContext"
 import CoordinateSwitcher from "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher";
 
+interface StylesRequest {
+    id: number;
+    label: string;
+}
+
 interface VisibleProps {
     hidden: boolean;
     overlay: number[] | undefined;
@@ -186,22 +191,7 @@ export class IdentifyModule extends Component {
         let count, response;
 
         if (this.params.request !== null) {
-            this.display.getVisibleItems()
-                .then(items => {
-                    const itemConfig = this.display.getItemConfig();
-                    const mapResolution = this.olmap.getView().getResolution();
-                    items.map(i => {
-                        const item = itemConfig[i.id];
-                        if (
-                            !item.identifiable ||
-                            mapResolution >= item.maxResolution ||
-                            mapResolution < item.minResolution
-                        ) {
-                            return;
-                        }
-                        this.params.request.styles.push({ id: item.styleId, label: item.label });
-                    });
-                })
+
 
             response = await route("feature_layer.identify_module")
                 .post({
@@ -231,7 +221,7 @@ export class IdentifyModule extends Component {
             count = 0;
             response = { data: [], featureCount: 0 }
         }
-        
+
         const offset = op === "context" ? 0 : settings.offset_point;
 
         const array_context = [ //для создания кнопок в контекстном меню
@@ -274,17 +264,51 @@ export class IdentifyModule extends Component {
     _overlayInfo = (e: MapBrowserEvent, op: string, p) => {
         let request;
         if (op === "popup" && p === false) {
+            const styles: StylesRequest[] = [];
+            this.display.getVisibleItems()
+                .then(items => {
+                    const itemConfig = this.display.getItemConfig();
+                    const mapResolution = this.olmap.getView().getResolution();
+                    items.map(i => {
+                        const item = itemConfig[i.id];
+                        if (
+                            !item.identifiable ||
+                            mapResolution >= item.maxResolution ||
+                            mapResolution < item.minResolution
+                        ) {
+                            return;
+                        }
+                        styles.push({ id: item.styleId, label: item.label });
+                    });
+                })
+
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
-                styles: [],
+                styles: styles,
             }
+
         } else {
             request = null;
         }
 
         if (op === "popup" && p && p.value.attribute === true) {
-            this.paramsSelected = p.value.params
+            console.log(p.value.params);
+
+            this.display.getVisibleItems()
+                .then(items => {
+                    const itemConfig = this.display.getItemConfig();
+                    p.value.params.map(itm => {
+                        console.log(itm, items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]);
+                        
+                        const label = items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]
+                        itm.label = label;
+                    })
+                    this.paramsSelected = p.value.params
+                })
+            console.log(this.paramsSelected);
+            
+            
         }
 
         this.params = {
@@ -331,8 +355,8 @@ export class IdentifyModule extends Component {
             const params: SelectedFeatureProps[] = [];
             val.lsf.split(",").map(i => {
                 params.push({
-                    layerId: Number(i.split(":")[0]),
-                    styleId: Number(i.split(":")[1]),
+                    styleId: Number(i.split(":")[0]),
+                    layerId: Number(i.split(":")[1]),
                     featureId: Number(i.split(":")[2]),
                     label: "",
                 });

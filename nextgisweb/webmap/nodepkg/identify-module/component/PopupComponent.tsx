@@ -23,9 +23,19 @@ interface Visible {
     overlay: boolean | undefined;
     key: string;
 }
+
+interface StyleRequestProps {
+    id: number;
+    label: string;
+    layerId: number;
+    layer_name: string;
+    styleId: number;
+    value: string;
+}
+
 interface Response {
     featureCount: number;
-    data: object;
+    data: StyleRequestProps[];
     fields: object;
 }
 
@@ -58,7 +68,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { params, visible, display } = props;
     const { position, response } = params;
     const imodule = display.identify_module;
-
+    
     const count = response.featureCount;
     const selectedItem = response.data[0];
     
@@ -122,7 +132,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         } else if (count > 0 && selectedItem.value.includes("Forbidden")) {
             setValueRnd(prev => ({ ...prev, height: 75 }));
         } else {
-            store.setContextUrl(generateUrl(display, { res: null }));
+            store.setContextUrl(generateUrl(display, { res: null, all: null }));
             store.setData([]);
             store.setAttribute(null);
             store.setFeature(null);
@@ -135,7 +145,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const onChange = (value: { value: number; label: string }) => {
         const selectedValue = store.data.find(item => item.value === value.value);
         store.setSelected(selectedValue);
-        store.setContextUrl(generateUrl(display, { res: selectedValue }));
+        const noSelectedItem = store.data.filter(item => item.value !== selectedItem.value)
+        store.setContextUrl(generateUrl(display, { res: selectedValue, all: noSelectedItem }));
         getAttribute(selectedValue)
             .then(item => {
                 store.setAttribute(item._fieldmap);

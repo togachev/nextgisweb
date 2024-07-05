@@ -109,9 +109,21 @@ def identify_module(request) -> JSONType:
     for style in style_list:
         layer = style.parent
         if not layer.has_permission(DataStructureScope.read, request.user):
-            options.append(dict(error="Forbidden"))
+            query = layer.feature_query()
+            query.geom()
+            query.intersects(geom)
+            query.limit(100)
+            for f in query():
+                options.append(dict(
+                    id=f.id,
+                    layerId=layer.id,
+                    styleId=style.id,
+                    label="Forbidden",
+                    value=str(f.id) + "/" + str(layer.id),
+                    layer_name="Forbidden",
+            ))
         elif not IFeatureLayer.providedBy(layer):
-            options.append(dict(error="Not implemented"))
+            options.append(dict(value="Not implemented"))
         else:
             query = layer.feature_query()
             query.geom()
@@ -127,9 +139,9 @@ def identify_module(request) -> JSONType:
                     value=str(f.id) + "/" + str(layer.id),
                     layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
-    # arr = list({value["value"]: value for value in options}.values())
-    result["data"] = options
-    result["featureCount"] = len(options)
+    arr = list({value["value"]: value for value in options}.values())
+    result["data"] = arr
+    result["featureCount"] = len(arr)
     return result
 
 def feature_selected(request) -> JSONType:
@@ -142,9 +154,19 @@ def feature_selected(request) -> JSONType:
         layer = Resource.filter_by(id=layerId).one()
         result = dict()
         if not layer.has_permission(DataStructureScope.read, request.user):
-            result["data"] = dict(value="Forbidden")
+            query = layer.feature_query()
+            for f in query():
+                if f.id == featureId:
+                    result["data"] = dict(
+                        id=f.id,
+                        layerId=layerId,
+                        styleId=styleId,
+                        label="Forbidden",
+                        value=str(f.id) + "/" + str(layer.id),
+                        layer_name="Forbidden",
+                    )
         elif not IFeatureLayer.providedBy(layer):
-            result["data"] = dict(error="Not implemented")
+            result["data"] = dict(value="Not implemented")
         else:
             query = layer.feature_query()
             for f in query():
@@ -155,10 +177,12 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         label=f.label,
                         value=str(f.id) + "/" + str(layer.id),
-                        layer_name=p["label"],
+                        layer_name=layer.parent.display_name if p["label"] is None else p["label"],
                     )
         options.append(result["data"])
-    return options
+    
+    arr = list({value["value"]: value for value in options}.values())
+    return arr
 
 def setup_pyramid(comp, config):
     config.add_route(
