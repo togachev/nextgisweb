@@ -293,22 +293,15 @@ export class IdentifyModule extends Component {
         }
 
         if (op === "popup" && p && p.value.attribute === true) {
-            console.log(p.value.params);
-
             this.display.getVisibleItems()
                 .then(items => {
                     const itemConfig = this.display.getItemConfig();
                     p.value.params.map(itm => {
-                        console.log(itm, items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]);
-                        
                         const label = items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]
                         itm.label = label;
                     })
                     this.paramsSelected = p.value.params
                 })
-            console.log(this.paramsSelected);
-            
-            
         }
 
         this.params = {
@@ -338,12 +331,12 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async (lon, lat, attribute, lid, fid, sid, lsf) => {
+    identifyModuleUrlParams = async (lon, lat, attribute, lsf) => {
         const lsf_ = new String(lsf);
         if (attribute && attribute === "false") {
             this._responseContext({ lon, lat, attribute: false });
-        } else if (this.isNumeric(lid) && this.isNumeric(fid) && this.isNumeric(sid) && lsf_ instanceof String) {
-            this._responseContext({ lon, lat, attribute: true, lid, fid, sid, lsf });
+        } else if (lsf_ instanceof String) {
+            this._responseContext({ lon, lat, attribute: true, lsf });
         }
         return true;
     };
@@ -353,7 +346,7 @@ export class IdentifyModule extends Component {
         const coordSwitcher = new CoordinateSwitcher({ point: [val.lon, val.lat] });
         coordSwitcher._transformFrom(4326).then((transformedCoord) => {
             const params: SelectedFeatureProps[] = [];
-            val.lsf.split(",").map(i => {
+            val.lsf?.split(",").map(i => {
                 params.push({
                     styleId: Number(i.split(":")[0]),
                     layerId: Number(i.split(":")[1]),
@@ -364,11 +357,8 @@ export class IdentifyModule extends Component {
 
             const value = {
                 attribute: val.attribute,
-                fid: val.fid,
                 lat: val.lat,
                 lon: val.lon,
-                lid: val.lid,
-                sid: val.sid,
                 params,
             }
 

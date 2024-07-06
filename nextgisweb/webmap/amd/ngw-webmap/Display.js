@@ -910,20 +910,15 @@ define([
                         "attribute" in urlParams
                     ) ||
                     (
-                        "lid" in urlParams &&
-                        "fid" in urlParams &&
-                        "sid" in urlParams
-                    ) ||
-                    (
                         "lsf" in urlParams
                     )
                 )
             ) {
                 return;
             }
-            const { lon, lat, attribute, lid, fid, sid, lsf } = urlParams;
+            const { lon, lat, attribute, lsf } = urlParams;
             this.identify_module
-                .identifyModuleUrlParams(lon, lat, attribute, lid, fid, sid, lsf)
+                .identifyModuleUrlParams(lon, lat, attribute, lsf)
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

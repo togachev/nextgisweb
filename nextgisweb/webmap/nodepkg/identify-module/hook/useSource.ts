@@ -16,17 +16,15 @@ export const useSource = () => {
                 styles.push(itm.itemConfig.styleId);
             }
         });
-        console.log(styles);
-        
+
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-        all?.map(i => {
+        all?.map(i => {           
             selected.push(i.styleId + ":" + i.layerId + ":" + i.id)
-        })
-        console.log(display);
-        
+        });        
+
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
-            { attribute: true, lat, lon, lid: res.layerId, fid: res.id, sid: res.styleId, zoom, styles: styles, panel, lsf: selected } :
+            { attribute: true, lat, lon, zoom, styles: styles, panel, lsf: selected } :
             { attribute: false, lat, lon, zoom, styles: styles, panel }
 
         const paramsUrl = new URLSearchParams();
@@ -54,9 +52,7 @@ export const useSource = () => {
             {
                 id: -1,
                 geom: "POINT EMPTY",
-                fields: {
-                    Forbidden: "Forbidden"
-                },
+                fields: { Forbidden: "Forbidden" },
                 extensions: null
             }
 

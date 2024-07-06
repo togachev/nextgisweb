@@ -145,7 +145,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const onChange = (value: { value: number; label: string }) => {
         const selectedValue = store.data.find(item => item.value === value.value);
         store.setSelected(selectedValue);
-        const noSelectedItem = store.data.filter(item => item.value !== selectedItem.value)
+        const noSelectedItem = store.data.filter(item => item.value !== value.value);
         store.setContextUrl(generateUrl(display, { res: selectedValue, all: noSelectedItem }));
         getAttribute(selectedValue)
             .then(item => {
@@ -389,11 +389,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 </div>
 
                             </>
-                        )}
-                        {count > 0 && selectedItem.value.includes("Forbidden") && (
-                            <div className="error-component">
-                                {gettext("Insufficient permissions")}
-                            </div>
                         )}
                         <div className="footer-popup">
                             <CoordinateComponent display={display} link={store.contextUrl} count={count} op="popup" />
