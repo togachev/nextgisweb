@@ -63,7 +63,7 @@ export const MapTile = (props) => {
                         height: 125
                     }}
                     title={
-                            <span title={display_name} className="grid-card-meta-title">{display_name}</span>
+                        <span title={display_name} className="grid-card-meta-title">{display_name}</span>
                     }
                     description={
                         <>
@@ -73,17 +73,18 @@ export const MapTile = (props) => {
 
                             </Link>
                             {description !== null && (
-                                    <span title={descTitle} className="icon-info-map" onClick={showDescription}>
-                                        <Info />
-                                    </span>
+                                <span title={descTitle} className="icon-info-map" onClick={showDescription}>
+                                    <Info />
+                                </span>
                             )}
                         </>
                     }
                 />
             </Card>
             <Modal
-            className="modal-desc-home-page"
-            centered title={display_name} footer={null} open={isModalOpen} onCancel={handleCancel}>
+                width="auto"
+                className="modal-desc-home-page"
+                centered title={display_name} footer={null} open={isModalOpen} onCancel={handleCancel}>
                 <DescMapTile type={type} upath_info={upath_info} content={description} />
             </Modal>
         </ConfigProvider>
