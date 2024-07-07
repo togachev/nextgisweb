@@ -210,15 +210,16 @@
             display: flex;
             width: 30px;
             border-right: solid rgba(0, 0, 0, 0.04) 1px;
+            flex-wrap: wrap;
+            align-content: space-between;
 
             .radio-group {
                 overflow: hidden;
 
                 .radio-component {
                     overflow: auto;
-                    height: 100%;
+                    height: auto;
                 }
-
             }
 
             .dropdown-block {
@@ -327,6 +328,28 @@
     }
 }
 
+.copy_to_clipboard {
+    height: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    margin: auto;
+
+    .ant-btn-icon {
+        margin: auto;
+    }
+
+    button {
+        width: 24px;
+    }
+
+    svg.icon {
+        margin: 0;
+        height: 18px;
+        width: 18px;
+    }
+}
+
 .footer-coordinate-component {
     display: flex;
     align-items: center;
@@ -356,25 +379,9 @@
         }
     }
 
-    .copy-to-clipboard {
-        height: 20px;
-        padding: 0 2px;
+    .link-copy {
         display: flex;
         align-items: center;
-
-        .ant-btn-icon {
-            margin-inline-end: 0 !important;
-        }
-
-        button {
-            width: 24px;
-        }
-
-        svg.icon {
-            margin: 0;
-            height: 18px;
-            width: 18px;
-        }
     }
 }
 

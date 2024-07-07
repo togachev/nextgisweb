@@ -16,8 +16,8 @@ import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
-
 import topic from "dojo/topic";
+
 interface Visible {
     hidden: boolean;
     overlay: boolean | undefined;
@@ -68,10 +68,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { params, visible, display } = props;
     const { position, response } = params;
     const imodule = display.identify_module;
-    
+
     const count = response.featureCount;
     const selectedItem = response.data[0];
-    
+
     const heightForbidden = selectedItem && selectedItem.value.includes("Forbidden") ? 75 : position.height;
 
     const [valueRnd, setValueRnd] = useState<Rnd>({
@@ -115,6 +115,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             store.setSelected(selectedItem);
             const noSelectedItem = store.data.filter(item => item.value !== selectedItem.value)
             store.setContextUrl(generateUrl(display, { res: selectedItem, all: noSelectedItem }));
+            store.setLinkToGeometry(selectedItem.layerId + ":" + selectedItem.id);
             getAttribute(selectedItem)
                 .then(item => {
                     store.setAttribute(item._fieldmap);
@@ -147,6 +148,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         store.setSelected(selectedValue);
         const noSelectedItem = store.data.filter(item => item.value !== value.value);
         store.setContextUrl(generateUrl(display, { res: selectedValue, all: noSelectedItem }));
+        store.setLinkToGeometry(selectedValue.layerId + ":" + selectedValue.id);
         getAttribute(selectedValue)
             .then(item => {
                 store.setAttribute(item._fieldmap);
@@ -168,7 +170,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
         (option?.layer_name ?? '').toLowerCase().includes(input.toLowerCase());
 
-    let operations;
+    let operations, linkToGeometry;
     count > 0 && store.selected && Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
         const { id, layerId, styleId } = store.selected;
         if (
@@ -185,6 +187,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                 featureId: id,
             });
         }
+
+        linkToGeometry = store.linkToGeometry;
+
         operations = (
             <div title={gettext("Edit")}>
                 <Button
@@ -385,13 +390,13 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 </div>
 
                                 <div className="content">
-                                    <ContentComponent store={store} attribute={store.attribute} position={valueRnd} />
+                                    <ContentComponent store={store} linkToGeometry={linkToGeometry} attribute={store.attribute} count={count} position={valueRnd} />
                                 </div>
 
                             </>
                         )}
                         <div className="footer-popup">
-                            <CoordinateComponent display={display} link={store.contextUrl} count={count} op="popup" />
+                            <CoordinateComponent display={display} contextUrl={store.contextUrl} count={count} op="popup" />
                         </div>
                     </div>
                 </Rnd >

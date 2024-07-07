@@ -20,6 +20,7 @@ export class IdentifyStore {
     update = false;
     fullscreen = false;
     contextUrl: string | null = null;
+    linkToGeometry: string | null = null;
 
     constructor({ data, ...props }) {
         this.data = data
@@ -66,6 +67,9 @@ export class IdentifyStore {
         this.setValue("contextUrl", contextUrl);
     };
 
+    setLinkToGeometry = (linkToGeometry: SetValue<string | null>) => {
+        this.setValue("linkToGeometry", linkToGeometry);
+    };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
         const isUpdaterFunction = (

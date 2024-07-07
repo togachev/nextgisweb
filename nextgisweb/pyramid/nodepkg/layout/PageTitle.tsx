@@ -11,7 +11,8 @@ export function PageTitle({ title, children }: PageTitleProps) {
         // Capture an existing page title if not set
         return title || document.getElementById("title")?.innerText;
     }, [title]);
-
+    console.log(ititle,children);
+    
     return (
         <h1 className="ngw-pyramid-layout-title">
             {ititle}

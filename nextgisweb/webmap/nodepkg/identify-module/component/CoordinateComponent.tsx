@@ -5,12 +5,12 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import LinkIcon from "@nextgisweb/icon/mdi/link";
 
-export const CoordinateComponent: FC = ({ display, link, count, op }) => {
+export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.identify_module;
     const lon = imodule.lonlat[0];
     const lat = imodule.lonlat[1];
-    
+
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
 
@@ -21,17 +21,19 @@ export const CoordinateComponent: FC = ({ display, link, count, op }) => {
                 <span className="icon-location"><Location /></span>
                 <span className="coords">{coordsVisible}</span>
             </span>
-            {op === "popup" && link !== null && (
-                <Button
-                    size="small"
-                    type="link"
-                    title={gettext("Object link")}
-                    className="copy-to-clipboard"
-                    icon={<LinkIcon />}
-                    onClick={() => {
-                        copyValue(link, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-                    }}
-                />
+            {op === "popup" && contextUrl !== null && (
+                <span className="link-copy">
+                    <Button
+                        size="small"
+                        type="link"
+                        title={gettext("Object link")}
+                        className="copy_to_clipboard"
+                        icon={<LinkIcon />}
+                        onClick={() => {
+                            copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+                        }}
+                    />
+                </span>
             )}
         </div>
     )

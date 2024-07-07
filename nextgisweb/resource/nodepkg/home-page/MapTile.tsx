@@ -4,7 +4,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import MapIcon from "@nextgisweb/icon/material/map";
 import Info from "@nextgisweb/icon/material/info";
-import { DescMapTile } from "./DescMapTile";
+import { DescComponent } from "@nextgisweb/resource/description";
 
 const openMap = gettext("открыть карту");
 const descTitle = gettext("Описание карты");
@@ -84,8 +84,12 @@ export const MapTile = (props) => {
             <Modal
                 width="auto"
                 className="modal-desc-home-page"
-                centered title={display_name} footer={null} open={isModalOpen} onCancel={handleCancel}>
-                <DescMapTile type={type} upath_info={upath_info} content={description} />
+                centered
+                title={display_name}
+                footer={null}
+                open={isModalOpen}
+                onCancel={handleCancel}>
+                <DescComponent type={type} upath_info={upath_info} content={description} />
             </Modal>
         </ConfigProvider>
     )

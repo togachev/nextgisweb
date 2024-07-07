@@ -1,5 +1,5 @@
 import { FC, useMemo, useState, useEffect, useRef } from "react";
-import { Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
+import { Dropdown, Button, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -9,17 +9,18 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
+import Identifier from "@nextgisweb/icon/mdi/identifier";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = ({ store, attribute, position }) => {
+export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, position }) => {
 
     const { copyValue, contextHolder } = useCopy();
 
-    const { id, layerId } = store.selected;
+    const { id, layerId, label } = store.selected;
     const panelRef = useRef<HTMLDivElement>(null);
-
+    
     const heightRadio = 106 + 2 + 2; /* ~ height and padding 2px */
     const [heightPanel, setHeightPanel] = useState();
 
@@ -119,6 +120,18 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
         setContentItem(options.find(item => item.key === e.target.value));
     }
 
+    const linkToGeometryString = `<a href='${linkToGeometry}'>${label}</a>`
+    const LinkToGeometry = linkToGeometry && (<Button
+        size="small"
+        type="link"
+        title={gettext("HTML code of the geometry link, for insertion into the description")}
+        className="copy_to_clipboard"
+        icon={<Identifier />}
+        onClick={() => {
+            copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+        }}
+    />)
+
     return (
         <>
             {contextHolder}
@@ -154,6 +167,7 @@ export const ContentComponent: FC = ({ store, attribute, position }) => {
                             </div>
                         )
                 }
+                {LinkToGeometry}
             </div>
             <div className="content-item">{contentItem.children}</div>
         </>

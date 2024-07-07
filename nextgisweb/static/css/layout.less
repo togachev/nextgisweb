@@ -126,11 +126,12 @@ a[class*=" icon-"]:hover:before {
                 }
 
                 >h1.ngw-pyramid-layout-title {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin: 0 0 6px 0;
                     min-height: 32px;
+                    overflow-wrap: anywhere;
+                    overflow: hidden;
+                    -webkit-line-clamp: 2;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
                 }
             }
         }
