@@ -424,7 +424,7 @@ define([
                                             "layer_max_scale_denom": null,
                                             "layer_adapter": "image",
                                             "legend_symbols": null,
-                                            "file_resourse_visible": false,
+                                            "file_resource_visible": false,
                                         },
                                         {
                                             parent: widget.getAddParent(),
@@ -525,9 +525,9 @@ define([
                                     "value",
                                     widget.getItemValue("layer_style_id")
                                 );
-                                widget.wdgtFileResourseVisible.set(
+                                widget.wdgtFileResourceVisible.set(
                                     "checked",
-                                    widget.getItemValue("file_resourse_visible")
+                                    widget.getItemValue("file_resource_visible")
                                 );
                             }
 
@@ -630,10 +630,10 @@ define([
                     );
                 });
 
-                this.wdgtFileResourseVisible.watch(
+                this.wdgtFileResourceVisible.watch(
                     "checked",
                     function (attr, oldValue, newValue) {
-                        widget.setItemValue("file_resourse_visible", newValue);
+                        widget.setItemValue("file_resource_visible", newValue);
                     }
                 );
             },
@@ -718,9 +718,9 @@ define([
                                 return traverse(i);
                             }
                         ),
-                        file_resourse_visible: store.getValue(
+                        file_resource_visible: store.getValue(
                             itm,
-                            "file_resourse_visible"
+                            "file_resource_visible"
                         ),
                     };
                 }

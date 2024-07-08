@@ -151,7 +151,7 @@ class WebMapItem(Base):
     layer_adapter = db.Column(db.Enum(*WebMapAdapter.registry.keys()), nullable=True)
     draw_order_position = db.Column(db.Integer, nullable=True)
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
-    file_resourse_visible = db.Column(db.Boolean, nullable=True, default=_item_default("layer", False))
+    file_resource_visible = db.Column(db.Boolean, nullable=True, default=_item_default("layer", False))
 
     parent = db.relationship(
         "WebMapItem",
@@ -206,7 +206,7 @@ class WebMapItem(Base):
                 draw_order_position=self.draw_order_position,
                 legend_symbols=self.legend_symbols,
                 style_parent_id=style_parent_id,
-                file_resourse_visible=self.file_resourse_visible,
+                file_resource_visible=self.file_resource_visible,
             )
 
         return data
@@ -227,7 +227,7 @@ class WebMapItem(Base):
             "layer_max_scale_denom",
             "draw_order_position",
             "legend_symbols",
-            "file_resourse_visible",
+            "file_resource_visible",
         ):
             if a in data:
                 setattr(self, a, data[a])
@@ -280,7 +280,7 @@ class WebMapItem(Base):
                     "layer_max_scale_denom",
                     "layer_adapter",
                     "legend_symbols",
-                    "file_resourse_visible",
+                    "file_resource_visible",
                 ):
                     _set(item, k, True)
 
