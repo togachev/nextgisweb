@@ -147,9 +147,10 @@ export const LayersTree = observer(
         };
 
         const titleRender = (nodeData: TreeWebmapItem) => {
-            const { title } = nodeData.treeItem;
+            const { title, fileResourseVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
-
+            console.log(nodeData);
+            
             let actions;
             if (shouldActions) {
                 const dropdownAction = showDropdown && (
@@ -162,7 +163,7 @@ export const LayersTree = observer(
                         setUpdate={setUpdate}
                     />
                 );
-                const dropdownFile = showDropdown && (
+                const dropdownFile = showDropdown && fileResourseVisible && (
                     <DropdownFile
                         nodeData={nodeData.treeItem}
                         setFileClickId={setFileClickId}

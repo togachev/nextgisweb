@@ -424,6 +424,7 @@ define([
                                             "layer_max_scale_denom": null,
                                             "layer_adapter": "image",
                                             "legend_symbols": null,
+                                            "file_resourse_visible": false,
                                         },
                                         {
                                             parent: widget.getAddParent(),
@@ -523,6 +524,10 @@ define([
                                 widget.wLayerStyle.set(
                                     "value",
                                     widget.getItemValue("layer_style_id")
+                                );
+                                widget.wdgtFileResourseVisible.set(
+                                    "checked",
+                                    widget.getItemValue("file_resourse_visible")
                                 );
                             }
 
@@ -624,6 +629,13 @@ define([
                         widget.wLayerLegend.get("value")
                     );
                 });
+
+                this.wdgtFileResourseVisible.watch(
+                    "checked",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("file_resourse_visible", newValue);
+                    }
+                );
             },
 
             startup: function () {
@@ -705,6 +717,10 @@ define([
                             function (i) {
                                 return traverse(i);
                             }
+                        ),
+                        file_resourse_visible: store.getValue(
+                            itm,
+                            "file_resourse_visible"
                         ),
                     };
                 }

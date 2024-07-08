@@ -176,6 +176,7 @@ def display(obj, request):
                 labelLayer=layer.display_name, # Наименование слоя
                 descStyle=style.description, # Описание стиля
                 descLayer=layer.description, # Описание слоя
+                fileResourseVisible=item.file_resourse_visible, # Прикрепленные файлы
                 legend_symbols = request.route_url('render.legend_symbols', id=style.id),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
