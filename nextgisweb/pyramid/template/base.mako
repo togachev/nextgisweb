@@ -106,7 +106,7 @@
                         %if len(bcpath) > 0:
                             <div class="ngw-pyramid-layout-bcrumb">
                                 %for idx, bc in enumerate(bcpath):
-                                    <span>
+                                    <span title="${tr(bc.label)}">
                                         <a href="${bc.link}">
                                             %if bc.icon:
                                                 ${icon_svg(bc.icon)}
