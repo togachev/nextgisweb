@@ -34,12 +34,15 @@ class ItemWidget(Widget):
     operation = ("create", "update")
     amdmod = "ngw-webmap/ItemWidget"
 
-
 class SettingsWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
     amdmod = "@nextgisweb/webmap/settings-widget"
 
+class LayerFileWidget(Widget):
+    resource = WebMap
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/webmap/layer-file"
 
 @viewargs(renderer="react")
 def settings(request):
@@ -147,14 +150,14 @@ def display(obj, request):
                 return None
 
             # If there are no necessary permissions skip web-map element
-            # so it won't be shown in the tree
+            # so it won"t be shown in the tree
 
             # TODO: Security
 
             # if not layer.has_permission(
             #     request.user,
-            #     'style-read',
-            #     'data-read',
+            #     "style-read",
+            #     "data-read",
             # ):
             #     return None
 
@@ -176,8 +179,9 @@ def display(obj, request):
                 labelLayer=layer.display_name, # Наименование слоя
                 descStyle=style.description, # Описание стиля
                 descLayer=layer.description, # Описание слоя
-                fileResourceVisible=item.file_resource_visible, # Прикрепленные файлы
-                legend_symbols = request.route_url('render.legend_symbols', id=style.id),
+                fileResourceVisible=item.file_resource_visible, # Прикрепленные файлы (показать/скрыть)
+                layerFile = request.route_url("file_resource.show", id=style.id), # Прикрепленные файлы
+                legend_symbols = request.route_url("render.legend_symbols", id=style.id),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
@@ -229,16 +233,16 @@ def display(obj, request):
     tmp = obj.to_dict()
 
     def getConstraint(item):
-        column_from_const = ''
-        if item.item_type == 'layer':
+        column_from_const = ""
+        if item.item_type == "layer":
             style = item.style
-            if item.style.parent.cls in ('postgis_layer', 'vector_layer'):
+            if item.style.parent.cls in ("postgis_layer", "vector_layer"):
                 column_from_const = item.style.parent.column_from_const
 
             if not style.has_permission(DataScope.read, request.user):
                 return None
 
-        elif item.item_type in ('root', 'group'):
+        elif item.item_type in ("root", "group"):
             column_from_const=list(filter(
                     None,
                     map(getConstraint, item.children)
@@ -254,9 +258,9 @@ def display(obj, request):
         constraintField=getConstraint(obj.root_item),
         active_panel=obj.active_panel,
         infomap=dict(
-            resource=request.route_url('resource.show', id=0),
-            link=request.route_url('resource.show', id=obj.id),
-            update=request.route_url('resource.update', id=obj.id),
+            resource=request.route_url("resource.show", id=0),
+            link=request.route_url("resource.show", id=obj.id),
+            update=request.route_url("resource.update", id=obj.id),
             scope=obj.has_permission(ResourceScope.update, request.user)
         ),
         mid=dict(
@@ -318,7 +322,7 @@ def preview_embedded(request):
         limit_width=False,
     )
 
-@viewargs(renderer='react')
+@viewargs(renderer="react")
 def wmg_settings(request):
     request.resource_permission(ResourceScope.update)
     rwg = DBSession.query(ResourceWebMapGroup)
@@ -333,7 +337,7 @@ def wmg_settings(request):
         result_wgr.append(dict(id=wmg_resource.webmap_group_id))
 
     return dict(
-        entrypoint='@nextgisweb/webmap/wmg-settings',
+        entrypoint="@nextgisweb/webmap/wmg-settings",
         props=dict(id=request.context.id, wmgroup=result_rwg, group=result_wgr),
         obj=request.context,
         title=_("Setting up a web map group"))
@@ -375,8 +379,8 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        'wmgroup.settings',
-        r'/wmgroup/{id:uint}/settings',
+        "wmgroup.settings",
+        r"/wmgroup/{id:uint}/settings",
         factory=resource_factory,
     ).add_view(wmg_settings, context=WebMap)
 

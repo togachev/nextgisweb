@@ -149,7 +149,6 @@ export const LayersTree = observer(
         const titleRender = (nodeData: TreeWebmapItem) => {
             const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
-            console.log(nodeData);
             
             let actions;
             if (shouldActions) {
