@@ -266,7 +266,6 @@ define([
         _displayFeature: function (featureInfo) {
             var widget = this,
                 lid = featureInfo.layerId,
-                sid = featureInfo.styleId,
                 fid = featureInfo.id,
                 iurl = api.routeURL("feature_layer.feature.item", {
                     id: lid,

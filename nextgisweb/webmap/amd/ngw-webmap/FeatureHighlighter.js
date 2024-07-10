@@ -7,8 +7,7 @@ define([
     "@nextgisweb/pyramid/api",
     "ngw-webmap/ol/layer/Vector",
     "openlayers/ol",
-    "@nextgisweb/webmap/identify-module",
-], function (declare, lang, xhr, topic, Deferred, api, Vector, ol, topics) {
+], function (declare, lang, xhr, topic, Deferred, api, Vector, ol) {
     return declare("ngw-webmap.FeatureHighlighter", [], {
         _map: null,
         _source: null,

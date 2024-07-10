@@ -30,6 +30,8 @@ define([
     "dgrid/extensions/DijitRegistry",
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/webmap/layer-file",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     // resource
@@ -84,6 +86,8 @@ define([
     DijitRegistry,
     serialize,
     ResourcePicker,
+    reactApp,
+    LayerFileComp,
     api,
     i18n,
     template,
@@ -114,6 +118,7 @@ define([
                 ],
                 showHeader: false,
                 class: "layer-order__grid layer-order__grid--faded",
+                sort: [{ attribute: "title" }]
             });
 
             aspect.after(
@@ -465,6 +470,13 @@ define([
                 this.widgetTree.watch(
                     "selectedItem",
                     function (attr, oldValue, newValue) {
+
+                        reactApp.default(
+                            LayerFileComp.default,
+                            { newValue },
+                            widget.wdgtLayerFile.domNode
+                        );
+
                         if (newValue) {
                             // On change of selected element move values to widgets
                             // and show needed panel: one for layers, another for groups.
@@ -529,6 +541,7 @@ define([
                                     "checked",
                                     widget.getItemValue("file_resource_visible")
                                 );
+
                             }
 
                             // Initially the side panel with current element properties is

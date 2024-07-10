@@ -39,11 +39,6 @@ class SettingsWidget(Widget):
     operation = ("create", "update")
     amdmod = "@nextgisweb/webmap/settings-widget"
 
-class LayerFileWidget(Widget):
-    resource = WebMap
-    operation = ("create", "update")
-    amdmod = "@nextgisweb/webmap/layer-file"
-
 @viewargs(renderer="react")
 def settings(request):
     request.require_administrator()
