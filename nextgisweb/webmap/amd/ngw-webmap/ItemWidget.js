@@ -31,7 +31,7 @@ define([
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
     "@nextgisweb/gui/react-app",
-    "@nextgisweb/webmap/layer-file",
+    "@nextgisweb/file-bucket/resource-file",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     // resource
@@ -87,7 +87,7 @@ define([
     serialize,
     ResourcePicker,
     reactApp,
-    LayerFileComp,
+    ResourceFileComp,
     api,
     i18n,
     template,
@@ -471,11 +471,7 @@ define([
                     "selectedItem",
                     function (attr, oldValue, newValue) {
 
-                        reactApp.default(
-                            LayerFileComp.default,
-                            { newValue },
-                            widget.wdgtLayerFile.domNode
-                        );
+
 
                         if (newValue) {
                             // On change of selected element move values to widgets
@@ -542,6 +538,13 @@ define([
                                     widget.getItemValue("file_resource_visible")
                                 );
 
+                                reactApp.default(
+                                    ResourceFileComp.default,
+                                    { 
+                                        id: newValue.layer_style_id[0],
+                                    },
+                                    widget.wdgtResourceFile.domNode
+                                );
                             }
 
                             // Initially the side panel with current element properties is
