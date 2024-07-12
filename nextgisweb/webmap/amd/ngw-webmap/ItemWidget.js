@@ -541,7 +541,7 @@ define([
                                 reactApp.default(
                                     ResourceFileComp.default,
                                     { 
-                                        id: newValue.layer_style_id[0],
+                                        styleId: newValue.layer_style_id[0],
                                     },
                                     widget.wdgtResourceFile.domNode
                                 );
