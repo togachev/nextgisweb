@@ -533,15 +533,18 @@ define([
                                     "value",
                                     widget.getItemValue("layer_style_id")
                                 );
-                                widget.wdgtFileResourceVisible.set(
-                                    "checked",
-                                    widget.getItemValue("file_resource_visible")
-                                );
+
+                                var onValueChecked = (e) => {
+                                    widget.setItemValue("file_resource_visible", e);
+                                };
+
 
                                 reactApp.default(
                                     ResourceFileComp.default,
-                                    { 
-                                        styleId: newValue.layer_style_id[0],
+                                    {
+                                        visibleFile: widget.getItemValue("file_resource_visible"),
+                                        id: newValue.layer_style_id[0],
+                                        onValueChecked: onValueChecked,
                                     },
                                     widget.wdgtResourceFile.domNode
                                 );
@@ -645,14 +648,9 @@ define([
                         widget.wLayerLegend.get("value")
                     );
                 });
-
-                this.wdgtFileResourceVisible.watch(
-                    "checked",
-                    function (attr, oldValue, newValue) {
-                        widget.setItemValue("file_resource_visible", newValue);
-                    }
-                );
             },
+
+
 
             startup: function () {
                 this.inherited(arguments);

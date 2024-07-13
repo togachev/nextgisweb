@@ -21,7 +21,7 @@ export function DropdownFile({
             if (nodeData.type === 'layer') {
                 const fileRes = await route("file_resource.show", nodeData.styleId).get();
                 if (isSubscribed) {
-                    setValue(fileRes);
+                    setValue(fileRes.result);
                 }
             }
         }
@@ -29,7 +29,7 @@ export function DropdownFile({
         return () => isSubscribed = false;
     }, []);
 
-    if (type === "root" || type === "group" || !value.status) {
+    if (type === "root" || type === "group" || value.length === 0) {
         return <></>;
     }
     if (fileClickId === undefined || fileClickId !== id) {
@@ -45,7 +45,7 @@ export function DropdownFile({
     }
 
     const menuItems = [];
-    value.result?.map((i) => {
+    value.length !== 0 && value.map((i) => {
         menuItems.push({
             key: i.id,
             label: (
@@ -71,29 +71,25 @@ export function DropdownFile({
 
     return (
         <>
-            {
-                value.status ?
-                    <Dropdown
-                        menu={menuProps}
-                        onOpenChange={onOpenChange}
-                        trigger={["click"]}
-                        open
-                        dropdownRender={(menu) => (
-                            <div className="dropdown-content customFile" onClick={(e) => { e.stopPropagation(); }}>
-                                {menu}
-                            </div>
-                        )}
-                    >
-                        <span
-                            title={DownloadAttachedFiles}
-                            className="more"
-                            onClick={(e) => { e.stopPropagation(); }}
-                        >
-                            <PaperClipOutlined />
-                        </span>
-                    </Dropdown>
-                    : null
-            }
+            {value.length !== 0 && (<Dropdown
+                menu={menuProps}
+                onOpenChange={onOpenChange}
+                trigger={["click"]}
+                open
+                dropdownRender={(menu) => (
+                    <div className="dropdown-content customFile" onClick={(e) => { e.stopPropagation(); }}>
+                        {menu}
+                    </div>
+                )}
+            >
+                <span
+                    title={DownloadAttachedFiles}
+                    className="more"
+                    onClick={(e) => { e.stopPropagation(); }}
+                >
+                    <PaperClipOutlined />
+                </span>
+            </Dropdown>)}
         </>
     );
 }
