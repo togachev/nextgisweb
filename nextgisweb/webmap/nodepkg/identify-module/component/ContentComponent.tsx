@@ -9,18 +9,19 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
+import { DescComponent } from "@nextgisweb/resource/description";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, position }) => {
+export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, position, display}) => {
 
     const { copyValue, contextHolder } = useCopy();
 
     const { id, layerId, label } = store.selected;
     const panelRef = useRef<HTMLDivElement>(null);
-    
+
     const heightRadio = 106 + 2 + 2; /* ~ height and padding 2px */
     const [heightPanel, setHeightPanel] = useState();
 
@@ -80,7 +81,8 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
             value: "description",
             key: "description",
             title: gettext("Description"),
-            hidden: false
+            hidden: false,
+            children: (<DescComponent display={display} type="feature" layerId={layerId} featureId={id} />)
         },
         {
             label: (<Attachment />),

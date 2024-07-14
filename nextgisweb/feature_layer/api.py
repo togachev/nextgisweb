@@ -195,7 +195,7 @@ def iget_iso(resource, request) -> JSONType:
     srlz_params = dict(
         geom_format=request.GET.get("geom_format", "wkt").lower(),
         dt_format=request.GET.get("dt_format", "iso"),
-        extensions=_extensions(request.GET.get("extensions"), resource),
+        # extensions=_extensions(request.GET.get("extensions"), resource),
     )
 
     query = resource.feature_query()
@@ -213,6 +213,21 @@ def iget_iso(resource, request) -> JSONType:
     result = serialize(feature, **srlz_params)
 
     return result
+
+def description_get(resource, request) -> JSONType:
+    request.resource_permission(PERM_DATA_READ)
+    srlz_params = dict(
+        extensions=_extensions(request.GET.get("extensions"), resource),
+    )
+
+    query = resource.feature_query()
+
+    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
+
+    result = serialize(feature, **srlz_params)
+
+    return result["extensions"]["description"]
+
 
 def iget(resource, request) -> JSONType:
     request.resource_permission(PERM_DATA_READ)
@@ -574,6 +589,14 @@ def setup_pyramid(comp, config):
         factory=feature_layer_factory,
         types=dict(fid=FeatureID),
         get=iget_iso,
+    )
+
+    config.add_route(
+        "feature_layer.feature.description",
+        "/api/resource/{id}/feature/{fid}/description",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=description_get,
     )
 
     config.add_route(

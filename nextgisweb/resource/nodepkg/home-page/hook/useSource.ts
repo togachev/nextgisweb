@@ -14,5 +14,10 @@ export const useSource = () => {
         return groupMaps_action_map;
     }
 
-    return { getListMap, getGroupMap };
+    const getPermission = async (id) => {
+        const value = await route("resource.permission", id).get();
+        return value;
+    }
+
+    return { getListMap, getGroupMap, getPermission };
 };

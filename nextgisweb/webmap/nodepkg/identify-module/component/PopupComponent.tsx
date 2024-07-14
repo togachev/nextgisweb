@@ -390,7 +390,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 </div>
 
                                 <div className="content">
-                                    <ContentComponent store={store} linkToGeometry={linkToGeometry} attribute={store.attribute} count={count} position={valueRnd} />
+                                    <ContentComponent store={store} linkToGeometry={linkToGeometry} attribute={store.attribute} count={count} position={valueRnd} display={display}/>
                                 </div>
 
                             </>

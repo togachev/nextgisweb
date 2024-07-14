@@ -535,7 +535,8 @@ def getMaplist(request) -> JSONType:
         action_map = res_wmg.action_map
         if res_wmg.id != 0:
             if res.has_permission(PERM_READ, request.user):
-                result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name, description=res.description,
+                result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
+                description_status=False if res.description == None else True,
                 webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id,
                 idx=wmg.id,
                 id_pos=wmg.id_pos,
@@ -724,6 +725,14 @@ def webmap_item(request) -> JSONType:
             preview_description=None if res_social == None else res_social.preview_description))
     return result
 
+def description_get(context, request) -> CompositeRead:
+    """Read resource"""
+    request.resource_permission(PERM_READ)
+
+    serializer = CompositeSerializer(user=request.user)
+    return serializer.serialize(context, CompositeRead).resource["description"]
+
+
 def setup_pyramid(comp, config):
 
     config.add_route(
@@ -887,4 +896,13 @@ def setup_pyramid(comp, config):
         "resource.feature_diagram",
         "/api/resource/{id:uint}/feature/?fld_{key_diag:any}={val_diag:any}",
         get=search,
+    )
+
+    config.add_route(
+        "resource.description",
+        "/api/resource/{id}/description",
+        factory=resource_factory,
+        get=description_get,
+        # put=item_put,
+        # delete=item_delete,
     )

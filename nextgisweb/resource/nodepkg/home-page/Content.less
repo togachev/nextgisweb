@@ -240,6 +240,25 @@
 									height: 168px;
 								}
 
+								.settings-map {
+									display: flex;
+									top: 0;
+									right: 0;
+									position: absolute;
+									justify-content: flex-end;
+									padding: 5px;
+									width: 18px;
+									font-size: 18px;
+									height: 18px;
+									align-items: center;
+									border-radius: 3px;
+									background: rgb(42 56 140 / 50%);
+
+									&:hover {
+										background: rgba(255, 255, 255, 0.75);
+									}
+								}
+
 								.meta-card {
 									overflow: hidden;
 									display: flex;
@@ -372,4 +391,6 @@ textarea::-webkit-input-placeholder {
 		max-width: 500px;
 		text-align: center;
 	}
+
+
 }

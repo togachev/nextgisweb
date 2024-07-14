@@ -39,7 +39,7 @@ export const EditorWidget: EditorWidgetComponent<
                 image={image}
                 onChange={(value) => {
                     store.update({
-                        imageUpdated: value === undefined ? null : value,
+                        imageUpdated: value,
                     });
                 }}
                 {...msgImageUploader}

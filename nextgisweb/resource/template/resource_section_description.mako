@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
     require([
-        "@nextgisweb/webmap/panel/description",
+        "@nextgisweb/resource/description",
         "@nextgisweb/gui/react-app",
     ], function (comp, reactApp) {
         

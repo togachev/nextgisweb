@@ -1,8 +1,12 @@
 import parse, { Element, domToReact } from "html-react-parser";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Image } from "@nextgisweb/gui/antd";
+import { Empty, Image } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
+import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
+import { Spin } from "@nextgisweb/gui/antd";
+
 import "./DescComponent.less";
 const title = gettext("Description");
 const msgLayer = gettext("Layer");
@@ -17,7 +21,29 @@ const zoomToFeature = (display, resourceId, featureId) => {
 };
 
 export const DescComponent = observer((props) => {
-    const { display, content, type, upath_info, close, visible} = props;
+    const { display, content, type, upath_info, close, visible, layerId, featureId } = props;
+    const {
+        data: description,
+        isLoading,
+        error,
+    } = type === "feature" && useRouteGet({
+        name: "feature_layer.feature.description",
+        params: {
+            id: layerId,
+            fid: featureId,
+        },
+    });
+
+    if (isLoading) {
+        return (
+            <div className="loading">
+                <Spin />
+                <div>{gettext("Load description...")}</div>
+            </div>
+        );
+    }
+
+
 
     const DescComp = ({ content }) => {
         return (
@@ -44,7 +70,6 @@ export const DescComponent = observer((props) => {
                         </div >
                     )
                 })
-
             }</>
         )
     }
@@ -99,21 +124,31 @@ export const DescComponent = observer((props) => {
             }
         }
     };
-    let data;
+    let data_;
     if (content === undefined && type === "map") {
-        data = parse(display.config.webmapDescription, options)
+        data_ = parse(display.config.webmapDescription, options)
     }
     else if (content instanceof Array && type === "map") {
-        data = (<DescComp content={content} />)
+        data_ = (<DescComp content={content} />)
     }
     else if (type === "home_page" || type === "resource") {
-        data = parse(content, options)
+        data_ = parse(content, options)
+    }
+    else if (type === "feature") {
+        data_ = parse(description, options)
+    }
+
+    if (error || !description && type === "feature") {
+        return (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />);
     }
 
     return (
         <div className="desc-component">
             {type === "map" && (<PanelHeader {...{ title, close }} />)}
-            {data}
+            {data_}
         </div>
     )
+
+
+
 });

@@ -70,7 +70,7 @@ define([
                     }
                 } else {
                     const cls = reactPanel(
-                        "@nextgisweb/webmap/panel/description",
+                        "@nextgisweb/resource/description",
                         {
                             props: { content },
                         }

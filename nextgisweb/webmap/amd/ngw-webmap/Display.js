@@ -1089,7 +1089,7 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/description"),
+                    cls: reactPanel("@nextgisweb/resource/description"),
                     params: {
                         title: gettext("Description"),
                         name: "info",

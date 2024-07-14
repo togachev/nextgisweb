@@ -1,7 +1,7 @@
 define([
     "dojo/_base/declare",
     "@nextgisweb/gui/react-app",
-    "@nextgisweb/webmap/panel/description",
+    "@nextgisweb/resource/description",
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     "@nextgisweb/pyramid/icon",

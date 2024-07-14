@@ -1,28 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, ConfigProvider, Empty, Modal, Typography } from "@nextgisweb/gui/antd";
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import MapIcon from "@nextgisweb/icon/material/map";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
+import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
+import { useSource } from "./hook/useSource";
 
 const openMap = gettext("открыть карту");
 const descTitle = gettext("Описание карты");
+const settingsTitle = gettext("Настройки карты");
 
 const { Meta } = Card;
 const { Text, Link } = Typography;
 
 export const MapTile = (props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { id, display_name, preview_fileobj_id, description } = props.item;
+    const [descValue, setDescValue] = useState(null);
+    const [perm, setPerm] = useState();
+    const { id, display_name, preview_fileobj_id, description_status } = props.item;
     const { type, upath_info } = props.config;
+    const { getPermission } = useSource();
+    const preview = routeURL("resource.preview", id);
+    const urlWebmap = routeURL("webmap.display", id);
+    
+    useEffect(() => {
+        getPermission(id)
+            .then(value => {
+                setPerm(value);
+            })
+    }, [id])
 
-    const preview = routeURL("resource.preview", id)
-    const urlWebmap = routeURL("webmap.display", id)
-    const showDescription = () => {
+    const urlWebmapSettings = routeURL("resource.update", id);
+
+    const showDescription = async () => {
+        const value = await route("resource.description", id).get({
+            cache: true,
+        });
+        setDescValue(value)
         setIsModalOpen(true);
     };
-
+    
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -43,17 +62,30 @@ export const MapTile = (props) => {
             <Card
                 hoverable
                 cover={
-                    <Link className="link-map" href={urlWebmap} target="_blank">
-                        {
-                            preview_fileobj_id ?
-                                (<div className="img_preview"
-                                    style={{
-                                        background: `url(${preview}) center center / cover no-repeat`,
-                                    }}
-                                ></div>) :
-                                (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
-                        }
-                    </Link>
+                    <>
+                        <Link className="link-map" href={urlWebmap} target="_blank">
+                            {
+                                preview_fileobj_id ?
+                                    (<div className="img_preview"
+                                        style={{
+                                            background: `url(${preview}) center center / cover no-repeat`,
+                                        }}
+                                    ></div>) :
+                                    (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
+                            }
+                        </Link>
+                        {perm && perm.resource.update === true && (
+                            <div className="settings-map">
+                                <SvgIconLink
+                                    title={settingsTitle}
+                                    href={urlWebmapSettings}
+                                    icon="material-settings"
+                                    target="_blank"
+                                    fill="currentColor"
+                                />
+                            </div>
+                        )}
+                    </>
                 }
             >
                 <Meta
@@ -72,7 +104,7 @@ export const MapTile = (props) => {
                                 <span className="icon-open-map"><MapIcon /></span>
 
                             </Link>
-                            {description !== null && (
+                            {description_status === true && (
                                 <span title={descTitle} className="icon-info-map" onClick={showDescription}>
                                     <Info />
                                 </span>
@@ -89,7 +121,7 @@ export const MapTile = (props) => {
                 footer={null}
                 open={isModalOpen}
                 onCancel={handleCancel}>
-                <DescComponent type={type} upath_info={upath_info} content={description} />
+                <DescComponent type={type} upath_info={upath_info} content={descValue} />
             </Modal>
         </ConfigProvider>
     )

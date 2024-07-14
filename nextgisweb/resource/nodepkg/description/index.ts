@@ -1,2 +1,2 @@
 /** @entrypoint */
-export { DescComponent } from "./DescComponent";
+export { DescComponent, DescComponent as default } from "./DescComponent";
