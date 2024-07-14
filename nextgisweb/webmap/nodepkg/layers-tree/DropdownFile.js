@@ -51,7 +51,7 @@ export function DropdownFile({
             label: (
                 <>
                     <div className="linkFile" title={i.name}>
-                        <a className="a-linkFile" target="_blank" href={i.link} >
+                        <a className="a-linkFile" target="_blank" href={i.link} download>
                             <span className="fileTitle">{i.res_name}</span>
                             <span className="fileName">{i.name}</span>
                         </a>

@@ -34,3 +34,9 @@
 .layer-order__grid .dgrid-cell-padding {
     padding: 3px 8px;
 }
+
+.dijitHidden {
+    position: absolute;
+    visibility: hidden;
+    display: none;
+}
