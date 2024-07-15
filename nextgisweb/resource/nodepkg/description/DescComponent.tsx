@@ -22,6 +22,9 @@ const zoomToFeature = (display, resourceId, featureId) => {
 
 export const DescComponent = observer((props) => {
     const { display, content, type, upath_info, close, visible, layerId, featureId } = props;
+
+    console.log(type, layerId, featureId);
+
     const {
         data: description,
         isLoading,
@@ -31,6 +34,9 @@ export const DescComponent = observer((props) => {
         params: {
             id: layerId,
             fid: featureId,
+        },
+        options: {
+            cache: true,
         },
     });
 
@@ -43,7 +49,9 @@ export const DescComponent = observer((props) => {
         );
     }
 
-
+    if (error || !description && type === "feature") {
+        return (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+    }
 
     const DescComp = ({ content }) => {
         return (
@@ -131,15 +139,11 @@ export const DescComponent = observer((props) => {
     else if (content instanceof Array && type === "map") {
         data_ = (<DescComp content={content} />)
     }
-    else if (type === "home_page" || type === "resource") {
+    else if (type === "home_page" || type === "resource" || type === "feature-obj") {
         data_ = parse(content, options)
     }
     else if (type === "feature") {
         data_ = parse(description, options)
-    }
-
-    if (error || !description && type === "feature") {
-        return (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />);
     }
 
     return (

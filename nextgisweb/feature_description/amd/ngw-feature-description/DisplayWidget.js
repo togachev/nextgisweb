@@ -18,7 +18,7 @@ define([
                 DescComp.default,
                 {
                     content: value,
-                    type: "feature",
+                    type: "feature-obj",
                 },
                 this.domNode
             );
