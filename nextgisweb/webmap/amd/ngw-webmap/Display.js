@@ -1094,7 +1094,7 @@ define([
                         title: gettext("Description"),
                         name: "info",
                         order: 40,
-                        menuIcon: "material-info-outline",
+                        menuIcon: "mdi-information-slab-circle-outline",
                         applyToTinyMap: true,
                     },
                 };

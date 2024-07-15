@@ -5,8 +5,9 @@ import type { PanelDojoItem, DojoDisplay } from "../type";
 
 import { navigationMenuStore } from "./NavigationMenuStore";
 import { Typography } from "@nextgisweb/gui/antd";
-import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
-
+import { SettingOutlined } from '@ant-design/icons';
+import Information from "@nextgisweb/icon/mdi/information";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./NavigationMenu.less";
 
 export interface NavigationMenuProps {
@@ -48,8 +49,8 @@ export const NavigationMenu = observer(({ panels, display }: NavigationMenuProps
             {menuItems}
             {infomap.scope ? (
                 <div className="infoblock">
-                    <Link href={infomap.link}><span className="iconLinks"><InfoCircleOutlined /></span></Link>
-                    <Link href={infomap.update}><span className="iconLinks"><SettingOutlined /></span></Link>
+                    <Link href={infomap.link}><span title={gettext("Map properties")} className="iconLinks"><Information /></span></Link>
+                    <Link href={infomap.update}><span title={gettext("Map settings")} className="iconLinks"><SettingOutlined /></span></Link>
                 </div>
             ) : null}
         </div>);

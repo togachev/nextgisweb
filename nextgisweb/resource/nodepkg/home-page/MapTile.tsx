@@ -3,9 +3,9 @@ import { Card, ConfigProvider, Empty, Modal, Typography } from "@nextgisweb/gui/
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import MapIcon from "@nextgisweb/icon/material/map";
+import Cog from "@nextgisweb/icon/mdi/cog";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
-import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { useSource } from "./hook/useSource";
 
 const openMap = gettext("открыть карту");
@@ -24,7 +24,7 @@ export const MapTile = (props) => {
     const { getPermission } = useSource();
     const preview = routeURL("resource.preview", id);
     const urlWebmap = routeURL("webmap.display", id);
-    
+
     useEffect(() => {
         getPermission(id)
             .then(value => {
@@ -41,7 +41,7 @@ export const MapTile = (props) => {
         setDescValue(value)
         setIsModalOpen(true);
     };
-    
+
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -74,17 +74,6 @@ export const MapTile = (props) => {
                                     (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
                             }
                         </Link>
-                        {perm && perm.resource.update === true && (
-                            <div className="settings-map">
-                                <SvgIconLink
-                                    title={settingsTitle}
-                                    href={urlWebmapSettings}
-                                    icon="material-settings"
-                                    target="_blank"
-                                    fill="currentColor"
-                                />
-                            </div>
-                        )}
                     </>
                 }
             >
@@ -92,18 +81,23 @@ export const MapTile = (props) => {
                     className="meta-card"
                     style={{
                         fontWeight: 500,
-                        height: 125
                     }}
                     title={
-                        <span title={display_name} className="grid-card-meta-title">{display_name}</span>
+                        <span title={display_name} className="grid-card-meta-title">
+                            {display_name}
+                        </span>
                     }
                     description={
                         <>
                             <Link href={urlWebmap} target="_blank">
                                 <Text className="open-map" underline>{openMap}</Text>
                                 <span className="icon-open-map"><MapIcon /></span>
-
                             </Link>
+                            {perm && perm.resource.update === true && (
+                                <Link className="settings-a" href={urlWebmapSettings} target="_blank">
+                                    <span title={settingsTitle} className="icon-info-map"><Cog /></span>
+                                </Link>
+                            )}
                             {description_status === true && (
                                 <span title={descTitle} className="icon-info-map" onClick={showDescription}>
                                     <Info />

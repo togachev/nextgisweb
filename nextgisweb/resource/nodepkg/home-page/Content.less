@@ -209,7 +209,7 @@
 									border-radius: 3px;
 
 									.ant-card-cover {
-										height: 100%;
+										height: 204px;
 
 										.link-map {
 											height: 100%;
@@ -223,6 +223,12 @@
 											}
 										}
 									}
+								}
+
+								.ant-card-body {
+									height: 116px;
+									display: flex;
+									background: #fffafa;
 								}
 
 								.img_preview {
@@ -240,31 +246,13 @@
 									height: 168px;
 								}
 
-								.settings-map {
-									display: flex;
-									top: 0;
-									right: 0;
-									position: absolute;
-									justify-content: flex-end;
-									padding: 5px;
-									width: 18px;
-									font-size: 18px;
-									height: 18px;
-									align-items: center;
-									border-radius: 3px;
-									background: rgb(42 56 140 / 50%);
-
-									&:hover {
-										background: rgba(255, 255, 255, 0.75);
-									}
-								}
-
 								.meta-card {
 									overflow: hidden;
 									display: flex;
 									flex: 1;
 									flex-direction: column;
 									justify-content: space-around;
+									margin: 0;
 
 									.ant-card-meta-detail {
 										overflow: hidden;
@@ -274,14 +262,19 @@
 										justify-content: space-around;
 
 										.ant-card-meta-title {
-											height: 100%;
+											height: 76px;
 											display: flex;
 											align-items: center;
-											margin: 8px 0 0 0;
+											margin: 0;
 											cursor: text;
+											justify-content: center;
+											position: absolute;
+											width: 100%;
+											bottom: 32px;
 
 											.grid-card-meta-title {
-												margin: 5px 16px;
+												margin: 0;
+												padding: 0px 16px;
 												color: #000000;
 												font-weight: 400;
 												font-size: 16px;
@@ -298,29 +291,42 @@
 										}
 
 										.ant-card-meta-description {
-											margin: 0 0 10px 0;
+											padding: 0 10px 0 10px;
 											display: flex;
-											align-items: center;
-											justify-content: space-between;
 											cursor: text;
+											position: absolute;
+											bottom: 1px;
+											align-items: center;
+											width: 100%;
+											height: 40px;
+											justify-content: space-between;
 
 											.icon-open-map {
 												margin: 0 0 0 10px;
 												color: #2a388c;
-												border: 1px solid #2a388c;
+												// border: 1px solid #2a388c;
 												padding: 0;
 												border-radius: 2px;
 												line-height: 1;
 											}
 
+											.settings-a {
+												padding: 0;
+											}
+
 											.icon-info-map {
 												line-height: 1;
 												font-size: 24px;
-												padding: 0 10px 0 0;
+												padding: 0;
 												cursor: pointer;
 
-												svg {
-													color: #b5bcc7;
+												svg.icon {
+													fill: #2a388c;
+													filter: drop-shadow(0 0 1.5px #2a388c);
+												}
+
+												svg.icon:hover {
+													fill: #2a398c79;
 												}
 											}
 
@@ -329,16 +335,24 @@
 												display: flex;
 												align-items: center;
 												font-size: 24px;
-												padding: 5px 16px;
+												padding: 0;
 											}
 
 											.open-map {
 												color: #2a388c;
 												text-transform: uppercase;
+												text-decoration: none;
+												text-decoration-skip-ink: auto;
+												font-weight: 600;
 											}
 
-											svg {
-												color: #2a388c;
+											svg.icon {
+												fill: #2a388c;
+												filter: drop-shadow(0 0 1.5px #2a388c);
+											}
+
+											svg.icon:hover {
+												fill: #2a398c79;
 											}
 										}
 									}

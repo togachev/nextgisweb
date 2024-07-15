@@ -21,9 +21,7 @@ const zoomToFeature = (display, resourceId, featureId) => {
 };
 
 export const DescComponent = observer((props) => {
-    const { display, content, type, upath_info, close, visible, layerId, featureId } = props;
-
-    console.log(type, layerId, featureId);
+    const { display, content, type, upath_info, close, layerId, featureId } = props;
 
     const {
         data: description,
