@@ -13,15 +13,21 @@ export function DropdownFile({
     setFileClickId,
 }) {
     const { id, type } = nodeData;
-    const [value, setValue] = useState({});
+    const [value, setValue] = useState([]);
 
     useEffect(() => {
         let isSubscribed = true;
         const getData = async () => {
             if (nodeData.type === 'layer') {
-                const result = await route("file_resource.show", nodeData.styleId).get();
+                const value = await route("file_resource.group_show", nodeData.styleId).get();
                 if (isSubscribed) {
-                    setValue(result);
+                    let files = []
+                    Object.values(value).map(item => {
+                        item.map(x => {
+                            files.push(x)
+                        })
+                    })
+                    setValue(files);
                 }
             }
         }

@@ -10,12 +10,14 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
+import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, position, display}) => {
+export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, position, display }) => {
 
     const { copyValue, contextHolder } = useCopy();
 
@@ -42,6 +44,14 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
             }
         }
     };
+
+    const { data: attachments, refresh: refreshTotal } = useRouteGet({
+        name: "feature_layer.feature.attachment",
+        params: {
+            id: layerId,
+            fid: id,
+        }
+    })
 
     const options = [
         {
@@ -89,7 +99,8 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
             value: "attachment",
             key: "attachment",
             title: gettext("Attachments"),
-            hidden: false
+            hidden: false,
+            children: (<AttachmentTable attachments={attachments} isSmall={true} resourceId={layerId} featureId={id} />)
         },
     ];
 

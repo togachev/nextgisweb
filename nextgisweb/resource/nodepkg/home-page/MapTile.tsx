@@ -90,7 +90,7 @@ export const MapTile = (props) => {
                     description={
                         <>
                             <Link href={urlWebmap} target="_blank">
-                                <Text className="open-map" underline>{openMap}</Text>
+                                <Text className="open-map">{openMap}</Text>
                                 <span className="icon-open-map"><MapIcon /></span>
                             </Link>
                             {perm && perm.resource.update === true && (

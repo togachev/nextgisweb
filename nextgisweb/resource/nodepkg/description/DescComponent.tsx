@@ -1,11 +1,10 @@
 import parse, { Element, domToReact } from "html-react-parser";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Empty, Image } from "@nextgisweb/gui/antd";
+import { Empty, Image, Spin } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import { Spin } from "@nextgisweb/gui/antd";
 
 import "./DescComponent.less";
 const title = gettext("Description");
