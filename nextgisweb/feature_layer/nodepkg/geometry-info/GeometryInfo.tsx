@@ -1,4 +1,3 @@
-import { Spin } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -34,8 +33,6 @@ export function GeometryInfo({
 }) {
     const {
         data: geometryInfo,
-        isLoading,
-        error,
     } = useRouteGet<GeometryInfo>({
         name: "feature_layer.feature.geometry_info",
         params: {
@@ -50,26 +47,7 @@ export function GeometryInfo({
         },
     });
 
-    if (isLoading) {
-        return (
-            <div className="loading">
-                <Spin />
-                <div>{gettext("Load geometry info...")}</div>
-            </div>
-        );
-    }
-
-    if (error || !geometryInfo) {
-        return (
-            <div className="error">
-                <div>
-                    {gettext("Failed to get information about the geometry")}
-                </div>
-            </div>
-        );
-    }
-
-    const length = geometryInfo.length !== null && (
+    const length = geometryInfo && geometryInfo.length !== null && (
         <tr>
             <td>
                 {geometryInfo.type.toLowerCase().includes("polygon")
@@ -80,40 +58,46 @@ export function GeometryInfo({
         </tr>
     );
 
-    const area = geometryInfo.area !== null && (
+    const area = geometryInfo && geometryInfo.area !== null && (
         <tr>
             <td>{gettext("Area")}</td>
             <td>{formatArea(geometryInfo.area)}</td>
         </tr>
     );
     return (
-        <table className="geometry-info-table">
-            <tbody>
-                <tr>
-                    <td>{gettext("Geometry type")}</td>
-                    <td>
-                        {getGeometryTypeTitle(geometryInfo.type.toLowerCase())}
-                    </td>
-                </tr>
-                {length}
-                {area}
-                <tr>
-                    <td>{gettext("Extent (xMin)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.minX)}</td>
-                </tr>
-                <tr>
-                    <td>{gettext("Extent (yMin)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.minY)}</td>
-                </tr>
-                <tr>
-                    <td>{gettext("Extent (xMax)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.maxX)}</td>
-                </tr>
-                <tr>
-                    <td>{gettext("Extent (yMax)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.maxY)}</td>
-                </tr>
-            </tbody>
-        </table>
+        <>
+            {
+                geometryInfo && (
+                    <table className="geometry-info-table">
+                        <tbody>
+                            <tr>
+                                <td>{gettext("Geometry type")}</td>
+                                <td>
+                                    {getGeometryTypeTitle(geometryInfo.type.toLowerCase())}
+                                </td>
+                            </tr>
+                            {length}
+                            {area}
+                            <tr>
+                                <td>{gettext("Extent (xMin)")}</td>
+                                <td>{formatCoordinatesValue(geometryInfo.extent.minX)}</td>
+                            </tr>
+                            <tr>
+                                <td>{gettext("Extent (yMin)")}</td>
+                                <td>{formatCoordinatesValue(geometryInfo.extent.minY)}</td>
+                            </tr>
+                            <tr>
+                                <td>{gettext("Extent (xMax)")}</td>
+                                <td>{formatCoordinatesValue(geometryInfo.extent.maxX)}</td>
+                            </tr>
+                            <tr>
+                                <td>{gettext("Extent (yMax)")}</td>
+                                <td>{formatCoordinatesValue(geometryInfo.extent.maxY)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                )
+            }
+        </>
     );
 }

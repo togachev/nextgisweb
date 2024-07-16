@@ -206,6 +206,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 onSave: () => {
                                     if (onSave) {
                                         onSave();
+                                        store.setUpdateContent(true);
                                     }
                                 },
                             },
@@ -242,10 +243,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         },
                         Radio: {
                             buttonPaddingInline: 3,
-                            buttonSolidCheckedBg: "var(--icon-color)",
-                            buttonSolidCheckedHoverBg: "var(--text-secondary)",
+                            buttonSolidCheckedHoverBg: "var(--icon-color)",
                             colorPrimary: "var(--primary)",
-                            colorBorder: "var(--divider-color)",
                             borderRadius: 4,
                             controlHeight: 24,
                             fontSize: 16,

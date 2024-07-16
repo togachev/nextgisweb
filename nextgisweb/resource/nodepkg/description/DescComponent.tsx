@@ -1,10 +1,9 @@
 import parse, { Element, domToReact } from "html-react-parser";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Empty, Image, Spin } from "@nextgisweb/gui/antd";
+import { Image } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import "./DescComponent.less";
 const title = gettext("Description");
@@ -20,35 +19,7 @@ const zoomToFeature = (display, resourceId, featureId) => {
 };
 
 export const DescComponent = observer((props) => {
-    const { display, content, type, upath_info, close, layerId, featureId } = props;
-
-    const {
-        data: description,
-        isLoading,
-        error,
-    } = type === "feature" && useRouteGet({
-        name: "feature_layer.feature.description",
-        params: {
-            id: layerId,
-            fid: featureId,
-        },
-        options: {
-            cache: true,
-        },
-    });
-
-    if (isLoading) {
-        return (
-            <div className="loading">
-                <Spin />
-                <div>{gettext("Load description...")}</div>
-            </div>
-        );
-    }
-
-    if (error || !description && type === "feature") {
-        return (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-    }
+    const { display, content, type, upath_info, close } = props;
 
     const DescComp = ({ content }) => {
         return (
@@ -139,8 +110,8 @@ export const DescComponent = observer((props) => {
     else if (type === "home_page" || type === "resource" || type === "feature-obj") {
         data_ = parse(content, options)
     }
-    else if (type === "feature") {
-        data_ = parse(description, options)
+    else if (type === "feature" && content) {
+        data_ = parse(content, options)
     }
 
     return (
@@ -149,7 +120,4 @@ export const DescComponent = observer((props) => {
             {data_}
         </div>
     )
-
-
-
 });

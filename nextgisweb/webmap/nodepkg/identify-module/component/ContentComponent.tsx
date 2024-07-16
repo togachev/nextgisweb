@@ -3,7 +3,6 @@ import { Dropdown, Button, Empty, Radio, Space, Typography } from "@nextgisweb/g
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
-import Description from "@nextgisweb/icon/material/description";
 import Attachment from "@nextgisweb/icon/material/attachment";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -13,6 +12,7 @@ import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
+import { Attribute } from "@nextgisweb/webmap/icon";
 
 const { Link } = Typography;
 const settings = webmapSettings;
@@ -29,6 +29,7 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
+    const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
     const RenderValue = (value) => {
         for (const k in value) {
@@ -45,8 +46,8 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
         }
     };
 
-    const { data: attachments, refresh: refreshTotal } = useRouteGet({
-        name: "feature_layer.feature.attachment",
+    const { data: extensions, refresh: refreshAttach } = useRouteGet({
+        name: "feature_layer.feature.extensions",
         params: {
             id: layerId,
             fid: id,
@@ -55,52 +56,63 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
 
     const options = [
         {
-            label: (<Info />),
+            label: (<span className="icon-style"><Attribute /></span>),
             value: "attributes",
             key: "attributes",
             title: gettext("Attributes"),
             hidden: !settings.identify_attributes,
-            children:
-                (<div>
-                    {attribute && Object.keys(attribute).length > 0 ?
-                        (<>
-                            {Object.keys(attribute).map((key) => {
-                                if (attribute[key])
+            children: attribute && Object.keys(attribute).length > 0 &&
+                (<>
+                    {
+                        Object.keys(attribute).length > 1 ?
+                            Object.keys(attribute).map((key) => {
+                                if (attribute[key] !== null) {
                                     return (
                                         <div key={key} className="item-fields">
                                             <div className="label">{key}</div>
                                             <RenderValue value={attribute[key]} />
                                         </div>
                                     )
-                            })}
-                        </>) :
-                        (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+                                }
+                            }) :
+                            Object.keys(attribute).map((key) => {
+                                if (attribute[key] !== null) {
+                                    return (
+                                        <div key={key} className="item-fields">
+                                            <div className="label">{key}</div>
+                                            <RenderValue value={attribute[key]} />
+                                        </div>
+                                    )
+                                } else {
+                                    return (<div key={key}>{emptyValue}</div>);
+                                }
+                            })
                     }
-                </div>)
+                </>)
         },
         {
-            label: (<QueryStats />),
+            label: (<span className="icon-style"><QueryStats /></span>),
             value: "geom_info",
             key: "geom_info",
             title: gettext("Geometry info"),
             hidden: !settings.show_geometry_info,
-            children: (<GeometryInfo layerId={layerId} featureId={id} />)
+            children: settings.show_geometry_info ? (<GeometryInfo layerId={layerId} featureId={id} />) : emptyValue
         },
         {
-            label: (<Description />),
+            label: (<span className="icon-style"><Info /></span>),
             value: "description",
             key: "description",
             title: gettext("Description"),
             hidden: false,
-            children: (<DescComponent display={display} type="feature" layerId={layerId} featureId={id} />)
+            children: extensions?.description ? (<DescComponent display={display} type="feature" content={extensions?.description} />) : emptyValue
         },
         {
-            label: (<Attachment />),
+            label: (<span className="icon-style"><Attachment /></span>),
             value: "attachment",
             key: "attachment",
             title: gettext("Attachments"),
             hidden: false,
-            children: (<AttachmentTable attachments={attachments} isSmall={true} resourceId={layerId} featureId={id} />)
+            children: extensions?.attachment ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
         },
     ];
 
@@ -121,6 +133,12 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
     );
 
     useEffect(() => {
+        store.updateContent === true &&
+            refreshAttach();
+        store.setUpdateContent(false);
+    }, [store.updateContent])
+
+    useEffect(() => {
         setHeightPanel(position.height - 70);
         setContentItem(options.find(item => item.key === "attributes"));
     }, [attribute]);
@@ -134,6 +152,7 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
     }
 
     const linkToGeometryString = `<a href='${linkToGeometry}'>${label}</a>`
+
     const LinkToGeometry = linkToGeometry && (<Button
         size="small"
         type="link"

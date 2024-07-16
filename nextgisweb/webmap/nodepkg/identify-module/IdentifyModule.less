@@ -219,6 +219,10 @@
                 .radio-component {
                     overflow: auto;
                     height: auto;
+
+                    .icon-style {
+                        vertical-align: middle;
+                    }
                 }
             }
 
@@ -253,9 +257,7 @@
         .content-item {
             width: 100%;
             overflow: overlay;
-            border-bottom: solid var(--divider-color) 0.005em;
             height: 100%;
-            padding: 3px 0 0 0;
 
             .content-move {
                 height: 100%;
@@ -263,11 +265,10 @@
             }
 
             .item-fields {
-                height: 100%;
                 display: flex;
                 justify-content: space-between;
-                padding: 2px 5px;
-                border-bottom: solid var(--divider-color) 0.005em;
+                padding: 2px 4px;
+                border-bottom: solid var(--divider-color) 1px;
                 align-items: center;
 
                 &:hover {
@@ -308,10 +309,7 @@
             .ant-empty-image {
                 height: 20px;
             }
-
-
         }
-
     }
 
     .footer-popup {

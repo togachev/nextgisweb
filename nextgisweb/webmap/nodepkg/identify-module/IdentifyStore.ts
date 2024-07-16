@@ -17,6 +17,7 @@ export class IdentifyStore {
     selected: string | null = null;
     attribute: object | null = null;
     feature: object | null = null;
+    updateContent: boolean;
     update = false;
     fullscreen = false;
     contextUrl: string | null = null;
@@ -57,6 +58,10 @@ export class IdentifyStore {
 
     setUpdate = (update: boolean) => {
         this.setValue("update", update);
+    };
+
+    setUpdateContent = (updateContent: boolean) => {
+        this.updateContent = updateContent;
     };
 
     setFullscreen = (fullscreen: boolean) => {

@@ -31,8 +31,8 @@ export function AttachmentTable({
 
     const [images, others] = useMemo(
         () => [
-            attachments.filter((a) => a.is_image),
-            attachments.filter((a) => !a.is_image),
+            attachments?.filter((a) => a.is_image),
+            attachments?.filter((a) => !a.is_image),
         ],
         [attachments]
     );
@@ -84,7 +84,7 @@ export function AttachmentTable({
 
     return (
         <div className="ngw-feature-attachment-attachment-table">
-            {images.length > 0 && (
+            {images && images.length > 0 && (
                 <div ref={previewRef} className="images">
                     {images.map((attachment, index) => {
                         return (
@@ -112,7 +112,7 @@ export function AttachmentTable({
                     })}
                 </div>
             )}
-            {others.length > 0 && (
+            {others && others.length > 0 && (
                 <Table
                     rowKey={(attachment: FeatureAttachment) => attachment.id}
                     dataSource={others}

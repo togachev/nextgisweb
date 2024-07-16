@@ -214,7 +214,7 @@ def iget_iso(resource, request) -> JSONType:
 
     return result
 
-def description_get(resource, request) -> JSONType:
+def extensions_get(resource, request) -> JSONType:
     request.resource_permission(PERM_DATA_READ)
     srlz_params = dict(
         extensions=_extensions(request.GET.get("extensions"), resource),
@@ -226,21 +226,7 @@ def description_get(resource, request) -> JSONType:
 
     result = serialize(feature, **srlz_params)
 
-    return result["extensions"]["description"]
-
-def attachment_get(resource, request) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
-    srlz_params = dict(
-        extensions=_extensions(request.GET.get("extensions"), resource),
-    )
-
-    query = resource.feature_query()
-
-    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
-
-    result = serialize(feature, **srlz_params)
-
-    return result["extensions"]["attachment"]
+    return result["extensions"]
 
 def iget(resource, request) -> JSONType:
     request.resource_permission(PERM_DATA_READ)
@@ -605,19 +591,11 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "feature_layer.feature.description",
-        "/api/resource/{id}/feature/{fid}/description",
+        "feature_layer.feature.extensions",
+        "/api/resource/{id}/feature/{fid}/extensions",
         factory=feature_layer_factory,
         types=dict(fid=FeatureID),
-        get=description_get,
-    )
-
-    config.add_route(
-        "feature_layer.feature.attachment",
-        "/api/resource/{id}/feature/{fid}/attachment",
-        factory=feature_layer_factory,
-        types=dict(fid=FeatureID),
-        get=attachment_get,
+        get=extensions_get,
     )
 
     config.add_route(
