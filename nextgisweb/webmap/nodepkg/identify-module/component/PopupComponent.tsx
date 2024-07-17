@@ -264,9 +264,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             colorLinkHover: "var(--primary)",
                             defaultHoverColor: "var(--primary)",
                         },
-                        Table: {
-                            borderRadiusLG: 0
-                        }
                     }
                 }}
             >
