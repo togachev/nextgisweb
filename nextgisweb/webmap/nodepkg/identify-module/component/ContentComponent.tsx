@@ -1,6 +1,6 @@
 import { FC, useMemo, useState, useEffect, useRef } from "react";
-import { Dropdown, Button, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
-import type { MenuProps } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Descriptions, Dropdown, Button, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
+import type { DescriptionsProps, MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
 import Attachment from "@nextgisweb/icon/material/attachment";
@@ -24,7 +24,7 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
     const { id, layerId, label } = store.selected;
     const panelRef = useRef<HTMLDivElement>(null);
 
-    const heightRadio = 106 + 2 + 2; /* ~ height and padding 2px */
+    const heightRadio = 110; /* ~ height and padding 2px */
     const [heightPanel, setHeightPanel] = useState();
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
@@ -35,13 +35,13 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
         for (const k in value) {
             const val = value[k];
             if (urlRegex.test(val)) {
-                return (<Link title={val} className="value-link" ellipsis={true} href={val} target="_blank">{val}</Link>)
+                return (<Link title={val} href={val} target="_blank">{val}</Link>)
             } else if (emailRegex.test(val)) {
-                return (<div title={val} className="value-email" onClick={() => {
+                return (<div className="value-email" title={val} onClick={() => {
                     copyValue(val, gettext("Email address copied"));
                 }} >{val}</div>)
             } else {
-                return (<div className="value text-ellipsis">{val}</div>)
+                return val
             }
         }
     };
@@ -61,34 +61,7 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
             key: "attributes",
             title: gettext("Attributes"),
             hidden: !settings.identify_attributes,
-            children: attribute && Object.keys(attribute).length > 0 &&
-                (<>
-                    {
-                        Object.keys(attribute).length > 1 ?
-                            Object.keys(attribute).map((key) => {
-                                if (attribute[key] !== null) {
-                                    return (
-                                        <div key={key} className="item-fields">
-                                            <div className="label">{key}</div>
-                                            <RenderValue value={attribute[key]} />
-                                        </div>
-                                    )
-                                }
-                            }) :
-                            Object.keys(attribute).map((key) => {
-                                if (attribute[key] !== null) {
-                                    return (
-                                        <div key={key} className="item-fields">
-                                            <div className="label">{key}</div>
-                                            <RenderValue value={attribute[key]} />
-                                        </div>
-                                    )
-                                } else {
-                                    return (<div key={key}>{emptyValue}</div>);
-                                }
-                            })
-                    }
-                </>)
+            children: null
         },
         {
             label: (<span className="icon-style"><QueryStats /></span>),
@@ -115,6 +88,38 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
             children: extensions?.attachment ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
         },
     ];
+
+    const attributeColumns = useMemo(() => {
+        const items: DescriptionsProps['items'] = [];
+
+        if (attribute && Object.keys(attribute).length > 0) {
+            if (Object.keys(attribute).length > 1) {
+                Object.keys(attribute).map((key) => {
+                    if (attribute[key] !== null) {
+                        items.push({
+                            key: key,
+                            label: key,
+                            children: (<RenderValue value={attribute[key]} />),
+                        })
+                    }
+                })
+            } else {
+                Object.keys(attribute).map((key) => {
+                    if (attribute[key] !== null) {
+                        items.push({
+                            key: key,
+                            label: key,
+                            children: (<RenderValue value={attribute[key]} />),
+                        })
+                    }
+                })
+            }
+        }
+
+        return <Descriptions bordered size="small" column={1} layout="hirizontal" items={items} />;
+    }, [attribute]);
+
+    options[0].children = attributeColumns.props.items.length > 0 ? attributeColumns : emptyValue;
 
     const [contentItem, setContentItem] = useState(options[0]);
 
@@ -165,7 +170,15 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
     />)
 
     return (
-        <>
+        <ConfigProvider
+            theme={{
+                token: {
+                    borderRadiusLG: 0,
+                    padding: 5,
+                    paddingXS: 2,
+                },
+            }}
+        >
             {contextHolder}
             <div className="radio-block">
                 {
@@ -202,6 +215,6 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
                 {LinkToGeometry}
             </div>
             <div className="content-item">{contentItem.children}</div>
-        </>
+        </ConfigProvider>
     )
 };
