@@ -74,17 +74,16 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     const heightForbidden = selectedItem && selectedItem.value.includes("Forbidden") ? 75 : position.height;
 
-    const [valueRnd, setValueRnd] = useState<Rnd>({
-        x: position.x,
-        y: position.y,
-        width: position.width,
-        height: heightForbidden,
-    });
-
     const { generateUrl, getAttribute } = useSource();
 
     const [store] = useState(() => new IdentifyStore({
         data: response.data,
+        valueRnd: {
+            x: position.x,
+            y: position.y,
+            width: position.width,
+            height: heightForbidden,
+        }
     }));
 
     imodule.identifyStore = store;
@@ -109,7 +108,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     }, [store.update]);
 
     useEffect(() => {
-        setValueRnd({ x: position.x, y: position.y, width: position.width, height: heightForbidden });
+        store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: heightForbidden });
         if (count > 0 && !selectedItem.value.includes("Forbidden")) {
             store.setData(response.data);
             store.setSelected(selectedItem);
@@ -131,7 +130,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     })
                 });
         } else if (count > 0 && selectedItem.value.includes("Forbidden")) {
-            setValueRnd(prev => ({ ...prev, height: 75 }));
+            store.setValueRnd(prev => ({ ...prev, height: 75 }));
         } else {
             store.setContextUrl(generateUrl(display, { res: null, all: null }));
             store.setData([]);
@@ -279,24 +278,24 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         topLeft: "hover-angle-top-left",
                     }}
                     cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
-                    bounds={valueRnd.width === W ? undefined : "window"}
+                    bounds={store.valueRnd.width === W ? undefined : "window"}
                     minWidth={position.width}
                     minHeight={heightForbidden}
                     allowAnyClick={true}
                     enableResizing={count > 0 ? true : false}
-                    position={{ x: valueRnd.x, y: valueRnd.y }}
-                    size={{ width: valueRnd.width, height: valueRnd.height }}
+                    position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
+                    size={{ width: store.valueRnd.width, height: store.valueRnd.height }}
                     onDragStop={(e, d) => {
-                        if (valueRnd.x !== d.x || valueRnd.y !== d.y) {
-                            setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
-                            if (valueRnd.width === W && valueRnd.height === H) {
-                                setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                        if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
+                            store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                            if (store.valueRnd.width === W && store.valueRnd.height === H) {
+                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
                                 store.setFullscreen(false);
                             }
                         }
                     }}
                     onResize={(e, direction, ref, delta, position) => {
-                        setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                        store.setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
                     }}
                 >
                     <div ref={ref} className="popup-position" >
@@ -305,11 +304,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 onClick={(e) => {
                                     if (count > 0 && e.detail === 2) {
                                         setTimeout(() => {
-                                            if (valueRnd.width > position.width || valueRnd.height > heightForbidden) {
-                                                setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                            if (store.valueRnd.width > position.width || store.valueRnd.height > heightForbidden) {
+                                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
                                                 store.setFullscreen(false)
                                             } else {
-                                                setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
                                                 store.setFullscreen(true)
                                             }
                                         }, 200)
@@ -331,15 +330,15 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
                                 className="icon-symbol"
                                 onClick={() => {
-                                    if (valueRnd.width > position.width || valueRnd.height > heightForbidden) {
-                                        setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                    if (store.valueRnd.width > position.width || store.valueRnd.height > heightForbidden) {
+                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
                                         store.setFullscreen(false)
                                     } else {
-                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
                                         store.setFullscreen(true)
                                     }
-                                    if (valueRnd.width < W && valueRnd.width > position.width || valueRnd.height < H && valueRnd.height > heightForbidden) {
-                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                    if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > heightForbidden) {
+                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
                                         store.setFullscreen(true)
                                     }
                                 }} >
@@ -352,7 +351,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                     visible({ hidden: true, overlay: undefined, key: "popup" })
                                     topic.publish("feature.unhighlight");
                                     store.setFullscreen(false)
-                                    setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                                    store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
                                 }} >
                                 <CloseIcon />
                             </span>
@@ -389,7 +388,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 </div>
 
                                 <div className="content">
-                                    <ContentComponent store={store} linkToGeometry={linkToGeometry} attribute={store.attribute} count={count} position={valueRnd} display={display}/>
+                                    <ContentComponent store={store} linkToGeometry={linkToGeometry} attribute={store.attribute} count={count} position={store.valueRnd} display={display}/>
                                 </div>
 
                             </>

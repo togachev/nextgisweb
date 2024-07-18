@@ -10,7 +10,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, ResourceFactory
+from nextgisweb.resource import DataStructureScope, DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .exception import FeatureNotFound
@@ -215,18 +215,15 @@ def iget_iso(resource, request) -> JSONType:
     return result
 
 def extensions_get(resource, request) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
-    srlz_params = dict(
-        extensions=_extensions(request.GET.get("extensions"), resource),
-    )
+    if resource.has_permission(DataStructureScope.read, request.user):
+        srlz_params = dict(
+            extensions=_extensions(request.GET.get("extensions"), resource),
+        )
+        query = resource.feature_query()
+        feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
 
-    query = resource.feature_query()
-
-    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
-
-    result = serialize(feature, **srlz_params)
-
-    return result["extensions"]
+        result = serialize(feature, **srlz_params)
+        return result["extensions"]
 
 def iget(resource, request) -> JSONType:
     request.resource_permission(PERM_DATA_READ)

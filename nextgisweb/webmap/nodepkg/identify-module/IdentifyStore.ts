@@ -11,6 +11,13 @@ export interface DataProps {
     layer_name: string;
 }
 
+interface Rnd {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 export class IdentifyStore {
     layerName: string | null = null;
     data: DataProps[] = [];
@@ -22,9 +29,10 @@ export class IdentifyStore {
     fullscreen = false;
     contextUrl: string | null = null;
     linkToGeometry: string | null = null;
+    valueRnd: Rnd | null = null;
 
     constructor({ data, ...props }) {
-        this.data = data
+        this.data = data;
         for (const key in props) {
             const k = key;
             const prop = (props)[k];
@@ -35,6 +43,10 @@ export class IdentifyStore {
 
         makeAutoObservable(this, {});
     }
+
+    setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
+        this.setValue("valueRnd", valueRnd);
+    };  
 
     setLayerName = (layerName: SetValue<string | null>) => {
         this.setValue("layerName", layerName);

@@ -42,8 +42,6 @@ export const useGraph = ({ display, topic }: GraphProps) => {
     }, [featInfo])
 
     const displayFeatureInfo = useCallback(async (pixel: number[]) => {
-        console.log(display);
-        
         const request: RequestProps = {
             srs: 3857,
             geom: display.identify_module._requestGeomString(pixel),
