@@ -16,7 +16,7 @@ import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatia
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import "./IdentifyModule.less";
 import { positionContext } from "./positionContext"
-import CoordinateSwitcher from "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher";
+import OlGeomPoint from "ol/geom/Point";
 
 interface StylesRequest {
     id: number;
@@ -341,45 +341,57 @@ export class IdentifyModule extends Component {
         return true;
     };
 
-    _responseContext = (val) => {
-
-        const coordSwitcher = new CoordinateSwitcher({ point: [val.lon, val.lat] });
-        coordSwitcher._transformFrom(4326).then((transformedCoord) => {
-            const params: SelectedFeatureProps[] = [];
-            val.lsf?.split(",").map(i => {
-                params.push({
-                    styleId: Number(i.split(":")[0]),
-                    layerId: Number(i.split(":")[1]),
-                    featureId: Number(i.split(":")[2]),
-                    label: "",
-                });
+    _responseContext = async (val) => {
+        await route("spatial_ref_sys.geom_transform.batch")
+            .post({
+                json: {
+                    srs_from: 4326,
+                    srs_to: Object.keys(srsCoordinates).map(Number),
+                    geom: wkt.writeGeometry(new OlGeomPoint([val.lon, val.lat])),
+                },
             })
-
-            const value = {
-                attribute: val.attribute,
-                lat: val.lat,
-                lon: val.lon,
-                params,
-            }
-
-            const p = { value, coordinate: transformedCoord };
-            const offHP = 40;
-
-            const W = window.innerWidth;
-            const H = window.innerHeight;
-
-            const simulateEvent = {
-                coordinate: p && p.coordinate,
-                map: this.olmap,
-                target: 'map',
-                pixel: [
-                    this.display.panelsManager._activePanelKey ? (W + this.display.leftPanelPane.w + offHP) / 2 : (W + offHP) / 2,
-                    (H + offHP) / 2
-                ],
-                type: 'singleclick'
-            };
-
-            this._overlayInfo(simulateEvent, "popup", p)
-        })
+            .then((transformed) => {
+                const t = transformed.find(i => i.srs_id !== 4326)
+                const wktPoint = wkt.readGeometry(t.geom);
+                const transformedCoord = wktPoint.getCoordinates();
+                return transformedCoord;
+            })
+            .then((transformedCoord) =>{
+                const params: SelectedFeatureProps[] = [];
+                val.lsf?.split(",").map(i => {
+                    params.push({
+                        styleId: Number(i.split(":")[0]),
+                        layerId: Number(i.split(":")[1]),
+                        featureId: Number(i.split(":")[2]),
+                        label: "",
+                    });
+                })
+    
+                const value = {
+                    attribute: val.attribute,
+                    lat: val.lat,
+                    lon: val.lon,
+                    params,
+                }
+    
+                const p = { value, coordinate: transformedCoord };
+                const offHP = 40;
+    
+                const W = window.innerWidth;
+                const H = window.innerHeight;
+    
+                const simulateEvent = {
+                    coordinate: p && p.coordinate,
+                    map: this.olmap,
+                    target: 'map',
+                    pixel: [
+                        this.display.panelsManager._activePanelKey ? (W + this.display.leftPanelPane.w + offHP) / 2 : (W + offHP) / 2,
+                        (H + offHP) / 2
+                    ],
+                    type: 'singleclick'
+                };
+    
+                this._overlayInfo(simulateEvent, "popup", p)
+            });
     };
 }
