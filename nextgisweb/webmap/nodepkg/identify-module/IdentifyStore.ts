@@ -21,7 +21,7 @@ interface Rnd {
 export class IdentifyStore {
     layerName: string | null = null;
     data: DataProps[] = [];
-    selected: string | null = null;
+    selected: DataProps | null = null;
     attribute: object | null = null;
     feature: object | null = null;
     updateContent: boolean;
@@ -56,7 +56,7 @@ export class IdentifyStore {
         this.data = data;
     };
 
-    setSelected = (selected: SetValue<string | null>) => {
+    setSelected = (selected: SetValue<DataProps | null>) => {
         this.setValue("selected", selected);
     };
 

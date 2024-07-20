@@ -62,14 +62,14 @@ Control.prototype = Object.create(Interaction.prototype);
 Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
-    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false) {
+    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
         this.tool._overlayInfo(e, "popup", false);
         e.preventDefault();
     }
-    // else if (e.type === "singleclick" && e.originalEvent.ctrlKey === true) {
-    //     this.tool._popupMultiple(e);
-    //     e.preventDefault();
-    // }
+    else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
+        this.tool._popupMultiple(e, "multi", false);
+        e.preventDefault();
+    }
     else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
         this.tool._overlayInfo(e, "context", false);
         e.preventDefault();
@@ -166,10 +166,6 @@ export class IdentifyModule extends Component {
         }
     };
 
-    // _popupMultiple = (e: MapBrowserEvent) => {
-    //     alert(e.pixel);
-    // };
-
     isNumeric = (string) => Number.isFinite(+string);
 
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
@@ -245,20 +241,24 @@ export class IdentifyModule extends Component {
         }
     };
 
-    _isEditEnabled = (display, config) => {
+    _isEditEnabled = (display, item) => {
         const pluginName = "ngw-webmap/plugin/FeatureLayer";
 
         if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
             return false;
         }
 
-        const configLayerPlugin = config.plugin["ngw-webmap/plugin/FeatureLayer"];
+        const configLayerPlugin = item.itemConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
         const readOnly = configLayerPlugin.readonly;
         return !readOnly;
     };
 
     _render = () => {
         this.display.identify_module.root_popup.render();
+    };
+
+    _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
+        // console.log(e.pixel, op);
     };
 
     _overlayInfo = (e: MapBrowserEvent, op: string, p) => {

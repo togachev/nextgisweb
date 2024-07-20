@@ -1,5 +1,5 @@
 import { FC, useMemo, useState, useEffect, useRef } from "react";
-import { ConfigProvider, Descriptions, Dropdown, Button, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Descriptions, Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
 import type { DescriptionsProps, MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -10,18 +10,17 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
-import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { Attribute } from "@nextgisweb/webmap/icon";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, position, display }) => {
+export const ContentComponent: FC = ({ store, attribute, LinkToGeometry, display }) => {
 
     const { copyValue, contextHolder } = useCopy();
-
-    const { id, layerId, label } = store.selected;
+    const { valueRnd } = store;
+    const { id, layerId } = store.selected;
     const panelRef = useRef<HTMLDivElement>(null);
 
     const heightRadio = 110; /* ~ height and padding 2px */
@@ -46,14 +45,14 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
         }
     };
 
-    const { data: extensions, refresh: refreshAttach } = useRouteGet({
+    const { data: extensions, refresh: refreshAttach } = store.selected && useRouteGet({
         name: "feature_layer.feature.extensions",
         params: {
             id: layerId,
             fid: id,
         }
     })
-
+    
     const options = [
         {
             label: (<span className="icon-style"><Attribute /></span>),
@@ -123,28 +122,27 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
 
     const [contentItem, setContentItem] = useState(options[0]);
 
-    const items = useMemo(
-        () =>
-            options.map(item => {
-                if (!item.hidden) {
-                    return {
-                        key: item.key,
-                        label: item.label,
-                        title: item.title,
-                    }
+    const dropdownItems = useMemo(() => {
+        options.map(item => {
+            if (!item.hidden) {
+                return {
+                    key: item.key,
+                    label: item.label,
+                    title: item.title,
                 }
-            }),
-        [attribute]
-    );
+            }
+        })
+    }, [attribute]);
 
     useEffect(() => {
-        store.updateContent === true &&
+        if (store.updateContent === true) {
             refreshAttach();
-        store.setUpdateContent(false);
+            store.setUpdateContent(false);
+        }
     }, [store.updateContent])
 
     useEffect(() => {
-        setHeightPanel(position.height - 70);
+        setHeightPanel(valueRnd.height - 70);
         setContentItem(options.find(item => item.key === "attributes"));
     }, [attribute]);
 
@@ -155,19 +153,6 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
     const onValuesChange = (e) => {
         setContentItem(options.find(item => item.key === e.target.value));
     }
-
-    const linkToGeometryString = `<a href='${linkToGeometry}'>${label}</a>`
-
-    const LinkToGeometry = linkToGeometry && (<Button
-        size="small"
-        type="link"
-        title={gettext("HTML code of the geometry link, for insertion into the description")}
-        className="copy_to_clipboard"
-        icon={<Identifier />}
-        onClick={() => {
-            copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-        }}
-    />)
 
     return (
         <ConfigProvider
@@ -204,7 +189,7 @@ export const ContentComponent: FC = ({ store, attribute, linkToGeometry, count, 
                             <div className="dropdown-block">
                                 <Dropdown placement="bottomLeft"
                                     menu={{
-                                        items,
+                                        dropdownItems,
                                         onClick
                                     }} trigger={["click", "hover"]} >
                                     <span title={options.filter(item => item.key === contentItem.value)[0].title} className="drop-down-icon">{options.filter(item => item.key === contentItem.value)[0].label}</span>

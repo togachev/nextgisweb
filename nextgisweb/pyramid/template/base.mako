@@ -123,7 +123,7 @@
                         <h1 id="title" title="${tr(effective_title)}" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
                             %if hasattr(next, 'title_ext'):
-                                <div title="${next.title_ext()}" class="ext">${next.title_ext()}</div>
+                                <div class="ext">${next.title_ext()}</div>
                             %endif
                         </h1>
 

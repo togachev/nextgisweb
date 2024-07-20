@@ -1,9 +1,11 @@
-import { forwardRef, RefObject, useState, useEffect } from "react";
+import { forwardRef, RefObject, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
+import Identifier from "@nextgisweb/icon/mdi/identifier";
+
 import { Rnd } from "react-rnd";
 import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
@@ -15,6 +17,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
+import { useCopy } from "@nextgisweb/webmap/useCopy";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import topic from "dojo/topic";
 
@@ -67,51 +70,40 @@ interface Params {
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display } = props;
     const { position, response } = params;
+    const { generateUrl, getAttribute } = useSource();
+    const { copyValue, contextHolder } = useCopy();
     const imodule = display.identify_module;
 
     const count = response.featureCount;
-    const selectedItem = response.data[0];
 
-    const heightForbidden = selectedItem && selectedItem.value.includes("Forbidden") ? 75 : position.height;
-
-    const { generateUrl, getAttribute } = useSource();
-
-    const [store] = useState(() => new IdentifyStore({
-        data: response.data,
-        valueRnd: {
-            x: position.x,
-            y: position.y,
-            width: position.width,
-            height: heightForbidden,
-        }
-    }));
-
+    const [store] = useState(
+        () => new IdentifyStore({
+            data: response.data,
+            selected: response.data[0],
+            valueRnd: {
+                x: position.x,
+                y: position.y,
+                width: position.width,
+                height: position.height,
+            },
+        }));
     imodule.identifyStore = store;
 
-    useEffect(() => {
-        if (store.update)
-            getAttribute(store.selected)
-                .then(item => {
-                    store.setAttribute(item._fieldmap);
-                    store.setFeature({
-                        geom: item.feature.geom,
-                        featureId: item.feature.id,
-                        layerId: item.resourceId,
-                    });
-                    topic.publish("feature.highlight", {
-                        geom: item.feature.geom,
-                        featureId: item.feature.id,
-                        layerId: item.resourceId,
-                    })
-                    store.setUpdate(false);
-                });
-    }, [store.update]);
+    const offHP = 40;
+    const offset = display.clientSettings.offset_point;
+    const fX = offHP + offset;
+    const fY = offHP + offset;
+
+    const W = window.innerWidth - offHP - offset * 2;
+    const H = window.innerHeight - offHP - offset * 2;
 
     useEffect(() => {
-        store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: heightForbidden });
-        if (count > 0 && !selectedItem.value.includes("Forbidden")) {
+        store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
+        store.setSelected(response.data[0]);
+        
+        if (count > 0 && !response.data[0].value.includes("Forbidden")) {
+            const selectedItem = response.data[0];
             store.setData(response.data);
-            store.setSelected(selectedItem);
             const noSelectedItem = store.data.filter(item => item.value !== selectedItem.value)
             store.setContextUrl(generateUrl(display, { res: selectedItem, all: noSelectedItem }));
             store.setLinkToGeometry(selectedItem.layerId + ":" + selectedItem.id);
@@ -129,8 +121,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         layerId: item.resourceId,
                     })
                 });
-        } else if (count > 0 && selectedItem.value.includes("Forbidden")) {
-            store.setValueRnd(prev => ({ ...prev, height: 75 }));
         } else {
             store.setContextUrl(generateUrl(display, { res: null, all: null }));
             store.setData([]);
@@ -140,7 +130,25 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         }
     }, [response]);
 
-    const currentLayer = store.selected !== null ? store.selected.layer_name : undefined
+    useEffect(() => {
+        if (store.update === true) {
+            getAttribute(store.selected)
+                .then(item => {
+                    store.setAttribute(item._fieldmap);
+                    store.setFeature({
+                        geom: item.feature.geom,
+                        featureId: item.feature.id,
+                        layerId: item.resourceId,
+                    });
+                    topic.publish("feature.highlight", {
+                        geom: item.feature.geom,
+                        featureId: item.feature.id,
+                        layerId: item.resourceId,
+                    })
+                    store.setUpdate(false);
+                });
+        }
+    }, [store.update]);
 
     const onChange = (value: { value: number; label: string }) => {
         const selectedValue = store.data.find(item => item.value === value.value);
@@ -156,7 +164,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     featureId: item.feature.id,
                     layerId: item.resourceId,
                 });
-
                 topic.publish("feature.highlight", {
                     geom: item.feature.geom,
                     featureId: item.feature.id,
@@ -169,64 +176,62 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
         (option?.layer_name ?? '').toLowerCase().includes(input.toLowerCase());
 
-    let operations, linkToGeometry;
-    count > 0 && store.selected && Object.values(display._itemConfigById).forEach((config: DisplayItemConfig) => {
-        const { id, layerId, styleId } = store.selected;
-        if (
-            config.layerId !== layerId ||
-            config.styleId !== styleId ||
-            !imodule._isEditEnabled(display, config)
-        ) {
-            return;
-        }
-        const onSave = () => {
-            store.setUpdate(true);
-            topic.publish("feature.updated", {
-                resourceId: layerId,
-                featureId: id,
-            });
-        }
-
-        linkToGeometry = store.linkToGeometry;
-
-        operations = (
-            <div title={gettext("Edit")}>
-                <Button
-                    type="text"
-                    className="edit-symbol"
-                    icon={<EditNote />}
+    const LinkToGeometry = useMemo(() => {
+        if (count > 0 && store.selected) {
+            const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === store.selected.styleId);
+            if (count > 0 && store.selected) {
+                if (!imodule._isEditEnabled(display, item)) { return false; }
+                return (<Button
+                    size="small"
+                    type="link"
+                    title={gettext("HTML code of the geometry link, for insertion into the description")}
+                    className="copy_to_clipboard"
+                    icon={<Identifier />}
                     onClick={() => {
-                        const featureId = id;
-                        const resourceId = layerId;
-                        showModal(FeatureEditorModal, {
-                            editorOptions: {
-                                featureId,
-                                resourceId: resourceId,
-                                onSave: () => {
-                                    if (onSave) {
-                                        onSave();
-                                        store.setUpdateContent(true);
-                                    }
-                                },
-                            },
-                        });
-
+                        const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
+                        copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
                     }}
-                />
-            </div>
-        );
-    })
+                />)
+            }
+        }
+    }, [count, store.selected])
 
-    const offHP = 40;
-    const offset = display.clientSettings.offset_point;
+    const editFeature = useMemo(() => {
+        if (count > 0 && store.selected) {
+            const { id, layerId, styleId } = store.selected;
+            const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === styleId);
 
-    const W = display.mapNode.clientWidth - offset * 2;
-    const H = display.mapNode.clientHeight - offset * 2;
+            if (display.isTinyMode() && !display.isTinyModePlugin("ngw-webmap/plugin/FeatureLayer")) {
+                return false;
+            } else if (!imodule._isEditEnabled(display, item)) {
+                return false;
+            } else {
+                return (<div title={gettext("Edit")}>
+                    <Button
+                        type="text"
+                        className="edit-symbol"
+                        icon={<EditNote />}
+                        onClick={() => {
+                            const featureId = id;
+                            const resourceId = layerId;
+                            showModal(FeatureEditorModal, {
+                                editorOptions: {
+                                    featureId,
+                                    resourceId: resourceId,
+                                    onSave: () => {
+                                        store.setUpdate(true);
+                                        topic.publish("feature.updated", { resourceId: layerId, featureId: id });
+                                        store.setUpdateContent(true);
+                                    },
+                                },
+                            });
 
-    const fX = display.panelsManager._activePanelKey ?
-        display.leftPanelPane.w + offHP + offset :
-        offHP + offset;
-    const fY = offHP + offset;
+                        }}
+                    />
+                </div>)
+            }
+        }
+    }, [count, store.selected])
 
     return (
         createPortal(
@@ -266,6 +271,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     }
                 }}
             >
+                {contextHolder}
                 <Rnd
                     resizeHandleClasses={{
                         right: "hover-right",
@@ -280,7 +286,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
                     bounds={store.valueRnd.width === W ? undefined : "window"}
                     minWidth={position.width}
-                    minHeight={heightForbidden}
+                    minHeight={position.height}
                     allowAnyClick={true}
                     enableResizing={count > 0 ? true : false}
                     position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
@@ -289,7 +295,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
                             store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
                             if (store.valueRnd.width === W && store.valueRnd.height === H) {
-                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
                                 store.setFullscreen(false);
                             }
                         }
@@ -304,8 +310,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 onClick={(e) => {
                                     if (count > 0 && e.detail === 2) {
                                         setTimeout(() => {
-                                            if (store.valueRnd.width > position.width || store.valueRnd.height > heightForbidden) {
-                                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                            if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
+                                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
                                                 store.setFullscreen(false)
                                             } else {
                                                 store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
@@ -318,26 +324,26 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 }}
                             >
                                 <span className="object-select">Объектов: {count}</span>
-                                {count > 0 && (
+                                {count > 0 && store.selected && (
                                     <span
-                                        title={currentLayer}
+                                        title={store.selected?.layer_name}
                                         className="layer-name">
-                                        {currentLayer}
+                                        {store.selected?.layer_name}
                                     </span>
                                 )}
                             </div>
-                            {count > 0 && (<span
+                            {count > 0 && store.selected && (<span
                                 title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
                                 className="icon-symbol"
                                 onClick={() => {
-                                    if (store.valueRnd.width > position.width || store.valueRnd.height > heightForbidden) {
-                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: heightForbidden, x: position.x, y: position.y }));
+                                    if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
+                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
                                         store.setFullscreen(false)
                                     } else {
                                         store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
                                         store.setFullscreen(true)
                                     }
-                                    if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > heightForbidden) {
+                                    if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > position.height) {
                                         store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
                                         store.setFullscreen(true)
                                     }
@@ -356,7 +362,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 <CloseIcon />
                             </span>
                         </div>
-                        {count > 0 && store.selected !== null && (
+                        {count > 0 && store.selected && (
                             <>
                                 <div className="select-feature" >
                                     <Select
@@ -370,7 +376,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                         showSearch
                                         size="small"
                                         value={store.selected}
-                                        style={{ width: operations ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
+                                        style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
                                         onChange={onChange}
                                         options={store.data}
                                         optionRender={(option) => (
@@ -384,13 +390,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                             </div>
                                         )}
                                     />
-                                    {operations}
+                                    {editFeature}
                                 </div>
-
                                 <div className="content">
-                                    <ContentComponent store={store} linkToGeometry={linkToGeometry} attribute={store.attribute} count={count} position={store.valueRnd} display={display}/>
+                                    <ContentComponent attribute={store.attribute} store={store} LinkToGeometry={LinkToGeometry} count={count} display={display} />
                                 </div>
-
                             </>
                         )}
                         <div className="footer-popup">
