@@ -1,6 +1,7 @@
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
 import type { StoreItem } from "@nextgisweb/webmap/type";
+
 export const useSource = () => {
 
     const generateUrl = (display, { res, all }) => {
@@ -18,9 +19,9 @@ export const useSource = () => {
         });
 
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-        all?.map(i => {           
+        all?.map(i => {
             selected.push(i.styleId + ":" + i.layerId + ":" + i.id)
-        });        
+        });
 
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
@@ -106,12 +107,12 @@ export const useSource = () => {
                             }
                             Object.assign(renameKeys, { [k]: fieldmap[k].display_name })
                         }
-                        const _fieldmap = rename(renameKeys, value)
-                        return { _fieldmap, feature, resourceId };
+                        const updateName = rename(renameKeys, value)
+                        return { updateName, feature, resourceId };
                     }
                 );
 
-            }) : { _fieldmap: { Forbidden: 'Forbidden' }, feature: feature, resourceId: -1 };
+            }) : { updateName: { Forbidden: 'Forbidden' }, feature: feature, resourceId: -1 };
         return fieldmap;
     }
 

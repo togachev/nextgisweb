@@ -4,7 +4,6 @@ import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
-import Identifier from "@nextgisweb/icon/mdi/identifier";
 
 import { Rnd } from "react-rnd";
 import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
@@ -17,7 +16,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
-import { useCopy } from "@nextgisweb/webmap/useCopy";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import topic from "dojo/topic";
 
@@ -70,16 +68,13 @@ interface Params {
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display } = props;
     const { position, response } = params;
-    const { generateUrl, getAttribute } = useSource();
-    const { copyValue, contextHolder } = useCopy();
+    const { getAttribute, generateUrl } = useSource();
     const imodule = display.identify_module;
 
     const count = response.featureCount;
 
     const [store] = useState(
         () => new IdentifyStore({
-            data: response.data,
-            selected: response.data[0],
             valueRnd: {
                 x: position.x,
                 y: position.y,
@@ -99,54 +94,30 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     useEffect(() => {
         store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
-        store.setSelected(response.data[0]);
-        
-        if (count > 0 && !response.data[0].value.includes("Forbidden")) {
-            const selectedItem = response.data[0];
+        if (count > 0) {
+            store.setSelected(response.data[0]);
             store.setData(response.data);
-            const noSelectedItem = store.data.filter(item => item.value !== selectedItem.value)
-            store.setContextUrl(generateUrl(display, { res: selectedItem, all: noSelectedItem }));
-            store.setLinkToGeometry(selectedItem.layerId + ":" + selectedItem.id);
-            getAttribute(selectedItem)
-                .then(item => {
-                    store.setAttribute(item._fieldmap);
-                    store.setFeature({
-                        geom: item.feature.geom,
-                        featureId: item.feature.id,
-                        layerId: item.resourceId,
-                    });
-                    topic.publish("feature.highlight", {
-                        geom: item.feature.geom,
-                        featureId: item.feature.id,
-                        layerId: item.resourceId,
-                    })
-                });
+
         } else {
             store.setContextUrl(generateUrl(display, { res: null, all: null }));
+            store.setSelected(undefined);
             store.setData([]);
-            store.setAttribute(null);
-            store.setFeature(null);
             topic.publish("feature.unhighlight");
         }
     }, [response]);
 
     useEffect(() => {
         if (store.update === true) {
-            getAttribute(store.selected)
-                .then(item => {
-                    store.setAttribute(item._fieldmap);
-                    store.setFeature({
-                        geom: item.feature.geom,
-                        featureId: item.feature.id,
-                        layerId: item.resourceId,
-                    });
-                    topic.publish("feature.highlight", {
-                        geom: item.feature.geom,
-                        featureId: item.feature.id,
-                        layerId: item.resourceId,
-                    })
-                    store.setUpdate(false);
-                });
+            (async () => {
+                const value = await getAttribute(store.selected);
+                store.setAttribute(value.updateName);
+                topic.publish("feature.highlight", {
+                    geom: value.feature.geom,
+                    featureId: value.feature.id,
+                    layerId: value.resourceId,
+                })
+                store.setUpdate(false);
+            })();
         }
     }, [store.update]);
 
@@ -155,46 +126,14 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         store.setSelected(selectedValue);
         const noSelectedItem = store.data.filter(item => item.value !== value.value);
         store.setContextUrl(generateUrl(display, { res: selectedValue, all: noSelectedItem }));
-        store.setLinkToGeometry(selectedValue.layerId + ":" + selectedValue.id);
-        getAttribute(selectedValue)
-            .then(item => {
-                store.setAttribute(item._fieldmap);
-                store.setFeature({
-                    geom: item.feature.geom,
-                    featureId: item.feature.id,
-                    layerId: item.resourceId,
-                });
-                topic.publish("feature.highlight", {
-                    geom: item.feature.geom,
-                    featureId: item.feature.id,
-                    layerId: item.resourceId,
-                })
-            });
+        if (count > 0 && !selectedValue.value.includes("Forbidden")) {
+            store.setLinkToGeometry(selectedValue.layerId + ":" + selectedValue.id);
+        }
     };
 
     const filterOption = (input: string, option?: { label: string; value: string; layer_name: string }) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
         (option?.layer_name ?? '').toLowerCase().includes(input.toLowerCase());
-
-    const LinkToGeometry = useMemo(() => {
-        if (count > 0 && store.selected) {
-            const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === store.selected.styleId);
-            if (count > 0 && store.selected) {
-                if (!imodule._isEditEnabled(display, item)) { return false; }
-                return (<Button
-                    size="small"
-                    type="link"
-                    title={gettext("HTML code of the geometry link, for insertion into the description")}
-                    className="copy_to_clipboard"
-                    icon={<Identifier />}
-                    onClick={() => {
-                        const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
-                        copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-                    }}
-                />)
-            }
-        }
-    }, [count, store.selected])
 
     const editFeature = useMemo(() => {
         if (count > 0 && store.selected) {
@@ -231,7 +170,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                 </div>)
             }
         }
-    }, [count, store.selected])
+    }, [store.selected])
 
     return (
         createPortal(
@@ -271,7 +210,6 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     }
                 }}
             >
-                {contextHolder}
                 <Rnd
                     resizeHandleClasses={{
                         right: "hover-right",
@@ -363,40 +301,38 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             </span>
                         </div>
                         {count > 0 && store.selected && (
-                            <>
-                                <div className="select-feature" >
-                                    <Select
-                                        labelInValue
-                                        placement="topLeft"
-                                        optionFilterProp="children"
-                                        filterOption={filterOption}
-                                        filterSort={(optionA, optionB) =>
-                                            (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
-                                        }
-                                        showSearch
-                                        size="small"
-                                        value={store.selected}
-                                        style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
-                                        onChange={onChange}
-                                        options={store.data}
-                                        optionRender={(option) => (
-                                            <div className="label-select">
-                                                <div title={option.data.label} className="label-feature">
-                                                    {option.data.label}
-                                                </div>
-                                                <div title={option.data.layer_name} className="label-style">
-                                                    {option.data.layer_name}
-                                                </div>
+                            <div className="select-feature" >
+                                <Select
+                                    labelInValue
+                                    placement="topLeft"
+                                    optionFilterProp="children"
+                                    filterOption={filterOption}
+                                    filterSort={(optionA, optionB) =>
+                                        (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                                    }
+                                    showSearch
+                                    size="small"
+                                    value={store.selected}
+                                    style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
+                                    onChange={onChange}
+                                    options={store.data}
+                                    optionRender={(option) => (
+                                        <div className="label-select">
+                                            <div title={option.data.label} className="label-feature">
+                                                {option.data.label}
                                             </div>
-                                        )}
-                                    />
-                                    {editFeature}
-                                </div>
-                                <div className="content">
-                                    <ContentComponent attribute={store.attribute} store={store} LinkToGeometry={LinkToGeometry} count={count} display={display} />
-                                </div>
-                            </>
+                                            <div title={option.data.layer_name} className="label-style">
+                                                {option.data.layer_name}
+                                            </div>
+                                        </div>
+                                    )}
+                                />
+                                {editFeature}
+                            </div>
                         )}
+                        {store.selected && (<div className="content">
+                            <ContentComponent store={store} display={display} />
+                        </div>)}
                         <div className="footer-popup">
                             <CoordinateComponent display={display} contextUrl={store.contextUrl} count={count} op="popup" />
                         </div>

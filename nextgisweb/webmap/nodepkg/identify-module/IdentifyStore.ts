@@ -23,7 +23,6 @@ export class IdentifyStore {
     data: DataProps[] = [];
     selected: DataProps | null = null;
     attribute: object | null = null;
-    feature: object | null = null;
     updateContent: boolean;
     update = false;
     fullscreen = false;
@@ -31,8 +30,7 @@ export class IdentifyStore {
     linkToGeometry: string | null = null;
     valueRnd: Rnd | null = null;
 
-    constructor({ data, ...props }) {
-        this.data = data;
+    constructor({ ...props }) {
         for (const key in props) {
             const k = key;
             const prop = (props)[k];
@@ -62,10 +60,6 @@ export class IdentifyStore {
 
     setAttribute = (attribute: SetValue<object | null>) => {
         this.setValue("attribute", attribute);
-    };
-
-    setFeature = (feature: SetValue<object | null>) => {
-        this.setValue("feature", feature);
     };
 
     setUpdate = (update: boolean) => {
