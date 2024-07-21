@@ -226,32 +226,32 @@ def extensions_get(resource, request) -> JSONType:
         return result["extensions"]
 
 def iget(resource, request) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
+    if resource.has_permission(DataStructureScope.read, request.user):
 
-    geom_skip = request.GET.get("geom", "yes").lower() == "no"
-    srs = request.GET.get("srs")
+        geom_skip = request.GET.get("geom", "yes").lower() == "no"
+        srs = request.GET.get("srs")
 
-    srlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
-        extensions=_extensions(request.GET.get("extensions"), resource),
-    )
+        srlz_params = dict(
+            geom_format=request.GET.get("geom_format", "wkt").lower(),
+            dt_format=request.GET.get("dt_format", "obj"),
+            extensions=_extensions(request.GET.get("extensions"), resource),
+        )
 
-    query = resource.feature_query()
+        query = resource.feature_query()
 
-    if resource.cls != 'nogeom_layer':
-        if not geom_skip:
-            if srs is not None:
-                query.srs(SRS.filter_by(id=int(srs)).one())
-            query.geom()
-            if srlz_params["geom_format"] == "wkt":
-                query.geom_format("WKT")
+        if resource.cls != 'nogeom_layer':
+            if not geom_skip:
+                if srs is not None:
+                    query.srs(SRS.filter_by(id=int(srs)).one())
+                query.geom()
+                if srlz_params["geom_format"] == "wkt":
+                    query.geom_format("WKT")
 
-    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
+        feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
 
-    result = serialize(feature, **srlz_params)
+        result = serialize(feature, **srlz_params)
 
-    return result
+        return result
 
 
 def item_extent(resource, request) -> JSONType:
