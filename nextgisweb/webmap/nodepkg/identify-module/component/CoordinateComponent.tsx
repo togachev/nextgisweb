@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";

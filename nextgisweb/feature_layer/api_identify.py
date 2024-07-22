@@ -120,7 +120,7 @@ def identify_module(request) -> JSONType:
                     styleId=style.id,
                     label="Forbidden",
                     value=str(f.id) + "/" + str(layer.id),
-                    layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                    desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
             ))
         elif not IFeatureLayer.providedBy(layer):
             options.append(dict(value="Not implemented"))
@@ -137,7 +137,7 @@ def identify_module(request) -> JSONType:
                     styleId=style.id,
                     label=f.label,
                     value=str(f.id) + "/" + str(layer.id),
-                    layer_name=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                    desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
     arr = list({value["value"]: value for value in options}.values())
     result["data"] = arr
@@ -163,7 +163,7 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         label="Forbidden",
                         value=str(f.id) + "/" + str(layer.id),
-                        layer_name=layer.parent.display_name if p["label"] is None else p["label"],
+                        desc=layer.parent.display_name if p["label"] is None else p["label"],
                     )
         elif not IFeatureLayer.providedBy(layer):
             result["data"] = dict(value="Not implemented")
@@ -177,7 +177,7 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         label=f.label,
                         value=str(f.id) + "/" + str(layer.id),
-                        layer_name=layer.parent.display_name if p["label"] is None else p["label"],
+                        desc=layer.parent.display_name if p["label"] is None else p["label"],
                     )
         options.append(result["data"])
     

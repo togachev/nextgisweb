@@ -21,6 +21,8 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import topic from "dojo/topic";
 
+const { Option } = Select;
+
 interface Visible {
     hidden: boolean;
     overlay: boolean | undefined;
@@ -31,7 +33,7 @@ interface StyleRequestProps {
     id: number;
     label: string;
     layerId: number;
-    layer_name: string;
+    desc: string;
     styleId: number;
     value: string;
 }
@@ -139,9 +141,10 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
         updateContent(selectedValue, false);
     };
 
-    const filterOption = (input: string, option?: { label: string; value: string; layer_name: string }) =>
+    const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
-        (option?.layer_name ?? '').toLowerCase().includes(input.toLowerCase());
+            (option?.desc ?? '').toLowerCase().includes(input.toLowerCase());
+    }
 
     const linkToGeometry = useMemo(() => {
         if (count > 0 && store.selected) {
@@ -156,14 +159,12 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     icon={<Identifier />}
                     onClick={() => {
                         const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
-                        copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+                        copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"));
                     }}
                 />)
             }
         }
     }, [count, store.selected])
-
-
 
     const editFeature = useMemo(() => {
         if (count > 0 && store.selected) {
@@ -295,9 +296,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 <span className="object-select">Объектов: {count}</span>
                                 {count > 0 && store.selected && (
                                     <span
-                                        title={store.selected?.layer_name}
+                                        title={store.selected?.desc}
                                         className="layer-name">
-                                        {store.selected?.layer_name}
+                                        {store.selected?.desc}
                                     </span>
                                 )}
                             </div>
@@ -338,26 +339,25 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                     placement="topLeft"
                                     optionFilterProp="children"
                                     filterOption={filterOption}
-                                    filterSort={(optionA, optionB) =>
-                                        (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
-                                    }
                                     showSearch
                                     size="small"
-                                    value={store.selected}
+                                    defaultValue={{
+                                        value: store.selected.value,
+                                        label: store.selected.label === "Forbidden" ? gettext("Field name is not available") : store.selected.label,
+                                        desc: store.selected.desc,
+                                    }}
                                     style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
                                     onChange={onChange}
-                                    options={store.data}
-                                    optionRender={(option) => (
-                                        <div className="label-select">
-                                            <div title={option.data.label} className="label-feature">
-                                                {option.data.label}
-                                            </div>
-                                            <div title={option.data.layer_name} className="label-style">
-                                                {option.data.layer_name}
-                                            </div>
-                                        </div>
-                                    )}
-                                />
+                                >
+                                    {store.data.map((item, index) => {
+                                        const alias = item.label === "Forbidden" ? gettext("Field name is not available") : item.label;
+                                        return (
+                                            <Option key={index} value={item.value} label={alias} desc={item.desc}>
+                                                {alias}
+                                            </Option>
+                                        )
+                                    })}
+                                </Select>
                                 {editFeature}
                             </div>
                         )}

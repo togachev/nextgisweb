@@ -8,7 +8,7 @@ export interface DataProps {
     styleId: number;
     label: string;
     value: number;
-    layer_name: string;
+    desc: string;
 }
 
 interface Rnd {

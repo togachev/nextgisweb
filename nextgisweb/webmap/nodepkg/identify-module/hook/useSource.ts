@@ -35,6 +35,7 @@ export const useSource = () => {
         })
 
         const url = routeURL("webmap.display", webmapId);
+
         const link = origin + url + '?' + paramsUrl.toString();
 
         return link
@@ -53,7 +54,7 @@ export const useSource = () => {
             {
                 id: -1,
                 geom: "POINT EMPTY",
-                fields: { Forbidden: "Forbidden" },
+                fields: { Forbidden: "Forbidden1" },
                 extensions: null
             }
 
@@ -112,7 +113,7 @@ export const useSource = () => {
                     }
                 );
 
-            }) : { updateName: { Forbidden: 'Forbidden' }, feature: feature, resourceId: -1 };
+            }) : { updateName: undefined, feature: feature, resourceId: -1 };
         return fieldmap;
     }
 

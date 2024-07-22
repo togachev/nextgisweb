@@ -194,14 +194,7 @@ export class IdentifyModule extends Component {
                     json: this.params.request,
                 })
                 .then(item => {
-                    const data = item.data.filter(x => {
-                        if (x.error === "Forbidden" || x.error === "Not implemented") {
-                            return;
-                        } else {
-                            return x;
-                        }
-                    });
-                    return { data: data, featureCount: item.featureCount };
+                    return { data: item.data, featureCount: item.featureCount };
                 });
             count = response.featureCount;
         } else if (op === "popup" && p.value.attribute === true) {
@@ -248,8 +241,8 @@ export class IdentifyModule extends Component {
             return false;
         }
 
-        const configLayerPlugin = item.itemConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
-        const readOnly = configLayerPlugin.readonly;
+        const configLayerPlugin = item?.itemConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
+        const readOnly = configLayerPlugin?.readonly;
         return !readOnly;
     };
 
@@ -296,10 +289,16 @@ export class IdentifyModule extends Component {
             this.display.getVisibleItems()
                 .then(items => {
                     const itemConfig = this.display.getItemConfig();
+
                     p.value.params.map(itm => {
-                        const label = items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]
-                        itm.label = label;
+                        items.some(x => {
+                            if (itemConfig[x.id].styleId === itm.styleId) {
+                                const label = items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]
+                                itm.label = label;
+                            }
+                        });
                     })
+
                     this.paramsSelected = p.value.params
                 })
         }
@@ -356,7 +355,7 @@ export class IdentifyModule extends Component {
                 const transformedCoord = wktPoint.getCoordinates();
                 return transformedCoord;
             })
-            .then((transformedCoord) =>{
+            .then((transformedCoord) => {
                 const params: SelectedFeatureProps[] = [];
                 val.lsf?.split(",").map(i => {
                     params.push({
@@ -366,20 +365,20 @@ export class IdentifyModule extends Component {
                         label: "",
                     });
                 })
-    
+
                 const value = {
                     attribute: val.attribute,
                     lat: val.lat,
                     lon: val.lon,
                     params,
                 }
-    
+
                 const p = { value, coordinate: transformedCoord };
                 const offHP = 40;
-    
+
                 const W = window.innerWidth;
                 const H = window.innerHeight;
-    
+
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
@@ -390,7 +389,7 @@ export class IdentifyModule extends Component {
                     ],
                     type: 'singleclick'
                 };
-    
+
                 this._overlayInfo(simulateEvent, "popup", p)
             });
     };

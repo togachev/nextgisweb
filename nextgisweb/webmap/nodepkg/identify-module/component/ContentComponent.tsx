@@ -91,7 +91,8 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
             key: "attributes",
             title: gettext("Attributes"),
             hidden: !settings.identify_attributes,
-            children: attribute && (<AttributeColumns attribute={attribute} />),
+            children: attribute ? (<AttributeColumns attribute={attribute} />):
+            emptyValue,
         },
         {
             label: (<span className="icon-style"><QueryStats /></span>),
