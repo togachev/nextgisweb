@@ -21,6 +21,7 @@ import OlGeomPoint from "ol/geom/Point";
 interface StylesRequest {
     id: number;
     label: string;
+    idm: number;
 }
 
 interface VisibleProps {
@@ -187,8 +188,6 @@ export class IdentifyModule extends Component {
         let count, response;
 
         if (this.params.request !== null) {
-
-
             response = await route("feature_layer.identify_module")
                 .post({
                     json: this.params.request,
@@ -223,6 +222,14 @@ export class IdentifyModule extends Component {
         const position = positionContext(event, offset, op, count, settings, p, array_context);
 
         if (op === "popup") {
+
+            const sortedArray = this.display._layer_order.reverse();
+            const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
+            
+            this.display.config.identifyOrderEnabled === true ?
+                response.data.sort((a, b) => sortedArray.indexOf(a.idm) - sortedArray.indexOf(b.idm)) : // порядок отрисовки слоев с учетом идентификации слоев
+                response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]); // порядок отрисовки слоев, без учета идентификации
+
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
             this.root_popup.render(<PopupComponent params={{ position, response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
@@ -271,7 +278,7 @@ export class IdentifyModule extends Component {
                         ) {
                             return;
                         }
-                        styles.push({ id: item.styleId, label: item.label });
+                        styles.push({ id: item.styleId, label: item.label, idm: item.id });
                     });
                 })
 

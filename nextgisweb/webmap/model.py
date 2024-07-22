@@ -52,6 +52,7 @@ class WebMap(Base, Resource):
     root_item_id = db.Column(db.ForeignKey("webmap_item.id"), nullable=False)
     bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
     draw_order_enabled = db.Column(db.Boolean, nullable=True)
+    identify_order_enabled = db.Column(db.Boolean, nullable=False)
     editable = db.Column(db.Boolean, nullable=False, default=False)
 
     extent_left = db.Column(db.Float, default=-180)
@@ -362,6 +363,7 @@ class WebMapSerializer(Serializer):
     extent_const_top = SP(**_mdargs)
 
     draw_order_enabled = SP(**_mdargs)
+    identify_order_enabled = SP(**_mdargs)
     editable = SP(**_mdargs)
 
     annotation_enabled = SP(**_mdargs)

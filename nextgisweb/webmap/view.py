@@ -270,6 +270,7 @@ def display(obj, request):
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
+        identifyOrderEnabled=obj.identify_order_enabled,
         measureSrsId=obj.measure_srs_id,
     )
 

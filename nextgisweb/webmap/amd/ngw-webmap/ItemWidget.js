@@ -32,6 +32,7 @@ define([
     "ngw-resource/ResourcePicker",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/file-bucket/resource-file",
+    "@nextgisweb/webmap/identify-order",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     // resource
@@ -88,6 +89,7 @@ define([
     ResourcePicker,
     reactApp,
     ResourceFileComp,
+    IdentifyOrderEnableComp,
     api,
     i18n,
     template,
@@ -142,7 +144,7 @@ define([
             this.inherited(arguments);
 
             this.container = new BorderContainer({
-                style: "width: 400px; height: 300px",
+                style: "width: 500px; height: 300px",
                 class: "layer-order",
             }).placeAt(this);
 
@@ -155,6 +157,7 @@ define([
                 "div",
                 {
                     class: "dijitDialogPaneActionBar",
+                    style: "display: flex; flex-direction: column; align-items: flex-start;",
                 },
                 this.containerNode
             );
@@ -162,7 +165,15 @@ define([
             this.checkboxContainer = domConstruct.create(
                 "div",
                 {
-                    style: "float: left; margin-top: 3px",
+                    style: "float: inline-start; margin: 5px",
+                },
+                this.actionBar
+            );
+
+            this.checkboxIdentifyOrderEnable = domConstruct.create(
+                "div",
+                {
+                    style: "float: inline-start; margin: 5px",
                 },
                 this.actionBar
             );
@@ -171,6 +182,19 @@ define([
                 id: "layerOrderEnabled",
                 name: "layerOrderEnabled",
             }).placeAt(this.checkboxContainer);
+
+            var onValueChecked = (e) => {
+                console.log(e);
+            };
+
+            reactApp.default(
+                IdentifyOrderEnableComp.default,
+                {
+                    identifyOrderEnabled: true,
+                    onValueChecked: onValueChecked,
+                },
+                this.checkboxIdentifyOrderEnable
+            );
 
             this.checkboxContainer.appendChild(
                 domConstruct.create("label", {
