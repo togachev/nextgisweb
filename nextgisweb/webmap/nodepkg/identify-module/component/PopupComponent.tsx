@@ -4,6 +4,7 @@ import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
+import Identifier from "@nextgisweb/icon/mdi/identifier";
 
 import { Rnd } from "react-rnd";
 import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
@@ -16,6 +17,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
+import { useCopy } from "@nextgisweb/webmap/useCopy";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import topic from "dojo/topic";
 
@@ -69,6 +71,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const { params, visible, display } = props;
     const { position, response } = params;
     const { getAttribute, generateUrl } = useSource();
+    const { copyValue, contextHolder } = useCopy();
     const imodule = display.identify_module;
 
     const count = response.featureCount;
@@ -92,12 +95,30 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const W = window.innerWidth - offHP - offset * 2;
     const H = window.innerHeight - offHP - offset * 2;
 
+    const updateContent = async (val, key) => {
+        const res = await getAttribute(val);
+        store.setAttribute(res.updateName);
+        topic.publish("feature.highlight", {
+            geom: res.feature.geom,
+            featureId: res.feature.id,
+            layerId: res.resourceId,
+        })
+        if (key === true) {
+            store.setUpdate(false);
+        } else {
+            const noSelectedItem = store.data.filter(item => item.value !== val.value);
+            store.setContextUrl(generateUrl(display, { res: val, all: noSelectedItem }));
+            store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
+        }
+    }
+
     useEffect(() => {
         store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
         if (count > 0) {
             store.setSelected(response.data[0]);
             store.setData(response.data);
-
+            const val = response.data[0];
+            updateContent(val, false);
         } else {
             store.setContextUrl(generateUrl(display, { res: null, all: null }));
             store.setSelected(undefined);
@@ -108,32 +129,41 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     useEffect(() => {
         if (store.update === true) {
-            (async () => {
-                const value = await getAttribute(store.selected);
-                store.setAttribute(value.updateName);
-                topic.publish("feature.highlight", {
-                    geom: value.feature.geom,
-                    featureId: value.feature.id,
-                    layerId: value.resourceId,
-                })
-                store.setUpdate(false);
-            })();
+            updateContent(store.selected, true);
         }
     }, [store.update]);
 
     const onChange = (value: { value: number; label: string }) => {
         const selectedValue = store.data.find(item => item.value === value.value);
         store.setSelected(selectedValue);
-        const noSelectedItem = store.data.filter(item => item.value !== value.value);
-        store.setContextUrl(generateUrl(display, { res: selectedValue, all: noSelectedItem }));
-        if (count > 0 && !selectedValue.value.includes("Forbidden")) {
-            store.setLinkToGeometry(selectedValue.layerId + ":" + selectedValue.id);
-        }
+        updateContent(selectedValue, false);
     };
 
     const filterOption = (input: string, option?: { label: string; value: string; layer_name: string }) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
         (option?.layer_name ?? '').toLowerCase().includes(input.toLowerCase());
+
+    const linkToGeometry = useMemo(() => {
+        if (count > 0 && store.selected) {
+            const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === store.selected.styleId);
+            if (count > 0 && store.selected) {
+                if (!imodule._isEditEnabled(display, item)) { return false; }
+                return (<Button
+                    size="small"
+                    type="link"
+                    title={gettext("HTML code of the geometry link, for insertion into the description")}
+                    className="copy_to_clipboard"
+                    icon={<Identifier />}
+                    onClick={() => {
+                        const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
+                        copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+                    }}
+                />)
+            }
+        }
+    }, [count, store.selected])
+
+
 
     const editFeature = useMemo(() => {
         if (count > 0 && store.selected) {
@@ -210,6 +240,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                     }
                 }}
             >
+                {contextHolder}
                 <Rnd
                     resizeHandleClasses={{
                         right: "hover-right",
@@ -221,7 +252,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         topRight: "hover-angle-top-right",
                         topLeft: "hover-angle-top-left",
                     }}
-                    cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.content-item"
+                    cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.link-value,.content-item"
                     bounds={store.valueRnd.width === W ? undefined : "window"}
                     minWidth={position.width}
                     minHeight={position.height}
@@ -331,7 +362,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             </div>
                         )}
                         {store.selected && (<div className="content">
-                            <ContentComponent store={store} display={display} />
+                            <ContentComponent linkToGeometry={linkToGeometry} store={store} display={display} />
                         </div>)}
                         <div className="footer-popup">
                             <CoordinateComponent display={display} contextUrl={store.contextUrl} count={count} op="popup" />

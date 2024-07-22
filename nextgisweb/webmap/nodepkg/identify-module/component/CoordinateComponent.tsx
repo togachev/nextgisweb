@@ -22,17 +22,12 @@ export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
                 <span className="coords">{coordsVisible}</span>
             </span>
             {op === "popup" && contextUrl !== null && (
-                <span className="link-copy">
-                    <Button
-                        size="small"
-                        type="link"
-                        title={gettext("Object link")}
-                        className="copy_to_clipboard"
-                        icon={<LinkIcon />}
-                        onClick={() => {
-                            copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-                        }}
-                    />
+                <span className="link-value"
+                onClick={() => {
+                    copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+                }}
+                >
+                    <LinkIcon />
                 </span>
             )}
         </div>

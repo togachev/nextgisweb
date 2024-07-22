@@ -1,10 +1,9 @@
 import { FC, useMemo, useState, useEffect, useRef } from "react";
-import { Button, ConfigProvider, Descriptions, Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Descriptions, Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
 import type { DescriptionsProps, MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
 import Attachment from "@nextgisweb/icon/material/attachment";
-import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -13,19 +12,14 @@ import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { Attribute } from "@nextgisweb/webmap/icon";
-import topic from "dojo/topic";
-import { useSource } from "../hook/useSource";
-import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = ({ store, display }) => {
-    const { attribute, data, linkToGeometry, selected, setAttribute, setContextUrl, setLinkToGeometry, setUpdateContent, updateContent, valueRnd } = store;
+export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
+    const { attribute, selected, setUpdateContent, updateContent, valueRnd } = store;
     const { id, layerId } = selected;
     const { copyValue, contextHolder } = useCopy();
-    const { generateUrl, getAttribute } = useSource();
-    const imodule = display.identify_module;
     const panelRef = useRef<HTMLDivElement>(null);
 
     const heightRadio = 110; /* ~ height and padding 2px */
@@ -35,21 +29,6 @@ export const ContentComponent: FC = ({ store, display }) => {
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
     const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
-
-    useEffect(() => {
-        (async () => {
-            const value = await getAttribute(selected);
-            const noSelectedItem = data.filter(item => item.value !== selected.value);
-            setContextUrl(generateUrl(display, { res: selected, all: noSelectedItem }));
-            setLinkToGeometry(value.resourceId + ":" + value.feature.id);
-            setAttribute(value.updateName);
-            topic.publish("feature.highlight", {
-                geom: value.feature.geom,
-                featureId: value.feature.id,
-                layerId: value.resourceId,
-            })
-        })();
-    }, [selected]);
 
     const RenderValue = (value) => {
         for (const k in value) {
@@ -174,22 +153,6 @@ export const ContentComponent: FC = ({ store, display }) => {
         setContentItem(options.find(item => item.key === e.target.value));
     }
 
-    const LinkToGeometry = useMemo(() => {
-        const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === selected.styleId);
-        if (!imodule._isEditEnabled(display, item)) { return false; }
-        return (<Button
-            size="small"
-            type="link"
-            title={gettext("HTML code of the geometry link, for insertion into the description")}
-            className="copy_to_clipboard"
-            icon={<Identifier />}
-            onClick={() => {
-                const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
-                copyValue(linkToGeometryString, gettext("Object reference copied"))
-            }}
-        />)
-    }, [store.attribute])
-
     return (
         <ConfigProvider
             theme={{
@@ -233,7 +196,7 @@ export const ContentComponent: FC = ({ store, display }) => {
                             </Dropdown>
                         </div>)
                 }
-                {LinkToGeometry}
+                {linkToGeometry}
             </div>
             <div className="content-item">{contentItem.children}</div>
         </ConfigProvider>

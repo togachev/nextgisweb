@@ -258,7 +258,7 @@ export class IdentifyModule extends Component {
     };
 
     _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
-        // console.log(e.pixel, op);
+        console.log(e.pixel, op, p);
     };
 
     _overlayInfo = (e: MapBrowserEvent, op: string, p) => {
