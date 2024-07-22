@@ -142,8 +142,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     };
 
     const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
-        (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
-            (option?.desc ?? '').toLowerCase().includes(input.toLowerCase());
+        if ((option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
+            (option?.desc ?? '').toLowerCase().includes(input.toLowerCase()))
+            return true
     }
 
     const linkToGeometry = useMemo(() => {
@@ -337,7 +338,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 <Select
                                     labelInValue
                                     placement="topLeft"
-                                    optionFilterProp="children"
+                                    optionLabelProp="label"
                                     filterOption={filterOption}
                                     showSearch
                                     size="small"
