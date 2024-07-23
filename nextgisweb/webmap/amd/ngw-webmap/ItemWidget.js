@@ -32,7 +32,7 @@ define([
     "ngw-resource/ResourcePicker",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/file-bucket/resource-file",
-    "@nextgisweb/webmap/identify-order",
+    "@nextgisweb/webmap/layer-order-settings",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     // resource
@@ -89,7 +89,7 @@ define([
     ResourcePicker,
     reactApp,
     ResourceFileComp,
-    IdentifyOrderEnableComp,
+    LayerOrderSettingsComp,
     api,
     i18n,
     template,
@@ -157,7 +157,6 @@ define([
                 "div",
                 {
                     class: "dijitDialogPaneActionBar",
-                    style: "display: flex; flex-direction: column; align-items: flex-start;",
                 },
                 this.containerNode
             );
@@ -165,15 +164,7 @@ define([
             this.checkboxContainer = domConstruct.create(
                 "div",
                 {
-                    style: "float: inline-start; margin: 5px",
-                },
-                this.actionBar
-            );
-
-            this.checkboxIdentifyOrderEnable = domConstruct.create(
-                "div",
-                {
-                    style: "float: inline-start; margin: 5px",
+                    style: "float: inline-start; margin-top: 3px",
                 },
                 this.actionBar
             );
@@ -182,19 +173,6 @@ define([
                 id: "layerOrderEnabled",
                 name: "layerOrderEnabled",
             }).placeAt(this.checkboxContainer);
-
-            var onValueChecked = (e) => {
-                console.log(e);
-            };
-
-            reactApp.default(
-                IdentifyOrderEnableComp.default,
-                {
-                    identifyOrderEnabled: true,
-                    onValueChecked: onValueChecked,
-                },
-                this.checkboxIdentifyOrderEnable
-            );
 
             this.checkboxContainer.appendChild(
                 domConstruct.create("label", {
@@ -489,6 +467,15 @@ define([
                     lang.hitch(this, function () {
                         this.layerOrder.show();
                     })
+                );
+
+                reactApp.default(
+                    LayerOrderSettingsComp.default,
+                    {
+                        identifyOrderEnabled: "props",
+                        onChange: 'onChange',
+                    },
+                    widget.wdgtLayerOrder.domNode
                 );
 
                 this.widgetTree.watch(

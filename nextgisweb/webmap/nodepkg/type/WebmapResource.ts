@@ -37,7 +37,8 @@ export interface WebmapResource {
     extent_const_right?: any;
     extent_const_bottom?: any;
     extent_const_top?: any;
-    draw_order_enabled?: any;
+    draw_order_enabled: boolean;
+    identify_order_enabled: boolean;
     editable: boolean;
     annotation_enabled: boolean;
     annotation_default: string;

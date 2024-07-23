@@ -48,7 +48,8 @@ export interface DisplayConfig {
     webmapTitle: string;
     webmapEditable: boolean;
     webmapLegendVisible: string;
-    drawOrderEnabled?: any;
+    drawOrderEnabled: boolean;
+    identifyOrderEnabled: boolean;
     annotations: Annotations;
     units: string;
 }
