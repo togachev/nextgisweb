@@ -22,9 +22,10 @@ export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
             </span>
             {op === "popup" && contextUrl !== null && (
                 <span className="link-value"
-                onClick={() => {
-                    copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-                }}
+                    title={gettext("Object link")}
+                    onClick={() => {
+                        copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+                    }}
                 >
                     <LinkIcon />
                 </span>

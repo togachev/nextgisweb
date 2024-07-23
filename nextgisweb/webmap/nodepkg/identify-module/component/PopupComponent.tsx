@@ -150,17 +150,19 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const linkToGeometry = useMemo(() => {
         if (count > 0 && store.selected) {
             const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === store.selected.styleId);
+            const title = gettext("HTML code of the geometry link, for insertion into the description")
+            const titleCopy = gettext("HTML code copied")
             if (count > 0 && store.selected) {
                 if (!imodule._isEditEnabled(display, item)) { return false; }
                 return (<Button
                     size="small"
                     type="link"
-                    title={gettext("HTML code of the geometry link, for insertion into the description")}
+                    title={title}
                     className="copy_to_clipboard"
                     icon={<Identifier />}
                     onClick={() => {
                         const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
-                        copyValue(linkToGeometryString, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"));
+                        copyValue(linkToGeometryString, titleCopy);
                     }}
                 />)
             }

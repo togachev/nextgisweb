@@ -223,11 +223,11 @@ export class IdentifyModule extends Component {
 
         if (op === "popup") {
 
-            const sortedArray = this.display._layer_order.reverse();
+            const sortedArray = this.display._layer_order;
             const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
             
             this.display.config.identifyOrderEnabled === true ?
-                response.data.sort((a, b) => sortedArray.indexOf(a.idm) - sortedArray.indexOf(b.idm)) : // порядок отрисовки слоев с учетом идентификации слоев
+                response.data.sort((a, b) => sortedArray.indexOf(b.idm) - sortedArray.indexOf(a.idm)) : // порядок отрисовки слоев с учетом идентификации слоев
                 response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]); // порядок отрисовки слоев, без учета идентификации
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
