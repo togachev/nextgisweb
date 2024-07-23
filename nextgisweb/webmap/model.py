@@ -208,6 +208,7 @@ class WebMapItem(Base):
                 legend_symbols=self.legend_symbols,
                 style_parent_id=style_parent_id,
                 file_resource_visible=self.file_resource_visible,
+                parent_id=self.parent_id,
             )
 
         return data
@@ -349,11 +350,11 @@ class _webmap_items_attr(SP):
     def getter(self, srlzr):
         return webmap_items_to_position_list(srlzr.obj)
 
-
 class WebMapSerializer(Serializer):
     identity = WebMap.identity
     resclass = WebMap
 
+    root_item_id = SP(**_mdargs)
     active_panel = SP(**_mdargs)
 
     extent_left = SP(**_mdargs)
@@ -380,7 +381,7 @@ class WebMapSerializer(Serializer):
     bookmark_resource = SRR(**_mdargs)
 
     root_item = _root_item_attr(**_mdargs)
-    webmap_items = _webmap_items_attr(**_mdargs)
+    layer_order = _webmap_items_attr(**_mdargs)
 
 @event.listens_for(SRS, "after_delete")
 def check_measurement_srid(mapper, connection, target):

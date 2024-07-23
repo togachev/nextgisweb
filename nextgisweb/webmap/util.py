@@ -50,4 +50,5 @@ def webmap_items_to_position_list(webmap):
 
     webmap_items.reverse()
 
-    return [i.to_dict() for i in webmap_items]
+    return [dict(parent_id=i.parent_id, display_name=i.display_name, draw_order_position=i.draw_order_position, layer_style_id=i.layer_style_id) for i in webmap_items]
+

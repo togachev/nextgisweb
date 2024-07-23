@@ -222,13 +222,15 @@ export class IdentifyModule extends Component {
         const position = positionContext(event, offset, op, count, settings, p, array_context);
 
         if (op === "popup") {
+            console.log(this.display);
 
             const sortedArray = this.display._layer_order;
             const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
-            
-            this.display.config.identifyOrderEnabled === true ?
-                response.data.sort((a, b) => sortedArray.indexOf(b.idm) - sortedArray.indexOf(a.idm)) : // порядок отрисовки слоев с учетом идентификации слоев
-                response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]); // порядок отрисовки слоев, без учета идентификации
+            console.log(this.display.config);
+
+            this.display.config.identify_order_enabled === true ?
+                response.data.sort((a, b) => sortedArray.indexOf(a.idm) - sortedArray.indexOf(b.idm)) :
+                response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");

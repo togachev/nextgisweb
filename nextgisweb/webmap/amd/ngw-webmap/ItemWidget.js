@@ -32,7 +32,6 @@ define([
     "ngw-resource/ResourcePicker",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/file-bucket/resource-file",
-    "@nextgisweb/webmap/layer-order-settings",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     // resource
@@ -89,7 +88,6 @@ define([
     ResourcePicker,
     reactApp,
     ResourceFileComp,
-    LayerOrderSettingsComp,
     api,
     i18n,
     template,
@@ -186,6 +184,7 @@ define([
                 label: i18n.gettext("Save"),
                 onClick: lang.hitch(this, this.save),
             }).placeAt(this.actionBar);
+
         },
 
         postCreate: function () {
@@ -198,30 +197,30 @@ define([
                 })
             );
 
-            this.chckbxEnabled.watch(
-                "checked",
-                lang.hitch(this, function (attr, oval, nval) {
-                    if (nval) {
-                        domClass.add(
-                            this.widget.btnLayerOrder.domNode,
-                            "dijitButton--signal-active"
-                        );
-                        domClass.remove(
-                            this.ordinalWidget.domNode,
-                            "layer-order__grid--faded"
-                        );
-                    } else {
-                        domClass.remove(
-                            this.widget.btnLayerOrder.domNode,
-                            "dijitButton--signal-active"
-                        );
-                        domClass.add(
-                            this.ordinalWidget.domNode,
-                            "layer-order__grid--faded"
-                        );
-                    }
-                })
-            );
+            // this.chckbxEnabled.watch(
+            //     "checked",
+            //     lang.hitch(this, function (attr, oval, nval) {
+            //         if (nval) {
+            //             domClass.add(
+            //                 this.widget.btnLayerOrder.domNode,
+            //                 "dijitButton--signal-active"
+            //             );
+            //             domClass.remove(
+            //                 this.ordinalWidget.domNode,
+            //                 "layer-order__grid--faded"
+            //             );
+            //         } else {
+            //             domClass.remove(
+            //                 this.widget.btnLayerOrder.domNode,
+            //                 "dijitButton--signal-active"
+            //             );
+            //             domClass.add(
+            //                 this.ordinalWidget.domNode,
+            //                 "layer-order__grid--faded"
+            //             );
+            //         }
+            //     })
+            // );
         },
 
         onHide: function () {
@@ -461,29 +460,17 @@ define([
                     widget.btnDeleteItem.set("disabled", true);
                 });
 
-                // Set up layer ordering
-                this.btnLayerOrder.on(
-                    "click",
-                    lang.hitch(this, function () {
-                        this.layerOrder.show();
-                    })
-                );
-
-                reactApp.default(
-                    LayerOrderSettingsComp.default,
-                    {
-                        identifyOrderEnabled: "props",
-                        onChange: 'onChange',
-                    },
-                    widget.wdgtLayerOrder.domNode
-                );
+                // // Set up layer ordering
+                // this.btnLayerOrder.on(
+                //     "click",
+                //     lang.hitch(this, function () {
+                //         this.layerOrder.show();
+                //     })
+                // );
 
                 this.widgetTree.watch(
                     "selectedItem",
                     function (attr, oldValue, newValue) {
-
-
-
                         if (newValue) {
                             // On change of selected element move values to widgets
                             // and show needed panel: one for layers, another for groups.
@@ -548,7 +535,6 @@ define([
                                 var onValueChecked = (e) => {
                                     widget.setItemValue("file_resource_visible", e);
                                 };
-
 
                                 reactApp.default(
                                     ResourceFileComp.default,
@@ -661,8 +647,6 @@ define([
                 });
             },
 
-
-
             startup: function () {
                 this.inherited(arguments);
             },
@@ -700,10 +684,10 @@ define([
                 }
                 const store = this.itemStore;
 
-                data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
-                if (data.webmap.draw_order_enabled) {
-                    this.layerOrder.save();
-                }
+                // data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
+                // if (data.webmap.draw_order_enabled) {
+                //     this.layerOrder.save();
+                // }
 
                 // There is no simple way to make data dump from itemStore for some rease
                 // so walk through recursively.
