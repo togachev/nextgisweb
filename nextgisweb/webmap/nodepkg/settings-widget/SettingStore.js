@@ -6,8 +6,6 @@ export class SettingStore {
     identity = "webmap";
 
     active_panel = "layers";
-    draw_order_enabled = false;
-    identify_order_enabled = false;
     editable = false;
     annotationEnabled = false;
     annotationDefault = "no";
@@ -21,12 +19,7 @@ export class SettingStore {
     }
 
     load(value) {
-        this.root_item = value.root_item;
-        this.root_item_id = value.root_item_id;
-        this.layer_order = value.layer_order;
         this.active_panel = value.active_panel;
-        this.draw_order_enabled = value.draw_order_enabled;
-        this.identify_order_enabled = value.identify_order_enabled;
         this.editable = value.editable;
         this.annotationEnabled = !!value.annotation_enabled;
         this.annotationDefault = value.annotation_default;
@@ -43,8 +36,6 @@ export class SettingStore {
             measure_srs: this.measureSrs ? { id: this.measureSrs } : null,
         };
         result.active_panel = this.active_panel;
-        result.draw_order_enabled = this.draw_order_enabled;
-        result.identify_order_enabled = this.identify_order_enabled;
         if (editing) result.editable = this.editable;
         if (annotation) {
             result.annotation_enabled = this.annotationEnabled;

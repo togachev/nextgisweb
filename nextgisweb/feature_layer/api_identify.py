@@ -118,7 +118,7 @@ def identify_module(request) -> JSONType:
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,
-                    idm=[x["idm"] for x in data["styles"] if x["id"] == style.id][0],
+                    dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                     label="Forbidden",
                     value=str(f.id) + "/" + str(layer.id),
                     desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
@@ -136,14 +136,14 @@ def identify_module(request) -> JSONType:
                     id=f.id,
                     layerId=layer.id,
                     styleId=style.id,
-                    idm=[x["idm"] for x in data["styles"] if x["id"] == style.id][0],
+                    dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                     label=f.label,
                     value=str(f.id) + "/" + str(layer.id),
                     desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
                 ))
     arr = list({value["value"]: value for value in options}.values())
-    result["data"] = arr
-    result["featureCount"] = len(arr)
+    result["data"] = options
+    result["featureCount"] = len(options)
     return result
 
 def feature_selected(request) -> JSONType:
@@ -184,7 +184,7 @@ def feature_selected(request) -> JSONType:
         options.append(result["data"])
     
     arr = list({value["value"]: value for value in options}.values())
-    return arr
+    return options
 
 def setup_pyramid(comp, config):
     config.add_route(

@@ -7,7 +7,6 @@ import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
-import { LayerOrderSettings } from "@nextgisweb/webmap/layer-order-settings";
 
 import "./SettingsWidget.less";
 
@@ -115,9 +114,6 @@ export const SettingsWidget = observer(({ store }) => {
                 }}
                 options={activeOptions}
             />
-
-            <label>{gettext("Layer order")}</label>
-            <LayerOrderSettings store={store} />
 
             <Checkbox
                 disabled={!editing}

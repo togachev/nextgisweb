@@ -17,9 +17,9 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
-from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory
 
-from .model import WebMap, WebMapAnnotation, WebMapScope, WebMapItem
+from .model import WebMap, WebMapAnnotation, WebMapScope
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
 
@@ -369,30 +369,8 @@ csetting("max_count_file_upload", float, default=10)
 csetting("idetify_module", bool, default=False)
 csetting("offset_point", int, default=10)
 
-
-def webmap_item_update(resource, request) -> JSONType:
-    # request.resource_permission(ResourceScope.update)
-    parent_id = int(request.matchdict["parent_id"])
-    layer_style_id = int(request.matchdict["layer_style_id"])
-    draw_order_position = int(request.matchdict["draw_order_position"])
-    def update(parent_id, layer_style_id, draw_order_position):
-        item = DBSession.query(WebMapItem).filter(WebMapItem.parent_id == parent_id, WebMapItem.layer_style_id == layer_style_id).one()
-        item.draw_order_position = draw_order_position
-
-    with DBSession.no_autoflush:
-        update(parent_id, layer_style_id, draw_order_position)
-    DBSession.flush()
-    return(dict(layer_style_id=layer_style_id, draw_order_position=draw_order_position))
-
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
-
-    config.add_route(
-        "webmap.item.update",
-        "/api/webmap/item/{parent_id:uint}/{layer_style_id:uint}/{draw_order_position:uint}/update",
-        # factory=resource_factory,
-        get=webmap_item_update,
-    )
 
     config.add_route(
         "webmap.annotation.collection",

@@ -16,7 +16,7 @@ from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
-from .util import webmap_items_to_position_list
+
 from .adapter import WebMapAdapter
 
 Base.depends_on("resource")
@@ -346,15 +346,10 @@ class _root_item_attr(SP):
 
         srlzr.obj.root_item.from_dict(value)
 
-class _webmap_items_attr(SP):
-    def getter(self, srlzr):
-        return webmap_items_to_position_list(srlzr.obj)
-
 class WebMapSerializer(Serializer):
     identity = WebMap.identity
     resclass = WebMap
 
-    root_item_id = SP(**_mdargs)
     active_panel = SP(**_mdargs)
 
     extent_left = SP(**_mdargs)
@@ -381,7 +376,6 @@ class WebMapSerializer(Serializer):
     bookmark_resource = SRR(**_mdargs)
 
     root_item = _root_item_attr(**_mdargs)
-    layer_order = _webmap_items_attr(**_mdargs)
 
 @event.listens_for(SRS, "after_delete")
 def check_measurement_srid(mapper, connection, target):

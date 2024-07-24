@@ -155,6 +155,7 @@ define([
                 "div",
                 {
                     class: "dijitDialogPaneActionBar",
+                    style: "display: flex; flex-direction: column; align-items: flex-start;",
                 },
                 this.containerNode
             );
@@ -162,7 +163,15 @@ define([
             this.checkboxContainer = domConstruct.create(
                 "div",
                 {
-                    style: "float: inline-start; margin-top: 3px",
+                    style: "float: inline-start; margin: 5px",
+                },
+                this.actionBar
+            );
+
+            this.checkboxIdentifyContainer = domConstruct.create(
+                "div",
+                {
+                    style: "float: inline-start; margin: 5px",
                 },
                 this.actionBar
             );
@@ -177,6 +186,19 @@ define([
                     for: "layerOrderEnabled",
                     style: "vertical-align: middle; padding-left: 4px;",
                     innerHTML: i18n.gettext("Use on the map"),
+                })
+            );
+
+            this.chckbxIdentifyOrderEnabled = new CheckBox({
+                id: "identifyOrderEnabled",
+                name: "identifyOrderEnabled",
+            }).placeAt(this.checkboxIdentifyContainer);
+
+            this.checkboxIdentifyContainer.appendChild(
+                domConstruct.create("label", {
+                    for: "identifyOrderEnabled",
+                    style: "vertical-align: middle; padding-left: 4px;",
+                    innerHTML: i18n.gettext("Link layer identification on web map to layer order"),
                 })
             );
 
@@ -197,30 +219,30 @@ define([
                 })
             );
 
-            // this.chckbxEnabled.watch(
-            //     "checked",
-            //     lang.hitch(this, function (attr, oval, nval) {
-            //         if (nval) {
-            //             domClass.add(
-            //                 this.widget.btnLayerOrder.domNode,
-            //                 "dijitButton--signal-active"
-            //             );
-            //             domClass.remove(
-            //                 this.ordinalWidget.domNode,
-            //                 "layer-order__grid--faded"
-            //             );
-            //         } else {
-            //             domClass.remove(
-            //                 this.widget.btnLayerOrder.domNode,
-            //                 "dijitButton--signal-active"
-            //             );
-            //             domClass.add(
-            //                 this.ordinalWidget.domNode,
-            //                 "layer-order__grid--faded"
-            //             );
-            //         }
-            //     })
-            // );
+            this.chckbxEnabled.watch(
+                "checked",
+                lang.hitch(this, function (attr, oval, nval) {
+                    if (nval) {
+                        domClass.add(
+                            this.widget.btnLayerOrder.domNode,
+                            "dijitButton--signal-active"
+                        );
+                        domClass.remove(
+                            this.ordinalWidget.domNode,
+                            "layer-order__grid--faded"
+                        );
+                    } else {
+                        domClass.remove(
+                            this.widget.btnLayerOrder.domNode,
+                            "dijitButton--signal-active"
+                        );
+                        domClass.add(
+                            this.ordinalWidget.domNode,
+                            "layer-order__grid--faded"
+                        );
+                    }
+                })
+            );
         },
 
         onHide: function () {
@@ -460,13 +482,13 @@ define([
                     widget.btnDeleteItem.set("disabled", true);
                 });
 
-                // // Set up layer ordering
-                // this.btnLayerOrder.on(
-                //     "click",
-                //     lang.hitch(this, function () {
-                //         this.layerOrder.show();
-                //     })
-                // );
+                // Set up layer ordering
+                this.btnLayerOrder.on(
+                    "click",
+                    lang.hitch(this, function () {
+                        this.layerOrder.show();
+                    })
+                );
 
                 this.widgetTree.watch(
                     "selectedItem",
@@ -684,10 +706,12 @@ define([
                 }
                 const store = this.itemStore;
 
-                // data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
-                // if (data.webmap.draw_order_enabled) {
-                //     this.layerOrder.save();
-                // }
+                data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
+                data.webmap.identify_order_enabled = this.layerOrder.chckbxIdentifyOrderEnabled.get("checked");
+
+                if (data.webmap.draw_order_enabled) {
+                    this.layerOrder.save();
+                }
 
                 // There is no simple way to make data dump from itemStore for some rease
                 // so walk through recursively.
@@ -742,6 +766,8 @@ define([
                 if (value === undefined) {
                     return;
                 }
+                
+                console.log(data.webmap);
 
                 var widget = this;
 
@@ -769,6 +795,7 @@ define([
 
                 this.layerOrder.isUpdating = true;
                 traverse(value, this.itemModel.root);
+                this.layerOrder.chckbxIdentifyOrderEnabled.set("checked", data.webmap.identify_order_enabled);
                 this.layerOrder.set("enabled", data.webmap.draw_order_enabled);
                 this.layerOrder.isUpdating = false;
                 this.layerOrder.setOrdinalWidgetStore();

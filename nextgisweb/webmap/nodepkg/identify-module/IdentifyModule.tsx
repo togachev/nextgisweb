@@ -21,7 +21,7 @@ import OlGeomPoint from "ol/geom/Point";
 interface StylesRequest {
     id: number;
     label: string;
-    idm: number;
+    dop: number;
 }
 
 interface VisibleProps {
@@ -222,15 +222,17 @@ export class IdentifyModule extends Component {
         const position = positionContext(event, offset, op, count, settings, p, array_context);
 
         if (op === "popup") {
-            console.log(this.display);
+            console.log(this.params.request.styles, response.data);
 
-            const sortedArray = this.display._layer_order;
-            const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
-            console.log(this.display.config);
+            const sortedArray = response.data.reduce((a, c, i) => { a[c.dop] = i; return a; }, {});
+            console.log(sortedArray);
+            
+            // const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
 
-            this.display.config.identify_order_enabled === true ?
-                response.data.sort((a, b) => sortedArray.indexOf(a.idm) - sortedArray.indexOf(b.idm)) :
-                response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
+            // this.display.config.identify_order_enabled === true ?
+            // response.data.sort((a, b) => sortedArray.indexOf(a.id) - sortedArray.indexOf(b.id))
+            // :
+            // response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
@@ -273,6 +275,8 @@ export class IdentifyModule extends Component {
                     const mapResolution = this.olmap.getView().getResolution();
                     items.map(i => {
                         const item = itemConfig[i.id];
+                        console.log(item);
+                        
                         if (
                             !item.identifiable ||
                             mapResolution >= item.maxResolution ||
@@ -280,7 +284,7 @@ export class IdentifyModule extends Component {
                         ) {
                             return;
                         }
-                        styles.push({ id: item.styleId, label: item.label, idm: item.id });
+                        styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
                     });
                 })
 

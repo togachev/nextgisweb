@@ -61,7 +61,8 @@ export const ContainerMenu = (props) => {
     const [disable, setDisable] = useState(true);
 
     const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
-
+    console.log(itemIds);
+    
     const [radioValue, setRadioValue] = useState(itemIds[0]);
 
     const updatePosition = async (id, id_pos) => {
