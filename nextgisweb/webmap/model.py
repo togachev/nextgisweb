@@ -208,7 +208,7 @@ class WebMapItem(Base):
                 legend_symbols=self.legend_symbols,
                 style_parent_id=style_parent_id,
                 file_resource_visible=self.file_resource_visible,
-                parent_id=self.parent_id,
+                # parent_id=self.parent_id,
             )
 
         return data
