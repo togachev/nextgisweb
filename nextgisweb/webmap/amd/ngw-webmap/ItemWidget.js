@@ -766,8 +766,6 @@ define([
                 if (value === undefined) {
                     return;
                 }
-                
-                console.log(data.webmap);
 
                 var widget = this;
 

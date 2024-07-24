@@ -98,7 +98,13 @@ def identify_layer(request) -> JSONType:
             result.append(items)
 
     return result
-
+class HashMyAttr:
+    def __init__(self, obj):
+        self.obj = obj
+    def __hash__(self):
+        return self.obj["layerId"].__hash__()
+    def __eq__(self, other):
+         return self.obj["layerId"] == other.obj["layerId"]
 def identify_module(request) -> JSONType:
     data = request.json_body
     srs = int(data["srs"])
@@ -114,15 +120,17 @@ def identify_module(request) -> JSONType:
             query.intersects(geom)
             query.limit(100)
             for f in query():
-                options.append(dict(
-                    id=f.id,
-                    layerId=layer.id,
-                    styleId=style.id,
-                    dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
-                    label="Forbidden",
-                    value=str(f.id) + "/" + str(layer.id),
-                    desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
-            ))
+                options.append(
+                    dict(
+                        desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                        id=f.id,
+                        layerId=layer.id,
+                        styleId=style.id,
+                        dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
+                        label="Forbidden",
+                        value=str(f.id) + "/" + str(layer.id),
+                    )
+                )
         elif not IFeatureLayer.providedBy(layer):
             options.append(dict(value="Not implemented"))
         else:
@@ -132,17 +140,22 @@ def identify_module(request) -> JSONType:
             query.limit(100)
 
             for f in query():
-                options.append(dict(
-                    id=f.id,
-                    layerId=layer.id,
-                    styleId=style.id,
-                    dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
-                    label=f.label,
-                    value=str(f.id) + "/" + str(layer.id),
-                    desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
-                ))
+                options.append(
+                    dict(
+                        desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                        id=f.id,
+                        layerId=layer.id,
+                        styleId=style.id,
+                        dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
+                        label=f.label,
+                        value=str(f.id) + "/" + str(layer.id),
+                    )
+                )
+
     arr = list({value["value"]: value for value in options}.values())
-    result["data"] = options
+    # arr = [x.obj for x in set(HashMyAttr(obj) for obj in options)]
+
+    result["data"] = arr
     result["featureCount"] = len(options)
     return result
 
@@ -160,12 +173,12 @@ def feature_selected(request) -> JSONType:
             for f in query():
                 if f.id == featureId:
                     result["data"] = dict(
+                        desc=layer.parent.display_name if p["label"] is None else p["label"],
                         id=f.id,
                         layerId=layerId,
                         styleId=styleId,
                         label="Forbidden",
                         value=str(f.id) + "/" + str(layer.id),
-                        desc=layer.parent.display_name if p["label"] is None else p["label"],
                     )
         elif not IFeatureLayer.providedBy(layer):
             result["data"] = dict(value="Not implemented")
@@ -174,17 +187,17 @@ def feature_selected(request) -> JSONType:
             for f in query():
                 if f.id == featureId:
                     result["data"] = dict(
+                        desc=layer.parent.display_name if p["label"] is None else p["label"],
                         id=f.id,
                         layerId=layerId,
                         styleId=styleId,
                         label=f.label,
                         value=str(f.id) + "/" + str(layer.id),
-                        desc=layer.parent.display_name if p["label"] is None else p["label"],
                     )
         options.append(result["data"])
     
     arr = list({value["value"]: value for value in options}.values())
-    return options
+    return arr
 
 def setup_pyramid(comp, config):
     config.add_route(
