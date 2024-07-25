@@ -17,7 +17,7 @@ export const useSource = () => {
                 styles.push(itm.itemConfig.styleId);
             }
         });
-
+        
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
         all?.map(i => {
             selected.push(i.styleId + ":" + i.layerId + ":" + i.id)

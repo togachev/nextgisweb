@@ -130,7 +130,7 @@ def identify_module(request) -> JSONType:
                         styleId=style.id,
                         dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                         label="Forbidden",
-                        value=str(f.id) + "/" + str(layer.id),
+                        value=str(f.id) + "/" + str(layer.id) + "/" + str(style.id),
                     )
                 )
         elif not IFeatureLayer.providedBy(layer):
@@ -150,7 +150,7 @@ def identify_module(request) -> JSONType:
                         styleId=style.id,
                         dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                         label=f.label,
-                        value=str(f.id) + "/" + str(layer.id),
+                        value=str(f.id) + "/" + str(layer.id) + "/" + str(style.id),
                     )
                 )
 
@@ -167,6 +167,7 @@ def feature_selected(request) -> JSONType:
         layerId = int(p["layerId"])
         styleId = int(p["styleId"])
         featureId = int(p["featureId"])
+        dop = int(p["dop"])
         layer = Resource.filter_by(id=layerId).one()
         result = dict()
         if not layer.has_permission(DataStructureScope.read, request.user):
@@ -178,8 +179,9 @@ def feature_selected(request) -> JSONType:
                         id=f.id,
                         layerId=layerId,
                         styleId=styleId,
+                        dop=dop,
                         label="Forbidden",
-                        value=str(f.id) + "/" + str(layer.id),
+                        value=str(f.id) + "/" + str(layerId) + "/" + str(styleId),
                     )
         elif not IFeatureLayer.providedBy(layer):
             result["data"] = dict(value="Not implemented")
@@ -192,8 +194,9 @@ def feature_selected(request) -> JSONType:
                         id=f.id,
                         layerId=layerId,
                         styleId=styleId,
+                        dop=dop,
                         label=f.label,
-                        value=str(f.id) + "/" + str(layer.id),
+                        value=str(f.id) + "/" + str(layerId) + "/" + str(styleId),
                     )
         options.append(result["data"])
     

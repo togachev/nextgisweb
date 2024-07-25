@@ -222,25 +222,20 @@ export class IdentifyModule extends Component {
         const position = positionContext(event, offset, op, count, settings, p, array_context);
 
         if (op === "popup") {
-            // // const sortedArray = response.data.reduce((a, c, i) => { a[c.dop] = i; return a; }, {});
-            // // // console.log(sortedArray);
-            // console.log(this.params.request.styles, response.data)
+            if (this.display.config.identify_order_enabled) {
+                console.log(3);
+                response.data.sort((a, b) => a.dop - b.dop)
+            } else {
+                if (!p) {
+                    const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
+                    console.log(1, orderObj);
 
-            // const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
-            // // const a = response.data.filter((v,i,a)=>a.findIndex(v2=>(v.id === v2.id))===i)
-
-
-            // var list = response.data.filter((obj1, i, arr) =>
-            //     arr.findIndex(obj2 => (obj2.id === obj1.id)) === i
-            // )
-
-            // let list2 = [...new Map(response.data.map((m) => [m.id, m])).values()];
-
-            // console.log(list, list2);
-
-            // this.display.config.identify_order_enabled === true ?
-            //     response.data.sort((a, b) => a.dop - b.dop) :
-            //     response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
+                    response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
+                } else {
+                    console.log(2);
+                    response.data.sort((a, b) => a.dop - b.dop)
+                }
+            }
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
@@ -314,7 +309,9 @@ export class IdentifyModule extends Component {
                         items.some(x => {
                             if (itemConfig[x.id].styleId === itm.styleId) {
                                 const label = items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]
+                                const dop = items.find(x => itemConfig[x.id].styleId === itm.styleId).position[0]
                                 itm.label = label;
+                                itm.dop = dop;
                             }
                         });
                     })
