@@ -36,12 +36,12 @@ interface StyleRequestProps {
     desc: string;
     styleId: number;
     value: string;
+    dop: number;
 }
 
 interface Response {
     featureCount: number;
     data: StyleRequestProps[];
-    fields: object;
 }
 
 interface Position {
@@ -77,7 +77,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const imodule = display.identify_module;
 
     const count = response.featureCount;
-
+    
     const [store] = useState(
         () => new IdentifyStore({
             valueRnd: {
@@ -97,7 +97,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     const W = window.innerWidth - offHP - offset * 2;
     const H = window.innerHeight - offHP - offset * 2;
 
-    const updateContent = async (val, key) => {
+    const getContent = async (val, key) => {
         const res = await getAttribute(val);
         store.setAttribute(res.updateName);
         topic.publish("feature.highlight", {
@@ -105,25 +105,25 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             featureId: res.feature.id,
             layerId: res.resourceId,
         })
+        const noSelectedItem = store.data.filter(item => item.value !== val.value);
+        store.setContextUrl(generateUrl(display, { res: val, all: noSelectedItem }));
+        store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
+        
         if (key === true) {
             store.setUpdate(false);
-        } else {
-            const noSelectedItem = store.data.filter(item => item.value !== val.value);
-            store.setContextUrl(generateUrl(display, { res: val, all: noSelectedItem }));
-            store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
         }
     }
 
     useEffect(() => {
         store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
         if (count > 0) {
+            response.data[0].label = response.data[0].label === "Forbidden" ? gettext("Field name is not available") : response.data[0].label
             store.setSelected(response.data[0]);
             store.setData(response.data);
-            const val = response.data[0];
-            updateContent(val, false);
+            getContent(response.data[0], false);
         } else {
             store.setContextUrl(generateUrl(display, { res: null, all: null }));
-            store.setSelected(undefined);
+            store.setSelected(null);
             store.setData([]);
             topic.publish("feature.unhighlight");
         }
@@ -131,14 +131,15 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
 
     useEffect(() => {
         if (store.update === true) {
-            updateContent(store.selected, true);
+            getContent(store.selected, true);
         }
     }, [store.update]);
 
-    const onChange = (value: { value: number; label: string }) => {
+    const onChangeSelect = (value: { value: number; label: string }) => {
+        value.label = value.label === "Forbidden" ? gettext("Field name is not available") : value.label
         const selectedValue = store.data.find(item => item.value === value.value);
         store.setSelected(selectedValue);
-        updateContent(selectedValue, false);
+        getContent(selectedValue, false);
     };
 
     const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
@@ -344,13 +345,9 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                     filterOption={filterOption}
                                     showSearch
                                     size="small"
-                                    defaultValue={{
-                                        value: store.selected.value,
-                                        label: store.selected.label === "Forbidden" ? gettext("Field name is not available") : store.selected.label,
-                                        desc: store.selected.desc,
-                                    }}
+                                    value={store.selected}
                                     style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
-                                    onChange={onChange}
+                                    onChange={onChangeSelect}
                                 >
                                     {store.data.map((item, index) => {
                                         const alias = item.label === "Forbidden" ? gettext("Field name is not available") : item.label;

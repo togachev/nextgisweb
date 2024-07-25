@@ -59,7 +59,6 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
                         if (item.visible) {
                             return (
                                 <div className="context-item" key={item.key} onClick={() => {
-                                    console.log(item.result);
                                     visible({ hidden: true, overlay: undefined, key: "context" });
                                 }} >
                                     <span>{item.title}</span>

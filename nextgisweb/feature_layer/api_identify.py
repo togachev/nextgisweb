@@ -99,14 +99,6 @@ def identify_layer(request) -> JSONType:
 
     return result
 
-class HashAttr:
-    def __init__(self, obj):
-        self.obj = obj
-    def __hash__(self):
-        return self.obj["layerId"].__hash__()
-    def __eq__(self, other):
-         return self.obj["layerId"] == other.obj["layerId"]
-
 def identify_module(request) -> JSONType:
     data = request.json_body
     srs = int(data["srs"])
@@ -154,8 +146,6 @@ def identify_module(request) -> JSONType:
                     )
                 )
 
-    arr = [x.obj for x in set(HashAttr(obj) for obj in options)]
-
     result["data"] = options
     result["featureCount"] = len(options)
     return result
@@ -199,8 +189,6 @@ def feature_selected(request) -> JSONType:
                         value=str(f.id) + "/" + str(layerId) + "/" + str(styleId),
                     )
         options.append(result["data"])
-    
-    arr = [x.obj for x in set(HashAttr(obj) for obj in options)]
     return options
 
 def setup_pyramid(comp, config):

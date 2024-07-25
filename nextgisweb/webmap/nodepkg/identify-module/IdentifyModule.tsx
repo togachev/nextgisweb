@@ -42,6 +42,21 @@ interface EventProps {
     point: number[];
 }
 
+interface StyleRequestProps {
+    id: number;
+    label: string;
+    layerId: number;
+    desc: string;
+    dop: number;
+    styleId: number;
+    value: string;
+}
+
+interface Response {
+    featureCount: number;
+    data: StyleRequestProps[];
+}
+
 const settings = webmapSettings;
 const wkt = new WKT();
 
@@ -85,6 +100,7 @@ export class IdentifyModule extends Component {
     private olmap: Map;
     private params: EventProps;
     private paramsSelected: SelectedFeatureProps[] = [];
+    private response: Response;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
     private control: Interaction;
@@ -185,29 +201,29 @@ export class IdentifyModule extends Component {
                 return transformedCoord;
             });
 
-        let count, response;
+        let count;
 
         if (this.params.request !== null) {
-            response = await route("feature_layer.identify_module")
+            this.response = await route("feature_layer.identify_module")
                 .post({
                     json: this.params.request,
                 })
                 .then(item => {
                     return { data: item.data, featureCount: item.featureCount };
                 });
-            count = response.featureCount;
+            count = this.response.featureCount;
         } else if (op === "popup" && p.value.attribute === true) {
-            response = await route("feature_layer.feature_selected")
+            this.response = await route("feature_layer.feature_selected")
                 .post({
                     json: this.paramsSelected,
                 })
                 .then(item => {
                     return { data: item, featureCount: item.length };
                 });
-            count = response.featureCount;
+            count = this.response.featureCount;
         } else {
             count = 0;
-            response = { data: [], featureCount: 0 }
+            this.response = { data: [], featureCount: 0 }
         }
 
         const offset = op === "context" ? 0 : settings.offset_point;
@@ -223,23 +239,19 @@ export class IdentifyModule extends Component {
 
         if (op === "popup") {
             if (this.display.config.identify_order_enabled) {
-                console.log(3);
-                response.data.sort((a, b) => a.dop - b.dop)
+                this.response.data.sort((a, b) => a.dop - b.dop);
+                console.log(3, this.response.data);
             } else {
                 if (!p) {
                     const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
-                    console.log(1, orderObj);
-
-                    response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
-                } else {
-                    console.log(2);
-                    response.data.sort((a, b) => a.dop - b.dop)
+                    this.response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
+                    console.log(1, this.response.data);
                 }
             }
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-            this.root_popup.render(<PopupComponent params={{ position, response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+            this.root_popup.render(<PopupComponent params={{ position, response: this.response }} display={this.display} visible={this._visible} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
             this._setValue(this.point_context, "context")
