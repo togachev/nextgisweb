@@ -19,13 +19,14 @@ export const useSource = () => {
         });
         
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+        const allItems: string[] = [];
         all?.map(i => {
-            selected.push(i.styleId + ":" + i.layerId + ":" + i.id)
+            allItems.push(i.styleId + ":" + i.layerId + ":" + i.id)
         });
 
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
-            { attribute: true, lat, lon, zoom, styles: styles, panel, lsf: selected } :
+            { attribute: true, lat, lon, zoom, styles: styles, panel, slf: selected, all: allItems } :
             { attribute: false, lat, lon, zoom, styles: styles, panel }
 
         const paramsUrl = new URLSearchParams();
@@ -37,7 +38,8 @@ export const useSource = () => {
         const url = routeURL("webmap.display", webmapId);
 
         const link = origin + url + '?' + paramsUrl.toString();
-
+        console.log(link);
+        
         return link
     };
 

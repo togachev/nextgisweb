@@ -4,11 +4,13 @@ export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export interface DataProps {
     id: number;
+    label: string;    
     layerId: number;
+    desc: string;   
+    dop: number;
     styleId: number;
-    label: string;
     value: number;
-    desc: string;
+    active: boolean;
 }
 
 interface Rnd {

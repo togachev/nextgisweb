@@ -29,19 +29,19 @@ interface Visible {
     key: string;
 }
 
-interface StyleRequestProps {
+export interface DataProps {
     id: number;
-    label: string;
+    label: string;    
     layerId: number;
-    desc: string;
-    styleId: number;
-    value: string;
+    desc: string;   
     dop: number;
+    styleId: number;
+    value: number;
 }
 
 interface Response {
     featureCount: number;
-    data: StyleRequestProps[];
+    data: DataProps[];
 }
 
 interface Position {
@@ -63,19 +63,28 @@ interface Props {
     position: Position;
 }
 
+interface SelectedFeatureProps {
+    layerId: number;
+    featureId: number;
+    styleId: number;
+    label: string;
+}
+
 interface Params {
     params: Props;
+    _selected: SelectedFeatureProps;
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: DojoDisplay;
 }
 
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
-    const { params, visible, display } = props;
+    const { params, visible, display, _selected } = props;
     const { position, response } = params;
     const { getAttribute, generateUrl } = useSource();
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.identify_module;
-
+    console.log(_selected);
+    
     const count = response.featureCount;
     
     const [store] = useState(

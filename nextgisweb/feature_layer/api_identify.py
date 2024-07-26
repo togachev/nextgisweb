@@ -122,7 +122,7 @@ def identify_module(request) -> JSONType:
                         styleId=style.id,
                         dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                         label="Forbidden",
-                        value=str(f.id) + "/" + str(layer.id) + "/" + str(style.id),
+                        value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                     )
                 )
         elif not IFeatureLayer.providedBy(layer):
@@ -142,7 +142,7 @@ def identify_module(request) -> JSONType:
                         styleId=style.id,
                         dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                         label=f.label,
-                        value=str(f.id) + "/" + str(layer.id) + "/" + str(style.id),
+                        value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                     )
                 )
 
@@ -171,7 +171,7 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         dop=dop,
                         label="Forbidden",
-                        value=str(f.id) + "/" + str(layerId) + "/" + str(styleId),
+                        value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
                     )
         elif not IFeatureLayer.providedBy(layer):
             result["data"] = dict(value="Not implemented")
@@ -186,7 +186,7 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         dop=dop,
                         label=f.label,
-                        value=str(f.id) + "/" + str(layerId) + "/" + str(styleId),
+                        value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
                     )
         options.append(result["data"])
     return options
