@@ -5,7 +5,7 @@ export const useCopy = () => {
 
     const messageInfo = (text) => {
         messageApi.open({
-            type: 'info',
+            type: "success",
             content: text,
             duration: 2,
         });

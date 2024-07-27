@@ -49,8 +49,8 @@ export const NavigationMenu = observer(({ panels, display }: NavigationMenuProps
             {menuItems}
             {infomap.scope ? (
                 <div className="infoblock">
-                    <Link href={infomap.link}><span title={gettext("Map properties")} className="iconLinks"><Information /></span></Link>
-                    <Link href={infomap.update}><span title={gettext("Map settings")} className="iconLinks"><SettingOutlined /></span></Link>
+                    <Link target="_blank" href={infomap.link}><span title={gettext("Map properties")} className="iconLinks"><Information /></span></Link>
+                    <Link target="_blank" href={infomap.update}><span title={gettext("Map settings")} className="iconLinks"><SettingOutlined /></span></Link>
                 </div>
             ) : null}
         </div>);

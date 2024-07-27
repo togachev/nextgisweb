@@ -122,6 +122,7 @@ def identify_module(request) -> JSONType:
                         styleId=style.id,
                         dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                         label="Forbidden",
+                        permission="Forbidden",
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                     )
                 )
@@ -142,6 +143,7 @@ def identify_module(request) -> JSONType:
                         styleId=style.id,
                         dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
                         label=f.label,
+                        permission="Read",
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                     )
                 )
@@ -171,6 +173,7 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         dop=dop,
                         label="Forbidden",
+                        permission="Forbidden",
                         value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
                     )
         elif not IFeatureLayer.providedBy(layer):
@@ -186,6 +189,7 @@ def feature_selected(request) -> JSONType:
                         styleId=styleId,
                         dop=dop,
                         label=f.label,
+                        permission="Read",
                         value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
                     )
         options.append(result["data"])

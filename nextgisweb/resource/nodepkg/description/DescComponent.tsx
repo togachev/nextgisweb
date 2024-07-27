@@ -7,8 +7,8 @@ import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 
 import "./DescComponent.less";
 const title = gettext("Description");
-const msgLayer = gettext("Layer");
-const msgStyle = gettext("Style");
+const msgLayer = gettext("Layer description");
+const msgStyle = gettext("Style description");
 
 const zoomToFeature = (display, resourceId, featureId) => {
     display.featureHighlighter
@@ -25,10 +25,12 @@ export const DescComponent = observer((props) => {
         return (
             <>{
                 content.map((item, index) => {
+                    console.log(item);
+                    
                     const title = item.type === "layer" ? msgLayer : msgStyle;
                     return (
                         <div key={index} className="item-description">
-                            <span className="titleDesc">
+                            <span className="title-desc">
                                 {item.permissions ?
                                     (<SvgIconLink
                                         className="desc-link"
@@ -37,9 +39,9 @@ export const DescComponent = observer((props) => {
                                         fill="currentColor"
                                         target="_blank"
                                     >
-                                        <span className="labelDesc">{title}</span>
+                                        <span className="label-desc">{title}</span>
                                     </SvgIconLink>)
-                                    : (<span className="labelDesc">{title}</span>)
+                                    : (<span className="label-desc-no">{title}</span>)
                                 }
                             </span>
                             {parse(item.description, options)}

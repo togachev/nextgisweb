@@ -22,6 +22,7 @@ import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import topic from "dojo/topic";
 
 const { Option } = Select;
+const forbidden = gettext("The data is not available for reading")
 
 interface Visible {
     hidden: boolean;
@@ -36,7 +37,8 @@ export interface DataProps {
     desc: string;   
     dop: number;
     styleId: number;
-    value: number;
+    value: string;
+    permission: string;
 }
 
 interface Response {
@@ -61,29 +63,22 @@ interface Rnd {
 interface Props {
     response: Response;
     position: Position;
-}
-
-interface SelectedFeatureProps {
-    layerId: number;
-    featureId: number;
-    styleId: number;
-    label: string;
+    selected: DataProps;
 }
 
 interface Params {
     params: Props;
-    _selected: SelectedFeatureProps;
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: DojoDisplay;
 }
 
 export default observer(forwardRef<Element>(function PopupComponent(props: Params, ref: RefObject<Element>) {
-    const { params, visible, display, _selected } = props;
-    const { position, response } = params;
+    const { params, visible, display } = props;
+    const { position, response, selected } = params;
     const { getAttribute, generateUrl } = useSource();
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.identify_module;
-    console.log(_selected);
+
     
     const count = response.featureCount;
     
@@ -114,7 +109,8 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
             featureId: res.feature.id,
             layerId: res.resourceId,
         })
-        const noSelectedItem = store.data.filter(item => item.value !== val.value);
+        
+        const noSelectedItem = store.data;
         store.setContextUrl(generateUrl(display, { res: val, all: noSelectedItem }));
         store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
         
@@ -126,10 +122,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     useEffect(() => {
         store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
         if (count > 0) {
-            response.data[0].label = response.data[0].label === "Forbidden" ? gettext("Field name is not available") : response.data[0].label
-            store.setSelected(response.data[0]);
+            const selectVal = selected ? selected : response.data[0];
+            selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
+            store.setSelected(selectVal);
             store.setData(response.data);
-            getContent(response.data[0], false);
+            getContent(selectVal, false);
         } else {
             store.setContextUrl(generateUrl(display, { res: null, all: null }));
             store.setSelected(null);
@@ -145,10 +142,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
     }, [store.update]);
 
     const onChangeSelect = (value: { value: number; label: string }) => {
-        value.label = value.label === "Forbidden" ? gettext("Field name is not available") : value.label
         const selectedValue = store.data.find(item => item.value === value.value);
-        store.setSelected(selectedValue);
-        getContent(selectedValue, false);
+        const cloneUser = { ...selectedValue };
+        cloneUser.label = cloneUser.permission === "Forbidden" ? forbidden : cloneUser.label;
+        store.setSelected(cloneUser);
+        getContent(cloneUser, false);
     };
 
     const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
@@ -346,11 +344,11 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                             </span>
                         </div>
                         {count > 0 && store.selected && (
-                            <div className="select-feature" >
+                            <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
                                 <Select
                                     labelInValue
-                                    placement="topLeft"
                                     optionLabelProp="label"
+                                    placement="topLeft"
                                     filterOption={filterOption}
                                     showSearch
                                     size="small"
@@ -359,7 +357,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                     onChange={onChangeSelect}
                                 >
                                     {store.data.map((item, index) => {
-                                        const alias = item.label === "Forbidden" ? gettext("Field name is not available") : item.label;
+                                        const alias = item.permission === "Forbidden" ? forbidden : item.label;
                                         return (
                                             <Option key={index} value={item.value} label={alias} desc={item.desc}>
                                                 {alias}
@@ -370,7 +368,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                                 {editFeature}
                             </div>
                         )}
-                        {store.selected && (<div className="content">
+                        {store.selected && store.selected.permission !== "Forbidden" && (<div className="content">
                             <ContentComponent linkToGeometry={linkToGeometry} store={store} display={display} />
                         </div>)}
                         <div className="footer-popup">

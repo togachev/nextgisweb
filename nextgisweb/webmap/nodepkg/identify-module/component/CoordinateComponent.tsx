@@ -3,6 +3,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import LinkIcon from "@nextgisweb/icon/mdi/link";
+import ContentCopy from "@nextgisweb/icon/mdi/content-copy";
 
 export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
     const { copyValue, contextHolder } = useCopy();
@@ -22,12 +23,12 @@ export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
             </span>
             {op === "popup" && contextUrl !== null && (
                 <span className="link-value"
-                    title={gettext("Object link")}
+                    title={count > 0 ? gettext("Copy link to object") : gettext("Copy link to location")}
                     onClick={() => {
                         copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
                     }}
                 >
-                    <LinkIcon />
+                    <ContentCopy />
                 </span>
             )}
         </div>

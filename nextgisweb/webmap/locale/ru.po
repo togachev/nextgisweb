@@ -16,7 +16,7 @@ msgstr "Объект не найден"
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:1026 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:1026 amd/ngw-webmap/ItemWidget.js:337
 #: nodepkg/settings-widget/SettingsWidget.js:17
 msgid "Layers"
 msgstr "Слои"
@@ -39,8 +39,7 @@ msgid "Bookmarks"
 msgstr "Закладки"
 
 #: amd/ngw-webmap/Display.js:1094 amd/ngw-webmap/plugin/LayerInfo.js:29
-#: nodepkg/identify-module/component/ContentComponent.tsx:82
-#: nodepkg/panel/description/DescriptionPanel.js:8
+#: nodepkg/identify-module/component/ContentComponent.tsx:109
 #: nodepkg/settings-widget/SettingsWidget.js:32
 msgid "Description"
 msgstr "Описание"
@@ -65,15 +64,19 @@ msgstr "Открыть карту целиком"
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
-#: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:40
+#: amd/ngw-webmap/ItemWidget.js:101 amd/ngw-webmap/template/ItemWidget.hbs:30
 msgid "Layer order"
 msgstr "Порядок слоёв"
 
-#: amd/ngw-webmap/ItemWidget.js:174
+#: amd/ngw-webmap/ItemWidget.js:188
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:179
+#: amd/ngw-webmap/ItemWidget.js:201
+msgid "Take into account the order of identification in the web card"
+msgstr "Учитывать порядок идентификации в веб-карте"
+
+#: amd/ngw-webmap/ItemWidget.js:206
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:38
@@ -81,7 +84,7 @@ msgstr "Учитывать на карте"
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-webmap/ItemWidget.js:395 amd/ngw-webmap/template/ItemWidget.hbs:25
+#: amd/ngw-webmap/ItemWidget.js:423 amd/ngw-webmap/template/ItemWidget.hbs:20
 msgid "Add group"
 msgstr "Добавить группу"
 
@@ -151,7 +154,7 @@ msgid "Stop editing"
 msgstr "Завершить редактирование"
 
 #: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/identify-module/component/PopupComponent.tsx:193
+#: nodepkg/identify-module/component/PopupComponent.tsx:190
 #: nodepkg/panel/annotations/AnnotationsPanel.js:86
 msgid "Edit"
 msgstr "Редактировать"
@@ -226,65 +229,65 @@ msgstr "На веб-карте нельзя будет выйти за этот 
 msgid "Constraining extent"
 msgstr "Ограничивающий охват"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:14
+#: amd/ngw-webmap/template/ItemWidget.hbs:11
 msgid "Add layer"
 msgstr "Добавить слой"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:18
+#: amd/ngw-webmap/template/ItemWidget.hbs:14
 msgid "Select layer's style"
 msgstr "Выберите стиль слоя"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:32
+#: amd/ngw-webmap/template/ItemWidget.hbs:25
 msgid "Remove"
 msgstr "Удалить"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:71
-#: amd/ngw-webmap/template/ItemWidget.hbs:128
+#: amd/ngw-webmap/template/ItemWidget.hbs:52
+#: amd/ngw-webmap/template/ItemWidget.hbs:96
 #: nodepkg/clone-webmap/CloneWebmap.tsx:84
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:75
+#: amd/ngw-webmap/template/ItemWidget.hbs:56
 msgid "Enabled"
 msgstr "Включен"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:80
+#: amd/ngw-webmap/template/ItemWidget.hbs:60
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:87
+#: amd/ngw-webmap/template/ItemWidget.hbs:65
 msgid "Transparency"
 msgstr "Прозрачность"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:92
+#: amd/ngw-webmap/template/ItemWidget.hbs:69
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:97
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:103
+#: amd/ngw-webmap/template/ItemWidget.hbs:77
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:114
+#: amd/ngw-webmap/template/ItemWidget.hbs:85
 msgid "Style resource"
 msgstr "Ресурс стиля"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:132
+#: amd/ngw-webmap/template/ItemWidget.hbs:100
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:136
+#: amd/ngw-webmap/template/ItemWidget.hbs:103
 msgid "Exclusive"
 msgstr ""
 
-#: amd/ngw-webmap/tool/Identify.js:437 amd/ngw-webmap/tool/Identify.js:453
+#: amd/ngw-webmap/tool/Identify.js:436 amd/ngw-webmap/tool/Identify.js:452
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:595 amd/ngw-webmap/tool/Identify.js:707
+#: amd/ngw-webmap/tool/Identify.js:594 amd/ngw-webmap/tool/Identify.js:706
 msgid "Features"
 msgstr "Объектов"
 
@@ -449,13 +452,11 @@ msgid "Resource group"
 msgstr "Группа ресурсов"
 
 #: nodepkg/feature-link/FeatureLink.tsx:26
-#: nodepkg/identify-module/component/ContentComponent.tsx:131
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:33
+#: nodepkg/identify-module/component/CoordinateComponent.tsx:28
 msgid "Object reference copied"
 msgstr "Ссылка на объект скопирована"
 
 #: nodepkg/feature-link/FeatureLink.tsx:54
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:29
 msgid "Object link"
 msgstr "Ссылка на объект"
 
@@ -515,48 +516,63 @@ msgstr "Изменить геометрию для фильтра"
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:37
+#: nodepkg/identify-module/component/ContentComponent.tsx:40
 msgid "Email address copied"
 msgstr "Адрес электронной почты скопирован"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:50
+#: nodepkg/identify-module/component/ContentComponent.tsx:92
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:74
+#: nodepkg/identify-module/component/ContentComponent.tsx:101
 msgid "Geometry info"
 msgstr "Информация о геометрии"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:89
+#: nodepkg/identify-module/component/ContentComponent.tsx:117
 msgid "Attachments"
 msgstr "Вложения"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:127
-msgid "HTML code of the geometry link, for insertion into the description"
-msgstr "HTML код ссылки на геометрию, для вставки в описание"
-
-#: nodepkg/identify-module/component/ContentComponent.tsx:131
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:33
-msgid "Location link copied"
-msgstr ""
-
 #: nodepkg/identify-module/component/CoordinateComponent.tsx:20
 msgid "Copy coordinates"
-msgstr ""
+msgstr "Скопировать координаты"
 
 #: nodepkg/identify-module/component/CoordinateComponent.tsx:20
 msgid "Coordinates copied"
-msgstr ""
+msgstr "Координаты скопированы"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:331
+#: nodepkg/identify-module/component/CoordinateComponent.tsx:26
+msgid "Copy link to object"
+msgstr "Копировать ссылку на объект"
+
+#: nodepkg/identify-module/component/CoordinateComponent.tsx:26
+msgid "Copy link to location"
+msgstr "Копировать ссылку на местоположение"
+
+#: nodepkg/identify-module/component/CoordinateComponent.tsx:28
+msgid "Location link copied"
+msgstr "Ссылка на местоположение скопирована"
+
+#: nodepkg/identify-module/component/PopupComponent.tsx:25
+msgid "The data is not available for reading"
+msgstr "Данные недоступны для чтения"
+
+#: nodepkg/identify-module/component/PopupComponent.tsx:161
+msgid "HTML code of the geometry link, for insertion into the description"
+msgstr "HTML код ссылки на геометрию, для вставки в описание"
+
+#: nodepkg/identify-module/component/PopupComponent.tsx:162
+msgid "HTML code copied"
+msgstr "HTML-код скопирован"
+
+#: nodepkg/identify-module/component/PopupComponent.tsx:317
 msgid "Close fullscreen popup"
 msgstr ""
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:331
+#: nodepkg/identify-module/component/PopupComponent.tsx:317
 msgid "Open fullscreen popup"
 msgstr ""
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:349
+#: nodepkg/identify-module/component/PopupComponent.tsx:335
 msgid "Close"
 msgstr ""
 
@@ -624,6 +640,14 @@ msgstr "Показывать охват"
 #: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
+
+#: nodepkg/navigation-menu/NavigationMenu.tsx:52
+msgid "Map properties"
+msgstr ""
+
+#: nodepkg/navigation-menu/NavigationMenu.tsx:53
+msgid "Map settings"
+msgstr ""
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:94
 msgid "Edit annotations"
@@ -793,14 +817,6 @@ msgstr "Максимум загружаемых файлов:"
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:42
 msgid "Maximum files/loaded:"
 msgstr "Максимум файлов/загружено:"
-
-#: nodepkg/panel/description/DescriptionPanel.js:9
-msgid "Layer"
-msgstr "Слой"
-
-#: nodepkg/panel/description/DescriptionPanel.js:10
-msgid "Style"
-msgstr "Стиль"
 
 #: nodepkg/panel/diagram/DiagramPanel.tsx:22
 msgid "Font size"
@@ -1274,7 +1290,7 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:49
+#: view.py:47
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
@@ -1297,34 +1313,4 @@ msgstr "Открыть"
 #: view.py:412
 msgid "Group setting"
 msgstr "Настройка группы"
-
-#~ msgid "Exclusive"
-#~ msgstr "Взаимоисключающая"
-
-#~ msgid "Geometry"
-#~ msgstr "Геометрия"
-
-#~ msgid "Link to geometry"
-#~ msgstr "Ссылка на геометрию объекта"
-
-#~ msgid "Elements"
-#~ msgstr "Элементы"
-
-#~ msgid "Number of legend columns"
-#~ msgstr "Количество столбцов легенды"
-
-#~ msgid "Title"
-#~ msgstr "Заголовок"
-
-#~ msgid "Map title text"
-#~ msgstr "Текст заголовка карты"
-
-#~ msgid "North Arrow"
-#~ msgstr "Указатель севера"
-
-#~ msgid "Measurement SRS"
-#~ msgstr "Система координат для измерений"
-
-#~ msgid "N/A"
-#~ msgstr "Н/Д"
 

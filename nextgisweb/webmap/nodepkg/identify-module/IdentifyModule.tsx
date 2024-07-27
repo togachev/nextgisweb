@@ -30,7 +30,7 @@ interface VisibleProps {
     key: string;
 }
 
-interface SelectedFeatureProps {
+interface ParamsProps {
     layerId: number;
     featureId: number;
     styleId: number;
@@ -49,7 +49,8 @@ export interface DataProps {
     desc: string;   
     dop: number;
     styleId: number;
-    value: number;
+    value: string;
+    permission: string;
 }
 
 interface Response {
@@ -99,8 +100,8 @@ export class IdentifyModule extends Component {
     private lonlat: number[];
     private olmap: Map;
     private params: EventProps;
-    private selected: SelectedFeatureProps[] = [];
-    private paramsSelected: SelectedFeatureProps[] = [];
+    private selected: string;
+    private paramsSelected: ParamsProps[] = [];
     private response: Response;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
@@ -247,11 +248,12 @@ export class IdentifyModule extends Component {
                     const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
                     this.response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
                 }
-            }
-
+            }  
+            
+            const value = this.response.data.find(x => x.value === this.selected)
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-            this.root_popup.render(<PopupComponent params={{ position, response: this.response, _selected: this.selected }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+            this.root_popup.render(<PopupComponent params={{ position, response: this.response, selected: value }} display={this.display} visible={this._visible} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
             this._setValue(this.point_context, "context")
@@ -386,7 +388,7 @@ export class IdentifyModule extends Component {
                 return transformedCoord;
             })
             .then((transformedCoord) => {
-                const params: SelectedFeatureProps[] = [];
+                const params: ParamsProps[] = [];
 
                 val.all?.split(",").map(i => {
                     params.push({
@@ -397,14 +399,7 @@ export class IdentifyModule extends Component {
                     });
                 })
 
-                val.slf?.split(",").map(i => {
-                    this.selected.push({
-                        styleId: Number(i.split(":")[0]),
-                        layerId: Number(i.split(":")[1]),
-                        featureId: Number(i.split(":")[2]),
-                        label: "",
-                    });
-                })
+                this.selected = val.slf
 
                 const value = {
                     attribute: val.attribute,

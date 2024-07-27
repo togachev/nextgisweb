@@ -133,12 +133,14 @@ define([
                 handleAs: "json",
             }).then(
                 lang.hitch(this, function (feature) {
-                    feature = this._highlightFeature({
-                        geom: feature.geom,
-                        featureId: featureId,
-                        layerId: layerId,
-                    });
-                    highlightedDeferred.resolve(feature);
+                    if (feature !== null) {
+                        feature = this._highlightFeature({
+                            geom: feature.geom,
+                            featureId: featureId,
+                            layerId: layerId,
+                        });
+                        highlightedDeferred.resolve(feature);
+                    }
                 })
             );
 

@@ -38,14 +38,13 @@ export const useSource = () => {
         const url = routeURL("webmap.display", webmapId);
 
         const link = origin + url + '?' + paramsUrl.toString();
-        console.log(link);
         
         return link
     };
 
     const getAttribute = async (res) => {
-        const resourceId = res.label !== "Forbidden" ? res.layerId : -1;
-        const feature = res.label !== "Forbidden" ? await route("feature_layer.feature.item_iso", {
+        const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
+        const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item_iso", {
             id: res.layerId,
             fid: res.id,
         })
@@ -56,18 +55,19 @@ export const useSource = () => {
             {
                 id: -1,
                 geom: "POINT EMPTY",
-                fields: { Forbidden: "Forbidden1" },
+                fields: { Forbidden: "Forbidden" },
                 extensions: null
             }
 
-        const fieldmap = res.label !== "Forbidden" ? await route("resource.fields", { id: resourceId })
+        const fieldmap = res.permission !== "Forbidden" ? await route("resource.item", { id: resourceId })
             .get({
                 cache: true,
             })
             .then(data => {
                 const deferreds: string[] = [];
                 const fieldmap = {};
-                data.map(itm => {
+                
+                data.feature_layer.fields.map(itm => {
                     fieldmap[itm.keyname] = itm;
                     if (itm.lookup_table !== null) {
                         deferreds.push(

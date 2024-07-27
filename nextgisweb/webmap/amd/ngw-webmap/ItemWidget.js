@@ -198,7 +198,7 @@ define([
                 domConstruct.create("label", {
                     for: "identifyOrderEnabled",
                     style: "vertical-align: middle; padding-left: 4px;",
-                    innerHTML: i18n.gettext("Link layer identification on web map to layer order"),
+                    innerHTML: i18n.gettext("Take into account the order of identification in the web card"),
                 })
             );
 
