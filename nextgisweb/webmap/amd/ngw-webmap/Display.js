@@ -1026,7 +1026,7 @@ define([
                     title: gettext("Layers"),
                     name: "layers",
                     order: 10,
-                    menuIcon: "material-layers",
+                    menuIcon: "mdi-layers-outline",
                     applyToTinyMap: true,
                 },
             });
@@ -1037,7 +1037,7 @@ define([
                     title: gettext("Search"),
                     name: "search",
                     order: 20,
-                    menuIcon: "material-search",
+                    menuIcon: "mdi-magnify",
                     applyToTinyMap: true,
                 },
             });
@@ -1062,7 +1062,7 @@ define([
                     title: gettext("Print map"),
                     name: "print",
                     order: 70,
-                    menuIcon: "material-print",
+                    menuIcon: "mdi-printer-outline",
                 },
             });
 
@@ -1136,7 +1136,7 @@ define([
                     title: gettext("Share"),
                     name: "share",
                     order: 60,
-                    menuIcon: "material-share",
+                    menuIcon: "mdi-share-variant-outline",
                 },
             });
 

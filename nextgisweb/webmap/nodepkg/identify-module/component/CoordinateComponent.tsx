@@ -2,7 +2,7 @@ import { FC } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
-import LinkIcon from "@nextgisweb/icon/mdi/link";
+import VectorLink from "@nextgisweb/icon/mdi/vector-link";
 import ContentCopy from "@nextgisweb/icon/mdi/content-copy";
 
 export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
@@ -28,7 +28,7 @@ export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
                         copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
                     }}
                 >
-                    <ContentCopy />
+                    <VectorLink />
                 </span>
             )}
         </div>

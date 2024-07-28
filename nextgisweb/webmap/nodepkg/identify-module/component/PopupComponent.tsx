@@ -264,7 +264,7 @@ export default observer(forwardRef<Element>(function PopupComponent(props: Param
                         topRight: "hover-angle-top-right",
                         topLeft: "hover-angle-top-left",
                     }}
-                    cancel=".select-feature,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.link-value,.content-item"
+                    cancel=".select-feature,.select-feature-forbidden,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.link-value,.content-item"
                     bounds={store.valueRnd.width === W ? undefined : "window"}
                     minWidth={position.width}
                     minHeight={position.height}
