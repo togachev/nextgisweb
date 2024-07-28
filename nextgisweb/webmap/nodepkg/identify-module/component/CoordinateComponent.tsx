@@ -3,7 +3,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import VectorLink from "@nextgisweb/icon/mdi/vector-link";
-import ContentCopy from "@nextgisweb/icon/mdi/content-copy";
 
 export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
     const { copyValue, contextHolder } = useCopy();

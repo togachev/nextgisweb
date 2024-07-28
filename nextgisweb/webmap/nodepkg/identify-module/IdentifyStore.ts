@@ -1,24 +1,7 @@
 import { makeAutoObservable } from "mobx";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
-
-export interface DataProps {
-    id: number;
-    label: string;    
-    layerId: number;
-    desc: string;   
-    dop: number;
-    styleId: number;
-    value: number;
-    active: boolean;
-}
-
-interface Rnd {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
+import type { DataProps, Rnd } from "./type";
 
 export class IdentifyStore {
     layerName: string | null = null;

@@ -918,7 +918,7 @@ define([
             }
             const { lon, lat, attribute, all, slf } = urlParams;
             this.identify_module
-                .identifyModuleUrlParams(lon, lat, attribute, all, slf)
+                .identifyModuleUrlParams({ lon, lat, attribute, all, slf })
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

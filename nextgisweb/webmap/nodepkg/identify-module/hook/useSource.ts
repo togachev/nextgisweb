@@ -1,15 +1,18 @@
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
 import type { StoreItem } from "@nextgisweb/webmap/type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { DataProps } from "./type";
 
 export const useSource = () => {
 
-    const generateUrl = (display, { res, all }) => {
+    const generateUrl = (display: DojoDisplay, { res, all }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
-        const webmapId = display.config.webmapId
-        const zoom = display.map.position.zoom;
+        const webmapId = display.config.webmapId;
+        const zoom = display.map.view.getZoom();
+        
         const styles: string[] = [];
         Object.entries(display.webmapStore._layers).find(item => {
             const itm: StoreItem = item[1];
@@ -36,13 +39,12 @@ export const useSource = () => {
         })
 
         const url = routeURL("webmap.display", webmapId);
-
         const link = origin + url + '?' + paramsUrl.toString();
         
-        return link
+        return link;
     };
 
-    const getAttribute = async (res) => {
+    const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item_iso", {
             id: res.layerId,

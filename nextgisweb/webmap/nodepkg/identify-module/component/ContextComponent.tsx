@@ -3,39 +3,8 @@ import { createPortal } from 'react-dom';
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { CoordinateComponent } from "./CoordinateComponent";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
-interface Position {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
-
-interface Props {
-    response: Response;
-    position: Position;
-}
-
-interface ContextProps {
-    key: string;
-    title: string;
-    result: string;
-    visible: boolean;
-}
-
-interface Visible {
-    hidden: boolean;
-    overlay: boolean | undefined;
-    key: string;
-}
-
-interface Params {
-    params: Props;
-    visible: ({ hidden, overlay, key }: Visible) => void;
-    display: DojoDisplay;
-    array_context: ContextProps[];
-}
+import type { Params } from "./type";
 
 export default forwardRef<Element>(function ContextComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display, array_context } = props;

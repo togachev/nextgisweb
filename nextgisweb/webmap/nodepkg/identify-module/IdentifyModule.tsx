@@ -1,7 +1,6 @@
 import React, { Component, createRef, RefObject } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import { Map, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { Interaction } from "ol/interaction";
@@ -13,50 +12,13 @@ import { Point } from "ol/geom";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
-import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
-import "./IdentifyModule.less";
 import { positionContext } from "./positionContext"
 import OlGeomPoint from "ol/geom/Point";
 
-interface StylesRequest {
-    id: number;
-    label: string;
-    dop: number;
-}
+import type { DojoDisplay, WebmapItemConfig, WebmapItem } from "@nextgisweb/webmap/type";
+import type { EventProps, ParamsProps, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
 
-interface VisibleProps {
-    hidden: boolean;
-    overlay: number[] | undefined;
-    key: string;
-}
-
-interface ParamsProps {
-    layerId: number;
-    featureId: number;
-    styleId: number;
-    label: string;
-}
-
-interface EventProps {
-    request: RequestProps | undefined;
-    point: number[];
-}
-
-export interface DataProps {
-    id: number;
-    label: string;    
-    layerId: number;
-    desc: string;   
-    dop: number;
-    styleId: number;
-    value: string;
-    permission: string;
-}
-
-interface Response {
-    featureCount: number;
-    data: DataProps[];
-}
+import "./IdentifyModule.less";
 
 const settings = webmapSettings;
 const wkt = new WKT();
@@ -100,7 +62,7 @@ export class IdentifyModule extends Component {
     private lonlat: number[];
     private olmap: Map;
     private params: EventProps;
-    private selected: string;
+    private selected: string | undefined;
     private paramsSelected: ParamsProps[] = [];
     private response: Response;
     private overlay_popup: Overlay;
@@ -248,8 +210,8 @@ export class IdentifyModule extends Component {
                     const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
                     this.response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
                 }
-            }  
-            
+            }
+
             const value = this.response.data.find(x => x.value === this.selected)
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
@@ -262,7 +224,7 @@ export class IdentifyModule extends Component {
         }
     };
 
-    _isEditEnabled = (display, item) => {
+    _isEditEnabled = (display: DojoDisplay, item: WebmapItem) => {
         const pluginName = "ngw-webmap/plugin/FeatureLayer";
 
         if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
@@ -287,8 +249,9 @@ export class IdentifyModule extends Component {
         if (op === "popup" && p === false) {
             const styles: StylesRequest[] = [];
             this.display.getVisibleItems()
-                .then(items => {
-                    const itemConfig = this.display.getItemConfig();
+                .then((items: WebmapItem[]) => {
+
+                    const itemConfig: WebmapItemConfig = this.display.getItemConfig();
                     const mapResolution = this.olmap.getView().getResolution();
                     items.map(i => {
                         const item = itemConfig[i.id];
@@ -316,8 +279,8 @@ export class IdentifyModule extends Component {
 
         if (op === "popup" && p && p.value.attribute === true) {
             this.display.getVisibleItems()
-                .then(items => {
-                    const itemConfig = this.display.getItemConfig();
+                .then((items: WebmapItem[]) => {
+                    const itemConfig: WebmapItemConfig = this.display.getItemConfig();
 
                     p.value.params.map(itm => {
                         items.some(x => {
@@ -361,7 +324,7 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async (lon, lat, attribute, all, slf) => {
+    identifyModuleUrlParams = async ({ lon, lat, attribute, all, slf }: UrlParamsProps) => {
         const all_ = new String(slf);
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
@@ -372,7 +335,7 @@ export class IdentifyModule extends Component {
         return true;
     };
 
-    _responseContext = async (val) => {
+    _responseContext = async (val: UrlParamsProps) => {
         await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
@@ -399,7 +362,7 @@ export class IdentifyModule extends Component {
                     });
                 })
 
-                this.selected = val.slf
+                this.selected = val.slf;
 
                 const value = {
                     attribute: val.attribute,
