@@ -159,7 +159,7 @@ def feature_selected(request) -> JSONType:
         layerId = int(p["layerId"])
         styleId = int(p["styleId"])
         featureId = int(p["featureId"])
-        dop = int(p["dop"])
+        dop = int(p["dop"]) if p.get("dop") is not None else 0
         layer = Resource.filter_by(id=layerId).one()
         result = dict()
         if not layer.has_permission(DataStructureScope.read, request.user):
