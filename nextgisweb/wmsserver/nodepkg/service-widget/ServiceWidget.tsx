@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
-import { InputNumber, InputValue } from "@nextgisweb/gui/antd";
-import type { InputNumberProps } from "@nextgisweb/gui/antd";
+import { InputValue } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
+import { InputScaleDenom } from "@nextgisweb/gui/component";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
 import type { FocusTablePropsActions } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
@@ -20,32 +20,6 @@ import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResou
 
 import { Layer } from "./Layer";
 import type { ServiceStore } from "./ServiceStore";
-
-const msgNotSet = gettext("Not set");
-
-function scaleDenomFormatter(value: number | string | undefined) {
-    return value ? `1 : ${value}` : "";
-}
-
-function scaleDenomParser(value: string | undefined) {
-    if (!value) return "";
-    return Number(value.replace(/^1\s*:\s*/, ""));
-}
-
-function InputScaleDenom(props: InputNumberProps) {
-    return (
-        <InputNumber
-            min={1}
-            max={1000000000}
-            controls={false}
-            formatter={scaleDenomFormatter}
-            parser={scaleDenomParser}
-            placeholder={msgNotSet}
-            style={{ width: "12em" }}
-            {...props}
-        />
-    );
-}
 
 const CollectionWidget = observer<{
     item: Layer;
@@ -94,6 +68,7 @@ export const ServiceWidget: EditorWidgetComponent<
             tableActions: [
                 pickToFocusTable(
                     async (res) => {
+                        const resourceId = res.resource.id;
                         if (
                             res.resource.cls.endsWith("_style") &&
                             res.resource.parent
@@ -104,7 +79,7 @@ export const ServiceWidget: EditorWidgetComponent<
                             ).get({ signal: makeSignal() });
                         }
                         return new Layer(store, {
-                            resource_id: res.resource.id,
+                            resource_id: resourceId,
                             display_name: res.resource.display_name,
                             keyname: generateResourceKeyname(res.resource),
                             min_scale_denom: null,

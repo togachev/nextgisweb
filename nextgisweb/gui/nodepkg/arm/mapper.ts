@@ -1,4 +1,5 @@
-import { action, computed, observable, runInAction } from "mobx";
+import isEqual from "lodash-es/isEqual";
+import { action, computed, observable, runInAction, toJS } from "mobx";
 import type { InputHTMLAttributes } from "react";
 
 import type { ErrorResult, Validator } from "./type";
@@ -11,6 +12,7 @@ interface FieldProps {
     type?: "string" | "number";
     required?: boolean;
 }
+
 interface NumberFieldProps {
     min?: number;
     max?: number;
@@ -43,7 +45,7 @@ export type CProps<V, E = ExtraProps> = {
     onChange?: OnChange<V>;
     status?: "error";
     extraProps?: E;
-} & Omit<InputHTMLAttributes<V>, "value" | "onChange">;
+} & Pick<InputHTMLAttributes<V>, "min" | "max" | "minLength" | "maxLength">;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class MappedValue<V = any, O = any, P extends string = string> {
@@ -52,9 +54,11 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     private readonly owner: O;
     @observable private accessor _value: V;
     readonly prop: MappedProperty<V, O, P>;
+    private initialValue: V;
 
     constructor(value: V, owner: O, prop: MappedProperty<V, O, P>) {
         this._value = value;
+        this.initialValue = toJS(value);
         this.owner = owner;
         this.prop = prop;
     }
@@ -70,8 +74,19 @@ export class MappedValue<V = any, O = any, P extends string = string> {
         this.prop.onChange?.(this.owner);
     }
 
+    /**
+     * A regular updates method where the initial state should remain unchanged.
+     */
     @action setter = (value: V): void => {
         this.value = value;
+    };
+
+    /**
+     * Initializes the property value and sets the initial value for dirty calculation.
+     */
+    @action load = (value: V): void => {
+        this.initialValue = value;
+        this.setter(value);
     };
 
     @computed get error(): ErrorResult {
@@ -84,6 +99,10 @@ export class MappedValue<V = any, O = any, P extends string = string> {
             if (!ok) return err;
         }
         return false;
+    }
+
+    @computed get dirty(): boolean {
+        return !isEqual(toJS(this._value), this.initialValue);
     }
 
     jsonPart(): { [K in P]: V } {
@@ -99,10 +118,10 @@ export class MappedValue<V = any, O = any, P extends string = string> {
             onChange: this.setter,
             status: this.error ? "error" : undefined,
             // HTML validation props
-            max,
-            min,
-            maxLength,
-            minLength,
+            ...(min !== undefined ? { min } : {}),
+            ...(max !== undefined ? { max } : {}),
+            ...(minLength !== undefined ? { minLength } : {}),
+            ...(maxLength !== undefined ? { maxLength } : {}),
         };
         if (this.prop.extraProps) {
             cprops.extraProps = this.prop.extraProps;
@@ -180,6 +199,8 @@ export type MapperResult<O, D> = {
 } & {
     $load: (target: O, source: Partial<D>) => void;
     $error: (obj: O) => ErrorResult;
+    $dump: (obj: O) => Partial<D>;
+    $dirty: (obj: O) => boolean;
 };
 
 export function mapper<O, D>(
@@ -204,9 +225,26 @@ export function mapper<O, D>(
     const $load = (obj: object, source: Partial<D>) => {
         for (const [mv, pn] of iterMV(obj)) {
             if (pn in source) {
-                mv.setter(source[pn]);
+                mv.load(source[pn]);
             }
         }
+    };
+
+    const $dump = (obj: object): Partial<D> => {
+        const result: Partial<D> = {};
+        for (const [mv, pn] of iterMV(obj)) {
+            result[pn] = toJS(mv.value);
+        }
+        return result;
+    };
+
+    const $dirty = (obj: object): boolean => {
+        for (const [mv] of iterMV(obj)) {
+            if (mv.dirty) {
+                return true;
+            }
+        }
+        return false;
     };
 
     const $error = (obj: object): ErrorResult => {
@@ -219,7 +257,7 @@ export function mapper<O, D>(
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new Proxy({ $load, $error } as any, {
+    return new Proxy({ $load, $error, $dump, $dirty } as any, {
         get: (target, prop) => {
             if (typeof prop === "string" && !prop.startsWith("$")) {
                 props.push(prop as keyof D);

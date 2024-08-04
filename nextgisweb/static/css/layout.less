@@ -126,14 +126,25 @@ a[class*=" icon-"]:hover:before {
                     }
                 }
 
-                >h1.ngw-pyramid-layout-title {
-                    min-height: 32px;
-                    overflow-wrap: anywhere;
-                    overflow: hidden;
-                    -webkit-line-clamp: 2;
-                    display: -webkit-box;
-                    -webkit-box-orient: vertical;
-                    font-size: 18px;
+                h1.ngw-pyramid-layout-title {
+                    align-items: center;
+                    display: flex;
+                    gap: 8px;
+                    margin: 0 0 12px;
+                    min-height: 40px;
+                    justify-content: space-between;
+
+                    .title-class {
+                        overflow-wrap: anywhere;
+                        overflow: hidden;
+                        -webkit-line-clamp: 2;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;  
+                    }
+
+                    &.pull-right > *:first-child {
+                        margin-right: auto;
+                    }
                 }
             }
         }
@@ -387,7 +398,6 @@ dl.ngw-pyramid-kv {
 }
 
 @import (css) "@{node_modules}/dijit/themes/claro/claro.css";
-@import (css) "@{node_modules}/dgrid/css/skins/claro.css";
 @import "override-claro.less";
 
 @import "include.less";

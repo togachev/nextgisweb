@@ -30,7 +30,7 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
                 pullRight && "pull-right"
             )}
         >
-            {ititle}
+            <div className="title-class">{ititle}</div>
             {children}
         </h1>
     );

@@ -27,13 +27,14 @@ export function CreateResourceButton({
 
     const hideModal = useCallback(() => {
         setModalOpen(false);
+        setModalWasOpen(false);
     }, []);
 
     return (
         <>
             <Button
                 type="primary"
-                size="large"
+                size="middle"
                 icon={<AddIcon />}
                 onClick={showModal}
             >

@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Union
-from warnings import warn
 
 import sqlalchemy as sa
 from msgspec import Struct, convert, to_builtins
@@ -75,10 +74,6 @@ class OnUserLogin(Struct):
     request: Request
     next_url: str
 
-    def set_next_url(self, url):
-        warn("Use event.next_url = ... instead of event.set_next_url()", DeprecationWarning, 2)
-        self._next_url = url
-
 
 @implementer(ISecurityPolicy)
 class SecurityPolicy:
@@ -135,12 +130,13 @@ class SecurityPolicy:
         return ()
 
     def forget(self, request, **kw):
-        def forget_session(request, response):
+        def forget_callback(request, response):
             cookie_name = request.env.pyramid.options["session.cookie.name"]
             cs = WebSession.cookie_settings(request)
             response.delete_cookie(cookie_name, path=cs["path"], domain=cs["domain"])
+            response.delete_cookie("ngw_ulg", path=cs["path"], domain=cs["domain"])
 
-        request.add_response_callback(forget_session)
+        request.add_response_callback(forget_callback)
         return ()
 
     def permits(self, request, context, permission):
