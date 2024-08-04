@@ -1,0 +1,274 @@
+#: api.py:83
+msgid "Table (%s) not found in schema (%s)."
+msgstr "Таблица (%s) не найдена в схеме (%s)."
+
+#: api.py:148
+msgid "Tablenogeom layer {} not found!"
+msgstr "Слой Tablenogeom {} не найден!"
+
+#: api.py:172
+msgid "Tablenogeom connection {} not found!"
+msgstr "Соединение Tablenogeom {} не найдено!"
+
+#: diagnostics.py:99
+msgid "Got an unexpected error."
+msgstr "Возникла неожиданная ошибка."
+
+#: diagnostics.py:156
+msgid "PostgreSQL connection"
+msgstr "Подключение к PostgreSQL"
+
+#: diagnostics.py:162
+msgid "Host name resolution failed: {}."
+msgstr "Не удалось выполнить разрешение имени: {}."
+
+#: diagnostics.py:180
+msgid "Failed to connect to the database."
+msgstr "Не удалось подключиться к базе данных."
+
+#: diagnostics.py:184
+msgid "Connected to the database."
+msgstr "Подключение к базе данных выполнено."
+
+#: diagnostics.py:187
+msgid "Executed {} query."
+msgstr "Выполнен запрос {}."
+
+#: diagnostics.py:190
+msgid "PostgreSQL version {}."
+msgstr "Версия PostgreSQL {}."
+
+#: diagnostics.py:199
+msgid "Tablenogeom extension"
+msgstr "Расширение Tablenogeom"
+
+#: diagnostics.py:209
+msgid "Tablenogeom extension not found."
+msgstr "Расширение Tablenogeom не найдено."
+
+#: diagnostics.py:211
+msgid "Tablenogeom extension version {}."
+msgstr "Версия расширения Tablenogeom {}."
+
+#: diagnostics.py:217
+msgid "Number of spatial reference systems: {}."
+msgstr "Количество систем координат: {}."
+
+#: diagnostics.py:257
+msgid "Layer table"
+msgstr "Таблица слоя"
+
+#: diagnostics.py:263
+msgid "Table not found."
+msgstr "Таблица не найдена."
+
+#: diagnostics.py:265
+msgid "Table found, table type is {}."
+msgstr "Таблица найдена, тип таблицы {}."
+
+#: diagnostics.py:283
+msgid "{} privilege is present."
+msgstr "Привилегия {} присутствует."
+
+#: diagnostics.py:285 diagnostics.py:287
+msgid "{} privilege is absent."
+msgstr "Привилегия {} отсутствует."
+
+#: diagnostics.py:290
+msgid "Number of records: {}."
+msgstr "Количество записей: {}."
+
+#: diagnostics.py:293
+msgid "ID column isn't set."
+msgstr "Не установлена колонка ID."
+
+#: diagnostics.py:300 nodepkg/layer-widget/LayerWidget.tsx:31
+msgid "ID column"
+msgstr "Поле ID"
+
+#: diagnostics.py:305 diagnostics.py:378
+msgid "Column not found."
+msgstr "Колонка не найдена."
+
+#: diagnostics.py:310
+msgid "Column found, but has non-integer type - {}."
+msgstr "Колонка найдена, но имеет не целочисленный тип - {}."
+
+#: diagnostics.py:312 diagnostics.py:390
+msgid "Column found, type is {}."
+msgstr "Колонка найдена, тип {}."
+
+#: diagnostics.py:317
+msgid "Column is the primary key."
+msgstr "Колонка является первичным ключем."
+
+#: diagnostics.py:320
+msgid "Column is not the primary key."
+msgstr "Колонка не является первичным ключем."
+
+#: diagnostics.py:329
+msgid "Column can be NULL."
+msgstr "Колонка может быть NULL."
+
+#: diagnostics.py:334
+msgid "NULL values in the column."
+msgstr "В колонке найдены значения NULL."
+
+#: diagnostics.py:336
+msgid "No NULL values in the column."
+msgstr "Значений NULL в колонке не найдено."
+
+#: diagnostics.py:338
+msgid "Column cannot be NULL."
+msgstr "Колонка не может быть NULL."
+
+#: diagnostics.py:342
+msgid "Unique index not found."
+msgstr "Уникальный индекс не найден."
+
+#: diagnostics.py:344
+msgid "Unique index found."
+msgstr "Уникальный индекс найден."
+
+#: diagnostics.py:360
+msgid "Non-unique values in the column."
+msgstr "В колонке есть не уникальные значения."
+
+#: diagnostics.py:362
+msgid "All values are unique."
+msgstr "Все значения уникальны."
+
+#: diagnostics.py:367
+msgid "Column is auto-incrementable."
+msgstr "Колонка авто-инкрементируемая."
+
+#: diagnostics.py:369
+msgid "Column isn't auto-incrementable."
+msgstr "Колонка не авто-инкрементируемая."
+
+#: diagnostics.py:388
+msgid "Column found, but has an incompatible type - {}."
+msgstr "Колонка найдена, но имеет несовместимый тип - {}."
+
+#: diagnostics.py:416
+msgid "Field columns"
+msgstr "Колонки полей"
+
+#: diagnostics.py:422
+msgid "Column of field '{}' not found."
+msgstr "Колонка поля '{}' не найдена."
+
+#: diagnostics.py:431
+msgid "Column of field '{}' found, but has an incompatible type - {}."
+msgstr "Колонка поля '{}' найдена, но имеет несовместимый тип - {}."
+
+#: diagnostics.py:437
+msgid "Column of field '{}' found, type is {}."
+msgstr "Колонка поля '{}' найдена, тип {}."
+
+#: exception.py:9
+msgid "External database error"
+msgstr "Ошибка внешней базы данных"
+
+#: model.py:121 nodepkg/connection-widget/ConnectionWidget.tsx:58
+msgid "Tablenogeom connection"
+msgstr "Соединение Tablenogeom"
+
+#: model.py:202
+msgid "Cannot connect to the database!"
+msgstr "Невозможно подключиться к базе данных!"
+
+#: model.py:236 nodepkg/layer-widget/LayerWidget.tsx:247
+msgid "Tablenogeom layer"
+msgstr "Слой Tablenogeom"
+
+#: model.py:290
+msgid "Table '%(table)s' not found!"
+msgstr "Таблица '%(table)s' не найдена!"
+
+
+#: model.py:358
+msgid "To use column as ID it should have integer type!"
+msgstr ""
+"Для использования поля в качестве идентификатора оно должно иметь "
+"целочисленный тип!"
+
+#: model.py:401 model.py:406
+msgid "Column '%(column)s' not found!"
+msgstr "Поле '%(column)s' не найдено!"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:21
+msgid "Host"
+msgstr "Сервер"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:26
+msgid "Port"
+msgstr "Порт"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:37
+msgid "User"
+msgstr "Пользователь"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:43
+msgid "Password"
+msgstr "Пароль"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:50
+msgid "Database"
+msgstr "База данных"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:12
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:13
+msgid "Success"
+msgstr "Успех"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:14
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:15
+msgid "Error"
+msgstr "Ошибка"
+
+#: nodepkg/layer-widget/LayerStore.ts:13
+msgid "Fields need to be updated due to autodetection"
+msgstr "Поля необходимо обновить из-за автоопределения"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:28
+msgid "Connection"
+msgstr "Соединение"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:29
+msgid "Schema"
+msgstr "Схема"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:30
+msgid "Table"
+msgstr "Таблица"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:33
+msgid "Autodetect"
+msgstr "Автоматически"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:36
+msgid "Fields"
+msgstr "Поля"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:107
+msgid "Keep existing definitions untouched"
+msgstr "Оставить существующие определения без изменений"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:108
+msgid "Update definitions from the database"
+msgstr "Обновить определения из базы данных"
+
+#: view.py:39
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+#: view.py:59
+msgid "Tablenogeom diagnostics"
+msgstr "Диагностика Tablenogeom"

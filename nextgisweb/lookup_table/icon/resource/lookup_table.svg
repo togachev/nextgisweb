@@ -1,14 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" id="lookup_table" viewBox="0 0 24 24">
-        <polygon fill="#81B0DC" points="2,0 4,2 6,0 8,2 10,0 12,2 14,0 16,2 18,0 20,2 22,0 22,24 20,22 18,24 16,22 14,24 12,22 10,24 8,22
-		6,24 4,22 2,24 	"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="13" y1="5.5" x2="19" y2="5.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="5" y1="5.5" x2="11" y2="5.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="13" y1="8.5" x2="19" y2="8.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="5" y1="8.5" x2="11" y2="8.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="13" y1="17.5" x2="17" y2="17.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="5" y1="17.5" x2="11" y2="17.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="13" y1="11.5" x2="19" y2="11.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="5" y1="11.5" x2="11" y2="11.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="13" y1="14.5" x2="19" y2="14.5"/>
-        <line stroke="#E6F4FC" stroke-miterlimit="10" x1="5" y1="14.5" x2="11" y2="14.5"/>
-    </svg>
+<svg version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="m2 0v24l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2v-24l-2 2-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2-2-2zm3 5h6v1h-6v-1zm8 0h6v1h-6v-1zm-8 3h6v1h-6v-1zm8 0h6v1h-6v-1zm-8 3h6v1h-6v-1zm8 0h6v1h-6v-1zm-8 3h6v1h-6v-1zm8 0h6v1h-6v-1zm-8 3h6v1h-6v-1zm8 0h4v1h-4v-1z" fill="#106a90"/>
+<path d="m13 5.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m5 5.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m13 8.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m5 8.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m13 17.5h4" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m5 17.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m13 11.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m5 11.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m13 14.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+<path d="m5 14.5h6" color="#000000" stroke-miterlimit="10" style="-inkscape-stroke:none"/>
+</svg>

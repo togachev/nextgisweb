@@ -28,6 +28,7 @@ export function LayersPanel({ title, close, display, ...props }) {
             </PanelHeader>
             <LayersTree
                 {...{
+                    display: display,
                     store: display.webmapStore,
                     onSelect: display.handleSelect.bind(display),
                     setLayerZIndex: display.setLayerZIndex.bind(display),

@@ -20,7 +20,7 @@ import {
     notifySuccessfulMove,
 } from "../util/notify";
 
-import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
+import DotsVertical from "@nextgisweb/icon/mdi/dots-vertical";
 import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
 
 interface MenuDropdownProps {
@@ -307,7 +307,7 @@ export function MenuDropdown({
     return (
         <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <a>
-                <MoreVertIcon />
+                <DotsVertical />
             </a>
         </Dropdown>
     );

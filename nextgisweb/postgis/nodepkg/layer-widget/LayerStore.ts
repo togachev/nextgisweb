@@ -14,9 +14,15 @@ const msgUpdate = gettext("Fields need to be updated due to autodetection");
 
 interface Value {
     connection: ResourceRef | null;
+    connection_relation: ResourceRef | null;
     schema: string;
     table: string;
     column_id: string;
+    
+    resource_field_name: string | null;
+    external_field_name: string | null;
+    external_resource_id: ResourceRef | null;
+
     column_geom: string;
     geometry_type: string | null;
     geometry_srid: number | null;
@@ -25,9 +31,14 @@ interface Value {
 
 const {
     connection,
+    connection_relation,
     schema,
     table,
     column_id: columnId,
+
+    resource_field_name: resourceFieldName,
+    external_field_name: externalFieldName,
+
     column_geom: columnGeom,
     geometry_type: geometryType,
     geometry_srid: geometrySrid,
@@ -58,9 +69,14 @@ export class LayerStore implements EditorStore<Value> {
     validate = false;
 
     connection = connection.init(null, this);
+    connection_relation = connection_relation.init(null, this);
     schema = schema.init("", this);
     table = table.init("", this);
     columnId = columnId.init("", this);
+
+    resourceFieldName = resourceFieldName.init("", this);
+    externalFieldName = externalFieldName.init("", this);
+
     columnGeom = columnGeom.init("", this);
     geometryType = geometryType.init(null, this);
     geometrySrid = geometrySrid.init(null, this);
@@ -87,9 +103,14 @@ export class LayerStore implements EditorStore<Value> {
         if (!this.dirty) return undefined;
         return {
             ...this.connection.jsonPart(),
+            ...this.connection_relation.jsonPart(),
             ...this.schema.jsonPart(),
             ...this.table.jsonPart(),
             ...this.columnId.jsonPart(),
+
+            ...this.resourceFieldName.jsonPart(),
+            ...this.externalFieldName.jsonPart(),
+
             ...this.columnGeom.jsonPart(),
             ...this.geometryType.jsonPart(),
             ...this.geometrySrid.jsonPart(),

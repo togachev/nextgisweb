@@ -5,7 +5,7 @@ import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import type { WebmapPlugin } from "../type";
 import type { TreeItem } from "../type/TreeItems";
 
-import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
+import DotsVertical from "@nextgisweb/icon/material/more_vert";
 import "./DropdownActions.less";
 
 interface DropdownActionsProps {
@@ -37,7 +37,7 @@ export function DropdownActions({
                     setMoreClickId(id);
                 }}
             >
-                <MoreVertIcon />
+                <DotsVertical />
             </span>
         );
     }
@@ -113,7 +113,7 @@ export function DropdownActions({
             )}
         >
             <span className="more">
-                <MoreVertIcon />
+                <DotsVertical />
             </span>
         </Dropdown>
     );

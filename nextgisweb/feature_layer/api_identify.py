@@ -54,6 +54,12 @@ def identify(request) -> JSONType:
                 for feature in features:
                     feature["parent"] = layer.parent.display_name
 
+            if layer.check_relation(layer):
+                for feature in features:
+                    rval = dict()
+                    rval.update({ layer.external_field_name: feature["fields"][layer.resource_field_name] })
+                    feature["relation"] = dict(relaition_column=rval, external_resource_id=layer.external_resource_id)
+
             result[layer_id_str] = dict(features=features, featureCount=len(features))
 
             feature_count += len(features)

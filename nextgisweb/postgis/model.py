@@ -242,6 +242,11 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     schema = db.Column(db.Unicode, default="public", nullable=False)
     table = db.Column(db.Unicode, nullable=False)
     column_id = db.Column(db.Unicode, nullable=False)
+
+    resource_field_name = db.Column(db.Unicode, nullable=True)
+    external_field_name = db.Column(db.Unicode, nullable=True)
+    external_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
+
     column_geom = db.Column(db.Unicode, nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
     geometry_srid = db.Column(db.Integer, nullable=False)
@@ -251,6 +256,12 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     connection = db.relationship(
         Resource,
         foreign_keys=connection_id,
+        cascade="save-update, merge",
+    )
+
+    connection_relation = db.relationship(
+        Resource,
+        foreign_keys=external_resource_id,
         cascade="save-update, merge",
     )
 
@@ -266,6 +277,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 schema=self.schema,
                 table=self.table,
                 column_id=self.column_id,
+                resource_field_name=self.resource_field_name,
+                external_field_name=self.external_field_name,
+                external_resource_id=self.external_resource_id,
                 column_geom=self.column_geom,
                 geometry_type=self.geometry_type,
             )
@@ -557,9 +571,14 @@ class PostgisLayerSerializer(Serializer, apitype=True):
     resclass = PostgisLayer
 
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
+    connection_relation = SResource(read=ResourceScope.read, write=ResourceScope.update)
     schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     table = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     column_id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+
+    resource_field_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    external_field_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    external_resource_id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     column_geom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
     geometry_srid = GeometrySridAttr(read=ResourceScope.read, write=ResourceScope.update)

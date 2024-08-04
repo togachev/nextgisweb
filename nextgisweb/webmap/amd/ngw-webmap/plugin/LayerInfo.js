@@ -24,7 +24,7 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "material-article",
+                icon: "mdi-text-long",
                 title: gettext("Description"),
                 onClick: function () {
                     return widget.run();
@@ -60,7 +60,7 @@ define([
                                 title: item.label,
                                 name: pkey,
                                 order: 100,
-                                menuIcon: "material-article",
+                                menuIcon: "mdi-text-long",
                             },
                         },
                     ]);

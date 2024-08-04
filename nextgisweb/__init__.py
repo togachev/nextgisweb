@@ -37,6 +37,7 @@ def pkginfo():
         "vector_layer",
         "lookup_table",
         "postgis",
+        "tablenogeom",
         "raster_layer",
         "raster_mosaic",
         "raster_style",

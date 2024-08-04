@@ -319,6 +319,10 @@ class Resource(Base, metaclass=ResourceMeta):
             if not q.scalar():
                 return c
 
+    @classmethod
+    def check_relation(self, res):
+        if hasattr(res, "external_resource_id") and res.resource_field_name is not None and res.external_field_name is not None and res.external_resource_id is not None:
+            return True
 
 @event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):

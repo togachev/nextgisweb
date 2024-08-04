@@ -408,16 +408,17 @@ def setup_pyramid(comp, config):
                 # add operation along 'Resource.children' will not proceed
                 child.parent = None
 
-                yield Link(
-                    "create/%s" % ident,
-                    cls.cls_display_name,
-                    lambda args, ident=ident: args.request.route_url(
-                        "resource.create",
-                        id=args.obj.id,
-                        _query=dict(cls=ident),
-                    ),
-                    icon=f"rescls-{cls.identity}",
-                )
+                if args.obj.cls != "tablenogeom_layer":
+                    yield Link(
+                        "create/%s" % ident,
+                        cls.cls_display_name,
+                        lambda args, ident=ident: args.request.route_url(
+                            "resource.create",
+                            id=args.obj.id,
+                            _query=dict(cls=ident),
+                        ),
+                        icon=f"rescls-{cls.identity}",
+                    )
 
         if ResourceScope.update in permissions:
             yield Link(

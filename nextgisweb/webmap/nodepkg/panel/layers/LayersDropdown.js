@@ -1,7 +1,7 @@
 import { Button, Dropdown } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
+import DotsVertical from "@nextgisweb/icon/mdi/dots-vertical";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
 export function LayersDropdown({ onClick }) {
@@ -28,7 +28,7 @@ export function LayersDropdown({ onClick }) {
             destroyPopupOnHide
             placement="bottomRight"
         >
-            <Button type="text" shape="circle" icon={<MoreVertIcon />} />
+            <Button type="text" shape="circle" icon={<DotsVertical />} />
         </Dropdown>
     );
 }

@@ -166,7 +166,7 @@ export const FeatureGridActions = observer(
         }
 
         const rightActions: ActionToolbarAction<ActionProps>[] = [];
-        if (isExportAllowed) {
+        if (isExportAllowed && store.cls !== "tablenogeom_layer") {
             rightActions.push((props) => (
                 <ExportAction queryParams={queryParams} {...props} />
             ));

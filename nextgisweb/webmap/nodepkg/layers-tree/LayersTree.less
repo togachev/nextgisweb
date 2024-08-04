@@ -3,7 +3,7 @@
         padding: 0;
 
         &.ant-tree-treenode-selected {
-            background-color: #e6f0f8;
+            background-color: #e6f0f800;
         }
     }
 
@@ -21,25 +21,18 @@
         }
     }
 
-    .ant-tree-switcher-line-icon {
-        vertical-align: -0.3em;
-    }
-
     .ant-tree-checkbox {
-        align-self: start;
-        scale: 0.75;
-        margin-top: 6px;
-        margin-right: 6px;
+        top: initial;
+        margin-inline-end: 0px;
+        align-self: flex-start;
+        margin-top: 4px;
     }
 
     .ant-tree-node-content-wrapper {
         display: flex;
-        column-gap: 6px;
-        align-items: start;
-        padding-left: 0;
         width: 100%;
         min-width: 0;
-        line-height: 28px;
+        align-items: center;
 
         &:hover {
             background: transparent;
@@ -49,23 +42,9 @@
             margin: 0;
         }
 
-        &.ant-tree-node-selected {
-            background-color: transparent;
-        }
-
-        .ant-tree-iconEle.ant-tree-icon__customize {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: auto;
-            height: 28px;
-
-            &:empty {
-                display: none;
-            }
-
+        .ant-tree-icon__customize {
             img {
-                display: block;
+                vertical-align: text-top;
             }
         }
 
@@ -78,6 +57,13 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                display: flex;
+
+                .legend-title {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
 
             .tree-item-action {
@@ -86,20 +72,143 @@
                 justify-content: end;
             }
 
-            .more,
-            .legend {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                justify-items: center;
-                border-radius: 50%;
-                width: 24px;
-                height: 24px;
-
-                &:hover {
-                    background: #076dbf21;
-                }
+            &:hover {
+                background: #ffffff00;
+                border-radius: 3px;
+                color: #000000;
             }
+
         }
     }
+}
+
+.tree-item-menu {
+    .ant-dropdown-menu-title-content {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 5px;
+        align-items: center;
+    }
+}
+
+:where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-node-content-wrapper:hover, :where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-checkbox+span:hover {
+    background-color: #ffffff00;
+}
+
+.ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle {
+    font-size: 24px;
+    color: #106a90;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    margin: 0 6px;
+}
+
+
+.icon-not-active {
+    background-color: #00000000 !important;
+    cursor: auto;
+}
+
+.titleName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
+    padding: 0 0 0 5px;
+    font-size: small;
+    width: 100%;
+
+    &:hover {
+        background: rgba(247, 247, 247, 1);
+        // padding: 2px;
+        border-radius: 3px;
+    }
+}
+
+.ant-tree .ant-tree-treenode {
+    align-items: center;
+    display: flex;
+    outline: none;
+    padding: 0;
+    margin: 3px 0;
+}
+
+.iconCustom {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.legend-list {
+    margin: 0 5px 0 5px;
+}
+
+.more,
+.legend {
+    font-size: 18px;
+    color: #106a90;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+
+
+}
+
+.colSingleIconLegend {
+    margin: 0;
+
+    &:hover {
+        color: #106a90;
+        border: #106a90 solid 1px;
+        border-radius: 3px;
+        margin: -1px;
+    }
+}
+
+.ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle,
+.ant-tree .ant-tree-checkbox+span .ant-tree-iconEle {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    vertical-align: top;
+    align-items: center;
+}
+
+.iconSingle {
+    display: flex;
+}
+
+.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected,
+.ant-tree .ant-tree-checkbox+span.ant-tree-node-selected {
+    background-color: #ffffff00;
+}
+
+.ant-tree .ant-tree-switcher-leaf-line:before {
+    position: absolute;
+    top: -10px;
+    inset-inline-end: 12px;
+    bottom: -11px;
+    margin-inline-start: -1px;
+    border-inline-end: 1px solid #d9d9d9;
+    content: "";
+}
+
+.ant-tree-show-line .ant-tree-indent-unit:before {
+    position: absolute;
+    top: -10px;
+    inset-inline-end: 12px;
+    bottom: -10px;
+    border-inline-end: 1px solid #d9d9d9;
+    content: "";
 }

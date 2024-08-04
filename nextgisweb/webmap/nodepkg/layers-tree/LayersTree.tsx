@@ -7,6 +7,8 @@ import type { TreeProps } from "@nextgisweb/gui/antd";
 import type WebmapStore from "../store";
 import type { TreeItem } from "../type/TreeItems";
 import type { WebmapPlugin } from "../type/WebmapPlugin";
+import type { DojoDisplay } from "../type";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
 import { Legend } from "./Legend";
@@ -14,7 +16,8 @@ import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
 import {
     keyInMutuallyExclusiveGroupDeep,
-    prepareWebMapItems,
+    // prepareWebMapItems,
+    prepareWebMapItemsCustom,
     updateKeysForGroup,
     updateKeysForMutualExclusivity,
 } from "./util/treeItems";
@@ -47,6 +50,7 @@ interface LayersTreeProps {
     draggable?: boolean;
     selectable?: boolean;
     showLine?: boolean;
+    display: DojoDisplay;
 }
 
 export const LayersTree = observer(
@@ -64,6 +68,7 @@ export const LayersTree = observer(
         draggable = true,
         selectable = true,
         showLine = true,
+        display,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
@@ -73,7 +78,8 @@ export const LayersTree = observer(
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
         const treeItems = useMemo(() => {
-            let _webmapItems = prepareWebMapItems(webmapItems);
+            // let _webmapItems = prepareWebMapItems(webmapItems);
+            let _webmapItems = prepareWebMapItemsCustom(webmapItems);
             if (onFilterItems) {
                 _webmapItems = onFilterItems(store, _webmapItems);
             }
@@ -144,13 +150,6 @@ export const LayersTree = observer(
 
             let actions;
             if (shouldActions) {
-                const legendAction = showLegend && (
-                    <LegendAction
-                        nodeData={nodeData.treeItem}
-                        onClick={() => setUpdate(!update)}
-                    />
-                );
-
                 const dropdownAction = showDropdown && (
                     <DropdownActions
                         nodeData={nodeData.treeItem}
@@ -166,23 +165,34 @@ export const LayersTree = observer(
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
-                        {legendAction}
                         {dropdownAction}
                     </Col>
                 );
             }
-
+            const legendAction = showLegend && (
+                <LegendAction
+                    nodeData={nodeData.treeItem}
+                    onClick={() => setUpdate(!update)}
+                />
+            );
             return (
                 <>
                     <Row wrap={false}>
                         <Col flex="auto" className="tree-item-title">
-                            {title}
+                            {legendAction}
+                            <div className="legend-title">{title}</div>
                         </Col>
                         {actions}
                     </Row>
                     {showLegend && (
                         <Legend
                             checkable={checkable}
+                            zoomToNgwExtent={(ngwExtent: NgwExtent) => {
+                                display.map.zoomToNgwExtent(
+                                    ngwExtent,
+                                    display.displayProjection
+                                );
+                            }}
                             nodeData={nodeData.treeItem}
                             store={store}
                         />

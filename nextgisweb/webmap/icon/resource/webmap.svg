@@ -1,5 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" id="webmap" viewBox="-467 269 24 24">
-       <g> <polygon style="fill:#D8E9F4;" points="-459,292.8 -467,290.3 -467,269.2 -459,271.7 	"/> <polygon style="fill:#AEC8E0;" points="-459,292.8 -451,290.3 -451,269.2 -459,271.7 	"/> <polygon style="fill:#D8E9F4;" points="-443,292.8 -451,290.3 -451,269.2 -443,271.7 	"/> <path style="fill:#55B9E5;" d="M-459,281.3l-8,1.2v4.8l8-1V281.3z"/> <polygon style="fill:#4497C6;" points="-451,269.2 -455.8,270.7 -451.8,278.6 -459,281.3 -459,286.3 -451,283.3 	"/> <polygon style="fill:#55B9E5;" points="-446.7,278.1 -451,269.2 -451,269.2 -451,283.3 -443,282.3 -443,277.7 	"/> <g> <path style="fill:#00B066;" d="M-462,269.2c-1.9,0-3.5,1.5-3.5,3.5c0,3.1,2.8,4,3.4,8.4c0,0.3,0.3,0.3,0.3,0
-			c0.6-4.4,3.4-5.4,3.4-8.4C-458.6,270.8-460.2,269.2-462,269.2z"/> <path style="fill:#FFFFFF;" d="M-460.6,272.8c0,0.9-0.7,1.5-1.5,1.5s-1.4-0.7-1.4-1.5c0-0.9,0.7-1.4,1.4-1.4
-			C-461.3,271.3-460.6,272-460.6,272.8z"/> </g> </g>
-    </svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="webmap"
+   viewBox="-467 269 24 24"
+   version="1.1"
+   sodipodi:docname="webmap.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs25" />
+  <sodipodi:namedview
+     id="namedview23"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="17.604167"
+     inkscape:cx="11.332544"
+     inkscape:cy="14.144379"
+     inkscape:window-width="1920"
+     inkscape:window-height="1022"
+     inkscape:window-x="1920"
+     inkscape:window-y="13"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g20" />
+  <g
+     id="g20">
+    <polygon
+       style="fill:#D8E9F4;"
+       points="-459,292.8 -467,290.3 -467,269.2 -459,271.7  "
+       id="polygon2" />
+    <polygon
+       style="fill:#AEC8E0;"
+       points="-459,292.8 -451,290.3 -451,269.2 -459,271.7  "
+       id="polygon4" />
+    <polygon
+       style="fill:#D8E9F4;"
+       points="-443,292.8 -451,290.3 -451,269.2 -443,271.7  "
+       id="polygon6" />
+    <path
+       style="fill:#1691c5;fill-opacity:1"
+       d="M-459,281.3l-8,1.2v4.8l8-1V281.3z"
+       id="path8" />
+    <polygon
+       style="fill:#106a90;fill-opacity:1"
+       points="-451,269.2 -455.8,270.7 -451.8,278.6 -459,281.3 -459,286.3 -451,283.3  "
+       id="polygon10" />
+    <polygon
+       style="fill:#1691c5;fill-opacity:1"
+       points="-446.7,278.1 -451,269.2 -451,269.2 -451,283.3 -443,282.3 -443,277.7  "
+       id="polygon12" />
+    <g
+       id="g18">
+      <path
+         style="fill:#00B066;"
+         d="M-462,269.2c-1.9,0-3.5,1.5-3.5,3.5c0,3.1,2.8,4,3.4,8.4c0,0.3,0.3,0.3,0.3,0    c0.6-4.4,3.4-5.4,3.4-8.4C-458.6,270.8-460.2,269.2-462,269.2z"
+         id="path14" />
+      <path
+         style="fill:#FFFFFF;"
+         d="M-460.6,272.8c0,0.9-0.7,1.5-1.5,1.5s-1.4-0.7-1.4-1.5c0-0.9,0.7-1.4,1.4-1.4    C-461.3,271.3-460.6,272-460.6,272.8z"
+         id="path16" />
+    </g>
+  </g>
+</svg>

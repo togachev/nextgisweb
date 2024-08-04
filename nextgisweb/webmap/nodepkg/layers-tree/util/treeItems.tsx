@@ -6,6 +6,9 @@ import { getChildrenDeep, getParent } from "@nextgisweb/gui/util/tree";
 import type { GroupItem, LayerItem, TreeItem } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
+import FolderClosedIcon from "../icons/folder.svg";
+import FolderOpenIcon from "../icons/folder_open.svg";
+
 type Node = EventDataNode<TreeWebmapItem>;
 
 const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
@@ -48,8 +51,59 @@ const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
     return item;
 };
 
+const handleWebMapItemCustom = (webMapItem: TreeItem): TreeWebmapItem => {
+    const { key, title } = webMapItem;
+    const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
+
+    if (item.treeItem.type === "root" || item.treeItem.type === "group") {
+        item.icon = ({ expanded }) =>
+            expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
+
+    } else if (item.treeItem.type === "layer") {
+        item.isLeaf = true;
+        
+        if ("legendInfo" in item.treeItem) {
+            const { legendInfo } = item.treeItem;
+            if (legendInfo && legendInfo.visible && legendInfo.single) {
+                item.legendIcon = (
+                    <img
+                        width={20}
+                        height={20}
+                        src={
+                            "data:image/png;base64," +
+                            legendInfo.symbols[0].icon.data
+                        }
+                    />
+                );
+            }
+        }
+
+        item.icon = (item_) => {
+            const item = item_ as TreeWebmapItem;
+            if ((item.treeItem as LayerItem).editable === true) {
+                return <EditIcon />;
+            } else {
+                if (item.legendIcon) {
+                    return item.legendIcon;
+                }
+            }
+        };
+    }
+    if ("children" in webMapItem) {
+        item.children = webMapItem.children.map(handleWebMapItemCustom);
+    }
+    // if ("children" in webMapItem) {
+    //     item.children = webMapItem.children.map(handleWebMapItem);
+    // }
+    return item;
+};
+
 export const prepareWebMapItems = (webMapItems: TreeItem[]) => {
     return webMapItems.map(handleWebMapItem);
+};
+
+export const prepareWebMapItemsCustom = (webMapItems: TreeItem[]) => {
+    return webMapItems.map(handleWebMapItemCustom);
 };
 
 export function isExclusiveGroup(

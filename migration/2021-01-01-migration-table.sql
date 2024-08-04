@@ -21,6 +21,7 @@ INSERT INTO core_migration VALUES
     ('webmap', '00000000'),
     ('raster_layer', '00000000'),
     ('postgis', '00000000'),
+    ('tablenogeom', '00000000'),
     ('render', '00000000'),
     ('resmeta', '00000000'),
     ('resource', '00000000'),

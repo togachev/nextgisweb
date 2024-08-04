@@ -38,9 +38,10 @@ def setup_pyramid(comp, config):
             return
 
         if args.obj.has_export_permission(args.request.user):
-            yield dm.Link(
-                "feature_layer/feature_attachment",
-                gettext("Manage attachments"),
-                lambda args: args.request.route_url("feature_attachment.page", id=args.obj.id),
-                icon="material-attach_file",
-            )
+            if args.obj.cls != 'tablenogeom_layer':
+                yield dm.Link(
+                    "feature_layer/feature_attachment",
+                    gettext("Manage attachments"),
+                    lambda args: args.request.route_url("feature_attachment.page", id=args.obj.id),
+                    icon="material-attach_file",
+                )

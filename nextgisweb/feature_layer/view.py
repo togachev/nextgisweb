@@ -38,7 +38,7 @@ def feature_browse(request):
         obj=request.context,
         title=gettext("Feature table"),
         entrypoint="@nextgisweb/feature-layer/feature-grid",
-        props=dict(id=request.context.id, readonly=readonly, editOnNewPage=True),
+        props=dict(id=request.context.id, readonly=readonly, editOnNewPage=True, cls=request.context.cls),
         maxwidth=True,
         maxheight=True,
     )
@@ -125,7 +125,8 @@ class MVTLink(ExternalAccessLink):
 
     @classmethod
     def is_applicable(cls, obj, request) -> bool:
-        return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
+        if obj.cls != "tablenogeom_layer":
+            return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
 
     @classmethod
     def url_factory(cls, obj, request) -> str:
@@ -193,12 +194,13 @@ def setup_pyramid(comp, config):
             )
 
         if args.obj.has_export_permission(args.request.user):
-            yield Link(
-                "feature_layer/export",
-                gettext("Save as"),
-                lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
-                icon="material-download",
-            )
+            if args.obj.cls != "tablenogeom_layer":
+                yield Link(
+                    "feature_layer/export",
+                    gettext("Save as"),
+                    lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
+                    icon="material-download",
+                )
 
     @resource_sections(title=gettext("Attributes"))
     def resource_section_fields(obj):

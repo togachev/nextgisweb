@@ -57,10 +57,11 @@ def setup_pyramid(comp, config):
             or IRenderableStyle.providedBy(args.obj)
             or (isinstance(args.obj, RasterLayer) and args.obj.cog)
         ) and (args.obj.has_permission(DataScope.read, args.request.user)):
-            yield Link(
-                "extra/preview",
-                gettext("Preview"),
-                lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
-                important=True,
-                icon="material-preview",
-            )
+            if args.obj.cls != "tablenogeom_layer":
+                yield Link(
+                    "extra/preview",
+                    gettext("Preview"),
+                    lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
+                    important=True,
+                    icon="material-preview",
+                )

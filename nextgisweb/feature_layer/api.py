@@ -123,6 +123,7 @@ class DumperParams(Struct, kw_only=True):
     srs: ParamSrs = None
     version: Optional[Annotated[int, Meta(gt=0)]] = None
     epoch: Optional[Annotated[int, Meta(gt=0)]] = None
+    relation: bool = False
 
 
 @dataclass
@@ -179,12 +180,13 @@ class Dumper:
         feature_query_pit(self.resource, query, self.params.version, self.params.epoch)
         query.fields(*(self.field_dumpers.keys() if self.field_dumpers is not None else ()))
 
-        if self.params.geom:
-            query.geom()
-            if self.params.geom_format == "wkt":
-                query.geom_format("WKT")
-            if self.params.srs:
-                query.srs(SRS.filter_by(id=self.params.srs).one())
+        if self.resource.cls != 'tablenogeom_layer':
+            if self.params.geom:
+                query.geom()
+                if self.params.geom_format == "wkt":
+                    query.geom_format("WKT")
+                if self.params.srs:
+                    query.srs(SRS.filter_by(id=self.params.srs).one())
 
         return query
 
@@ -197,9 +199,10 @@ class Dumper:
         if self.params.label:
             result["label"] = feature.label
 
-        if self.params.geom:
-            geom = feature.geom
-            result["geom"] = self.geom_dumper(geom) if geom is not None else None
+        if self.resource.cls != 'tablenogeom_layer':
+            if self.params.geom:
+                geom = feature.geom
+                result["geom"] = self.geom_dumper(geom) if geom is not None else None
 
         if (fdumpers := self.field_dumpers) is not None:
             fsource = feature.fields
@@ -210,6 +213,14 @@ class Dumper:
 
         if (edumpers := self.extension_dumpers) is not None:
             result["extensions"] = {ident: ext(feature) for ident, ext in edumpers.items()}
+
+        if self.params.relation:
+            if self.resource.check_relation(self.resource):
+                result["relation_resource"] = dict(
+                    resource_field_name=self.resource.resource_field_name,
+                    external_field_name=self.resource.external_field_name,
+                    external_resource_id=self.resource.external_resource_id,
+                )
 
         return result
 
@@ -352,7 +363,6 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
         area = None
 
     return dict(type=geom_type, area=area, length=length, extent=extent)
-
 
 def apply_fields_filter(query, request):
     filter_ = []

@@ -22,6 +22,7 @@ export class FeatureGridStore {
     editOnNewPage = false;
     cleanSelectedOnFilter? = true;
     settingsOpen = false;
+    cls: string;
 
     visibleFields: number[] = [KEY_FIELD_ID];
     fields: FeatureLayerField[] = [];

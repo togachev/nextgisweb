@@ -2,6 +2,8 @@
 
 @import (css) "@{node_modules}/@fontsource/roboto/400.css";
 @import (css) "@{node_modules}/@fontsource/roboto/500.css";
+@import (css) "@{node_modules}/@fontsource/montserrat/400.css";
+@import (css) "@{node_modules}/@fontsource/montserrat/500.css";
 
 @import "blocks/_icons.less";
 @import "blocks/_links.less";
@@ -72,32 +74,30 @@ a[class*=" icon-"]:hover:before {
     min-width: 680px;
     min-height: 100%;
 
-    > .ngw-pyramid-layout-crow {
+    >.ngw-pyramid-layout-crow {
         display: flex;
         flex-grow: 1;
         margin: 0;
         padding: 0;
 
-        > .ngw-pyramid-layout-mwrapper {
+        >.ngw-pyramid-layout-mwrapper {
             display: flex;
             flex-grow: 1;
             justify-content: center;
             align-items: stretch;
-            min-width: 0;
 
-            > .ngw-pyramid-layout-main {
+            >.ngw-pyramid-layout-main {
                 display: flex;
                 flex-grow: 1;
                 flex-direction: column;
                 gap: 6px;
-                box-sizing: border-box;
-                padding: 24px 12px 12px 12px;
+                padding: 12px;
                 max-width: 1000px;
 
-                > .ngw-pyramid-layout-bcrumb {
+                >.ngw-pyramid-layout-bcrumb {
                     color: var(--text-secondary);
 
-                    > span {
+                    >span {
                         &::before {
                             vertical-align: 30%;
                             opacity: 0.5;
@@ -110,58 +110,47 @@ a[class*=" icon-"]:hover:before {
                             display: none;
                         }
 
-                        > a {
+                        >a {
                             color: inherit;
                             text-decoration: none;
+                            max-width: 350px;
 
                             &:hover {
                                 color: var(--link-hover-color);
                             }
 
-                            > svg.icon {
+                            >svg.icon {
                                 opacity: 0.75;
                             }
                         }
                     }
                 }
 
-                h1.ngw-pyramid-layout-title {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin: 0 0 12px 0;
-                    min-height: 40px;
-
-                    & > *:not(.ant-btn) {
-                        font-weight: initial;
-                        font-size: initial;
-                    }
-
-                    &.pull-right > *:first-child {
-                        margin-left: auto;
-                    }
+                >h1.ngw-pyramid-layout-title {
+                    min-height: 32px;
+                    overflow-wrap: anywhere;
+                    overflow: hidden;
+                    -webkit-line-clamp: 2;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    font-size: 18px;
                 }
             }
         }
     }
 
     &.ngw-pyramid-layout-hstretch {
-        > .ngw-pyramid-layout-crow
-            > .ngw-pyramid-layout-mwrapper
-            > .ngw-pyramid-layout-main {
-            max-width: 100%;
+        >.ngw-pyramid-layout-crow>.ngw-pyramid-layout-mwrapper>.ngw-pyramid-layout-main {
+            max-width: none;
         }
     }
 
     &.ngw-pyramid-layout-vstretch {
-        > .ngw-pyramid-layout-crow
-            > .ngw-pyramid-layout-mwrapper
-            > .ngw-pyramid-layout-main
-            > .content {
+        >.ngw-pyramid-layout-crow>.ngw-pyramid-layout-mwrapper>.ngw-pyramid-layout-main>.content {
             flex-grow: 1;
             min-height: 400px;
 
-            > * {
+            >* {
                 box-sizing: border-box;
             }
         }
@@ -171,15 +160,16 @@ a[class*=" icon-"]:hover:before {
 /* -- Header --*/
 
 .ngw-pyramid-layout-header {
-    display: flex;
-    position: relative;
     align-items: center;
-    gap: 10px;
+    border-bottom: 0 solid var(--divider-color);
     box-sizing: border-box;
-    border-bottom: 1px solid var(--divider-color);
-    padding: 5px 5px;
+    display: flex;
+    gap: 10px;
+    min-height: 40px;
     min-width: 0;
-    min-height: 50px;
+    padding: 0;
+    position: relative;
+    justify-content: space-between;
 
     &::before {
         position: absolute;
@@ -190,32 +180,49 @@ a[class*=" icon-"]:hover:before {
         content: "";
     }
 
-    > a {
-        display: flex;
-        flex-shrink: 1;
-        justify-content: center;
-        box-sizing: content-box;
-        min-width: 40px;
 
-        > img {
-            display: block;
+    >div.panel-text {
+        display: flex;
+        align-items: center;
+
+        >a {
+            display: flex;
+            flex-shrink: 1;
+            justify-content: center;
+            box-sizing: content-box;
+            min-width: 40px;
+
+            >img {
+                display: block;
+            }
+        }
+
+        >div.text {
+            color: var(--primary);
+            flex-grow: 1;
+            font-family: var(--ngw-head-font-family-list);
+            font-size: 16px;
+            font-weight: var(--ngw-head-font-weight);
+            padding: 0 5px 0 5px;
+            overflow: hidden;
+            white-space: initial;
+            text-overflow: ellipsis;
+            line-height: 20.7px;
+            text-align: left;
+            letter-spacing: normal;
+            -webkit-line-clamp: 1;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
         }
     }
 
-    > div.text {
-        flex-grow: 1;
-        color: var(--primary);
-        font-weight: var(--ngw-head-font-weight);
-        font-size: 16px;
-        font-family: var(--ngw-head-font-family-list);
-    }
 
-    > div.container {
-        display: flex;
+    >div.container {
         align-items: center;
-        gap: 6px;
-        min-width: 0;
-        min-height: 32px;
+        display: flex;
+        gap: 7px;
+        padding: 0 7px 0 0;
+        min-height: 24px;
     }
 }
 
@@ -239,24 +246,28 @@ a[class*=" icon-"]:hover:before {
     background: white;
     padding: 12px;
 
-    & > p:first-child,
-    & > p:last-child,
-    & > div > p:first-child,
-    & > div > p:last-child {
+    &>p:first-child,
+    &>p:last-child,
+    &>div>p:first-child,
+    &>div>p:last-child {
         margin-top: 0;
         margin-bottom: 0;
     }
+}
+
+.content-box img {
+    max-width: 100%;
 }
 
 /* Sidebar */
 
 .ngw-pyramid-layout-sidebar {
     position: relative;
-    flex-shrink: 0.5;
     box-sizing: border-box;
     border-left: 1px solid var(--divider-color);
     background: white;
-    padding: 24px 12px 24px 24px;
+    padding: 12px;
+    padding-left: 24px;
     width: 25%;
     min-width: 25ch;
 }
@@ -266,8 +277,8 @@ a[class*=" icon-"]:hover:before {
     padding: 0;
     list-style-type: none;
 
-    > li.label {
-        margin: 24px 0 6px 0;
+    >li.label {
+        margin: 6px 0 6px 0;
         border-bottom: 1px solid var(--divider-color);
         color: var(--text-secondary);
         font-weight: var(--ngw-text-font-weight);
@@ -279,7 +290,7 @@ a[class*=" icon-"]:hover:before {
         }
     }
 
-    > li.item {
+    >li.item {
         position: relative;
         padding-top: 3px;
         padding-bottom: 3px;
@@ -304,10 +315,10 @@ a[class*=" icon-"]:hover:before {
 
         &.selected {
             color: var(--primary);
-            font-weight: bold;
+            font-weight: 500;
         }
 
-        > a {
+        >a {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -318,10 +329,44 @@ a[class*=" icon-"]:hover:before {
                 color: var(--primary);
             }
 
-            > svg.icon {
+            >svg.icon {
                 width: 16px;
                 height: 16px;
             }
+        }
+    }
+}
+
+/*-- Key-value definition list --*/
+
+dl.ngw-pyramid-kv {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 4px;
+
+    >dt,
+    >dd {
+        margin: 0;
+        padding: 0;
+    }
+
+    >dt {
+        display: flex;
+        gap: 4px;
+        min-width: 15ch;
+        color: var(--text-secondary);
+
+        &:after {
+            display: inline-block;
+            flex-grow: 1;
+            background-image: radial-gradient(circle,
+                    currentcolor 0.75px,
+                    transparent 0.75px);
+            background-position: left 0 top 10px;
+            background-size: 6px 10px;
+            background-repeat: repeat-x;
+            min-width: 2em;
+            content: "";
         }
     }
 }
@@ -344,6 +389,92 @@ a[class*=" icon-"]:hover:before {
 @import (css) "@{node_modules}/dijit/themes/claro/claro.css";
 @import (css) "@{node_modules}/dgrid/css/skins/claro.css";
 @import "override-claro.less";
-@import "override-antd.less";
 
 @import "include.less";
+
+.maplist_link {
+    transition: background-color 0.5s;
+}
+
+.maplist_link:hover {
+    background-color: var(--secondary);
+}
+
+
+
+.footer {
+    align-items: center;
+    background-color: var(--primary);
+    bottom: 0;
+    color: #fff;
+    display: flex;
+    font-size: 14px;
+    // font-weight: 600;
+    height: 30px;
+    justify-content: center;
+    margin-top: 0;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 0;
+}
+
+.parentDescClass {
+    overflow: auto !important;
+}
+
+div.descClass img {
+    max-width: 100%;
+}
+
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTab {
+    top: 0;
+    border-top: 1px solid transparent;
+    margin-bottom: 0;
+    font-size: 13px;
+    height: 26px;
+    line-height: 24px;
+    font-variant: unset;
+}
+
+.claro .dijitTabListContainer-top .tabStripButton {
+    margin-top: 1px !important;
+    padding: 4px 3px;
+}
+
+.ant-image-preview-img {
+    background: #ffffff;
+    border-radius: 2px;
+}
+
+.ant-image-preview-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    pointer-events: none;
+}
+
+.ant-image-preview-close {
+    position: fixed;
+    top: 72px !important;
+    right: 32px;
+    display: flex;
+    color: #fff;
+    background-color: var(--primary) !important;
+    border-radius: 50%;
+    padding: 12px;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    transition: all 0s;
+}
+
+.ant-image-preview-operations {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    background-color: var(--primary) !important;
+    border-radius: 100px;
+}
