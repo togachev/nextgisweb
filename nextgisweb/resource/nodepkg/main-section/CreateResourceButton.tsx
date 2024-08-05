@@ -27,7 +27,6 @@ export function CreateResourceButton({
 
     const hideModal = useCallback(() => {
         setModalOpen(false);
-        setModalWasOpen(false);
     }, []);
 
     return (
