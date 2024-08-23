@@ -972,7 +972,7 @@ define([
                 },
             });
 
-            const makeBookmarkPanel = new Promise((resolve) => {
+            const makeBookmarkPanel = new Promise((resolve) => {                
                 if (!this.config.bookmarkLayerId) {
                     resolve(undefined);
                 }
@@ -1007,6 +1007,29 @@ define([
                 resolve(panel);
             });
             panels.push(makeInfoPanel);
+
+            const makeDiagramPanel = new Promise((resolve) => {
+                if (!this.config.relation) {
+                    resolve(undefined);
+                }
+                const panel = {
+                    cls: reactPanel("@nextgisweb/webmap/panel/diagram", {
+                        props: {
+                            topic: topic,
+                        },
+                    }),
+                    params: {
+                        title: gettext("Diagram"),
+                        name: "diagram",
+                        order: 80,
+                        menuIcon: "material-auto_graph",
+                        class: "diagram-panel dynamic-panel--fullwidth",
+                        withTitle: false,
+                    },
+                };
+                resolve(panel);
+            });
+            panels.push(makeDiagramPanel);
 
             const makeAnnotationsPanel = new Promise((resolve) => {
                 this._buildAnnotationPanel(resolve);

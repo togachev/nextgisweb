@@ -484,6 +484,9 @@ define([
                         },
                     }).then(function (response) {
                         tool._responsePopup(response, point, layerLabels);
+                        topic.publish("feature_layer.identify", {
+                            response,
+                        });
                     });
                 })
             );

@@ -159,6 +159,7 @@ def display(obj, request):
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
+                relation = layer.check_relation(layer)
             )
 
             data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid
@@ -201,6 +202,23 @@ def display(obj, request):
 
     tmp = obj.to_dict()
 
+    def get_relation(item):
+        list = []
+        def traverse_relation(item):
+            if item.item_type in ("root", "group"):
+                if item.children:
+                    for child in item.children:
+                        traverse_relation(child) # Traverse child nodes.
+            elif item.item_type == "layer":
+                layer=item.style.parent
+                if not layer.has_permission(DataScope.read, request.user):
+                    return None
+                if layer.check_relation(layer):
+                    list.append(layer.check_relation(layer))
+
+        traverse_relation(item)
+        return list if len(list) > 0 else None
+
     display_config = dict(
         extent=tmp["extent"],
         extent_const=tmp["extent_const"],
@@ -221,6 +239,7 @@ def display(obj, request):
         drawOrderEnabled=obj.draw_order_enabled,
         measureSrsId=obj.measure_srs_id,
         printMaxSize=request.env.webmap.options["print.max_size"],
+        relation=get_relation(obj.root_item)
     )
 
     if request.env.webmap.options["annotation"]:
