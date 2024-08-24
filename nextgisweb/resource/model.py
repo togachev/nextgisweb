@@ -7,7 +7,7 @@ from msgspec import Struct
 from sqlalchemy import event, func, text
 from typing_extensions import Annotated
 
-from nextgisweb.env import Base, DBSession, env, gettext
+from nextgisweb.env import Base, DBSession, env, gettext, gettextf
 from nextgisweb.lib import db
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
@@ -530,12 +530,12 @@ class ACLAttr(SAttribute, apitype=True):
                     if p in perms:
                         continue
                     raise ValidationError(
-                        message=gettext(
+                        message=gettextf(
                             "Unable to revoke '{permission}' permission for "
                             "'{user}' as the user belongs to the administrators "
                             "group. Administrators must always have ability to "
                             "configure permissions of resources."
-                        ).format(permission=p.label, user=user.display_name)
+                        )(permission=p.label, user=user.display_name)
                     )
                 else:
                     assert False
@@ -563,10 +563,7 @@ class ScopesAttr(SAttribute, apitype=True):
         return list(srlzr.obj.scope.keys())
 
 
-class ResourceSerializer(Serializer, apitype=True):
-    identity = Resource.identity
-    resclass = Resource
-
+class ResourceSerializer(Serializer, resource=Resource):
     id = SColumn(read=ResourceScope.read, write=None)
     cls = ClsAttr(read=ResourceScope.read, write=None, required=False)
     creation_date = SColumn(read=ResourceScope.read, write=None)

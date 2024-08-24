@@ -7,6 +7,7 @@ from itertools import chain
 from pathlib import Path
 from time import sleep
 from typing import Optional
+from warnings import warn
 
 from markupsafe import Markup
 from psutil import Process
@@ -187,6 +188,16 @@ def locale(request):
 def sysinfo(request):
     request.require_administrator()
     return dict(title=gettext("System information"), dynmenu=request.env.pyramid.control_panel)
+
+
+@viewargs(renderer="react")
+def fonts(request):
+    request.require_administrator()
+    return dict(
+        title=gettext("Font management"),
+        entrypoint="@nextgisweb/pyramid/fonts",
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
 
 @viewargs(renderer="react")
@@ -490,6 +501,11 @@ def setup_pyramid(comp, config):
         "/control-panel/sysinfo",
     ).add_view(sysinfo)
 
+    config.add_route(
+        "pyramid.control_panel.fonts",
+        "/control-panel/fonts",
+    ).add_view(fonts)
+
     if env.core.options["storage.enabled"]:
         config.add_route("pyramid.control_panel.storage", "/control-panel/storage").add_view(
             storage
@@ -581,6 +597,12 @@ def setup_pyramid(comp, config):
             "info/sysinfo",
             gettext("System information"),
             lambda args: (args.request.route_url("pyramid.control_panel.sysinfo")),
+        )
+
+        yield dm.Link(
+            "settings/fonts",
+            gettext("Font management"),
+            lambda args: (args.request.route_url("pyramid.control_panel.fonts")),
         )
 
         yield dm.Link(
@@ -744,6 +766,20 @@ def json_js(value, pretty=False):
     return Markup(dumps(value, pretty=pretty))
 
 
+def _legacy_underscore(factory):
+    def wrapped(msg, _gettext=factory.gettext):
+        warn(
+            "Usage of _ in Mako templates isn't encouraged since "
+            "nextgisweb >= 4.9.0.dev8 and it will be removed in 5.0.0. "
+            "Use gettext or gettextf instead.",
+            UserWarning,  # Mako supresses DeprecationWarning
+            stacklevel=2,
+        )
+        return _gettext(msg)
+
+    return wrapped
+
+
 def _m_gettext(_template_filename):
     head = _template_filename
     comp_id = None
@@ -753,12 +789,24 @@ def _m_gettext(_template_filename):
             comp_id = head.rpartition("/")[-1]
             break
 
-    if comp_id:
-        if comp_id.startswith("nextgisweb_"):
-            comp_id = comp_id[len("nextgisweb_") :]
+    if comp_id is None:
+        return None
 
-        assert comp_id in pkginfo.components, f"Component {comp_id} not found"
-        return trstr_factory(comp_id)
+    if comp_id.startswith("nextgisweb_"):
+        comp_id = comp_id[len("nextgisweb_") :]
+
+    if comp_id not in pkginfo.components:
+        return None
+
+    factory = trstr_factory(comp_id)
+
+    return {
+        "_": _legacy_underscore(factory),
+        "gettext": factory.gettext,
+        "gettextf": factory.gettextf,
+        "ngettext": factory.ngettext,
+        "ngettextf": factory.ngettextf,
+    }
 
 
 def _setup_pyramid_mako(comp, config):
@@ -769,7 +817,21 @@ def _setup_pyramid_mako(comp, config):
         "from markupsafe import Markup",
         "from nextgisweb.pyramid.view import json_js",
         "from nextgisweb.pyramid.view import _m_gettext",
-        "_ = _m_gettext(_template_filename); del _m_gettext",
+        "_m = _m_gettext(_template_filename)",
+        "if _m: "
+        + "; ".join(
+            [
+                f"{k} = _m['{k}']"
+                for k in (
+                    "_",
+                    "gettext",
+                    "gettextf",
+                    "ngettext",
+                    "ngettextf",
+                )
+            ]
+        ),
+        "del _m, _m_gettext",
     ]
     settings["mako.default_filters"] = ["h"]
 

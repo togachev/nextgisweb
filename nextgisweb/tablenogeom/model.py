@@ -142,10 +142,7 @@ class TablenogeomConnection(Base, Resource):
             conn.close()
 
 
-class TablenogeomConnectionSerializer(Serializer, apitype=True):
-    identity = TablenogeomConnection.identity
-    resclass = TablenogeomConnection
-
+class TablenogeomConnectionSerializer(Serializer, resource=TablenogeomConnection):
     hostname = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     port = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -375,10 +372,7 @@ class FieldsAttr(SAttribute, apitype=True):
                 raise ForbiddenError()
 
 
-class TablenogeomLayerSerializer(Serializer, apitype=True):
-    identity = TablenogeomLayer.identity
-    resclass = TablenogeomLayer
-
+class TablenogeomLayerSerializer(Serializer, resource=TablenogeomLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     table = SColumn(read=ResourceScope.read, write=ResourceScope.update)

@@ -184,7 +184,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
             dataset_ref = None
             assert layer is UNSET
 
-        loader = OGRLoader(source, params=lparams).scan()
+        loader = OGRLoader(source, params=lparams)
         self.geometry_type = loader.geometry_type
         self.fields[:] = [
             VectorLayerField(
@@ -817,10 +817,7 @@ class DeleteAllFeaturesAttr(SAttribute, apitype=True):
             srlzr.obj.feature_delete_all()
 
 
-class VectorLayerSerializer(Serializer, apitype=True):
-    identity = VectorLayer.identity
-    resclass = VectorLayer
-
+class VectorLayerSerializer(Serializer, resource=VectorLayer):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
     source = SourceAttr(write=DataScope.write)

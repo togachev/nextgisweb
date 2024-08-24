@@ -210,10 +210,7 @@ class PostgisConnection(Base, Resource):
             conn.close()
 
 
-class PostgisConnectionSerializer(Serializer, apitype=True):
-    identity = PostgisConnection.identity
-    resclass = PostgisConnection
-
+class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     hostname = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     port = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -566,10 +563,7 @@ class FieldsAttr(SAttribute, apitype=True):
                 raise ForbiddenError()
 
 
-class PostgisLayerSerializer(Serializer, apitype=True):
-    identity = PostgisLayer.identity
-    resclass = PostgisLayer
-
+class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     connection_relation = SResource(read=ResourceScope.read, write=ResourceScope.update)
     schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
@@ -827,28 +821,28 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
 
                         if self._geom:
-                            if (geom_data := row["geom"]) is None:
+                            if (geom_data := row.geom) is None:
                                 geom = None
                             elif self._geom_format == "WKB":
                                 geom = Geometry.from_wkb(geom_data.tobytes(), validate=False)
-                            else:
+                            elif self._geom_format == "WKT":
                                 geom = Geometry.from_wkt(geom_data, validate=False)
+                            else:
+                                raise NotImplementedError
                         else:
                             geom = UNSET
 
+                        if self._box and row.box_left is not None:
+                            _box = box(row.box_left, row.box_bottom, row.box_right, row.box_top)
+                        else:
+                            _box = None
+
                         yield Feature(
                             layer=self.layer,
-                            id=row["id"],
+                            id=row.id,
                             fields=fdict,
                             geom=geom,
-                            box=box(
-                                row["box_left"],
-                                row["box_bottom"],
-                                row["box_right"],
-                                row["box_top"],
-                            )
-                            if self._box
-                            else None,
+                            box=_box,
                         )
 
             @property

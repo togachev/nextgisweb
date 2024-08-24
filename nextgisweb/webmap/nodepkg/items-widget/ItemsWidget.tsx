@@ -13,7 +13,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { adapters } from "@nextgisweb/pyramid/settings!webmap";
 import { ResourceSelect } from "@nextgisweb/resource/component";
-import { pickToFocusTable } from "@nextgisweb/resource/component/resource-picker";
+import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker/hook/useFocusTablePicker";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -73,7 +73,6 @@ const adapterOptions = sortBy(
     })),
     "value"
 );
-console.log(adapterOptions);
 
 const LayerWidget = observer(({ item }: { item: Layer }) => {
     return (
@@ -99,7 +98,13 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                 label={msgResource}
                 value={item.layerStyleId}
                 component={ResourceSelect}
-                props={{ readOnly: true, style: { width: "100%" } }}
+                props={{
+                    readOnly: true,
+                    style: { width: "100%" },
+                    pickerOptions: {
+                        initParentId: item.store.composite.parent,
+                    },
+                }}
             />
             <LotMV
                 label={msgMinScaleDenom}
@@ -148,6 +153,10 @@ export const ItemsWidget: EditorWidgetComponent<EditorWidgetProps<ItemsStore>> =
     observer(({ store }: EditorWidgetProps<ItemsStore>) => {
         const { makeSignal } = useAbortController();
         const [drawOrderEdit, setDrawOrderEdit] = useState(false);
+
+        const { pickToFocusTable } = useFocusTablePicker({
+            initParentId: store.composite.parent,
+        });
 
         const drawOrderEnabled = store.drawOrderEnabled.value;
         const { tableActions, itemActions } = useMemo(
@@ -207,7 +216,7 @@ export const ItemsWidget: EditorWidgetComponent<EditorWidgetProps<ItemsStore>> =
                 ],
                 itemActions: [action.deleteItem<ItemObject>()],
             }),
-            [drawOrderEnabled, makeSignal, store]
+            [drawOrderEnabled, makeSignal, pickToFocusTable, store]
         );
 
         return drawOrderEdit ? (

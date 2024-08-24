@@ -2,14 +2,9 @@ import unique from "lodash-es/uniq";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-    AutoComplete,
-    Input,
-    Select,
-    Spin,
-} from "@nextgisweb/gui/antd";
-import type { AutoCompleteProps } from "@nextgisweb/gui/antd";
+import { Divider, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
+import { AutoCompleteInput } from "@nextgisweb/gui/component";
 import { Area } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
 import { useCache } from "@nextgisweb/pyramid/hook";
@@ -57,20 +52,6 @@ async function inspTabFetch(
         if (/^INTEGER|BIGINT$/i.test(type)) result.id.push(name);
     }
     return result;
-}
-
-interface AutoCompleteInputProps extends AutoCompleteProps {
-    loading?: boolean;
-}
-
-const spinner = <Spin indicator={<LoadingOutlined spin />} size="small" />;
-
-function AutoCompleteInput({ loading, ...props }: AutoCompleteInputProps) {
-    return (
-        <AutoComplete {...props}>
-            <Input suffix={loading ? spinner : <span />} />
-        </AutoComplete>
-    );
 }
 
 type FocusedField = "schema" | "table" | "columnId" | null;

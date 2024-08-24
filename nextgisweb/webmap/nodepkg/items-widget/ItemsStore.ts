@@ -5,7 +5,11 @@ import { mapper } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import { observableChildren } from "@nextgisweb/gui/focus-table";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
-import type { EditorStore } from "@nextgisweb/resource/type";
+import type {
+    Composite,
+    EditorStore,
+    EditorStoreOptions,
+} from "@nextgisweb/resource/type";
 import type { WebMapRead, WebMapUpdate } from "@nextgisweb/webmap/type/api";
 
 import { Group, Layer } from "./Item";
@@ -31,8 +35,16 @@ export class ItemsStore
     @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
 
-    readonly items = observableChildren<ItemObject>(null, "parent");
     readonly drawOrderEnabled = drawOrderEnabled.init(false, this);
+    readonly items = observableChildren<ItemObject>(null, "parent", () => {
+        this.markDirty();
+    });
+
+    composite: Composite;
+
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
+    }
 
     @action load(value: PickMy<WebMapRead>) {
         mapperLoad(this, value);

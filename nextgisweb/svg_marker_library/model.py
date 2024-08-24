@@ -9,7 +9,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from typing_extensions import Annotated
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base, gettext, gettextf
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
@@ -84,18 +84,18 @@ class SVGMarker(Base):
 
 def validate_filename(fn):
     if os.path.isabs(fn) or fn != os.path.normpath(fn):
-        raise ValidationError(gettext("File '{}' has an insecure name.").format(fn))
+        raise ValidationError(gettextf("File '{}' has an insecure name.")(fn))
 
 
 def validate_ext(fn, ext):
     if ext.lower() != ".svg":
-        raise ValidationError(gettext("File '{}' has an invalid extension.").format(fn))
+        raise ValidationError(gettextf("File '{}' has an invalid extension.")(fn))
 
 
 def validate_mime(fn, buf):
     mime = magic.from_buffer(buf, mime=True)
     if mime != mime_valid:
-        raise ValidationError(gettext("File '{}' has a format different from SVG.").format(fn))
+        raise ValidationError(gettextf("File '{}' has a format different from SVG.")(fn))
 
 
 class ArchiveAttr(SAttribute, apitype=True):
@@ -157,10 +157,7 @@ class FilesAttr(SAttribute, apitype=True):
             srlzr.obj.files.append(svg_marker)
 
 
-class SVGMarkerLibrarySerializer(Serializer, apitype=True):
-    identity = SVGMarkerLibrary.identity
-    resclass = SVGMarkerLibrary
-
+class SVGMarkerLibrarySerializer(Serializer, resource=SVGMarkerLibrary):
     archive = ArchiveAttr(read=None, write=ResourceScope.update)
     files = FilesAttr(read=ResourceScope.read, write=ResourceScope.update)
 
