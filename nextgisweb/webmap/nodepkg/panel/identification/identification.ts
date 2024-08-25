@@ -16,12 +16,21 @@ export interface IdentifyInfo {
     point: number[];
 }
 
+
+
+export interface RelationProps {
+    external_resource_id: number;
+    relation_key: string;
+    relation_value: number;
+}
+
 export interface FeatureIdentify<F extends Attrs = Attrs> {
     id: number;
     layerId: number;
     label: string;
     fields: F;
     parent: string;
+    relation: RelationProps;
 }
 
 export interface FeatureInfo {
