@@ -322,6 +322,7 @@ const FeatureSelector = ({
 const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
     const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
     const [featureItem, setFeatureItem] = useState<FeatureItem>();
+    const [relationInfo, setRelationInfo] = useState<FeatureIdentify>();
     const [loading, setLoading] = useState(false);
 
     const isNotFound = identifyInfo && identifyInfo.response.featureCount === 0;
@@ -330,6 +331,7 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
         if (isNotFound) {
             setFeatureInfo(undefined);
             setFeatureItem(undefined);
+            setRelationInfo(undefined);
         }
     }, [isNotFound]);
 
@@ -343,6 +345,9 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
             .finally(() => {
                 setLoading(false);
             });
+        const layerResponse = identifyInfo.response[featureInfo?.layerId];
+        const featureResponse = layerResponse?.features[featureInfo.idx];
+        setRelationInfo(featureResponse);
     };
 
     const onFeatureChange = (featureInfo: FeatureInfo) => {
@@ -372,16 +377,6 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
                 </div>
             </div>
         );
-    }
-
-    const relations: FeatureIdentify[] = [];
-    if (identifyInfo) {
-        const { response } = identifyInfo;
-        Object.keys(response).filter(function (k) {
-            if (response[k].features && response[k].features.length > 0) {
-                relations.push(...response[k].features.filter(i => i.relation));
-            }
-        });
     }
 
     const coordinatesPanel = (
@@ -436,11 +431,16 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
         );
     }
 
+    let relationElement;
+    if (relationInfo?.relation) {
+        relationElement = (<GraphPanel item={relationInfo} />);
+    }
+
     return (
         <>
             <div className="top">{featureSelector}</div>
             <div className="center">
-                {relations.length > 0 && (<GraphPanel relations={relations} />)}
+                {relationElement}
                 {loadElement}
                 {tabsElement}
                 {noFoundElement}

@@ -2,30 +2,36 @@ import { useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 
-import { Button, List, ConfigProvider } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
 import { LineChartOutlined } from "@ant-design/icons";
 
 import ScatterPlot from "@nextgisweb/icon/material/scatter_plot/outline";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 
 import "./GraphPanel.less";
 
-export const GraphPanel = ({ relations }) => {
-
+export const GraphPanel = ({ item }) => {
     const [result, setResult] = useState(undefined);
 
-    const msgGraphs = relations?.length === 1 ? gettext("Graph") : gettext("Graphs");
+    const status = result && Object.keys(result).includes(item.id.toString());
+
+    const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 
     const loadData = async (item) => {
         const { external_resource_id, relation_key, relation_value } = item.relation;
         const key_rel = "fld_" + relation_key;
-        const query = {
+        const json = {
             [key_rel]: relation_value,
             extensions: "",
             geom: "no",
+            cache: true,
         }
         const data = await route("feature_layer.feature.collection", {
             id: external_resource_id,
-        }).get({ query });
+        }).get({
+            query: json,
+            cache: true,
+        });
 
         setResult(prev => ({
             ...prev,
@@ -34,51 +40,43 @@ export const GraphPanel = ({ relations }) => {
     }
 
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    List: {
-                        itemPaddingSM: "5px 0",
-                        paddingXS: 4,
-                        paddingSM: 4,
-                    },
-                },
-            }}
-        >
+        <>
             <div className="panel-content-container">
-                <div className="fill">
+                <div className="graph">
                     <h3>
                         <LineChartOutlined />
                         {msgGraphs}
                     </h3>
+                    <div className="button-graph">
+                        {status ?
+                            (<Button
+                                title={gettext("Delete graph")}
+                                type="text"
+                                icon={<DeleteForever />}
+                                onClick={() => {
+                                    const newItems = { ...result };
+                                    delete newItems[item.id];
+                                    setResult(newItems);
+                                }}
+                                danger
+                            />) :
+                            (<Button
+                                title={gettext("Build graph")}
+                                type="text"
+                                icon={<ScatterPlot />}
+                                onClick={() => loadData(item)}
+                            />)
+                        }
+                    </div>
                 </div>
             </div>
             <div className="panel-content-container">
                 <div className="fill">
-                    <List
-                        size="small"
-                        bordered={false}
-                        dataSource={relations}
-                        renderItem={(item) => {
-                            return (
-                                <List.Item>
-                                    <div className="relation-item">
-                                        <Button
-                                            size="small"
-                                            className="build-graph"
-                                            icon={<ScatterPlot />}
-                                            onClick={() => loadData(item)}
-                                        >
-                                            {gettext("Build graph")}
-                                        </Button>
-                                        <span style={{ textWrap: "balance", maxHeight: "250px", overflow: "overlay" }}>{result && JSON.stringify(result[item.id])}</span>
-                                    </div>
-                                </List.Item>
-                            )
-                        }}
-                    />
+                    <div className="relation-item">
+                        <span style={{ textWrap: "balance", maxHeight: "250px", overflow: "overlay" }}>{result && JSON.stringify(result[item.id])}</span>
+                    </div>
                 </div>
             </div>
-        </ConfigProvider >
+        </>
     );
 };
