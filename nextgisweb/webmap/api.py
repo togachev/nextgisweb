@@ -384,6 +384,7 @@ csetting("measurement_srid", int, default=4326)
 csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
 csetting("identify_panel", bool, default=False)
+csetting("diagram_panel", bool, default=False)
 
 
 def setup_pyramid(comp, config):

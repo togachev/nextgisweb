@@ -494,9 +494,9 @@ define([
                     } catch (err) {
                         console.warn(
                             "Can't initialize layer [" +
-                                baseOptions.keyname +
-                                "]: " +
-                                err
+                            baseOptions.keyname +
+                            "]: " +
+                            err
                         );
                     }
 
@@ -580,10 +580,10 @@ define([
                 queryOptions: { deep: true },
                 sort: widget.config.drawOrderEnabled
                     ? [
-                          {
-                              attribute: "position",
-                          },
-                      ]
+                        {
+                            attribute: "position",
+                        },
+                    ]
                     : null,
                 onItem: function (item) {
                     widget._onNewStoreItem(item, visibleStyles);
@@ -985,7 +985,7 @@ define([
                 },
             });
 
-            const makeBookmarkPanel = new Promise((resolve) => {                
+            const makeBookmarkPanel = new Promise((resolve) => {
                 if (!this.config.bookmarkLayerId) {
                     resolve(undefined);
                 }
@@ -1042,7 +1042,9 @@ define([
                 };
                 resolve(panel);
             });
-            panels.push(makeDiagramPanel);
+            if (settings.diagram_panel && !settings.identify_panel) {
+                panels.push(makeDiagramPanel);
+            }
 
             const makeAnnotationsPanel = new Promise((resolve) => {
                 this._buildAnnotationPanel(resolve);

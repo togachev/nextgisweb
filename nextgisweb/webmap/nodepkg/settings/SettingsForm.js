@@ -25,6 +25,7 @@ import {
 
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
 import ExperimentalIcon from "@nextgisweb/icon/material/science";
+import InfoIcon from "@nextgisweb/icon/material/info";
 
 const { Title } = Typography;
 
@@ -37,6 +38,20 @@ const experimentalPanelMsg = gettext(
 const experimentalPanel = (
     <Tooltip title={experimentalPanelMsg}>
         <ExperimentalIcon />
+    </Tooltip>
+);
+
+const diagramPanelMsg = gettext(
+    "Panel for creating graphs"
+);
+
+const diagramPanelInfoMsg = gettext(
+    "Disabled if use panel instead of popup identification"
+);
+
+const diagramPanel = (
+    <Tooltip title={diagramPanelInfoMsg}>
+        <InfoIcon />
     </Tooltip>
 );
 
@@ -168,6 +183,20 @@ export const SettingsForm = ({
                                 <Switch />
                             </Form.Item>
                             {experimentalPanelMsg} {experimentalPanel}
+                        </Space>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item>
+                        <Space direction="horizontal">
+                            <Form.Item
+                                noStyle
+                                name="diagram_panel"
+                                valuePropName="checked"
+                            >
+                                <Switch />
+                            </Form.Item>
+                            {diagramPanelMsg} {diagramPanel}
                         </Space>
                     </Form.Item>
                 </Col>

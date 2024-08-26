@@ -4,21 +4,24 @@ import { context, params } from "../constant";
 import type { GraphProps, RequestProps, ContextItemProps } from "../type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 
+import type {
+    FeatureIdentify,
+} from "@nextgisweb/webmap/panel/identification/identification";
+
 export const useGraph = ({ display, topic }: GraphProps) => {
     const olmap = display.map.olMap;
 
     const identifyFeature = useCallback(({ response }) => {
         const { featureCount } = response;
+        const relations: FeatureIdentify[] = [];
+        Object.keys(response).filter(function (k) {
+            if (response[k].features && response[k].features.length > 0) {
+                relations.push(...response[k].features.filter(i => i.relation));
+            }
+        });
 
-        const relationFeature = Object.values(response)
-            .reduce((k, val) => {
-                if (val.features) {
-                    k.push(...val.features.filter(i => i.relation));
-                }
-                return k;
-            }, []);
-        console.log(relationFeature);
-
+        console.log(relations);
+        
 
         // if (featureCount > 0) {
         //     route("feature_layer.identify_layer")

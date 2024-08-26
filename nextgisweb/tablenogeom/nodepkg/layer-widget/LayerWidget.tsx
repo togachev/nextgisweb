@@ -2,7 +2,7 @@ import unique from "lodash-es/uniq";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import { Divider, InputNumber, Select } from "@nextgisweb/gui/antd";
+import { Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { AutoCompleteInput } from "@nextgisweb/gui/component";
 import { Area } from "@nextgisweb/gui/mayout";
@@ -16,8 +16,6 @@ import type {
 } from "@nextgisweb/resource/type";
 
 import type { LayerStore } from "./LayerStore";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 const msgConnection = gettext("Connection");
 const msgSchema = gettext("Schema");

@@ -4,8 +4,8 @@ import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info/";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
-import { Alert, Button, Collapse, ConfigProvider, Select, Table, Tooltip } from "@nextgisweb/gui/antd";
-import type { CollapseProps } from "@nextgisweb/gui/antd";
+import { Alert, Button, Select, Table, Tooltip } from "@nextgisweb/gui/antd";
+
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -16,6 +16,7 @@ import { PanelHeader } from "../header";
 
 import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
 import { FeatureEditButton } from "./FeatureEditButton";
+import { GraphPanel } from "../diagram/GraphPanel";
 import { getExtensionsComps } from "./extensions";
 import { fieldValuesToDataSource, getFieldsInfo } from "./fields";
 import type { FieldDataItem } from "./fields";
@@ -33,8 +34,6 @@ import type {
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 import EarthIcon from "@nextgisweb/icon/material/public/outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
-
-import { LineChartOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
 
 import "./IdentificationPanel.less";
 import "./PanelContentContainer.less";
@@ -101,7 +100,7 @@ const loadFeatureItem = async (
             id: featureResponse.layerId,
             fid: featureResponse.id,
         }).get(),
-        new Promise((resolve) => delay(resolve, 1000)),
+        new Promise((resolve) => delay(resolve, 250)),
     ]);
 
     const featureItem = result[0];
@@ -384,60 +383,6 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
             }
         });
     }
-
-    const GraphPanel = ({ relations }) => {
-        const msgGraphs = relations?.length === 1 ? gettext("Build a graph") : gettext("Build a graphs");
-        const items: CollapseProps["items"] = [];
-
-        relations.map((item, index) => {
-            items.push({
-                key: index,
-                children: (
-                    <div className="relation-item">
-                        <span>{item.relation.external_resource_id}</span>
-                        <span>{item.relation.relation_key}</span>
-                        <span>{item.relation.relation_value}</span>
-                    </div>
-                ),
-            })
-        });
-
-        const LabelGraph = ({ isActive }) => {
-            return isActive ?
-                (<div className="header-relation-block">
-                    <FullscreenExitOutlined />
-                    <div className="label">{gettext("Hide the graph panel")}</div>
-                </div>) :
-                (<div className="header-relation-block">
-                    <FullscreenOutlined />
-                    <div className="label">{gettext("Go to plotting the graph")}</div>
-                </div>)
-        }
-
-        return (
-            <div className="panel-content-container margin-all">
-                <div className="fill">
-                    <ConfigProvider
-                        theme={{
-                            components: {
-                                Collapse: { paddingXS: 4, paddingSM: 4 },
-                            },
-                        }}
-                    >
-                        <h3>
-                            <LineChartOutlined />
-                            {msgGraphs}
-                        </h3>
-                        <Collapse
-                            size="small"
-                            items={items}
-                            expandIcon={({ isActive }) => (<LabelGraph isActive={isActive} />)}
-                        />
-                    </ConfigProvider>
-                </div>
-            </div>
-        );
-    };
 
     const coordinatesPanel = (
         <div className="panel-content-container margin-all">
