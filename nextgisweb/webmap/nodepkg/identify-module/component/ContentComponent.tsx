@@ -14,6 +14,7 @@ import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import { GraphPanel } from "@nextgisweb/webmap/panel/diagram/GraphPanel";
+import { LineChartOutlined } from "@ant-design/icons";
 
 const { Link } = Typography;
 const settings = webmapSettings;
@@ -24,7 +25,9 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
     const { copyValue, contextHolder } = useCopy();
     const panelRef = useRef<HTMLDivElement>(null);
 
-    const heightRadio = 110; /* ~ height and padding 2px */
+    const relationItem = store.data.filter(i => i.id === id);
+
+    const heightRadio = 135; /* ~ height and padding 2px */
     const [heightPanel, setHeightPanel] = useState();
     const [contentItem, setContentItem] = useState("attributes");
 
@@ -128,14 +131,15 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
             hidden: false,
             children: ext?.attachment ? (<AttachmentTable attachments={ext?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
         },
+        {
+            label: (<span className="icon-style"><LineChartOutlined /></span>),
+            value: "relation",
+            key: "relation",
+            title: gettext("Relations"),
+            hidden: false,
+            children: relationItem[0] ? (<GraphPanel item={relationItem[0]} />) : emptyValue
+        },
     ];
-    console.log(store);
-    
-    // let relationElement;
-    // if (relationInfo?.relation) {
-    //     relationElement = (<GraphPanel item={relationInfo} />);
-    // }
-
 
     useEffect(() => {
         setHeightPanel(valueRnd.height - 70);

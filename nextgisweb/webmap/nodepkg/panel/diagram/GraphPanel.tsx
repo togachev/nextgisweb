@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
-
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { Button } from "@nextgisweb/gui/antd";
 import { LineChartOutlined } from "@ant-design/icons";
 
@@ -14,6 +14,7 @@ export const GraphPanel = ({ item }) => {
     const [result, setResult] = useState(undefined);
 
     const status = result && Object.keys(result).includes(item.id.toString());
+    const imodule = webmapSettings.idetify_module;
 
     const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 
@@ -42,12 +43,12 @@ export const GraphPanel = ({ item }) => {
     return (
         <>
             <div className="panel-content-container">
-                <div className="graph">
-                    <h3>
+                <div className={imodule ? "right-graph" : "graph"}>
+                    {!imodule && (<h3>
                         <LineChartOutlined />
                         {msgGraphs}
-                    </h3>
-                    <div className="button-graph">
+                    </h3>)}
+                    <div className={imodule ? "right-button-graph" : "button-graph"}>
                         {status ?
                             (<Button
                                 title={gettext("Delete graph")}
