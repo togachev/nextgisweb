@@ -115,9 +115,17 @@ def identify_module(request) -> JSONType:
                         label=f.label,
                         permission="Read",
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
+                        fields=f.fields,
                     )
                 )
 
+            if layer.check_relation(layer):
+                for feature in options:
+                    feature["relation"] = dict(
+                        external_resource_id=layer.external_resource_id,
+                        relation_key=layer.external_field_name,
+                        relation_value=feature["fields"][layer.resource_field_name]
+                    )
     result["data"] = options
     result["featureCount"] = len(options)
     return result
@@ -161,7 +169,14 @@ def feature_selected(request) -> JSONType:
                         label=f.label,
                         permission="Read",
                         value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
+                        fields=f.fields,
                     )
+            if layer.check_relation(layer):
+                result["data"]["relation"] = dict(
+                    external_resource_id=layer.external_resource_id,
+                    relation_key=layer.external_field_name,
+                    relation_value=result["data"]["fields"][layer.resource_field_name]
+                )
         options.append(result["data"])
     return options
 
