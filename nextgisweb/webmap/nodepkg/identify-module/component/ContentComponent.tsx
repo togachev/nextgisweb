@@ -13,6 +13,8 @@ import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
+import { GraphPanel } from "@nextgisweb/webmap/panel/diagram/GraphPanel";
+
 const { Link } = Typography;
 const settings = webmapSettings;
 
@@ -57,7 +59,9 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
                 geom: "no",
             },
         },
-    })
+    });
+
+    const ext = extensions?.extensions
 
     const AttributeColumns = ({ attribute }) => {
         const items: DescriptionsProps['items'] = [];
@@ -114,7 +118,7 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
             key: "description",
             title: gettext("Description"),
             hidden: false,
-            children: extensions?.description ? (<DescComponent display={display} type="feature" content={extensions?.description} />) : emptyValue
+            children: ext?.description ? (<DescComponent display={display} type="feature" content={ext?.description} />) : emptyValue
         },
         {
             label: (<span className="icon-style"><Attachment /></span>),
@@ -122,9 +126,16 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
             key: "attachment",
             title: gettext("Attachments"),
             hidden: false,
-            children: extensions?.attachment ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
+            children: ext?.attachment ? (<AttachmentTable attachments={ext?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
         },
     ];
+    console.log(store);
+    
+    // let relationElement;
+    // if (relationInfo?.relation) {
+    //     relationElement = (<GraphPanel item={relationInfo} />);
+    // }
+
 
     useEffect(() => {
         setHeightPanel(valueRnd.height - 70);

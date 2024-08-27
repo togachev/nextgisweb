@@ -31,6 +31,8 @@ import type {
     IdentifyResultProps,
 } from "./identification";
 
+import { DescComponent } from "@nextgisweb/resource/description";
+
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 import EarthIcon from "@nextgisweb/icon/material/public/outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";

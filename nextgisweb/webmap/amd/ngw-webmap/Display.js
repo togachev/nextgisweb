@@ -1017,7 +1017,7 @@ define([
                 },
             });
 
-            if (settings.identify_panel) {
+            if (settings.identify_panel && !settings.idetify_module) {
                 panels.push({
                     cls: reactPanel("@nextgisweb/webmap/panel/identification"),
                     params: {
