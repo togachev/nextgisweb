@@ -131,15 +131,18 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
             hidden: false,
             children: ext?.attachment ? (<AttachmentTable attachments={ext?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
         },
-        {
+    ];
+
+    if (relationItem[0].relation) {
+        options.push(        {
             label: (<span className="icon-style"><LineChartOutlined /></span>),
             value: "relation",
             key: "relation",
             title: gettext("Relations"),
             hidden: false,
-            children: relationItem[0] ? (<GraphPanel item={relationItem[0]} />) : emptyValue
-        },
-    ];
+            children: relationItem[0] && relationItem[0].relation ? (<GraphPanel item={relationItem[0]} />) : emptyValue
+        })
+    }
 
     useEffect(() => {
         setHeightPanel(valueRnd.height - 70);
