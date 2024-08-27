@@ -5,7 +5,7 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
-
+from .api import serialize
 
 def identify(request) -> JSONType:
     data = request.json_body
