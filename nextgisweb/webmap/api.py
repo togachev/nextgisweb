@@ -385,7 +385,8 @@ csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
 csetting("identify_panel", bool, default=False)
 csetting("diagram_panel", bool, default=False)
-
+csetting("idetify_module", bool, default=False)
+csetting("offset_point", int, default=10)
 
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)

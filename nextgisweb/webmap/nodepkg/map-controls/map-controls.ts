@@ -22,7 +22,7 @@ import MyLocation from "ngw-webmap/controls/MyLocation";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import Identify from "ngw-webmap/tool/Identify";
-
+import { IdentifyModule } from "@nextgisweb/webmap/identify-module";
 import type { DojoDisplay, MapControl } from "../type";
 
 import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
@@ -131,6 +131,16 @@ export const ControlsInfo: ControlInfo[] = [
         },
         key: "id",
         mapStateKey: "identifying",
+        embeddedShowMode: "customize",
+        olMapControl: false,
+    },
+    {
+        key: "im",
+        label: gettext("Identification module"),
+        ctor: (display) => {
+            return new IdentifyModule(display);
+        },
+        mapStateKey: "identify_module",
         embeddedShowMode: "customize",
         olMapControl: false,
     },
