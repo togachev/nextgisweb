@@ -66,7 +66,7 @@ export default observer(
                 })
 
                 const noSelectedItem = store.data;
-                store.setContextUrl(generateUrl(display, { res: val, all: noSelectedItem }));
+                store.setContextUrl(generateUrl(display, { res: val }));
                 store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
 
                 if (key === true) {
@@ -83,7 +83,7 @@ export default observer(
                     store.setData(response.data);
                     getContent(selectVal, false);
                 } else {
-                    store.setContextUrl(generateUrl(display, { res: null, all: null }));
+                    store.setContextUrl(generateUrl(display, { res: null }));
                     store.setSelected(null);
                     store.setData([]);
                     topic.publish("feature.unhighlight");

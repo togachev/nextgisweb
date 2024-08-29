@@ -63,7 +63,7 @@ export class IdentifyModule extends Component {
     private olmap: Map;
     private params: EventProps;
     private selected: string | undefined;
-    private paramsSelected: ParamsProps[] = [];
+    private paramsSelected: EventProps;
     private response: Response;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
@@ -177,12 +177,12 @@ export class IdentifyModule extends Component {
                 });
             count = this.response.featureCount;
         } else if (op === "popup" && p.value.attribute === true) {
-            this.response = await route("feature_layer.feature_selected")
+            this.response = await route("feature_layer.identify_module")
                 .post({
-                    json: this.paramsSelected,
+                    json: this.paramsSelected.request,
                 })
                 .then(item => {
-                    return { data: item, featureCount: item.length };
+                    return { data: item.data, featureCount: item.featureCount };
                 });
             count = this.response.featureCount;
         } else {
@@ -193,10 +193,10 @@ export class IdentifyModule extends Component {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         const array_context = [ //для создания кнопок в контекстном меню
-            { key: 1, title: 'Действие 1', result: 'Действие 1 выполнено', visible: false },
-            { key: 2, title: 'Действие 2', result: 'Действие 2 выполнено', visible: false },
-            { key: 3, title: 'Действие 3', result: 'Действие 3 выполнено', visible: false },
-            { key: 4, title: 'Действие 4', result: 'Действие 4 выполнено', visible: false },
+            { key: 1, title: "Действие 1", result: "Действие 1 выполнено", visible: false },
+            { key: 2, title: "Действие 2", result: "Действие 2 выполнено", visible: false },
+            { key: 3, title: "Действие 3", result: "Действие 3 выполнено", visible: false },
+            { key: 4, title: "Действие 4", result: "Действие 4 выполнено", visible: false },
         ];
 
         const position = positionContext(event, offset, op, count, settings, p, array_context);
@@ -245,17 +245,15 @@ export class IdentifyModule extends Component {
     };
 
     _overlayInfo = (e: MapBrowserEvent, op: string, p) => {
-        let request;
+        let request, request_select;
         if (op === "popup" && p === false) {
             const styles: StylesRequest[] = [];
             this.display.getVisibleItems()
                 .then((items: WebmapItem[]) => {
-
                     const itemConfig: WebmapItemConfig = this.display.getItemConfig();
                     const mapResolution = this.olmap.getView().getResolution();
                     items.map(i => {
                         const item = itemConfig[i.id];
-
                         if (
                             !item.identifiable ||
                             mapResolution >= item.maxResolution ||
@@ -281,20 +279,28 @@ export class IdentifyModule extends Component {
             this.display.getVisibleItems()
                 .then((items: WebmapItem[]) => {
                     const itemConfig: WebmapItemConfig = this.display.getItemConfig();
-
                     p.value.params.map(itm => {
                         items.some(x => {
-                            if (itemConfig[x.id].styleId === itm.styleId) {
-                                const label = items.find(x => itemConfig[x.id].styleId === itm.styleId).label[0]
-                                const dop = items.find(x => itemConfig[x.id].styleId === itm.styleId).position[0]
+                            if (itemConfig[x.id].styleId === itm.id) {
+                                const label = items.find(x => itemConfig[x.id].styleId === itm.id).label[0]
+                                const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position[0]
                                 itm.label = label;
                                 itm.dop = dop;
                             }
                         });
                     })
-
-                    this.paramsSelected = p.value.params
                 })
+            
+            request_select = {
+                srs: this.displaySrid,
+                geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p.coordinate)),
+                styles: p.value.params,
+            }
+        }
+
+        this.paramsSelected = {
+            point: e.coordinate,
+            request: request_select,
         }
 
         this.params = {
@@ -324,13 +330,12 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async ({ lon, lat, attribute, all, slf }: UrlParamsProps) => {
-        const all_ = new String(slf);
+    identifyModuleUrlParams = async ({ lon, lat, attribute, styles, slf }: UrlParamsProps) => {
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
             this._responseContext({ lon, lat, attribute: false });
-        } else if (all_ instanceof String && slf_ instanceof String) {
-            this._responseContext({ lon, lat, attribute: true, all, slf });
+        } else if (slf_ instanceof String) {
+            this._responseContext({ lon, lat, attribute: true, styles, slf });
         }
         return true;
     };
@@ -352,13 +357,11 @@ export class IdentifyModule extends Component {
             })
             .then((transformedCoord) => {
                 const params: ParamsProps[] = [];
-
-                val.all?.split(",").map(i => {
+                val.styles?.split(",").map(i => {
                     params.push({
-                        styleId: Number(i.split(":")[0]),
-                        layerId: Number(i.split(":")[1]),
-                        featureId: Number(i.split(":")[2]),
+                        id: Number(i),
                         label: "",
+                        dop: null,
                     });
                 })
 
@@ -370,7 +373,7 @@ export class IdentifyModule extends Component {
                     lon: val.lon,
                     params,
                 }
-
+                
                 const p = { value, coordinate: transformedCoord };
                 const offHP = 40;
 
@@ -380,12 +383,12 @@ export class IdentifyModule extends Component {
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
-                    target: 'map',
+                    target: "map",
                     pixel: [
                         this.display.panelsManager._activePanelKey ? (W + this.display.leftPanelPane.w + offHP) / 2 : (W + offHP) / 2,
                         (H + offHP) / 2
                     ],
-                    type: 'singleclick'
+                    type: "singleclick"
                 };
 
                 this._overlayInfo(simulateEvent, "popup", p)

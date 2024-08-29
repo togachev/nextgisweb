@@ -904,15 +904,15 @@ define([
                         "attribute" in urlParams
                     ) ||
                     (
-                        "all" in urlParams && "slf" in urlParams
+                        "slf" in urlParams
                     )
                 )
             ) {
                 return;
             }
-            const { lon, lat, attribute, all, slf } = urlParams;
+            const { lon, lat, attribute, styles, slf } = urlParams;
             this.identify_module
-                .identifyModuleUrlParams({ lon, lat, attribute, all, slf })
+                .identifyModuleUrlParams({ lon, lat, attribute, styles, slf })
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

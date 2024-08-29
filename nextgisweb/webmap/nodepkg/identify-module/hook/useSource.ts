@@ -6,7 +6,7 @@ import type { DataProps } from "./type";
 
 export const useSource = () => {
 
-    const generateUrl = (display: DojoDisplay, { res, all }) => {
+    const generateUrl = (display: DojoDisplay, { res }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
@@ -22,14 +22,10 @@ export const useSource = () => {
         });
         
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-        const allItems: string[] = [];
-        all?.map(i => {
-            allItems.push(i.styleId + ":" + i.layerId + ":" + i.id)
-        });
 
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
-            { attribute: true, lat, lon, zoom, styles: styles, panel, slf: selected, all: allItems } :
+            { attribute: true, lat, lon, zoom, styles: styles, panel, slf: selected } :
             { attribute: false, lat, lon, zoom, styles: styles, panel }
 
         const paramsUrl = new URLSearchParams();

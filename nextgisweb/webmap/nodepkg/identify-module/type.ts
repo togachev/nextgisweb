@@ -16,7 +16,7 @@ export interface UrlParamsProps {
     lon: number;
     lat: number;
     attribute: string | boolean;
-    all?: string;
+    styles?: string;
     slf?: string;
 }
 
@@ -33,10 +33,9 @@ export interface VisibleProps {
 }
 
 export interface ParamsProps {
-    layerId: number;
-    featureId: number;
-    styleId: number;
+    id: number;
     label: string;
+    dop: number | null;
 }
 
 export interface EventProps {

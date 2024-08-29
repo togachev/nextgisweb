@@ -130,56 +130,6 @@ def identify_module(request) -> JSONType:
     result["featureCount"] = len(options)
     return result
 
-def feature_selected(request) -> JSONType:
-    data = request.json_body
-    options = []
-    for p in data:
-        layerId = int(p["layerId"])
-        styleId = int(p["styleId"])
-        featureId = int(p["featureId"])
-        dop = int(p["dop"]) if p.get("dop") is not None else -1
-        layer = Resource.filter_by(id=layerId).one()
-        result = dict()
-        if not layer.has_permission(DataScope.read, request.user):
-            query = layer.feature_query()
-            for f in query():
-                if f.id == featureId:
-                    result["data"] = dict(
-                        desc=layer.parent.display_name if p["label"] is None else p["label"],
-                        id=f.id,
-                        layerId=layerId,
-                        styleId=styleId,
-                        dop=dop,
-                        label="Forbidden",
-                        permission="Forbidden",
-                        value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
-                    )
-        elif not IFeatureLayer.providedBy(layer):
-            result["data"] = dict(value="Not implemented")
-        else:
-            query = layer.feature_query()
-            for f in query():
-                if f.id == featureId:
-                    result["data"] = dict(
-                        desc=layer.parent.display_name if p["label"] is None else p["label"],
-                        id=f.id,
-                        layerId=layerId,
-                        styleId=styleId,
-                        dop=dop,
-                        label=f.label,
-                        permission="Read",
-                        value=str(styleId) + ":" + str(layerId) + ":" + str(f.id),
-                        fields=f.fields,
-                    )
-            if layer.check_relation(layer):
-                result["data"]["relation"] = dict(
-                    external_resource_id=layer.external_resource_id,
-                    relation_key=layer.external_field_name,
-                    relation_value=result["data"]["fields"][layer.resource_field_name]
-                )
-        options.append(result["data"])
-    return options
-
 def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.identify",
@@ -191,10 +141,4 @@ def setup_pyramid(comp, config):
         "feature_layer.identify_module",
         "/api/feature_layer/identify_module",
         post=identify_module,
-    )
-
-    config.add_route(
-        "feature_layer.feature_selected",
-        "/api/feature_layer/feature_selected",
-        post=feature_selected,
     )
