@@ -16,7 +16,7 @@ export interface UrlParamsProps {
     lon: number;
     lat: number;
     attribute: string | boolean;
-    styles?: string;
+    st?: string;
     slf?: string;
 }
 

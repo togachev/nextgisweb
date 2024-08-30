@@ -6,13 +6,13 @@ import type { DataProps } from "./type";
 
 export const useSource = () => {
 
-    const generateUrl = (display: DojoDisplay, { res }) => {
+    const generateUrl = (display: DojoDisplay, { res, st }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
         const webmapId = display.config.webmapId;
         const zoom = display.map.view.getZoom();
-        
+
         const styles: string[] = [];
         Object.entries(display.webmapStore._layers).find(item => {
             const itm: StoreItem = item[1];
@@ -20,12 +20,13 @@ export const useSource = () => {
                 styles.push(itm.itemConfig.styleId);
             }
         });
-        
+
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+        let result = [...new Set(st?.map(a => a.styleId))];
 
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
-            { attribute: true, lat, lon, zoom, styles: styles, panel, slf: selected } :
+            { attribute: true, lat, lon, zoom, styles: styles, panel, st: result, slf: selected } :
             { attribute: false, lat, lon, zoom, styles: styles, panel }
 
         const paramsUrl = new URLSearchParams();
@@ -36,7 +37,7 @@ export const useSource = () => {
 
         const url = routeURL("webmap.display", webmapId);
         const link = origin + url + '?' + paramsUrl.toString();
-        
+
         return link;
     };
 
@@ -70,7 +71,7 @@ export const useSource = () => {
             .then(data => {
                 const deferreds: string[] = [];
                 const fieldmap = {};
-                
+
                 data.feature_layer.fields.map(itm => {
                     fieldmap[itm.keyname] = itm;
                     if (itm.lookup_table !== null) {

@@ -66,7 +66,7 @@ export default observer(
                 })
 
                 const noSelectedItem = store.data;
-                store.setContextUrl(generateUrl(display, { res: val }));
+                store.setContextUrl(generateUrl(display, { res: val, st: noSelectedItem }));
                 store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
 
                 if (key === true) {
@@ -83,7 +83,7 @@ export default observer(
                     store.setData(response.data);
                     getContent(selectVal, false);
                 } else {
-                    store.setContextUrl(generateUrl(display, { res: null }));
+                    store.setContextUrl(generateUrl(display, { res: null, st: null }));
                     store.setSelected(null);
                     store.setData([]);
                     topic.publish("feature.unhighlight");
@@ -98,10 +98,10 @@ export default observer(
 
             const onChangeSelect = (value: { value: number; label: string }) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
-                const cloneUser = { ...selectedValue };
-                cloneUser.label = cloneUser.permission === "Forbidden" ? forbidden : cloneUser.label;
-                store.setSelected(cloneUser);
-                getContent(cloneUser, false);
+                const clone = { ...selectedValue };
+                clone.label = clone.permission === "Forbidden" ? forbidden : clone.label;
+                store.setSelected(clone);
+                getContent(clone, false);
             };
 
             const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {

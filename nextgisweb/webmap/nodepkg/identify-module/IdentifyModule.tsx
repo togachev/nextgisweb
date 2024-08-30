@@ -42,6 +42,7 @@ Control.prototype.constructor = Control;
 
 Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+        this.tool.selected = undefined;
         this.tool._overlayInfo(e, "popup", false);
         e.preventDefault();
     }
@@ -63,7 +64,6 @@ export class IdentifyModule extends Component {
     private olmap: Map;
     private params: EventProps;
     private selected: string | undefined;
-    private paramsSelected: EventProps;
     private response: Response;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
@@ -166,20 +166,10 @@ export class IdentifyModule extends Component {
             });
 
         let count;
-
-        if (this.params.request !== null) {
+        if (this.params.request !== null || op === "popup" && p.value.attribute === true) {
             this.response = await route("feature_layer.identify_module")
                 .post({
                     json: this.params.request,
-                })
-                .then(item => {
-                    return { data: item.data, featureCount: item.featureCount };
-                });
-            count = this.response.featureCount;
-        } else if (op === "popup" && p.value.attribute === true) {
-            this.response = await route("feature_layer.identify_module")
-                .post({
-                    json: this.paramsSelected.request,
                 })
                 .then(item => {
                     return { data: item.data, featureCount: item.featureCount };
@@ -245,7 +235,7 @@ export class IdentifyModule extends Component {
     };
 
     _overlayInfo = (e: MapBrowserEvent, op: string, p) => {
-        let request, request_select;
+        let request;
         if (op === "popup" && p === false) {
             const styles: StylesRequest[] = [];
             this.display.getVisibleItems()
@@ -264,15 +254,11 @@ export class IdentifyModule extends Component {
                         styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
                     });
                 })
-
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
                 styles: styles,
             }
-
-        } else {
-            request = null;
         }
 
         if (op === "popup" && p && p.value.attribute === true) {
@@ -282,25 +268,19 @@ export class IdentifyModule extends Component {
                     p.value.params.map(itm => {
                         items.some(x => {
                             if (itemConfig[x.id].styleId === itm.id) {
-                                const label = items.find(x => itemConfig[x.id].styleId === itm.id).label[0]
-                                const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position[0]
+                                const label = items.find(x => itemConfig[x.id].styleId === itm.id).label[0];
+                                const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position[0];
                                 itm.label = label;
                                 itm.dop = dop;
                             }
                         });
                     })
                 })
-            
-            request_select = {
+            request = {
                 srs: this.displaySrid,
-                geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p.coordinate)),
+                geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
                 styles: p.value.params,
             }
-        }
-
-        this.paramsSelected = {
-            point: e.coordinate,
-            request: request_select,
         }
 
         this.params = {
@@ -330,12 +310,12 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async ({ lon, lat, attribute, styles, slf }: UrlParamsProps) => {
+    identifyModuleUrlParams = async ({ lon, lat, attribute, st, slf }: UrlParamsProps) => {
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
             this._responseContext({ lon, lat, attribute: false });
         } else if (slf_ instanceof String) {
-            this._responseContext({ lon, lat, attribute: true, styles, slf });
+            this._responseContext({ lon, lat, attribute: true, st, slf });
         }
         return true;
     };
@@ -357,7 +337,7 @@ export class IdentifyModule extends Component {
             })
             .then((transformedCoord) => {
                 const params: ParamsProps[] = [];
-                val.styles?.split(",").map(i => {
+                val.st?.split(",").map(i => {
                     params.push({
                         id: Number(i),
                         label: "",
@@ -373,7 +353,7 @@ export class IdentifyModule extends Component {
                     lon: val.lon,
                     params,
                 }
-                
+
                 const p = { value, coordinate: transformedCoord };
                 const offHP = 40;
 
