@@ -26,8 +26,8 @@ export const useSource = () => {
 
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
-            { attribute: true, lat, lon, zoom, styles: styles, panel, st: result, slf: selected } :
-            { attribute: false, lat, lon, zoom, styles: styles, panel }
+            { attribute: true, lon, lat, zoom, styles: styles, panel, st: result, slf: selected } :
+            { attribute: false, lon, lat, zoom, styles: styles, panel }
 
         const paramsUrl = new URLSearchParams();
 

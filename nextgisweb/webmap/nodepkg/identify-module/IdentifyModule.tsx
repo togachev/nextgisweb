@@ -349,8 +349,8 @@ export class IdentifyModule extends Component {
 
                 const value = {
                     attribute: val.attribute,
-                    lat: val.lat,
                     lon: val.lon,
+                    lat: val.lat,
                     params,
                 }
 
