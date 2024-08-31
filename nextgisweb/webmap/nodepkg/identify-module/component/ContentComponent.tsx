@@ -12,24 +12,24 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-
+import { observer } from "mobx-react-lite";
 import { GraphPanel } from "@nextgisweb/webmap/panel/diagram/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
-    const { attribute, selected, setUpdateContent, updateContent, valueRnd } = store;
+export const ContentComponent: FC = observer(({ store: storeProp, display, linkToGeometry }) => {
+    const [store] = useState(() => storeProp);
+    const { attribute, data, fixContentItem, fixPanel, fixPos, setFixContentItem, selected, setUpdateContent, updateContent, valueRnd } = store;
     const { id, layerId } = selected;
     const { copyValue, contextHolder } = useCopy();
     const panelRef = useRef<HTMLDivElement>(null);
 
-    const relationItem = store.data.filter(i => i.id === id);
+    const firstItem = data.find(i => i.id === id);
 
     const heightRadio = 135; /* ~ height and padding 2px */
     const [heightPanel, setHeightPanel] = useState();
-    const [contentItem, setContentItem] = useState("attributes");
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
@@ -93,7 +93,7 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
         }
 
         return items.length > 0 ?
-            (<Descriptions bordered size="small" column={1} layout="hirizontal" items={items} />) :
+            (<Descriptions bordered size="small" column={1} layout="horizontal" items={items} />) :
             emptyValue;
     };
 
@@ -133,21 +133,26 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
         },
     ];
 
-    if (relationItem[0].relation) {
-        options.push(        {
+    if (firstItem.relation) {
+        options.push({
             label: (<span className="icon-style"><LineChartOutlined /></span>),
             value: "relation",
             key: "relation",
             title: gettext("Relations"),
             hidden: false,
-            children: relationItem[0] && relationItem[0].relation ? (<GraphPanel item={relationItem[0]} />) : emptyValue
+            children: firstItem && firstItem.relation && (<GraphPanel emptyValue={emptyValue} item={firstItem} store={store} />),
         })
     }
 
     useEffect(() => {
         setHeightPanel(valueRnd.height - 70);
-        setContentItem(options.find(item => item.key === "attributes"));
-    }, [store.attribute]);
+        if (fixPos !== null) {
+            const result = options.find(item => item.key === fixPanel);
+            result ? setFixContentItem(result) : setFixContentItem(options.find(item => item.key === "attributes"));
+        } else {
+            setFixContentItem(options.find(item => item.key === "attributes"));
+        }
+    }, [attribute]);
 
     useEffect(() => {
         if (updateContent === true) {
@@ -157,7 +162,7 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
     }, [updateContent])
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
-        setContentItem(options.find(item => item.key === key));
+        setFixContentItem(options.find(item => item.key === key));
     };
 
     const items: MenuProps['items'] = useMemo(() => {
@@ -172,10 +177,10 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
         })
     }, []);
 
-    const valueDropdown = items.find(item => item.key === contentItem.value);
+    const valueDropdown = items.find(item => item.key === fixContentItem?.value);
 
     const onValuesChange = (e) => {
-        setContentItem(options.find(item => item.key === e.target.value));
+        setFixContentItem(options.find(item => item.key === e.target.value));
     }
 
     return (
@@ -197,7 +202,7 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
                                 <Radio.Group
                                     buttonStyle="solid"
                                     onChange={onValuesChange}
-                                    value={contentItem.value}
+                                    value={fixContentItem?.value}
                                     className="radio-component"
                                 >
                                     <Space direction="vertical" style={{ rowGap: 2, padding: 2 }} >
@@ -223,7 +228,7 @@ export const ContentComponent: FC = ({ store, display, linkToGeometry }) => {
                 }
                 {linkToGeometry}
             </div>
-            <div className="content-item">{contentItem.children}</div>
+            <div className="content-item">{fixContentItem?.children}</div>
         </ConfigProvider>
     )
-};
+});

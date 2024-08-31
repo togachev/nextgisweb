@@ -12,8 +12,12 @@ export class IdentifyStore {
     update = false;
     fullscreen = false;
     contextUrl: string | null = null;
+    fixContentItem = "attributes";
     linkToGeometry: string | null = null;
     valueRnd: Rnd | null = null;
+    fixPos: Rnd | null = null;
+    fixPanel: string | null = null;
+    fixPopup = false;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -29,7 +33,19 @@ export class IdentifyStore {
 
     setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
         this.setValue("valueRnd", valueRnd);
-    };  
+    };
+    
+    setFixPos = (fixPos: SetValue<Rnd | null>) => {
+        this.setValue("fixPos", fixPos);
+    };
+
+    setFixPanel = (fixPanel: SetValue<string | null>) => {
+        this.setValue("fixPanel", fixPanel);
+    };
+
+    setFixPopup = (fixPopup: boolean) => {
+        this.fixPopup = fixPopup;
+    };
 
     setLayerName = (layerName: SetValue<string | null>) => {
         this.setValue("layerName", layerName);
@@ -61,6 +77,10 @@ export class IdentifyStore {
 
     setContextUrl = (contextUrl: SetValue<string | null>) => {
         this.setValue("contextUrl", contextUrl);
+    };
+
+    setFixContentItem = (fixContentItem: SetValue<string | null>) => {
+        this.setValue("fixContentItem", fixContentItem);
     };
 
     setLinkToGeometry = (linkToGeometry: SetValue<string | null>) => {

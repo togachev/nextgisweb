@@ -6,8 +6,11 @@ import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 
+import Pin from "@nextgisweb/icon/mdi/pin";
+import PinOff from "@nextgisweb/icon/mdi/pin-off";
+
 import { Rnd } from "react-rnd";
-import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
@@ -25,6 +28,21 @@ import topic from "dojo/topic";
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
 
+const CheckOnlyOne = ({ store }) => {
+    const onChange = (checked: boolean) => {
+        store.setFixPopup(checked);
+    };
+
+    return (
+        <Tag.CheckableTag
+            checked={store.fixPopup}
+            onChange={onChange}
+        >
+            {store.fixPopup ? <PinOff style={{ transform: "rotate(30deg)" }} /> : <Pin style={{ transform: "rotate(30deg)" }} />}
+        </Tag.CheckableTag>
+    );
+};
+
 export default observer(
     forwardRef<Element>(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
@@ -33,7 +51,6 @@ export default observer(
             const { getAttribute, generateUrl } = useSource();
             const { copyValue, contextHolder } = useCopy();
             const imodule = display.identify_module;
-
 
             const count = response.featureCount;
 
@@ -45,6 +62,7 @@ export default observer(
                         width: position.width,
                         height: position.height,
                     },
+                    fixPos: null,
                 }));
             imodule.identifyStore = store;
 
@@ -96,17 +114,27 @@ export default observer(
                 }
             }, [store.update]);
 
+            useEffect(() => {
+                if (store.fixPopup) {
+                    store.setFixPos(store.valueRnd);
+                    store.setFixPanel(store.fixContentItem.key)
+                } else {
+                    store.setFixPos(null);
+                    store.setFixPanel(null);
+                }
+            }, [store.fixPopup]);
+
             const onChangeSelect = (value: { value: number; label: string }) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
-                const clone = { ...selectedValue };
-                clone.label = clone.permission === "Forbidden" ? forbidden : clone.label;
-                store.setSelected(clone);
-                getContent(clone, false);
+                const cloneUser = { ...selectedValue };
+                cloneUser.label = cloneUser.permission === "Forbidden" ? forbidden : cloneUser.label;
+                store.setSelected(cloneUser);
+                getContent(cloneUser, false);
             };
 
             const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
-                if ((option?.label ?? '').toLowerCase().includes(input.toLowerCase()) ||
-                    (option?.desc ?? '').toLowerCase().includes(input.toLowerCase()))
+                if ((option?.label ?? "").toLowerCase().includes(input.toLowerCase()) ||
+                    (option?.desc ?? "").toLowerCase().includes(input.toLowerCase()))
                     return true
             }
 
@@ -204,6 +232,14 @@ export default observer(
                                     colorLinkHover: "var(--primary)",
                                     defaultHoverColor: "var(--primary)",
                                 },
+                                Tag: {
+                                    colorFillSecondary: "#00000010",
+                                    defaultColor: "var(--text-secondary)",
+                                    colorPrimary: "var(--primary)",
+                                    colorPrimaryActive: "#00000010",
+                                    colorPrimaryHover: "#00000010",
+                                    borderRadiusSM: 2,
+                                }
                             }
                         }}
                     >
@@ -224,9 +260,10 @@ export default observer(
                             minWidth={position.width}
                             minHeight={position.height}
                             allowAnyClick={true}
-                            enableResizing={count > 0 ? true : false}
-                            position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
-                            size={{ width: store.valueRnd.width, height: store.valueRnd.height }}
+                            enableResizing={count > 0 ? (store.fixPos === null ? true : false) : false}
+                            disableDragging={store.fixPos !== null ? true : false}
+                            position={store.fixPos !== null ? { x: store.fixPos.x, y: store.fixPos.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
+                            size={store.fixPos !== null ? { width: store.fixPos.width, height: store.fixPos.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
                             onDragStop={(e, d) => {
                                 if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
                                     store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
@@ -268,32 +305,40 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    {count > 0 && store.selected && (<span
-                                        title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
-                                        className="icon-symbol"
-                                        onClick={() => {
-                                            if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
-                                                store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                                store.setFullscreen(false)
-                                            } else {
-                                                store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                                store.setFullscreen(true)
-                                            }
-                                            if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > position.height) {
-                                                store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                                store.setFullscreen(true)
-                                            }
-                                        }} >
-                                        {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
-                                    </span>)}
+                                    <CheckOnlyOne store={store} />
+                                    {count > 0 && store.selected && (
+                                        <span
+                                            title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
+                                            className={store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                            onClick={() => {
+                                                if (store.fixPos === null) {
+                                                    if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
+                                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                                        store.setFullscreen(false)
+                                                    } else {
+                                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                        store.setFullscreen(true)
+                                                    }
+                                                    if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > position.height) {
+                                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                        store.setFullscreen(true)
+                                                    }
+                                                }
+                                            }} >
+                                            {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
+                                        </span>
+                                    )}
                                     <span
                                         title={gettext("Close")}
-                                        className="icon-symbol"
+                                        className={store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
-                                            visible({ hidden: true, overlay: undefined, key: "popup" })
-                                            topic.publish("feature.unhighlight");
-                                            store.setFullscreen(false)
-                                            store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                                            if (store.fixPos === null) {
+                                                visible({ hidden: true, overlay: undefined, key: "popup" })
+                                                topic.publish("feature.unhighlight");
+                                                store.setFullscreen(false)
+                                                store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                                                store.setFixPos(null);
+                                            }
                                         }} >
                                         <CloseIcon />
                                     </span>

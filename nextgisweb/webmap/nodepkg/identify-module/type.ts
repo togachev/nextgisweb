@@ -69,6 +69,7 @@ export interface Position {
 }
 
 export interface Props {
+    op: string;
     response: Response;
     position: Position;
     selected: DataProps;
