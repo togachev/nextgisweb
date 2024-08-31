@@ -166,7 +166,9 @@ export class IdentifyModule extends Component {
             });
 
         let count;
-        if (this.params.request !== undefined && op === "popup" || p.value.attribute === true) {
+        console.log(this.params.request, op);
+        
+        if (this.params.request !== undefined && (op === "popup" || p.value.attribute === true)) {
             this.response = await route("feature_layer.identify_module")
                 .post({
                     json: this.params.request,
