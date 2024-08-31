@@ -8,7 +8,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context) =
     const py = p && p.value ? event.pixel[1] : event.originalEvent.clientY;
     
     const context_height = 24 + context_item * length;
-    const context_width = 170;
+    const context_width = 180;
     const popup_height = settings.popup_height;
     const popup_width = settings.popup_width;
     const coords_not_count_w = 250;
