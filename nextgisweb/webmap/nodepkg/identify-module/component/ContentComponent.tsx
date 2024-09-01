@@ -76,7 +76,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
         }
 
         return items.length > 0 ?
-            (<Descriptions bordered size="small" column={1} layout="horizontal" items={items} />) :
+            (<Descriptions labelStyle={{ width: "50%" }} bordered size="small" column={1} layout="horizontal" items={items} />) :
             emptyValue;
     };
 
