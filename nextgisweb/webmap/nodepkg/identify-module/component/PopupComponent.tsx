@@ -101,7 +101,7 @@ export default observer(
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
 
-            const getContent = async (val: DataProps, key: boolean, data) => {
+            const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val);
                 setExtensions(res.feature.extensions);
                 setAttribute(res.updateName);
@@ -111,8 +111,7 @@ export default observer(
                     layerId: res.resourceId,
                 })
 
-                const noSelectedItem = data;
-                setContextUrl(generateUrl(display, { res: val, st: noSelectedItem, pn: fixPanel }));
+                setContextUrl(generateUrl(display, { res: val, st: response.data, pn: fixPanel }));
                 setLinkToGeometry(res.resourceId + ":" + res.feature.id);
 
                 if (key === true) {
@@ -127,7 +126,7 @@ export default observer(
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
                     setSelected(selectVal);
                     setData(response.data);
-                    getContent(selectVal, false, response.data);
+                    getContent(selectVal, false);
                 } else {
                     setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
                     setSelected(null);
@@ -138,7 +137,7 @@ export default observer(
 
             useEffect(() => {
                 if (update === true) {
-                    getContent(selected, true, data);
+                    getContent(selected, true);
                 }
             }, [update]);
 
@@ -148,16 +147,15 @@ export default observer(
                     setFixPanel(fixContentItem.key)
                 } else {
                     setFixPos(null);
-                    // setFixPanel(null);
                 }
             }, [fixPopup]);
 
             const onChangeSelect = (value: { value: number; label: string }) => {
                 const selectedValue = data.find(item => item.value === value.value);
-                const cloneUser = { ...selectedValue };
-                cloneUser.label = cloneUser.permission === "Forbidden" ? forbidden : cloneUser.label;
-                setSelected(cloneUser);
-                getContent(cloneUser, false);
+                const copy = { ...selectedValue };
+                copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
+                setSelected(copy);
+                getContent(copy, false);
             };
 
             const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {

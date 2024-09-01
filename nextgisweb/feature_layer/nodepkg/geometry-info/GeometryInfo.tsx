@@ -1,4 +1,4 @@
-import { Spin } from "@nextgisweb/gui/antd";
+import { useMemo } from "react";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -7,9 +7,10 @@ import {
     formatMetersArea,
     formatMetersLength,
 } from "@nextgisweb/webmap/utils/format-units";
-import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
 import { getGeometryTypeTitle } from "@nextgisweb/webmap/utils/geometry-types";
-
+import { ConfigProvider, Descriptions } from "@nextgisweb/gui/antd";
+import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
+import type { DescriptionsProps } from "@nextgisweb/gui/antd";
 import type { GeometryInfo } from "../type/GeometryInfo";
 
 import "./GeometryInfo.less";
@@ -20,10 +21,8 @@ const formatConfig: DefaultConfig = {
     locale,
 };
 
-const formatLength = (length: number) =>
-    formatMetersLength(length, webmapSettings.units_length, formatConfig);
-const formatArea = (area: number) =>
-    formatMetersArea(area, webmapSettings.units_area, formatConfig);
+const formatLength = (length: number) => formatMetersLength(length, webmapSettings.units_length, formatConfig);
+const formatArea = (area: number) => formatMetersArea(area, webmapSettings.units_area, formatConfig);
 
 export function GeometryInfo({
     layerId,
@@ -34,8 +33,6 @@ export function GeometryInfo({
 }) {
     const {
         data: geometryInfo,
-        isLoading,
-        error,
     } = useRouteGet<GeometryInfo>({
         name: "feature_layer.feature.geometry_info",
         params: {
@@ -43,76 +40,68 @@ export function GeometryInfo({
             fid: featureId,
         },
         options: {
+            cache: true,
             query: {
                 srs: webmapSettings.measurement_srid,
             },
         },
     });
 
-    if (isLoading) {
-        return (
-            <div className="loading">
-                <Spin />
-                <div>{gettext("Load geometry info...")}</div>
-            </div>
-        );
-    }
+    const geometryInfoColumns = useMemo(() => {
+        const items: DescriptionsProps['items'] = [
+            {
+                key: gettext("Geometry type"),
+                label: gettext("Geometry type"),
+                children: getGeometryTypeTitle(geometryInfo?.type.toLowerCase()),
+            },
+            {
+                key: gettext("Extent (xMin)"),
+                label: gettext("Extent (xMin)"),
+                children: formatCoordinatesValue(geometryInfo?.extent.minX),
+            },
+            {
+                key: gettext("Extent (yMin)"),
+                label: gettext("Extent (yMin)"),
+                children: formatCoordinatesValue(geometryInfo?.extent.minY),
+            },
+            {
+                key: gettext("Extent (xMax)"),
+                label: gettext("Extent (xMax)"),
+                children: formatCoordinatesValue(geometryInfo?.extent.maxX),
+            },
+            {
+                key: gettext("Extent (yMax)"),
+                label: gettext("Extent (yMax)"),
+                children: formatCoordinatesValue(geometryInfo?.extent.maxY),
+            },
+        ];
 
-    if (error || !geometryInfo) {
-        return (
-            <div className="error">
-                <div>
-                    {gettext("Failed to get information about the geometry")}
-                </div>
-            </div>
-        );
-    }
+        geometryInfo?.length !== null && items.splice(1, 0, {
+            key: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
+            label: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
+            children: formatLength(geometryInfo?.length),
+        });
 
-    const length = geometryInfo.length !== null && (
-        <tr>
-            <td>
-                {geometryInfo.type.toLowerCase().includes("polygon")
-                    ? gettext("Perimeter")
-                    : gettext("Length")}
-            </td>
-            <td>{formatLength(geometryInfo.length)}</td>
-        </tr>
-    );
+        geometryInfo?.area !== null && items.splice(1, 0, {
+            key: gettext("Area"),
+            label: gettext("Area"),
+            children: formatArea(geometryInfo?.area),
+        })
 
-    const area = geometryInfo.area !== null && (
-        <tr>
-            <td>{gettext("Area")}</td>
-            <td>{formatArea(geometryInfo.area)}</td>
-        </tr>
-    );
+        return items;
+    }, [featureId, layerId, geometryInfo]);
+
     return (
-        <table className="geometry-info-table">
-            <tbody>
-                <tr>
-                    <td>{gettext("Geometry type")}</td>
-                    <td>
-                        {getGeometryTypeTitle(geometryInfo.type.toLowerCase())}
-                    </td>
-                </tr>
-                {length}
-                {area}
-                <tr>
-                    <td>{gettext("Extent (xMin)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.minX)}</td>
-                </tr>
-                <tr>
-                    <td>{gettext("Extent (yMin)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.minY)}</td>
-                </tr>
-                <tr>
-                    <td>{gettext("Extent (xMax)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.maxX)}</td>
-                </tr>
-                <tr>
-                    <td>{gettext("Extent (yMax)")}</td>
-                    <td>{formatCoordinatesValue(geometryInfo.extent.maxY)}</td>
-                </tr>
-            </tbody>
-        </table>
-    );
+        <ConfigProvider
+            theme={{
+                token: {
+                    borderRadiusLG: 0,
+                    padding: 5,
+                    paddingXS: 2,
+                },
+            }}
+        >
+            <Descriptions bordered size="small" column={1} layout="hirizontal" items={geometryInfoColumns} />
+        </ConfigProvider>
+    )
 }
