@@ -47,7 +47,7 @@ export default observer(
     forwardRef<Element>(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
             const { params, visible, display } = props;
-            const { position, response, selected } = params;
+            const { position, response, selectedValue } = params;
             const { getAttribute, generateUrl } = useSource();
             const { copyValue, contextHolder } = useCopy();
             const imodule = display.identify_module;
@@ -67,7 +67,31 @@ export default observer(
                     fixPanel: s.pn ? s.pn : "attributes",
                 }));
             imodule.identifyStore = store;
-            
+
+            const {
+                contextUrl,
+                data,
+                fixContentItem,
+                fixPanel,
+                fixPopup,
+                fixPos,
+                fullscreen,
+                selected,
+                setAttribute,
+                setContextUrl,
+                setData,
+                setExtensions,
+                setFixPanel,
+                setFixPos,
+                setFullscreen,
+                setLinkToGeometry,
+                setSelected,
+                setUpdate,
+                setValueRnd,
+                update,
+                valueRnd,
+            } = store;
+
             const offHP = 40;
             const offset = display.clientSettings.offset_point;
             const fX = offHP + offset;
@@ -75,63 +99,63 @@ export default observer(
 
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
-            
+
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val);
-                store.setExtensions(res.feature.extensions);
-                store.setAttribute(res.updateName);
+                setExtensions(res.feature.extensions);
+                setAttribute(res.updateName);
                 topic.publish("feature.highlight", {
                     geom: res.feature.geom,
                     featureId: res.feature.id,
                     layerId: res.resourceId,
                 })
 
-                const noSelectedItem = store.data;
-                store.setContextUrl(generateUrl(display, { res: val, st: noSelectedItem, pn: store.fixPanel }));
-                store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
+                const noSelectedItem = data;
+                setContextUrl(generateUrl(display, { res: val, st: noSelectedItem, pn: fixPanel }));
+                setLinkToGeometry(res.resourceId + ":" + res.feature.id);
 
                 if (key === true) {
-                    store.setUpdate(false);
+                    setUpdate(false);
                 }
             }
 
             useEffect(() => {
-                store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
+                setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
                 if (count > 0) {
-                    const selectVal = selected ? selected : response.data[0];
+                    const selectVal = selectedValue ? selectedValue : response.data[0];
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
-                    store.setSelected(selectVal);
-                    store.setData(response.data);
+                    setSelected(selectVal);
+                    setData(response.data);
                     getContent(selectVal, false);
                 } else {
-                    store.setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
-                    store.setSelected(null);
-                    store.setData([]);
+                    setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
+                    setSelected(null);
+                    setData([]);
                     topic.publish("feature.unhighlight");
                 }
-            }, [response, store.fixPanel]);
+            }, [response, fixPanel]);
 
             useEffect(() => {
-                if (store.update === true) {
-                    getContent(store.selected, true);
+                if (update === true) {
+                    getContent(selected, true);
                 }
-            }, [store.update]);
-            
+            }, [update]);
+
             useEffect(() => {
-                if (store.fixPopup) {
-                    store.setFixPos(store.valueRnd);
-                    store.setFixPanel(store.fixContentItem.key)
+                if (fixPopup) {
+                    setFixPos(valueRnd);
+                    setFixPanel(fixContentItem.key)
                 } else {
-                    store.setFixPos(null);
-                    // store.setFixPanel(null);
+                    setFixPos(null);
+                    // setFixPanel(null);
                 }
-            }, [store.fixPopup]);
+            }, [fixPopup]);
 
             const onChangeSelect = (value: { value: number; label: string }) => {
-                const selectedValue = store.data.find(item => item.value === value.value);
+                const selectedValue = data.find(item => item.value === value.value);
                 const cloneUser = { ...selectedValue };
                 cloneUser.label = cloneUser.permission === "Forbidden" ? forbidden : cloneUser.label;
-                store.setSelected(cloneUser);
+                setSelected(cloneUser);
                 getContent(cloneUser, false);
             };
 
@@ -142,11 +166,11 @@ export default observer(
             }
 
             const linkToGeometry = useMemo(() => {
-                if (count > 0 && store.selected) {
-                    const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === store.selected.styleId);
+                if (count > 0 && selected) {
+                    const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === selected.styleId);
                     const title = gettext("HTML code of the geometry link, for insertion into the description")
                     const titleCopy = gettext("HTML code copied")
-                    if (count > 0 && store.selected) {
+                    if (count > 0 && selected) {
                         if (!imodule._isEditEnabled(display, item)) { return false; }
                         return (<Button
                             size="small"
@@ -155,17 +179,17 @@ export default observer(
                             className="copy_to_clipboard"
                             icon={<Identifier />}
                             onClick={() => {
-                                const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
+                                const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
                                 copyValue(linkToGeometryString, titleCopy);
                             }}
                         />)
                     }
                 }
-            }, [count, store.selected])
+            }, [count, selected])
 
             const editFeature = useMemo(() => {
-                if (count > 0 && store.selected) {
-                    const { id, layerId, styleId } = store.selected;
+                if (count > 0 && selected) {
+                    const { id, layerId, styleId } = selected;
                     const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === styleId);
 
                     if (display.isTinyMode() && !display.isTinyModePlugin("ngw-webmap/plugin/FeatureLayer")) {
@@ -186,7 +210,7 @@ export default observer(
                                             featureId,
                                             resourceId: resourceId,
                                             onSave: () => {
-                                                store.setUpdate(true);
+                                                setUpdate(true);
                                                 topic.publish("feature.updated", { resourceId: layerId, featureId: id });
                                             },
                                         },
@@ -197,7 +221,7 @@ export default observer(
                         </div>)
                     }
                 }
-            }, [store.selected])
+            }, [selected])
 
             return (
                 createPortal(
@@ -258,25 +282,25 @@ export default observer(
                                 topLeft: "hover-angle-top-left",
                             }}
                             cancel=".select-feature,.select-feature-forbidden,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.link-value,.content-item"
-                            bounds={store.valueRnd.width === W ? undefined : "window"}
+                            bounds={valueRnd.width === W ? undefined : "window"}
                             minWidth={position.width}
                             minHeight={position.height}
                             allowAnyClick={true}
-                            enableResizing={count > 0 ? (store.fixPos === null ? true : false) : false}
-                            disableDragging={count > 0 && store.fixPos !== null ? true : false}
-                            position={count > 0 && store.fixPos !== null ? { x: store.fixPos.x, y: store.fixPos.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
-                            size={count > 0 && store.fixPos !== null ? { width: store.fixPos.width, height: store.fixPos.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
+                            enableResizing={count > 0 ? (fixPos === null ? true : false) : false}
+                            disableDragging={count > 0 && fixPos !== null ? true : false}
+                            position={count > 0 && fixPos !== null ? { x: fixPos.x, y: fixPos.y } : { x: valueRnd.x, y: valueRnd.y }}
+                            size={count > 0 && fixPos !== null ? { width: fixPos.width, height: fixPos.height } : { width: valueRnd.width, height: valueRnd.height }}
                             onDragStop={(e, d) => {
-                                if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
-                                    store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
-                                    if (store.valueRnd.width === W && store.valueRnd.height === H) {
-                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                        store.setFullscreen(false);
+                                if (valueRnd.x !== d.x || valueRnd.y !== d.y) {
+                                    setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                                    if (valueRnd.width === W && valueRnd.height === H) {
+                                        setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                        setFullscreen(false);
                                     }
                                 }
                             }}
                             onResize={(e, direction, ref, delta, position) => {
-                                store.setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                                setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
                             }}
                         >
                             <div ref={ref} className="popup-position" >
@@ -285,12 +309,12 @@ export default observer(
                                         onClick={(e) => {
                                             if (count > 0 && e.detail === 2) {
                                                 setTimeout(() => {
-                                                    if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
-                                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                                        store.setFullscreen(false)
+                                                    if (valueRnd.width > position.width || valueRnd.height > position.height) {
+                                                        setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                                        setFullscreen(false)
                                                     } else {
-                                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                                        store.setFullscreen(true)
+                                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                        setFullscreen(true)
                                                     }
                                                 }, 200)
                                             } else {
@@ -299,51 +323,51 @@ export default observer(
                                         }}
                                     >
                                         <span className="object-select">Объектов: {count}</span>
-                                        {count > 0 && store.selected && (
+                                        {count > 0 && selected && (
                                             <span
-                                                title={store.selected?.desc}
+                                                title={selected?.desc}
                                                 className="layer-name">
-                                                {store.selected?.desc}
+                                                {selected?.desc}
                                             </span>
                                         )}
                                     </div>
                                     {count > 0 && <CheckOnlyOne store={store} />}
-                                    {count > 0 && store.selected && (
+                                    {count > 0 && selected && (
                                         <span
-                                            title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
-                                            className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                            title={fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
+                                            className={count > 0 && fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                             onClick={() => {
-                                                if (count > 0 && store.fixPos === null) {
-                                                    if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
-                                                        store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
-                                                        store.setFullscreen(false)
+                                                if (count > 0 && fixPos === null) {
+                                                    if (valueRnd.width > position.width || valueRnd.height > position.height) {
+                                                        setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
+                                                        setFullscreen(false)
                                                     } else {
-                                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                                        store.setFullscreen(true)
+                                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                        setFullscreen(true)
                                                     }
-                                                    if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > position.height) {
-                                                        store.setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
-                                                        store.setFullscreen(true)
+                                                    if (valueRnd.width < W && valueRnd.width > position.width || valueRnd.height < H && valueRnd.height > position.height) {
+                                                        setValueRnd(prev => ({ ...prev, width: W, height: H, x: fX, y: fY }));
+                                                        setFullscreen(true)
                                                     }
                                                 }
                                             }} >
-                                            {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
+                                            {fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
                                         </span>
                                     )}
                                     <span
                                         title={gettext("Close")}
-                                        className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                        className={count > 0 && fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
                                             visible({ hidden: true, overlay: undefined, key: "popup" })
                                             topic.publish("feature.unhighlight");
-                                            store.setFullscreen(false)
-                                            store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                                            setFullscreen(false)
+                                            setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
                                         }} >
                                         <CloseIcon />
                                     </span>
                                 </div>
-                                {count > 0 && store.selected && (
-                                    <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
+                                {count > 0 && selected && (
+                                    <div className={selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
                                         <Select
                                             labelInValue
                                             optionLabelProp="label"
@@ -351,11 +375,11 @@ export default observer(
                                             filterOption={filterOption}
                                             showSearch
                                             size="small"
-                                            value={store.selected}
+                                            value={selected}
                                             style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
                                             onChange={onChangeSelect}
                                         >
-                                            {store.data.map((item, index) => {
+                                            {data.map((item, index) => {
                                                 const alias = item.permission === "Forbidden" ? forbidden : item.label;
                                                 return (
                                                     <Option key={index} value={item.value} label={alias} desc={item.desc}>
@@ -367,13 +391,13 @@ export default observer(
                                         {editFeature}
                                     </div>
                                 )}
-                                {store.selected && store.selected.permission !== "Forbidden" && (
+                                {selected && selected.permission !== "Forbidden" && (
                                     <div className="content">
                                         <ContentComponent linkToGeometry={linkToGeometry} store={store} display={display} />
                                     </div>
                                 )}
                                 <div className="footer-popup">
-                                    <CoordinateComponent display={display} contextUrl={store.contextUrl} count={count} op="popup" />
+                                    <CoordinateComponent display={display} contextUrl={contextUrl} count={count} op="popup" />
                                 </div>
                             </div>
                         </Rnd >
