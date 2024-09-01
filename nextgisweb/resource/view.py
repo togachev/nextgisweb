@@ -259,28 +259,28 @@ def creatable_resources(parent, *, user):
     result = []
     options = env.resource.options
     permissions = parent.permissions(user)
+    if parent.cls != "tablenogeom_layer":
+        for ident, cls in Resource.registry._dict.items():
+            if ident in options["disabled_cls"] or options["disable." + ident]:
+                continue
 
-    for ident, cls in Resource.registry._dict.items():
-        if ident in options["disabled_cls"] or options["disable." + ident]:
-            continue
+            if not cls.check_parent(parent):
+                continue
 
-        if not cls.check_parent(parent):
-            continue
+            # Is current user has permission to manage resource children?
+            if ResourceScope.manage_children not in permissions:
+                continue
 
-        # Is current user has permission to manage resource children?
-        if ResourceScope.manage_children not in permissions:
-            continue
+            # Is current user has permission to create child resource?
+            child = cls(parent=parent, owner_user=user)
+            if not child.has_permission(ResourceScope.create, user):
+                continue
 
-        # Is current user has permission to create child resource?
-        child = cls(parent=parent, owner_user=user)
-        if not child.has_permission(ResourceScope.create, user):
-            continue
+            # Workaround SAWarning: Object of type ... not in session,
+            # add operation along 'Resource.children' will not proceed
+            child.parent = None
 
-        # Workaround SAWarning: Object of type ... not in session,
-        # add operation along 'Resource.children' will not proceed
-        child.parent = None
-
-        result.append(cls)
+            result.append(cls)
 
     return result
 
