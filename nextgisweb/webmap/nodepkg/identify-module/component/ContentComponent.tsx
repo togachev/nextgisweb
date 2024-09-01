@@ -57,7 +57,6 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             fid: id,
         },
         options: {
-            cache: true,
             query: {
                 geom: "no",
             },

@@ -8,7 +8,7 @@ export class IdentifyStore {
     data: DataProps[] = [];
     selected: DataProps | null = null;
     attribute: object | null = null;
-    updateContent: boolean;
+    updateContent = false;
     update = false;
     fullscreen = false;
     contextUrl: string | null = null;
@@ -64,7 +64,7 @@ export class IdentifyStore {
     };
 
     setUpdate = (update: boolean) => {
-        this.setValue("update", update);
+        this.update = update;
     };
 
     setUpdateContent = (updateContent: boolean) => {

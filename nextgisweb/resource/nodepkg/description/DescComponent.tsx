@@ -1,4 +1,5 @@
 import parse, { Element, domToReact } from "html-react-parser";
+import { useMemo, useRef } from "react";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Image } from "@nextgisweb/gui/antd";
@@ -20,13 +21,11 @@ const zoomToFeature = (display, resourceId, featureId) => {
 
 export const DescComponent = observer((props) => {
     const { display, content, type, upath_info, close } = props;
-
-    const DescComp = ({ content }) => {
+    const previewRef = useRef<HTMLDivElement>(null);
+    const DescComp = useMemo((content) => {
         return (
             <>{
-                content.map((item, index) => {
-                    console.log(item);
-                    
+                content?.map((item, index) => {
                     const title = item.type === "layer" ? msgLayer : msgStyle;
                     return (
                         <div key={index} className="item-description">
@@ -50,7 +49,7 @@ export const DescComponent = observer((props) => {
                 })
             }</>
         )
-    }
+    }, [content]);
 
     const options = {
         replace: item => {
@@ -117,7 +116,7 @@ export const DescComponent = observer((props) => {
     }
 
     return (
-        <div className="desc-component">
+        <div ref={previewRef} className="desc-component">
             {type === "map" && (<PanelHeader {...{ title, close }} />)}
             {data_}
         </div>

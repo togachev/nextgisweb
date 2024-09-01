@@ -24,7 +24,7 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
     const [store] = useState(() => storeProp);
     const [result, setResult] = useState(undefined);
     const [sizeFont, setSizeFont] = useState(16);
-    const [hideLegend, setHideLegend] = useState(true);
+    const [hideLegend, setHideLegend] = useState(false);
 
     const chartRef = useRef();
     const imodule = webmapSettings.idetify_module;
