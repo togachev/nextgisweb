@@ -46,7 +46,7 @@ const CheckOnlyOne = ({ store }) => {
 export default observer(
     forwardRef<Element>(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
-            const { op, params, visible, display } = props;
+            const { params, visible, display } = props;
             const { position, response, selected } = params;
             const { getAttribute, generateUrl } = useSource();
             const { copyValue, contextHolder } = useCopy();
@@ -332,13 +332,10 @@ export default observer(
                                         title={gettext("Close")}
                                         className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
-                                            // if (count === 0 && store.fixPos === null) {
-                                                visible({ hidden: true, overlay: undefined, key: "popup" })
-                                                topic.publish("feature.unhighlight");
-                                                store.setFullscreen(false)
-                                                store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
-                                                // store.setFixPos(null);
-                                            // }
+                                            visible({ hidden: true, overlay: undefined, key: "popup" })
+                                            topic.publish("feature.unhighlight");
+                                            store.setFullscreen(false)
+                                            store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
                                         }} >
                                         <CloseIcon />
                                     </span>
