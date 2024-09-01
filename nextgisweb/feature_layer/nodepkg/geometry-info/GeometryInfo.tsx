@@ -100,7 +100,7 @@ export function GeometryInfo({
                 },
             }}
         >
-            <Descriptions bordered size="small" column={1} layout="hirizontal" items={geometryInfoColumns} />
+            <Descriptions labelStyle={{ width: "50%" }} bordered size="small" column={1} layout="hirizontal" items={geometryInfoColumns} />
         </ConfigProvider>
     )
 }
