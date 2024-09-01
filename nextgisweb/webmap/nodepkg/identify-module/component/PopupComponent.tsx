@@ -66,7 +66,6 @@ export default observer(
                     fixPos: null,
                     fixPanel: s.pn ? s.pn : "attributes",
                 }));
-            imodule.identifyStore = store;
 
             const {
                 contextUrl,
@@ -92,6 +91,8 @@ export default observer(
                 valueRnd,
             } = store;
 
+            imodule.identifyStore = store;
+
             const offHP = 40;
             const offset = display.clientSettings.offset_point;
             const fX = offHP + offset;
@@ -100,7 +101,7 @@ export default observer(
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
 
-            const getContent = async (val: DataProps, key: boolean) => {
+            const getContent = async (val: DataProps, key: boolean, data) => {
                 const res = await getAttribute(val);
                 setExtensions(res.feature.extensions);
                 setAttribute(res.updateName);
@@ -126,7 +127,7 @@ export default observer(
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
                     setSelected(selectVal);
                     setData(response.data);
-                    getContent(selectVal, false);
+                    getContent(selectVal, false, response.data);
                 } else {
                     setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
                     setSelected(null);
@@ -137,7 +138,7 @@ export default observer(
 
             useEffect(() => {
                 if (update === true) {
-                    getContent(selected, true);
+                    getContent(selected, true, data);
                 }
             }, [update]);
 
