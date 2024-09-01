@@ -310,12 +310,12 @@ export class IdentifyModule extends Component {
         )
     };
 
-    identifyModuleUrlParams = async ({ lon, lat, attribute, st, slf }: UrlParamsProps) => {
+    identifyModuleUrlParams = async ({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) => {
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
             this._responseContext({ lon, lat, attribute: false });
         } else if (slf_ instanceof String) {
-            this._responseContext({ lon, lat, attribute: true, st, slf });
+            this._responseContext({ lon, lat, attribute: true, st, slf, pn });
         }
         return true;
     };
@@ -349,6 +349,7 @@ export class IdentifyModule extends Component {
 
                 const value = {
                     attribute: val.attribute,
+                    pn: val.pn,
                     lon: val.lon,
                     lat: val.lat,
                     params,
@@ -370,7 +371,6 @@ export class IdentifyModule extends Component {
                     ],
                     type: "singleclick"
                 };
-
                 this._overlayInfo(simulateEvent, "popup", p)
             });
     };

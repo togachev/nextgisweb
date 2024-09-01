@@ -53,6 +53,7 @@ export default observer(
             const imodule = display.identify_module;
 
             const count = response.featureCount;
+            const s = display.getUrlParams()
 
             const [store] = useState(
                 () => new IdentifyStore({
@@ -63,9 +64,10 @@ export default observer(
                         height: position.height,
                     },
                     fixPos: null,
+                    fixPanel: s.pn ? s.pn : "attributes",
                 }));
             imodule.identifyStore = store;
-
+            
             const offHP = 40;
             const offset = display.clientSettings.offset_point;
             const fX = offHP + offset;
@@ -73,7 +75,7 @@ export default observer(
 
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
-
+            
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val);
                 store.setAttribute(res.updateName);
@@ -84,7 +86,7 @@ export default observer(
                 })
 
                 const noSelectedItem = store.data;
-                store.setContextUrl(generateUrl(display, { res: val, st: noSelectedItem }));
+                store.setContextUrl(generateUrl(display, { res: val, st: noSelectedItem, pn: store.fixPanel }));
                 store.setLinkToGeometry(res.resourceId + ":" + res.feature.id);
 
                 if (key === true) {
@@ -101,26 +103,26 @@ export default observer(
                     store.setData(response.data);
                     getContent(selectVal, false);
                 } else {
-                    store.setContextUrl(generateUrl(display, { res: null, st: null }));
+                    store.setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
                     store.setSelected(null);
                     store.setData([]);
                     topic.publish("feature.unhighlight");
                 }
-            }, [response]);
+            }, [response, store.fixPanel]);
 
             useEffect(() => {
                 if (store.update === true) {
                     getContent(store.selected, true);
                 }
             }, [store.update]);
-
+            
             useEffect(() => {
                 if (store.fixPopup) {
                     store.setFixPos(store.valueRnd);
                     store.setFixPanel(store.fixContentItem.key)
                 } else {
                     store.setFixPos(null);
-                    store.setFixPanel(null);
+                    // store.setFixPanel(null);
                 }
             }, [store.fixPopup]);
 

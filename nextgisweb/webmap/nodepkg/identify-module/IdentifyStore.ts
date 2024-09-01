@@ -12,7 +12,7 @@ export class IdentifyStore {
     update = false;
     fullscreen = false;
     contextUrl: string | null = null;
-    fixContentItem = "attributes";
+    fixContentItem: string | null = null;
     linkToGeometry: string | null = null;
     valueRnd: Rnd | null = null;
     fixPos: Rnd | null = null;

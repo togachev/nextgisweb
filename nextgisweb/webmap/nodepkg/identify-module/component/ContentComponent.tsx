@@ -21,7 +21,7 @@ const settings = webmapSettings;
 
 export const ContentComponent: FC = observer(({ store: storeProp, display, linkToGeometry }) => {
     const [store] = useState(() => storeProp);
-    const { attribute, data, fixContentItem, fixPanel, fixPos, setFixContentItem, selected, setUpdateContent, updateContent, valueRnd } = store;
+    const { attribute, data, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, setUpdateContent, updateContent, valueRnd } = store;
     const { id, layerId } = selected;
     const { copyValue, contextHolder } = useCopy();
     const panelRef = useRef<HTMLDivElement>(null);
@@ -148,9 +148,10 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
         setHeightPanel(valueRnd.height - 70);
         if (fixPos !== null) {
             const result = options.find(item => item.key === fixPanel);
-            result ? setFixContentItem(result) : setFixContentItem(options.find(item => item.key === "attributes"));
+            result ? setFixContentItem(options.find(item => item.key === result.key)) : setFixContentItem(options.find(item => item.key === "attributes"));
         } else {
-            setFixContentItem(options.find(item => item.key === "attributes"));
+            const result = options.find(item => item.key === fixPanel);
+            result ? setFixContentItem(options.find(item => item.key === result.key)) : setFixContentItem(options.find(item => item.key === "attributes"));
         }
     }, [attribute]);
 
@@ -181,6 +182,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
 
     const onValuesChange = (e) => {
         setFixContentItem(options.find(item => item.key === e.target.value));
+        setFixPanel(e.target.value);
     }
 
     return (

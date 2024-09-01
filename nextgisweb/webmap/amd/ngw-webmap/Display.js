@@ -910,9 +910,9 @@ define([
             ) {
                 return;
             }
-            const { lon, lat, attribute, st, slf } = urlParams;
+            const { lon, lat, attribute, st, slf, pn } = urlParams;
             this.identify_module
-                .identifyModuleUrlParams({ lon, lat, attribute, st, slf })
+                .identifyModuleUrlParams({ lon, lat, attribute, st, slf, pn })
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({

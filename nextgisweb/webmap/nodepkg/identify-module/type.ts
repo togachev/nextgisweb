@@ -18,6 +18,7 @@ export interface UrlParamsProps {
     attribute: string | boolean;
     st?: string;
     slf?: string;
+    pn?: string;
 }
 
 export interface StylesRequest {
