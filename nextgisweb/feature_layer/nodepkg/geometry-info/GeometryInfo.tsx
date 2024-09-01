@@ -75,7 +75,7 @@ export function GeometryInfo({
             },
         ];
 
-        geometryInfo?.length !== null && geometryInfo?.length !== null && items.splice(1, 0, {
+        geometryInfo?.length !== null && items.splice(1, 0, {
             key: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
             label: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
             children: formatLength(geometryInfo?.length),
