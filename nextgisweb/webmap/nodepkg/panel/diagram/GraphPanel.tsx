@@ -24,7 +24,7 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
     const [store] = useState(() => storeProp);
     const [result, setResult] = useState(undefined);
     const [sizeFont, setSizeFont] = useState(16);
-    const [hideLegend, setHideLegend] = useState(false);
+    const [hideLegend, setHideLegend] = useState(true);
 
     const chartRef = useRef();
     const imodule = webmapSettings.idetify_module;
@@ -96,6 +96,9 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
         const options = {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: 5,
+            },
             plugins: {
                 legend: {
                     labels: {
@@ -103,13 +106,11 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
                             size: sizeFont
                         },
                         padding: 10,
+                        usePointStyle: true,
                     },
                     position: "top",
                     align: "start",
                     display: hideLegend,
-                },
-                legendDistance: {
-                    padding: 24,
                 },
             },
             tooltips: {
@@ -152,6 +153,16 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
             },
         };
 
+        const plugin = {
+            beforeInit: function (chart) {
+                const originalFit = chart.legend.fit
+                chart.legend.fit = function fit() {
+                    originalFit.bind(chart.legend)()
+                    this.height += 20
+                }
+            }
+        }
+
         return (
             <>
                 <HideLegend />
@@ -160,6 +171,7 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
                         ref={chartRef}
                         type="scatter"
                         options={options}
+                        plugins={[plugin]}
                         data={value?.data}
                         style={
                             store.fixPos !== null ?

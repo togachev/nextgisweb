@@ -46,7 +46,7 @@ const CheckOnlyOne = ({ store }) => {
 export default observer(
     forwardRef<Element>(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
-            const { params, visible, display } = props;
+            const { op, params, visible, display } = props;
             const { position, response, selected } = params;
             const { getAttribute, generateUrl } = useSource();
             const { copyValue, contextHolder } = useCopy();
@@ -261,9 +261,9 @@ export default observer(
                             minHeight={position.height}
                             allowAnyClick={true}
                             enableResizing={count > 0 ? (store.fixPos === null ? true : false) : false}
-                            disableDragging={store.fixPos !== null ? true : false}
-                            position={store.fixPos !== null ? { x: store.fixPos.x, y: store.fixPos.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
-                            size={store.fixPos !== null ? { width: store.fixPos.width, height: store.fixPos.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
+                            disableDragging={count > 0 && store.fixPos !== null ? true : false}
+                            position={count > 0 && store.fixPos !== null ? { x: store.fixPos.x, y: store.fixPos.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
+                            size={count > 0 && store.fixPos !== null ? { width: store.fixPos.width, height: store.fixPos.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
                             onDragStop={(e, d) => {
                                 if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
                                     store.setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
@@ -305,13 +305,13 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    <CheckOnlyOne store={store} />
+                                    {count > 0 && <CheckOnlyOne store={store} />}
                                     {count > 0 && store.selected && (
                                         <span
                                             title={store.fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
-                                            className={store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                            className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                             onClick={() => {
-                                                if (store.fixPos === null) {
+                                                if (count > 0 && store.fixPos === null) {
                                                     if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
                                                         store.setValueRnd(prev => ({ ...prev, width: position.width, height: position.height, x: position.x, y: position.y }));
                                                         store.setFullscreen(false)
@@ -330,15 +330,15 @@ export default observer(
                                     )}
                                     <span
                                         title={gettext("Close")}
-                                        className={store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                        className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
-                                            if (store.fixPos === null) {
+                                            // if (count === 0 && store.fixPos === null) {
                                                 visible({ hidden: true, overlay: undefined, key: "popup" })
                                                 topic.publish("feature.unhighlight");
                                                 store.setFullscreen(false)
                                                 store.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
-                                                store.setFixPos(null);
-                                            }
+                                                // store.setFixPos(null);
+                                            // }
                                         }} >
                                         <CloseIcon />
                                     </span>
