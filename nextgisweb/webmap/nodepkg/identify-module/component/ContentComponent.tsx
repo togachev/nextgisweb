@@ -11,7 +11,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { observer } from "mobx-react-lite";
 import { GraphPanel } from "@nextgisweb/webmap/panel/diagram/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
@@ -21,7 +20,7 @@ const settings = webmapSettings;
 
 export const ContentComponent: FC = observer(({ store: storeProp, display, linkToGeometry }) => {
     const [store] = useState(() => storeProp);
-    const { attribute, data, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, setUpdateContent, updateContent, valueRnd } = store;
+    const { attribute, data, extensions, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, valueRnd } = store;
     const { id, layerId } = selected;
     const { copyValue, contextHolder } = useCopy();
     const panelRef = useRef<HTMLDivElement>(null);
@@ -49,21 +48,6 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             }
         }
     };
-
-    const { data: extensions, refresh: refreshAttach } = useRouteGet({
-        name: "feature_layer.feature.item",
-        params: {
-            id: layerId,
-            fid: id,
-        },
-        options: {
-            query: {
-                geom: "no",
-            },
-        },
-    });
-
-    const ext = extensions?.extensions
 
     const AttributeColumns = ({ attribute }) => {
         const items: DescriptionsProps['items'] = [];
@@ -120,7 +104,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             key: "description",
             title: gettext("Description"),
             hidden: false,
-            children: ext?.description ? (<DescComponent display={display} type="feature" content={ext?.description} />) : emptyValue
+            children: extensions !== null && extensions.description !== null ? (<DescComponent display={display} type="feature" content={extensions?.description} />) : emptyValue
         },
         {
             label: (<span className="icon-style"><Attachment /></span>),
@@ -128,7 +112,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             key: "attachment",
             title: gettext("Attachments"),
             hidden: false,
-            children: ext?.attachment ? (<AttachmentTable attachments={ext?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
+            children: extensions !== null && extensions.attachment !== null ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
         },
     ];
 
@@ -153,13 +137,6 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             result ? setFixContentItem(options.find(item => item.key === result.key)) : setFixContentItem(options.find(item => item.key === "attributes"));
         }
     }, [attribute]);
-
-    useEffect(() => {
-        if (updateContent === true) {
-            refreshAttach();
-            setUpdateContent(false);
-        }
-    }, [updateContent])
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setFixContentItem(options.find(item => item.key === key));

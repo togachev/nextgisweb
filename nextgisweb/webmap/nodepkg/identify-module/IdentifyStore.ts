@@ -8,6 +8,7 @@ export class IdentifyStore {
     data: DataProps[] = [];
     selected: DataProps | null = null;
     attribute: object | null = null;
+    extensions: object | null = null;
     updateContent = false;
     update = false;
     fullscreen = false;
@@ -61,6 +62,10 @@ export class IdentifyStore {
 
     setAttribute = (attribute: SetValue<object | null>) => {
         this.setValue("attribute", attribute);
+    };
+
+    setExtensions = (extensions: SetValue<object | null>) => {
+        this.setValue("extensions", extensions);
     };
 
     setUpdate = (update: boolean) => {

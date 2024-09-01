@@ -366,20 +366,24 @@
         }
     }
 
-    .link-value {
-        padding: 0;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        line-height: normal;
-        height: 24px;
-        width: 24px;
-        justify-content: center;
+    .link-block {
+        display: inline-flex;
 
-        &:hover {
-            color: var(--primary);
-            background-color: rgba(0, 0, 0, .02);
-            border-radius: 3px;
+        .link-value {
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            line-height: normal;
+            height: 24px;
+            width: 24px;
+            justify-content: center;
+
+            &:hover {
+                color: var(--primary);
+                background-color: rgba(0, 0, 0, .02);
+                border-radius: 3px;
+            }
         }
     }
 }

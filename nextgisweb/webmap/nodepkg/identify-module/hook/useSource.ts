@@ -43,7 +43,6 @@ export const useSource = () => {
 
     const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
-
         const query = {
             dt_format: "iso",
         };

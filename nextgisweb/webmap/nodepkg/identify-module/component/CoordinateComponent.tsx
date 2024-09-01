@@ -3,6 +3,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import VectorLink from "@nextgisweb/icon/mdi/vector-link";
+import UpdateLink from "@nextgisweb/icon/mdi/update";
 
 export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
     const { copyValue, contextHolder } = useCopy();
@@ -21,14 +22,24 @@ export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
                 <span className="coords">{coordsVisible}</span>
             </span>
             {op === "popup" && contextUrl !== null && (
-                <span className="link-value"
-                    title={count > 0 ? gettext("Copy link to object") : gettext("Copy link to location")}
-                    onClick={() => {
-                        copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-                    }}
-                >
-                    <VectorLink />
-                </span>
+                <div className="link-block">
+                    <span className="link-value"
+                        title={gettext("Update url display map")}
+                        onClick={() => {
+                            window.history.pushState({}, "", contextUrl)
+                        }}
+                    >
+                        <UpdateLink />
+                    </span>
+                    <span className="link-value"
+                        title={count > 0 ? gettext("Copy link to object") : gettext("Copy link to location")}
+                        onClick={() => {
+                            copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
+                        }}
+                    >
+                        <VectorLink />
+                    </span>
+                </div>
             )}
         </div>
     )

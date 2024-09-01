@@ -78,6 +78,7 @@ export default observer(
             
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val);
+                store.setExtensions(res.feature.extensions);
                 store.setAttribute(res.updateName);
                 topic.publish("feature.highlight", {
                     geom: res.feature.geom,
@@ -187,7 +188,6 @@ export default observer(
                                             onSave: () => {
                                                 store.setUpdate(true);
                                                 topic.publish("feature.updated", { resourceId: layerId, featureId: id });
-                                                store.setUpdateContent(true);
                                             },
                                         },
                                     });
