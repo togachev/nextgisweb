@@ -133,7 +133,7 @@ export default observer(
                     setData([]);
                     topic.publish("feature.unhighlight");
                 }
-            }, [response, fixPanel]);
+            }, [response]);
 
             useEffect(() => {
                 if (update === true) {

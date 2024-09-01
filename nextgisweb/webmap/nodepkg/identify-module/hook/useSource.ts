@@ -20,7 +20,7 @@ export const useSource = () => {
                 styles.push(itm.itemConfig.styleId);
             }
         });
-        
+
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
         let result = [...new Set(st?.map(a => a.styleId))];
 
