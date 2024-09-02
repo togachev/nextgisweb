@@ -41,12 +41,6 @@ const experimentalPanel = (
     </Tooltip>
 );
 
-const diagramPanel = (
-    <Tooltip title={diagramPanelInfoMsg}>
-        <InfoIcon />
-    </Tooltip>
-);
-
 export const SettingsForm = ({
     onFinish,
     initialValues,
