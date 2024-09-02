@@ -93,7 +93,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
         );
     };
 
-    const GraphScatter = ({ value }) => {
+    const GraphComponent = ({ value }) => {
         const options = {
             responsive: true,
             maintainAspectRatio: false,
@@ -164,14 +164,13 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             }
         }
 
-        const styleScatter = store?.fixPos !== null ?
+        const styleResize = store?.fixPos !== null ?
             { width: store?.fixPos.width - 47, height: store?.fixPos.height - 110 } :
             { width: store?.valueRnd.width - 47, height: store?.valueRnd.height - 110 }
 
         const styleGtaph = !hideLegend ?
             { height: webmapSettings.popup_height } :
             { height: webmapSettings.popup_height * 1.5 };
-        console.log(webmapSettings);
         
         return (
             <>
@@ -182,7 +181,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
                         options={options}
                         plugins={[plugin]}
                         data={value?.data}
-                        style={store ? styleScatter : null}
+                        style={store ? styleResize : null}
                     />
                 </div>
             </>
@@ -203,7 +202,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             <div className="panel-content-container">
                 <div className="fill">
                     <div className="relation-item">
-                        {result ? (<GraphScatter value={result} />) : emptyValue}
+                        {result ? (<GraphComponent value={result} />) : emptyValue}
                     </div>
                 </div>
             </div>
