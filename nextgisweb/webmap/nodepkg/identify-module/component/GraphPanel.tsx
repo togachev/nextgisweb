@@ -1,25 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
+import { Empty } from "@nextgisweb/gui/antd";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { Tag } from "@nextgisweb/gui/antd";
 import { LineChartOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
-
 import { Scatter } from "react-chartjs-2";
 import { Chart, Title, registerables } from "chart.js";
 Chart.register(...registerables);
 Chart.register(Title);
 
-import { context, params } from "./constant";
-import type { ContextItemProps } from "./type";
+import { context, params } from "../constant";
+import type { ContextItemProps } from "../type";
 
 import "./GraphPanel.less";
 
 const msgHideLegend = gettext("Hide chart legend");
 const msgShowLegend = gettext("Show chart legend");
+const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
+export const GraphPanel = observer(({ item, store: storeProp }) => {
 
     const [store] = useState(() => storeProp);
     const [result, setResult] = useState(undefined);
@@ -31,7 +32,7 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
 
     const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 
-    const loadData = async (item, value) => {
+    const loadData = async (item) => {
         const { external_resource_id, relation_key, relation_value } = item.relation;
         const key_rel = "fld_" + relation_key;
         const json = {
@@ -65,17 +66,17 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
             data.push(copy)
         })
 
-        const obj = { props: value, data: { datasets: data } };
+        const obj = { props: item, data: { datasets: data } };
         feature.length > 0 ? setResult(obj) : setResult(undefined);
     }
 
     useEffect(() => {
-        loadData(item, store.selected);
-    }, [store.attribute]);
+        loadData(item);
+    }, [item]);
 
     useEffect(() => {
         chartRef.current?.resize(store.valueRnd.width - 47, store.valueRnd.height - 110);
-    }, [store.valueRnd]);
+    }, [store?.valueRnd]);
 
     const HideLegend = () => {
         const onChange = (checked: boolean) => {
@@ -163,21 +164,23 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
             }
         }
 
+        const styleScatter = store?.fixPos !== null ?
+            { width: store?.fixPos.width - 47, height: store?.fixPos.height - 110 } :
+            { width: store?.valueRnd.width - 47, height: store?.valueRnd.height - 110 }
+
+        const styleGtaph = !hideLegend ? { height: webmapSettings.popup_height } : { height: webmapSettings.popup_height * 1.5 };
+
         return (
             <>
-                <HideLegend />
-                <div className="graph-content" >
+                
+                <div className={store && "graph-content"} style={!store ? styleGtaph : null}>
                     <Scatter
                         ref={chartRef}
                         type="scatter"
                         options={options}
                         plugins={[plugin]}
                         data={value?.data}
-                        style={
-                            store.fixPos !== null ?
-                                { width: store.fixPos.width - 47, height: store.fixPos.height - 110 } :
-                                { width: store.valueRnd.width - 47, height: store.valueRnd.height - 110 }
-                        }
+                        style={store ? styleScatter : null}
                     />
                 </div>
             </>
@@ -192,14 +195,13 @@ export const GraphPanel = observer(({ emptyValue, item, store: storeProp }) => {
                         <LineChartOutlined />
                         {msgGraphs}
                     </h3>)}
+                    {result && (<HideLegend />)}
                 </div>
             </div>
             <div className="panel-content-container">
                 <div className="fill">
                     <div className="relation-item">
-                        {
-                            result ? (<GraphScatter value={result} />) : emptyValue
-                        }
+                        {result ? (<GraphScatter value={result} />) : emptyValue}
                     </div>
                 </div>
             </div>

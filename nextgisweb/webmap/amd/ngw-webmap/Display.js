@@ -1087,31 +1087,6 @@ define([
             });
             panels.push(makeInfoPanel);
 
-            const makeDiagramPanel = new Promise((resolve) => {
-                if (!this.config.relation) {
-                    resolve(undefined);
-                }
-                const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/diagram", {
-                        props: {
-                            topic: topic,
-                        },
-                    }),
-                    params: {
-                        title: gettext("Diagram"),
-                        name: "diagram",
-                        order: 80,
-                        menuIcon: "material-auto_graph",
-                        class: "diagram-panel dynamic-panel--fullwidth",
-                        withTitle: false,
-                    },
-                };
-                resolve(panel);
-            });
-            if (settings.diagram_panel && !settings.identify_panel) {
-                panels.push(makeDiagramPanel);
-            }
-
             const makeAnnotationsPanel = new Promise((resolve) => {
                 this._buildAnnotationPanel(resolve);
             });

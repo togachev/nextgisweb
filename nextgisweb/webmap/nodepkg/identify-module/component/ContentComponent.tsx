@@ -12,7 +12,7 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { observer } from "mobx-react-lite";
-import { GraphPanel } from "@nextgisweb/webmap/panel/diagram/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 
 const { Link } = Typography;
@@ -123,7 +123,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             key: "relation",
             title: gettext("Relations"),
             hidden: false,
-            children: firstItem && firstItem.relation && (<GraphPanel emptyValue={emptyValue} item={firstItem} store={store} />),
+            children: firstItem && firstItem.relation && (<GraphPanel item={firstItem} store={store} />),
         })
     }
 

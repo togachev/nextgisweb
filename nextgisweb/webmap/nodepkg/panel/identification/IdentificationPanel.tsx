@@ -16,7 +16,7 @@ import { PanelHeader } from "../header";
 
 import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
 import { FeatureEditButton } from "./FeatureEditButton";
-import { GraphPanel } from "../diagram/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
 import { getExtensionsComps } from "./extensions";
 import { fieldValuesToDataSource, getFieldsInfo } from "./fields";
 import type { FieldDataItem } from "./fields";
@@ -30,8 +30,6 @@ import type {
     IdentifyInfo,
     IdentifyResultProps,
 } from "./identification";
-
-import { DescComponent } from "@nextgisweb/resource/description";
 
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 import EarthIcon from "@nextgisweb/icon/material/public/outline";

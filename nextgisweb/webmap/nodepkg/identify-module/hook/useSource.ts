@@ -22,7 +22,7 @@ export const useSource = () => {
         });
 
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-        let result = [...new Set(st?.map(a => a.styleId))];
+        const result = [...new Set(st?.map(a => a.styleId))];
 
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
