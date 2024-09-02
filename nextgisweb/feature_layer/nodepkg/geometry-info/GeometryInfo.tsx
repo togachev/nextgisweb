@@ -100,7 +100,7 @@ export function GeometryInfo({
                 },
             }}
         >
-            <Descriptions labelStyle={{ width: "50%" }} bordered size="small" column={1} layout="hirizontal" items={geometryInfoColumns} />
+            <Descriptions labelStyle={{ wordBreak: "break-all", width: "calc(50%)" }} bordered size="small" column={1} layout="hirizontal" items={geometryInfoColumns} />
         </ConfigProvider>
     )
 }
