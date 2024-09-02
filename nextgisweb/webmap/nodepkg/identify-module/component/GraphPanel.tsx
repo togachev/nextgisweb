@@ -168,11 +168,13 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             { width: store?.fixPos.width - 47, height: store?.fixPos.height - 110 } :
             { width: store?.valueRnd.width - 47, height: store?.valueRnd.height - 110 }
 
-        const styleGtaph = !hideLegend ? { height: webmapSettings.popup_height } : { height: webmapSettings.popup_height * 1.5 };
-
+        const styleGtaph = !hideLegend ?
+            { height: webmapSettings.popup_height } :
+            { height: webmapSettings.popup_height * 1.5 };
+        console.log(webmapSettings);
+        
         return (
             <>
-                
                 <div className={store && "graph-content"} style={!store ? styleGtaph : null}>
                     <Scatter
                         ref={chartRef}
