@@ -128,6 +128,7 @@ export default observer(
                     setSelected(selectVal);
                     setData(response.data);
                     getContent(selectVal, false);
+                    setLinkToGeometry(selectVal.layerId + ":" + selectVal.id);
                 } else {
                     setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
                     setSelected(null);
