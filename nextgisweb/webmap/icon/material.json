@@ -33,5 +33,6 @@
     "upload_file",
     "close_fullscreen",
     "open_in_full",
-    "chat"
+    "chat",
+    "table_view"
 ]

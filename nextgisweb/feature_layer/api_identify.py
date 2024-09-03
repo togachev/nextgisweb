@@ -10,16 +10,15 @@ def identify(request) -> JSONType:
     data = request.json_body
     srs = int(data["srs"])
     geom = Geometry.from_wkt(data["geom"], srid=srs)
-    layers = map(int, data["layers"])
-
-    layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
-
+    styles = map(int, data["styles"])
+    style_list = DBSession.query(Resource).filter(Resource.id.in_(styles))
     result = dict()
 
     # Number of features in all layers
     feature_count = 0
 
-    for layer in layer_list:
+    for style in style_list:
+        layer = style.parent
         layer_id_str = str(layer.id)
         if not layer.has_permission(DataScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
@@ -39,6 +38,7 @@ def identify(request) -> JSONType:
                 dict(
                     id=f.id,
                     layerId=layer.id,
+                    styleId=style.id,
                     label=f.label,
                     fields=f.fields,
                 )

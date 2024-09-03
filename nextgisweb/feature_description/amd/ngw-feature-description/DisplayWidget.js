@@ -7,7 +7,7 @@ define([
     "@nextgisweb/pyramid/icon",
 ], function (declare, reactApp, DescComp, { gettext }, DisplayWidget, icon) {
     return declare(DisplayWidget, {
-        title: gettext("Description"),
+        title: `<div class="custom-popup-button" title="${gettext("Description")}">` + icon.html({ glyph: "description" }) + `</div>`,
 
         renderValue: function (value) {
             if (!value) {
@@ -17,6 +17,7 @@ define([
             reactApp.default(
                 DescComp.default,
                 {
+                    display: this.display,
                     content: value,
                     type: "feature-obj",
                 },

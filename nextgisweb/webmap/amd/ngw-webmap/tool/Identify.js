@@ -12,6 +12,7 @@ define([
     "dojo/dom-construct",
     "dojo/on",
     "dojo/topic",
+    "@nextgisweb/pyramid/icon",
     "dijit/_WidgetBase",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -50,6 +51,7 @@ define([
     domConstruct,
     on,
     topic,
+    icon,
     _WidgetBase,
     BorderContainer,
     ContentPane,
@@ -62,7 +64,7 @@ define([
     ol,
     Popup,
     api,
-    i18n,
+    { gettext },
     FieldsDisplayWidget,
     GeometryInfoWidget,
     CoordinateSwitcher,
@@ -95,7 +97,7 @@ define([
             featureEditorModal
         ) => {
             featureEditorModal.showFeatureEditorModal({
-                bodyStyle: { height: "100%" },
+                // bodyStyle: { height: "100%" },
                 editorOptions: {
                     featureId,
                     resourceId,
@@ -244,10 +246,12 @@ define([
 
             domConstruct.empty(widget.featureContainer.domNode);
 
-            xhr.get(iurl, {
+            const iurlXHR = xhr.get(iurl, {
                 method: "GET",
                 handleAs: "json",
-            }).then(function (feature) {
+            });
+
+            iurlXHR.then(function (feature) {
                 widget.extWidgetClassesDeferred.then(function () {
                     widget.extContainer = new StackContainer({
                         region: "center",
@@ -263,7 +267,7 @@ define([
                     });
                     domClass.add(
                         widget.extController.domNode,
-                        "ngwWebmapToolIdentify-controller"
+                        "ngwWebmapToolIdentify-controller other-style"
                     );
 
                     widget.featureContainer.addChild(widget.extController);
@@ -274,7 +278,7 @@ define([
                             resourceId: lid,
                             featureId: fid,
                             compact: true,
-                            title: i18n.gettext("Attributes"),
+                            title: `<div class="custom-popup-button" title="${gettext("Attributes")}">` + icon.html({ glyph: "table_view" }) + `</div>`,
                         });
 
                         fwidget.renderValue(feature.fields);
@@ -286,7 +290,7 @@ define([
                             resourceId: lid,
                             featureId: fid,
                             compact: true,
-                            title: i18n.gettext("Geometry"),
+                            title: `<div class="custom-popup-button" title="${gettext("Geometry")}">` + icon.html({ glyph: "query_stats" }) + `</div>`,
                         });
                         geometryWidget.renderValue(lid, fid);
                         geometryWidget.placeAt(widget.extContainer);
@@ -297,6 +301,7 @@ define([
                         function (key) {
                             var cls = widget.extWidgetClasses[key],
                                 ewidget = new cls({
+                                    display: widget.tool.display,
                                     resourceId: lid,
                                     featureId: fid,
                                     compact: true,
@@ -320,7 +325,8 @@ define([
                         if (!editEnabled) return false;
 
                         widget.editButton = new Button({
-                            iconClass: "dijitIconEdit",
+                            innerHTML: `<div title="${gettext("Edit")}">` + icon.html({ glyph: "edit_note" }) + `</div>`,
+                            class:"custom-popup-button",
                             showLabel: true,
                             onClick: () =>
                                 openFeatureEditorTab({
@@ -385,7 +391,7 @@ define([
     });
 
     return declare(Base, {
-        label: i18n.gettext("Identify"),
+        label: gettext("Identify"),
         iconClass: "iconIdentify",
 
         pixelRadius: webmapSettings.identify_radius,
@@ -401,7 +407,7 @@ define([
             this._bindEvents();
 
             this._popup = new Popup({
-                title: i18n.gettext("Identify"),
+                title: gettext("Identify"),
                 size: [this.popupWidth, this.popupHeight],
             });
             this.display.map.olMap.addOverlay(this._popup);
@@ -440,7 +446,7 @@ define([
             var request = {
                 srs: 3857,
                 geom: this._requestGeomString(pixel),
-                layers: [],
+                styles: [],
             };
 
             this.display.getVisibleItems().then(
@@ -460,7 +466,7 @@ define([
                             ) {
                                 return;
                             }
-                            request.layers.push(item.layerId);
+                            request.styles.push(item.styleId);
                         },
                         this
                     );
@@ -476,18 +482,13 @@ define([
                         this
                     );
 
-                    xhr.post(route.feature_layer.identify(), {
-                        handleAs: "json",
-                        data: json.stringify(request),
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }).then(function (response) {
-                        tool._responsePopup(response, point, layerLabels);
-                        topic.publish("feature_layer.identify", {
-                            response,
+                    api.route("feature_layer.identify")
+                        .post({
+                            body: json.stringify(request),
+                        })
+                        .then(function (response) {
+                            tool._responsePopup(response, point, layerLabels);
                         });
-                    });
                 })
             );
         },
@@ -517,7 +518,7 @@ define([
             response,
             point,
             layerLabels,
-            afterPopupInit
+            afterPopupInit,
         ) {
             if (response.featureCount === 0) {
                 topic.publish("feature.unhighlight");
@@ -558,8 +559,9 @@ define([
             widget.placeAt(this._popup.contentDiv);
 
             this._popup.setTitle(
-                i18n.gettext("Features") + ": " + response.featureCount
+                gettext("Features") + ": " + response.featureCount
             );
+            
             this._popup.setPosition(point);
             if (afterPopupInit && afterPopupInit instanceof Function)
                 afterPopupInit();
