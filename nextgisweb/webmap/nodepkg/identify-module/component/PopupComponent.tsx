@@ -75,6 +75,7 @@ export default observer(
                 fixPopup,
                 fixPos,
                 fullscreen,
+                linkToGeometry,
                 selected,
                 setAttribute,
                 setContextUrl,
@@ -164,7 +165,7 @@ export default observer(
                     return true
             }
 
-            const linkToGeometry = useMemo(() => {
+            const linkToGeometryFeature = useMemo(() => {
                 if (count > 0 && selected) {
                     const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === selected.styleId);
                     const title = gettext("HTML code of the geometry link, for insertion into the description")
@@ -392,7 +393,7 @@ export default observer(
                                 )}
                                 {selected && selected.permission !== "Forbidden" && (
                                     <div className="content">
-                                        <ContentComponent linkToGeometry={linkToGeometry} store={store} display={display} />
+                                        <ContentComponent linkToGeometry={linkToGeometryFeature} store={store} display={display} />
                                     </div>
                                 )}
                                 <div className="footer-popup">

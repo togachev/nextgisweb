@@ -12,7 +12,7 @@ const msgLayer = gettext("Layer description");
 const msgStyle = gettext("Style description");
 
 const zoomToFeature = (display, resourceId, featureId) => {
-    display.featureHighlighter
+    display?.featureHighlighter
         .highlightFeatureById(featureId, resourceId)
         .then((feature) => {
             display.map.zoomToFeature(feature);
@@ -89,7 +89,7 @@ export const DescComponent = observer((props) => {
                 }
             }
 
-            if (item instanceof Element && item.name === 'a' && !upath_info && type !== "feature") {
+            if (item instanceof Element && item.name === "a" && !upath_info && type !== "feature") {
                 if (/^\d+:\d+$/.test(item.attribs.href)) {
                     return (<a onClick={
                         () => {

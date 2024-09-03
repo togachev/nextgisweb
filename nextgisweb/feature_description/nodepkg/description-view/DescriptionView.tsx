@@ -2,7 +2,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identification/identification";
 
 import DescriptionIcon from "@nextgisweb/icon/material/description/outline";
-
+import { DescComponent } from "@nextgisweb/resource/description";
 import "@nextgisweb/webmap/panel/identification/PanelContentContainer.less";
 
 const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
@@ -22,7 +22,8 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
                 </div>
             </div>
             <div className="panel-content-container">
-                <div dangerouslySetInnerHTML={{ __html: description }} />
+                {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
+                <DescComponent type="feature" content={description} />
             </div>
         </>
     );

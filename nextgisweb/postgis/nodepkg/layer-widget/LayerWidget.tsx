@@ -265,7 +265,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                         }}
                     />
                 </Area>
-                <Divider orientation="left" plain>{msgResRelSettings}</Divider>
+                <Divider orientation="left" orientationMargin="16" plain>{msgResRelSettings}</Divider>
                 <Area pad cols={["1fr", "1fr"]}>
                     <LotMV
                         row

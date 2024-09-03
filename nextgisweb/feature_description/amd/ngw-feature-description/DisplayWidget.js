@@ -1,14 +1,27 @@
 define([
     "dojo/_base/declare",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/resource/description",
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
-], function (declare, i18n, DisplayWidget) {
+    "@nextgisweb/pyramid/icon",
+], function (declare, reactApp, DescComp, { gettext }, DisplayWidget, icon) {
     return declare(DisplayWidget, {
-        title: i18n.gettext("Description"),
+        title: gettext("Description"),
 
         renderValue: function (value) {
-            this.domNode.innerHTML = value;
-            return !!value;
+            if (!value) {
+                return false;
+            }
+
+            reactApp.default(
+                DescComp.default,
+                {
+                    content: value,
+                    type: "feature-obj",
+                },
+                this.domNode
+            );
         },
     });
 });
