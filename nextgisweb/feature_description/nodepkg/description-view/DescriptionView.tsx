@@ -5,7 +5,7 @@ import DescriptionIcon from "@nextgisweb/icon/material/description/outline";
 import { DescComponent } from "@nextgisweb/resource/description";
 import "@nextgisweb/webmap/panel/identification/PanelContentContainer.less";
 
-const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
+const DescriptionView = ({ display, featureItem }: IdentifyExtensionComponentProps) => {
     if (!featureItem.extensions || !featureItem.extensions["description"]) {
         return null;
     }
@@ -23,7 +23,7 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
             </div>
             <div className="panel-content-container">
                 {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
-                <DescComponent type="feature" content={description} />
+                <DescComponent display={display} content={description} />
             </div>
         </>
     );

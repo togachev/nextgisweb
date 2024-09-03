@@ -10,6 +10,7 @@ define([
     "put-selector/put",
     "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/pyramid/icon",
     "ngw-lookup-table/cached",
     "./DisplayWidget",
     // css
@@ -25,14 +26,15 @@ define([
     regexp,
     put,
     route,
-    i18n,
+    { gettext },
+    icon,
     lookupTableCached,
     DisplayWidget
 ) {
     var fieldsCache = {};
 
     return declare([DisplayWidget], {
-        title: i18n.gettext("Attributes"),
+        title: `<div class="custom-popup-button" title="${gettext("Attributes")}">` + icon.html({ glyph: "table" }) + ` ${gettext("Attributes")}</div>`,
         aliases: false,
         grid_visibility: false,
         urlRegex:
@@ -175,7 +177,7 @@ define([
                         tbody,
                         "tr th.display_name $ < td.value span.null $",
                         fieldmap[k].display_name,
-                        i18n.gettext("N/A")
+                        gettext("N/A")
                     );
                 }
             }

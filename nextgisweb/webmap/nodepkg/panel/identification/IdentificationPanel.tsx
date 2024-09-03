@@ -186,6 +186,7 @@ const FeatureInfo = ({
                 newExtComps.push(
                     <Suspense key={key} fallback={msgLoading}>
                         <ExtensionComponent
+                            display={display}
                             featureItem={featureItem}
                             resourceId={featureInfo.layerId}
                         ></ExtensionComponent>

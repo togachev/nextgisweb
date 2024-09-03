@@ -17,8 +17,6 @@
         var props = ${
             json_js(dict(
                 content = obj.description,
-                upath_info = request.upath_info,
-                type="resource",
             )),
         };
 

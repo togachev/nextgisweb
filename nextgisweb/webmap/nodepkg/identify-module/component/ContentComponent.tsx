@@ -104,7 +104,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             key: "description",
             title: gettext("Description"),
             hidden: false,
-            children: extensions !== null && extensions.description !== null ? (<DescComponent display={display} type="feature" content={extensions?.description} />) : emptyValue
+            children: extensions !== null && extensions.description !== null ? (<DescComponent display={display} content={extensions?.description} />) : emptyValue
         },
         {
             label: (<span className="icon-style"><Attachment /></span>),

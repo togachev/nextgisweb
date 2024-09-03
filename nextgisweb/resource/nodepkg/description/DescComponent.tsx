@@ -20,7 +20,7 @@ const zoomToFeature = (display, resourceId, featureId) => {
 };
 
 export const DescComponent = observer((props) => {
-    const { display, content, type, upath_info, close } = props;
+    const { display, content, type, close } = props;
     const previewRef = useRef<HTMLDivElement>(null);
     const DescComp = useMemo((content) => {
         return (
@@ -73,30 +73,23 @@ export const DescComponent = observer((props) => {
                 return <span className="p-padding">{domToReact(item.children, options)}</span>;
             }
 
-            if (item instanceof Element && item.name === "a") {
-                item.attribs.target = "_blank"
-            }
-
-            if (item instanceof Element && item.name === "a" && upath_info) {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
-                    return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
+            if (display === undefined) {
+                if (item instanceof Element && item.name === "a") {
+                    if (/^\d+:\d+$/.test(item.attribs.href)) {
+                        return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
+                    }
                 }
             }
-
-            if (item instanceof Element && item.name === "a" && type === "feature") {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
-                    return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
-                }
-            }
-
-            if (item instanceof Element && item.name === "a" && !upath_info && type !== "feature") {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
-                    return (<a onClick={
-                        () => {
-                            const [resId, fid] = item.attribs.href.split(":");
-                            zoomToFeature(display, resId, fid);
-                        }
-                    }>{domToReact(item.children, options)}</a>);
+            if (display) {
+                if (item instanceof Element && item.name === "a") {
+                    if (/^\d+:\d+$/.test(item.attribs.href)) {
+                        return (<a onClick={
+                            () => {
+                                const [resId, fid] = item.attribs.href.split(":");
+                                zoomToFeature(display, resId, fid);
+                            }
+                        }>{domToReact(item.children, options)}</a>);
+                    }
                 }
             }
         }
@@ -108,10 +101,7 @@ export const DescComponent = observer((props) => {
     else if (content instanceof Array && type === "map") {
         data_ = (<DescComp content={content} />)
     }
-    else if (type === "home_page" || type === "resource" || type === "feature-obj") {
-        data_ = parse(content, options)
-    }
-    else if (type === "feature" && content) {
+    else {
         data_ = parse(content, options)
     }
 

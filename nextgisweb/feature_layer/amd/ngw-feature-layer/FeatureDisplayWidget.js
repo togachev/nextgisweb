@@ -25,8 +25,9 @@ define([
     return declare([_WidgetBase], {
         buildRendering: function () {
             this.inherited(arguments);
-
+                        
             this._wfields = new FieldsDisplayWidget({
+                display: this.display,
                 resourceId: this.resourceId,
                 featureId: this.featureId,
                 fields: this.fields,
@@ -43,6 +44,7 @@ define([
             this._ext = {};
             for (var k in this.extmid) {
                 var widget = new this.extmid[k]({
+                    display: this.display,
                     resourceId: this.resourceId,
                     featureId: this.featureId,
                 });
