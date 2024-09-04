@@ -2,11 +2,12 @@ define([
     "dojo/_base/declare",
     "./Adapter",
     "@nextgisweb/pyramid/api",
+    "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/XYZ",
-], function (declare, Adapter, api, XYZ) {
+], function (declare, Adapter, api, util, XYZ) {
     return declare(Adapter, {
         createLayer: function (item) {
-            return new XYZ(
+            const layer = new XYZ(
                 item.id,
                 {
                     visible: item.visibility,
@@ -28,8 +29,22 @@ define([
                         item.styleId +
                         "&nd=204",
                     crossOrigin: "anonymous",
+                    tileLoadFunction: function (image, src) {
+                        const img = image.getImage();
+                        const abortController = new AbortController();
+
+                        util.tileLoadFunction({
+                            src,
+                            signal: abortController.signal,
+                            cache: "force-cache",
+                        }).then((imageUrl) => {
+                            img.src = imageUrl;
+                        });
+                    },
                 }
             );
+
+            return layer;
         },
     });
 });

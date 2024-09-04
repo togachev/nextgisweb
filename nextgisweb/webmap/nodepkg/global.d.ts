@@ -49,7 +49,7 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         measurement_srid: number;
         legend_symbols: unknown;
         hide_nav_menu: boolean;
-        idetify_module: boolean;
+        identify_module: boolean;
         offset_point: number;
     }
 

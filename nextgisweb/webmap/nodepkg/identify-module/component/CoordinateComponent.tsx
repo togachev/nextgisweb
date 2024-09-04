@@ -1,4 +1,6 @@
 import { FC } from "react";
+import { Button } from "@nextgisweb/gui/antd";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
@@ -23,22 +25,25 @@ export const CoordinateComponent: FC = ({ display, contextUrl, count, op }) => {
             </span>
             {op === "popup" && contextUrl !== null && (
                 <div className="link-block">
-                    <span className="link-value"
+                    <Button className="link-button"
+                        icon={<UpdateLink />}
                         title={gettext("Update url display map")}
-                        onClick={() => {
-                            window.history.pushState({}, "", contextUrl)
+                        onClick={(e) => {
+                            if (e.detail === 2) {
+                                window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))
+                            }
+                            if (e.detail === 1) {
+                                window.history.pushState({}, "", contextUrl)
+                            }
                         }}
-                    >
-                        <UpdateLink />
-                    </span>
-                    <span className="link-value"
+                    />
+                    <Button className="link-button"
+                        icon={<VectorLink />}
                         title={count > 0 ? gettext("Copy link to object") : gettext("Copy link to location")}
                         onClick={() => {
                             copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
                         }}
-                    >
-                        <VectorLink />
-                    </span>
+                    />
                 </div>
             )}
         </div>

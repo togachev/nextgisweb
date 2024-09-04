@@ -6,9 +6,9 @@ import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { ResourceIcon } from "@nextgisweb/resource/icon";
 
+import { useResourcePicker } from "../resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
-import { useResourcePicker } from "./hook/useResourcePicker";
 import { useResourceSelect } from "./hook/useResourceSelect";
 import type { ResourceSelectOption, ResourceSelectProps } from "./type";
 
@@ -24,7 +24,6 @@ export function ResourceSelect<V extends number = number>({
 }: ResourceSelectProps<V>) {
     const [value, setValue] = useState<V | undefined>(valueProp);
     const [open, setOpen] = useState(false);
-
     const { showResourcePicker } = useResourcePicker({
         initParentId:
             pickerOptionsProp?.initParentId || pickerOptionsProp?.parentId,
@@ -33,7 +32,7 @@ export function ResourceSelect<V extends number = number>({
     const [pickerOptions] = useObjectState(pickerOptionsProp);
 
     const { resource, isLoading: resourceLoading } = useResourceSelect({
-        value: value,
+        value,
     });
 
     const onPick = useCallback(
@@ -46,8 +45,8 @@ export function ResourceSelect<V extends number = number>({
     );
 
     useEffect(() => {
-        setValue(value);
-    }, [value]);
+        setValue(valueProp);
+    }, [valueProp]);
 
     useEffect(() => {
         if (open) {

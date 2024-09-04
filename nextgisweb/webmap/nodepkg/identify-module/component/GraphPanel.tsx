@@ -28,7 +28,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
     const [hideLegend, setHideLegend] = useState(false);
 
     const chartRef = useRef();
-    const imodule = webmapSettings.idetify_module;
+    const imodule = webmapSettings.identify_module;
 
     const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 

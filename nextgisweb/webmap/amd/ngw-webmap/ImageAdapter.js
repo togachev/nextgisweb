@@ -3,11 +3,14 @@ define([
     "dojo/io-query",
     "./Adapter",
     "@nextgisweb/pyramid/api",
+    "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
-], function (declare, ioQuery, Adapter, api, Image) {
+], function (declare, ioQuery, Adapter, api, util, Image) {
     return declare(Adapter, {
         createLayer: function (item) {
-            var layer = new Image(
+            const queue = util.imageQueue;
+
+            const layer = new Image(
                 item.id,
                 {
                     maxResolution: item.maxResolution
@@ -29,17 +32,19 @@ define([
                     ratio: 1,
                     crossOrigin: "anonymous",
                     imageLoadFunction: function (image, src) {
-                        var url = src.split("?")[0];
-                        var query = src.split("?")[1];
-                        var queryObject = ioQuery.queryToObject(query);
+                        const url = src.split("?")[0];
+                        const query = src.split("?")[1];
+                        const queryObject = ioQuery.queryToObject(query);
 
-                        var resource = queryObject["resource"];
-                        var symbolsParam = queryObject["symbols"];
-                        var symbols = symbolsParam
+                        const resource = queryObject["resource"];
+                        const symbolsParam = queryObject["symbols"];
+                        const symbols = symbolsParam
                             ? `&symbols[${resource}]=${symbolsParam === "-1" ? "" : symbolsParam}`
                             : "";
 
-                        image.getImage().src =
+                        const img = image.getImage();
+
+                        const newSrc =
                             url +
                             "?resource=" +
                             resource +
@@ -50,9 +55,21 @@ define([
                             "," +
                             queryObject["HEIGHT"] +
                             "&nd=204" +
-                            symbols +
-                            "#" +
-                            Date.now(); // in-memory cache busting
+                            symbols;
+                        // Use a timeout to prevent the queue from aborting right after adding, especially in cases with zoomToExtent.
+                        setTimeout(() => {
+                            queue.add(({ signal }) =>
+                                util
+                                    .tileLoadFunction({
+                                        src: newSrc,
+                                        cache: "no-cache",
+                                        signal,
+                                    })
+                                    .then((imageUrl) => {
+                                        img.src = imageUrl;
+                                    })
+                            );
+                        });
                     },
                 }
             );

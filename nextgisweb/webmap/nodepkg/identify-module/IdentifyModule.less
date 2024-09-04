@@ -369,22 +369,30 @@
     .link-block {
         display: inline-flex;
 
-        .link-value {
-            padding: 0;
-            cursor: pointer;
+        .link-button {
+            font-size: 16px;
+            width: 22px;
+            height: 22px;
             display: flex;
-            align-items: center;
-            line-height: normal;
-            height: 24px;
-            width: 24px;
+            justify-items: center;
             justify-content: center;
+            align-items: center;
+            flex: 0 0 auto;
+            margin: 0 0 0 5px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            z-index: 1000;
+            border-radius: 3px;
+            border: none;
 
             &:hover {
+                background-color: #00000010;
+                border: none;
                 color: var(--primary);
-                background-color: rgba(0, 0, 0, .02);
                 border-radius: 3px;
             }
         }
+
     }
 }
 

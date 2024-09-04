@@ -1,4 +1,4 @@
-import debounce from "lodash-es/debounce";
+import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Select, Spin } from "@nextgisweb/gui/antd";
@@ -35,8 +35,6 @@ function QMSLabel({ name, id }: { name: string; id: number }) {
                 style={{ paddingLeft: "3px" }}
                 href={`${settings.qms_url}/geoservices/${id}`}
                 target="_blank"
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
             >
                 <OpenInNewIcon />
             </a>

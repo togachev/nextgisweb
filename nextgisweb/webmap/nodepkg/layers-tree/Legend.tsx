@@ -78,7 +78,7 @@ export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendPr
                                     onClick={(evt) => evt.stopPropagation()}
                                 />
                             ) : (
-                                <div style={{ width: "16px" }} />
+                                <div style={{ flex: "0 0 16px" }} />
                             );
                     }
 

@@ -40,6 +40,9 @@ const experimentalPanel = (
         <ExperimentalIcon />
     </Tooltip>
 );
+const identifyModuleMsg = gettext(
+    "Identification popup (priority when enabled)"
+);
 
 export const SettingsForm = ({
     onFinish,
@@ -173,21 +176,17 @@ export const SettingsForm = ({
                     </Form.Item>
                 </Col>
             </Row>
-
-            <Title level={4}>{gettext("Identify module")}</Title>
-
             <Row gutter={[16, 16]}>
                 <Col span={8}>
-                    <Form.Item>
+                    <Form.Item label={identifyModuleMsg}>
                         <Space direction="horizontal">
                             <Form.Item
                                 noStyle
-                                name="idetify_module"
-                                valuePropName="checked"
+                                name="identify_module"
+                                valuePropName="checked"                 
                             >
                                 <Switch />
                             </Form.Item>
-                            {gettext("Idetify module")}
                         </Space>
                     </Form.Item>
                 </Col>

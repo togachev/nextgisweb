@@ -1,4 +1,4 @@
-import uniq from "lodash-es/uniq";
+import { uniq } from "lodash-es";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
@@ -12,9 +12,9 @@ import type {
 } from "@nextgisweb/resource/type/api";
 
 import { ResourcePickerStore } from "../resource-picker";
+import { useResourcePicker } from "../resource-picker/hook";
 import type { SelectValue } from "../resource-picker/type";
 
-import { useResourcePicker } from "./hook/useResourcePicker";
 import type { ResourceSelectProps } from "./type";
 
 import ManageSearchIcon from "@nextgisweb/icon/material/manage_search";

@@ -450,7 +450,7 @@ define([
 
             const controlsReady = MapControls.buildControls(this);
 
-            if (settings.idetify_module) {
+            if (settings.identify_module) {
                 if (controlsReady.has("im")) {
                     const { control } = controlsReady.get("im");
                     this.identify_module = control;
@@ -1017,7 +1017,7 @@ define([
                 },
             });
 
-            if (settings.identify_panel && !settings.idetify_module) {
+            if (settings.identify_panel && !settings.identify_module) {
                 panels.push({
                     cls: reactPanel("@nextgisweb/webmap/panel/identification"),
                     params: {

@@ -1,5 +1,5 @@
 import { publish } from "dojo/topic";
-import delay from "lodash-es/delay";
+import { delay } from "lodash-es";
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info/";
@@ -22,9 +22,9 @@ import { fieldValuesToDataSource, getFieldsInfo } from "./fields";
 import type { FieldDataItem } from "./fields";
 import type {
     FeatureInfo,
+    FeatureTabsProps as FeatureInfoProps,
     FeatureIdentify,
     FeatureSelectorProps,
-    FeatureTabsProps as FeatureInfoProps,
     FieldsTableProps,
     IdentificationPanelProps,
     IdentifyInfo,
@@ -84,8 +84,18 @@ const identifyInfoToFeaturesInfo = (
     return featuresInfo;
 };
 
-const highlightFeature = (featureItem: FeatureItem) => {
-    publish("feature.highlight", featureItem);
+const highlightFeature = (
+    featureItem: FeatureItem,
+    featureInfo: FeatureInfo
+) => {
+    const { label } = featureInfo;
+
+    publish("feature.highlight", {
+        geom: featureItem.geom,
+        featureId: featureItem.id,
+        layerId: featureInfo.layerId,
+        featureInfo: { ...featureItem, labelWithLayer: label },
+    });
 };
 
 const loadFeatureItem = async (
@@ -104,7 +114,7 @@ const loadFeatureItem = async (
     ]);
 
     const featureItem = result[0];
-    highlightFeature(featureItem);
+    highlightFeature(featureItem, featureInfo);
     return featureItem;
 };
 
@@ -162,7 +172,7 @@ const FieldsTable = ({ featureInfo, featureItem }: FieldsTableProps) => {
     return table;
 };
 
-const FeatureInfo = ({
+const FeatureInfoSection = ({
     display,
     featureInfo,
     featureItem,
@@ -423,7 +433,7 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
     let tabsElement;
     if (featureItem && featureInfo) {
         tabsElement = (
-            <FeatureInfo
+            <FeatureInfoSection
                 display={display}
                 featureInfo={featureInfo}
                 featureItem={featureItem}
