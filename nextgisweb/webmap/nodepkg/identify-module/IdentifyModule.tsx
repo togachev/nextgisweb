@@ -357,17 +357,15 @@ export class IdentifyModule extends Component {
 
                 const p = { value, coordinate: transformedCoord };
                 const offHP = 40;
-
-                const W = window.innerWidth;
-                const H = window.innerHeight;
-
+                const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
                     target: "map",
                     pixel: [
-                        this.display.panelsManager._activePanelKey ? (W + this.display.leftPanelPane.w + offHP) / 2 : (W + offHP) / 2,
-                        (H + offHP) / 2
+                        this.display.panelsManager._activePanelKey ?
+                            (pixel[0] + this.display.leftPanelPane.w + offHP) :
+                            (pixel[0] + offHP), (pixel[1] + offHP)
                     ],
                     type: "singleclick"
                 };
