@@ -180,7 +180,7 @@ export const SettingsForm = ({
                         label={gettext("Identification options")}
                         initialValue={initialValues.identify_options}
                     >
-                        <Radio.Group>
+                        <Radio.Group optionType="button" buttonStyle="solid">
                             <Radio.Button value="identify_popup">{identifyStandartMsg}</Radio.Button>
                             <Radio.Button value="identify_panel">{experimentalPanelMsg} {experimentalPanel}</Radio.Button>
                             <Radio.Button value="identify_module">{identifyModuleMsg}</Radio.Button>

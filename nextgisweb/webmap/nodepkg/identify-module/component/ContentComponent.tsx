@@ -140,6 +140,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setFixContentItem(options.find(item => item.key === key));
+        setFixPanel(key);
     };
 
     const items: MenuProps['items'] = useMemo(() => {
