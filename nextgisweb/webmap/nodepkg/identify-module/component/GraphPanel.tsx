@@ -3,7 +3,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { Empty } from "@nextgisweb/gui/antd";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
-import { Tag } from "@nextgisweb/gui/antd";
 import { LineChartOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import { Scatter } from "react-chartjs-2";
@@ -16,16 +15,19 @@ import type { ContextItemProps } from "../type";
 
 import "./GraphPanel.less";
 
-const msgHideLegend = gettext("Hide chart legend");
-const msgShowLegend = gettext("Show chart legend");
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
 export const GraphPanel = observer(({ item, store: storeProp }) => {
-
     const [store] = useState(() => storeProp);
-    const [result, setResult] = useState(undefined);
+    const {
+        hideLegend,
+        result,
+        setResult,
+        fixPos,
+        valueRnd,
+    } = store;
+
     const [sizeFont, setSizeFont] = useState(16);
-    const [hideLegend, setHideLegend] = useState(false);
 
     const chartRef = useRef();
     const imodule = webmapSettings.identify_module;
@@ -39,7 +41,6 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             [key_rel]: relation_value,
             extensions: "",
             geom: "no",
-            cache: true,
         }
         const feature = await route("feature_layer.feature.collection", {
             id: external_resource_id,
@@ -66,6 +67,10 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             data.push(copy)
         })
 
+        if (feature.length > 0 && chartRef.current) {
+            chartRef.current.destroy();            
+        }
+
         const obj = { props: item, data: { datasets: data } };
         feature.length > 0 ? setResult(obj) : setResult(undefined);
     }
@@ -74,27 +79,10 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
         loadData(item);
     }, [item]);
 
-    useEffect(() => {
-        chartRef.current?.resize(store.valueRnd.width - 47, store.valueRnd.height - 110);
-    }, [store?.valueRnd]);
-
-    const HideLegend = () => {
-        const onChange = (checked: boolean) => {
-            setHideLegend(checked);
-        };
-        return (
-            <Tag.CheckableTag
-                checked={hideLegend}
-                onChange={onChange}
-                className="legend-hide-button"
-            >
-                {hideLegend ? msgHideLegend : msgShowLegend}
-            </Tag.CheckableTag>
-        );
-    };
-
     const GraphComponent = ({ value }) => {
         const options = {
+            animation: false,
+            resizeDelay: 250,
             responsive: true,
             maintainAspectRatio: false,
             layout: {
@@ -111,7 +99,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
                     },
                     position: "top",
                     align: "start",
-                    display: hideLegend,
+                    display: !hideLegend,
                 },
             },
             tooltips: {
@@ -164,27 +152,25 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             }
         }
 
-        const styleResize = store?.fixPos !== null ?
-            { width: store?.fixPos.width - 47, height: store?.fixPos.height - 110 } :
-            { width: store?.valueRnd.width - 47, height: store?.valueRnd.height - 110 }
+        const styleResize = fixPos !== null ?
+            { width: fixPos.width - 47, height: fixPos.height - 78 } :
+            { width: valueRnd.width - 47, height: valueRnd.height - 78 }
 
         const styleGtaph = !hideLegend ?
             { height: webmapSettings.popup_height } :
             { height: webmapSettings.popup_height * 1.5 };
-        
+
         return (
-            <>
-                <div className={store && "graph-content"} style={!store ? styleGtaph : null}>
-                    <Scatter
-                        ref={chartRef}
-                        type="scatter"
-                        options={options}
-                        plugins={[plugin]}
-                        data={value?.data}
-                        style={store ? styleResize : null}
-                    />
-                </div>
-            </>
+            <div className={store && "graph-content"} style={!store ? styleGtaph : null}>
+                <Scatter
+                    ref={chartRef}
+                    type="scatter"
+                    options={options}
+                    plugins={[plugin]}
+                    data={value?.data}
+                    style={store ? styleResize : null}
+                />
+            </div>
         )
     }
 
@@ -196,7 +182,6 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
                         <LineChartOutlined />
                         {msgGraphs}
                     </h3>)}
-                    {result && (<HideLegend />)}
                 </div>
             </div>
             <div className="panel-content-container">

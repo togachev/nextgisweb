@@ -205,11 +205,11 @@ export class IdentifyModule extends Component {
             const value = this.response.data.find(x => x.value === this.selected)
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-            this.root_popup.render(<PopupComponent params={{ position, response: this.response, selectedValue: value }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+            this.root_popup.render(<PopupComponent params={{ op, position, response: this.response, selectedValue: value }} display={this.display} visible={this._visible} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
             this._setValue(this.point_context, "context")
-            this.root_context.render(<ContextComponent array_context={array_context} params={{ position }} display={this.display} visible={this._visible} ref={this.refContext} />);
+            this.root_context.render(<ContextComponent array_context={array_context} params={{ op, position }} display={this.display} visible={this._visible} ref={this.refContext} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         }
     };

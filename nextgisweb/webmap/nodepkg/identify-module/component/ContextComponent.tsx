@@ -8,7 +8,7 @@ import type { Params } from "./type";
 
 export default forwardRef<Element>(function ContextComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display, array_context } = props;
-    const { position } = params;
+    const { op, position } = params;
     useOutsideClick(ref, true);
     const { contextHolder } = useCopy();
     return (
@@ -22,17 +22,17 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
                 {contextHolder}
                 <span
                     onClick={() => {
-                        visible({ hidden: true, overlay: undefined, key: "context" });
+                        visible({ hidden: true, overlay: undefined, key: op });
                     }}
                 >
-                    <CoordinateComponent display={display} op="context" />
+                    <CoordinateComponent display={display} op={op} />
                 </span>
                 {
                     array_context.map(item => {
                         if (item.visible) {
                             return (
                                 <div className="context-item" key={item.key} onClick={() => {
-                                    visible({ hidden: true, overlay: undefined, key: "context" });
+                                    visible({ hidden: true, overlay: undefined, key: op });
                                 }} >
                                     <span>{item.title}</span>
                                 </div>

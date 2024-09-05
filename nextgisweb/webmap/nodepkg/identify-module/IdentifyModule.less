@@ -145,39 +145,48 @@
 
         .icon-symbol {
             font-size: 16px;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             display: flex;
             justify-items: center;
             justify-content: center;
             align-items: center;
             flex: 0 0 auto;
-            margin: 0 0 0 4px;
+            margin: 0;
             cursor: pointer;
             color: var(--text-secondary);
             z-index: 1000;
+            border-radius: 3px;
+            border: 1px solid var(--divider-color);
+            background-color: #ffffff00;
+            box-sizing: border-box;
+            margin-inline-start: 2px;
 
             &:hover {
                 background-color: #00000010;
                 color: var(--primary);
-                border-radius: 2px;
+                border-radius: 3px;
             }
         }
 
         .icon-disabled {
             font-size: 16px;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             display: flex;
             justify-items: center;
             justify-content: center;
             align-items: center;
             flex: 0 0 auto;
-            margin: 0 0 0 4px;
+            margin: 0;
             cursor: pointer;
             color: var(--text-secondary);
-            z-index: 1000;
+            border: 1px solid var(--divider-color);
+            background: #8d8d8d36;
+            box-sizing: border-box;
             pointer-events: none;
+            margin-inline-start: 2px;
+            border-radius: 3px;
         }
     }
 
@@ -186,7 +195,7 @@
         width: 100%;
         display: inline-flex;
         position: absolute;
-        top: 22px;
+        top: 24px;
     }
 
     .select-feature {
@@ -310,6 +319,7 @@
         align-items: center;
         height: 24px;
         border-top: solid rgba(0, 0, 0, 0.04) 1px;
+        background: white;
     }
 }
 
@@ -368,28 +378,32 @@
 
     .link-block {
         display: inline-flex;
+        align-items: center;
 
         .link-button {
             font-size: 16px;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             display: flex;
             justify-items: center;
             justify-content: center;
             align-items: center;
             flex: 0 0 auto;
-            margin: 0 0 0 5px;
+            margin: 0;
             cursor: pointer;
             color: var(--text-secondary);
             z-index: 1000;
             border-radius: 3px;
             border: none;
+            border: 1px solid var(--divider-color);
+            background-color: #ffffff00;
+            margin-inline-start: 2px;
 
             &:hover {
                 background-color: #00000010;
-                border: none;
                 color: var(--primary);
                 border-radius: 3px;
+                border: 1px solid var(--divider-color);
             }
         }
 
@@ -473,10 +487,6 @@
 .error-component {
     display: flex;
     justify-content: center;
-}
-
-.ant-tag-checkable-checked {
-    color: var(--primary);
 }
 
 .ant-tag {

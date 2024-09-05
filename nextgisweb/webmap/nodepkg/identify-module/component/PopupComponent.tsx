@@ -37,8 +37,9 @@ const CheckOnlyOne = ({ store }) => {
         <Tag.CheckableTag
             checked={store.fixPopup}
             onChange={onChange}
+            className="legend-hide-button"
         >
-            {store.fixPopup ? <PinOff style={{ transform: "rotate(30deg)" }} /> : <Pin style={{ transform: "rotate(30deg)" }} />}
+            {store.fixPopup ? <PinOff /> : <Pin />}
         </Tag.CheckableTag>
     );
 };
@@ -47,7 +48,7 @@ export default observer(
     forwardRef<Element>(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
             const { params, visible, display } = props;
-            const { position, response, selectedValue } = params;
+            const { op, position, response, selectedValue } = params;
             const { getAttribute, generateUrl } = useSource();
             const { copyValue, contextHolder } = useCopy();
             const imodule = display.identify_module;
@@ -223,7 +224,8 @@ export default observer(
                     }
                 }
             }, [selected])
-
+            console.log(op);
+            
             return (
                 createPortal(
                     <ConfigProvider
@@ -397,9 +399,9 @@ export default observer(
                                         <ContentComponent linkToGeometry={linkToGeometryFeature} store={store} display={display} />
                                     </div>
                                 )}
-                                <div className="footer-popup">
-                                    <CoordinateComponent display={display} contextUrl={contextUrl} count={count} op="popup" />
-                                </div>
+                                {op==="popup" && (<div className="footer-popup">
+                                    <CoordinateComponent display={display} count={count} store={store} op="popup" />
+                                </div>)}
                             </div>
                         </Rnd >
                     </ConfigProvider>,
