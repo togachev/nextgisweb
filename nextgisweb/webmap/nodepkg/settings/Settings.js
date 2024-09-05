@@ -17,6 +17,8 @@ const srsListToOptions = (srsList) => {
     });
 };
 
+const option = ["identify_panel", "identify_module"];
+
 export function Settings() {
     const [status, setStatus] = useState("loading");
     const [srsOptions, setSrsOptions] = useState([]);
@@ -29,6 +31,14 @@ export function Settings() {
                 route("spatial_ref_sys.collection").get(),
             ]);
             setSettings(csettings.webmap);
+            
+            const val = Object.fromEntries(Object.entries(csettings.webmap).filter(i => option.includes(i[0]) && i[1] === true));
+            if (Object.keys(val).length) {
+                csettings.webmap.identify_options = Object.keys(val)[0]
+            } else {
+                csettings.webmap.identify_options = "identify_popup"
+            }
+
             setSrsOptions(srsListToOptions(srsInfo));
             setStatus("loaded");
         } catch (err) {
@@ -41,6 +51,14 @@ export function Settings() {
     }, []);
 
     const onFinish = async (values) => {
+        if (!option.includes(values.identify_option)) {
+            values.identify_panel = false
+            values.identify_module = false
+        } else {
+            values[values.identify_option] = true
+            values[option.find(item => item !== values.identify_option)] = false
+        }
+
         setStatus("saving");
         try {
             await route("pyramid.csettings").put({ json: { webmap: values } });

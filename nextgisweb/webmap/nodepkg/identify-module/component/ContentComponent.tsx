@@ -154,7 +154,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
         })
     }, []);
 
-    const valueDropdown = items.find(item => item.key === fixContentItem?.value);
+    const valueDropdown = items.find(item => item?.key === fixContentItem?.value);
 
     const onValuesChange = (e) => {
         setFixContentItem(options.find(item => item.key === e.target.value));

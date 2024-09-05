@@ -6,6 +6,7 @@ import {
     Form,
     Input,
     InputNumber,
+    Radio,
     Row,
     Select,
     Space,
@@ -25,11 +26,14 @@ import {
 
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
 import ExperimentalIcon from "@nextgisweb/icon/material/science";
-import InfoIcon from "@nextgisweb/icon/material/info";
 
 const { Title } = Typography;
 
 const INPUT_DEFAULT_WIDTH = { width: "100%" };
+
+const identifyStandartMsg = gettext(
+    "Standart identification popup"
+);
 
 const experimentalPanelMsg = gettext(
     "Use panel instead of popup identification"
@@ -40,8 +44,15 @@ const experimentalPanel = (
         <ExperimentalIcon />
     </Tooltip>
 );
+
 const identifyModuleMsg = gettext(
-    "Identification popup (priority when enabled)"
+    "Updated identification popup"
+);
+
+const offsetInfo = (
+    <Tooltip title={gettext("For updated popup")}>
+        <ExperimentalIcon />
+    </Tooltip>
 );
 
 export const SettingsForm = ({
@@ -161,47 +172,36 @@ export const SettingsForm = ({
                         </Space>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
-                    <Form.Item>
-                        <Space direction="horizontal">
-                            <Form.Item
-                                noStyle
-                                name="identify_panel"
-                                valuePropName="checked"
-                            >
-                                <Switch />
-                            </Form.Item>
-                            {experimentalPanelMsg} {experimentalPanel}
-                        </Space>
-                    </Form.Item>
-                </Col>
             </Row>
             <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item label={identifyModuleMsg}>
-                        <Space direction="horizontal">
-                            <Form.Item
-                                noStyle
-                                name="identify_module"
-                                valuePropName="checked"                 
-                            >
-                                <Switch />
-                            </Form.Item>
-                        </Space>
+                <Col>
+                    <Form.Item
+                        name="identify_option"
+                        label={gettext("Identification options")}
+                        initialValue={initialValues.identify_options}
+                    >
+                        <Radio.Group>
+                            <Radio.Button value="identify_popup">{identifyStandartMsg}</Radio.Button>
+                            <Radio.Button value="identify_panel">{experimentalPanelMsg} {experimentalPanel}</Radio.Button>
+                            <Radio.Button value="identify_module">{identifyModuleMsg}</Radio.Button>
+                        </Radio.Group>
                     </Form.Item>
                 </Col>
                 <Col span={8}>
-                    <Form.Item
-                        name="offset_point"
-                        label={gettext("Offset, px")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min="0" max="50" style={INPUT_DEFAULT_WIDTH} />
-                    </Form.Item>
+                    <Space>
+                        <Form.Item
+                            name="offset_point"
+                            label={gettext("Offset of popup relative to click point, px")}
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}
+                        >
+                            <InputNumber min="0" max="50" style={INPUT_DEFAULT_WIDTH} />
+                        </Form.Item>
+                        {offsetInfo}
+                    </Space>
                 </Col>
             </Row>
 
