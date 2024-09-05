@@ -29,6 +29,8 @@ import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
 import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+
 export const getLabel = (glyph: string): HTMLElement => {
     const labelEl = document.createElement("span");
     labelEl.innerHTML = html({ glyph });
@@ -124,7 +126,10 @@ export const ControlsInfo: ControlInfo[] = [
         embeddedShowMode: "customize",
         olMapControl: true,
     },
-    {
+];
+
+if (!webmapSettings.identify_module) {
+    ControlsInfo.push(    {
         label: gettext("Identification"),
         ctor: (display) => {
             return new Identify({ display });
@@ -133,8 +138,9 @@ export const ControlsInfo: ControlInfo[] = [
         mapStateKey: "identifying",
         embeddedShowMode: "customize",
         olMapControl: false,
-    },
-    {
+    })
+} else {
+    ControlsInfo.push({
         key: "im",
         label: gettext("Identification module"),
         ctor: (display) => {
@@ -143,8 +149,8 @@ export const ControlsInfo: ControlInfo[] = [
         mapStateKey: "identify_module",
         embeddedShowMode: "customize",
         olMapControl: false,
-    },
-];
+    })
+}
 
 export const buildControls = (
     display: DojoDisplay
