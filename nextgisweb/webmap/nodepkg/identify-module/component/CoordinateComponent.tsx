@@ -44,7 +44,7 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
                 className="legend-hide-button"
                 title={hideLegend ? msgHideLegend : msgShowLegend}
             >
-                {hideLegend ? <EyeOff /> : <Eye />}
+                {hideLegend ? <Eye /> : <EyeOff />}
             </Tag.CheckableTag>
         );
     };

@@ -224,7 +224,6 @@ export default observer(
                     }
                 }
             }, [selected])
-            console.log(op);
             
             return (
                 createPortal(
