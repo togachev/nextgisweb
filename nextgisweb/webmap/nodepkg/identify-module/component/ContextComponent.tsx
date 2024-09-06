@@ -15,6 +15,7 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
     const imodule = display.identify_module;
     const lon = imodule.lonlat[0];
     const lat = imodule.lonlat[1];
+
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
 
@@ -41,19 +42,17 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
                         <span className="coords">{coordsVisible}</span>
                     </span>
                 </span>
-                {
-                    array_context.map(item => {
-                        if (item.visible) {
-                            return (
-                                <div className="context-item" key={item.key} onClick={() => {
-                                    visible({ hidden: true, overlay: undefined, key: op });
-                                }} >
-                                    <span>{item.title}</span>
-                                </div>
-                            )
-                        }
-                    })
-                }
+                {array_context.map(item => {
+                    if (item.visible) {
+                        return (
+                            <div className="context-item" key={item.key} onClick={() => {
+                                visible({ hidden: true, overlay: undefined, key: op });
+                            }} >
+                                <span>{item.title}</span>
+                            </div>
+                        )
+                    }
+                })}
             </div>,
             document.body
         )

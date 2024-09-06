@@ -67,14 +67,10 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             data.push(copy)
         })
 
-        if (feature.length > 0 && chartRef.current) {
-            chartRef.current.destroy();            
-        }
-
         const obj = { props: item, data: { datasets: data } };
         feature.length > 0 ? setResult(obj) : setResult(undefined);
     }
-
+    
     useEffect(() => {
         loadData(item);
     }, [item]);
@@ -82,7 +78,6 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
     const GraphComponent = ({ value }) => {
         const options = {
             animation: false,
-            resizeDelay: 250,
             responsive: true,
             maintainAspectRatio: false,
             layout: {

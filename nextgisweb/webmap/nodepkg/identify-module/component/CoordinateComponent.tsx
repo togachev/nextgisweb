@@ -42,9 +42,9 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
                 checked={hideLegend}
                 onChange={onChange}
                 className="legend-hide-button"
-                title={hideLegend ? msgHideLegend : msgShowLegend}
+                title={hideLegend ? msgShowLegend : msgHideLegend}
             >
-                {hideLegend ? <Eye /> : <EyeOff />}
+                {hideLegend ? <EyeOff /> : <Eye />}
             </Tag.CheckableTag>
         );
     };
@@ -57,7 +57,9 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
                 title={gettext("Copy coordinates")}
                 onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
             >
-                <span className="icon-location"><Location /></span>
+                <span className="icon-location">
+                    <Location />
+                </span>
                 <span className="coords">{coordsVisible}</span>
             </span>
             {op === "popup" && contextUrl !== null && (

@@ -29,6 +29,8 @@ const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
 
 const CheckOnlyOne = ({ store }) => {
+    const msgFixPopup = gettext("Lock popup position");
+    const msgFixOffPopup = gettext("Disable lock popup position");
     const onChange = (checked: boolean) => {
         store.setFixPopup(checked);
     };
@@ -38,6 +40,7 @@ const CheckOnlyOne = ({ store }) => {
             checked={store.fixPopup}
             onChange={onChange}
             className="legend-hide-button"
+            title={store.fixPopup ? msgFixOffPopup : msgFixPopup}
         >
             {store.fixPopup ? <PinOff /> : <Pin />}
         </Tag.CheckableTag>
