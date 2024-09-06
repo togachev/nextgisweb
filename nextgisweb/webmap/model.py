@@ -146,7 +146,6 @@ def _item_default(item_type, default):
 
     return _default
 
-
 class WebMapItem(Base):
     __tablename__ = "webmap_item"
 
@@ -221,6 +220,7 @@ class WebMapItem(Base):
                 draw_order_position=self.draw_order_position,
                 legend_symbols=self.legend_symbols,
                 style_parent_id=style_parent_id,
+                file_resource_visible=self.file_resource_visible,
             )
 
         return data
@@ -258,6 +258,7 @@ class WebMapItem(Base):
                     "layer_max_scale_denom",
                     "layer_adapter",
                     "legend_symbols",
+                    "file_resource_visible",
                 ):
                     _set(item, k, True)
 
@@ -319,6 +320,7 @@ def _children_from_model(obj):
 class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_type"):
     display_name: str
     layer_enabled: bool
+    file_resource_visible: bool
     layer_identifiable: bool
     layer_transparency: Union[float, None]
     layer_style_id: int
@@ -338,6 +340,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
         return WebMapItemLayerRead(
             display_name=obj.display_name,
             layer_enabled=bool(obj.layer_enabled),
+            file_resource_visible=bool(obj.file_resource_visible),
             layer_identifiable=bool(obj.layer_identifiable),
             layer_transparency=obj.layer_transparency,
             layer_style_id=obj.layer_style_id,
@@ -353,6 +356,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
 class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_type"):
     display_name: str
     layer_enabled: bool = False
+    file_resource_visible: bool = False
     layer_identifiable: bool = True
     layer_transparency: Union[float, None] = None
     layer_style_id: int

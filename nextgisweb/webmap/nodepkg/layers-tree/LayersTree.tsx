@@ -11,6 +11,7 @@ import type { DojoDisplay } from "../type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import { DropdownActions } from "./DropdownActions";
+import { DropdownFile } from "./DropdownFile";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
@@ -72,6 +73,7 @@ export const LayersTree = observer(
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
+        const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const webmapItems = store.webmapItems;
 
@@ -144,8 +146,7 @@ export const LayersTree = observer(
         };
 
         const titleRender = (nodeData: TreeWebmapItem) => {
-            const { title } = nodeData.treeItem;
-
+            const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
 
             let actions;
@@ -160,11 +161,19 @@ export const LayersTree = observer(
                         setUpdate={setUpdate}
                     />
                 );
+                const dropdownFile = showDropdown && fileResourceVisible && (
+                    <DropdownFile
+                        nodeData={nodeData.treeItem}
+                        setFileClickId={setFileClickId}
+                        fileClickId={fileClickId}
+                    />
+                );
                 actions = (
                     <Col
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
+                        {dropdownFile}
                         {dropdownAction}
                     </Col>
                 );

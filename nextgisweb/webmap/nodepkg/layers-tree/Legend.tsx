@@ -1,7 +1,5 @@
 import { theme } from "antd";
-
 import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
-
 import type WebmapStore from "../store";
 import type { TreeItem } from "../type/TreeItems";
 import type { DisplayMap } from "../type/DisplayMap";

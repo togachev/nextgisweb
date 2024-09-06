@@ -410,6 +410,19 @@ def setup_pyramid(comp, config):
                 icon="material-edit",
             )
 
+        if args.obj.cls in ["mapserver_style", "qgis_vector_style", "qgis_raster_style", "wmsclient_layer", "tmsclient_layer"]:
+            if isinstance(args.obj, Resource):
+                if ResourceScope.update in permissions:
+                    # проверка наличия маршрута-route
+                    route_intr = args.request.registry.introspector.get("routes", "file_resource.settings")
+                    if route_intr:
+                        yield Link(
+                            "operation/0-file_resource",
+                            gettext("Add/remove public files"),
+                            lambda args: args.request.route_url("file_resource.settings", id=args.obj.id),
+                            icon="material-attach_file",
+                        )
+
         if (
             ResourceScope.delete in permissions
             and args.obj.id != 0

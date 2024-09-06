@@ -1,12 +1,14 @@
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { WebmapPlugin } from "../type";
 import type { TreeItem } from "../type/TreeItems";
 
 import DotsVertical from "@nextgisweb/icon/material/more_vert";
 import "./DropdownActions.less";
+const AdditionalTools = gettext("Additional tools");
 
 interface DropdownActionsProps {
     nodeData: TreeItem;
@@ -32,6 +34,7 @@ export function DropdownActions({
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
+                title={AdditionalTools}
                 className="more"
                 onClick={() => {
                     setMoreClickId(id);

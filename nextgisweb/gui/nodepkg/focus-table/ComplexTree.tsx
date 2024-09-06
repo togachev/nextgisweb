@@ -29,7 +29,7 @@ import type {
     FocusTableStore,
 } from "./type";
 
-import ArrowIcon from "@nextgisweb/icon/material/keyboard_arrow_right";
+import ArrowIcon from "@nextgisweb/icon/material/arrow_forward_ios";
 
 import "./ComplexTree.less";
 
@@ -38,7 +38,7 @@ const getItemTitleStub = () => "STUB";
 
 const arrowCollapsed = <ArrowIcon />;
 const arrowExpanded = <ArrowIcon style={{ transform: "rotate(90deg)" }} />;
-const arrowItem = <span style={{ display: "inline-block", width: "16px" }} />;
+const arrowItem = <span style={{ display: "inline-block", width: "18px" }} />;
 
 function ActionButton({ title, ...buttonProps }: ButtonProps) {
     return (

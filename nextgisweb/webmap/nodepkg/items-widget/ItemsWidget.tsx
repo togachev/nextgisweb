@@ -14,6 +14,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { adapters } from "@nextgisweb/pyramid/settings!webmap";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker/hook/useFocusTablePicker";
+import ResourceFile from "@nextgisweb/file-bucket/resource-file"
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -27,6 +28,7 @@ import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
+import { useEffect } from "react";
 
 const msgDisplayName = gettext("Display name");
 const msgExpanded = gettext("Expanded");
@@ -76,73 +78,78 @@ const adapterOptions = sortBy(
 
 const LayerWidget = observer(({ item }: { item: Layer }) => {
     return (
-        <Area pad cols={2}>
-            <LotMV
-                row
-                label={msgDisplayName}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <Lot row>
-                <Space size="middle">
-                    <CheckboxValue {...item.layerEnabled.cprops()}>
-                        {msgEnabled}
-                    </CheckboxValue>
-                    <CheckboxValue {...item.layerIdentifiable.cprops()}>
-                        {msgIdentifiable}
-                    </CheckboxValue>
-                </Space>
-            </Lot>
-            <LotMV
-                row
-                label={msgResource}
-                value={item.layerStyleId}
-                component={ResourceSelect}
-                props={{
-                    readOnly: true,
-                    style: { width: "100%" },
-                    pickerOptions: {
-                        initParentId: item.store.composite.parent,
-                    },
-                }}
-            />
-            <LotMV
-                label={msgMinScaleDenom}
-                value={item.layerMinScaleDenom}
-                component={InputScaleDenom}
-                props={{ style: { width: "100%" } }}
-            />
-            <LotMV
-                label={msgMaxScaleDenom}
-                value={item.layerMaxScaleDenom}
-                component={InputScaleDenom}
-                props={{ style: { width: "100%" } }}
-            />
-            <LotMV
-                row
-                label={msgLegendSymbols}
-                value={item.layerLegendSymbols}
-                component={SelectLegendSymbols}
-                props={{ allowClear: true, style: { width: "100%" } }}
-            />
-            <LotMV
-                row
-                label={msgAdapter}
-                value={item.layerAdapter}
-                component={Select<string>}
-                props={{
-                    style: { width: "100%" },
-                    options: adapterOptions,
-                }}
-            />
-            <LotMV
-                row
-                label={msgTransparency}
-                value={item.layerTransparency}
-                component={InputOpacity}
-                props={{ mode: "transparency", valuePercent: true }}
-            />
-        </Area>
+        <>
+            <Area pad cols={2}>
+                <LotMV
+                    row
+                    label={msgDisplayName}
+                    value={item.displayName}
+                    component={InputValue}
+                />
+                <Lot row>
+                    <Space size="middle">
+                        <CheckboxValue {...item.layerEnabled.cprops()}>
+                            {msgEnabled}
+                        </CheckboxValue>
+                        <CheckboxValue {...item.layerIdentifiable.cprops()}>
+                            {msgIdentifiable}
+                        </CheckboxValue>
+                    </Space>
+                </Lot>
+                <LotMV
+                    row
+                    label={msgResource}
+                    value={item.layerStyleId}
+                    component={ResourceSelect}
+                    props={{
+                        readOnly: true,
+                        style: { width: "100%" },
+                        pickerOptions: {
+                            initParentId: item.store.composite.parent,
+                        },
+                    }}
+                />
+                <LotMV
+                    label={msgMinScaleDenom}
+                    value={item.layerMinScaleDenom}
+                    component={InputScaleDenom}
+                    props={{ style: { width: "100%" } }}
+                />
+                <LotMV
+                    label={msgMaxScaleDenom}
+                    value={item.layerMaxScaleDenom}
+                    component={InputScaleDenom}
+                    props={{ style: { width: "100%" } }}
+                />
+                <LotMV
+                    row
+                    label={msgLegendSymbols}
+                    value={item.layerLegendSymbols}
+                    component={SelectLegendSymbols}
+                    props={{ allowClear: true, style: { width: "100%" } }}
+                />
+                <LotMV
+                    row
+                    label={msgAdapter}
+                    value={item.layerAdapter}
+                    component={Select<string>}
+                    props={{
+                        style: { width: "100%" },
+                        options: adapterOptions,
+                    }}
+                />
+                <LotMV
+                    row
+                    label={msgTransparency}
+                    value={item.layerTransparency}
+                    component={InputOpacity}
+                    props={{ mode: "transparency", valuePercent: true }}
+                />
+            </Area>
+            <Area pad  labelColumn={false}>
+                <ResourceFile id={item.layerStyleId.value} {...item.fileResourceVisible.cprops()} />
+            </Area>
+        </>
     );
 });
 
