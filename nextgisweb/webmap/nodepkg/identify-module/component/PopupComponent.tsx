@@ -173,21 +173,19 @@ export default observer(
             const linkToGeometryFeature = useMemo(() => {
                 if (count > 0 && selected) {
                     const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === selected.styleId);
-                    const title = gettext("HTML code of the geometry link, for insertion into the description")
-                    const titleCopy = gettext("HTML code copied")
                     if (count > 0 && selected) {
                         if (!imodule._isEditEnabled(display, item)) { return false; }
-                        return (<Button
-                            size="small"
-                            type="link"
-                            title={title}
-                            className="copy_to_clipboard"
-                            icon={<Identifier />}
-                            onClick={() => {
-                                const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
-                                copyValue(linkToGeometryString, titleCopy);
-                            }}
-                        />)
+                        return (
+                            <span
+                                title={gettext("HTML code of the geometry link, for insertion into the description")}
+                                className="link-button"
+                                onClick={() => {
+                                    const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
+                                    copyValue(linkToGeometryString, gettext("HTML code copied"));
+                                }}
+                            ><Identifier />
+                            </span>
+                        )
                     }
                 }
             }, [count, selected])
@@ -202,11 +200,10 @@ export default observer(
                     } else if (!imodule._isEditEnabled(display, item)) {
                         return false;
                     } else {
-                        return (<div title={gettext("Edit")}>
-                            <Button
-                                type="text"
-                                className="edit-symbol"
-                                icon={<EditNote />}
+                        return (
+                            <span
+                                title={gettext("Edit")}
+                                className="link-button"
                                 onClick={() => {
                                     const featureId = id;
                                     const resourceId = layerId;
@@ -222,12 +219,14 @@ export default observer(
                                     });
 
                                 }}
-                            />
-                        </div>)
+                            >
+                                <EditNote />
+                            </span>
+                        )
                     }
                 }
             }, [selected])
-            
+
             return (
                 createPortal(
                     <ConfigProvider
@@ -401,7 +400,7 @@ export default observer(
                                         <ContentComponent linkToGeometry={linkToGeometryFeature} store={store} display={display} />
                                     </div>
                                 )}
-                                {op==="popup" && (<div className="footer-popup">
+                                {op === "popup" && (<div className="footer-popup">
                                     <CoordinateComponent display={display} count={count} store={store} op="popup" />
                                 </div>)}
                             </div>

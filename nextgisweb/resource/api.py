@@ -5,6 +5,8 @@ from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import db
@@ -21,7 +23,8 @@ from .category import ResourceCategory
 from .composite import CompositeSerializer
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
-from .model import Resource
+from .model import Resource, ResourceWebMapGroup, WebMapGroupResource
+from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
@@ -517,6 +520,235 @@ ResourceExport = Annotated[
 csetting("resource_export", ResourceExport, default="data_read")
 
 
+def tbl_res(request) -> JSONType:
+    clsItems = ["nogeom_layer", "postgis_layer", "vector_layer"];
+    query = DBSession.query(Resource).filter(Resource.cls.in_(clsItems)).all()
+    result = list()
+    for resource in query:
+        if resource.has_permission(ResourceScope.read, request.user):
+            fields=list()
+            for idx in resource.fields:
+                fields.append({"value": idx.keyname, "label": idx.display_name})
+            result.append(dict(
+                id=resource.id,
+                name=resource.display_name,
+                column_key=resource.column_key,
+                column_constraint=resource.column_constraint,
+                column_from_const=resource.column_from_const,
+                fields=fields
+            ))
+    return result
+
+
+def wmg_item_create(request) -> JSONType:
+    request.resource_permission(ResourceScope.update)
+    resource_id = int(request.matchdict["id"])
+    webmap_group_id = int(request.matchdict["webmap_group_id"])
+
+    try:
+        query = WebMapGroupResource(resource_id=resource_id, webmap_group_id=webmap_group_id)
+        DBSession.add(query)   
+        DBSession.flush()
+    except SQLAlchemyError as exc:
+        raise ExternalDatabaseError(message=gettext("ERROR: Error not create."), sa_error=exc)
+
+
+def wmg_item_update(request) -> JSONType:
+    request.require_administrator()
+    id = int(request.matchdict["id"])
+    id_pos = int(request.matchdict["id_pos"])
+    def update(id, id_pos):
+        wmg_resource = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.id == id).one()
+        wmg_resource.id_pos = id_pos
+
+    with DBSession.no_autoflush:
+        update(id, id_pos)
+    DBSession.flush()
+    return(dict(id=id, id_pos=id_pos))
+
+
+def wmg_item_delete(request) -> JSONType:
+    request.resource_permission(ResourceScope.update)
+    resource_id = int(request.matchdict["id"])
+    webmap_group_id = int(request.matchdict["webmap_group_id"])
+
+    def delete(resource_id, webmap_group_id):
+        try:
+            query = WebMapGroupResource.filter_by(resource_id=resource_id, webmap_group_id=webmap_group_id).one()
+            DBSession.delete(query)
+            DBSession.flush()
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(message=gettext("ERROR: Error not delete."), sa_error=exc)
+
+    with DBSession.no_autoflush:
+        delete(resource_id, webmap_group_id)
+    
+    return dict(resource_id=resource_id, webmap_group_id=webmap_group_id)
+
+
+def wmg_item_delete_all(request) -> JSONType:
+    request.resource_permission(ResourceScope.update)
+    DBSession.query(WebMapGroupResource).filter_by(resource_id=request.context.id).delete()
+    DBSession.flush()
+    return None
+
+
+def wmgroup_update(request) -> JSONType:
+    request.require_administrator()
+    wmg_id = int(request.matchdict["id"])
+    wmg_value = str(request.matchdict["wmg"]).strip()
+    action_map_value = request.matchdict["action"]
+    if wmg_value and wmg_value != "":
+        def update(wmg_id, wmg_value, action_map_value):
+            if wmg_id != 0:
+                resource_wmg = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == wmg_id).one()
+                resource_wmg.webmap_group_name = wmg_value
+                resource_wmg.action_map = eval(action_map_value.lower().capitalize())
+            else:
+                raise HierarchyError("Имя корневой группы с идентификатором %s изменять запрещено." % wmg_id)
+        with DBSession.no_autoflush:
+            update(wmg_id, wmg_value, action_map_value)
+        DBSession.flush()
+        return dict(webmap_group_name=wmg_value, action_map=action_map_value)
+    else:
+        raise HierarchyError("Введено некорректное имя группы")
+
+
+def wmgroup_update_position(request) -> JSONType:
+    request.require_administrator()
+    id = int(request.matchdict["id"])
+    id_pos = int(request.matchdict["id_pos"])
+    def update(id, id_pos):
+        resource_wmg = DBSession.query(ResourceWebMapGroup).filter(ResourceWebMapGroup.id == id).one()
+        resource_wmg.id_pos = id_pos
+    with DBSession.no_autoflush:
+        update(id, id_pos)
+    DBSession.flush()
+    return(dict(id=id, id_pos=id_pos))
+
+
+def wmgroup_delete(request) -> JSONType:
+    request.require_administrator()
+    wmg_id = int(request.matchdict["id"])
+    def delete(wmg_id):
+        try:
+            query = ResourceWebMapGroup.filter_by(id=wmg_id).one()
+            DBSession.delete(query)
+            DBSession.flush()
+            
+        except IntegrityError as exc:
+            raise ExternalDatabaseError(message="ОШИБКА:  UPDATE или DELETE в таблице 'resource_wmg' нарушает ограничение внешнего ключа 'webmap_group_id_fkey' таблицы 'resource' DETAIL:  На ключ (id)=(%s) всё ещё есть ссылки в таблице 'resource'." % wmg_id, sa_error=exc)
+
+    if wmg_id == 0:
+        raise HierarchyError(gettext("Root resource could not be deleted."))
+
+    with DBSession.no_autoflush:
+        delete(wmg_id)
+    
+    return dict(id=wmg_id)
+
+
+def wmgroup_create(request) -> JSONType:
+    request.require_administrator()
+    webmap_group_name = request.json["webmap_group_name"].strip()
+    action_map = request.json["action_map"]
+    if webmap_group_name:
+        try:
+            query = ResourceWebMapGroup(webmap_group_name=webmap_group_name, action_map=action_map)
+            DBSession.add(query)   
+            DBSession.flush()
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(message=gettext("ERROR: duplicate key violates unique constraint."), sa_error=exc)
+
+
+def getWebmapGroup(request) -> JSONType:
+    query = DBSession.query(ResourceWebMapGroup)
+    result = list()
+    for resource_wmg in query:
+        if resource_wmg.action_map:
+            result.append(
+                dict(
+                    id=resource_wmg.id,
+                    webmap_group_name=resource_wmg.webmap_group_name,
+                    action_map=resource_wmg.action_map,
+                    id_pos=resource_wmg.id_pos
+                )
+            )
+    return result
+
+
+def getMaplist(request) -> JSONType:
+    query = DBSession.query(Resource, ResourceWebMapGroup, WebMapGroupResource, ResourceSocial) \
+        .join(WebMapGroupResource, Resource.id == WebMapGroupResource.resource_id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for res, res_wmg, wmg, res_social in query:
+        action_map = res_wmg.action_map
+        if res_wmg.id != 0:
+            if res.has_permission(ResourceScope.read, request.user):
+                result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
+                description_status=False if res.description == None else True,
+                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id,
+                idx=wmg.id,
+                id_pos=wmg.id_pos,
+                action_map=res_wmg.action_map,
+                preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+                preview_description=None if res_social == None else res_social.preview_description))
+
+    is_adm = request.user.is_administrator
+
+    return dict(scope=is_adm, result=result)
+
+
+def webmap_group_item(request) -> JSONType:
+    id = int(request.matchdict["id"])
+
+    query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(webmap_group_id=id) \
+        .join(Resource, WebMapGroupResource.resource_id == Resource.id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for wmg, res, res_wmg, res_social in query:
+        action_map = res_wmg.action_map
+        if res.has_permission(ResourceScope.read, request.user):
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=True, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
+
+    return result
+
+
+def webmap_item(request) -> JSONType:
+    id = int(request.matchdict["id"])
+
+    query = DBSession.query(WebMapGroupResource, Resource, ResourceWebMapGroup, ResourceSocial).filter_by(resource_id=id) \
+        .join(Resource, WebMapGroupResource.resource_id == Resource.id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for wmg, res, res_wmg, res_social in query:
+        action_map = res_wmg.action_map
+        if res.has_permission(ResourceScope.read, request.user):
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=True, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
+        if not res.has_permission(ResourceScope.read, request.user) and action_map == True:
+            result.append(dict(wmg_id=wmg.webmap_group_id,
+            webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,
+            owner=False, id=res.id, value=res.id, display_name=res.display_name, label=res.display_name,
+            preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+            preview_description=None if res_social == None else res_social.preview_description))
+    return result
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "resource.blueprint",
@@ -592,4 +824,79 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/file/{name:any}",
         factory=resource_factory,
         overloaded=True,
+    )
+
+    config.add_route(
+        "resource.tbl_res",
+        "/api/resource/tblres/",
+        get=tbl_res,
+    )
+
+    config.add_route(
+        "wmgroup.create",
+        "/api/wmg/create/{id:uint}/{webmap_group_id:uint}/",
+        factory=resource_factory,
+        get=wmg_item_create,
+    )
+
+    config.add_route(
+        "wmgroup.update",
+        "/api/wmg/update/{id:uint}/{id_pos:uint}/",
+        get=wmg_item_update,
+    )
+
+    config.add_route(
+        "wmgroup.delete",
+        "/api/wmg/delete/{id:uint}/{webmap_group_id:uint}/",
+        factory=resource_factory,
+        get=wmg_item_delete,
+    )
+
+    config.add_route(
+        "wmgroup.delete_all",
+        "/api/wmg/delete_all/{id:uint}",
+        factory=resource_factory,
+        get=wmg_item_delete_all,
+    )
+
+    config.add_route(
+        "resource.wmgroup.update",
+        "/api/wmgroup/update/{id:uint}/{wmg:str}/{action:str}/",
+        get=wmgroup_update,
+    )
+
+    config.add_route(
+        "resource.wmgroup.update_position",
+        "/api/wmgroup/update_position/{id:uint}/{id_pos:uint}/",
+        get=wmgroup_update_position,
+    )
+
+    config.add_route(
+        "resource.wmgroup.delete",
+        r"/api/wmgroup/delete/{id:uint}/",
+        get=wmgroup_delete,
+    )
+
+    config.add_route(
+        "resource.wmgroup_create",
+        "/api/wmgroup/create",
+        put=wmgroup_create,
+    )
+
+    config.add_route(
+        "resource.mapgroup",
+        "/api/resource/mapgroup/",
+        get=getWebmapGroup,
+    )
+
+    config.add_route(
+        "resource.maplist",
+        "/api/resource/maplist/",
+        get=getMaplist,
+    )
+
+    config.add_route(
+        "resource.webmap_group_item",
+        "/wmgroup/{id:uint}",
+        get=webmap_group_item,
     )

@@ -962,7 +962,15 @@ define([
         },
 
         _buildPanelsManager: function () {
-            const activePanelKey = this._urlParams[this.modeURLParam];
+            let activePanelKey;
+            if (!this._urlParams[this.modeURLParam]) {
+                activePanelKey = this.config.active_panel
+            } else if (this._urlParams[this.modeURLParam] !== this.config.active_panel) {
+                activePanelKey = this._urlParams[this.modeURLParam]
+            } else {
+                activePanelKey = this.config.active_panel
+            }
+
             const onChangePanel = (panel) => {
                 if (panel) {
                     URL.setURLParam(this.modeURLParam, panel.name);

@@ -339,6 +339,26 @@ class Resource(Base, metaclass=ResourceMeta):
         if hasattr(res, "external_resource_id") and res.resource_field_name is not None and res.external_field_name is not None and res.external_resource_id is not None:
             return res.id
 
+class ResourceWebMapGroup(Base):
+    __tablename__ = "resource_wmg"
+
+    identity = "resource_wmg"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
+    action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
+    id_pos = db.Column(db.Integer, nullable=True)
+    webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
+        backref="resource_wmg")
+
+class WebMapGroupResource(Base):
+    __tablename__ = "wmg_resource"
+    identity = "wmg_resource"
+    id = db.Column(db.Integer, primary_key=True)
+    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
+    webmap_group_id = db.Column(db.ForeignKey(ResourceWebMapGroup.id), primary_key=True)
+    id_pos = db.Column(db.Integer, nullable=True)
+
 @event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):
     # fmt: off

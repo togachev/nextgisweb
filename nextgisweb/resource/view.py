@@ -287,6 +287,14 @@ def creatable_resources(parent, *, user):
 
 resource_sections = PageSections("resource_section")
 
+@viewargs(renderer="react")
+def webmap_group_data(request):
+    request.require_administrator()
+    result = dict(
+        entrypoint="@nextgisweb/resource/webmap-group-widget",
+        title=gettext("Groups of digital web maps"),
+        dynmenu=request.env.pyramid.control_panel)
+    return result
 
 def setup_pyramid(comp, config):
     def resource_permission(request, permission, resource=None):
@@ -343,6 +351,12 @@ def setup_pyramid(comp, config):
         "resource.control_panel.resource_export",
         "/control-panel/resource-export",
         get=resource_export,
+    )
+
+    config.add_route(
+        "resource.webmap_group",
+        "/wmgroup",
+        get=webmap_group_data,
     )
 
     # CRUD
@@ -435,7 +449,13 @@ def setup_pyramid(comp, config):
                 gettext("Resource export"),
                 lambda args: (args.request.route_url("resource.control_panel.resource_export")),
             )
-
+        if args.request.user.is_administrator:
+            yield Link(
+                "settings/webmap_group",
+                gettext("Groups of digital web maps"),
+                lambda args: (args.request.route_url("resource.webmap_group")),
+            )
+    
     if comp.options["home.enabled"]:
         from .home import on_user_login
 

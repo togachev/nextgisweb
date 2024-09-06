@@ -193,6 +193,7 @@ class PyramidComponent(Component):
         Option("help_page.enabled", bool, default=True),
         Option("help_page.url", default="https://nextgis.com/redirect/{lang}/help/"),
 
+        Option("header_image", default=str(module_path("nextgisweb.pyramid") / "asset/header_image.png")),
         Option("logo", default=str(module_path("nextgisweb.pyramid") / "asset/nextgis_logo_s.svg")),
         Option("favicon", default=str(module_path("nextgisweb.pyramid") / "asset/favicon.ico")),
         Option("company_url", default="https://nextgis.com"),

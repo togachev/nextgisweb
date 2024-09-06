@@ -65,8 +65,7 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
             {op === "popup" && contextUrl !== null && (
                 <div className="link-block">
                     {result && fixPanel === "relation" && firstItem?.relation && (<HideLegend />)}
-                    <Button className="link-button"
-                        icon={<UpdateLink />}
+                    <span className="link-button"
                         title={gettext("Update url display map")}
                         onClick={(e) => {
                             if (e.detail === 2) {
@@ -76,14 +75,13 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
                                 window.history.pushState({}, "", contextUrl)
                             }
                         }}
-                    />
-                    <Button className="link-button"
-                        icon={<VectorLink />}
+                    ><UpdateLink /></span>
+                    <span className="link-button"
                         title={count > 0 ? gettext("Copy link to object") : gettext("Copy link to location")}
                         onClick={() => {
                             copyValue(contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
                         }}
-                    />
+                    ><VectorLink /></span>
                 </div>
             )}
         </div>

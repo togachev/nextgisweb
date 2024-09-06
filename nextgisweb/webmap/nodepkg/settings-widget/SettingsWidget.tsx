@@ -18,6 +18,7 @@ import { SelectLegendSymbols } from "../component";
 import type { SettingStore } from "./SettingStore";
 
 type AnnotationType = WebMapRead["annotation_default"];
+type ActivePanelType = WebMapRead["active_panel"];
 
 const msgInitExtent = gettext("Initial extent");
 const msgConstrExtent = gettext("Constraining extent");
@@ -28,6 +29,7 @@ const msgBookmarks = gettext("Bookmarks");
 const msgBookmarksPlaceholder = gettext("Select resource");
 const msgMeasurementSrs = gettext("Measurement SRS");
 const msgLayersEditing = gettext("Layers editing");
+const msgActivePanel = gettext("Active panel");
 
 const msgDefault = gettext("Default");
 
@@ -40,6 +42,17 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
     { value: "no", label: gettext("Hide by default") },
     { value: "yes", label: gettext("Show without messages") },
     { value: "messages", label: gettext("Show with messages") },
+];
+
+const activePanelOptions: { value: ActivePanelType; label: string }[] = [
+    { value: "layers", label: gettext("Layers") },
+    { value: "search", label: gettext("Search") },
+    { value: "custom-layer", label: gettext("CustomLayer") },
+    { value: "print", label: gettext("Print map") },
+    { value: "bookmark", label: gettext("Bookmarks") },
+    { value: "info", label: gettext("Description") },
+    { value: "share", label: gettext("Share") },
+    { value: "annotation", label: gettext("Annotations") }
 ];
 
 export const SettingsWidget: EditorWidgetComponent<
@@ -126,6 +139,17 @@ export const SettingsWidget: EditorWidgetComponent<
                     onChange={(e) => {
                         store.update({ editable: e.target.checked });
                     }}
+                />
+            </Lot>
+            <Lot row label={msgActivePanel}>
+                <Select<ActivePanelType>
+                    style={{ width: "100%" }}
+                    value={store.activePanel}
+                    onChange={(activePanel) => {
+                        store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
+                    }}
+                    options={activePanelOptions}
+                    allowClear
                 />
             </Lot>
         </Area>

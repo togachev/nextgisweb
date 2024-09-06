@@ -19,6 +19,7 @@ export class SettingStore
     readonly identity = "webmap";
     readonly composite: Composite;
 
+    activePanel: apitype.WebMapRead["active_panel"] = "layers";
     editable = false;
     annotationEnabled = false;
     annotationDefault: apitype.WebMapRead["annotation_default"] = "no";
@@ -61,6 +62,7 @@ export class SettingStore
         this.annotationEnabled = value.annotation_enabled;
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
+        this.activePanel = value.active_panel;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
         this.extent = {
             left: value.extent_left,
@@ -83,6 +85,7 @@ export class SettingStore
             annotation_enabled: this.annotationEnabled,
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
+            active_panel: this.activePanel,
             extent_bottom: this.extent.bottom,
             extent_left: this.extent.left,
             extent_right: this.extent.right,

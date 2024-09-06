@@ -20,6 +20,8 @@ from .model import LegendSymbolsEnum, WebMap, WebMapScope
 from .plugin import WebmapLayerPlugin, WebmapPlugin
 from .util import webmap_items_to_tms_ids_list
 
+from nextgisweb.env import DBSession
+from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
 
 class ItemWidget(Widget):
     resource = WebMap
@@ -152,6 +154,13 @@ def display(obj, request):
             data.update(
                 layerId=style.parent_id,
                 styleId=style.id,
+                cls=style.cls, # для создания легенды (фильтрация ресурсов)
+                layerCls=layer.cls, # для создания легенды (фильтрация ресурсов)
+                labelLayer=layer.display_name, # Наименование слоя
+                descStyle=style.description, # Описание стиля
+                descLayer=layer.description, # Описание слоя
+                fileResourceVisible=item.file_resource_visible, # Прикрепленные файлы (показать/скрыть)
+                legend_symbols = request.route_url("render.legend_symbols", id=style.id),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
@@ -224,6 +233,13 @@ def display(obj, request):
         extent_const=tmp["extent_const"],
         rootItem=traverse(obj.root_item),
         itemsStates=items_states,
+        active_panel=obj.active_panel,
+        infomap=dict(
+            resource=request.route_url("resource.show", id=0),
+            link=request.route_url("resource.show", id=obj.id),
+            update=request.route_url("resource.update", id=obj.id),
+            scope=obj.has_permission(ResourceScope.update, request.user)
+        ),
         mid=dict(
             adapter=tuple(display.mid.adapter),
             basemap=tuple(display.mid.basemap),
@@ -295,6 +311,25 @@ def settings(request):
         dynmenu=request.env.pyramid.control_panel,
     )
 
+@viewargs(renderer="react")
+def wmg_settings(request):
+    request.resource_permission(ResourceScope.update)
+    rwg = DBSession.query(ResourceWebMapGroup)
+    wgr = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.resource_id == request.context.id)
+
+    result_rwg = list() # список групп
+    result_wgr = list() # установленные группы для цифровых карт
+    for resource_wmg in rwg:
+        result_rwg.append(dict(id=resource_wmg.id, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map))
+
+    for wmg_resource in wgr:
+        result_wgr.append(dict(id=wmg_resource.webmap_group_id))
+
+    return dict(
+        entrypoint="@nextgisweb/webmap/wmg-settings",
+        props=dict(id=request.context.id, wmgroup=result_rwg, group=result_wgr),
+        obj=request.context,
+        title=gettext("Setting up a web map group"))
 
 class WebMapTMSLink(TMSLink):
     resource = WebMap
@@ -343,6 +378,12 @@ def setup_pyramid(comp, config):
         get=settings,
     )
 
+    config.add_route(
+        "wmgroup.settings",
+        r"/wmgroup/{id:uint}/settings",
+        factory=resource_factory,
+    ).add_view(wmg_settings, context=WebMap)
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if not isinstance(args.obj, WebMap):
@@ -369,7 +410,15 @@ def setup_pyramid(comp, config):
                 target="_self",
                 icon="material-content_copy",
             )
-
+        if args.obj.has_permission(ResourceScope.update, args.request.user):
+            yield Link(
+                "wmgroup/settings",
+                gettext("Group setting"),
+                lambda args: args.request.route_url("wmgroup.settings", id=args.obj.id),
+                important=False,
+                target="_self",
+                icon="material-edit",
+            )
     @comp.env.pyramid.control_panel.add
     def _control_panel(args):
         if args.request.user.is_administrator:

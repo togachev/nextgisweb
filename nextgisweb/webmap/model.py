@@ -32,6 +32,7 @@ from .adapter import WebMapAdapter
 
 Base.depends_on("resource")
 
+ACTIVE_PANEL_VALUES = ("layers", "search", "custom-layer", "print", "bookmark", "info", "share", "annotation")
 ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
 
@@ -64,6 +65,7 @@ class WebMap(Base, Resource):
     root_item_id = db.Column(db.ForeignKey("webmap_item.id"), nullable=False)
     bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
     draw_order_enabled = db.Column(db.Boolean, nullable=True)
+    identify_order_enabled = db.Column(db.Boolean, nullable=True, default=False)
     editable = db.Column(db.Boolean, nullable=False, default=False)
 
     extent_left = db.Column(db.Float, default=-180)
@@ -75,6 +77,8 @@ class WebMap(Base, Resource):
     extent_const_right = db.Column(db.Float)
     extent_const_bottom = db.Column(db.Float)
     extent_const_top = db.Column(db.Float)
+
+    active_panel = db.Column(db.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(
@@ -162,6 +166,7 @@ class WebMapItem(Base):
     layer_adapter = db.Column(db.Enum(*WebMapAdapter.registry.keys()), nullable=True)
     draw_order_position = db.Column(db.Integer, nullable=True)
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
+    file_resource_visible = db.Column(db.Boolean, nullable=True, default=_item_default("layer", False))
 
     parent = db.relationship(
         "WebMapItem",
@@ -432,6 +437,8 @@ class RootItemAttr(SAttribute, apitype=True):
 
 
 class WebMapSerializer(Serializer, resource=WebMap):
+    active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+
     extent_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     extent_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     extent_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
@@ -443,6 +450,7 @@ class WebMapSerializer(Serializer, resource=WebMap):
     extent_const_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     draw_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    identify_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     editable = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     annotation_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
