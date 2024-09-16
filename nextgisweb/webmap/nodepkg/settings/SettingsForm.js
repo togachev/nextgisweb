@@ -173,6 +173,25 @@ export const SettingsForm = ({
                     </Form.Item>
                 </Col>
             </Row>
+
+            <Title level={4}>{gettext("Custom map settings")}</Title>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item
+                        name="max_count_file_upload"
+                        label={gettext("Maximum uploaded files")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min="1" />
+                    </Form.Item>
+                </Col>
+            </Row>
+
             <Row gutter={[16, 16]}>
                 <Col>
                     <Form.Item

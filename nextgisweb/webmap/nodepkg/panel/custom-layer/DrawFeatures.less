@@ -1,0 +1,268 @@
+.label-type {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .label {
+        padding: 0 4px 0px 0px;
+    }
+
+    .icon {
+        padding: 0 0 0 4px;
+    }
+}
+
+.dropdown-button-draw {
+    .dropdown-button {
+        display: flex;
+        padding: 5px 0px;
+        align-items: center;
+        margin: 5px;
+
+        .ant-space-compact-block {
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+
+
+            .ant-btn-compact-first-item.ant-btn-sm {
+                border-start-end-radius: 0;
+                border-end-end-radius: 0;
+                width: 100%;
+            }
+        }
+    }
+
+    .layer-name-input {
+        margin: 0;
+    }
+
+    .item-control {
+        display: flex;
+        padding: 0 5px;
+    }
+
+    .layer-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 32px;
+        padding: 0px 5px;
+    }
+
+    .custom-button {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        cursor: auto;
+    }
+
+    .icon-edit {
+        box-shadow: inset 0px 0px 2px 0px #000000;
+        border-radius: 3px;
+
+        &:hover {
+            background-color: #acacac20;
+            border-radius: 3px;
+        }
+    }
+
+    .icon-red {
+        color: #ff0000;
+    }
+
+    .icon-edit-auto {
+        margin: 0 0px 0 10px;
+    }
+
+    .icon-edit-margin {
+        margin: 0 8px 0 2px;
+    }
+
+    .icon-edit-no {
+        cursor: default;
+    }
+
+    .icon-symbol-disable {
+        font-size: 18px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        justify-items: center;
+        justify-content: center;
+        align-items: center;
+        flex: 0 0 auto;
+        color: #acacac;
+    }
+
+    .input-button-none {
+        display: none;
+    }
+
+    .checkbox-item {
+        min-width: 0;
+        user-select: none;
+
+        .ant-checkbox-wrapper {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.88);
+            font-size: 14px;
+            line-height: 1.5714285714285714;
+            list-style: none;
+            font-family: "Roboto", sans-serif;
+            display: inline-flex;
+            align-items: baseline;
+            cursor: pointer;
+            width: 100%;
+
+            .ant-checkbox {
+                overflow: visible;
+            }
+
+            span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+
+    .modal-style {
+        .select-format {
+            display: flex;
+            align-items: center;
+
+            .select-title {
+                padding: 0 10px 0 0;
+            }
+        }
+
+        .ant-modal-content {
+            position: relative;
+            background-color: #ffffff;
+            background-clip: padding-box;
+            border: 0;
+            border-radius: 4px;
+            box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+            pointer-events: auto;
+            padding: 16px 16px;
+        }
+
+        .ant-modal-close {
+            position: absolute;
+            top: 10px;
+            inset-inline-end: 10px;
+            z-index: 1010;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.45);
+            font-weight: 500;
+            line-height: 1;
+            text-decoration: none;
+            background: transparent;
+            border-radius: 4px;
+            width: 22px;
+            height: 22px;
+            border: 0;
+            outline: 0;
+            cursor: pointer;
+            transition: color 0s, background-color 0s;
+        }
+    }
+
+    .control {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 1px 5px 5px;
+        align-items: center;
+
+        .control-button {
+            display: flex;
+
+            &:label {
+                padding: 0 5px;
+            }
+
+            .icon-symbol-yes {
+                box-shadow: inset 0px 0px 2px 0px #000000;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 16px;
+                width: 21px;
+                height: 21px;
+                display: flex;
+                justify-items: center;
+                justify-content: center;
+                align-items: center;
+                flex: 0 0 auto;
+                color: #106a90;
+            }
+
+            .icon-symbol-no {
+                cursor: pointer;
+                font-size: 16px;
+                width: 21px;
+                height: 21px;
+                display: flex;
+                justify-items: center;
+                justify-content: center;
+                align-items: center;
+                flex: 0 0 auto;
+                color: #acacac;
+            }
+
+            .button-active {
+                margin: 0 4px;
+
+                .icon-symbol-no {
+                    box-shadow: none;
+                    color: #106a90;
+                }
+
+                &:hover {
+                    background-color: #acacac20;
+                    border-radius: 3px;
+                }
+            }
+
+            .button-disable {
+                margin: 0 4px;
+                pointer-events: none;
+
+                .icon-symbol-yes {
+                    box-shadow: none;
+                    color: #acacac;
+                }
+            }
+        }
+    }
+
+    .ant-radio-group {
+        display: block;
+    }
+
+    .radio-custom {
+
+        .ant-radio-wrapper {
+            color: #ccc;
+            margin-inline-start: 0;
+            margin-inline-end: 0;
+
+            span.ant-radio+* {
+                padding-inline-start: 0;
+                padding-inline-end: 0;
+            }
+        }
+
+        .ant-radio-wrapper-checked {
+            color: var(--primary);
+        }
+
+        .ant-radio {
+            position: absolute;
+            left: -9999px;
+            overflow: hidden;
+        }
+    }
+}

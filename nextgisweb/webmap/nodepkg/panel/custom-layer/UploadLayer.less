@@ -1,0 +1,98 @@
+.upload-tab-panel {
+    .ant-upload-wrapper .ant-upload-drag {
+        position: relative;
+        width: auto;
+        height: 100%;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.02);
+        border: 1px dashed #d9d9d9;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: border-color 0s;
+        margin: 5px;
+
+        .ant-upload {
+            padding: 5px;
+        }
+
+        .ant-space-gap-col-small {
+            column-gap: 0px;
+        }
+
+        .ant-space-gap-row-small {
+            row-gap: 0px;
+        }
+    }
+
+    .item-list {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 5px;
+        user-select: none;
+
+        .checkbox-item {
+            min-width: 0;
+
+            .ant-checkbox-wrapper {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                color: rgba(0, 0, 0, 0.88);
+                font-size: 14px;
+                line-height: 1.5714285714285714;
+                list-style: none;
+                font-family: "Roboto", sans-serif;
+                display: inline-flex;
+                align-items: baseline;
+                cursor: pointer;
+                width: 100%;
+
+                .ant-checkbox {
+                    overflow: visible;
+                }
+
+                span {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .feature-info-block {
+        .feature-item {
+            cursor: pointer;
+            margin: 10px 5px;
+            padding: 5px;
+            border-radius: 2px;
+            box-shadow: 0px 0px 5px 1px #02223c33;
+
+            &:hover {
+                background-color: #00000005;
+                border-radius: 2px;
+            }
+
+            .feature-info {
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 24px;
+                border-bottom: 0.005em solid #00000010;
+                font-size: 14px;
+
+                .title-info {
+                    margin: 0 10px 0 0;
+                }
+
+                .value-info {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}
