@@ -1,22 +1,40 @@
 import re
+from typing import Literal
 
+import sqlalchemy as sa
 from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, require
-from nextgisweb.lib import db
+from nextgisweb.lib.apitype import fillgap
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
 
 from .exception import QuotaExceeded
-from .model import Resource, ResourceGroup
+from .interface import interface_registry
+from .model import (
+    Resource,
+    ResourceCls,
+    ResourceGroup,
+    ResourceInterfaceIdentity,
+    ResourceScope,
+    ResourceScopeIdentity,
+)
 from .model import ResourceACLRule as ACLRule
 
 
 class ResourceComponent(Component):
+    def __init__(self, env, settings):
+        super().__init__(env, settings)
+
+        fillgap(ResourceCls, Literal[tuple(Resource.registry.keys())])  # type: ignore
+        fillgap(ResourceInterfaceIdentity, Literal[tuple(i.__name__ for i in interface_registry)])  # type: ignore
+        fillgap(ResourceScopeIdentity, Literal[tuple(ResourceScope.registry.keys())])  # type: ignore
+
     def initialize(self):
         super().initialize()
+
         for item in self.options["disabled_cls"]:
             try:
                 Resource.registry[item]
@@ -52,7 +70,7 @@ class ResourceComponent(Component):
 
             # Quota per resource class checking
             if cls in self.quota_resource_by_cls:
-                query = DBSession.query(db.func.count(Resource.id)).filter(Resource.cls == cls)
+                query = DBSession.query(sa.func.count(Resource.id)).filter(Resource.cls == cls)
 
                 with DBSession.no_autoflush:
                     count = query.scalar()
@@ -68,7 +86,7 @@ class ResourceComponent(Component):
 
         # Total quota checking
         if self.quota_limit is not None:
-            query = DBSession.query(db.func.count(Resource.id))
+            query = DBSession.query(sa.func.count(Resource.id))
             if self.quota_resource_cls is not None:
                 query = query.filter(Resource.cls.in_(self.quota_resource_cls))
 
@@ -125,7 +143,7 @@ class ResourceComponent(Component):
         return result
 
     def query_stat(self):
-        query = DBSession.query(Resource.cls, db.func.count(Resource.id)).group_by(Resource.cls)
+        query = DBSession.query(Resource.cls, sa.func.count(Resource.id)).group_by(Resource.cls)
 
         total = 0
         by_cls = dict()
@@ -133,7 +151,7 @@ class ResourceComponent(Component):
             by_cls[cls] = count
             total += count
 
-        query = DBSession.query(db.func.max(Resource.creation_date))
+        query = DBSession.query(sa.func.max(Resource.creation_date))
         cdate = query.scalar()
 
         return dict(resource_count=dict(total=total, cls=by_cls), last_creation_date=cdate)

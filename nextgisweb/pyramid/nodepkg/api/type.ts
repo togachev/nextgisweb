@@ -9,7 +9,7 @@ export type RouteParameters = {
     [K in keyof Routes]: Routes[K]["pathArr"] | [Routes[K]["pathObj"]];
 };
 
-export type RouteName = keyof RouteParameters;
+export type RouteName = keyof Routes;
 
 export type GetRouteParam<R extends RouteName> = (RouteParameters[R] &
     [object])[0];
@@ -58,7 +58,7 @@ export interface RequestOptionsJSON<
     method?: M;
 }
 
-export interface RequestOptionsBoby<
+export interface RequestOptionsBody<
     Q = any,
     RT extends ResponseType = "json",
     M extends Method = Method,
@@ -71,19 +71,19 @@ export type PutRequestOptions<
     Q = any,
     B = any,
     RT extends ResponseType = "json",
-> = RequestOptionsJSON<Q, B, RT, "PUT"> | RequestOptionsBoby<Q, RT, "PUT">;
+> = RequestOptionsJSON<Q, B, RT, "PUT"> | RequestOptionsBody<Q, RT, "PUT">;
 
 export type PostRequestOptions<
     Q = any,
     B = any,
     RT extends ResponseType = "json",
-> = RequestOptionsJSON<Q, B, RT, "PUT"> | RequestOptionsBoby<Q, RT, "PUT">;
+> = RequestOptionsJSON<Q, B, RT, "POST"> | RequestOptionsBody<Q, RT, "POST">;
 
 export type PatchRequestOptions<
     Q = any,
     B = any,
     RT extends ResponseType = "json",
-> = RequestOptionsJSON<Q, B, RT, "PATCH"> | RequestOptionsBoby<Q, RT, "PATCH">;
+> = RequestOptionsJSON<Q, B, RT, "PATCH"> | RequestOptionsBody<Q, RT, "PATCH">;
 
 export type DeleteRequestOptions<
     Q = any,
@@ -109,7 +109,9 @@ export type RequestOptionsByMethod<
     B = any,
     RT extends ResponseType = "json",
     ReturnUrl extends boolean = false,
-> = RouteRequestOptions<Q, B, RT, ReturnUrl>[M];
+> = M extends keyof RouteRequestOptions
+    ? RouteRequestOptions<Q, B, RT, ReturnUrl>[M]
+    : never;
 
 export type ApiRouteParams = Record<string, string>;
 
@@ -164,6 +166,19 @@ type HasRequiredKeys<T> = {
     : true;
 
 export interface RouteMethods<N extends RouteName> {
+    url: HasRequiredKeys<RouteQuery<N, "get">> extends true
+        ? (
+              options: Pick<
+                  RequestOptionsByMethod<"get", RouteQuery<N, "get">>,
+                  "query"
+              >
+          ) => string
+        : (
+              options?: Pick<
+                  RequestOptionsByMethod<"get", RouteQuery<N, "get">>,
+                  "query"
+              >
+          ) => string;
     get: HasRequiredKeys<RouteQuery<N, "get">> extends true
         ? <
               T = RouteResp<N, "get">,
@@ -229,7 +244,11 @@ export interface RouteMethods<N extends RouteName> {
 export type MethodAvailable<
     N extends RouteName,
     M extends RequestMethod,
-> = M extends keyof Routes[N] ? RouteMethods<N>[M] : never;
+> = M extends "url"
+    ? RouteMethods<N>["url"]
+    : M extends keyof Routes[N]
+      ? RouteMethods<N>[M]
+      : never;
 
 export type RouteResults<N extends RouteName> = {
     [M in keyof RouteMethods<any>]: MethodAvailable<N, M>;

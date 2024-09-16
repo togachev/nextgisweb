@@ -2,7 +2,14 @@ import re
 from contextlib import contextmanager
 from typing import Literal, Union
 
-from sqlalchemy import alias, cast, func, sql
+import sqlalchemy as sa
+import sqlalchemy.event as sa_event
+import sqlalchemy.orm as orm
+from msgspec import UNSET
+from shapely.geometry import box
+from sqlalchemy import alias, bindparam, cast, func, select, sql, text
+from sqlalchemy import and_ as sql_and
+from sqlalchemy import or_ as sql_or
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
@@ -10,7 +17,7 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import db
+from nextgisweb.lib import saext
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ForbiddenError, ValidationError
@@ -55,11 +62,11 @@ class TablenogeomConnection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    hostname = db.Column(db.Unicode, nullable=False)
-    database = db.Column(db.Unicode, nullable=False)
-    username = db.Column(db.Unicode, nullable=False)
-    password = db.Column(db.Unicode, nullable=False)
-    port = db.Column(db.Integer, nullable=True)
+    hostname = sa.Column(sa.Unicode, nullable=False)
+    database = sa.Column(sa.Unicode, nullable=False)
+    username = sa.Column(sa.Unicode, nullable=False)
+    password = sa.Column(sa.Unicode, nullable=False)
+    port = sa.Column(sa.Integer, nullable=True)
 
     @classmethod
     def check_parent(cls, parent):
@@ -100,23 +107,23 @@ class TablenogeomConnection(Base, Resource):
                 password=self.password,
             )
         )
-        engine = db.create_engine(engine_url, **args)
+        engine = sa.create_engine(engine_url, **args)
 
         resid = self.id
 
-        @db.event.listens_for(engine, "connect")
+        @sa_event.listens_for(engine, "connect")
         def _connect(dbapi, record):
             logger.debug(
                 "Resource #%d, pool 0x%x, connection 0x%x created", resid, id(dbapi), id(engine)
             )
 
-        @db.event.listens_for(engine, "checkout")
+        @sa_event.listens_for(engine, "checkout")
         def _checkout(dbapi, record, proxy):
             logger.debug(
                 "Resource #%d, pool 0x%x, connection 0x%x retrieved", resid, id(dbapi), id(engine)
             )
 
-        @db.event.listens_for(engine, "checkin")
+        @sa_event.listens_for(engine, "checkin")
         def _checkin(dbapi, record):
             logger.debug(
                 "Resource #%d, pool 0x%x, connection 0x%x returned", resid, id(dbapi), id(engine)
@@ -156,8 +163,8 @@ class TablenogeomLayerField(Base, LayerField):
     __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
-    column_name = db.Column(db.Unicode, nullable=False)
+    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
+    column_name = sa.Column(sa.Unicode, nullable=False)
 
 
 @implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
@@ -167,14 +174,14 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
 
     __scope__ = DataScope
 
-    connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
-    schema = db.Column(db.Unicode, default="public", nullable=False)
-    table = db.Column(db.Unicode, nullable=False)
-    column_id = db.Column(db.Unicode, nullable=False)
+    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    schema = sa.Column(sa.Unicode, default="public", nullable=False)
+    table = sa.Column(sa.Unicode, nullable=False)
+    column_id = sa.Column(sa.Unicode, nullable=False)
 
     __field_class__ = TablenogeomLayerField
 
-    connection = db.relationship(
+    connection = orm.relationship(
         Resource,
         foreign_keys=connection_id,
         cascade="save-update, merge",
@@ -207,7 +214,7 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
         self.feature_label_field = None
 
         with self.connection.get_connection() as conn:
-            inspector = db.inspect(conn.engine)
+            inspector = sa.inspect(conn.engine)
             try:
                 columns = inspector.get_columns(self.table, self.schema)
             except NoSuchTableError:
@@ -220,7 +227,7 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
 
             for column in columns:
                 if column["name"] == self.column_id:
-                    if not isinstance(column["type"], db.Integer):
+                    if not isinstance(column["type"], sa.Integer):
                         raise ValidationError(
                             gettext("To use column as ID it should have integer type!")
                         )
@@ -231,19 +238,19 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
                     pass
 
                 else:
-                    if isinstance(column["type"], db.BigInteger):
+                    if isinstance(column["type"], sa.BigInteger):
                         datatype = FIELD_TYPE.BIGINT
-                    elif isinstance(column["type"], db.Integer):
+                    elif isinstance(column["type"], sa.Integer):
                         datatype = FIELD_TYPE.INTEGER
-                    elif isinstance(column["type"], db.Numeric):
+                    elif isinstance(column["type"], sa.Numeric):
                         datatype = FIELD_TYPE.REAL
-                    elif isinstance(column["type"], (db.String, UUID)):
+                    elif isinstance(column["type"], (sa.String, UUID)):
                         datatype = FIELD_TYPE.STRING
-                    elif isinstance(column["type"], db.Date):
+                    elif isinstance(column["type"], sa.Date):
                         datatype = FIELD_TYPE.DATE
-                    elif isinstance(column["type"], db.Time):
+                    elif isinstance(column["type"], sa.Time):
                         datatype = FIELD_TYPE.TIME
-                    elif isinstance(column["type"], db.DateTime):
+                    elif isinstance(column["type"], sa.DateTime):
                         datatype = FIELD_TYPE.DATETIME
                     else:
                         logger.warning(f"Column type '{column['type']}' is not supported.")
@@ -286,10 +293,10 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
     def _sa_table(self, init_columns=False):
         cols = []
         if init_columns:
-            cols.extend([db.sql.column(f.column_name) for f in self.fields])
-            cols.append(db.sql.column(self.column_id))
+            cols.extend([sa.sql.column(f.column_name) for f in self.fields])
+            cols.append(sa.sql.column(self.column_id))
 
-        tab = db.sql.table(self.table, *cols)
+        tab = sa.sql.table(self.table, *cols)
         tab.schema = self.schema
         tab.quote = True
         tab.quote_schema = True
@@ -311,9 +318,9 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
         :param feature: object description
         :type feature:  Feature
         """
-        idcol = db.sql.column(self.column_id)
+        idcol = sa.sql.column(self.column_id)
         tab = self._sa_table(True)
-        stmt = db.update(tab).values(self._makevals(feature)).where(idcol == feature.id)
+        stmt = sa.update(tab).values(self._makevals(feature)).where(idcol == feature.id)
 
         with self.connection.get_connection() as conn:
             conn.execute(stmt)
@@ -326,9 +333,9 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
 
         :return:    inserted object ID
         """
-        idcol = db.sql.column(self.column_id)
+        idcol = sa.sql.column(self.column_id)
         tab = self._sa_table(True)
-        stmt = db.insert(tab).values(self._makevals(feature)).returning(idcol)
+        stmt = sa.insert(tab).values(self._makevals(feature)).returning(idcol)
 
         with self.connection.get_connection() as conn:
             return conn.execute(stmt).scalar()
@@ -339,9 +346,9 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
         :param feature_id: record id
         :type feature_id:  int or bigint
         """
-        idcol = db.sql.column(self.column_id)
+        idcol = sa.sql.column(self.column_id)
         tab = self._sa_table()
-        stmt = db.delete(tab).where(idcol == feature_id)
+        stmt = sa.delete(tab).where(idcol == feature_id)
 
         with self.connection.get_connection() as conn:
             conn.execute(stmt)
@@ -349,7 +356,7 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
     def feature_delete_all(self):
         """Remove all records from a layer"""
         tab = self._sa_table()
-        stmt = db.delete(tab)
+        stmt = sa.delete(tab)
 
         with self.connection.get_connection() as conn:
             conn.execute(stmt)
@@ -479,9 +486,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         o = "isnot"
                     else:
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
-                    v = db.sql.null()
+                    v = sa.sql.null()
 
-                op = getattr(db.sql.operators, o)
+                op = getattr(sa.sql.operators, o)
                 if k == "id":
                     column = idcol
                 else:
@@ -491,11 +498,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
-                where.append(db.and_(*_where_filter))
+                where.append(sa.and_(*_where_filter))
 
         if self._like or self._ilike:
             operands = [
-                cast(tab.columns[fld.column_name], db.Unicode)
+                cast(tab.columns[fld.column_name], sa.Unicode)
                 for fld in self.layer.fields
                 if fld.text_search
             ]
@@ -503,14 +510,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append(False)
             else:
                 method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
-                where.append(db.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
+                where.append(sa.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         order_criterion = []
         if self._order_by:
             for order, k in self._order_by:
                 field = self.layer.field_by_keyname(k)
                 order_criterion.append(
-                    dict(asc=db.asc, desc=db.desc)[order](tab.columns[field.column_name])
+                    dict(asc=sa.asc, desc=sa.desc)[order](tab.columns[field.column_name])
                 )
         order_criterion.append(idcol)
 
@@ -530,7 +537,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 )
 
                 if len(where) > 0:
-                    query = query.where(db.and_(*where))
+                    query = query.where(sa.and_(*where))
 
                 with self.layer.connection.get_connection() as conn:
                     result = conn.execute(query)
@@ -539,7 +546,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                         yield Feature(
                             layer=self.layer,
-                            id=row["id"],
+                            id=row.id,
                             fields=fdict,
                         )
 
@@ -548,7 +555,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 with self.layer.connection.get_connection() as conn:
                     query = sql.select(func.count(idcol))
                     if len(where) > 0:
-                        query = query.where(db.and_(*where))
+                        query = query.where(sa.and_(*where))
                     result = conn.execute(query)
                     return result.scalar()
 

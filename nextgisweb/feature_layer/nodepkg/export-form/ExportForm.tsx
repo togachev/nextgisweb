@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { Checkbox, Input, Select } from "@nextgisweb/gui/antd";
 import {
     ExtentRow,
@@ -20,7 +21,6 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
-import type { FeatureLayerField } from "../type";
 
 interface ExportFormProps {
     id: number;
@@ -60,7 +60,7 @@ const srsListToOptions = (srsList: SRSRead[]): SrsOption[] =>
         value: srs.id,
     }));
 
-const fieldListToOptions = (fieldList: FeatureLayerField[]) => {
+const fieldListToOptions = (fieldList: FeatureLayerFieldRead[]) => {
     return fieldList.map((field) => {
         return {
             label: field.display_name,
@@ -131,26 +131,26 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                 signal,
             });
             setSrsOptions(srsListToOptions(srsInfo));
-            let itemInfo = null;
+
             if (id !== undefined) {
-                itemInfo = await route("resource.item", id).get({
+                const itemInfo = await route("resource.item", id).get({
                     signal,
                 });
-            }
 
-            if (itemInfo && itemInfo.feature_layer) {
-                const cls = itemInfo.resource.cls as "vector_layer";
-                const vectorLayer = itemInfo[cls];
-                if (vectorLayer) {
-                    setDefaultSrs(vectorLayer.srs.id);
-                }
-                setFieldOptions(
-                    fieldListToOptions(itemInfo.feature_layer.fields)
-                );
-            } else {
-                const defSrs = srsInfo.find((srs) => srs.id === 3857);
-                if (defSrs) {
-                    setDefaultSrs(defSrs.id);
+                if (itemInfo && itemInfo.feature_layer) {
+                    const cls = itemInfo.resource.cls as "vector_layer";
+                    const vectorLayer = itemInfo[cls];
+                    if (vectorLayer) {
+                        setDefaultSrs(vectorLayer.srs.id);
+                    }
+                    setFieldOptions(
+                        fieldListToOptions(itemInfo.feature_layer.fields)
+                    );
+                } else {
+                    const defSrs = srsInfo.find((srs) => srs.id === 3857);
+                    if (defSrs) {
+                        setDefaultSrs(defSrs.id);
+                    }
                 }
             }
         } catch (err) {

@@ -6,7 +6,10 @@ import type { InputRef, ModalProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { BlueprintCategory } from "@nextgisweb/resource/type/api";
+import type {
+    BlueprintCategory,
+    ResourceCls,
+} from "@nextgisweb/resource/type/api";
 
 import { categories, resources } from "../blueprint";
 import { ResourceIcon } from "../icon";
@@ -21,7 +24,7 @@ const ALL_RESOURCES = "";
 interface CreateResourceModalProps
     extends Omit<ModalProps, "footer" | "classNames"> {
     resourceId: number;
-    creatable: string[];
+    creatable: ResourceCls[];
 }
 
 export default function CreateResourceModal({

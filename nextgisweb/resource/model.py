@@ -3,12 +3,14 @@ from datetime import datetime
 from types import MappingProxyType
 from typing import ClassVar, List, Literal, Tuple, Type, Union
 
-from msgspec import Struct
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from msgspec import UNSET, Struct, UnsetType
 from sqlalchemy import event, func, text
 from typing_extensions import Annotated
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
-from nextgisweb.lib import db
+from nextgisweb.lib.apitype import Gap
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
@@ -32,7 +34,7 @@ resource_registry = DictRegistry()
 PermissionSets = namedtuple("PermissionSets", ("allow", "deny", "mask"))
 
 
-class ResourceMeta(db.DeclarativeMeta):
+class ResourceMeta(orm.DeclarativeMeta):
     def __new__(cls, name, bases, nspc):
         identity = nspc["identity"]
 
@@ -100,32 +102,32 @@ class Resource(Base, metaclass=ResourceMeta):
 
     __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
 
-    id = db.Column(db.Integer, primary_key=True)
-    cls = db.Column(db.Unicode, nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    cls = sa.Column(sa.Unicode, nullable=False)
 
-    parent_id = db.Column(db.ForeignKey(id))
+    parent_id = sa.Column(sa.ForeignKey(id))
 
-    keyname = db.Column(db.Unicode, unique=True)
-    display_name = db.Column(db.Unicode, nullable=False)
-    creation_date = db.Column(db.TIMESTAMP, nullable=False, default=datetime.utcnow)
+    keyname = sa.Column(sa.Unicode, unique=True)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    creation_date = sa.Column(sa.TIMESTAMP, nullable=False, default=datetime.utcnow)
 
-    owner_user_id = db.Column(db.ForeignKey(User.id), nullable=False)
+    owner_user_id = sa.Column(sa.ForeignKey(User.id), nullable=False)
 
-    description = db.Column(db.Unicode)
+    description = sa.Column(sa.Unicode)
 
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
-        db.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
-        db.UniqueConstraint(parent_id, display_name),
+        sa.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
+        sa.UniqueConstraint(parent_id, display_name),
     )
 
-    parent = db.relationship(
+    parent = orm.relationship(
         "Resource",
         remote_side=[id],
-        backref=db.backref("children", cascade=None, order_by=display_name),
+        backref=orm.backref("children", cascade=None, order_by=display_name),
     )
 
-    owner_user = db.relationship(User)
+    owner_user = orm.relationship(User)
 
     def __str__(self):
         return self.display_name
@@ -134,14 +136,18 @@ class Resource(Base, metaclass=ResourceMeta):
     def id_column(cls):
         """Constructs new 'id' column with a foreign key to cls.id"""
 
-        col = db.Column("id", db.ForeignKey(cls.id), primary_key=True)
+        col = sa.Column("id", sa.ForeignKey(cls.id), primary_key=True)
         col._creation_order = cls.id._creation_order
         return col
 
     @classmethod
-    def check_parent(cls, parent) -> bool:
+    def check_parent(cls, parent: "Resource") -> bool:
         """Can this resource be child for parent?"""
         return False
+
+    def check_child(self, child: "Resource") -> bool:
+        """Can this resource be parent for child?"""
+        return True
 
     @classmethod
     def implemented_interfaces(cls):
@@ -270,7 +276,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     # Data validation
 
-    @db.validates("parent")
+    @orm.validates("parent")
     def _validate_parent(self, key, value):
         """Test for closed loops in hierarchy"""
 
@@ -281,7 +287,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return value
 
-    @db.validates("keyname")
+    @orm.validates("keyname")
     def _validate_keyname(self, key, value):
         """Test for key uniqueness"""
 
@@ -294,7 +300,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return value
 
-    @db.validates("owner_user")
+    @orm.validates("owner_user")
     def _validate_owner_user(self, key, value):
         with DBSession.no_autoflush:
             if value.system and value.keyname != "guest":
@@ -344,20 +350,20 @@ class ResourceWebMapGroup(Base):
 
     identity = "resource_wmg"
     
-    id = db.Column(db.Integer, primary_key=True)
-    webmap_group_name = db.Column(db.Unicode, nullable=True, unique=True)
-    action_map = db.Column(db.Boolean, default=True, server_default="true", nullable=False)
-    id_pos = db.Column(db.Integer, nullable=True)
-    webmap_group_id = db.relationship("WebMapGroupResource", cascade="all,delete",
+    id = sa.Column(sa.Integer, primary_key=True)
+    webmap_group_name = sa.Column(sa.Unicode, nullable=True, unique=True)
+    action_map = sa.Column(sa.Boolean, default=True, server_default="true", nullable=False)
+    id_pos = sa.Column(sa.Integer, nullable=True)
+    webmap_group_id = orm.relationship("WebMapGroupResource", cascade="all,delete",
         backref="resource_wmg")
 
 class WebMapGroupResource(Base):
     __tablename__ = "wmg_resource"
     identity = "wmg_resource"
-    id = db.Column(db.Integer, primary_key=True)
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    webmap_group_id = db.Column(db.ForeignKey(ResourceWebMapGroup.id), primary_key=True)
-    id_pos = db.Column(db.Integer, nullable=True)
+    id = sa.Column(sa.Integer, primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    webmap_group_id = sa.Column(sa.ForeignKey(ResourceWebMapGroup.id), primary_key=True)
+    id_pos = sa.Column(sa.Integer, nullable=True)
 
 @event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):
@@ -393,19 +399,19 @@ ResourceScope.read.require(
 class ResourceACLRule(Base):
     __tablename__ = "resource_acl_rule"
 
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    principal_id = db.Column(db.ForeignKey(Principal.id), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
 
-    identity = db.Column(db.Unicode, primary_key=True, default="")
-    scope = db.Column(db.Unicode, primary_key=True, default="")
-    permission = db.Column(db.Unicode, primary_key=True, default="")
-    propagate = db.Column(db.Boolean, primary_key=True, default=True)
-    action = db.Column(db.Unicode, nullable=False, default=True)
+    identity = sa.Column(sa.Unicode, primary_key=True, default="")
+    scope = sa.Column(sa.Unicode, primary_key=True, default="")
+    permission = sa.Column(sa.Unicode, primary_key=True, default="")
+    propagate = sa.Column(sa.Boolean, primary_key=True, default=True)
+    action = sa.Column(sa.Unicode, nullable=False, default=True)
 
-    resource = db.relationship(Resource, backref=db.backref("acl", cascade="all, delete-orphan"))
-    principal = db.relationship(
+    resource = orm.relationship(Resource, backref=orm.backref("acl", cascade="all, delete-orphan"))
+    principal = orm.relationship(
         Principal,
-        backref=db.backref(
+        backref=orm.backref(
             "__resource_acl_rule",
             cascade="all, delete-orphan",
         ),
@@ -431,17 +437,22 @@ class ResourceACLRule(Base):
         )
 
 
-ResourceCls = Annotated[str, TSExport("ResourceCls")]
+ResourceCls = Gap[Annotated[str, TSExport("ResourceCls")]]
+ResourceInterfaceIdentity = Gap[Annotated[str, TSExport("ResourceInterface")]]
+ResourceScopeIdentity = Gap[Annotated[str, TSExport("ResourceScope")]]
 
 
 class ClsAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(ResourceCls, ResourceCls, UnsetType)
+
     def writeperm(self, srlzr):
         return True
 
     def get(self, srlzr) -> ResourceCls:
         return super().get(srlzr)
 
-    def set(self, srlzr, value: ResourceCls, *, create: bool):
+    def set(self, srlzr, value: Union[ResourceCls, UnsetType], *, create: bool):
+        assert create and value is not UNSET
         assert srlzr.obj.cls == value
 
 
@@ -457,14 +468,15 @@ class ParentAttr(SResource, apitype=True):
     def set(self, srlzr: Serializer, value, *, create: bool):
         old_parent = srlzr.obj.parent
         super().set(srlzr, value, create=create)
+        new_parent = srlzr.obj.parent
 
-        if old_parent == srlzr.obj.parent:
+        if old_parent == new_parent:
             return
 
-        if srlzr.obj.parent is None:
+        if new_parent is None:
             raise ForbiddenError(gettext("Resource can not be without a parent."))
 
-        for parent in (old_parent, srlzr.obj.parent):
+        for parent in (old_parent, new_parent):
             if parent is not None and not parent.has_permission(
                 ResourceScope.manage_children, srlzr.user
             ):
@@ -473,7 +485,13 @@ class ParentAttr(SResource, apitype=True):
                     % parent.id
                 )
 
-        if not srlzr.obj.check_parent(srlzr.obj.parent):
+        from .event import OnChildClasses
+
+        if not (
+            srlzr.obj.check_parent(new_parent)
+            and new_parent.check_child(srlzr.obj)
+            and (OnChildClasses.apply(parent=new_parent, classes={srlzr.obj.__class__}))
+        ):
             raise HierarchyError(
                 gettext("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
             )
@@ -503,7 +521,7 @@ REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
 class ACLRule(Struct, kw_only=True):
     action: Annotated[Literal["allow", "deny"], TSExport("ACLRuleAction")]
     principal: PrincipalRef
-    identity: str
+    identity: Union[ResourceCls, Literal[""]]
     scope: str
     permission: str
     propagate: bool
@@ -574,27 +592,27 @@ class ChildrenAttr(SAttribute, apitype=True):
 
 
 class InterfacesAttr(SAttribute, apitype=True):
-    def get(self, srlzr) -> List[str]:
+    def get(self, srlzr) -> List[ResourceInterfaceIdentity]:
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
 class ScopesAttr(SAttribute, apitype=True):
-    def get(self, srlzr) -> List[str]:
+    def get(self, srlzr) -> List[ResourceScopeIdentity]:
         return list(srlzr.obj.scope.keys())
 
 
 class ResourceSerializer(Serializer, resource=Resource):
     id = SColumn(read=ResourceScope.read, write=None)
-    cls = ClsAttr(read=ResourceScope.read, write=None, required=False)
+    cls = ClsAttr(read=ResourceScope.read, write=ResourceScope.update, required=True)
     creation_date = SColumn(read=ResourceScope.read, write=None)
 
-    parent = ParentAttr(read=ResourceScope.read, write=ResourceScope.update)
+    parent = ParentAttr(read=ResourceScope.read, write=ResourceScope.update, required=True)
     owner_user = OwnerUserAttr(read=ResourceScope.read, write=ResourceScope.update, required=False)
 
     permissions = ACLAttr(read=ResourceScope.read, write=ResourceScope.change_permissions)
 
     keyname = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update, required=True)
 
     description = DescriptionAttr(read=ResourceScope.read, write=ResourceScope.update)
 

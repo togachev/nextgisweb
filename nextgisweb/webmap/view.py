@@ -209,7 +209,7 @@ def display(obj, request):
 
         return data
 
-    tmp = obj.to_dict()
+    title = obj.display_name if obj.title is None else obj.title
 
     def get_relation(item):
         list = []
@@ -228,6 +228,7 @@ def display(obj, request):
         traverse_relation(item)
         return list if len(list) > 0 else None
 
+    tmp = obj.to_dict()
     display_config = dict(
         extent=tmp["extent"],
         extent_const=tmp["extent_const"],
@@ -249,7 +250,7 @@ def display(obj, request):
         bookmarkLayerId=obj.bookmark_resource_id,
         webmapId=obj.id,
         webmapDescription=obj.description,
-        webmapTitle=obj.display_name,
+        webmapTitle=title,
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
@@ -269,7 +270,7 @@ def display(obj, request):
             ),
         )
 
-    return dict(obj=obj, display_config=display_config, custom_layout=True)
+    return dict(obj=obj, title=title, display_config=display_config, custom_layout=True)
 
 
 @viewargs(renderer="mako")

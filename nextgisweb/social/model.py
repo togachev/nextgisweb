@@ -1,15 +1,15 @@
 from io import BytesIO
 from typing import Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from PIL import Image
 
 from nextgisweb.env import COMP_ID, Base
-from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
-from nextgisweb.resource import Resource, ResourceScope, Serializer
-from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 
 Base.depends_on("resource")
 
@@ -19,22 +19,22 @@ MAX_SIZE = (1600, 630)
 class ResourceSocial(Base):
     __tablename__ = "resource_social"
 
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    preview_fileobj_id = db.Column(db.ForeignKey(FileObj.id))
-    preview_description = db.Column(db.Unicode)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    preview_fileobj_id = sa.Column(sa.ForeignKey(FileObj.id))
+    preview_description = sa.Column(sa.Unicode)
 
-    resource = db.relationship(
+    resource = orm.relationship(
         Resource,
-        backref=db.backref(
+        backref=orm.backref(
             "social",
             cascade="all, delete-orphan",
             uselist=False,
         ),
     )
-    preview_fileobj = db.relationship(FileObj, lazy="joined")
+    preview_fileobj = orm.relationship(FileObj, lazy="joined")
 
 
-class FileUploadAttr(SP, apitype=True):
+class FileUploadAttr(SAttribute, apitype=True):
     def set(self, srlzr, value: Union[FileUploadRef, None], *, create: bool):
         if srlzr.obj.social is None:
             srlzr.obj.social = ResourceSocial()
@@ -58,13 +58,13 @@ class FileUploadAttr(SP, apitype=True):
             social.preview_fileobj = None
 
 
-class ImageExistsAttr(SP, apitype=True):
+class ImageExistsAttr(SAttribute, apitype=True):
     def get(self, srlzr) -> bool:
         social = srlzr.obj.social
         return social is not None and social.preview_fileobj_id is not None
 
 
-class DescriptionAttr(SP, apitype=True):
+class DescriptionAttr(SAttribute, apitype=True):
     def get(self, srlzr) -> Union[str, None]:
         social = srlzr.obj.social
         return social.preview_description if social is not None else None
@@ -75,10 +75,9 @@ class DescriptionAttr(SP, apitype=True):
         srlzr.obj.social.preview_description = value
 
 
-class SocialSerializer(Serializer, apitype=True):
+class SocialSerializer(Serializer, resource=Resource):
     identity = COMP_ID
-    resclass = Resource
 
-    preview_file_upload = FileUploadAttr(write=ResourceScope.update)
-    preview_image_exists = ImageExistsAttr(read=ResourceScope.read)
-    preview_description = DescriptionAttr(read=ResourceScope.read, write=ResourceScope.update)
+    file_upload = FileUploadAttr(write=ResourceScope.update)
+    image_exists = ImageExistsAttr(read=ResourceScope.read)
+    description = DescriptionAttr(read=ResourceScope.read, write=ResourceScope.update)

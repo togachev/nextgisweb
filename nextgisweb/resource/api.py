@@ -1,5 +1,7 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast, get_args
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 import zope.event
 from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
 from sqlalchemy.sql import exists
@@ -9,7 +11,6 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib import db
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
 
 from nextgisweb.auth import User
@@ -21,9 +22,9 @@ from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .category import ResourceCategory
 from .composite import CompositeSerializer
-from .events import AfterResourceCollectionPost, AfterResourcePut
+from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
 from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
-from .model import Resource, ResourceWebMapGroup, WebMapGroupResource
+from .model import Resource, ResourceWebMapGroup, WebMapGroupResource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
 from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
@@ -32,11 +33,11 @@ from .view import resource_factory
 
 
 class BlueprintResource(Struct):
-    identity: str
+    identity: ResourceCls
     label: str
-    base_classes: List[str]
-    interfaces: List[str]
-    scopes: List[str]
+    base_classes: List[ResourceCls]
+    interfaces: List[ResourceInterfaceIdentity]
+    scopes: List[ResourceScopeIdentity]
     category: str
     order: int
 
@@ -47,7 +48,7 @@ class BlueprintPermission(Struct):
 
 
 class BlueprintScope(Struct):
-    identity: str
+    identity: ResourceScopeIdentity
     label: str
     permissions: Dict[str, BlueprintPermission]
 
@@ -59,8 +60,8 @@ class BlueprintCategory(Struct):
 
 
 class Blueprint(Struct):
-    resources: Dict[str, BlueprintResource]
-    scopes: Dict[str, BlueprintScope]
+    resources: Dict[ResourceCls, BlueprintResource]
+    scopes: Dict[ResourceScopeIdentity, BlueprintScope]
     categories: Dict[str, BlueprintCategory]
 
 
@@ -113,12 +114,12 @@ def blueprint(request) -> Blueprint:
 
 
 if TYPE_CHECKING:
-    CompositCreate = Struct
+    CompositeCreate = Struct
     CompositeRead = Struct
     CompositeUpdate = Struct
 else:
     composite = CompositeSerializer.types()
-    CompositCreate = composite.create
+    CompositeCreate = composite.create
     CompositeRead = composite.read
     CompositeUpdate = composite.update
 
@@ -155,7 +156,10 @@ def item_delete(context, request) -> EmptyObject:
         DBSession.delete(obj)
 
     if context.id == 0:
-        raise HierarchyError(message=gettext("Root resource could not be deleted."))
+        raise HierarchyError(gettext("Root resource could not be deleted."))
+
+    if not OnDeletePrompt.apply(context):
+        raise HierarchyError
 
     with DBSession.no_autoflush:
         delete(context)
@@ -173,7 +177,7 @@ def collection_get(
         Resource.query()
         .filter_by(parent_id=parent)
         .order_by(Resource.display_name)
-        .options(db.subqueryload(Resource.acl))
+        .options(orm.subqueryload(Resource.acl))
     )
 
     serializer = CompositeSerializer(user=request.user)
@@ -184,41 +188,20 @@ def collection_get(
 
     serializer = CompositeSerializer(user=request.user)
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
-    return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
+    resources = [res for res in query if check_perm(res)]
+    resources.sort(key=lambda res: (res.cls_order, res.display_name))
+    return [serializer.serialize(res, CompositeRead) for res in resources]
 
 
 def collection_post(
-    request,
-    body: CompositCreate,
-    *,
-    cls: Union[str, UnsetType] = UNSET,
-    parent: Union[int, UnsetType] = UNSET,
+    request, body: CompositeCreate
 ) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
     """Create resource"""
+
     request.env.core.check_storage_limit()
+    resource_cls = body.resource.cls
 
-    if body.resource is UNSET:
-        resource_type = CompositCreate.__annotations__["resource"]
-        resource_struct = get_args(resource_type)[0]
-        body.resource = resource_struct()
-
-    resource = body.resource
-
-    if cls is not UNSET:
-        resource.cls = cls
-
-    if parent is not UNSET:
-        resource.parent = dict(id=parent)
-    elif resource.parent is UNSET:
-        raise ValidationError(gettext("Resource parent required."))
-
-    resource_cls = resource.cls
-
-    if resource_cls is UNSET:
-        raise ValidationError(message=gettext("Resource class required."))
-    elif resource_cls not in Resource.registry:
-        raise ValidationError(gettext("Unknown resource class '%s'.") % resource_cls)
-    elif (
+    if (
         resource_cls in request.env.resource.options["disabled_cls"]
         or request.env.resource.options["disable." + resource_cls]
     ):
@@ -429,7 +412,7 @@ def search(
         else:
             raise ValidationError("Operator '%s' is not supported" % op)
     if len(filter_) > 0:
-        query = query.filter(db.and_(*filter_))
+        query = query.filter(sa.and_(*filter_))
 
     query = query.order_by(Resource.display_name)
 

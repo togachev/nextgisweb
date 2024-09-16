@@ -6,6 +6,7 @@ from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
 
+from nextgisweb.lib.apitype.util import decompose_union
 from nextgisweb.lib.registry import dict_registry
 
 from nextgisweb.auth import User
@@ -53,6 +54,14 @@ class Serializer:
         else:
             assert hasattr(cls, "resclass")
             cls.apitype = apitype or False
+
+            if not cls.apitype:
+                warn(
+                    f"{cls.__name__} uses legacy serializer API, upgrade it. "
+                    "This will become unsupported in nextgisweb 5.0.0.dev0.",
+                    DeprecationWarning,
+                    stacklevel=3,
+                )
 
             if (
                 cls.apitype
@@ -123,22 +132,30 @@ class Serializer:
         fcreate, fread, fupdate = list(), list(), list()
         for pn, pv in cls.proptab:
             pt = pv.types
-            if pv.write is not None or (pn == "cls" and cls.identity == "resource"):
-                # FIXME: ResourceSerializer.cls create-only attribute workaround
+            if pv.write is not None:
                 if not getattr(pv, "required", False):
                     fcreate.append((pn, Union[pt.create, UnsetType], UNSET))
+                elif UnsetType in decompose_union(pt.create):
+                    fcreate.append((pn, pt.create, UNSET))
                 else:
                     fcreate.append((pn, pt.create))
             if pv.read is not None:
                 if pv.read is ResourceScope.read:
                     # ResourceScope.read is the minimum required permission,
                     # without this permission a resource cannot be serialized.
-                    fread.append((pn, pt.read))
+                    # But it stil may contain UnsetType, then we need set UNSET
+                    # as default value.
+                    if UnsetType in decompose_union(pt.read):
+                        fread.append((pn, pt.read, UNSET))
+                    else:
+                        fread.append((pn, pt.read))
                 else:
                     fread.append((pn, Union[pt.read, UnsetType], UNSET))
             if pv.write is not None:
-                # Any attribute can be ommited during update
-                fupdate.append((pn, Union[pt.update, UnsetType], UNSET))
+                # Any attribute can be ommited during update. Attributes of
+                # UnsetType are skipped entirely.
+                if pt.update != UnsetType:
+                    fupdate.append((pn, Union[pt.update, UnsetType], UNSET))
 
         skwa: Any = dict(kw_only=True, module=cls.__module__)
         return CRUTypes(
@@ -177,6 +194,14 @@ class SAttribute:
                 tset = _type_from_signature(mset, "value") if mset else None
                 cls.ctypes = CRUTypes(tset, tget, tset)
 
+        if not cls.apitype:
+            warn(
+                f"{cls.__name__} uses legacy serializer API, upgrade it. "
+                "This will become unsupported in nextgisweb 5.0.0.dev0.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
     def __init__(
         self,
         read: Union[Permission, None] = None,
@@ -213,8 +238,12 @@ class SAttribute:
 
     def serialize(self, srlzr: Serializer) -> None:
         if self.readperm(srlzr):
-            apitype = srlzr.apitype and self.apitype
-            srlzr.data[self.attrname] = self.get(srlzr) if apitype else self.getter(srlzr)
+            if srlzr.apitype and self.apitype:
+                value = self.get(srlzr)
+            else:
+                value = self.getter(srlzr)
+            if value is not UNSET:
+                srlzr.data[self.attrname] = value
 
     def deserialize(self, srlzr: Serializer) -> None:
         if self.writeperm(srlzr):

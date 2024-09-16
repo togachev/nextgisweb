@@ -540,7 +540,7 @@ define([
                     response,
                     layerLabels,
                 };
-                this.openIdentifyPanel(identifyInfo);
+                this.openIdentifyPanel(identifyInfo, afterPopupInit);
                 return;
             }
 
@@ -571,7 +571,7 @@ define([
             };
         },
 
-        openIdentifyPanel: function (identifyInfo) {
+        openIdentifyPanel: function (identifyInfo, afterPopupInit) {
             const pm = this.display.panelsManager;
             const pkey = "identify";
             let panel = pm.getPanel(pkey);
@@ -589,6 +589,10 @@ define([
             const activePanel = pm.getActivePanelName();
             if (activePanel !== pkey) {
                 pm.activatePanel(pkey);
+            }
+
+            if (afterPopupInit && afterPopupInit instanceof Function) {
+                afterPopupInit();
             }
         },
 

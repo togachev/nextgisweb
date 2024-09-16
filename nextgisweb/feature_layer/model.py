@@ -1,15 +1,20 @@
+from typing import Any, List, Literal, Union
+
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
 from nextgisweb.env import Base, gettext, gettextf
-from nextgisweb.lib import db
+from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Transformer
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.lookup_table import LookupTable
-from nextgisweb.resource import Resource, ResourceScope, Serializer
-from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
+from nextgisweb.resource.model import ResourceRef
 from nextgisweb.spatial_ref_sys import SRS
 
 from .interface import FIELD_TYPE, FIELD_TYPE_OGR, IVersionableFeatureLayer
@@ -24,57 +29,36 @@ _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 class LayerField(Base):
     __tablename__ = "layer_field"
 
-    id = db.Column(db.Integer, primary_key=True)
-    layer_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
-    cls = db.Column(db.Unicode, nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    layer_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    cls = sa.Column(sa.Unicode, nullable=False)
 
-    idx = db.Column(db.Integer, nullable=False)
-    keyname = db.Column(db.Unicode, nullable=False)
-    datatype = db.Column(db.Enum(*FIELD_TYPE.enum), nullable=False)
-    display_name = db.Column(db.Unicode, nullable=False)
-    grid_visibility = db.Column(db.Boolean, nullable=False, default=True)
-    text_search = db.Column(db.Boolean, nullable=False, default=True)
-    lookup_table_id = db.Column(db.ForeignKey(LookupTable.id))
+    idx = sa.Column(sa.Integer, nullable=False)
+    keyname = sa.Column(sa.Unicode, nullable=False)
+    datatype = sa.Column(saext.Enum(*FIELD_TYPE.enum), nullable=False)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
+    text_search = sa.Column(sa.Boolean, nullable=False, default=True)
+    lookup_table_id = sa.Column(sa.ForeignKey(LookupTable.id))
 
     identity = __tablename__
 
     __mapper_args__ = {"polymorphic_identity": identity, "polymorphic_on": cls}
     __table_args__ = (
-        db.UniqueConstraint(layer_id, keyname, deferrable=True, initially="DEFERRED"),
-        db.UniqueConstraint(layer_id, display_name, deferrable=True, initially="DEFERRED"),
+        sa.UniqueConstraint(layer_id, keyname, deferrable=True, initially="DEFERRED"),
+        sa.UniqueConstraint(layer_id, display_name, deferrable=True, initially="DEFERRED"),
     )
 
-    layer = db.relationship(Resource, primaryjoin="Resource.id == LayerField.layer_id")
+    layer = orm.relationship(Resource, primaryjoin="Resource.id == LayerField.layer_id")
 
-    lookup_table = db.relationship(
+    lookup_table = orm.relationship(
         LookupTable,
         primaryjoin="LayerField.lookup_table_id == LookupTable.id",
-        backref=db.backref("layer_fields"),
+        backref=orm.backref("layer_fields", cascade_backrefs=False),
     )
 
     def __str__(self):
         return self.display_name
-
-    def to_dict(self):
-        result = dict(
-            (c, getattr(self, c))
-            for c in (
-                "id",
-                "layer_id",
-                "cls",
-                "idx",
-                "keyname",
-                "datatype",
-                "display_name",
-                "grid_visibility",
-                "text_search",
-            )
-        )
-        if self.lookup_table is not None:
-            result["lookup_table"] = dict(id=self.lookup_table.id)
-        else:
-            result["lookup_table"] = None
-        return result
 
 
 class LayerFieldsMixin:
@@ -82,7 +66,7 @@ class LayerFieldsMixin:
 
     @declared_attr
     def fields(cls):
-        return db.relationship(
+        return orm.relationship(
             cls.__field_class__,
             foreign_keys=cls.__field_class__.layer_id,
             order_by=cls.__field_class__.idx,
@@ -94,18 +78,18 @@ class LayerFieldsMixin:
 
     @declared_attr
     def feature_label_field_id(cls):
-        return db.Column("feature_label_field_id", db.ForeignKey(cls.__field_class__.id))
+        return sa.Column("feature_label_field_id", sa.ForeignKey(cls.__field_class__.id))
 
     @declared_attr
     def feature_label_field(cls):
-        return db.relationship(
+        return orm.relationship(
             cls.__field_class__,
             uselist=False,
             primaryjoin="%s.id == %s.feature_label_field_id"
             % (cls.__field_class__.__name__, cls.__name__),
             cascade="all",
             post_update=True,
-            backref=db.backref("_feature_label_field_backref"),
+            backref=orm.backref("_feature_label_field_backref"),
         )
 
     def to_ogr(self, ogr_ds, *, name="", fields=None, use_display_name=False, fid=None):
@@ -125,24 +109,52 @@ class LayerFieldsMixin:
         return ogr_layer
 
 
-class _fields_attr(SP):
-    def getter(self, srlzr):
+DataType = Union[tuple(Literal[i] for i in FIELD_TYPE.enum)]  # type: ignore
+
+
+class FeatureLayerFieldRead(Struct, kw_only=True):
+    id: int
+    keyname: str
+    display_name: str
+    datatype: DataType
+    typemod: Any
+    label_field: bool
+    grid_visibility: bool
+    text_search: bool
+    lookup_table: Union[ResourceRef, None]
+
+
+class FeatureLayerFieldWrite(Struct, kw_only=True):
+    id: Union[int, UnsetType] = UNSET
+    delete: Union[bool, UnsetType] = UNSET
+    keyname: Union[str, UnsetType] = UNSET
+    display_name: Union[str, UnsetType] = UNSET
+    datatype: Union[DataType, UnsetType] = UNSET
+    typemod: Union[Any, UnsetType] = UNSET
+    label_field: Union[bool, UnsetType] = UNSET
+    grid_visibility: Union[bool, UnsetType] = UNSET
+    text_search: Union[bool, UnsetType] = UNSET
+    lookup_table: Union[ResourceRef, None, UnsetType] = UNSET
+
+
+class FieldsAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> List[FeatureLayerFieldRead]:
         return [
-            {
-                "id": f.id,
-                "keyname": f.keyname,
-                "datatype": f.datatype,
-                "typemod": None,
-                "display_name": f.display_name,
-                "label_field": f == srlzr.obj.feature_label_field,
-                "grid_visibility": f.grid_visibility,
-                "text_search": f.text_search,
-                "lookup_table": (dict(id=f.lookup_table.id) if f.lookup_table else None),
-            }
+            FeatureLayerFieldRead(
+                id=f.id,
+                keyname=f.keyname,
+                display_name=f.display_name,
+                datatype=f.datatype,
+                typemod=None,
+                label_field=(f == srlzr.obj.feature_label_field),
+                grid_visibility=f.grid_visibility,
+                text_search=f.text_search,
+                lookup_table=ResourceRef(id=f.lookup_table.id) if f.lookup_table else None,
+            )
             for f in srlzr.obj.fields
         ]
 
-    def setter(self, srlzr, value):
+    def set(self, srlzr: Serializer, value: List[FeatureLayerFieldWrite], *, create: bool):
         obj = srlzr.obj
 
         fldmap = dict()
@@ -152,44 +164,44 @@ class _fields_attr(SP):
         obj.feature_label_field = None
 
         new_fields = list()
-
         for fld in value:
-            fldid = fld.get("id")
-
-            if fldid is not None:
+            if (fldid := fld.id) is not UNSET:
                 try:
-                    mfld = fldmap.pop(fldid)  # update
+                    mfld = fldmap.pop(fldid)
                 except KeyError:
                     raise ValidationError(gettext("Field not found (ID=%d)." % fldid))
 
-                if fld.get("delete", False):
-                    obj.field_delete(mfld)  # delete
+                if fld.delete is True:
+                    obj.field_delete(mfld)
                     continue
             else:
-                mfld = obj.field_create(fld["datatype"])  # create
+                mfld = obj.field_create(fld.datatype)
 
-            if "keyname" in fld:
-                if fld["keyname"] in FIELD_FORBIDDEN_NAME:
+            if fld.keyname is not UNSET:
+                if fld.keyname in FIELD_FORBIDDEN_NAME:
                     raise ValidationError(
                         message=gettextf(
                             "Field name is forbidden: '{}'. Please remove or rename it."
-                        )(fld["keyname"])
+                        )(fld.keyname)
                     )
-                mfld.keyname = fld["keyname"]
-            if "display_name" in fld:
-                mfld.display_name = fld["display_name"]
-            if "grid_visibility" in fld:
-                mfld.grid_visibility = fld["grid_visibility"]
-            if "text_search" in fld:
-                mfld.text_search = fld["text_search"]
-            if "lookup_table" in fld:
-                # TODO: Handle errors: wrong schema, missing lookup table
-                ltval = fld["lookup_table"]
-                mfld.lookup_table = (
-                    LookupTable.filter_by(id=ltval["id"]).one() if ltval is not None else None
-                )
+                mfld.keyname = fld.keyname
 
-            if fld.get("label_field", False):
+            if fld.display_name is not UNSET:
+                mfld.display_name = fld.display_name
+
+            if fld.grid_visibility is not UNSET:
+                mfld.grid_visibility = fld.grid_visibility
+
+            if fld.text_search is not UNSET:
+                mfld.text_search = fld.text_search
+
+            if fld.lookup_table is None:
+                mfld.lookup_table = fld.lookup_table
+            elif fld.lookup_table is not UNSET:
+                # TODO: Handle errors: wrong schema, missing lookup table
+                mfld.lookup_table = LookupTable.filter_by(id=fld.lookup_table.id).one()
+
+            if fld.label_field is not UNSET:
                 obj.feature_label_field = mfld
 
             new_fields.append(mfld)
@@ -215,37 +227,43 @@ class _fields_attr(SP):
         obj.fields.reorder()
 
 
-class _fversioning_attr(SP):
-    def getter(self, srlzr):
+class FVersioningRead(Struct, kw_only=True):
+    enabled: bool
+    epoch: Union[int, UnsetType]
+    latest: Union[int, UnsetType]
+
+
+class FVersioningUpdate(Struct, kw_only=True):
+    enabled: Union[bool, UnsetType] = UNSET
+
+
+class FVersioningAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> Union[FVersioningRead, None]:
         obj = srlzr.obj
         if not IVersionableFeatureLayer.providedBy(obj):
             return None
 
-        enabled = bool(obj.fversioning)
-        result = dict(enabled=enabled)
-        if enabled:
-            result["epoch"] = obj.fversioning.epoch
-            result["latest"] = obj.fversioning.latest
+        fversioning = obj.fversioning
+        enabled = bool(fversioning)
+        epoch = fversioning.epoch if enabled else UNSET
+        latest = fversioning.latest if enabled else UNSET
+        return FVersioningRead(enabled=enabled, epoch=epoch, latest=latest)
 
-        return result
-
-    def setter(self, srlzr, value):
+    def set(self, srlzr: Serializer, value: FVersioningUpdate, *, create: bool):
         obj = srlzr.obj
-
-        if (not IVersionableFeatureLayer.providedBy(obj)) and value is not None:
+        if not IVersionableFeatureLayer.providedBy(obj):
             raise ValidationError(message=gettext("Versioning not supported"))
 
-        if (enabled := value.get("enabled", None)) is not None:
-            if enabled != bool(obj.fversioning):
-                obj.fversioning_configure(enabled=enabled, source=srlzr)
+        if value.enabled is not None:
+            if value.enabled != bool(obj.fversioning):
+                obj.fversioning_configure(enabled=value.enabled, source=srlzr)
 
 
-class FeatureLayerSerializer(Serializer):
+class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin):
     identity = "feature_layer"
-    resclass = LayerFieldsMixin
 
-    fields = _fields_attr(read=ResourceScope.read, write=ResourceScope.update)
-    versioning = _fversioning_attr(read=ResourceScope.read, write=ResourceScope.update)
+    fields = FieldsAttr(read=ResourceScope.read, write=ResourceScope.update)
+    versioning = FVersioningAttr(read=ResourceScope.read, write=ResourceScope.update)
 
 
 class FeatureQueryIntersectsMixin:

@@ -1,20 +1,25 @@
 from enum import Enum
-from typing import List, Literal, Union
+from typing import List, Literal, Type, Union
 
 import geoalchemy2 as ga
-from msgspec import Struct
+import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
+import sqlalchemy.event as sa_event
+import sqlalchemy.orm as orm
+from msgspec import Meta, Struct
 from msgspec.structs import asdict as struct_asdict
-from sqlalchemy import event, text
+from sqlalchemy import text
 from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import set_committed_value
+from typing_extensions import Annotated
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
-from nextgisweb.lib import db
+from nextgisweb.lib import saext
+from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
-from nextgisweb.resource import Permission as P
 from nextgisweb.resource import (
+    CRUTypes,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -25,6 +30,7 @@ from nextgisweb.resource import (
     SRelationship,
     SResource,
 )
+from nextgisweb.resource import Permission as P
 from nextgisweb.resource.category import MapsAndServicesCategory
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -62,42 +68,42 @@ class WebMap(Base, Resource):
 
     __scope__ = WebMapScope
 
-    root_item_id = db.Column(db.ForeignKey("webmap_item.id"), nullable=False)
-    bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
-    draw_order_enabled = db.Column(db.Boolean, nullable=True)
-    identify_order_enabled = db.Column(db.Boolean, nullable=True, default=False)
-    editable = db.Column(db.Boolean, nullable=False, default=False)
+    root_item_id = sa.Column(sa.ForeignKey("webmap_item.id"), nullable=False)
+    bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
+    draw_order_enabled = sa.Column(sa.Boolean, nullable=True)
+    identify_order_enabled = sa.Column(sa.Boolean, nullable=True, default=False)
+    editable = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    extent_left = db.Column(db.Float, default=-180)
-    extent_right = db.Column(db.Float, default=+180)
-    extent_bottom = db.Column(db.Float, default=-90)
-    extent_top = db.Column(db.Float, default=+90)
+    extent_left = sa.Column(sa.Float, default=-180)
+    extent_right = sa.Column(sa.Float, default=+180)
+    extent_bottom = sa.Column(sa.Float, default=-90)
+    extent_top = sa.Column(sa.Float, default=+90)
 
-    extent_const_left = db.Column(db.Float)
-    extent_const_right = db.Column(db.Float)
-    extent_const_bottom = db.Column(db.Float)
-    extent_const_top = db.Column(db.Float)
+    extent_const_left = sa.Column(sa.Float)
+    extent_const_right = sa.Column(sa.Float)
+    extent_const_bottom = sa.Column(sa.Float)
+    extent_const_top = sa.Column(sa.Float)
 
-    active_panel = db.Column(db.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
-
-    annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    annotation_default = db.Column(
-        db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
+    title = sa.Column(sa.Unicode)
+    active_panel = sa.Column(saext.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
+    annotation_enabled = sa.Column(sa.Boolean, nullable=False, default=False)
+    annotation_default = sa.Column(
+        saext.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
     )
-    legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
-    measure_srs_id = db.Column(db.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
+    legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
+    measure_srs_id = sa.Column(sa.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
 
-    root_item = db.relationship("WebMapItem", cascade="all")
+    root_item = orm.relationship("WebMapItem", cascade="all")
 
-    bookmark_resource = db.relationship(
+    bookmark_resource = orm.relationship(
         Resource,
         foreign_keys=bookmark_resource_id,
-        backref=db.backref("bookmarked_webmaps"),
+        backref=orm.backref("bookmarked_webmaps"),
     )
 
-    measure_srs = db.relationship(SRS, foreign_keys=measure_srs_id)
+    measure_srs = orm.relationship(SRS, foreign_keys=measure_srs_id)
 
-    annotations = db.relationship(
+    annotations = orm.relationship(
         "WebMapAnnotation",
         back_populates="webmap",
         cascade="all,delete-orphan",
@@ -149,29 +155,29 @@ def _item_default(item_type, default):
 class WebMapItem(Base):
     __tablename__ = "webmap_item"
 
-    id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("webmap_item.id"))
-    item_type = db.Column(db.Enum("root", "group", "layer"), nullable=False)
-    position = db.Column(db.Integer, nullable=True)
-    display_name = db.Column(db.Unicode, nullable=True)
-    group_expanded = db.Column(db.Boolean, nullable=True, default=_item_default("group", False))
-    group_exclusive = db.Column(db.Boolean, nullable=True, default=_item_default("group", False))
-    layer_style_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
-    layer_enabled = db.Column(db.Boolean, nullable=True, default=_item_default("layer", False))
-    layer_identifiable = db.Column(db.Boolean, nullable=True, default=_item_default("layer", True))
-    layer_transparency = db.Column(db.Float, nullable=True)
-    layer_min_scale_denom = db.Column(db.Float, nullable=True)
-    layer_max_scale_denom = db.Column(db.Float, nullable=True)
-    layer_adapter = db.Column(db.Enum(*WebMapAdapter.registry.keys()), nullable=True)
-    draw_order_position = db.Column(db.Integer, nullable=True)
-    legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
-    file_resource_visible = db.Column(db.Boolean, nullable=True, default=_item_default("layer", False))
+    id = sa.Column(sa.Integer, primary_key=True)
+    parent_id = sa.Column(sa.Integer, sa.ForeignKey("webmap_item.id"))
+    item_type = sa.Column(saext.Enum("root", "group", "layer"), nullable=False)
+    position = sa.Column(sa.Integer, nullable=True)
+    display_name = sa.Column(sa.Unicode, nullable=True)
+    group_expanded = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
+    group_exclusive = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
+    layer_style_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
+    layer_enabled = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
+    layer_identifiable = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", True))
+    layer_transparency = sa.Column(sa.Float, nullable=True)
+    layer_min_scale_denom = sa.Column(sa.Float, nullable=True)
+    layer_max_scale_denom = sa.Column(sa.Float, nullable=True)
+    layer_adapter = sa.Column(saext.Enum(*WebMapAdapter.registry.keys()), nullable=True)
+    draw_order_position = sa.Column(sa.Integer, nullable=True)
+    legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
+    file_resource_visible = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
 
-    parent = db.relationship(
+    parent = orm.relationship(
         "WebMapItem",
         remote_side=id,
         cascade_backrefs=False,
-        backref=db.backref(
+        backref=orm.backref(
             "children",
             order_by=position,
             cascade="all, delete-orphan",
@@ -179,11 +185,11 @@ class WebMapItem(Base):
         ),
     )
 
-    style = db.relationship(
+    style = orm.relationship(
         "Resource",
         # Temporary solution that allows to automatically
         # remove web-map elements when style is removed
-        backref=db.backref(
+        backref=orm.backref(
             "webmap_items",
             cascade="all",
             cascade_backrefs=False,
@@ -270,7 +276,7 @@ class WebMapItem(Base):
         return (self.layer_min_scale_denom, self.layer_max_scale_denom)
 
 
-@event.listens_for(WebMapItem, "load")
+@sa_event.listens_for(WebMapItem, "load")
 def load_webmap_item_children(target, context):
     if target.item_type == "layer":
         set_committed_value(target, "children", ())
@@ -279,24 +285,24 @@ def load_webmap_item_children(target, context):
 class WebMapAnnotation(Base):
     __tablename__ = "webmap_annotation"
 
-    id = db.Column(db.Integer, primary_key=True)
-    webmap_id = db.Column(db.ForeignKey(WebMap.id), nullable=False)
-    description = db.Column(db.Unicode)
-    style = db.Column(db.JSONB)
-    geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
-    public = db.Column(db.Boolean, nullable=False, default=True)
-    user_id = db.Column(db.ForeignKey(User.id), nullable=True)
+    id = sa.Column(sa.Integer, primary_key=True)
+    webmap_id = sa.Column(sa.ForeignKey(WebMap.id), nullable=False)
+    description = sa.Column(sa.Unicode)
+    style = sa.Column(sa_pg.JSONB)
+    geom = sa.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
+    public = sa.Column(sa.Boolean, nullable=False, default=True)
+    user_id = sa.Column(sa.ForeignKey(User.id), nullable=True)
 
-    webmap = db.relationship(WebMap, back_populates="annotations")
-    user = db.relationship(
+    webmap = orm.relationship(WebMap, back_populates="annotations")
+    user = orm.relationship(
         User,
-        backref=db.backref(
+        backref=orm.backref(
             "webmap_annotations",
             cascade="all, delete-orphan",
         ),
     )
 
-    @validates("public", "user_id")
+    @orm.validates("public", "user_id")
     def validates_read_only_fields(self, key, value):
         val = getattr(self, key)
         if val or val is False:
@@ -440,18 +446,63 @@ class RootItemAttr(SAttribute, apitype=True):
         value.to_model(srlzr.obj.root_item)
 
 
+Lon = Annotated[float, Meta(ge=-180, le=180, description="Longitude")]
+Lat = Annotated[float, Meta(ge=-90, le=90, description="Latitude")]
+
+
+class ExtentPartAttr(SColumn, apitype=True):
+    def setup_types(self):
+        if self.attrname.endswith(("_left", "_right")):
+            base = Lon
+        elif self.attrname.endswith(("_bottom", "_top")):
+            base = Lat
+        else:
+            raise NotImplementedError
+
+        self.required = False
+        self.types = CRUTypes(
+            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+        )
+
+
+class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
+    west: Annotated[Lon, Meta(title="West")]
+    south: Annotated[Lat, Meta(title="South")]
+    east: Annotated[Lon, Meta(title="East")]
+    north: Annotated[Lat, Meta(title="North")]
+
+
+class ExtentAttr(SAttribute, apitype=True):
+    def bind(self, srlzrcls: Type[Serializer], attrname: str):
+        super().bind(srlzrcls, attrname)
+        if attrname == "initial_extent":
+            self.attrs = tuple(f"extent_{i}" for i in ("left", "bottom", "right", "top"))
+        elif attrname == "constraining_extent":
+            self.attrs = tuple(f"extent_const_{i}" for i in ("left", "bottom", "right", "top"))
+        else:
+            raise NotImplementedError
+
+    def get(self, srlzr: Serializer) -> Union[ExtentWSEN, None]:
+        obj = srlzr.obj
+        parts = [getattr(obj, a) for a in self.attrs]
+        return ExtentWSEN(*parts) if None not in parts else None
+
+    def set(self, srlzr: Serializer, value: Union[ExtentWSEN, None], *, create: bool):
+        obj = srlzr.obj
+        if value is None:
+            for a in self.attrs:
+                setattr(obj, a, None)
+        else:
+            for a, b in zip(self.attrs, ("west", "south", "east", "north")):
+                setattr(obj, a, getattr(value, b))
+
+
 class WebMapSerializer(Serializer, resource=WebMap):
-    active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-
-    extent_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-
-    extent_const_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_const_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_const_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_const_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    initial_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
+    constraining_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
+    title = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     draw_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     identify_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
@@ -467,8 +518,20 @@ class WebMapSerializer(Serializer, resource=WebMap):
 
     root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
 
+    active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-@event.listens_for(SRS, "after_delete")
+    extent_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_right = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_bottom = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_top = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+    extent_const_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_right = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_bottom = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_top = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+
+@sa_event.listens_for(SRS, "after_delete")
 def check_measurement_srid(mapper, connection, target):
     sql = "DELETE FROM setting WHERE component = :c AND name = :n AND value::text::int = :v"
     connection.execute(text(sql), dict(c=COMP_ID, n="measurement_srid", v=target.id))
