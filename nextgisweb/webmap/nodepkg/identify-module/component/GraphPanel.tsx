@@ -10,182 +10,190 @@ import { Chart, Title, registerables } from "chart.js";
 Chart.register(...registerables);
 Chart.register(Title);
 
+import { IdentifyStore } from "../IdentifyStore";
+
 import { context, params } from "../constant";
-import type { ContextItemProps } from "../type";
+import type { ContextItemProps, DataProps } from "../type";
 
 import "./GraphPanel.less";
 
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-export const GraphPanel = observer(({ item, store: storeProp }) => {
-    const [store] = useState(() => storeProp);
-    const {
-        hideLegend,
-        result,
-        setResult,
-        fixPos,
-        valueRnd,
-    } = store;
+export const GraphPanel = observer(
+    ({
+        item,
+        store: storeProp
+    }: {
+        item: DataProps
+        store?: IdentifyStore
+    }) => {
+        const [store] = useState(() => storeProp);
+        // const {
+        //     hideLegend,
+        //     fixPos,
+        //     valueRnd,
+        // } = store;
 
-    const [sizeFont, setSizeFont] = useState(16);
+        const [result, setResult] = useState();
+        const [sizeFont, setSizeFont] = useState(16);
 
-    const chartRef = useRef();
-    const imodule = webmapSettings.identify_module;
+        const chartRef = useRef();
+        const imodule = webmapSettings.identify_module;
 
-    const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
+        const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 
-    const loadData = async (item) => {
-        const { external_resource_id, relation_key, relation_value } = item.relation;
-        const key_rel = "fld_" + relation_key;
-        const json = {
-            [key_rel]: relation_value,
-            extensions: "",
-            geom: "no",
-        }
-        const feature = await route("feature_layer.feature.collection", {
-            id: external_resource_id,
-        }).get({
-            query: json,
-            cache: true,
-        });
+        const loadData = async (item) => {
+            const { external_resource_id, relation_key, relation_value } = item.relation;
+            const key_rel = "fld_" + relation_key;
+            const json = {
+                [key_rel]: relation_value,
+                extensions: "",
+                geom: "no",
+            }
+            const feature = await route("feature_layer.feature.collection", {
+                id: external_resource_id,
+            }).get({
+                query: json,
+                cache: true,
+            });
 
-        feature.sort(function (a, b) {
-            return parseFloat(a.fields.year) - parseFloat(b.fields.year);
-        });
+            feature.sort(function (a, b) {
+                return parseFloat(a.fields.year) - parseFloat(b.fields.year);
+            });
 
-        const data: ContextItemProps[] = [];
-        Object.keys(context).map(item => {
-            const copy: ContextItemProps = structuredClone(context[item]);
-            feature.map(i => {
-                if (item === i.fields.type) {
-                    Object.assign(copy, { key: i.fields.type });
-                    Object.assign(copy, params);
-                    copy.data.push({ y: i.fields.value, x: i.fields.year });
-                    copy.labels.push(i.fields.year);
-                }
+            const data: ContextItemProps[] = [];
+            Object.keys(context).map(item => {
+                const copy: ContextItemProps = structuredClone(context[item]);
+                feature.map(i => {
+                    if (item === i.fields.type) {
+                        Object.assign(copy, { key: i.fields.type });
+                        Object.assign(copy, params);
+                        copy.data.push({ y: i.fields.value, x: i.fields.year });
+                        copy.labels.push(i.fields.year);
+                    }
+                })
+                data.push(copy)
             })
-            data.push(copy)
-        })
 
-        const obj = { props: item, data: { datasets: data } };
-        feature.length > 0 ? setResult(obj) : setResult(undefined);
-    }
-    
-    useEffect(() => {
-        loadData(item);
-    }, [item]);
+            const obj = { props: item, data: { datasets: data } };
+            feature.length > 0 ? setResult(obj) : setResult(undefined);
+        }
 
-    const GraphComponent = ({ value }) => {
-        const options = {
-            animation: false,
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: 5,
-            },
-            plugins: {
-                legend: {
-                    labels: {
-                        font: {
-                            size: sizeFont
-                        },
-                        padding: 10,
-                        usePointStyle: true,
-                    },
-                    position: "top",
-                    align: "start",
-                    display: !hideLegend,
+        useEffect(() => {
+            loadData(item);
+        }, [item]);
+
+        const GraphComponent = ({ value }) => {
+            const options = {
+                animation: false,
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: 5,
                 },
-            },
-            tooltips: {
-                mode: "index",
-                intersect: false,
-            },
-            hover: {
-                mode: "nearest",
-                intersect: true
-            },
-            interaction: {
-                mode: "nearest",
-                axis: "x",
-                intersect: false,
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        font: {
-                            size: sizeFont
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: sizeFont
+                            },
+                            padding: 10,
+                            usePointStyle: true,
                         },
-                        color: "#000",
-
+                        position: "top",
+                        align: "start",
+                        display: !store?.hideLegend,
                     },
-                    grid: {
-                        color: "#000",
+                },
+                tooltips: {
+                    mode: "index",
+                    intersect: false,
+                },
+                hover: {
+                    mode: "nearest",
+                    intersect: true
+                },
+                interaction: {
+                    mode: "nearest",
+                    axis: "x",
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: {
+                                size: sizeFont
+                            },
+                            color: "#000",
+
+                        },
+                        grid: {
+                            color: "#000",
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: {
+                                size: sizeFont
+                            },
+                            color: "#000"
+                        },
+                        grid: {
+                            color: "#000",
+                        }
                     }
                 },
-                y: {
-                    ticks: {
-                        font: {
-                            size: sizeFont
-                        },
-                        color: "#000"
-                    },
-                    grid: {
-                        color: "#000",
-                    }
-                }
-            },
-        };
+            };
 
-        const plugin = {
-            beforeInit: function (chart) {
-                const originalFit = chart.legend.fit
-                chart.legend.fit = function fit() {
-                    originalFit.bind(chart.legend)()
-                    this.height += 20
+            const plugin = {
+                beforeInit: function (chart) {
+                    const originalFit = chart.legend.fit
+                    chart.legend.fit = function fit() {
+                        originalFit.bind(chart.legend)()
+                        this.height += 20
+                    }
                 }
             }
+            
+            const styleResize = store?.fixPos !== null ?
+                { width: store?.fixPos.width - 47, height: store?.fixPos.height - 78 } :
+                { width: store?.valueRnd.width - 47, height: store?.valueRnd.height - 78 }
+
+            const styleGtaph = !store?.hideLegend ?
+                { height: webmapSettings.popup_height } :
+                { height: webmapSettings.popup_height * 1.5 };
+
+            return (
+                <div className={store && "graph-content"} style={!store ? styleGtaph : null}>
+                    <Scatter
+                        ref={chartRef}
+                        type="scatter"
+                        options={options}
+                        plugins={[plugin]}
+                        data={value?.data}
+                        style={store ? styleResize : null}
+                    />
+                </div>
+            )
         }
 
-        const styleResize = fixPos !== null ?
-            { width: fixPos.width - 47, height: fixPos.height - 78 } :
-            { width: valueRnd.width - 47, height: valueRnd.height - 78 }
-
-        const styleGtaph = !hideLegend ?
-            { height: webmapSettings.popup_height } :
-            { height: webmapSettings.popup_height * 1.5 };
-
         return (
-            <div className={store && "graph-content"} style={!store ? styleGtaph : null}>
-                <Scatter
-                    ref={chartRef}
-                    type="scatter"
-                    options={options}
-                    plugins={[plugin]}
-                    data={value?.data}
-                    style={store ? styleResize : null}
-                />
-            </div>
-        )
-    }
-
-    return (
-        <div>
-            <div className="panel-content-container">
-                <div className={imodule ? "right-graph" : "graph"}>
-                    {!imodule && (<h3>
-                        <LineChartOutlined />
-                        {msgGraphs}
-                    </h3>)}
+            <div>
+                <div className="panel-content-container">
+                    <div className={imodule ? "right-graph" : "graph"}>
+                        {!imodule && (<h3>
+                            <LineChartOutlined />
+                            {msgGraphs}
+                        </h3>)}
+                    </div>
                 </div>
-            </div>
-            <div className="panel-content-container">
-                <div className="fill">
-                    <div className="relation-item">
-                        {result ? (<GraphComponent value={result} />) : emptyValue}
+                <div className="panel-content-container">
+                    <div className="fill">
+                        <div className="relation-item">
+                            {result ? (<GraphComponent value={result} />) : emptyValue}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
-});
+        );
+    });

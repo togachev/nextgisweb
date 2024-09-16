@@ -20,7 +20,6 @@ export class IdentifyStore {
     fixPos: Rnd | null = null;
     fixPanel: string | null = null;
     fixPopup = false;
-    result: object | undefined = undefined;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -36,10 +35,6 @@ export class IdentifyStore {
 
     setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
         this.setValue("valueRnd", valueRnd);
-    };
-
-    setResult = (result: SetValue<object | null>) => {
-        this.setValue("result", result);
     };
 
     setHideLegend = (hideLegend: boolean) => {

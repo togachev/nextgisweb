@@ -2,6 +2,12 @@ import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { DojoTopic } from "@nextgisweb/webmap/panels-manager/type";
 
+export interface RelationProps {
+    external_resource_id: number;
+    relation_key: string;
+    relation_value: number;
+}
+
 export interface DataProps {
     id: number;
     label: string;    
@@ -11,6 +17,7 @@ export interface DataProps {
     styleId: number;
     value: string;
     permission: string;
+    relation?: RelationProps;
 }
 
 export interface UrlParamsProps {
