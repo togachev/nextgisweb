@@ -41,6 +41,7 @@ def identify(request) -> JSONType:
                     styleId=style.id,
                     label=f.label,
                     fields=f.fields,
+                    relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None
                 )
                 for f in query()
             ]
@@ -52,14 +53,6 @@ def identify(request) -> JSONType:
             if allow:
                 for feature in features:
                     feature["parent"] = layer.parent.display_name
-
-            if layer.check_relation(layer):
-                for feature in features:
-                    feature["relation"] = dict(
-                        external_resource_id=layer.external_resource_id,
-                        relation_key=layer.external_field_name,
-                        relation_value=feature["fields"][layer.resource_field_name]
-                    )
 
             result[layer_id_str] = dict(features=features, featureCount=len(features))
 
@@ -116,16 +109,10 @@ def identify_module(request) -> JSONType:
                         permission="Read",
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                         fields=f.fields,
+                        relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None
                     )
                 )
 
-            if layer.check_relation(layer):
-                for feature in options:
-                    feature["relation"] = dict(
-                        external_resource_id=layer.external_resource_id,
-                        relation_key=layer.external_field_name,
-                        relation_value=feature["fields"][layer.resource_field_name]
-                    )
     result["data"] = options
     result["featureCount"] = len(options)
     return result

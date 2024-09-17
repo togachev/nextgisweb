@@ -20,7 +20,7 @@ const settings = webmapSettings;
 
 export const ContentComponent: FC = observer(({ store: storeProp, display, linkToGeometry }) => {
     const [store] = useState(() => storeProp);
-    const { attribute, data, extensions, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, valueRnd } = store;
+    const { attribute, data, extensions, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, setCurrentUrlParams, valueRnd } = store;
     const { id, layerId } = selected;
     const { copyValue, contextHolder } = useCopy();
     const panelRef = useRef<HTMLDivElement>(null);
@@ -141,6 +141,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setFixContentItem(options.find(item => item.key === key));
         setFixPanel(key);
+        setCurrentUrlParams(key);
     };
 
     const items: MenuProps['items'] = useMemo(() => {
@@ -160,6 +161,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
     const onValuesChange = (e) => {
         setFixContentItem(options.find(item => item.key === e.target.value));
         setFixPanel(e.target.value);
+        setCurrentUrlParams(e.target.value);
     }
 
     return (

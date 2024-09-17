@@ -9,7 +9,7 @@ export class IdentifyStore {
     selected: DataProps | null = null;
     attribute: object | null = null;
     extensions: object | null = null;
-    updateContent = false;
+    currentUrlParams: string | null = null;
     update = false;
     fullscreen = false;
     contextUrl: string | null = null;
@@ -20,6 +20,7 @@ export class IdentifyStore {
     fixPos: Rnd | null = null;
     fixPanel: string | null = null;
     fixPopup = false;
+    result: object | undefined = undefined;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -35,6 +36,10 @@ export class IdentifyStore {
 
     setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
         this.setValue("valueRnd", valueRnd);
+    };
+
+    setResult = (result: SetValue<object | null>) => {
+        this.setValue("result", result);
     };
 
     setHideLegend = (hideLegend: boolean) => {
@@ -77,8 +82,8 @@ export class IdentifyStore {
         this.update = update;
     };
 
-    setUpdateContent = (updateContent: boolean) => {
-        this.updateContent = updateContent;
+    setCurrentUrlParams = (currentUrlParams: SetValue<string | null>) => {
+        this.setValue("currentUrlParams", currentUrlParams);
     };
 
     setFullscreen = (fullscreen: boolean) => {

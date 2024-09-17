@@ -57,7 +57,7 @@ export default observer(
             const imodule = display.identify_module;
 
             const count = response.featureCount;
-            const s = display.getUrlParams()
+            const urlParams = display.getUrlParams()
 
             const [store] = useState(
                 () => new IdentifyStore({
@@ -68,11 +68,10 @@ export default observer(
                         height: position.height,
                     },
                     fixPos: null,
-                    fixPanel: s.pn ? s.pn : "attributes",
+                    fixPanel: urlParams.pn ? urlParams.pn : "attributes",
                 }));
 
             const {
-                contextUrl,
                 data,
                 fixContentItem,
                 fixPanel,
@@ -92,6 +91,7 @@ export default observer(
                 setSelected,
                 setUpdate,
                 setValueRnd,
+                currentUrlParams,
                 update,
                 valueRnd,
             } = store;
@@ -140,6 +140,10 @@ export default observer(
                     topic.publish("feature.unhighlight");
                 }
             }, [response]);
+
+            useEffect(() => {
+                setContextUrl(generateUrl(display, { res: response.data[0], st: response.data, pn: fixPanel }));
+            }, [currentUrlParams]);
 
             useEffect(() => {
                 if (update === true) {

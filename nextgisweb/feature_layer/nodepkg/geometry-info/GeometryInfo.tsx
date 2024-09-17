@@ -8,7 +8,7 @@ import {
     formatMetersLength,
 } from "@nextgisweb/webmap/utils/format-units";
 import { getGeometryTypeTitle } from "@nextgisweb/webmap/utils/geometry-types";
-import { ConfigProvider, Descriptions } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Descriptions, Spin } from "@nextgisweb/gui/antd";
 import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
 import type { DescriptionsProps } from "@nextgisweb/gui/antd";
 import type { GeometryInfo } from "../type/GeometryInfo";
@@ -33,6 +33,8 @@ export function GeometryInfo({
 }) {
     const {
         data: geometryInfo,
+        isLoading,
+        error,
     } = useRouteGet<GeometryInfo>({
         name: "feature_layer.feature.geometry_info",
         params: {
@@ -100,7 +102,21 @@ export function GeometryInfo({
                 },
             }}
         >
-            <Descriptions labelStyle={{ wordBreak: "break-all", width: "calc(50%)" }} bordered size="small" column={1} layout="hirizontal" items={geometryInfoColumns} />
+            {
+                isLoading ?
+                    (<div className="loading"><Spin /><div>{gettext("Load geometry info...")}</div></div>) :
+                    error || !geometryInfo ?
+                        (<div className="error"><div>{gettext("Failed to get information about the geometry")}</div></div>) :
+                        (<Descriptions
+                            labelStyle={{ wordBreak: "break-all", width: "calc(50%)" }}
+                            bordered
+                            size="small"
+                            column={1}
+                            layout="hirizontal"
+                            items={geometryInfoColumns}
+                        />)
+            }
+
         </ConfigProvider>
     )
 }
