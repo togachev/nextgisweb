@@ -45,6 +45,7 @@ export function GeometryInfo({
             query: {
                 srs: webmapSettings.measurement_srid,
             },
+            cache: true,
         },
     });
 
