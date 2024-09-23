@@ -288,7 +288,9 @@ export class IdentifyModule extends Component {
             request: request,
         }
 
-        this.displayFeatureInfo(e, op, p);
+        if (this.display.panelsManager._activePanelKey !== "custom-layer") {
+            this.displayFeatureInfo(e, op, p);
+        }
     };
 
     _requestGeomString = (pixel: number[]) => {

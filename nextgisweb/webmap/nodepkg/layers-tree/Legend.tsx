@@ -22,12 +22,13 @@ export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendPr
     if (!nodeData || !legendInfo || !legendInfo.open) {
         return <></>;
     }
+    
     const asyncFunc = async (id, name, zoomToNgwExtent) => {
         if (name) {
             const query = { ilike: name }
             const getData = async () => {
-                const layer_extent = await route('layer.extent', id).get();
-                const extent = await route('feature_layer.feature.extent', id).get({ query });
+                const layer_extent = await route("layer.extent", id).get();
+                const extent = await route("feature_layer.feature.extent", id).get({ query });
 
                 if (extent.extent.minLon !== null) {
                     return extent.extent
@@ -56,6 +57,8 @@ export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendPr
             >
                 {legendInfo.symbols.map((s, idx) => {
                     const id = nodeData.id;
+                    const layerId = nodeData.layerId;
+                    const layerCls = nodeData.layerCls;
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;
                     const title = s.display_name ? s.display_name : nodeData.title;
@@ -85,7 +88,7 @@ export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendPr
                             key={idx}
                             className="legend-symbol"
                             title={s.display_name}
-                            onClick={() => asyncFunc(nodeData.layerId, title, zoomToNgwExtent)}
+                            onClick={() => ["vector_layer", "postgis_layer"].includes(layerCls) && asyncFunc(layerId, title, zoomToNgwExtent)}
                         >
                             {checkbox}
                             <img

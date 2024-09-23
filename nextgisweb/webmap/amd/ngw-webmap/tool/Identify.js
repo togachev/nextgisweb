@@ -325,7 +325,7 @@ define([
 
                         widget.editButton = new Button({
                             innerHTML: `<div title="${gettext("Edit")}">` + icon.html({ glyph: "edit_note" }) + `</div>`,
-                            class:"custom-popup-button",
+                            class: "custom-popup-button",
                             showLabel: true,
                             onClick: () =>
                                 openFeatureEditorTab({
@@ -560,7 +560,7 @@ define([
             this._popup.setTitle(
                 gettext("Features") + ": " + response.featureCount
             );
-            
+
             this._popup.setPosition(point);
             if (afterPopupInit && afterPopupInit instanceof Function)
                 afterPopupInit();
@@ -572,27 +572,30 @@ define([
         },
 
         openIdentifyPanel: function (identifyInfo, afterPopupInit) {
-            const pm = this.display.panelsManager;
-            const pkey = "identify";
-            let panel = pm.getPanel(pkey);
-            if (panel) {
-                if (panel.app) {
-                    panel.app.update({ identifyInfo });
+            topic.publish("feature.unhighlight");
+            if (this.display.panelsManager._activePanelKey !== "custom-layer") {
+                const pm = this.display.panelsManager;
+                const pkey = "identify";
+                let panel = pm.getPanel(pkey);
+                if (panel) {
+                    if (panel.app) {
+                        panel.app.update({ identifyInfo });
+                    } else {
+                        panel.props = { identifyInfo };
+                    }
                 } else {
-                    panel.props = { identifyInfo };
+                    throw new Error(
+                        "Identification panel should add during Display initialization"
+                    );
                 }
-            } else {
-                throw new Error(
-                    "Identification panel should add during Display initialization"
-                );
-            }
-            const activePanel = pm.getActivePanelName();
-            if (activePanel !== pkey) {
-                pm.activatePanel(pkey);
-            }
+                const activePanel = pm.getActivePanelName();
+                if (activePanel !== pkey) {
+                    pm.activatePanel(pkey);
+                }
 
-            if (afterPopupInit && afterPopupInit instanceof Function) {
-                afterPopupInit();
+                if (afterPopupInit && afterPopupInit instanceof Function) {
+                    afterPopupInit();
+                }
             }
         },
 

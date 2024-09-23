@@ -71,47 +71,48 @@ def identify_module(request) -> JSONType:
     options = []
     for style in style_list:
         layer = style.parent
-        if not layer.has_permission(DataScope.read, request.user):
-            query = layer.feature_query()
-            query.geom()
-            query.intersects(geom)
-            query.limit(100)
-            for f in query():
-                options.append(
-                    dict(
-                        desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
-                        id=f.id,
-                        layerId=layer.id,
-                        styleId=style.id,
-                        dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
-                        label="Forbidden",
-                        permission="Forbidden",
-                        value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
+        if hasattr(layer, "feature_query"):
+            if not layer.has_permission(DataScope.read, request.user):
+                query = layer.feature_query()
+                query.geom()
+                query.intersects(geom)
+                query.limit(100)
+                for f in query():
+                    options.append(
+                        dict(
+                            desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                            id=f.id,
+                            layerId=layer.id,
+                            styleId=style.id,
+                            dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
+                            label="Forbidden",
+                            permission="Forbidden",
+                            value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
+                        )
                     )
-                )
-        elif not IFeatureLayer.providedBy(layer):
-            options.append(dict(value="Not implemented"))
-        else:
-            query = layer.feature_query()
-            query.geom()
-            query.intersects(geom)
-            query.limit(100)
+            elif not IFeatureLayer.providedBy(layer):
+                options.append(dict(value="Not implemented"))
+            else:
+                query = layer.feature_query()
+                query.geom()
+                query.intersects(geom)
+                query.limit(100)
 
-            for f in query():
-                options.append(
-                    dict(
-                        desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
-                        id=f.id,
-                        layerId=layer.id,
-                        styleId=style.id,
-                        dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
-                        label=f.label,
-                        permission="Read",
-                        value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
-                        fields=f.fields,
-                        relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None
+                for f in query():
+                    options.append(
+                        dict(
+                            desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                            id=f.id,
+                            layerId=layer.id,
+                            styleId=style.id,
+                            dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
+                            label=f.label,
+                            permission="Read",
+                            value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
+                            fields=f.fields,
+                            relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None
+                        )
                     )
-                )
 
     result["data"] = options
     result["featureCount"] = len(options)

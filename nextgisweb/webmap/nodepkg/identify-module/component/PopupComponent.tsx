@@ -10,7 +10,7 @@ import Pin from "@nextgisweb/icon/mdi/pin";
 import PinOff from "@nextgisweb/icon/mdi/pin-off";
 
 import { Rnd } from "react-rnd";
-import { Button, ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
@@ -202,6 +202,8 @@ export default observer(
                     if (display.isTinyMode() && !display.isTinyModePlugin("ngw-webmap/plugin/FeatureLayer")) {
                         return false;
                     } else if (!imodule._isEditEnabled(display, item)) {
+                        return false;
+                    } else if (selected.permission === "Forbidden") {
                         return false;
                     } else {
                         return (

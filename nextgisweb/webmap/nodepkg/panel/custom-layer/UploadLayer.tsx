@@ -9,6 +9,7 @@ import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import { useFeatures } from "./hook/useFeatures";
 
 import type { DojoDisplay } from "../type";
+import type { DojoTopic } from "../panels-manager/type";
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
 import type { FeatureContext } from "./type";
@@ -18,6 +19,7 @@ type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 type UploadLayerProps = {
     display: DojoDisplay;
+    topic: DojoTopic;
 }
 
 const { Dragger } = Upload;
@@ -43,7 +45,7 @@ const MaxFiles = gettext("Maximum files/loaded:");
 
 let id = 0;
 
-export function UploadLayer({ display }: UploadLayerProps) {
+export function UploadLayer({ display, topic }: UploadLayerProps) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
     const maxCount = webmapSettings.max_count_file_upload;
@@ -135,7 +137,17 @@ export function UploadLayer({ display }: UploadLayerProps) {
         olmap.on("click", (e) => {
             if (e.dragging) return;
             setCustomStyle(null, false);
-            setFeatures(displayFeatureInfo(e.pixel));
+
+            if (display.panelsManager._activePanelKey === "custom-layer") {
+                setFeatures(displayFeatureInfo(e.pixel));
+                if (display.identify_module?.identifyStore) {
+                    const imodule = display.identify_module
+                    imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
+                    topic.publish("feature.unhighlight");
+                    imodule.identifyStore.setFullscreen(false)
+                    imodule.identifyStore.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                }
+            }
         });
     }, [])
 

@@ -21,6 +21,8 @@ const title = gettext("CustomLayer")
 const loading = gettext("Loading")
 const creation = gettext("Creation")
 
+const disableIdentifyModule = gettext("When the panel is active, layer identification is disabled.");
+
 export function CustomLayer({ display, close, topic }: CustomLayerProps) {
 
     const items = [
@@ -28,7 +30,7 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
             key: "1",
             label: loading,
             children:
-                <UploadLayer display={display} />,
+                <UploadLayer display={display} topic={topic} />,
             icon: <UploadIcon />,
         },
         {
@@ -42,7 +44,7 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
 
     return (
         <div className="ngw-webmap-custom-layer-panel">
-            <PanelHeader {...{ title, close }} />
+            <PanelHeader {...{ title, close, disableIdentifyModule }} />
             <Tabs
                 items={items}
                 defaultActiveKey="1"

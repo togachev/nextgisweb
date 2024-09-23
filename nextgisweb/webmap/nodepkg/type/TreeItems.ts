@@ -53,6 +53,7 @@ export interface LayerItem extends BaseItem {
     minResolution: number | null;
     maxResolution: number | null;
     editable?: boolean;
+    layerCls: string | "";
 }
 
 export type TreeItem = GroupItem | LayerItem | RootItem;

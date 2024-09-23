@@ -32,6 +32,7 @@ export interface DisplayConfig {
     extent_const: null[];
     rootItem: GroupItem;
     itemsStates: ItemsStates;
+    infomap: InfoMap;
     mid: Mid;
     webmapPlugin: WebmapPlugin;
     bookmarkLayerId?: any;
