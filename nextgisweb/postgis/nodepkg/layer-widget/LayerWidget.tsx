@@ -64,7 +64,7 @@ async function inspTabFetch(
 }
 
 async function relFieldFetch([extResId]: [number], opts: { signal: AbortSignal }) {
-    const fields = await route("feature_layer.field", extResId).get({
+    const fields = await route("feature_layer.fields", extResId).get({
         signal: opts.signal,
     });
     const result = { fields: new Array<string>() };
