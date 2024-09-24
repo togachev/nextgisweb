@@ -231,7 +231,7 @@ div.dijitContentPane.leftPanelPane {
 
 .leftPanelPane--fullwidth {
     box-sizing: border-box;
-    width: calc(100% - 50px) !important;
+    width: calc(100% - 40px) !important;
 }
 
 .navigation,
@@ -246,7 +246,7 @@ div.dijitContentPane.leftPanelPane {
 }
 
 .tiny.tiny-panels .navigation-menu-pane {
-    width: 50px;
+    width: 40px;
 }
 
 /* .tiny .company-logo {

@@ -1,7 +1,6 @@
-const positionContext = (event, offset, op, count, settings, p, array_context) => {
+const positionContext = (event, offset, op, count, settings, p, array_context, offHP) => {
     const W = window.innerWidth;
     const H = window.innerHeight;
-    const offHP = 40;
     const context_item = 34;
     const length = array_context.filter(item => item.visible === true).length
     const px = p && p.value ? event.pixel[0] : event.originalEvent.clientX;

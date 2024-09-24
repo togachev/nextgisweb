@@ -31,7 +31,7 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
                 </span>
                 <span className="coords">{coordsVisible}</span>
             </span>
-            {op === "popup" && contextUrl !== null && (
+            {!display.tinyConfig && op === "popup" && contextUrl !== null && (
                 <div className="link-block">
                     <span className="link-button"
                         title={gettext("Update url display map")}

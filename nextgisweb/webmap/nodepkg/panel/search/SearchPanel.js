@@ -2,7 +2,7 @@ import { debounce } from "lodash-es";
 import GeoJSON from "ol/format/GeoJSON";
 import { useCallback, useState } from "react";
 
-import { Alert, Button, Descriptions, Typography, Input, Space, Spin } from "@nextgisweb/gui/antd";
+import { Alert, Button, Collapse, ConfigProvider, Descriptions, Input, Space, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -20,13 +20,59 @@ import PublicIcon from "@nextgisweb/icon/material/public";
 
 import "./SearchPanel.less";
 
-const { Link } = Typography;
-
 const searchMsg = gettext("To search, enter coordinates in decimal format:");
 const exampleMsg = gettext("Examples of supported formats");
 const separateMsg = gettext("The separator of the integer and fractional parts is a dot, the separator of coordinates is a space or a comma");
 const coordExample = "61.018944, 69.089089";
 const exampleCoordTitle = "Нажмите для заполнения поля поиска";
+
+const exampleCoords = [
+    {
+        key: gettext("Десятичные градусы:"),
+        label: gettext("Десятичные градусы:"),
+        children: gettext(`40.730, -73.935`),
+    },
+    {
+        key: gettext("Градусы, минуты и секунды:"),
+        label: gettext("Градусы, минуты и секунды:"),
+        children: gettext(`40° 43' 50.196", -73° 56' 6.871"`),
+    },
+    {
+        key: gettext("Градусы и десятичные минуты:"),
+        label: gettext("Градусы и десятичные минуты:"),
+        children: gettext(`40° 43.836', 73° 56.114'`),
+    },
+    {
+        key: gettext("Десятичные градусы (подписи к координатам):"),
+        label: gettext("Десятичные градусы (подписи к координатам):"),
+        children: gettext(`N 40.730, W -73.935`),
+    },
+    {
+        key: gettext("Градусы, минуты и секунды (подписи к координатам):"),
+        label: gettext("Градусы, минуты и секунды (подписи к координатам):"),
+        children: gettext(`40° 43' 50.196" N, 73° 56' 6.871" W`),
+    }, {
+        key: gettext("Градусы и десятичные минуты (подписи к координатам):"),
+        label: gettext("Градусы и десятичные минуты (подписи к координатам):"),
+        children: gettext(`40° 43.836' N, 73° 56.114' W`),
+    },
+];
+
+const items = [
+    {
+        key: "1",
+        label: exampleMsg,
+        showArrow: false,
+        children: <Descriptions
+            labelStyle={{ wordBreak: "break-all", width: "calc(50%)" }}
+            bordered
+            size="small"
+            column={1}
+            layout="hirizontal"
+            items={exampleCoords}
+        />,
+    }
+];
 
 const GEO_JSON_FORMAT = new GeoJSON();
 
@@ -362,50 +408,62 @@ export const SearchPanel = ({ display, close }) => {
     };
 
     return (
-        <div className="ngw-webmap-search-panel">
-            <div className="control">
-                <Input
-                    onChange={searchChange}
-                    variant="borderless"
-                    placeholder={gettext("Enter at least 2 characters")}
-                    value={searchText}
-                />
-                {searchText && searchText.trim() && (
-                    <Button
-                        onClick={() => clearSearchText()}
-                        type="text"
-                        shape="circle"
-                        icon={<BackspaceIcon />}
+        <ConfigProvider
+            theme={{
+                components: {
+                    Collapse: {
+                        contentPadding: "0 0",
+                        headerPadding: "1px 8px",
+                        headerBg: "var(--on-primary-text)",
+                    }
+                },
+            }}
+        >
+            <div className="ngw-webmap-search-panel">
+                <div className="control">
+                    <Input
+                        onChange={searchChange}
+                        variant="borderless"
+                        placeholder={gettext("Enter at least 2 characters")}
+                        value={searchText}
                     />
-                )}
-                <CloseButton {...{ close }} />
-            </div>
-            {info}
-            <div className="results">
-                {
-                    results ? results :
-                        <Alert
-                            className="alert-desc"
-                            message={
-                                <Space direction="vertical">
-                                    {searchMsg}
-                                    <span>{separateMsg}</span>
-                                    <Button
-                                        title={exampleCoordTitle}
-                                        size="small"
-                                        onClick={() => {
-                                            !searchText && setSearchText(coordExample)
-                                            _search(coordExample);
-                                        }}
-                                    >{coordExample}</Button>
-                                    <Link href="https://geo.uriit.ru/resource/17212" target="_blank">{exampleMsg}</Link>
-                                </Space>
-                            }
-                            type="info"
+                    {searchText && searchText.trim() && (
+                        <Button
+                            onClick={() => clearSearchText()}
+                            type="text"
+                            shape="circle"
+                            icon={<BackspaceIcon />}
                         />
-                }
+                    )}
+                    <CloseButton {...{ close }} />
+                </div>
+                {info}
+                <div className="results">
+                    {
+                        results ? results :
+                            <Alert
+                                className="alert-desc"
+                                message={
+                                    <Space direction="vertical">
+                                        {searchMsg}
+                                        <span>{separateMsg}</span>
+                                        <Button
+                                            title={exampleCoordTitle}
+                                            size="small"
+                                            onClick={() => {
+                                                !searchText && setSearchText(coordExample)
+                                                _search(coordExample);
+                                            }}
+                                        >{coordExample}</Button>
+                                        <Collapse items={items} />
+                                    </Space>
+                                }
+                                type="info"
+                            />
+                    }
+                </div>
             </div>
-        </div>
+        </ConfigProvider>
     );
 };
 

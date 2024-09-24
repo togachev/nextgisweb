@@ -61,6 +61,7 @@ export class IdentifyModule extends Component {
     private display: DojoDisplay;
     private displaySrid: number;
     private lonlat: number[];
+    private offHP: number;
     private olmap: Map;
     private params: EventProps;
     private selected: string | undefined;
@@ -81,6 +82,7 @@ export class IdentifyModule extends Component {
 
         this.display = props;
         this.displaySrid = 3857;
+        this.offHP = !this.display.tinyConfig ? 40 : 0;
         this.olmap = this.display.map.olMap;
         this.control = new Control({ tool: this });
         this.control.setActive(false);
@@ -189,7 +191,7 @@ export class IdentifyModule extends Component {
             { key: 4, title: "Действие 4", result: "Действие 4 выполнено", visible: false },
         ];
 
-        const position = positionContext(event, offset, op, count, settings, p, array_context);
+        const position = positionContext(event, offset, op, count, settings, p, array_context, this.offHP);
 
         if (op === "popup") {
             if (this.display.config.identify_order_enabled) {
@@ -358,7 +360,7 @@ export class IdentifyModule extends Component {
                 }
 
                 const p = { value, coordinate: transformedCoord };
-                const offHP = 40;
+                
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
@@ -366,8 +368,8 @@ export class IdentifyModule extends Component {
                     target: "map",
                     pixel: [
                         this.display.panelsManager._activePanelKey ?
-                            (pixel[0] + this.display.leftPanelPane.w + offHP) :
-                            (pixel[0] + offHP), (pixel[1] + offHP)
+                            (pixel[0] + this.display.leftPanelPane.w + this.offHP) :
+                            (pixel[0] + this.offHP), (pixel[1] + this.offHP)
                     ],
                     type: "singleclick"
                 };

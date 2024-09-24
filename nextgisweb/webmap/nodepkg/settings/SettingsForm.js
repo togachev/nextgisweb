@@ -22,6 +22,7 @@ import {
     LegendEnabledOptions,
     UnitsAreaOptions,
     UnitsLengthOptions,
+    StyleRadioButton,
 } from "./select-options";
 
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
@@ -37,12 +38,6 @@ const identifyStandartMsg = gettext(
 
 const experimentalPanelMsg = gettext(
     "Use panel instead of popup identification"
-);
-
-const experimentalPanel = (
-    <Tooltip title={experimentalPanelMsg}>
-        <ExperimentalIcon />
-    </Tooltip>
 );
 
 const identifyModuleMsg = gettext(
@@ -200,9 +195,9 @@ export const SettingsForm = ({
                         initialValue={initialValues.identify_options}
                     >
                         <Radio.Group optionType="button" buttonStyle="solid">
-                            <Radio.Button value="identify_popup">{identifyStandartMsg}</Radio.Button>
-                            <Radio.Button value="identify_panel">{experimentalPanelMsg} {experimentalPanel}</Radio.Button>
-                            <Radio.Button value="identify_module">{identifyModuleMsg}</Radio.Button>
+                            <Radio.Button style={StyleRadioButton} title={identifyStandartMsg} value="identify_popup">{identifyStandartMsg}</Radio.Button>
+                            <Radio.Button style={StyleRadioButton} title={experimentalPanelMsg} value="identify_panel">{experimentalPanelMsg} </Radio.Button>
+                            <Radio.Button style={StyleRadioButton} title={identifyModuleMsg} value="identify_module">{identifyModuleMsg}</Radio.Button>
                         </Radio.Group>
                     </Form.Item>
                 </Col>

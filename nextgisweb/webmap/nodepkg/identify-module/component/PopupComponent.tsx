@@ -98,7 +98,7 @@ export default observer(
 
             imodule.identifyStore = store;
 
-            const offHP = 40;
+            const offHP = imodule.offHP;
             const offset = display.clientSettings.offset_point;
             const fX = offHP + offset;
             const fY = offHP + offset;

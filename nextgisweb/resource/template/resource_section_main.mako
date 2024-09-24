@@ -3,9 +3,17 @@
 
 <%page args="section" />
 <% section.content_box = False %>
-
 <%
+    from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
+    from nextgisweb.env import DBSession
+    query = DBSession.query(ResourceWebMapGroup, WebMapGroupResource) \
+        .join(WebMapGroupResource, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id).filter(WebMapGroupResource.resource_id == request.context.id)
+
     props = dict(resourceId=obj.id)
+
+    groupMap = props["groupMap"] = []
+    for resource_wmg, wmg_resource in query:
+        groupMap.append((tr(resource_wmg.webmap_group_name)))
 
     summary = props["summary"] = []
     summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))

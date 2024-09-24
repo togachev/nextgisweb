@@ -86,7 +86,12 @@ define([
 
     Control.prototype.handleClickEvent = function (evt) {
         if (evt.type === "singleclick") {
-            this.tool.execute(evt.pixel);
+            if (this.tool.display.panelsManager._activePanelKey !== "custom-layer") {
+                this.tool.execute(evt.pixel);
+            } else {
+                this.tool._popup.setPosition(undefined);
+                topic.publish("feature.unhighlight");
+            }
             evt.preventDefault();
         }
         return true;

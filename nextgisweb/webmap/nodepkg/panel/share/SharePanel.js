@@ -77,30 +77,32 @@ const toolsOptions = getControls()
         };
     });
 
-export const ToolsSelect = (props) => {
-    const [selectedItems, setSelectedItems] = useState([]);
+const ToolsSelect = (props) => {
     const filteredOptions = toolsOptions.filter((o) => {
-        return !selectedItems.includes(o.value);
+        return !props.value.includes(o.value);
     });
-    
     return (
         <Select
             mode="multiple"
             value={toolsOptions.filter((o) => {
-                return selectedItems.includes(o.value);
+                return props.value.includes(o.value);
             })}
-            onChange={setSelectedItems}
+            onChange={props.onChange}
             allowClear
             style={{
                 width: "100%",
             }}
             placeholder={gettext("Select tools")}
             options={filteredOptions}
+            maxTagCount={1}
         />
     );
 };
 
 const PanelsSelect = (props) => {
+    const filteredOptions = props.options.filter((o) => {
+        return !props.value.includes(o.value);
+    });
     return (
         <Select
             mode="multiple"
@@ -108,8 +110,13 @@ const PanelsSelect = (props) => {
             style={{
                 width: "100%",
             }}
-            {...props}
+            onChange={props.onChange}
+            options={filteredOptions}
+            value={props.options.filter((o) => {
+                return props.value.includes(o.value);
+            })}
             placeholder={gettext("Select panels")}
+            maxTagCount={1}
         />
     );
 };
