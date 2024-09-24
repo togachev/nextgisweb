@@ -114,6 +114,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
      * @deprecated use webmapStore.getlayers() instead
      */
     _layers: Record<number, WebmapLayer>;
+    _extent: number[];
 
     _adapters: Record<string, WebmapAdapter>;
 }

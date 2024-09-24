@@ -6,7 +6,7 @@ import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
 import { customStyle, clickStyle } from "../constant";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
-import type { DojoDisplay } from "../../type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { SourceType } from "../type";
 
 export const useFeatures = (display: DojoDisplay) => {

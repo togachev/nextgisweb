@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { DojoDisplay } from "../../../type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { FeatureLike } from "ol/Feature";
 import Feature from "ol/Feature";
 import { Draw, Modify, Snap } from "ol/interaction";
