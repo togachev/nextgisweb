@@ -9,7 +9,7 @@ define([
         getPluginState: function (nodeData) {
             return {
                 enabled:
-                    nodeData.type === "layer" && nodeData.plugin[this.identity],
+                    !this.display.tinyConfig && nodeData.type === "layer" && nodeData.plugin[this.identity],
             };
         },
 
