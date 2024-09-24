@@ -268,6 +268,14 @@ def iget(
     feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid)
     return dumper(feature)
 
+def iget_permission(
+    resource,
+    request,
+    fid: FeatureID
+) -> JSONType:
+    """Read feature"""
+    ipermission = resource.has_permission(DataScope.read, request.user)
+    return ipermission
 
 def iput(
     resource,
@@ -554,6 +562,14 @@ def feature_extent(resource, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+
+    config.add_route(
+        "feature_layer.feature_permission.item",
+        "/api/resource/{id}/feature_permission/{fid}",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=iget_permission,
+    )
 
     config.add_route(
         "feature_layer.feature.item",

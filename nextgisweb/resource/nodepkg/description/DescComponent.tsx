@@ -1,10 +1,11 @@
 import parse, { Element, domToReact } from "html-react-parser";
-import { useMemo, useRef } from "react";
+import { useRef, useState } from "react";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Image } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
+import { route } from "@nextgisweb/pyramid/api";
 
 import "./DescComponent.less";
 const title = gettext("Description");
@@ -19,10 +20,21 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export const DescComponent = observer((props) => {
-    const { display, content, type, close } = props;
-    const previewRef = useRef<HTMLDivElement>(null);
+const feature_permission = async (resId, fid) => {
+    const permission = await route("feature_layer.feature_permission.item", {
+        id: resId,
+        fid: fid,
+    })
+        .get({
+            cache: true,
+        })
+    return permission;
+}
 
+export const DescComponent = observer((props) => {
+    const { display, content, type, close, permission } = props;
+    const previewRef = useRef<HTMLDivElement>(null);
+    const [permissions, setPermissions] = useState();
     const DescComp = ({ content }) => {
         return (
             <>{
@@ -52,64 +64,75 @@ export const DescComponent = observer((props) => {
         )
     };
 
-const options = {
-    replace: item => {
-        if (item instanceof Element && item.attribs && item.name === "img" && type === "home_page") {
-            return (<span className="img-style">
-                <span className="img-item-home">
-                    <Image src={item.attribs.src}>item</Image>
-                </span>
-            </span>);
-        }
-
-        if (item instanceof Element && item.attribs && item.name === "img" && type !== "home_page") {
-            return (<span className="img-style">
-                <span className="img-item">
-                    <Image src={item.attribs.src}>item</Image>
-                </span>
-            </span>);
-        }
-
-        if (item instanceof Element && item.attribs && item.name === "p") {
-            return <span className="p-padding">{domToReact(item.children, options)}</span>;
-        }
-
-        if (display === undefined) {
-            if (item instanceof Element && item.name === "a") {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
-                    return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
-                }
+    const options = {
+        replace: item => {
+            if (item instanceof Element && item.attribs && item.name === "img" && type === "home_page") {
+                return (<span className="img-style">
+                    <span className="img-item-home">
+                        <Image src={item.attribs.src}>item</Image>
+                    </span>
+                </span>);
             }
-        }
-        if (display) {
-            if (item instanceof Element && item.name === "a") {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
-                    return (<a onClick={
-                        () => {
-                            const [resId, fid] = item.attribs.href.split(":");
-                            zoomToFeature(display, resId, fid);
+
+            if (item instanceof Element && item.attribs && item.name === "img" && type !== "home_page") {
+                return (<span className="img-style">
+                    <span className="img-item">
+                        <Image src={item.attribs.src}>item</Image>
+                    </span>
+                </span>);
+            }
+
+            if (item instanceof Element && item.attribs && item.name === "p") {
+                return <span className="p-padding">{domToReact(item.children, options)}</span>;
+            }
+
+            if (display === undefined) {
+                if (item instanceof Element && item.name === "a") {
+                    if (/^\d+:\d+$/.test(item.attribs.href)) {
+                        if (!permission) {
+                            return <></>
+                        } else {
+                            return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
                         }
-                    }>{domToReact(item.children, options)}</a>);
+                    }
+                }
+            }
+            if (display) {
+                if (item instanceof Element && item.name === "a") {
+                    if (/^\d+:\d+$/.test(item.attribs.href)) {
+                        const [resId, fid] = item.attribs.href.split(":");
+                        feature_permission(resId, fid).then((value) => {
+                            setPermissions(value)
+                        })
+                        if (permissions) {
+                            return (<a onClick={
+                                () => {
+                                    zoomToFeature(display, resId, fid);
+                                }
+                            }>{domToReact(item.children, options)}</a>);
+                        } else {
+                            return <></>;
+                        }
+                    }
                 }
             }
         }
+    };
+    let data_;
+    if (content === undefined && type === "map") {
+        data_ = parse(display.config.webmapDescription, options)
     }
-};
-let data_;
-if (content === undefined && type === "map") {
-    data_ = parse(display.config.webmapDescription, options)
-}
-else if (content instanceof Array && type === "map") {
-    data_ = (<DescComp content={content} />)
-}
-else {
-    data_ = parse(content, options)
-}
+    else if (content instanceof Array && type === "map") {
+        data_ = (<DescComp content={content} />)
+    }
+    else {
+        data_ = parse(content, options)
+    }
 
-return (
-    <div ref={previewRef} className="desc-component">
-        {type === "map" && (<PanelHeader {...{ title, close }} />)}
-        {data_}
-    </div>
-)
+    return (
+        <div ref={previewRef} className="desc-component">
+            {type === "map" && (<PanelHeader {...{ title, close }} />)}
+            {data_}
+        </div>
+    )
 });
