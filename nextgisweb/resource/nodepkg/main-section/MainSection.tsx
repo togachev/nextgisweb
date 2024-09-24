@@ -10,7 +10,7 @@ import "./MainSection.less";
 interface MainSectionProps {
     resourceId: number;
     summary: [string, string][];
-    groupMap: [string, string][];
+    groupMap: string[];
     creatable?: ResourceCls[];
 }
 
