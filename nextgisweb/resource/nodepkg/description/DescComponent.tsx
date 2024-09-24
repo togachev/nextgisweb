@@ -1,11 +1,11 @@
 import parse, { Element, domToReact } from "html-react-parser";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Image } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
-import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
 import "./DescComponent.less";
 const title = gettext("Description");
@@ -20,20 +20,9 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-const resource_permission = async (resId) => {
-    const permission = await route("resource.permission", {
-        id: resId,
-    })
-        .get({
-            cache: true,
-        })
-    return permission;
-}
-
 export const DescComponent = observer((props) => {
     const { display, content, type, close } = props;
     const previewRef = useRef<HTMLDivElement>(null);
-    const [permissions, setPermissions] = useState();
     const DescComp = ({ content }) => {
         return (
             <>{
@@ -89,10 +78,8 @@ export const DescComponent = observer((props) => {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+$/.test(item.attribs.href)) {
                         const [resId, fid] = item.attribs.href.split(":");
-                        resource_permission(resId).then((value) => {
-                            setPermissions(value.data.read)
-                        })
-                        if (!permissions) {
+                        const { data: data } = useRouteGet("resource.permission", { id: resId }, { cache: true });
+                        if (!data?.data.read) {
                             return <></>
                         } else {
                             return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
@@ -104,15 +91,9 @@ export const DescComponent = observer((props) => {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+$/.test(item.attribs.href)) {
                         const [resId, fid] = item.attribs.href.split(":");
-                        resource_permission(resId).then((value) => {
-                            setPermissions(value.data.read)
-                        })
-                        if (permissions) {
-                            return (<a onClick={
-                                () => {
-                                    zoomToFeature(display, resId, fid);
-                                }
-                            }>{domToReact(item.children, options)}</a>);
+                        const { data: data } = useRouteGet("resource.permission", { id: resId }, { cache: true });
+                        if (data?.data.read) {
+                            return (<a onClick={() => { zoomToFeature(display, resId, fid); }}>{domToReact(item.children, options)}</a>);
                         } else {
                             return <></>;
                         }
