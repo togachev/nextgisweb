@@ -1,7 +1,3 @@
-<%!
-    from nextgisweb.resource import DataScope
-%>
-
 <%page args="section" />
 <%namespace file="nextgisweb:pyramid/template/clean.mako" import="clean_html"/>
 
@@ -12,10 +8,6 @@
     <span id="desc-data"></span>
 %endif
 
-<%
-    permission = obj.has_permission(DataScope.read, request.user)
-%>
-
 <script type="text/javascript">
     require([
         "@nextgisweb/resource/description",
@@ -25,7 +17,6 @@
         var props = ${
             json_js(dict(
                 content = obj.description,
-                permission = permission,
             )),
         };
 

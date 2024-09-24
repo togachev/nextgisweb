@@ -20,10 +20,9 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-const feature_permission = async (resId, fid) => {
-    const permission = await route("feature_layer.feature_permission.item", {
+const resource_permission = async (resId) => {
+    const permission = await route("resource.permission", {
         id: resId,
-        fid: fid,
     })
         .get({
             cache: true,
@@ -32,7 +31,7 @@ const feature_permission = async (resId, fid) => {
 }
 
 export const DescComponent = observer((props) => {
-    const { display, content, type, close, permission } = props;
+    const { display, content, type, close } = props;
     const previewRef = useRef<HTMLDivElement>(null);
     const [permissions, setPermissions] = useState();
     const DescComp = ({ content }) => {
@@ -89,7 +88,11 @@ export const DescComponent = observer((props) => {
             if (display === undefined) {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+$/.test(item.attribs.href)) {
-                        if (!permission) {
+                        const [resId, fid] = item.attribs.href.split(":");
+                        resource_permission(resId).then((value) => {
+                            setPermissions(value.data.read)
+                        })
+                        if (!permissions) {
                             return <></>
                         } else {
                             return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
@@ -101,8 +104,8 @@ export const DescComponent = observer((props) => {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+$/.test(item.attribs.href)) {
                         const [resId, fid] = item.attribs.href.split(":");
-                        feature_permission(resId, fid).then((value) => {
-                            setPermissions(value)
+                        resource_permission(resId).then((value) => {
+                            setPermissions(value.data.read)
                         })
                         if (permissions) {
                             return (<a onClick={
