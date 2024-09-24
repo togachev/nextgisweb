@@ -29,6 +29,7 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
             }}>
                 {contextHolder}
                 <span
+                    className="context-coord"
                     onClick={() => {
                         visible({ hidden: true, overlay: undefined, key: op });
                     }}
@@ -47,6 +48,7 @@ export default forwardRef<Element>(function ContextComponent(props: Params, ref:
                         return (
                             <div className="context-item" key={item.key} onClick={() => {
                                 visible({ hidden: true, overlay: undefined, key: op });
+                                alert(item.result)
                             }} >
                                 <span>{item.title}</span>
                             </div>

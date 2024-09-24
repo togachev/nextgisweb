@@ -17,7 +17,7 @@ export function PanelHeader({ title, close, children, disableIdentifyModule }: P
         info = (
             <Alert
                 message={disableIdentifyModule}
-                type="info"
+                type="warning"
                 closable
             />
         );
@@ -25,13 +25,13 @@ export function PanelHeader({ title, close, children, disableIdentifyModule }: P
 
     return (
         <div key={children}>
+            {info}
             <div className="ngw-webmap-panel-header">
                 <span>{title}</span>
                 {children}
                 <div className="spacer"></div>
                 <CloseButton close={close} />
             </div>
-            {info}
         </div>
     );
 }

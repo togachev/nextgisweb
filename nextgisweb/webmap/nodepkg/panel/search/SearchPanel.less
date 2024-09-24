@@ -3,7 +3,7 @@
     flex-direction: column;
     height: 100%;
 
-    > .control {
+    >.control {
         display: flex;
         border-bottom: 1px solid var(--divider-color);
         padding: 2px;
@@ -13,9 +13,16 @@
         }
     }
 
-    > .results {
+    >.results {
         flex: auto;
         overflow-y: auto;
+
+        .alert-desc {
+            background: var(--divider-color);
+            border: 1px solid var(--divider-color);
+            display: flex;
+            align-items: flex-end;
+        }
 
         .result {
             cursor: pointer;

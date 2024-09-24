@@ -77,17 +77,25 @@ const toolsOptions = getControls()
         };
     });
 
-const ToolsSelect = (props) => {
+export const ToolsSelect = (props) => {
+    const [selectedItems, setSelectedItems] = useState([]);
+    const filteredOptions = toolsOptions.filter((o) => {
+        return !selectedItems.includes(o.value);
+    });
+    
     return (
         <Select
             mode="multiple"
+            value={toolsOptions.filter((o) => {
+                return selectedItems.includes(o.value);
+            })}
+            onChange={setSelectedItems}
             allowClear
             style={{
                 width: "100%",
             }}
             placeholder={gettext("Select tools")}
-            options={toolsOptions}
-            {...props}
+            options={filteredOptions}
         />
     );
 };

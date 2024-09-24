@@ -2,7 +2,7 @@ import { debounce } from "lodash-es";
 import GeoJSON from "ol/format/GeoJSON";
 import { useCallback, useState } from "react";
 
-import { Alert, Button, Input, Spin } from "@nextgisweb/gui/antd";
+import { Alert, Button, Descriptions, Typography, Input, Space, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -19,6 +19,14 @@ import LocationOnIcon from "@nextgisweb/icon/material/location_on";
 import PublicIcon from "@nextgisweb/icon/material/public";
 
 import "./SearchPanel.less";
+
+const { Link } = Typography;
+
+const searchMsg = gettext("To search, enter coordinates in decimal format:");
+const exampleMsg = gettext("Examples of supported formats");
+const separateMsg = gettext("The separator of the integer and fractional parts is a dot, the separator of coordinates is a space or a comma");
+const coordExample = "61.018944, 69.089089";
+const exampleCoordTitle = "Нажмите для заполнения поля поиска";
 
 const GEO_JSON_FORMAT = new GeoJSON();
 
@@ -373,7 +381,31 @@ export const SearchPanel = ({ display, close }) => {
                 <CloseButton {...{ close }} />
             </div>
             {info}
-            <div className="results">{results}</div>
+            <div className="results">
+                {
+                    results ? results :
+                        <Alert
+                            className="alert-desc"
+                            message={
+                                <Space direction="vertical">
+                                    {searchMsg}
+                                    <span>{separateMsg}</span>
+                                    <Button
+                                        title={exampleCoordTitle}
+                                        size="small"
+                                        onClick={() => {
+                                            !searchText && setSearchText(coordExample)
+                                            _search(coordExample);
+                                        }}
+                                    >{coordExample}</Button>
+                                    <Link href="https://geo.uriit.ru/resource/17212" target="_blank">{exampleMsg}</Link>
+                                </Space>
+                            }
+                            type="info"
+                        />
+                }
+            </div>
         </div>
     );
 };
+

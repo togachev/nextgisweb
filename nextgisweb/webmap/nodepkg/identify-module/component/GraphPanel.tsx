@@ -91,7 +91,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
                 onChange={onChange}
                 className="legend-hide-button"
                 title={hideLegend ? msgShowLegend : msgHideLegend}
-                style={!fixPanel ? {} : { position: "absolute", right: 0, boxSizing: "content-box" }}
+                style={!fixPanel ? {} : { position: "absolute", right: 0 }}
             >
                 {hideLegend ? <EyeOff /> : <Eye />}
             </Tag.CheckableTag>
