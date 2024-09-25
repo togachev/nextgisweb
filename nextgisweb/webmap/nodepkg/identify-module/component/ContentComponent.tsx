@@ -121,7 +121,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             label: (<span className="icon-style"><LineChartOutlined /></span>),
             value: "relation",
             key: "relation",
-            title: gettext("Relations"),
+            title: gettext("Graphs"),
             hidden: false,
             children: firstItem && firstItem.relation && (<GraphPanel item={firstItem} store={store} />),
         })

@@ -48,7 +48,7 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
 const activePanelOptions: { value: ActivePanelType; label: string }[] = [
     { value: "layers", label: gettext("Layers") },
     { value: "search", label: gettext("Search") },
-    { value: "custom-layer", label: gettext("CustomLayer") },
+    { value: "custom-layer", label: gettext("Custom layers") },
     { value: "print", label: gettext("Print map") },
     { value: "bookmark", label: gettext("Bookmarks") },
     { value: "info", label: gettext("Description") },

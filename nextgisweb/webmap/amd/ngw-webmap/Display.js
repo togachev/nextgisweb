@@ -1056,7 +1056,7 @@ define([
                     },
                 }),
                 params: {
-                    title: gettext("CustomLayer"),
+                    title: gettext("Custom layers"),
                     name: "custom-layer",
                     order: 90,
                     menuIcon: "material-upload_file",

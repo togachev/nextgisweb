@@ -34,7 +34,7 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
             {!display.tinyConfig && op === "popup" && contextUrl !== null && (
                 <div className="link-block">
                     <span className="link-button"
-                        title={gettext("Update url display map")}
+                        title={gettext("Update web map url")}
                         onClick={(e) => {
                             if (e.detail === 2) {
                                 window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))

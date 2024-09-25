@@ -17,7 +17,7 @@ interface CustomLayerProps {
     close: () => void;
 }
 
-const title = gettext("CustomLayer")
+const title = gettext("Custom layers")
 const loading = gettext("Loading")
 const creation = gettext("Creation")
 

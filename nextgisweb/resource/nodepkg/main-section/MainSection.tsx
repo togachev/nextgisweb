@@ -40,7 +40,7 @@ export function MainSection({
                     ))}
                 </dl>
             )}
-            <Divider orientation="left" orientationMargin="0">{gettext("Web map group")}</Divider>
+            <Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>
             {groupMap.length > 0 && (
                 <Flex gap="4px 0" wrap>
                     {groupMap.map((k, idx) => (

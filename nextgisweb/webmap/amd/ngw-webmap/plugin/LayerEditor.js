@@ -49,7 +49,7 @@ define([
     ModifyFeature,
     DeleteFeature,
     MapStatesObserver,
-    i18n
+    { gettext }
 ) {
     var wkt = new ol.format.WKT(),
         finishConfirmDialog = new FinishEditingDialog();
@@ -139,8 +139,8 @@ define([
             var widget = this;
             var active = nodeData.editable && nodeData.editable === true;
             var title = active
-                ? i18n.gettext("Stop editing")
-                : i18n.gettext("Edit");
+                ? gettext("Stop editing")
+                : gettext("Edit");
             return {
                 icon: "material-edit",
                 title: title,

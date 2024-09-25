@@ -344,7 +344,7 @@ export default observer(
                                     {count > 0 && <CheckOnlyOne store={store} />}
                                     {count > 0 && selected && (
                                         <span
-                                            title={fullscreen === true ? gettext("Close fullscreen popup") : gettext("Open fullscreen popup")}
+                                            title={fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}
                                             className={count > 0 && fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                             onClick={() => {
                                                 if (count > 0 && fixPos === null) {

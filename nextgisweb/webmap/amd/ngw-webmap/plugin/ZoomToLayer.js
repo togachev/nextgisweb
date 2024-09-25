@@ -4,7 +4,7 @@ define([
     "dojo/request/xhr",
     "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
-], function (declare, _PluginBase, xhr, route, i18n) {
+], function (declare, _PluginBase, xhr, route, { gettext }) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             return {
@@ -22,7 +22,7 @@ define([
             var widget = this;
             return {
                 icon: "material-zoom_in_map",
-                title: i18n.gettext("Zoom to layer"),
+                title: gettext("Zoom to layer"),
                 onClick: function () {
                     return widget.run();
                 },

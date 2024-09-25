@@ -28,33 +28,33 @@ const exampleCoordTitle = "Нажмите для заполнения поля �
 
 const exampleCoords = [
     {
-        key: gettext("Десятичные градусы:"),
-        label: gettext("Десятичные градусы:"),
-        children: gettext(`40.730, -73.935`),
+        key: gettext("Decimal degrees:"),
+        label: gettext("Decimal degrees:"),
+        children: `40.730, -73.935`,
     },
     {
-        key: gettext("Градусы, минуты и секунды:"),
-        label: gettext("Градусы, минуты и секунды:"),
-        children: gettext(`40° 43' 50.196", -73° 56' 6.871"`),
+        key: gettext("Degrees, minutes and seconds:"),
+        label: gettext("Degrees, minutes and seconds:"),
+        children: `40° 43' 50.196", -73° 56' 6.871"`,
     },
     {
-        key: gettext("Градусы и десятичные минуты:"),
-        label: gettext("Градусы и десятичные минуты:"),
-        children: gettext(`40° 43.836', 73° 56.114'`),
+        key: gettext("Degrees and decimal minutes:"),
+        label: gettext("Degrees and decimal minutes:"),
+        children: `40° 43.836', 73° 56.114'`,
     },
     {
-        key: gettext("Десятичные градусы (подписи к координатам):"),
-        label: gettext("Десятичные градусы (подписи к координатам):"),
-        children: gettext(`N 40.730, W -73.935`),
+        key: gettext("Decimal degrees (coordinate labels):"),
+        label: gettext("Decimal degrees (coordinate labels):"),
+        children: `N 40.730, W -73.935`,
     },
     {
-        key: gettext("Градусы, минуты и секунды (подписи к координатам):"),
-        label: gettext("Градусы, минуты и секунды (подписи к координатам):"),
-        children: gettext(`40° 43' 50.196" N, 73° 56' 6.871" W`),
+        key: gettext("Degrees, minutes and seconds (coordinate labels):"),
+        label: gettext("Degrees, minutes and seconds (coordinate labels):"),
+        children: `40° 43' 50.196" N, 73° 56' 6.871" W`,
     }, {
-        key: gettext("Градусы и десятичные минуты (подписи к координатам):"),
-        label: gettext("Градусы и десятичные минуты (подписи к координатам):"),
-        children: gettext(`40° 43.836' N, 73° 56.114' W`),
+        key: gettext("Degrees and decimal minutes (coordinate captions):"),
+        label: gettext("Degrees and decimal minutes (coordinate captions):"),
+        children: `40° 43.836' N, 73° 56.114' W`,
     },
 ];
 

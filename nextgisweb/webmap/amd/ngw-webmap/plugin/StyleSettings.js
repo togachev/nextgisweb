@@ -4,7 +4,7 @@ define([
     "dojo/request/xhr",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
-], function (declare, _PluginBase, xhr, api, i18n) {
+], function (declare, _PluginBase, xhr, api, { gettext }) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             return {
@@ -17,7 +17,7 @@ define([
             var widget = this;
             return {
                 icon: "mdi-image-edit",
-                title: i18n.gettext("Style settings"),
+                title: gettext("Style settings"),
                 onClick: (item) => {
                     window.open(api.routeURL("resource.update", { id: item.styleId }), "_blank");
                 },

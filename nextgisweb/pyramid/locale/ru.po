@@ -11,15 +11,11 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: amd/ngw-pyramid/form/ScaleTextBox.js:13
-msgid "Enter the correct scale value, e.g. 1:"
-msgstr "Введите корректное значение масштаба, например 1:"
-
-#: api.py:233
+#: api.py:243
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:311
+#: api.py:321
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -27,11 +23,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:319
+#: api.py:329
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:502
+#: api.py:524
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -39,27 +35,27 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:630
+#: api.py:652
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:633
+#: api.py:655
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:778
+#: api.py:806
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:164
+#: component.py:167
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:167
+#: component.py:170
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:167
+#: component.py:170
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -276,7 +272,10 @@ msgstr "Настройка стартовой страницы сохранен�
 #: nodepkg/i18n/testentry.ts:8 nodepkg/i18n/testentry.ts:12 test/test_i18n.py:15
 msgctxt "test"
 msgid "unit"
-msgstr "штука"
+msgid_plural "units"
+msgstr[0] "штука"
+msgstr[1] ""
+msgstr[2] ""
 
 #: nodepkg/layout/Avatar.tsx:12
 msgid "Sign in"
@@ -298,7 +297,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:54 view.py:169
+#: nodepkg/layout/store.ts:54 view.py:179
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -444,7 +443,7 @@ msgstr "Доступна новая версия {distribution}: {version}."
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
-#: permission.py:5 view.py:233 view.py:588
+#: permission.py:5 view.py:243 view.py:611
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -573,50 +572,53 @@ msgstr "Некорректный параметр"
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
-#: view.py:157
+#: view.py:167
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:189 view.py:597
+#: view.py:199 view.py:620
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:196 view.py:603
+#: view.py:206 view.py:626
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:207 view.py:640
+#: view.py:217 view.py:663
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:218 view.py:647
+#: view.py:228 view.py:670
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:245 view.py:615
+#: view.py:255 view.py:638
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:255 view.py:621
+#: view.py:265 view.py:644
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:265 view.py:609
+#: view.py:275 view.py:632
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:275 view.py:627
+#: view.py:285 view.py:650
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:285 view.py:633
+#: view.py:295 view.py:656
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:577
+#: view.py:600
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:578
+#: view.py:601
 msgid "Settings"
 msgstr "Настройки"
+
+#~ msgid "Enter the correct scale value, e.g. 1:"
+#~ msgstr "Введите корректное значение масштаба, например 1:"
