@@ -934,8 +934,8 @@ msgid "PDF"
 msgstr "PDF"
 
 #: nodepkg/panel/search/SearchPanel.js:23
-msgid "To search, enter coordinates in decimal format:"
-msgstr "Для поиска введите координаты в десятичном формате:"
+msgid "To search, enter coordinates in decimal format"
+msgstr "Для поиска введите координаты в десятичном формате"
 
 #: nodepkg/panel/search/SearchPanel.js:24
 msgid "Examples of supported formats"

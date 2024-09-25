@@ -20,7 +20,7 @@ import PublicIcon from "@nextgisweb/icon/material/public";
 
 import "./SearchPanel.less";
 
-const searchMsg = gettext("To search, enter coordinates in decimal format:");
+const searchMsg = gettext("To search, enter coordinates in decimal format");
 const exampleMsg = gettext("Examples of supported formats");
 const separateMsg = gettext("The separator of the integer and fractional parts is a dot, the separator of coordinates is a space or a comma");
 const coordExample = "61.018944, 69.089089";
