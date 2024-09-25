@@ -27,6 +27,7 @@
     summary.append((tr(gettext("Owner")), tr(obj.owner_user.display_name_i18n)))
 
     props["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
+    props["cls"] = obj.cls
 %>
 
 <div id="resourceMainSection" class="ngw-resource-section"></div>

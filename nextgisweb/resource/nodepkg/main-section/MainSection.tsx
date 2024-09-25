@@ -12,6 +12,7 @@ interface MainSectionProps {
     summary: [string, string][];
     groupMap: string[];
     creatable?: ResourceCls[];
+    cls?: string;
 }
 
 export function MainSection({
@@ -19,6 +20,7 @@ export function MainSection({
     groupMap,
     summary,
     creatable,
+    cls,
 }: MainSectionProps) {
     return (
         <>
@@ -40,8 +42,8 @@ export function MainSection({
                     ))}
                 </dl>
             )}
-            <Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>
-            {groupMap.length > 0 && (
+            {cls === "webmap" && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
+            {cls === "webmap" && groupMap.length > 0 && (
                 <Flex gap="4px 0" wrap>
                     {groupMap.map((k, idx) => (
                         <Tag key={idx}>{k}</Tag>
