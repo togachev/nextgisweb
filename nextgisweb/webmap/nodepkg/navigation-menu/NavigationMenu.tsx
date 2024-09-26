@@ -48,7 +48,7 @@ export const NavigationMenu = observer(({ panels, display }: NavigationMenuProps
     return (
         <div className="navigation-menu">
             {menuItems}
-            {infomap.scope ? (
+            {!display.tinyConfig && infomap.scope ? (
                 <div className="infoblock">
                     <Link target="_blank" href={infomap.link}><span title={gettext("Map properties")} className="iconLinks"><Information /></span></Link>
                     <Link target="_blank" href={infomap.update}><span title={gettext("Map settings")} className="iconLinks"><SettingOutlined /></span></Link>
