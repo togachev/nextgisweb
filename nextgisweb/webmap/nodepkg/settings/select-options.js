@@ -94,10 +94,3 @@ export const LegendEnabledOptions = [
     { value: "collapse", label: gettext("Collapse") },
     { value: "disable", label: gettext("Disable") },
 ];
-
-export const StyleRadioButton = {
-    maxWidth: "200px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-}

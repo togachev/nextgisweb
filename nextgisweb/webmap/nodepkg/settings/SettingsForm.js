@@ -22,7 +22,6 @@ import {
     LegendEnabledOptions,
     UnitsAreaOptions,
     UnitsLengthOptions,
-    StyleRadioButton,
 } from "./select-options";
 
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
@@ -172,34 +171,38 @@ export const SettingsForm = ({
             <Title level={4}>{gettext("Custom map settings")}</Title>
 
             <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        name="max_count_file_upload"
-                        label={gettext("Maximum uploaded files")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min="1" />
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Row gutter={[16, 16]}>
                 <Col>
                     <Form.Item
                         name="identify_option"
                         label={gettext("Identification options")}
                         initialValue={initialValues.identify_options}
                     >
-                        <Radio.Group optionType="button" buttonStyle="solid">
-                            <Radio.Button style={StyleRadioButton} title={identifyStandartMsg} value="identify_popup">{identifyStandartMsg}</Radio.Button>
-                            <Radio.Button style={StyleRadioButton} title={experimentalPanelMsg} value="identify_panel">{experimentalPanelMsg} </Radio.Button>
-                            <Radio.Button style={StyleRadioButton} title={identifyModuleMsg} value="identify_module">{identifyModuleMsg}</Radio.Button>
+                        <Radio.Group optionType="button" buttonStyle="solid" >
+                            <Space size={10} direction="vertical">
+                                <Radio.Button title={identifyStandartMsg} value="identify_popup">{identifyStandartMsg}</Radio.Button>
+                                <Radio.Button title={experimentalPanelMsg} value="identify_panel">{experimentalPanelMsg} </Radio.Button>
+                                <Radio.Button title={identifyModuleMsg} value="identify_module">{identifyModuleMsg}</Radio.Button>
+                            </Space>
                         </Radio.Group>
                     </Form.Item>
+                </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Space>
+                        <Form.Item
+                            name="max_count_file_upload"
+                            label={gettext("Maximum uploaded files")}
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}
+                        >
+                            <InputNumber min="1" style={INPUT_DEFAULT_WIDTH} />
+                        </Form.Item>
+                    </Space>
                 </Col>
                 <Col span={8}>
                     <Space>
@@ -212,9 +215,9 @@ export const SettingsForm = ({
                                 },
                             ]}
                         >
-                            <InputNumber min="0" max="50" style={INPUT_DEFAULT_WIDTH} />
+                            <InputNumber min="0" max="50" addonAfter={offsetInfo} style={INPUT_DEFAULT_WIDTH} />
                         </Form.Item>
-                        {offsetInfo}
+
                     </Space>
                 </Col>
             </Row>
