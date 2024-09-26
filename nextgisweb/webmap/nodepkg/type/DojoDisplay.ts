@@ -117,7 +117,9 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _extent: number[];
 
     _adapters: Record<string, WebmapAdapter>;
-    tinyConfig: object;
+    tinyConfig: {
+        mainDisplayUrl: string;
+    };
 }
 
 export interface PluginParams {
