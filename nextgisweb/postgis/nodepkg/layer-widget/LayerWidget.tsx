@@ -23,9 +23,9 @@ const msgTable = gettext("Table");
 const msgColumnId = gettext("ID column");
 
 const msgResRelSettings = gettext("Resource relation settings");
-const msgResourceFieldName = gettext("Resource field name");
-const msgExternalFieldName = gettext("External field name");
-const msgExternalResourceId = gettext("External resource id");
+const msgFieldforConnectionWithExternalTable = gettext("Field for connection with external table");
+const msgExternalTableField = gettext("External table field");
+const msgJoiningWithAnExternalTable = gettext("Joining with an external table");
 
 const msgColumnGeom = gettext("Geometry column");
 const msgAutodetect = gettext("Autodetect");
@@ -269,7 +269,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                 <Area pad cols={["1fr", "1fr"]}>
                     <LotMV
                         row
-                        label={msgExternalResourceId}
+                        label={msgJoiningWithAnExternalTable}
                         value={store.connection_relation}
                         component={ResourceSelectRef}
                         props={{
@@ -279,13 +279,13 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                         }}
                     />
                     <LotMV
-                        label={msgResourceFieldName}
+                        label={msgFieldforConnectionWithExternalTable}
                         value={store.resourceFieldName}
                         component={AutoCompleteInput}
                         props={resourceFieldNameProps}
                     />
                     <LotMV
-                        label={msgExternalFieldName}
+                        label={msgExternalTableField}
                         value={store.externalFieldName}
                         component={AutoCompleteInput}
                         props={externalFieldNameProps}

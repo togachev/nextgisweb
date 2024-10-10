@@ -346,19 +346,19 @@ msgstr "Таблица"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:25
 msgid "Resource relation settings"
-msgstr ""
+msgstr "Настройки отношения ресурсов"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:26
-msgid "Resource field name"
-msgstr ""
+msgid "Joining with an external table"
+msgstr "Соединение с внешней таблицей"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:27
-msgid "External field name"
-msgstr ""
+msgid "Field for connection with external table"
+msgstr "Поле для связи с внешней таблицей"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:28
-msgid "External resource id"
-msgstr ""
+msgid "External table field"
+msgstr "Поле внешней таблицы"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:31
 msgid "Autodetect"

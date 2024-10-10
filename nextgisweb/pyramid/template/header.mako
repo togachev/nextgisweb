@@ -25,7 +25,7 @@
                 ${svglogo}
             %endif
         </a>
-        <div class="text">${title}</div>
+        <div class="text" title="${title}">${title}</div>
     </div>
     <div class="container">
         %if not hide_resource_filter:
