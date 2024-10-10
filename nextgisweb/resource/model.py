@@ -359,10 +359,12 @@ class ResourceWebMapGroup(Base):
 
 class WebMapGroupResource(Base):
     __tablename__ = "wmg_resource"
+
     identity = "wmg_resource"
+
     id = sa.Column(sa.Integer, primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    webmap_group_id = sa.Column(sa.ForeignKey(ResourceWebMapGroup.id), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    webmap_group_id = sa.Column(sa.ForeignKey(ResourceWebMapGroup.id), nullable=False)
     id_pos = sa.Column(sa.Integer, nullable=True)
 
 @event.listens_for(Resource, "after_delete", propagate=True)
