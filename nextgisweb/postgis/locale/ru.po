@@ -349,8 +349,8 @@ msgid "Resource relation settings"
 msgstr "Настройки отношения ресурсов"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:26
-msgid "Joining with an external table"
-msgstr "Соединение с внешней таблицей"
+msgid "Table for communication"
+msgstr "Таблица для связи"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:27
 msgid "Field for connection with external table"

@@ -25,7 +25,7 @@ const msgColumnId = gettext("ID column");
 const msgResRelSettings = gettext("Resource relation settings");
 const msgFieldforConnectionWithExternalTable = gettext("Field for connection with external table");
 const msgExternalTableField = gettext("External table field");
-const msgJoiningWithAnExternalTable = gettext("Joining with an external table");
+const msgTableForCommunication = gettext("Table for communication");
 
 const msgColumnGeom = gettext("Geometry column");
 const msgAutodetect = gettext("Autodetect");
@@ -269,7 +269,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                 <Area pad cols={["1fr", "1fr"]}>
                     <LotMV
                         row
-                        label={msgJoiningWithAnExternalTable}
+                        label={msgTableForCommunication}
                         value={store.connection_relation}
                         component={ResourceSelectRef}
                         props={{
