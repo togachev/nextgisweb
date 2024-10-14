@@ -297,7 +297,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:54 view.py:179
+#: nodepkg/layout/store.ts:54 view.py:170
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -443,7 +443,7 @@ msgstr "Доступна новая версия {distribution}: {version}."
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
-#: permission.py:5 view.py:243 view.py:611
+#: permission.py:5 view.py:234 view.py:589
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -572,51 +572,51 @@ msgstr "Некорректный параметр"
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
-#: view.py:167
+#: view.py:158
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:199 view.py:620
+#: view.py:190 view.py:598
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:206 view.py:626
+#: view.py:197 view.py:604
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:217 view.py:663
+#: view.py:208 view.py:641
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:228 view.py:670
+#: view.py:219 view.py:648
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:255 view.py:638
+#: view.py:246 view.py:616
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:265 view.py:644
+#: view.py:256 view.py:622
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:275 view.py:632
+#: view.py:266 view.py:610
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:285 view.py:650
+#: view.py:276 view.py:628
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:295 view.py:656
+#: view.py:286 view.py:634
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:600
+#: view.py:578
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:601
+#: view.py:579
 msgid "Settings"
 msgstr "Настройки"
 

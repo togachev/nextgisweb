@@ -18,7 +18,7 @@ msgstr "Сохранить"
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:211
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:60 view.py:450
+#: nodepkg/delete-page/DeletePage.tsx:60 view.py:422
 msgid "Delete"
 msgstr "Удалить"
 
@@ -46,7 +46,7 @@ msgstr "Валидация провалилась"
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:304
+#: api.py:301
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -198,11 +198,11 @@ msgstr "Ресурс не может быть без родителя"
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:496
+#: model.py:472
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:571
+#: model.py:547
 msgid ""
 "Unable to revoke '{permission}' permission for '{user}' as the user belongs "
 "to the administrators group. Administrators must always have ability to "
@@ -212,7 +212,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:668
+#: model.py:644
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -283,6 +283,14 @@ msgstr "Переместить"
 #: nodepkg/children-section/component/MenuDropdown.tsx:255
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
+
+#: nodepkg/children-section/component/PreviewModal.tsx:18
+msgid "Open in a new tab"
+msgstr "Открыть в новой вкладке"
+
+#: nodepkg/children-section/component/PreviewModal.tsx:56
+msgid "Close"
+msgstr "Закрыть"
 
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:7
 msgid "Change"
@@ -506,7 +514,7 @@ msgid "Настройки карты"
 msgstr ""
 
 #: nodepkg/main-section/CreateResourceButton.tsx:8
-#: nodepkg/main-section/CreateResourceModal.tsx:19 view.py:174 view.py:411
+#: nodepkg/main-section/CreateResourceModal.tsx:19 view.py:174 view.py:396
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -530,7 +538,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:412
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:397
 msgid "Action"
 msgstr "Действие"
 
@@ -659,11 +667,11 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:117 view.py:459
+#: view.py:117 view.py:431
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:129 view.py:466
+#: view.py:129 view.py:438
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -675,7 +683,7 @@ msgstr "Изменить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:254 view.py:479
+#: view.py:254 view.py:451
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -683,15 +691,15 @@ msgstr "Экспорт ресурсов"
 msgid "Groups of digital web maps"
 msgstr "Группы цифровых веб-карт"
 
-#: view.py:331
+#: view.py:322
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:413
+#: view.py:398
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:423
+#: view.py:408
 msgid "Update"
 msgstr "Изменить"
 

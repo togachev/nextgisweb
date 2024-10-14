@@ -12,6 +12,33 @@ import type * as apitype from "@nextgisweb/webmap/type/api";
 
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 
+function convertExtentToArray(
+    extent: ExtentRowValue
+): apitype.ExtentWSEN | null | undefined {
+    const { left, bottom, right, top } = extent;
+
+    if (
+        [left, bottom, right, top].some(
+            (value) => value === undefined || value === null
+        )
+    ) {
+        return null;
+    }
+
+    return [left, bottom, right, top] as apitype.ExtentWSEN;
+}
+
+function extractExtent(
+    extentArray?: (number | null | undefined)[] | null
+): ExtentRowValue {
+    return {
+        left: extentArray?.[0] ?? null,
+        bottom: extentArray?.[1] ?? null,
+        right: extentArray?.[2] ?? null,
+        top: extentArray?.[3] ?? null,
+    };
+}
+
 export class SettingStore
     implements
         EditorStore<apitype.WebMapRead, WithoutItems<apitype.WebMapUpdate>>
@@ -41,10 +68,7 @@ export class SettingStore
     bookmarkResource?: ResourceRef | null = null;
 
     private _initValue: Partial<WithoutItems<apitype.WebMapRead>> = {
-        extent_bottom: -90,
-        extent_left: -180,
-        extent_right: 180,
-        extent_top: 90,
+        initial_extent: [-90, -180, 180, 90],
     };
 
     constructor({ composite }: EditorStoreOptions) {
@@ -65,18 +89,8 @@ export class SettingStore
         this.legendSymbols = value.legend_symbols;
         this.activePanel = value.active_panel;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
-        this.extent = {
-            left: value.extent_left,
-            right: value.extent_right,
-            bottom: value.extent_bottom,
-            top: value.extent_top,
-        };
-        this.extentConst = {
-            left: value.extent_const_left,
-            right: value.extent_const_right,
-            bottom: value.extent_const_bottom,
-            top: value.extent_const_top,
-        };
+        this.extent = extractExtent(value.initial_extent);
+        this.extentConst = extractExtent(value.constraining_extent);
         this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
     }
@@ -88,14 +102,8 @@ export class SettingStore
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
             active_panel: this.activePanel,
-            extent_bottom: this.extent.bottom,
-            extent_left: this.extent.left,
-            extent_right: this.extent.right,
-            extent_top: this.extent.top,
-            extent_const_bottom: this.extentConst.bottom,
-            extent_const_left: this.extentConst.left,
-            extent_const_right: this.extentConst.right,
-            extent_const_top: this.extentConst.top,
+            initial_extent: convertExtentToArray(this.extent),
+            constraining_extent: convertExtentToArray(this.extentConst),
             title: this.title ? this.title : null,
             measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
             bookmark_resource: this.bookmarkResource,
