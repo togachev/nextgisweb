@@ -30,8 +30,8 @@ export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendPr
                 const layer_extent = await route("layer.extent", id).get();
                 const extent = await route("feature_layer.feature.extent", id).get({ query });
 
-                if (extent.extent.minLon !== null) {
-                    return extent.extent
+                if (extent.minLon !== null) {
+                    return extent
                 } else {
                     return layer_extent.extent
                 }
