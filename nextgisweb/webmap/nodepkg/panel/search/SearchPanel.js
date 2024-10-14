@@ -415,6 +415,10 @@ export const SearchPanel = ({ display, close }) => {
                         contentPadding: "0 0",
                         headerPadding: "1px 8px",
                         headerBg: "var(--on-primary-text)",
+                    },
+                    Descriptions: {
+                        padding: "5px",
+                        paddingXS: "5px",
                     }
                 },
             }}
