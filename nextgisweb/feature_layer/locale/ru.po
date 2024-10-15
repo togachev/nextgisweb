@@ -1,9 +1,4 @@
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: nodepkg/attribute-editor/index.ts:7 view.py:203
-msgid "Attributes"
-msgstr "Атрибуты"
-
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:178
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:180
 msgid "N/A"
 msgstr "Н/Д"
 
@@ -15,11 +10,11 @@ msgstr "Геометрия"
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:332
+#: api.py:340
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:405 api_export.py:122
+#: api.py:414 api_export.py:122
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -67,25 +62,29 @@ msgstr "Невозможно восстановить объект #{} поск�
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: model.py:163
+#: model.py:172
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:174
+#: model.py:183
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '{}'. Пожалуйста, удалите или переименуйте его."
 
-#: model.py:236
+#: model.py:255
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:32
+#: nodepkg/attribute-editor/AttributeEditor.tsx:33
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:33
+#: nodepkg/attribute-editor/AttributeEditor.tsx:34
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
+
+#: nodepkg/attribute-editor/plugin.ts:11 view.py:214
+msgid "Attributes"
+msgstr "Атрибуты"
 
 #: nodepkg/export-form/ExportForm.tsx:204
 msgid "Resources"
@@ -112,7 +111,7 @@ msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
 #: nodepkg/export-form/ExportForm.tsx:268
-#: nodepkg/fields-widget/FieldsWidget.tsx:167
+#: nodepkg/fields-widget/FieldsWidget.tsx:171
 msgid "Fields"
 msgstr "Поля"
 
@@ -129,7 +128,7 @@ msgid "Zip archive"
 msgstr "Zip архив"
 
 #: nodepkg/export-form/ExportForm.tsx:327
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:34
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:33
 msgid "Save"
 msgstr "Сохранить"
 
@@ -145,19 +144,19 @@ msgstr "Вы уверены?"
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
-#: nodepkg/feature-editor/FeatureEditorStore.ts:20
+#: nodepkg/feature-editor/FeatureEditorStore.ts:18
 msgid "Feature saved"
 msgstr "Объект сохранен"
 
-#: nodepkg/feature-editor/FeatureEditorStore.ts:21
+#: nodepkg/feature-editor/FeatureEditorStore.ts:19
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:33
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:32
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:35
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:34
 msgid "Reset"
 msgstr "Сбросить"
 
@@ -166,6 +165,10 @@ msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
 #: nodepkg/feature-grid/FeatureGrid.tsx:25
+msgid "Number of objects"
+msgstr "Количество объектов"
+
+#: nodepkg/feature-grid/FeatureGrid.tsx:26
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
@@ -189,13 +192,13 @@ msgstr "Редактировать на новой странице"
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureTable.tsx:95
+#: nodepkg/feature-grid/FeatureTable.tsx:94
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:53
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:99 view.py:110
-#: view.py:198
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:108 view.py:119
+#: view.py:209
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -247,49 +250,57 @@ msgstr "Выберите тип"
 msgid "Not used"
 msgstr "Не используется"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:115
+#: nodepkg/fields-widget/FieldsWidget.tsx:118
 msgid "Field"
 msgstr "Поле"
 
+#: nodepkg/geometry-info/GeometryInfo.tsx:55
 #: nodepkg/geometry-info/GeometryInfo.tsx:56
-msgid "Load geometry info..."
-msgstr "Загрузка информации..."
-
-#: nodepkg/geometry-info/GeometryInfo.tsx:65
-msgid "Failed to get information about the geometry"
-msgstr "Не удалось получить информацию о геометрии"
-
-#: nodepkg/geometry-info/GeometryInfo.tsx:75
-msgid "Perimeter"
-msgstr "Периметр"
-
-#: nodepkg/geometry-info/GeometryInfo.tsx:76
-msgid "Length"
-msgstr "Длина"
-
-#: nodepkg/geometry-info/GeometryInfo.tsx:84
-msgid "Area"
-msgstr "Площадь"
-
-#: nodepkg/geometry-info/GeometryInfo.tsx:92
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:100
+#: nodepkg/geometry-info/GeometryInfo.tsx:60
+#: nodepkg/geometry-info/GeometryInfo.tsx:61
 msgid "Extent (xMin)"
 msgstr "Охват (xMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:104
+#: nodepkg/geometry-info/GeometryInfo.tsx:65
+#: nodepkg/geometry-info/GeometryInfo.tsx:66
 msgid "Extent (yMin)"
 msgstr "Охват (yMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:108
+#: nodepkg/geometry-info/GeometryInfo.tsx:70
+#: nodepkg/geometry-info/GeometryInfo.tsx:71
 msgid "Extent (xMax)"
 msgstr "Охват (xMax)"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:112
+#: nodepkg/geometry-info/GeometryInfo.tsx:75
+#: nodepkg/geometry-info/GeometryInfo.tsx:76
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
+
+#: nodepkg/geometry-info/GeometryInfo.tsx:82
+#: nodepkg/geometry-info/GeometryInfo.tsx:83
+msgid "Perimeter"
+msgstr "Периметр"
+
+#: nodepkg/geometry-info/GeometryInfo.tsx:82
+#: nodepkg/geometry-info/GeometryInfo.tsx:83
+msgid "Length"
+msgstr "Длина"
+
+#: nodepkg/geometry-info/GeometryInfo.tsx:88
+#: nodepkg/geometry-info/GeometryInfo.tsx:89
+msgid "Area"
+msgstr "Площадь"
+
+#: nodepkg/geometry-info/GeometryInfo.tsx:108
+msgid "Load geometry info..."
+msgstr "Загрузка информации..."
+
+#: nodepkg/geometry-info/GeometryInfo.tsx:110
+msgid "Failed to get information about the geometry"
+msgstr "Не удалось получить информацию о геометрии"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:18
 msgid "Feature versioning"
@@ -319,7 +330,7 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: template/resource_section_fields.mako:21 view.py:187
+#: template/resource_section_fields.mako:21 view.py:197
 msgid "Table"
 msgstr "Таблица"
 
@@ -390,11 +401,11 @@ msgstr "Некорректный диапазон"
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:118
+#: view.py:127
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:119
+#: view.py:128
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -402,6 +413,6 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:182
+#: view.py:192
 msgid "Features"
 msgstr "Объекты"

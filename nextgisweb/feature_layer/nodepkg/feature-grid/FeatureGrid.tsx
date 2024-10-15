@@ -22,6 +22,7 @@ import TuneIcon from "@nextgisweb/icon/material/tune";
 import "./FeatureGrid.less";
 
 const msgSettingsTitle = gettext("Open table settings");
+const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
 
 const loadingCol = () => "...";
@@ -119,6 +120,9 @@ export const FeatureGrid = observer(
                             }}
                             size={size}
                         />
+                    </Tooltip>
+                    <Tooltip title={msgNumberOfObjects}>
+                        <span className="count-feature">#{totalData.total_count}</span>
                     </Tooltip>
                 </FeatureGridActions>
 
