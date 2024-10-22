@@ -6,17 +6,28 @@ import { Image } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import type { WebmapItemConfig } from "@nextgisweb/webmap/type";
 
 import "./DescComponent.less";
 const title = gettext("Description");
 const msgLayer = gettext("Layer description");
 const msgStyle = gettext("Style description");
 
-const zoomToFeature = (display, resourceId, featureId) => {
+const zoomToFeature = (display, resourceId, featureId, result) => {
     display.featureHighlighter
         .highlightFeatureById(featureId, resourceId)
         .then((feature) => {
+            const styles: number[] = [];
+            const itemConfig: WebmapItemConfig = display.getItemConfig();
+            Object.keys(itemConfig).forEach(function (key, index) {
+                if (result.includes(itemConfig[key].styleId)) {
+                    styles.push(itemConfig[key].id);
+                }
+            });
+
             display.map.zoomToFeature(feature);
+            display.webmapStore.setChecked(styles);
+            display.webmapStore._updateLayersVisibility(styles);
         });
 };
 
@@ -76,8 +87,8 @@ export const DescComponent = observer((props) => {
 
             if (display === undefined) {
                 if (item instanceof Element && item.name === "a") {
-                    if (/^\d+:\d+$/.test(item.attribs.href)) {
-                        const [resId, fid] = item.attribs.href.split(":");
+                    if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
+                        const [resId] = item.attribs.href.split(":");
                         const { data: data } = useRouteGet("resource.permission", { id: resId }, { cache: true });
                         if (!data?.data.read) {
                             return <></>
@@ -89,11 +100,12 @@ export const DescComponent = observer((props) => {
             }
             if (display) {
                 if (item instanceof Element && item.name === "a") {
-                    if (/^\d+:\d+$/.test(item.attribs.href)) {
-                        const [resId, fid] = item.attribs.href.split(":");
+                    if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
+                        const [resId, fid, styles] = item.attribs.href.split(":");
+                        const result = Array.from(styles.split(','), Number)
                         const { data: data } = useRouteGet("resource.permission", { id: resId }, { cache: true });
                         if (data?.data.read) {
-                            return (<a onClick={() => { zoomToFeature(display, resId, fid); }}>{domToReact(item.children, options)}</a>);
+                            return (<a onClick={() => { zoomToFeature(display, resId, fid, result); }}>{domToReact(item.children, options)}</a>);
                         } else {
                             return <></>;
                         }

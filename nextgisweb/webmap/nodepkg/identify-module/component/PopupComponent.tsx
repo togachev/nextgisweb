@@ -21,9 +21,11 @@ import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
-
+import type { WebmapItemConfig, WebmapItem } from "@nextgisweb/webmap/type";
 import type { DataProps, Params } from "./type";
 import topic from "dojo/topic";
+
+import type { StylesRequest } from "../type";
 
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
@@ -106,6 +108,21 @@ export default observer(
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
 
+            const LinkToGeometry = (value: DataProps) => {
+                const styles: number[] = [];
+                display.getVisibleItems()
+                    .then((items: WebmapItem[]) => {
+                        const itemConfig: WebmapItemConfig = display.getItemConfig();
+                        items.map(i => {
+                            const item = itemConfig[i.id];
+                            if (item.visibility) {
+                                styles.push(item.styleId);
+                            }
+                        });
+                    })
+                setLinkToGeometry(value.layerId + ":" + value.id + ":" + styles);
+            }
+
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val);
                 setExtensions(res.feature.extensions);
@@ -116,8 +133,8 @@ export default observer(
                     layerId: res.resourceId,
                 })
 
+                LinkToGeometry(res)
                 setContextUrl(generateUrl(display, { res: val, st: response.data, pn: fixPanel }));
-                setLinkToGeometry(res.resourceId + ":" + res.feature.id);
 
                 if (key === true) {
                     setUpdate(false);
@@ -132,7 +149,7 @@ export default observer(
                     setSelected(selectVal);
                     setData(response.data);
                     getContent(selectVal, false);
-                    setLinkToGeometry(selectVal.layerId + ":" + selectVal.id);
+                    LinkToGeometry(selectVal)
                 } else {
                     setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
                     setSelected(null);
@@ -160,12 +177,15 @@ export default observer(
                 }
             }, [fixPopup]);
 
+
+
             const onChangeSelect = (value: { value: number; label: string }) => {
                 const selectedValue = data.find(item => item.value === value.value);
                 const copy = { ...selectedValue };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
                 setSelected(copy);
                 getContent(copy, false);
+                LinkToGeometry(copy);
             };
 
             const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
