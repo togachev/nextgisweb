@@ -22,10 +22,12 @@ import ImageInsert from "@ckeditor/ckeditor5-image/src/imageinsert.js";
 import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle.js";
 import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar.js";
 import ImageUpload from "@ckeditor/ckeditor5-image/src/imageupload.js";
+import ImageResize from "@ckeditor/ckeditor5-image/src/imageresize.js";
 import PictureEditing from "@ckeditor/ckeditor5-image/src/pictureediting.js";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent.js";
 import Highlight from "@ckeditor/ckeditor5-highlight/src/highlight.js";
 import Link from "@ckeditor/ckeditor5-link/src/link.js";
+import LinkImage from "@ckeditor/ckeditor5-link/src/linkimage.js";
 import List from "@ckeditor/ckeditor5-list/src/list.js";
 import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph.js";
 import PasteFromOffice from "@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice.js";
@@ -45,7 +47,7 @@ import SpecialCharacters from "@ckeditor/ckeditor5-special-characters/src/specia
 import SpecialCharactersEssentials from "@ckeditor/ckeditor5-special-characters/src/specialcharactersessentials.js";
 import Clipboard from "@ckeditor/ckeditor5-clipboard/src/clipboard.js";
 import RemoveFormat from "@ckeditor/ckeditor5-remove-format/src/removeformat.js";
-
+import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment.js";
 class Editor extends ClassicEditor {
     constructor(element, config) {
         config.language = window.ngwConfig.locale;
@@ -68,6 +70,7 @@ Editor.builtinPlugins = [
     Essentials,
     Heading,
     Image,
+    ImageResize,
     ImageCaption,
     ImageInsert,
     ImageStyle,
@@ -77,6 +80,7 @@ Editor.builtinPlugins = [
     Indent,
     Highlight,
     Link,
+    LinkImage,
     List,
     Paragraph,
     PasteFromOffice,
@@ -96,6 +100,7 @@ Editor.builtinPlugins = [
     SpecialCharactersEssentials,
     Clipboard,
     RemoveFormat,
+    Alignment,
 ];
 
 // Editor configuration.
@@ -104,8 +109,8 @@ Editor.defaultConfig = {
         items: [
             "undo",
             "redo",
-            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',
-            'heading', 'bulletedList', 'numberedList',
+            "fontSize", "fontFamily", "fontColor", "fontBackgroundColor",
+            "heading", "alignment", "bulletedList", "numberedList",
             "|",
             "bold",
             "italic",
@@ -128,19 +133,47 @@ Editor.defaultConfig = {
             "specialCharacters",
             "removeFormat",
         ],
-    shouldNotGroupWhenFull: true,
+        shouldNotGroupWhenFull: true,
     },
     fontFamily: {
         supportAllValues: true
     },
     image: {
+        insert: {
+            integrations: ["upload", "url"]
+        },
+        resizeUnit: "px",
+        resizeOptions: [
+            {
+                name: "resizeImage:original",
+                value: null,
+                icon: "original"
+            },
+            {
+                name: "resizeImage:custom",
+                value: "custom",
+                icon: "custom"
+            },
+            {
+                name: "resizeImage:50",
+                value: "50",
+                icon: "medium"
+            },
+            {
+                name: "resizeImage:75",
+                value: "75",
+                icon: "large"
+            }
+        ],
         toolbar: [
-            "imageStyle:inline",
-            "imageStyle:block",
             "imageStyle:side",
+            "imageStyle:wrapText",
+            "imageStyle:breakText",
             "|",
-            "toggleImageCaption",
-            "imageTextAlternative",
+            "toggleImageCaption", "imageTextAlternative", "linkImage",
+            "resizeImage:50",
+            "resizeImage:75",
+            "resizeImage:original",
         ],
     },
     table: {

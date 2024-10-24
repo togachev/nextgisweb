@@ -1,10 +1,28 @@
+
+:root {
+	--ck-color-image-caption-background: hsl(0, 0%, 97%);
+	--ck-color-image-caption-text: hsl(0, 0%, 20%);
+	--ck-color-mention-background: hsla(341, 100%, 30%, 0.1);
+	--ck-color-mention-text: hsl(341, 100%, 30%);
+	--ck-color-selector-caption-background: hsl(0, 0%, 97%);
+	--ck-color-selector-caption-text: hsl(0, 0%, 20%);
+	--ck-highlight-marker-blue: hsl(201, 97%, 72%);
+	--ck-highlight-marker-green: hsl(120, 93%, 68%);
+	--ck-highlight-marker-pink: hsl(345, 96%, 73%);
+	--ck-highlight-marker-yellow: hsl(60, 97%, 73%);
+	--ck-highlight-pen-green: hsl(112, 100%, 27%);
+	--ck-highlight-pen-red: hsl(0, 85%, 49%);
+	--ck-image-style-spacing: 1.5em;
+	--ck-inline-image-style-spacing: calc(var(--ck-image-style-spacing) / 2);
+	--ck-todo-list-checkmark-size: 16px;
+}
+
 .desc-component {
 	overflow: auto;
 
 	.ck-content figure {
 		margin: 0;
 	}
-
 
 	.ck-content table,
 	tbody,
@@ -16,20 +34,6 @@
 		td {
 			border-collapse: collapse;
 			padding: 0 5px 0 5px;
-		}
-	}
-
-	.ck-content .img-style {
-		width: 100%;
-		display: flex;
-		justify-content: center;
-
-		.img-item {
-			width: 50%;
-		}
-
-		.img-item-home {
-			width: 25%;
 		}
 	}
 
@@ -54,14 +58,6 @@
 		color: gray;
 	}
 
-	.ck-content .image {
-		display: block;
-		margin-block-start: 0em;
-		margin-block-end: 0em;
-		margin-inline-start: 5px;
-		margin-inline-end: 5px;
-	}
-
 	.ck-content a {
 		text-decoration: none;
 	}
@@ -84,23 +80,6 @@
 		}
 	}
 
-	:root {
-		--ck-color-image-caption-background: hsl(0, 0%, 97%);
-		--ck-color-image-caption-text: hsl(0, 0%, 20%);
-		--ck-color-mention-background: hsla(341, 100%, 30%, 0.1);
-		--ck-color-mention-text: hsl(341, 100%, 30%);
-		--ck-color-selector-caption-background: hsl(0, 0%, 97%);
-		--ck-color-selector-caption-text: hsl(0, 0%, 20%);
-		--ck-highlight-marker-blue: hsl(201, 97%, 72%);
-		--ck-highlight-marker-green: hsl(120, 93%, 68%);
-		--ck-highlight-marker-pink: hsl(345, 96%, 73%);
-		--ck-highlight-marker-yellow: hsl(60, 97%, 73%);
-		--ck-highlight-pen-green: hsl(112, 100%, 27%);
-		--ck-highlight-pen-red: hsl(0, 85%, 49%);
-		--ck-image-style-spacing: 1.5em;
-		--ck-inline-image-style-spacing: calc(var(--ck-image-style-spacing) / 2);
-		--ck-todo-list-checkmark-size: 16px;
-	}
 
 	/* @ckeditor/ckeditor5-table/theme/tablecolumnresize.css */
 	.ck-content .table .ck-table-resized {

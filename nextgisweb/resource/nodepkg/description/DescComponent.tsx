@@ -66,19 +66,11 @@ export const DescComponent = observer((props) => {
     const options = {
         replace: item => {
             if (item instanceof Element && item.attribs && item.name === "img" && type === "home_page") {
-                return (<span className="img-style">
-                    <span className="img-item-home">
-                        <Image src={item.attribs.src}>item</Image>
-                    </span>
-                </span>);
+                return (<Image src={item.attribs.src}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && type !== "home_page") {
-                return (<span className="img-style">
-                    <span className="img-item">
-                        <Image src={item.attribs.src}>item</Image>
-                    </span>
-                </span>);
+                return (<Image src={item.attribs.src}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {
@@ -98,6 +90,7 @@ export const DescComponent = observer((props) => {
                     }
                 }
             }
+
             if (display) {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {

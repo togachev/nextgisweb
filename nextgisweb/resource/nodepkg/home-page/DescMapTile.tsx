@@ -6,11 +6,7 @@ export function DescMapTile(props) {
     const options = {
         replace: item => {
             if (item instanceof Element && item.attribs && item.name === "img") {
-                return (<span className="img-style">
-                    <span className="img-item">
-                        <Image src={item.attribs.src}>item</Image>
-                    </span>
-                </span>);
+                return (<Image src={item.attribs.src}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {
@@ -23,12 +19,12 @@ export function DescMapTile(props) {
 
 
             if (item instanceof Element && item.name === "a" && upath_info) {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
+                if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
                     return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
                 }
             }
             if (item instanceof Element && item.name === "a" && type === "feature") {
-                if (/^\d+:\d+$/.test(item.attribs.href)) {
+                if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
                     return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
                 }
             }
