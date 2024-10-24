@@ -93,7 +93,7 @@ export const DescComponent = observer((props) => {
                         if (!data?.data.read) {
                             return <></>
                         } else {
-                            return (<span className="label-delete-link">{domToReact(item.children, options)}</span>);
+                            return (<span>{domToReact(item.children, options)}</span>);
                         }
                     }
                 }
@@ -127,8 +127,10 @@ export const DescComponent = observer((props) => {
 
     return (
         <div ref={previewRef} className="desc-component">
-            {type === "map" && (<PanelHeader {...{ title, close }} />)}
-            {data_}
+            <div className="ck-content">
+                {type === "map" && (<PanelHeader {...{ title, close }} />)}
+                {data_}
+            </div>
         </div>
     )
 });
