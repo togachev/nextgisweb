@@ -72,7 +72,12 @@ export const useSource = () => {
                 const fieldmap = {};
 
                 data.feature_layer.fields.map(itm => {
-                    fieldmap[itm.keyname] = itm;
+                    if (itm.grid_visibility) {
+                        fieldmap[itm.keyname] = itm;
+                    } else {
+                        delete feature.fields[itm.keyname]
+                    }
+                    
                     if (itm.lookup_table !== null) {
                         deferreds.push(
                             lookupTableCached.load(
@@ -98,10 +103,6 @@ export const useSource = () => {
                         for (const k in value) {
                             const val = value[k];
                             const field = fieldmap[k];
-
-                            if (!fieldmap[k].grid_visibility) {
-                                continue;
-                            }
 
                             if (field.lookup_table !== null) {
                                 const lval = lookupTableCached.lookup(
