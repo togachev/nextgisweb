@@ -29,7 +29,7 @@
         "@ckeditor/ckeditor5-highlight": "42.0.0",
         "@ckeditor/ckeditor5-font": "42.0.0",
         "@ckeditor/ckeditor5-code-block": "42.0.0",
-        "@ckeditor/ckeditor5-ckeditor5-find-and-replace": "42.0.0",
+        "@ckeditor/ckeditor5-find-and-replace": "42.0.0",
         "@ckeditor/ckeditor5-horizontal-line": "42.0.0",
         "@ckeditor/ckeditor5-special-characters": "42.0.0",
         "@ckeditor/ckeditor5-clipboard": "42.0.0",
