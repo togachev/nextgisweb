@@ -120,10 +120,8 @@ export const DescComponent = observer((props) => {
 
     return (
         <div ref={previewRef} className="desc-component">
-            <div className="ck-content">
-                {type === "map" && (<PanelHeader {...{ title, close }} />)}
-                {data_}
-            </div>
+            {type === "map" && (<PanelHeader {...{ title, close }} />)}
+            <div className="ck-content">{data_}</div>
         </div>
     )
 });
