@@ -13,8 +13,8 @@ import type { ItemsStore } from "./ItemsStore";
 
 type ItemPayload = {
     [P in keyof WebMapItemGroupWrite & keyof WebMapItemLayerWrite]:
-    | WebMapItemGroupWrite[P]
-    | WebMapItemLayerWrite[P];
+        | WebMapItemGroupWrite[P]
+        | WebMapItemLayerWrite[P];
 };
 type ItemType = ItemPayload["item_type"];
 type ItemData<D> = Partial<Omit<D, "item_type">>;
@@ -81,7 +81,7 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
                 item.item_type === "group"
                     ? new Group(this.store, item)
                     : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                    new Layer(this.store, item)
+                      new Layer(this.store, item)
             )
         );
     }
@@ -132,13 +132,13 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
     readonly layerEnabled = layerEnabled.init(true, this);
     readonly layerIdentifiable = layerIdentifiable.init(true, this);
     readonly layerTransparency = layerTransparency.init(null, this);
+    readonly fileResourceVisible = fileResourceVisible.init(false, this);
     readonly layerMinScaleDenom = layerMinScaleDenom.init(null, this);
     readonly layerMaxScaleDenom = layerMaxScaleDenom.init(null, this);
     readonly layerAdapter = layerAdapter.init("image", this);
     readonly layerLegendSymbols = layerLegendSymbols.init(null, this);
     readonly layerStyleId = layerStyleId.init(-1, this);
     readonly layerDrawOrderPosition = layerDrawOrderPosition.init(null, this);
-    fileResourceVisible = false;
 
     constructor(store: ItemsStore, data: ItemData<WebMapItemLayerWrite>) {
         super(store, data);
