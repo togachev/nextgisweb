@@ -27,6 +27,7 @@ import PictureEditing from "@ckeditor/ckeditor5-image/src/pictureediting.js";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent.js";
 import Highlight from "@ckeditor/ckeditor5-highlight/src/highlight.js";
 import Link from "@ckeditor/ckeditor5-link/src/link.js";
+import AutoLink from "@ckeditor/ckeditor5-link/src/autolink.js";
 import LinkImage from "@ckeditor/ckeditor5-link/src/linkimage.js";
 import List from "@ckeditor/ckeditor5-list/src/list.js";
 import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph.js";
@@ -80,6 +81,7 @@ Editor.builtinPlugins = [
     Indent,
     Highlight,
     Link,
+    AutoLink,
     LinkImage,
     List,
     Paragraph,
@@ -186,7 +188,26 @@ Editor.defaultConfig = {
             "toggleTableCaption"
         ],
     },
-
+    link: {
+        decorators: {
+            toggleDownloadable: {
+                mode: 'manual',
+                label: 'Downloadable',
+                attributes: {
+                    download: 'file'
+                }
+            },
+            openInNewTab: {
+                mode: 'manual',
+                label: 'Open in a new tab',
+                defaultValue: true,
+                attributes: {
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                }
+            }
+        }
+    },
     // This value must be kept in sync with the language defined in webpack.config.js.
     language: "en",
 };
