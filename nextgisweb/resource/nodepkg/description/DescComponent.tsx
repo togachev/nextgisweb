@@ -73,10 +73,6 @@ export const DescComponent = observer((props) => {
                 return (<Image src={item.attribs.src}>item</Image>);
             }
 
-            if (item instanceof Element && item.attribs && item.name === "p") {
-                return <span className="p-padding">{domToReact(item.children, options)}</span>;
-            }
-
             if (display === undefined) {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
