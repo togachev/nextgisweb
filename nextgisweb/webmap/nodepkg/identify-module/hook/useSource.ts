@@ -23,11 +23,11 @@ export const useSource = () => {
 
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
         const result = [...new Set(st?.map(a => a.styleId))];
-
+        
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
-            { attribute: true, lon, lat, zoom, styles: styles, panel, st: result, slf: selected, pn: pn } :
-            { attribute: false, lon, lat, zoom, styles: styles, panel }
+            { attribute: true, lon, lat, zoom, styles: styles, panel, st: result, slf: selected, pn: pn, base: display._baseLayer.name } :
+            { attribute: false, lon, lat, zoom, styles: styles, panel, base: display._baseLayer.name }
 
         const paramsUrl = new URLSearchParams();
 
