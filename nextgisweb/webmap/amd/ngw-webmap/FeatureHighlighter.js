@@ -33,18 +33,25 @@ define([
         },
 
         _getDefaultStyle: function () {
-            var strokeStyle = new ol.style.Stroke({
-                width: 3,
-                color: "rgba(255,255,0,1)",
-            });
-
             return new ol.style.Style({
-                stroke: strokeStyle,
-                image: new ol.style.Circle({
-                    stroke: strokeStyle,
-                    radius: 5,
-                }),
-            });
+                    stroke: new ol.style.Stroke({
+                        width: 7,
+                        color: "rgba(255,255,0,0.7)",
+                    }),
+                    fill: new ol.style.Fill({
+                        color: "rgba(255,255,255,0.5)",
+                    }),
+                    image: new ol.style.Circle({
+                        stroke: new ol.style.Stroke({
+                            width: 7,
+                            color: "rgba(255,255,0,0.7)",
+                        }),
+                        fill: new ol.style.Fill({
+                            color: "rgba(255,0,0,1)",
+                        }),
+                        radius: 7,
+                    }),
+                });
         },
 
         _bindEvents: function () {
@@ -123,9 +130,9 @@ define([
 
         highlightFeatureById: function (featureId, layerId) {
             var get_feature_item_url = api.routeURL(
-                    "feature_layer.feature.item",
-                    { id: layerId, fid: featureId }
-                ),
+                "feature_layer.feature.item",
+                { id: layerId, fid: featureId }
+            ),
                 highlightedDeferred = new Deferred();
 
             xhr.get(get_feature_item_url, {
