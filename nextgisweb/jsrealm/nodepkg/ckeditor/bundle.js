@@ -214,5 +214,6 @@ Editor.defaultConfig = {
 
 // eslint-disable-next-line no-undef
 Editor.availableLanguages = AVAILABLE_LANGUAGES;
+Editor.enterMode = Editor.ENTER_BR;
 
 export default Editor;

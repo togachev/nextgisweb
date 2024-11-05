@@ -1,4 +1,4 @@
-import parse, { Element, domToReact } from "html-react-parser";
+import parse, { attributesToProps, Element, domToReact } from "html-react-parser";
 import { useRef } from "react";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -71,6 +71,11 @@ export const DescComponent = observer((props) => {
 
             if (item instanceof Element && item.attribs && item.name === "img" && type !== "home_page") {
                 return (<Image src={item.attribs.src}>item</Image>);
+            }
+
+            if (item instanceof Element && item.attribs && item.name === "p") {
+                const props = attributesToProps(item.attribs);
+                return <div {...props} >{domToReact(item.children, options)}</div>;
             }
 
             if (display === undefined) {
