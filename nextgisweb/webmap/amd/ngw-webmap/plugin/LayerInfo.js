@@ -9,7 +9,7 @@ define([
         getPluginState: function (nodeData) {
             var type = nodeData.type;
             var data = this.display.get("itemConfig").plugin[this.identity];
-            
+
             return {
                 enabled:
                     type === "layer" &&
@@ -40,45 +40,37 @@ define([
             const item = this.display.dumpItem();
             const data = this.display.get("itemConfig").plugin[this.identity];
             let content = [];
+            const vectorType = ["postgis_layer", "vector_layer"];
             if (Object.values(data).length > 0) {
 
-                const writable = nodeData.plugin['ngw-webmap/plugin/LayerEditor'] &&
-                    nodeData.plugin['ngw-webmap/plugin/LayerEditor'].writable
-
-                data.description_layer && content.push({
+                vectorType.includes(nodeData.layerCls) && data.description_layer && content.push({
                     description: data.description_layer,
-                    cls: nodeData.layerCls,
                     type: "layer",
-                    url: api.routeURL("resource.show", nodeData.layerId),
-                    permissions: writable
+                    url: api.routeURL("resource.show", item.layerId),
                 });
 
                 data.description_style && content.push({
                     description: data.description_style,
-                    cls: nodeData.cls,
                     type: "style",
-                    url: api.routeURL("resource.show", nodeData.styleId),
-                    permissions: writable
+                    url: api.routeURL("resource.show", item.styleId),
                 });
-                
-                let panel = pm.getPanel(pkey);
 
+                let panel = pm.getPanel(pkey);
                 if (panel) {
                     if (panel.app) {
-                        panel.app.update(content);
+                        panel.app.update({ content });
                     } else {
-                        panel.props = content;
+                        panel.props = { content };
                     }
                 } else {
-                    const cls = reactPanel(
-                        "@nextgisweb/resource/description",
-                        {
-                            props: { content },
-                        }
-                    );
                     pm.addPanels([
                         {
-                            cls: cls,
+                            cls: reactPanel(
+                                "@nextgisweb/resource/description",
+                                {
+                                    props: { content },
+                                }
+                            ),
                             params: {
                                 title: item.label,
                                 name: pkey,

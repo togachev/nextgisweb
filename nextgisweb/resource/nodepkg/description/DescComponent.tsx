@@ -2,9 +2,7 @@ import parse, { attributesToProps, Element, domToReact } from "html-react-parser
 import { useRef } from "react";
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Image } from "@nextgisweb/gui/antd";
-import { observer } from "mobx-react-lite";
-import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
+import { Divider, Image } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import type { WebmapItemConfig } from "@nextgisweb/webmap/type";
 
@@ -31,30 +29,20 @@ const zoomToFeature = (display, resourceId, featureId, result) => {
         });
 };
 
-export const DescComponent = observer((props) => {
+export const DescComponent = (props) => {
     const { display, content, type, close } = props;
     const previewRef = useRef<HTMLDivElement>(null);
     const DescComp = ({ content }) => {
+
         return (
             <>{
                 content?.map((item, index) => {
                     const title = item.type === "layer" ? msgLayer : msgStyle;
                     return (
                         <div key={index} className="item-description">
-                            <span className="title-desc">
-                                {item.permissions ?
-                                    (<SvgIconLink
-                                        className="desc-link"
-                                        href={item.url}
-                                        icon={`rescls-${item.cls}`}
-                                        fill="currentColor"
-                                        target="_blank"
-                                    >
-                                        <span className="label-desc">{title}</span>
-                                    </SvgIconLink>)
-                                    : (<span className="label-desc-no">{title}</span>)
-                                }
-                            </span>
+                            {content.length > 1 && (
+                                <Divider style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
+                            )}
                             {parse(item.description, options)}
                         </div >
                     )
@@ -125,4 +113,4 @@ export const DescComponent = observer((props) => {
             <div className="ck-content">{data_}</div>
         </div>
     )
-});
+};

@@ -7,7 +7,6 @@ define([
 ], function (declare, _PluginBase, xhr, api, { gettext }) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
-            console.log(nodeData);
             const typeLayer = ["postgis_layer", "vector_layer"]
             return {
                 enabled:
