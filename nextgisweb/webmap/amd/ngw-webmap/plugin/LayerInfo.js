@@ -9,11 +9,12 @@ define([
         getPluginState: function (nodeData) {
             var type = nodeData.type;
             var data = this.display.get("itemConfig").plugin[this.identity];
+            
             return {
                 enabled:
                     type === "layer" &&
                     nodeData.plugin[this.identity] &&
-                    data,
+                    Object.values(data).length > 0,
             };
         },
 
@@ -37,11 +38,9 @@ define([
             const pm = this.display.panelsManager;
             const pkey = "resource-description";
             const item = this.display.dumpItem();
-            var data = this.display.get("itemConfig").plugin[this.identity];
-            console.log(data);
-            
-            if (data !== undefined) {
-                const content = [];
+            const data = this.display.get("itemConfig").plugin[this.identity];
+            let content = [];
+            if (Object.values(data).length > 0) {
 
                 const writable = nodeData.plugin['ngw-webmap/plugin/LayerEditor'] &&
                     nodeData.plugin['ngw-webmap/plugin/LayerEditor'].writable
