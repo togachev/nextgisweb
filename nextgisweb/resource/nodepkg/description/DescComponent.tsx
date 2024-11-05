@@ -39,7 +39,7 @@ export const DescComponent = (props) => {
                 content?.map((item, index) => {
                     const title = item.type === "layer" ? msgLayer : msgStyle;
                     return (
-                        <div key={index} className="item-description">
+                        <div key={index}>
                             {content.length > 1 && (
                                 <Divider style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
                             )}
