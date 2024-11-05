@@ -154,13 +154,8 @@ def display(obj, request):
             data.update(
                 layerId=style.parent_id,
                 styleId=style.id,
-                cls=style.cls, # для создания легенды (фильтрация ресурсов)
-                layerCls=layer.cls, # для создания легенды (фильтрация ресурсов)
-                labelLayer=layer.display_name, # Наименование слоя
-                descStyle=style.description, # Описание стиля
-                descLayer=layer.description, # Описание слоя
-                fileResourceVisible=item.file_resource_visible, # Прикрепленные файлы (показать/скрыть)
-                legend_symbols = request.route_url("render.legend_symbols", id=style.id),
+                cls=style.cls,
+                layerCls=layer.cls,
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
@@ -168,8 +163,17 @@ def display(obj, request):
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
-                relation = layer.check_relation(layer)
             )
+
+            if item.file_resource_visible:
+                data.update(
+                    fileResourceVisible=item.file_resource_visible, # Прикрепленные файлы (показать/скрыть)
+                )
+
+            if layer.check_relation(layer):
+                data.update(
+                    relation=layer.check_relation(layer)
+                )
 
             data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid
             display.mid.adapter.add(data["adapter"])
@@ -256,7 +260,6 @@ def display(obj, request):
         drawOrderEnabled=obj.draw_order_enabled,
         measureSrsId=obj.measure_srs_id,
         printMaxSize=request.env.webmap.options["print.max_size"],
-        relation=get_relation(obj.root_item)
     )
 
     if request.env.webmap.options["annotation"]:

@@ -5,10 +5,11 @@ import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
-
+import { Point } from "ol/geom";
 import Pin from "@nextgisweb/icon/mdi/pin";
 import PinOff from "@nextgisweb/icon/mdi/pin-off";
-
+import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
+import { WKT } from "ol/format";
 import { Rnd } from "react-rnd";
 import { ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
 import { IdentifyStore } from "../IdentifyStore";
@@ -24,8 +25,17 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import type { WebmapItemConfig, WebmapItem } from "@nextgisweb/webmap/type";
 import type { DataProps, Params } from "./type";
 import topic from "dojo/topic";
-
+import { route } from "@nextgisweb/pyramid/api";
 import type { StylesRequest } from "../type";
+
+const wkt = new WKT();
+const srsCoordinates = {};
+if (spatialRefSysList) {
+    spatialRefSysList.forEach((srsInfo) => {
+        srsCoordinates[srsInfo.id] = srsInfo;
+    });
+}
+
 
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
@@ -127,6 +137,29 @@ export default observer(
                 const res = await getAttribute(val);
                 setExtensions(res.feature.extensions);
                 setAttribute(res.updateName);
+
+                /* replacing the coordinate of a point on the map with the coordinate of the object itself, if the geometry type is "Point", "MultiPoint" */
+                const pointTypes = ["Point", "MultiPoint"]
+                const featureGeom = wkt.readFeatures(res.feature.geom)[0];
+                if (pointTypes.includes(featureGeom.getGeometry().getType())) {
+                    const coords = featureGeom.getGeometry().getCoordinates()[0]
+                    imodule.lonlat  = await route("spatial_ref_sys.geom_transform.batch")
+                    .post({
+                        json: {
+                            srs_from: imodule.displaySrid,
+                            srs_to: Object.keys(srsCoordinates).map(Number),
+                            geom: wkt.writeGeometry(new Point(coords)),
+                        },
+                    })
+                    .then((transformed) => {
+                        const t = transformed.find(i => i.srs_id !== imodule.displaySrid)
+                        const wktPoint = wkt.readGeometry(t.geom);
+                        const transformedCoord = wktPoint.getCoordinates();
+                        return transformedCoord;
+                    });
+                }
+                /*------------------------------------------------------------------------*/
+
                 topic.publish("feature.highlight", {
                     geom: res.feature.geom,
                     featureId: res.feature.id,

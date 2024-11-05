@@ -92,7 +92,7 @@ export class IdentifyModule extends Component {
 
         this.popup = document.createElement("div");
         this.point_popup = document.createElement("div");
-        this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
+        // this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
         this.root_popup = createRoot(this.popup);
         this.point_context = document.createElement("div");
         this.root_context = createRoot(this.point_context);
@@ -177,6 +177,13 @@ export class IdentifyModule extends Component {
                     return { data: item.data, featureCount: item.featureCount };
                 });
             count = this.response.featureCount;
+
+            if (count === 0) {
+                this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
+            } else {
+                this.point_popup.innerHTML = '';
+            }
+            
         } else {
             count = 0;
             this.response = { data: [], featureCount: 0 }

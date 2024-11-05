@@ -13,7 +13,7 @@ define([
                 enabled:
                     type === "layer" &&
                     nodeData.plugin[this.identity] &&
-                    data.description,
+                    data,
             };
         },
 
@@ -37,26 +37,28 @@ define([
             const pm = this.display.panelsManager;
             const pkey = "resource-description";
             const item = this.display.dumpItem();
-            const data = nodeData;
+            var data = this.display.get("itemConfig").plugin[this.identity];
+            console.log(data);
+            
             if (data !== undefined) {
                 const content = [];
 
                 const writable = nodeData.plugin['ngw-webmap/plugin/LayerEditor'] &&
                     nodeData.plugin['ngw-webmap/plugin/LayerEditor'].writable
 
-                data.descLayer && content.push({
-                    description: data.descLayer,
-                    cls: data.layerCls,
+                data.description_layer && content.push({
+                    description: data.description_layer,
+                    cls: nodeData.layerCls,
                     type: "layer",
-                    url: api.routeURL("resource.show", data.layerId),
+                    url: api.routeURL("resource.show", nodeData.layerId),
                     permissions: writable
                 });
 
-                data.descStyle && content.push({
-                    description: data.descStyle,
-                    cls: data.cls,
+                data.description_style && content.push({
+                    description: data.description_style,
+                    cls: nodeData.cls,
                     type: "style",
-                    url: api.routeURL("resource.show", data.styleId),
+                    url: api.routeURL("resource.show", nodeData.styleId),
                     permissions: writable
                 });
                 
