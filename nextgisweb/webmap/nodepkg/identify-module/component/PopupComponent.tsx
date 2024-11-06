@@ -142,7 +142,7 @@ export default observer(
                 const pointTypes = ["Point", "MultiPoint"]
                 const featureGeom = wkt.readFeatures(res.feature.geom)[0];
                 if (pointTypes.includes(featureGeom.getGeometry().getType())) {
-                    const coords = featureGeom.getGeometry().getCoordinates()[0]
+                    const coords = featureGeom.getGeometry().getCoordinates();
                     imodule.lonlat  = await route("spatial_ref_sys.geom_transform.batch")
                     .post({
                         json: {
