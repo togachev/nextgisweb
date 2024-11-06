@@ -181,7 +181,7 @@ export class IdentifyModule extends Component {
             if (count === 0) {
                 this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
             } else {
-                this.point_popup.innerHTML = '';
+                this.point_popup.innerHTML = "";
             }
             
         } else {

@@ -1,5 +1,5 @@
-import { forwardRef, RefObject } from 'react';
-import { createPortal } from 'react-dom';
+import { forwardRef, RefObject } from "react";
+import { createPortal } from "react-dom";
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";

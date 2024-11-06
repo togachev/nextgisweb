@@ -50,7 +50,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
     };
 
     const AttributeColumns = ({ attribute }) => {
-        const items: DescriptionsProps['items'] = [];
+        const items: DescriptionsProps["items"] = [];
         if (Object.keys(attribute).length > 0) {
             if (Object.keys(attribute).length > 1) {
                 Object.keys(attribute).map((key) => {
@@ -138,13 +138,13 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
         }
     }, [attribute]);
 
-    const onClick: MenuProps['onClick'] = ({ key }) => {
+    const onClick: MenuProps["onClick"] = ({ key }) => {
         setFixContentItem(options.find(item => item.key === key));
         setFixPanel(key);
         setCurrentUrlParams(key);
     };
 
-    const items: MenuProps['items'] = useMemo(() => {
+    const items: MenuProps["items"] = useMemo(() => {
         return options.map(item => {
             if (item.hidden === false) {
                 return {

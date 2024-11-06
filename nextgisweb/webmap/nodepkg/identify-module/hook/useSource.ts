@@ -36,7 +36,7 @@ export const useSource = () => {
         })
 
         const url = routeURL("webmap.display", webmapId);
-        const link = origin + url + '?' + paramsUrl.toString();
+        const link = origin + url + "?" + paramsUrl.toString();
 
         return link;
     };

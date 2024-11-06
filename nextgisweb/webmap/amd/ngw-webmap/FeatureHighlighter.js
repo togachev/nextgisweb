@@ -33,10 +33,17 @@ define([
         },
 
         _getDefaultStyle: function () {
-            var pointClick = "data:image/svg+xml;base64,PHN2ZyBpZD0iaWNvbi1wb2ludC1jbGljayIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTIgMTIiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDxwYXRoIGQ9Im02IDBjLTMuMzEgMC02IDIuNjktNiA2IDAgMy4zMSAyLjY5IDYgNiA2IDMuMzEgMCA2LTIuNjkgNi02IDAtMy4zMS0yLjY5LTYtNi02eiIgZmlsbD0iIzEwNmE5MiIgc3Ryb2tlLXdpZHRoPSIuODU3Ii8+CiAgPHBhdGggZD0ibTUuNTMgMTAuN2MtMi4yMi0wLjIyOS0zLjk3LTEuOTktNC4xOS00LjIyLTAuMjM5LTIuMzggMS40NC00LjYxIDMuOC01LjA0IDIuMzYtMC40MzYgNC42OSAwLjk5OCA1LjM1IDMuMyAwLjUwMyAxLjc1LTAuMDI3MiAzLjU5LTEuMzggNC44LTAuOTczIDAuODcxLTIuMjkgMS4zLTMuNTggMS4xN3oiIGZpbGw9IiNmZmYiIHN0cm9rZS13aWR0aD0iLjAyMjQiLz4KICA8cGF0aCBkPSJtNS43NSA4LjUxYy0xLjE5LTAuMTIzLTIuMTMtMS4wNy0yLjI1LTIuMjctMC4xMjgtMS4yOCAwLjc3NC0yLjQ4IDIuMDQtMi43MSAxLjI3LTAuMjM0IDIuNTIgMC41MzcgMi44OCAxLjc3IDAuMjcgMC45MzktMC4wMTQ2IDEuOTMtMC43NDIgMi41OC0wLjUyMyAwLjQ2OC0xLjIzIDAuNy0xLjkzIDAuNjI4eiIgc3Ryb2tlLXdpZHRoPSIuMDEyIi8+CiA8L2c+Cjwvc3ZnPg=="
+            const pointClick =
+                `<svg id="icon-point-click" version="1.1" viewBox="0 0 13 13" width="13" height="13" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <path d="m6.5 0c-3.58 0-6.5 2.92-6.5 6.5s2.92 6.5 6.5 6.5 6.5-2.92 6.5-6.5-2.92-6.5-6.5-6.5z" fill="#106a92" stroke-width=".929"/>
+                        <path d="m5.99 11.5c-2.41-0.248-4.3-2.15-4.54-4.57-0.259-2.58 1.56-4.99 4.12-5.46 2.56-0.472 5.08 1.08 5.8 3.57 0.545 1.89-0.0295 3.89-1.5 5.2-1.05 0.943-2.49 1.41-3.88 1.27z" fill="#fff" stroke-width=".0242"/>
+                        <path d="m6.23 9.21c-1.29-0.133-2.31-1.16-2.44-2.46-0.139-1.39 0.839-2.68 2.21-2.94 1.38-0.254 2.73 0.582 3.12 1.92 0.293 1.02-0.0158 2.09-0.804 2.8-0.567 0.507-1.34 0.758-2.09 0.681z" stroke-width=".013"/>
+                    </g>
+                </svg>`
             return new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    width: 2.5,
+                    width: 2.26,
                     color: "rgba(255,255,0,1)",
                 }),
                 fill: new ol.style.Fill({
@@ -44,7 +51,7 @@ define([
                 }),
                 image: new ol.style.Icon({
                     opacity: 1,
-                    src: pointClick,
+                    src: "data:image/svg+xml," + encodeURIComponent(pointClick),
                     scale: 1,
                 })
             });
