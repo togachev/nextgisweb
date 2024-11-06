@@ -33,18 +33,18 @@ define([
         },
 
         _getDefaultStyle: function () {
-            var pointClick = "PHN2ZyBpZD0iaWNvbi1wb2ludC1jbGljayIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTQgMTQiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxwYXRoIGQ9Im03IDBjLTMuODYgMC03IDMuMTQtNyA3czMuMTQgNyA3IDcgNy0zLjE0IDctNy0zLjE0LTctNy03IiBmaWxsPSIjMTA2YTkwIi8+CiA8cGF0aCBkPSJtNyAxMi42Yy0zLjA5IDAtNS42LTIuNTEtNS42LTUuNnMyLjUxLTUuNiA1LjYtNS42IDUuNiAyLjUxIDUuNiA1LjYtMi41MSA1LjYtNS42IDUuNiIgZmlsbD0iI2ZmZiIvPgogPHBhdGggZD0ibTcgMy41Yy0xLjkzIDAtMy41IDEuNTctMy41IDMuNXMxLjU3IDMuNSAzLjUgMy41IDMuNS0xLjU3IDMuNS0zLjUtMS41Ny0zLjUtMy41LTMuNSIgZmlsbD0iIzAwMDAwMDczIi8+Cjwvc3ZnPgo="
+            var pointClick = "data:image/svg+xml;base64,PHN2ZyBpZD0iaWNvbi1wb2ludC1jbGljayIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTIgMTIiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxwYXRoIGQ9Im02IDBjLTMuMzEgMC02IDIuNjktNiA2IDAgMy4zMSAyLjY5IDYgNiA2IDMuMzEgMCA2LTIuNjkgNi02IDAtMy4zMS0yLjY5LTYtNi02em0wIDIuNjRjMS44NSAwIDMuMzYgMS41MSAzLjM2IDMuMzYgMCAxLjg1LTEuNTEgMy4zNi0zLjM2IDMuMzYtMS44NSAwLTMuMzYtMS41MS0zLjM2LTMuMzYgMC0xLjg1IDEuNTEtMy4zNiAzLjM2LTMuMzZ6IiBmaWxsPSIjZmEwIiBzdHJva2Utd2lkdGg9Ii44NTciLz4KPC9zdmc+Cg=="
             return new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     width: 3,
-                    color: "rgba(255,255,0,1)",
+                    color: "rgba(255,170,0,1)",
                 }),
                 fill: new ol.style.Fill({
                     color: "rgba(255,255,255,0.5)",
                 }),
                 image: new ol.style.Icon({
                     opacity: 1,
-                    src: 'data:image/svg+xml;base64,' + pointClick,
+                    src: pointClick,
                     scale: 1,
                 })
             });
