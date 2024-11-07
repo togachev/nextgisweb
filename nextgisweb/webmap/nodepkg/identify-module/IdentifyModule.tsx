@@ -186,6 +186,7 @@ export class IdentifyModule extends Component {
             
         } else {
             count = 0;
+            this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
             this.response = { data: [], featureCount: 0 }
         }
 
