@@ -108,12 +108,8 @@ export default observer(
                 const styles: number[] = [];
                 display.getVisibleItems()
                     .then((items: WebmapItem[]) => {
-                        const itemConfig: WebmapItemConfig = display.getItemConfig();
                         items.map(i => {
-                            const item = itemConfig[i.id];
-                            if (item.visibility) {
-                                styles.push(item.styleId);
-                            }
+                            styles.push(i.styleId[0]);
                         });
                     })
                 setLinkToGeometry(value.layerId + ":" + value.id + ":" + styles);
