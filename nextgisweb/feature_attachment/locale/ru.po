@@ -135,11 +135,7 @@ msgstr "Переключить просмотр панорам"
 
 #: nodepkg/image-thumbnail/component/CarouselSlide.tsx:70
 msgid "Failed to upload image"
-<<<<<<< HEAD
 msgstr ""
-=======
-msgstr "Не удалось загрузить изображение"
->>>>>>> master
 
 #: util.py:26
 msgid "Invalid ZIP archive."
