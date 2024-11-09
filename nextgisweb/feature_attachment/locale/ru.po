@@ -47,17 +47,17 @@ msgstr "Нет вложений"
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:166
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:160
 #: nodepkg/attachment-table/AttachmentTable.tsx:45
 msgid "File name"
 msgstr "Имя файла"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:172
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:166
 #: nodepkg/attachment-table/AttachmentTable.tsx:63
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:178
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:172
 #: nodepkg/attachment-table/AttachmentTable.tsx:78
 msgid "Description"
 msgstr "Описание"
@@ -135,7 +135,11 @@ msgstr "Переключить просмотр панорам"
 
 #: nodepkg/image-thumbnail/component/CarouselSlide.tsx:70
 msgid "Failed to upload image"
+<<<<<<< HEAD
 msgstr ""
+=======
+msgstr "Не удалось загрузить изображение"
+>>>>>>> master
 
 #: util.py:26
 msgid "Invalid ZIP archive."

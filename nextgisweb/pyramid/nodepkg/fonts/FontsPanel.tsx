@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import type React from "react";
 
 import type { CustomFont, SystemFont } from "@nextgisweb/core/type/api";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
@@ -50,6 +51,29 @@ const LoadingModal = (props: ModalProps) => {
     );
 };
 
+const waitForRestart = async (timestamp: number) => {
+    let resp = { started: 0 };
+
+    const handleRestart = () => {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        clearInterval(connectionInterval);
+        window.location.reload();
+    };
+
+    const connectionInterval = setInterval(async () => {
+        try {
+            resp = await route("pyramid.ping").get({ cache: false });
+        } catch {
+            // ignore
+        } finally {
+            console.log("Web GIS is not available. Retrying connection...");
+        }
+        if (resp.started > timestamp) {
+            handleRestart();
+        }
+    }, 2000);
+};
+
 export function FontsPanel() {
     const [showSystem, setShowSystem] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
@@ -96,44 +120,33 @@ export function FontsPanel() {
         },
     ];
 
-    const waitForRestart = async (timestamp: number) => {
-        let resp = { started: 0 };
-
-        const handleRestart = () => {
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            clearInterval(connectionInterval);
-            window.location.reload();
-        };
-
-        const connectionInterval = setInterval(async () => {
-            try {
-                resp = await route("pyramid.ping").get({ cache: false });
-            } catch {
-                // ignore
-            } finally {
-                console.log("Web GIS is not available. Retrying connection...");
-            }
-            if (resp.started > timestamp) {
-                handleRestart();
-            }
-        }, 2000);
-    };
-
-    const save = async ({ remove, add }: FontCUpdateBody) => {
-        const confirmed = await modal.confirm({ content: msgConfirm });
-        if (confirmed)
-            try {
-                const resp = await route("pyramid.font").put({
-                    json: { remove, add },
-                });
-                if (resp.restarted) {
-                    showModal(LoadingModal, { open: true });
-                    await waitForRestart(resp.timestamp);
+    const save = useCallback(
+        async ({ remove, add }: FontCUpdateBody) => {
+            const confirmed = await modal.confirm({ content: msgConfirm });
+            if (confirmed)
+                try {
+                    const resp = await route("pyramid.font").put({
+                        json: { remove, add },
+                    });
+                    if (resp.restarted) {
+                        showModal(LoadingModal, { open: true });
+                        await waitForRestart(resp.timestamp);
+                    }
+                } catch (error) {
+                    errorModal(error as ApiError);
                 }
-            } catch (error) {
-                errorModal(error as ApiError);
+        },
+        [modal]
+    );
+
+    const onFileChange = useCallback(
+        (meta?: FileMeta[]) => {
+            if (meta) {
+                save({ add: meta, remove: [] });
             }
-    };
+        },
+        [save]
+    );
 
     if (isLoading) {
         return <LoadingWrapper />;
@@ -150,11 +163,7 @@ export function FontsPanel() {
                 <FileUploaderButton
                     multiple={true}
                     accept=".ttf,.otf"
-                    onChange={(meta?: FileMeta[]) => {
-                        if (meta) {
-                            save({ add: meta, remove: [] });
-                        }
-                    }}
+                    onChange={onFileChange}
                 />
                 <Button
                     danger
@@ -179,7 +188,9 @@ export function FontsPanel() {
                 dataSource={dataWithKeys}
                 rowSelection={{
                     type: "checkbox",
-                    onChange: (keys: any) => setSelectedRowKeys(keys),
+                    onChange: (keys) => {
+                        setSelectedRowKeys(keys.map(String));
+                    },
                     getCheckboxProps: (record) => ({
                         disabled: ["system"].includes(record.type),
                     }),
