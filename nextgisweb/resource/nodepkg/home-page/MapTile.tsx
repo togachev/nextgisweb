@@ -7,7 +7,6 @@ import Cog from "@nextgisweb/icon/mdi/cog";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { useSource } from "./hook/useSource";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 const openMap = gettext("открыть карту");
 const descTitle = gettext("Описание карты");

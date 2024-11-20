@@ -5,8 +5,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Divider, Image } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import type { WebmapItemConfig } from "@nextgisweb/webmap/type";
-
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import "./DescComponent.less";
+
 const title = gettext("Description");
 const msgLayer = gettext("Layer description");
 const msgStyle = gettext("Style description");
@@ -53,16 +54,26 @@ export const DescComponent = (props) => {
 
     const options = {
         replace: item => {
-            if (item instanceof Element && item.attribs && item.name === "img" && type === "home_page") {
-                return (<Image src={item.attribs.src}>item</Image>);
+            const props = attributesToProps(item.attribs);
+            
+            if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_width && type === "feature") {
+                return (<Image {...props}>item</Image>);
             }
 
-            if (item instanceof Element && item.attribs && item.name === "img" && type !== "home_page") {
-                return (<Image src={item.attribs.src}>item</Image>);
+            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "map") {
+                return (<Image {...props}>item</Image>);
             }
+
+            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === undefined) {
+                return (<div style={{ width: 350 }}><Image {...props}>item</Image></div>);
+            }
+
+            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "home_page") {
+                return (<div style={{ width: 350 }}><Image {...props}>item</Image></div>);
+            }
+
 
             if (item instanceof Element && item.attribs && item.name === "p") {
-                const props = attributesToProps(item.attribs);
                 return <div {...props} >{domToReact(item.children, options)}</div>;
             }
 
@@ -110,7 +121,7 @@ export const DescComponent = (props) => {
     return (
         <div ref={previewRef} className="desc-component">
             {type === "map" && (<PanelHeader {...{ title, close }} />)}
-            <div className="ck-content">{data_}</div>
+            <div className="ck-content ck-editor">{data_}</div>
         </div>
     )
 };

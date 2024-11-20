@@ -22,7 +22,6 @@ import ImageInsert from "@ckeditor/ckeditor5-image/src/imageinsert.js";
 import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle.js";
 import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar.js";
 import ImageUpload from "@ckeditor/ckeditor5-image/src/imageupload.js";
-import ImageResize from "@ckeditor/ckeditor5-image/src/imageresize.js";
 import PictureEditing from "@ckeditor/ckeditor5-image/src/pictureediting.js";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent.js";
 import Highlight from "@ckeditor/ckeditor5-highlight/src/highlight.js";
@@ -41,7 +40,6 @@ import TableColumnResize from "@ckeditor/ckeditor5-table/src/tablecolumnresize.j
 import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar.js";
 import TextTransformation from "@ckeditor/ckeditor5-typing/src/texttransformation.js";
 import Base64UploadAdapter from "@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter.js";
-import CodeBlock from "@ckeditor/ckeditor5-code-block/src/codeblock.js";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace.js";
 import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalline.js";
 import SpecialCharacters from "@ckeditor/ckeditor5-special-characters/src/specialcharacters.js";
@@ -49,6 +47,7 @@ import SpecialCharactersEssentials from "@ckeditor/ckeditor5-special-characters/
 import Clipboard from "@ckeditor/ckeditor5-clipboard/src/clipboard.js";
 import RemoveFormat from "@ckeditor/ckeditor5-remove-format/src/removeformat.js";
 import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment.js";
+
 class Editor extends ClassicEditor {
     constructor(element, config) {
         config.language = window.ngwConfig.locale;
@@ -71,7 +70,6 @@ Editor.builtinPlugins = [
     Essentials,
     Heading,
     Image,
-    ImageResize,
     ImageCaption,
     ImageInsert,
     ImageStyle,
@@ -95,7 +93,6 @@ Editor.builtinPlugins = [
     TableToolbar,
     TextTransformation,
     Base64UploadAdapter,
-    CodeBlock,
     FindAndReplace,
     HorizontalLine,
     SpecialCharacters,
@@ -129,7 +126,6 @@ Editor.defaultConfig = {
             "highlight",
             "|",
             "sourceEditing",
-            "codeBlock",
             "findAndReplace",
             "horizontalLine",
             "specialCharacters",
@@ -144,38 +140,11 @@ Editor.defaultConfig = {
         insert: {
             integrations: ["upload", "url"]
         },
-        resizeUnit: "px",
-        resizeOptions: [
-            {
-                name: "resizeImage:original",
-                value: null,
-                icon: "original"
-            },
-            {
-                name: "resizeImage:custom",
-                value: "custom",
-                icon: "custom"
-            },
-            {
-                name: "resizeImage:50",
-                value: "50",
-                icon: "medium"
-            },
-            {
-                name: "resizeImage:75",
-                value: "75",
-                icon: "large"
-            }
-        ],
         toolbar: [
-            "imageStyle:side",
             "imageStyle:wrapText",
             "imageStyle:breakText",
             "|",
             "toggleImageCaption", "imageTextAlternative", "linkImage",
-            "resizeImage:50",
-            "resizeImage:75",
-            "resizeImage:original",
         ],
     },
     table: {
