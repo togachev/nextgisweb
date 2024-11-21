@@ -55,21 +55,22 @@ export const DescComponent = (props) => {
     const options = {
         replace: item => {
             const props = attributesToProps(item.attribs);
+            console.log(type, item);
             
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_width && type === "feature") {
-                return (<Image style={{ maxWidth: webmapSettings.popup_width - 40 }} {...props}>item</Image>);
+                return (<Image {...props}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "map") {
-                return (<div style={{ maxWidth: 200 }}><Image {...props}>item</Image></div>);
+                return (<Image {...props}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === undefined) {
-                return (<div style={{ maxWidth: 400 }}><Image {...props}>item</Image></div>);
+                return (<Image {...props}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "home_page") {
-                return (<div style={{ width: "50%" }}><Image {...props}>item</Image></div>);
+                return (<Image {...props}>item</Image>);
             }
 
 

@@ -3,7 +3,6 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
-import { CKBox } from "@ckeditor/ckeditor5-ckbox";
 import UploadAdapter from "@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js";
 import Autoformat from "@ckeditor/ckeditor5-autoformat/src/autoformat.js";
 import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold.js";
@@ -22,11 +21,12 @@ import {
     Image,
     ImageCaption,
     ImageInsert,
+    ImageResize,
     ImageStyle,
     ImageToolbar,
     ImageUpload,
     PictureEditing,
-  } from "@ckeditor/ckeditor5-image";
+} from "@ckeditor/ckeditor5-image";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent.js";
 import Highlight from "@ckeditor/ckeditor5-highlight/src/highlight.js";
 import Link from "@ckeditor/ckeditor5-link/src/link.js";
@@ -80,6 +80,7 @@ Editor.builtinPlugins = [
     ImageStyle,
     ImageToolbar,
     ImageUpload,
+    ImageResize,
     PictureEditing,
     Indent,
     Highlight,
@@ -145,6 +146,7 @@ Editor.defaultConfig = {
         insert: {
             integrations: ["upload", "url"]
         },
+        styles: ["alignCenter", "alignLeft", "alignRight"],
         toolbar: [
             "imageStyle:alignBlockLeft",
             "imageStyle:alignCenter",
@@ -156,6 +158,10 @@ Editor.defaultConfig = {
             "imageStyle:inline",
             "|",
             "toggleImageCaption", "imageTextAlternative", "linkImage",
+            "|",
+            "resizeImage:original",
+            "resizeImage:50",
+            "resizeImage:75",
         ],
     },
     table: {

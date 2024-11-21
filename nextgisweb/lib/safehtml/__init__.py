@@ -2,8 +2,9 @@ from lxml.etree import tounicode
 from lxml.html import document_fromstring
 from lxml.html.clean import Cleaner
 
-_cleaner = Cleaner(style=True)
+_cleaner = Cleaner()
 
+attrs = ['abbr', 'accesskey', 'align', 'alt', 'autocomplete', 'axis', 'background', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'char', 'charoff', 'class', 'cols', 'colspan', 'disabled', 'headers', 'height', 'href', 'src', 'id', 'lang', 'leftmargin', 'marginheight', 'marginwidth', 'media', 'name', 'nowrap', 'onblur', 'onclick', 'ondblclick', 'onfocus', 'onmousedown', 'onmouseover', 'onmouseup', 'readonly', 'rows', 'rowspan', 'scope', 'shape', 'size', 'style', 'title', 'topmargin', 'valign', 'width']
 
 def sanitize(text, *, validate=False):
     if text is None:
@@ -11,6 +12,9 @@ def sanitize(text, *, validate=False):
 
     # LXML should handle anything without exceptions
     doc = document_fromstring("<html><body>" + text + "</body></html>")
+
+    _cleaner.safe_attrs_only = True
+    _cleaner.safe_attrs=frozenset(attrs)
     cleaned = _cleaner.clean_html(doc)
 
     if validate:
