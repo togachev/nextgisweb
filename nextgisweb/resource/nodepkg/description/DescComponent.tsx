@@ -55,24 +55,15 @@ export const DescComponent = (props) => {
     const options = {
         replace: item => {
             const props = attributesToProps(item.attribs);
-            console.log(type, item);
+            const types = ["map", undefined, "home_page"];
             
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_width && type === "feature") {
                 return (<Image {...props}>item</Image>);
             }
 
-            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "map") {
+            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && types.includes(type)) {
                 return (<Image {...props}>item</Image>);
             }
-
-            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === undefined) {
-                return (<Image {...props}>item</Image>);
-            }
-
-            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "home_page") {
-                return (<Image {...props}>item</Image>);
-            }
-
 
             if (item instanceof Element && item.attribs && item.name === "p") {
                 return <div {...props} >{domToReact(item.children, options)}</div>;
