@@ -350,11 +350,13 @@
 
 	/* @ckeditor/ckeditor5-image/theme/image.css */
 	.ck-content .image {
-		display: table;
+		display: flex;
 		clear: both;
 		text-align: center;
 		margin: 0.9em auto;
 		min-width: 50px;
+		align-items: center;
+		flex-direction: column;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/image.css */
@@ -407,62 +409,61 @@
 	.ck-content .image.image-style-side {
 		float: right;
 		margin-left: 5px;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image.image-style-align-left {
 		float: left;
 		margin-right: 5px;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image.image-style-align-right {
 		float: right;
 		margin-left: 5px;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image.image-style-block-align-right {
 		margin-right: 0;
 		margin-left: auto;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image.image-style-block-align-left {
 		margin-left: 0;
 		margin-right: auto;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	.ck-content .image.image-style-align-left {
 		float: left;
 		margin-right: 5px;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image-style-align-center {
 		margin-left: auto;
 		margin-right: auto;
-		max-width: 50%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image-style-align-left {
 		float: left;
 		margin-right: 5px;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
 	.ck-content .image-style-align-right {
 		float: right;
 		margin-left: 5px;
-		max-width: 50%;
+		max-width: 40%;
 	}
 
 	/* @ckeditor/ckeditor5-image/theme/imagestyle.css */
@@ -619,11 +620,12 @@
 		display: table-caption;
 		caption-side: bottom;
 		word-break: break-word;
-		color: var(--ck-color-image-caption-text);
-		background-color: var(--ck-color-image-caption-background);
+		color: var(--text-base);
+		background-color: transparent;
 		padding: .6em;
 		font-size: .75em;
 		outline-offset: -1px;
+		font-weight: 500;
 	}
 
 	@media print {

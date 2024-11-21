@@ -108,7 +108,7 @@ export const MapTile = (props) => {
                 />
             </Card>
             <Modal
-                width="auto"
+                width="max-content"
                 className="modal-desc-home-page"
                 centered
                 title={display_name}

@@ -3,6 +3,7 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
+import { CKBox } from "@ckeditor/ckeditor5-ckbox";
 import UploadAdapter from "@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js";
 import Autoformat from "@ckeditor/ckeditor5-autoformat/src/autoformat.js";
 import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold.js";
@@ -16,13 +17,16 @@ import Font from "@ckeditor/ckeditor5-font/src/font.js";
 import FontFamily from "@ckeditor/ckeditor5-font/src/fontfamily.js";
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials.js";
 import Heading from "@ckeditor/ckeditor5-heading/src/heading.js";
-import Image from "@ckeditor/ckeditor5-image/src/image.js";
-import ImageCaption from "@ckeditor/ckeditor5-image/src/imagecaption.js";
-import ImageInsert from "@ckeditor/ckeditor5-image/src/imageinsert.js";
-import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle.js";
-import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar.js";
-import ImageUpload from "@ckeditor/ckeditor5-image/src/imageupload.js";
-import PictureEditing from "@ckeditor/ckeditor5-image/src/pictureediting.js";
+import {
+    AutoImage,
+    Image,
+    ImageCaption,
+    ImageInsert,
+    ImageStyle,
+    ImageToolbar,
+    ImageUpload,
+    PictureEditing,
+  } from "@ckeditor/ckeditor5-image";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent.js";
 import Highlight from "@ckeditor/ckeditor5-highlight/src/highlight.js";
 import Link from "@ckeditor/ckeditor5-link/src/link.js";
@@ -69,6 +73,7 @@ Editor.builtinPlugins = [
     FontFamily,
     Essentials,
     Heading,
+    AutoImage,
     Image,
     ImageCaption,
     ImageInsert,
@@ -141,8 +146,14 @@ Editor.defaultConfig = {
             integrations: ["upload", "url"]
         },
         toolbar: [
-            "imageStyle:wrapText",
-            "imageStyle:breakText",
+            "imageStyle:alignBlockLeft",
+            "imageStyle:alignCenter",
+            "imageStyle:alignBlockRight",
+            "|",
+            "imageStyle:alignLeft",
+            "imageStyle:alignRight",
+            "|",
+            "imageStyle:inline",
             "|",
             "toggleImageCaption", "imageTextAlternative", "linkImage",
         ],

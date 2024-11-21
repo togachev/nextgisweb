@@ -57,19 +57,19 @@ export const DescComponent = (props) => {
             const props = attributesToProps(item.attribs);
             
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_width && type === "feature") {
-                return (<Image {...props}>item</Image>);
+                return (<Image style={{ maxWidth: webmapSettings.popup_width - 40 }} {...props}>item</Image>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "map") {
-                return (<Image {...props}>item</Image>);
+                return (<div style={{ maxWidth: 200 }}><Image {...props}>item</Image></div>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === undefined) {
-                return (<div style={{ width: 350 }}><Image {...props}>item</Image></div>);
+                return (<div style={{ maxWidth: 400 }}><Image {...props}>item</Image></div>);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && type === "home_page") {
-                return (<div style={{ width: 350 }}><Image {...props}>item</Image></div>);
+                return (<div style={{ width: "50%" }}><Image {...props}>item</Image></div>);
             }
 
 
@@ -121,7 +121,7 @@ export const DescComponent = (props) => {
     return (
         <div ref={previewRef} className="desc-component">
             {type === "map" && (<PanelHeader {...{ title, close }} />)}
-            <div className="ck-content ck-editor">{data_}</div>
+            <div className="ck-content">{data_}</div>
         </div>
     )
 };
