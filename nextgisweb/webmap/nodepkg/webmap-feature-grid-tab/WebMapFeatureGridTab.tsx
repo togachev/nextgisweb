@@ -72,6 +72,7 @@ export function WebMapFeatureGridTab({
         () =>
             new FeatureGridStore({
                 id: layerId,
+                topic: topic,
                 readonly: data.current?.readonly ?? true,
                 size: "small",
                 cleanSelectedOnFilter: false,
@@ -207,6 +208,19 @@ export function WebMapFeatureGridTab({
             topic.subscribe(
                 "feature.unhighlight",
                 store.setSelectedIds.bind(null, [])
+            ),
+            // подписка на фильтрацию через дерево слоев
+            // исправить параметры фильтрации в таблице атрибутов, объект на массив с параметрами
+            // сейчас берется первый фильтр
+            topic.subscribe(
+                "query.params_" + layerId,
+                (e) => {
+                    if (e?.fld_field_op) {
+                        store.setQueryParams({ fld_field_op: e.fld_field_op[0] });
+                    }
+                    // console.log(typeof e?.fld_field_op);
+
+                }
             ),
             topic.subscribe("feature.updated", featureUpdatedEvent),
             topic.subscribe("/webmap/feature-table/refresh", () => {

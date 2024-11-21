@@ -16,6 +16,7 @@ export type ExportFeatureLayerOptions = {
     resources?: string[];
     intersects?: string;
     ilike?: string;
+    fld_field_op?: string;
     format?: string;
 };
 

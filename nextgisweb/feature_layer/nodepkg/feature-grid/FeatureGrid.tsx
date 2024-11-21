@@ -6,6 +6,7 @@ import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 import type { FeatureLayerCount } from "../type/FeatureLayer";
 
@@ -49,14 +50,20 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
+            topic
         } = store;
+        
+        topic?.publish("query.params", queryParams);
 
         const { data: totalData, refresh: refreshTotal } =
-            useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
-                id,
+            useRouteGet<FeatureLayerCount>({
+                name: "feature_layer.feature.count", 
+                params: { id: id },
+                options: { query: queryParams?.fld_field_op },
             });
-        const { data: resourceData, isLoading } = useRouteGet("resource.item", {
-            id,
+        const { data: resourceData, isLoading } = useRouteGet<ResourceItem>({
+            name: "resource.item",
+            params: { id: id },
         });
 
         useEffect(() => {
@@ -137,8 +144,10 @@ export const FeatureGrid = observer(
                     loadingCol={loadingCol}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
+                    setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
+                    topic={topic}
                 />
                 <TableConfigModal store={store} />
             </div>

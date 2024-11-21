@@ -363,6 +363,45 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
 
     return dict(type=geom_type, area=area, length=length, extent=extent)
 
+class FilterQueryParams:
+    prop_op = dict()
+    def __init__(self, d):
+        self.d = d
+
+    def set_prop(self):
+        self.prop_op.update(self.d)
+
+    def get_prop(self):
+        return self.prop_op
+
+def filter_feature_op(query, params, keynames):
+    filter_ = []
+    for param, value in params.items():
+        if param.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", param)
+        elif param == "id" or param.startswith("id__"):
+            fld_expr = param
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        if keynames:
+            if key != "id" and key not in keynames:
+                raise ValidationError(message="Unknown field '%s'." % key)
+
+        filter_.append((key, operator, value))
+
+    if len(filter_) > 0:
+        query.filter(*filter_)
+
+    if "like" in params and IFeatureQueryLike.providedBy(query):
+        query.like(value)
+    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
+        query.ilike(value)
+
 def apply_fields_filter(query, request):
     filter_ = []
     for param in request.GET.keys():
@@ -429,6 +468,12 @@ def cget(
 
     dumper = Dumper(resource, dumper_params)
     query = dumper.feature_query()
+
+    d = dict()
+    for k,v in dict(request.GET).items():
+        d[k] = v
+    keys = [fld.keyname for fld in resource.fields]
+    filter_feature_op(query, d, keys)
 
     # Paging
     if limit is not None:
@@ -534,6 +579,12 @@ def count(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
+
+    d = dict()
+    for k,v in dict(request.GET).items():
+        d[k] = v
+    filter_feature_op(query, d, None)
+
     total_count = query().total_count
 
     return dict(total_count=total_count)

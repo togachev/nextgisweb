@@ -26,3 +26,4 @@ from .interface import (
 from .model import FIELD_FORBIDDEN_NAME, FeatureQueryIntersectsMixin, LayerField, LayerFieldsMixin
 from .transaction import FeatureLayerTransaction
 from .versioning import FVersioningMeta, FVersioningObj
+from .api import query_feature_or_not_found, FilterQueryParams, filter_feature_op

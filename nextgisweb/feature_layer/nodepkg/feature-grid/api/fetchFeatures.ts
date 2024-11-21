@@ -16,6 +16,7 @@ interface FeatureLayerQuery {
     ilike?: string;
     intersects?: string;
     label?: boolean;
+    fld_field_op?: string;
 }
 
 export interface FetchFeaturesOptions {
@@ -31,6 +32,7 @@ export interface FetchFeaturesOptions {
     ilike?: string;
     like?: string;
     label?: boolean;
+    fld_field_op?: string;
 }
 
 export function fetchFeaturesItems({
@@ -46,6 +48,7 @@ export function fetchFeaturesItems({
     like,
     ilike,
     label,
+    fld_field_op,
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
         geom: false,
@@ -67,6 +70,9 @@ export function fetchFeaturesItems({
         query.limit = limit;
     }
 
+    if (fld_field_op) {
+        Object.assign(query, fld_field_op)
+    }
     if (intersects) {
         query.intersects = intersects;
     }

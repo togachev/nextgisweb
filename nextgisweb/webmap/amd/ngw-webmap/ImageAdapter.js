@@ -5,10 +5,23 @@ define([
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
-], function (declare, ioQuery, Adapter, api, util, Image) {
+    "dojo/topic",
+], function (declare, ioQuery, Adapter, api, util, Image, topic) {
     return declare(Adapter, {
         createLayer: function (item) {
             const queue = util.imageQueue;
+            let p_filters = ""
+            topic.subscribe("query.params_" + item.layerId,
+                async (e) => {
+                    if (e?.fld_field_op) {
+                        p_filters = '&' + e?.fld_field_op.map(item => new URLSearchParams(item).toString()).join('&');
+                    } else {
+                        p_filters = ""
+                    }
+                    console.log(p_filters);
+                    
+                }
+            );
 
             const layer = new Image(
                 item.id,
@@ -35,6 +48,7 @@ define([
                         const url = src.split("?")[0];
                         const query = src.split("?")[1];
                         const queryObject = ioQuery.queryToObject(query);
+                        const filter = p_filters !== "" ? p_filters : "";
 
                         const resource = queryObject["resource"];
                         const symbolsParam = queryObject["symbols"];
@@ -54,6 +68,7 @@ define([
                             queryObject["WIDTH"] +
                             "," +
                             queryObject["HEIGHT"] +
+                            filter +
                             "&nd=204" +
                             symbols;
                         // Use a timeout to prevent the queue from aborting right after adding, especially in cases with zoomToExtent.
