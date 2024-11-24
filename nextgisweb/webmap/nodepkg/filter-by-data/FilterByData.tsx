@@ -5,14 +5,14 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { parseNgwAttribute, formatNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 
+import { topics } from "@nextgisweb/webmap/identify-module"
+
 import type { QueryParams } from "@nextgisweb/feature-layer/feature-grid/hook/useFeatureTable";
 import type { FeatureLayerField, SetValue } from "@nextgisweb/feature-layer/feature-grid/type";
 
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-import type {
-    DojoTopic,
-} from "../panels-manager/type";
+
 import "./FilterByData.less";
 
 const msgAllInterval = gettext("Apply filter for entire interval");
@@ -27,7 +27,6 @@ interface FilterByDataProps {
     queryParams?: QueryParams;
     setQueryParams: (queryParams: SetValue<QueryParams | null>) => void;
     dataType: string[];
-    topic: DojoTopic;
 }
 
 export const FilterByData = ({
@@ -36,7 +35,6 @@ export const FilterByData = ({
     queryParams,
     setQueryParams,
     dataType,
-    topic,
 }: FilterByDataProps) => {
     const { keyname, datatype } = column;
 
@@ -54,10 +52,14 @@ export const FilterByData = ({
         const item = await route('feature_layer.feature.collection', resourceId).get({ query });
 
         const date = [item[0].fields[keyname], item.at(-1).fields[keyname]];
-        console.log(datatype, item[0].fields[keyname], parseNgwAttribute(datatype, date[0]));
-        item ? value.length > 0 ? setValueStart(value) :
-            setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])]) : null
 
+        if (item) {
+            if (value.length > 0) {
+                setValueStart(value)
+            } else {
+                setValueStart([parseNgwAttribute(datatype, date[0]), parseNgwAttribute(datatype, date[1])])
+            }
+        }
         setIsSending(false)
     }, [isSending])
 
@@ -70,13 +72,12 @@ export const FilterByData = ({
                     ["fld_" + keyname + "__ge"]: formatNgwAttribute(datatype, value[0]),
                     ["fld_" + keyname + "__le"]: formatNgwAttribute(datatype, value[1]),
                 }
-                
-                topic.publish("query.params_" + resourceId, params)
+
+
                 setQueryParams((prev) => ({
                     ...prev,
                     fld_field_op: params,
                 }));
-                console.log({fld_field_op: params});
             }
         }
     }, [status, open]);
@@ -147,7 +148,8 @@ export const FilterByData = ({
                         startValue();
                     }}
                     icon={dataType.includes(datatype) && (<FilterIcon />)}
-                /></Tooltip>
+                />
+            </Tooltip>
         </Dropdown >
     )
 }

@@ -40,6 +40,7 @@ from nextgisweb.feature_layer import (
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
+    FilterQueryParams,
 )
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
@@ -232,7 +233,7 @@ class PostgisLayerField(Base, LayerField):
 
 
 @implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
-class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FilterQueryParams):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
 
@@ -729,6 +730,34 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             if len(_where_filter) > 0:
                 where.append(sa.and_(*_where_filter))
+
+        filters = []
+        prop_op = self.layer.get_prop()
+        res_id = str(self.layer.id)
+        if len(prop_op) and res_id in prop_op:
+            for param in prop_op[res_id]:
+                if param.startswith("fld_"):
+                    fld_expr = re.sub("^fld_", "", param)
+                else:
+                    continue
+
+                try:
+                    key, operator = fld_expr.rsplit("__", 1)
+                except ValueError:
+                    key, operator = (fld_expr, "eq")
+                filters.append((key, operator, prop_op[res_id][param]))
+        filters_ = []
+        for k, o, v in filters:
+            op = getattr(sa.sql.operators, o)
+            if k == "id":
+                column = idcol
+            else:
+                field = self.layer.field_by_keyname(k)
+                column = tab.columns[field.column_name]
+            filters_.append(op(column, v))
+            
+        if len(filters_) > 0:
+            where.append(sa.and_(*filters_))
 
         if self._like or self._ilike:
             operands = [

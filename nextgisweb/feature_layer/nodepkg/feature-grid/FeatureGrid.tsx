@@ -50,11 +50,8 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
-            topic
         } = store;
         
-        topic?.publish("query.params", queryParams);
-
         const { data: totalData, refresh: refreshTotal } =
             useRouteGet<FeatureLayerCount>({
                 name: "feature_layer.feature.count", 
@@ -147,7 +144,6 @@ export const FeatureGrid = observer(
                     setQueryParams={store.setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
-                    topic={topic}
                 />
                 <TableConfigModal store={store} />
             </div>

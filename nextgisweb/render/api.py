@@ -2,9 +2,6 @@ from io import BytesIO
 from itertools import product
 from math import ceil, floor, log
 from pathlib import Path
-
-import re
-
 from typing import Dict, List, Literal, Union
 
 from msgspec import Meta, Struct
@@ -23,8 +20,6 @@ from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
 from .util import af_transform
-
-from nextgisweb.feature_layer import filter_feature_op
 
 RenderResource = Annotated[
     List[int],
@@ -264,26 +259,6 @@ def image(
     zexact = None
     for resid in resource:
         obj = Resource.filter_by(id=resid).one_or_none()
-        keys = [fld.keyname for fld in obj.parent.fields]
-
-        filter_ = []
-        for param in request.GET.keys():
-            if param.startswith("fld_"):
-                fld_expr = re.sub("^fld_", "", param)
-            elif param == "id" or param.startswith("id__"):
-                fld_expr = param
-            else:
-                continue
-
-            try:
-                key, operator = fld_expr.rsplit("__", 1)
-            except ValueError:
-                key, operator = (fld_expr, "eq")
-            if key != "id" and key not in keys:
-                raise ValidationError(message="Unknown field '%s'." % key)
-
-            filter_.append((key, operator, request.GET[param]))
-        filter_ = tuple(i for i in filter_)
 
         if obj is None:
             raise ResourceNotFound(resid)
@@ -387,7 +362,7 @@ def image(
             cond = dict()
             if rsymbols is not None:
                 cond["symbols"] = rsymbols
-            req = obj.render_request(obj.srs, filter_)
+            req = obj.render_request(obj.srs, cond=cond)
             rimg = req.render_extent(ext_extent, ext_size)
 
             empty_image = rimg is None

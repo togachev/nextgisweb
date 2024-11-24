@@ -73,9 +73,6 @@ export const ExportAction = ({
         ],
         onClick: (e) => {
             const params: ExportFeatureLayerOptions = queryParams || {};
-            if (params.fld_field_op) {
-                Object.assign(params, params.fld_field_op)
-            }
             if (e.key === settingsKey) {
                 openExportPage(params);
             } else {

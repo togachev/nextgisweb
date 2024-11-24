@@ -4,6 +4,7 @@ from shapely.geometry import box
 from sqlalchemy import cast, func
 from sqlalchemy.sql import alias, literal_column, null, select
 from zope.interface import implementer
+import re
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
@@ -209,6 +210,30 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             if len(_where_filter) > 0:
                 where.append(sa.and_(*_where_filter))
+
+        filters = []
+        prop_op = self.layer.get_prop()
+        res_id = str(self.layer.id)
+        if len(prop_op) and res_id in prop_op:
+            for param in prop_op[res_id]:
+                if param.startswith("fld_"):
+                    fld_expr = re.sub("^fld_", "", param)
+                else:
+                    continue
+
+                try:
+                    key, operator = fld_expr.rsplit("__", 1)
+                except ValueError:
+                    key, operator = (fld_expr, "eq")
+                filters.append((key, operator, prop_op[res_id][param]))
+        filters_ = []
+        for k, o, v in filters:
+            op = getattr(sa.sql.operators, o)
+            column = idcol if k == "id" else fields[k]
+            filters_.append(op(column, v))
+            
+        if len(filters_) > 0:
+            where.append(sa.and_(*filters_))
 
         if self._like or self._ilike:
             operands = []

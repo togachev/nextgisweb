@@ -26,6 +26,7 @@ from nextgisweb.feature_layer import (
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
+    FilterQueryParams,
 )
 from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
 from nextgisweb.feature_layer.versioning import (
@@ -126,7 +127,7 @@ def _vlschema_autoflush(res):
     IWritableFeatureLayer,
     IBboxLayer,
 )
-class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
+class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin, FilterQueryParams):
     identity = "vector_layer"
     cls_display_name = gettext("Vector layer")
     cls_order = 60

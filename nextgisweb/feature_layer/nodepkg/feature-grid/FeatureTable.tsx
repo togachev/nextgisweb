@@ -25,13 +25,12 @@ import { scrollbarWidth } from "./util/scrollbarWidth";
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
 import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
+
+import { topics } from "@nextgisweb/webmap/identify-module"
+
 const msgClearFilter = gettext("Clear filter");
 
 import "./FeatureTable.less";
-
-import type {
-    DojoTopic,
-} from "../panels-manager/type";
 
 interface FeatureTableProps {
     resourceId: number;
@@ -49,7 +48,6 @@ interface FeatureTableProps {
     setSelectedIds: (ids: SetValue<number[]>) => void;
     loadingCol: () => string;
     empty: () => ReactNode;
-    topic: DojoTopic;
 }
 
 const RESIZE_HANDLE_WIDTH = 6;
@@ -67,7 +65,6 @@ const FeatureTable = observer(
         visibleFields = [],
         queryIntersects,
         cleanSelectedOnFilter = true,
-        topic,
         setSelectedIds,
         loadingCol,
         empty,
@@ -272,31 +269,31 @@ const FeatureTable = observer(
                                 >
                                     <div className="label">{label}</div>
                                     <div className="button-column">
-                                    {colSort && (
-                                        <div className="suffix">
-                                            <SortIcon dir={colSort} />
-                                        </div>
-                                    )}
-                                    {
-                                        queryParams && filter_column == keyname ?
-                                            <Tooltip title={msgClearFilter}>
-                                                <Button
-                                                    type="text"
-                                                    onClick={() => {
-                                                        setQueryParams(undefined)
-                                                    }}
-                                                    icon={<FilterAltOff />}
+                                        {colSort && (
+                                            <div className="suffix">
+                                                <SortIcon dir={colSort} />
+                                            </div>
+                                        )}
+                                        {
+                                            queryParams && filter_column == keyname ?
+                                                <Tooltip title={msgClearFilter}>
+                                                    <Button
+                                                        type="text"
+                                                        onClick={(e) => {
+                                                            setQueryParams(null);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        icon={<FilterAltOff />}
+                                                    />
+                                                </Tooltip> :
+                                                <FilterByData
+                                                    resourceId={resourceId}
+                                                    dataType={dataType}
+                                                    column={column}
+                                                    queryParams={queryParams || undefined}
+                                                    setQueryParams={setQueryParams}
                                                 />
-                                            </Tooltip> :
-                                            <FilterByData
-                                                resourceId={resourceId}
-                                                dataType={dataType}
-                                                column={column}
-                                                queryParams={queryParams || undefined}
-                                                setQueryParams={setQueryParams}
-                                                topic={topic}
-                                            />
-                                    }
+                                        }
                                     </div>
                                 </div>
                             );

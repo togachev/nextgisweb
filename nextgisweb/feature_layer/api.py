@@ -179,7 +179,6 @@ class Dumper:
         query = self.resource.feature_query()
         feature_query_pit(self.resource, query, self.params.version, self.params.epoch)
         query.fields(*(self.field_dumpers.keys() if self.field_dumpers is not None else ()))
-
         if self.resource.cls != 'tablenogeom_layer':
             if self.params.geom:
                 query.geom()
@@ -374,35 +373,7 @@ class FilterQueryParams:
     def get_prop(self):
         return self.prop_op
 
-def filter_feature_op(query, params, keynames):
-    filter_ = []
-    for param, value in params.items():
-        if param.startswith("fld_"):
-            fld_expr = re.sub("^fld_", "", param)
-        elif param == "id" or param.startswith("id__"):
-            fld_expr = param
-        else:
-            continue
-
-        try:
-            key, operator = fld_expr.rsplit("__", 1)
-        except ValueError:
-            key, operator = (fld_expr, "eq")
-        if keynames:
-            if key != "id" and key not in keynames:
-                raise ValidationError(message="Unknown field '%s'." % key)
-
-        filter_.append((key, operator, value))
-
-    if len(filter_) > 0:
-        query.filter(*filter_)
-
-    if "like" in params and IFeatureQueryLike.providedBy(query):
-        query.like(value)
-    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
-        query.ilike(value)
-
-def apply_fields_filter(query, request):
+def apply_fields_filter(query, request, keynames):
     filter_ = []
     for param in request.GET.keys():
         if param.startswith("fld_"):
@@ -417,7 +388,7 @@ def apply_fields_filter(query, request):
         except ValueError:
             key, operator = (fld_expr, "eq")
 
-        if key != "id":
+        if key != "id" and key not in keynames:
             try:
                 query.layer.field_by_keyname(key)
             except KeyError:
@@ -472,14 +443,16 @@ def cget(
     d = dict()
     for k,v in dict(request.GET).items():
         d[k] = v
-    keys = [fld.keyname for fld in resource.fields]
-    filter_feature_op(query, d, keys)
+
+    prop_op = FilterQueryParams.prop_op
+    res_id = str(resource.id)
+    prop_op.update({ res_id: d})
 
     # Paging
     if limit is not None:
         query.limit(limit, offset)
-
-    apply_fields_filter(query, request)
+    keys = [fld.keyname for fld in resource.fields]
+    apply_fields_filter(query, request, keys)
     apply_intersect_filter(query, request, resource)
 
     # Ordering
@@ -577,14 +550,7 @@ def cdelete(resource, request) -> JSONType:
 
 def count(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
-
     query = resource.feature_query()
-
-    d = dict()
-    for k,v in dict(request.GET).items():
-        d[k] = v
-    filter_feature_op(query, d, None)
-
     total_count = query().total_count
 
     return dict(total_count=total_count)
@@ -600,9 +566,10 @@ class NgwExtent(Struct):
 def feature_extent(resource, request) -> NgwExtent:
     request.resource_permission(DataScope.read)
 
+    keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
-    apply_fields_filter(query, request)
+    apply_fields_filter(query, request, keys)
     apply_intersect_filter(query, request, resource)
 
     extent = query().extent

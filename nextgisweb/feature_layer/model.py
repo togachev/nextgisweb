@@ -60,26 +60,6 @@ class LayerField(Base):
     def __str__(self):
         return self.display_name
 
-    def to_dict(self):
-        result = dict(
-            (c, getattr(self, c))
-            for c in (
-                "id",
-                "layer_id",
-                "cls",
-                "idx",
-                "keyname",
-                "datatype",
-                "display_name",
-                "grid_visibility",
-            )
-        )
-        if self.lookup_table is not None:
-            result["lookup_table"] = dict(id=self.lookup_table.id)
-        else:
-            result["lookup_table"] = None
-        return result
-
 class LayerFieldsMixin:
     __field_class__ = LayerField
 
