@@ -4,6 +4,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Draggable from "react-draggable";
 
+import { route } from "@nextgisweb/pyramid/api/route";
+import CryptoJS from "crypto-js";
+
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -275,13 +278,18 @@ const FeatureTable = observer(
                                             </div>
                                         )}
                                         {
-                                            queryParams && filter_column == keyname ?
+                                            queryParams?.fld_field_op && filter_column == keyname ?
                                                 <Tooltip title={msgClearFilter}>
                                                     <Button
                                                         type="text"
                                                         onClick={(e) => {
                                                             setQueryParams(null);
                                                             e.stopPropagation();
+                                                            route("feature_layer.feature.filter_clear", {
+                                                                id: resourceId,
+                                                            }).get({});
+                                                            const di_digest = CryptoJS.SHA1(navigator.userAgent).toString(CryptoJS.enc.Base64);
+                                                            console.log(di_digest);
                                                         }}
                                                         icon={<FilterAltOff />}
                                                     />

@@ -1,4 +1,6 @@
 import re
+import hashlib
+import base64
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
@@ -424,6 +426,11 @@ def apply_intersect_filter(query, request, resource):
             raise ValidationError(gettext("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
+def clear_filter(resource, request) -> JSONType:
+    request.resource_permission(DataScope.read)
+    props = resource.prop_op
+    props.pop(str(resource.id), None)
+    return dict(filter_props=resource.prop_op)
 
 def cget(
     resource,
@@ -445,8 +452,12 @@ def cget(
         d[k] = v
 
     prop_op = FilterQueryParams.prop_op
+
+    sha1_hash = hashlib.sha1(request.user_agent.encode())
+    hash = base64.b64encode(sha1_hash.digest()).decode('ascii')
+
     res_id = str(resource.id)
-    prop_op.update({ res_id: d})
+    prop_op.update({ res_id: d, hash: hash})
 
     # Paging
     if limit is not None:
@@ -553,14 +564,14 @@ def count(resource, request) -> JSONType:
     query = resource.feature_query()
     total_count = query().total_count
 
-    return dict(total_count=total_count)
+    return dict(total_count=total_count, test=str(resource.prop_op))
 
 
 class NgwExtent(Struct):
-    maxLon: int
-    minLon: int
-    maxLat: int
-    minLat: int
+    maxLon: float
+    minLon: float
+    maxLat: float
+    minLat: float
 
 
 def feature_extent(resource, request) -> NgwExtent:
@@ -615,6 +626,12 @@ def setup_pyramid(comp, config):
         cdelete, context=IWritableFeatureLayer
     )
 
+    config.add_route(
+        "feature_layer.feature.filter_clear",
+        "/api/resource/{id}/filter_clear/",
+        factory=feature_layer_factory,
+        get=clear_filter,
+    )
     config.add_route(
         "feature_layer.feature.count",
         "/api/resource/{id}/feature_count",

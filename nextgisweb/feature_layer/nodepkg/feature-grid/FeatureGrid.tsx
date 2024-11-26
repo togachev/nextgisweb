@@ -51,10 +51,10 @@ export const FeatureGrid = observer(
             bumpVersion,
             onSelect,
         } = store;
-        
+
         const { data: totalData, refresh: refreshTotal } =
             useRouteGet<FeatureLayerCount>({
-                name: "feature_layer.feature.count", 
+                name: "feature_layer.feature.count",
                 params: { id: id },
                 options: { query: queryParams?.fld_field_op },
             });
@@ -111,7 +111,9 @@ export const FeatureGrid = observer(
                         <Button
                             type="text"
                             icon={<RefreshIcon />}
-                            onClick={bumpVersion}
+                            onClick={() => {
+                                bumpVersion();
+                            }}
                             size={size}
                         />
                     </Tooltip>

@@ -1,8 +1,5 @@
 import type { QueryParams } from "@nextgisweb/feature-layer/feature-grid/hook/useFeatureTable";
-import type {
-    FeatureExtent,
-    NgwExtent,
-} from "@nextgisweb/feature-layer/type/FeatureExtent";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { Button } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
@@ -33,11 +30,20 @@ export const ZoomToFilteredBtn = ({
         if (!onZoomToFiltered) {
             return;
         }
-        const resp = await route.get<FeatureExtent>({
-            query: queryParams || undefined,
-            cache: true,
-        });
-        onZoomToFiltered(resp.extent);
+        if (!queryParams?.fld_field_op) {
+            const resp = await route.get<NgwExtent>({
+                query: queryParams || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);            
+        } else {
+            const resp = await route.get<NgwExtent>({
+                query: queryParams?.fld_field_op || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);    
+        }
+
     };
 
     return (
