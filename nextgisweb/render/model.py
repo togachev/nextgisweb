@@ -458,13 +458,13 @@ sa_event.listen(
 )
 
 
-class TileCacheFlushAttr(SAttribute, apitype=True):
+class TileCacheFlushAttr(SAttribute):
     def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
         if value and srlzr.obj.tile_cache is not None:
             srlzr.obj.tile_cache.clear()
 
 
-class TileCacheAttr(SAttribute, apitype=True):
+class TileCacheAttr(SAttribute):
     def bind(self, srlzrcls, attrname):
         assert not self.required
         self.column = column = getattr(ResourceTileCache, attrname)
@@ -493,9 +493,8 @@ class TileCacheAttr(SAttribute, apitype=True):
             setattr(srlzr.obj.tile_cache, self.model_attr, value)
 
 
-class TileCacheSerializer(Serializer, apitype=True):
+class TileCacheSerializer(Serializer, resource=Resource):
     identity = "tile_cache"
-    resclass = Resource
 
     # NOTE: Flush property should be deserialized at first!
     flush = TileCacheFlushAttr(read=None, write=ResourceScope.update)

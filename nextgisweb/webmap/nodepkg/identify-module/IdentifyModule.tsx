@@ -171,7 +171,7 @@ export class IdentifyModule extends Component {
         if (this.params.request !== undefined && (op === "popup" || p.value.attribute === true)) {
             this.response = await route("feature_layer.identify_module")
                 .post({
-                    json: this.params.request,
+                    body: JSON.stringify(this.params.request),
                 })
                 .then(item => {
                     return { data: item.data, featureCount: item.featureCount };

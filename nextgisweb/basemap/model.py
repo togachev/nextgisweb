@@ -101,7 +101,7 @@ class BasemapWebMapItemWrite(Struct, kw_only=True):
     opacity: Union[OpacityFloat, None, UnsetType] = UNSET
 
 
-class BasemapsAttr(SAttribute, apitype=True):
+class BasemapsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[BasemapWebMapItemRead]:
         return [
             BasemapWebMapItemRead(
@@ -117,8 +117,7 @@ class BasemapsAttr(SAttribute, apitype=True):
         srlzr.obj.basemaps = [BasemapWebMap(**to_builtins(i)) for i in value]
 
 
-class BasemapWebMapSerializer(Serializer, apitype=True):
+class BasemapWebMapSerializer(Serializer, resource=WebMap):
     identity = BasemapWebMap.__tablename__
-    resclass = WebMap
 
     basemaps = BasemapsAttr(read=ResourceScope.read, write=ResourceScope.update)

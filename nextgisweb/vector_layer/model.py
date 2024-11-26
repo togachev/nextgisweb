@@ -695,15 +695,14 @@ def estimate_vector_layer_data(resource):
         else:
             fixed += FIELD_TYPE_SIZE[f.datatype]
 
-    dynamic.insert(0, str(fixed))
-    query = select(text(" + ".join(dynamic))).select_from(ctab)
+    query = select(text("SUM(" + " + ".join([str(fixed), *dynamic]) + ")")).select_from(ctab)
     return inspect(resource).session.scalar(query)
 
 
 GeometryType = Union[tuple(Literal[i] for i in GEOM_TYPE.enum)]  # type: ignore
 
 
-class SourceAttr(SAttribute, apitype=True):
+class SourceAttr(SAttribute):
     def _ogrds(self, file_upload: FileUpload):
         ogrds = read_dataset_vector(
             str(file_upload.data_path),
@@ -782,7 +781,7 @@ class SourceAttr(SAttribute, apitype=True):
         )
 
 
-class LoaderAttr(SAttribute, apitype=True):
+class LoaderAttr(SAttribute):
     def __init__(self, type: Any):
         super().__init__(write=DataScope.write)
         self.type = type
@@ -794,7 +793,7 @@ class LoaderAttr(SAttribute, apitype=True):
         pass  # Handled by the `source` attribute
 
 
-class GeometryTypeAttr(SAttribute, apitype=True):
+class GeometryTypeAttr(SAttribute):
     def get(self, srlzr: Serializer) -> GeometryType:
         return super().get(srlzr)
 
@@ -807,13 +806,13 @@ class GeometryTypeAttr(SAttribute, apitype=True):
             srlzr.obj.geometry_type_change(value)
 
 
-class FieldsAttr(SAttribute, apitype=True):
+class FieldsAttr(SAttribute):
     def set(self, srlzr: Serializer, value: List[Dict[str, Any]], *, create: bool):
         # TODO: Improve typing, use types from feature layer APIs
         srlzr.obj.setup_from_fields(value)
 
 
-class DeleteAllFeaturesAttr(SAttribute, apitype=True):
+class DeleteAllFeaturesAttr(SAttribute):
     def set(self, srlzr: Serializer, value: bool, *, create: bool):
         if value:
             srlzr.obj.feature_delete_all()

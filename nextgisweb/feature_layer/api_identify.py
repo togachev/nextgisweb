@@ -1,23 +1,40 @@
-from nextgisweb.env import DBSession
-from nextgisweb.lib.geometry import Geometry
+from typing import List
 
+from msgspec import Struct
+
+from nextgisweb.env import DBSession, gettext
+from nextgisweb.lib.geometry import Geometry, GeometryNotValid
+
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 
-def identify(request) -> JSONType:
-    data = request.json_body
-    srs = int(data["srs"])
-    geom = Geometry.from_wkt(data["geom"], srid=srs)
-    styles = map(int, data["styles"])
-    style_list = DBSession.query(Resource).filter(Resource.id.in_(styles))
-    result = dict()
+
+class IdentifyBody(Struct, kw_only=True):
+    geom: str
+    srs: int
+    styles: List[int]
+
+class IdentifyModuleBody(Struct, kw_only=True):
+    geom: str
+    srs: int
+    styles: List
+
+def identify(request, *, body: IdentifyBody) -> JSONType:
+
+    try:
+        geom = Geometry.from_wkt(body.geom, srid=body.srs)
+    except GeometryNotValid:
+        raise ValidationError(gettext("Geometry is not valid."))
 
     # Number of features in all layers
     feature_count = 0
 
-    for style in style_list:
+    query = DBSession.query(Resource).filter(Resource.id.in_(body.styles))
+    result = dict()
+    for style in query:
         layer = style.parent
         layer_id_str = str(layer.id)
         if not layer.has_permission(DataScope.read, request.user):
@@ -62,29 +79,31 @@ def identify(request) -> JSONType:
 
     return result
 
-def identify_module(request) -> JSONType:
-    data = request.json_body
-    srs = int(data["srs"])
-    geom = Geometry.from_wkt(data["geom"], srid=srs)
+def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
+
+    try:
+        geom = Geometry.from_wkt(body.geom, srid=body.srs)
+    except GeometryNotValid:
+        raise ValidationError(gettext("Geometry is not valid."))
+
     result = dict()
-    style_list = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in data["styles"]]))
+    query = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in body.styles]))
     options = []
-    for style in style_list:
+    for style in query:
         layer = style.parent
         if hasattr(layer, "feature_query"):
             if not layer.has_permission(DataScope.read, request.user):
                 query = layer.feature_query()
-                query.geom()
                 query.intersects(geom)
                 query.limit(100)
                 for f in query():
                     options.append(
                         dict(
-                            desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                            desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
                             id=f.id,
                             layerId=layer.id,
                             styleId=style.id,
-                            dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
+                            dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
                             label="Forbidden",
                             permission="Forbidden",
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
@@ -94,18 +113,17 @@ def identify_module(request) -> JSONType:
                 options.append(dict(value="Not implemented"))
             else:
                 query = layer.feature_query()
-                query.geom()
                 query.intersects(geom)
                 query.limit(100)
 
                 for f in query():
                     options.append(
                         dict(
-                            desc=[x["label"] for x in data["styles"] if x["id"] == style.id][0],
+                            desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
                             id=f.id,
                             layerId=layer.id,
                             styleId=style.id,
-                            dop=[x["dop"] for x in data["styles"] if x["id"] == style.id][0],
+                            dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
                             label=f.label,
                             permission="Read",
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
