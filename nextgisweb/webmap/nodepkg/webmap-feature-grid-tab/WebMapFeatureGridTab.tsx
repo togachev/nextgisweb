@@ -162,10 +162,12 @@ export function WebMapFeatureGridTab({
                                 {...props}
                                 display={display.current}
                                 onGeomChange={(_, geomWKT) => {
-                                    store.setQueryParams((prev) => ({
-                                        ...prev,
-                                        intersects: geomWKT,
-                                    }));
+                                    geomWKT ?
+                                        store.setQueryParams((prev) => ({
+                                            ...prev,
+                                            intersects: geomWKT,
+                                        })) :
+                                        store.setQueryParams(null)
                                 }}
                             />
                         );
