@@ -249,8 +249,7 @@ const FeatureTable = observer(
                                 : { flex };
 
                             const dataType = ["DATE", "DATETIME"]
-                            const filter_column = queryParams?.fld_field_op?.keyname
-
+                            
                             const onClick =
                                 id === KEY_FIELD_ID
                                     ? () => toggleSorting($FID)
@@ -278,7 +277,7 @@ const FeatureTable = observer(
                                             </div>
                                         )}
                                         {
-                                            queryParams && filter_column == keyname ?
+                                            queryParams && queryParams?.fld_field_op ?
                                                 <Tooltip title={msgClearFilter}>
                                                     <Button
                                                         type="text"
