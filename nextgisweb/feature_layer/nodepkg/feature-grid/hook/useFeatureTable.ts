@@ -16,7 +16,7 @@ const debouncedFn = debounce((fn) => {
 }, 100);
 
 export type QueryParams = Partial<
-    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects">
+    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects" | "fld_field_op">
 >;
 
 export interface UseFeatureTableProps {
@@ -179,7 +179,7 @@ export function useFeatureTable({
                 handleFeatures(attrs);
             } else {
                 const signal = makeSignal();
-                const promises = [];
+                const promises: any[] = [];
                 for (const { key, page } of cacheKeys) {
                     if (pages.includes(page)) {
                         promises.push(
@@ -248,7 +248,7 @@ export function useFeatureTable({
         if (loaderCache.current) {
             loaderCache.current.clean();
         }
-    }, [total]);
+    }, [total, queryParams]);
 
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);
@@ -275,12 +275,12 @@ export function useFeatureTable({
         }
         prevVersion.current = version;
         debouncedFn(queryFn);
-    }, [hasNextPage, pageSize, queryFn, version, total, pages, data]);
+    }, [hasNextPage, pageSize, queryFn, version, total, pages, data, queryParams]);
 
     // Update prevTotal only after useEffect with queryFn call!
     useEffect(() => {
         prevTotal.current = total;
-    }, [total]);
+    }, [total, queryParams]);
 
     useEffect(() => {
         setData([]);

@@ -30,11 +30,19 @@ export const ZoomToFilteredBtn = ({
         if (!onZoomToFiltered) {
             return;
         }
-        const resp = await route.get<NgwExtent>({
-            query: queryParams || undefined,
-            cache: true,
-        });
-        onZoomToFiltered(resp);
+        if (!queryParams?.fld_field_op) {
+            const resp = await route.get<NgwExtent>({
+                query: queryParams || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);
+        } else {
+            const resp = await route.get<NgwExtent>({
+                query: queryParams?.fld_field_op || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);
+        }
     };
 
     return (

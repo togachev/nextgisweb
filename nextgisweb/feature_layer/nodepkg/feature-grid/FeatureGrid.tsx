@@ -7,6 +7,7 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { FeatureLayerCount } from "../type/FeatureLayer";
 
 import { FeatureGridActions } from "./FeatureGridActions";
@@ -44,19 +45,24 @@ export const FeatureGrid = observer(
             fields,
             version,
             queryParams,
+            setQueryParams,
             selectedIds,
             visibleFields,
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
+            topic,
         } = store;
 
         const { data: totalData, refresh: refreshTotal } =
-            useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
-                id,
+            useRouteGet<FeatureLayerCount>({
+                name: "feature_layer.feature.count",
+                params: { id: id },
+                options: { query: queryParams?.fld_field_op },
             });
-        const { data: resourceData, isLoading } = useRouteGet("resource.item", {
-            id,
+        const { data: resourceData, isLoading } = useRouteGet<ResourceItem>({
+            name: "resource.item",
+            params: { id: id },
         });
 
         useEffect(() => {
@@ -137,8 +143,10 @@ export const FeatureGrid = observer(
                     loadingCol={loadingCol}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
+                    setQueryParams={setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
+                    topic={topic}
                 />
                 <TableConfigModal store={store} />
             </div>

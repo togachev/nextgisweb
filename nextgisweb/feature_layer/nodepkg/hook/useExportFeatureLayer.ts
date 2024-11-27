@@ -17,6 +17,7 @@ export type ExportFeatureLayerOptions = {
     intersects?: string;
     ilike?: string;
     format?: string;
+    fld_field_op?: string;
 };
 
 export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {

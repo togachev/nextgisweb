@@ -5,10 +5,28 @@ define([
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
-], function (declare, ioQuery, Adapter, api, util, Image) {
+    "@nextgisweb/webmap/identify-module",
+], function (declare, ioQuery, Adapter, api, util, Image, topics) {
     return declare(Adapter, {
         createLayer: function (item) {
             const queue = util.imageQueue;
+
+            let p_filters = ""
+            topics.subscribe("query.params_" + item.layerId,
+                async (e) => {
+                    if (e?.detail?.fld_field_op) {
+                        const obj = e.detail.fld_field_op
+                        const paramsUrl = new URLSearchParams();
+
+                        Object.entries(obj)?.map(([key, value]) => {
+                            paramsUrl.append(key, value);
+                        })
+                        p_filters = '&' + paramsUrl.toString();
+                    } else {
+                        p_filters = ""
+                    }
+                }
+            );
 
             const layer = new Image(
                 item.id,
@@ -35,6 +53,7 @@ define([
                         const url = src.split("?")[0];
                         const query = src.split("?")[1];
                         const queryObject = ioQuery.queryToObject(query);
+                        const filter = p_filters !== "" ? p_filters : "";
 
                         const resource = queryObject["resource"];
                         const symbolsParam = queryObject["symbols"];
@@ -54,6 +73,7 @@ define([
                             queryObject["WIDTH"] +
                             "," +
                             queryObject["HEIGHT"] +
+                            filter +
                             "&nd=204" +
                             symbols;
                         // Use a timeout to prevent the queue from aborting right after adding, especially in cases with zoomToExtent.

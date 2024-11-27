@@ -11,12 +11,21 @@ import type {
 } from "../type";
 import type { TreeItem } from "../type/TreeItems";
 
+import type { SetValue } from "@nextgisweb/feature-layer/feature-grid/type";
+import type { QueryParams } from "@nextgisweb/feature-layer/feature-grid/hook/useFeatureTable.ts";
+
 type LegendSymbols = { [layerId: number]: { [symbolIndex: number]: boolean } };
 
 export class WebmapStore {
     _webmapItems: StoreItem[] = [];
     _checked: number[] = [];
     _expanded: number[] = [];
+
+    queryParams: QueryParams | null = null;
+    startDate: string | null = null;
+    currentDate: string | null = null;
+    dataType: string | null = null;
+    inputData: {} | null = null;
 
     _itemStore: CustomItemFileWriteStore;
     _layers: Record<number, WebmapLayer> = {};
@@ -320,4 +329,31 @@ export class WebmapStore {
             layer.set("opacity", opacity);
         }
     };
+
+    setQueryParams = (queryParams: SetValue<QueryParams | null>) => {
+        this.setValue("queryParams", queryParams);
+    };
+    setStartDate = (startDate:  SetValue<string | null>) => {
+        this.setValue("startDate", startDate);
+    };
+    setCurrentDate = (currentDate:  SetValue<string | null>) => {
+        this.setValue("currentDate", currentDate);
+    };
+    setDataType = (dataType:  SetValue<string | null>) => {
+        this.setValue("dataType", dataType);
+    };
+    setInputData = (inputData:  SetValue<{} | null>) => {
+        this.setValue("inputData", inputData);
+    };
+    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
+        const isUpdaterFunction = (
+            input: unknown
+        ): input is (prevValue: T) => T => {
+            return typeof input === "function";
+        };
+        const newValue = isUpdaterFunction(valueOrUpdater)
+            ? valueOrUpdater(this[property] as T)
+            : valueOrUpdater;
+        Object.assign(this, { [property]: newValue });
+    }
 }
