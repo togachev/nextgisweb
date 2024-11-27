@@ -20,7 +20,7 @@ class IdentifyBody(Struct, kw_only=True):
 class IdentifyModuleBody(Struct, kw_only=True):
     geom: str
     srs: int
-    styles: List
+    styles: List[object]
 
 def identify(request, *, body: IdentifyBody) -> JSONType:
 
@@ -128,7 +128,7 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                             permission="Read",
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                             fields=f.fields,
-                            relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None
+                            relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None,
                         )
                     )
 
