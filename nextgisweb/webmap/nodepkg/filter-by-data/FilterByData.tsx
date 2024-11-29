@@ -58,6 +58,10 @@ interface FilterByDataProps {
     store: FeatureGridStore;
 }
 
+type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
+
+const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+
 const operator = {
     eq: { label: 'равно', value: 'eq' },
     in: { label: 'массив', value: 'in' },
@@ -75,8 +79,8 @@ const op_type = {
     number: ['eq', 'in', 'ne', 'lt', 'gt', 'le', 'ge'],
 }
 
-const DATETYPE = ["DATETIME", "DATE", "TIME"]
-const NUMBERTYPE = ["REAL", "INTEGER", "BIGINT"]
+const DATE_TYPE = ["DATETIME", "DATE", "TIME"]
+const NUMBER_TYPE = ["REAL", "INTEGER", "BIGINT"]
 
 export const FilterByData = observer(({
     id,
@@ -84,10 +88,13 @@ export const FilterByData = observer(({
 }: FilterByDataProps) => {
 
     const { fields, setStartDate, setStartFilter, setQueryParams, queryParams } = store;
+
     const options: SelectProps['options'] = [];
+
     fields.map((x) => {
         options.push({ id: x.id, key: x.keyname, title: x.display_name, checked: false, datatype: x.datatype });
     });
+
     const [openModal, setOpenModal] = useState(true);
     const [openRangePicker, setOpenRangePicker] = useState();
     const [changeRP, setChangeRP] = useState<boolean>(false);
@@ -117,8 +124,8 @@ export const FilterByData = observer(({
             let params = {
                 resourceId: id,
                 keyname: currentRangeOption,
-                ["fld_" + currentRangeOption + "__ge"]: formatNgwAttribute(store.DATETYPE, store.currentDate[currentRangeOption][0]),
-                ["fld_" + currentRangeOption + "__le"]: formatNgwAttribute(store.DATETYPE, store.currentDate[currentRangeOption][1]),
+                ["fld_" + currentRangeOption + "__ge"]: formatNgwAttribute(store.DATE_TYPE, store.currentDate[currentRangeOption][0]),
+                ["fld_" + currentRangeOption + "__le"]: formatNgwAttribute(store.DATE_TYPE, store.currentDate[currentRangeOption][1]),
             }
 
             store.setQueryParams((prev) => ({
@@ -150,56 +157,56 @@ export const FilterByData = observer(({
         }
     };
 
-    const onFinish = ({ params }) => {
+    const onFinish = (values: any) => {
 
+        const params = values.params
         const keys_ = Object.keys(params || {})
-        let values = {}
+        let obj = {}
 
-        fields.map((a) => {
-            if (keys_.includes(a.keyname)) {
-                const field = params[a.keyname];
+        getEntries(fields).map(([key, value]) => {
+            if (keys_.includes(value.keyname)) {
+                const field = params[value.keyname];
 
-                if (field && DATETYPE.includes(a.datatype)) {
-                    if (a.datatype !== "TIME") {
-                        Object.assign(values, {
-                            ['fld_' + a.keyname + '__ge']: field[0].format('YYYY-MM-DD'),
-                            ['fld_' + a.keyname + '__le']: field[1].format('YYYY-MM-DD'),
+                if (field && DATE_TYPE.includes(value.datatype)) {
+                    if (value.datatype !== "TIME") {
+                        Object.assign(obj, {
+                            ['fld_' + value.keyname + '__ge']: field[0].format('YYYY-MM-DD'),
+                            ['fld_' + value.keyname + '__le']: field[1].format('YYYY-MM-DD'),
                         });
                     } else {
                         console.log(field);
 
-                        Object.assign(values, {
-                            ['fld_' + a.keyname + '__ge']: field[0].format('HH:mm:ss'),
-                            ['fld_' + a.keyname + '__le']: field[1].format('HH:mm:ss'),
+                        Object.assign(obj, {
+                            ['fld_' + value.keyname + '__ge']: field[0].format('HH:mm:ss'),
+                            ['fld_' + value.keyname + '__le']: field[1].format('HH:mm:ss'),
                         });
                     }
                 }
-                else if (field && a.datatype === "STRING") {
+                else if (field && value.datatype === "STRING") {
                     let val_ = opStr.value !== '' ? "__" + opStr.value : ""
                     let opt_ = opStr.value !== '' ? opStr.opt : ""
 
-                    Object.assign(values, {
-                        ["fld_" + a.keyname + val_]: opt_ + field + opt_
+                    Object.assign(obj, {
+                        ["fld_" + value.keyname + val_]: opt_ + field + opt_
                     });
                 }
-                else if (field !== undefined && NUMBERTYPE.includes(a.datatype)) {
+                else if (field !== undefined && NUMBER_TYPE.includes(value.datatype)) {
                     Object.keys(opInt)?.map((i, index) => {
                         let val_ = opInt[i].value
                             ? "__" + opInt[i].value
                             : "";
 
-                        Object.assign(values, {
-                            ["fld_" + a.keyname + val_]: field[index]
+                        Object.assign(obj, {
+                            ["fld_" + value.keyname + val_]: field[index]
                         });
                     });
                 }
             }
         });
-        console.log(values);
 
         setQueryParams((prev) => ({
             ...prev,
-            fld_field_op: values,
+            fld_field_op: obj,
         }))
     };
 
@@ -219,35 +226,35 @@ export const FilterByData = observer(({
         >
             <div className="content-filters">
                 <Form
+                    form={form}
                     name="dynamic_form_nest_item"
                     onFinish={onFinish}
                     style={{ maxWidth: 600 }}
                     autoComplete="off"
+                    initialValues={{ params: [{}] }}
                 >
-                    <Form.List name="params">
+                    <Form.List name="params" >
                         {() => (
                             <>
-                                {fields.map(({ keyname, display_name, datatype }) => {
-                                    console.log(datatype);
-
-                                    return (
-                                        <Space key={keyname} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }} align="baseline">
-                                            {DATETYPE.includes(datatype) ?
-                                                (
-                                                    <Form.Item name={keyname} label={display_name} >
-                                                        {datatype === "TIME" ? <TimeRangePicker /> : <RangePicker />}
-                                                    </Form.Item>
-                                                )
-                                                : (<></>)}
-                                            {NUMBERTYPE.includes(datatype) ? (
-                                                <>
-                                                    <Form.List name={keyname}>
-                                                        {(intArray, { add, remove }) => (
+                                {fields.map(({ keyname, display_name, datatype }) => (
+                                    <Space key={keyname} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }} align="baseline">
+                                        {DATE_TYPE.includes(datatype) ?
+                                            (
+                                                <Form.Item name={keyname} label={display_name} >
+                                                    {datatype === "TIME" ? <TimeRangePicker /> : <RangePicker />}
+                                                </Form.Item>
+                                            )
+                                            : (<></>)}
+                                        {NUMBER_TYPE.includes(datatype) ? (
+                                            <>
+                                                <Form.List name={keyname}>
+                                                    {
+                                                        (intArray, { add, remove }) => (
                                                             <>
                                                                 {intArray.map(({ key, name, ...rest }) => (
                                                                     <Space key={key} align="baseline">
                                                                         <Form.Item {...rest} name={[name]}>
-                                                                            <Input placeholder="First Name" />
+                                                                            <Input />
                                                                         </Form.Item>
                                                                         <Select
                                                                             allowClear
@@ -294,37 +301,38 @@ export const FilterByData = observer(({
                                                                     </Button>
                                                                 </Form.Item>
                                                             </>
-                                                        )}
-                                                    </Form.List>
+                                                        )
+                                                    }
+                                                </Form.List>
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
+                                        {datatype === "STRING" ?
+                                            (
+                                                <>
+                                                    <Form.Item name={keyname} label={display_name} >
+                                                        <Input />
+                                                    </Form.Item>
+                                                    <Select
+                                                        allowClear
+                                                        showSearch
+                                                        style={{ width: 200 }}
+                                                        placeholder="Операторы"
+                                                        defaultValue={operator.ilike}
+                                                        onChange={onChangeSelectStr}
+                                                        options={
+                                                            op_type.string.map(item => {
+                                                                return operator[item];
+                                                            })
+                                                        }
+                                                    />
                                                 </>
-                                            ) : (
-                                                <></>
-                                            )}
-                                            {datatype === "STRING" ?
-                                                (
-                                                    <>
-                                                        <Form.Item name={keyname} label={display_name} >
-                                                            <Input />
-                                                        </Form.Item>
-                                                        <Select
-                                                            allowClear
-                                                            showSearch
-                                                            style={{ width: 200 }}
-                                                            placeholder="Операторы"
-                                                            defaultValue={operator.ilike}
-                                                            onChange={onChangeSelectStr}
-                                                            options={
-                                                                op_type.string.map(item => {
-                                                                    return operator[item];
-                                                                })
-                                                            }
-                                                        />
-                                                    </>
 
-                                                ) : (<></>)}
-                                        </Space>
-                                    )
-                                })}
+                                            ) : (<></>)}
+                                    </Space>
+                                )
+                                )}
                             </>
                         )}
                     </Form.List>
