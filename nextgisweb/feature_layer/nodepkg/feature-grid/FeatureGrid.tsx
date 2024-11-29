@@ -2,7 +2,7 @@ import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 
-import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Checkbox, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -20,8 +20,17 @@ import type { FeatureGridProps } from "./type";
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
+import FilterByData from "@nextgisweb/webmap/filter-by-data";
+import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
+import FilterAlt from "@nextgisweb/icon/material/filter_alt";
+import { topics } from "@nextgisweb/webmap/identify-module"
+
 import "./FeatureGrid.less";
 
+const msgFilter = gettext("Filter data");
+const msgClearFilter = gettext("Clear filter");
+const EnableFilter = gettext("Filter...")
+const DisableFilter = gettext("Set up filter")
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -51,7 +60,8 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
-            topic,
+            startFilter,
+            setStartFilter,
         } = store;
 
         const { data: totalData, refresh: refreshTotal } =
@@ -102,13 +112,42 @@ export const FeatureGrid = observer(
             }
         }, [onSelect, selectedIds]);
 
+        useEffect(() => {
+            if (startFilter === false) {
+                setQueryParams(null);
+                topics.publish("query.params_" + id, null)
+            }
+        }, [startFilter]);
+
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }
-
+        
         return (
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
+                    <Tooltip title={startFilter ? DisableFilter : EnableFilter}>
+                        <div className="filter-component">
+                            <label className="icon-edit-auto">
+                                <Checkbox checked={startFilter} onChange={(e) => setStartFilter(e.target.checked)} className="input-button-none" />
+
+                                {startFilter ?
+                                    <span className="icon-edit icon-symbol">
+                                        <FilterAltOff />
+                                    </span> :
+                                    <span className="icon-symbol">
+                                        <FilterAlt />
+                                    </span>
+                                }
+                            </label>
+                            {
+                                startFilter && <FilterByData
+                                    id={id}
+                                    store={store}
+                                />
+                            }
+                        </div>
+                    </Tooltip>
                     <Tooltip title={msgRefreshTitle}>
                         <Button
                             type="text"
@@ -143,10 +182,8 @@ export const FeatureGrid = observer(
                     loadingCol={loadingCol}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
-                    setQueryParams={setQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
-                    topic={topic}
                 />
                 <TableConfigModal store={store} />
             </div>

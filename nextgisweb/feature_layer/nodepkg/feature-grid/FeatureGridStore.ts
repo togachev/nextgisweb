@@ -11,12 +11,15 @@ import type { ActionProps, FeatureGridProps, SetValue } from "./type";
 
 export class FeatureGridStore {
     id: number;
+    startFilter: boolean = false;
     versioning: boolean = false;
     size: SizeType = "middle";
     actions: ActionToolbarAction<ActionProps>[] = [];
     version = 0;
     readonly = true;
     queryParams: QueryParams | null = null;
+    startDate: string | null = null;
+    dataType: string | null = null;
     selectedIds: number[] = [];
     editOnNewPage = false;
     cleanSelectedOnFilter? = true;
@@ -47,6 +50,18 @@ export class FeatureGridStore {
 
     setId = (id: number) => {
         this.id = id;
+    };
+
+    setStartDate = (startDate:  SetValue<string | null>) => {
+        this.setValue("startDate", startDate);
+    };
+
+    setDataType = (dataType:  SetValue<string | null>) => {
+        this.setValue("dataType", dataType);
+    };
+
+    setStartFilter = (value: boolean) => {
+        this.startFilter = value;
     };
 
     setVersioning = (value: boolean) => {

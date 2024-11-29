@@ -43,7 +43,7 @@ export function WebMapFeatureGridTab({
     );
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current.plugin[
-            plugin.identity as string
+        plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
 

@@ -27,3 +27,58 @@
 .ant-tabs-tabpane > .ngw-feature-layer-feature-grid {
     padding: 8px;
 }
+
+.filter-component {
+    display: flex;
+    padding: 0;
+    align-items: center;
+    margin: 0;
+
+    .icon-edit-auto {
+        margin: 0 0px 0 10px;
+
+        .input-button-none {
+            display: none;
+        }
+
+        .icon-edit {
+            box-shadow: inset 0px 0px 2px 0px #000000;
+            border-radius: 3px;
+
+            &:hover {
+                background-color: #acacac20;
+                border-radius: 3px;
+            }
+        }
+
+        .icon-symbol {
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-items: center;
+            justify-content: center;
+            align-items: center;
+            flex: 0 0 auto;
+
+            &:hover {
+                background-color: #acacac20;
+                border-radius: 3px;
+            }
+        }
+
+    }
+
+    .ant-space-compact-block {
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
+
+
+        .ant-btn-compact-first-item.ant-btn-sm {
+            border-start-end-radius: 0;
+            border-end-end-radius: 0;
+            width: 100%;
+        }
+    }
+}
