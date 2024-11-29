@@ -32,7 +32,6 @@ import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
 import { topics } from "@nextgisweb/webmap/identify-module"
-import { FilterByDataStore } from "./FilterByDataStore";
 
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -151,38 +150,39 @@ export const FilterByData = observer(({
         }
     };
 
-    const onFinish = (value) => {
-        const keys_ = Object.keys(value.params || {})
+    const onFinish = ({ params }) => {
+
+        const keys_ = Object.keys(params || {})
         let values = {}
 
         fields.map((a) => {
             if (keys_.includes(a.keyname)) {
-                const field = value.params[a.keyname];
+                const field = params[a.keyname];
 
                 if (field && DATETYPE.includes(a.datatype)) {
                     if (a.datatype !== "TIME") {
                         Object.assign(values, {
-                            ...value.fld_field_op,
                             ['fld_' + a.keyname + '__ge']: field[0].format('YYYY-MM-DD'),
                             ['fld_' + a.keyname + '__le']: field[1].format('YYYY-MM-DD'),
                         });
                     } else {
                         console.log(field);
-                        
+
                         Object.assign(values, {
-                            ...value.fld_field_op,
                             ['fld_' + a.keyname + '__ge']: field[0].format('HH:mm:ss'),
                             ['fld_' + a.keyname + '__le']: field[1].format('HH:mm:ss'),
                         });
                     }
-                } else if (field && a.datatype === "STRING") {
+                }
+                else if (field && a.datatype === "STRING") {
                     let val_ = opStr.value !== '' ? "__" + opStr.value : ""
                     let opt_ = opStr.value !== '' ? opStr.opt : ""
 
                     Object.assign(values, {
                         ["fld_" + a.keyname + val_]: opt_ + field + opt_
                     });
-                } else if (field !== undefined && NUMBERTYPE.includes(a.datatype)) {
+                }
+                else if (field !== undefined && NUMBERTYPE.includes(a.datatype)) {
                     Object.keys(opInt)?.map((i, index) => {
                         let val_ = opInt[i].value
                             ? "__" + opInt[i].value
@@ -195,14 +195,12 @@ export const FilterByData = observer(({
                 }
             }
         });
+        console.log(values);
 
         setQueryParams((prev) => ({
             ...prev,
-            fld_field_op: {
-                ...prev?.fld_field_op,
-                ...values,
-            }
-        }));
+            fld_field_op: values,
+        }))
     };
 
     return (
