@@ -390,11 +390,6 @@ def filter_feature_op(query, params, keynames):
     if len(filter_) > 0:
         query.filter(*filter_)
 
-    if "like" in params and IFeatureQueryLike.providedBy(query):
-        query.like(value)
-    elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
-        query.ilike(value)
-
 def apply_fields_filter(query, request):
     filter_ = []
     for param in request.GET.keys():
@@ -578,7 +573,7 @@ def count(resource, request) -> JSONType:
     filter_feature_op(query, d, None)
     total_count = query().total_count
 
-    return dict(total_count=total_count)
+    return dict(total_count=total_count, test=str(d))
 
 
 class NgwExtent(Struct):

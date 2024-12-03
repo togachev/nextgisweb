@@ -266,7 +266,6 @@ def image(
         filter_ = []
         if obj.parent.cls in ["vector_layer", "postgis_layer"]:
             keys = [fld.keyname for fld in obj.parent.fields]
-            # for param in request.GET.keys():
             for param in request.GET.dict_of_lists():
                 if param.startswith("fld_"):
                     fld_expr = re.sub("^fld_", "", param)
@@ -280,10 +279,11 @@ def image(
                     key, operator = (fld_expr, "eq")
                 if key != "id" and key not in keys:
                     raise ValidationError(message="Unknown field '%s'." % key)
-                # filter_.append((key, operator, request.GET[param]))
+
                 for v in request.GET.dict_of_lists()[param]:
                     filter_.append((key, operator, v))
             filter_ = tuple(i for i in filter_)
+
         if obj is None:
             raise ResourceNotFound(resid)
 

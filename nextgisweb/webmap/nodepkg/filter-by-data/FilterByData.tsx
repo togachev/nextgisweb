@@ -268,69 +268,11 @@ export const FilterByData = observer(({
                 >
                     <Form.List name="params" >
                         {() => (<>
-                            {fields.map(({ keyname, display_name, datatype }) => (
-                                <Space key={keyname} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }} align="baseline">
-                                    {DATE_TYPE.includes(datatype) && (<>
-                                        <Form.List name={keyname}>
-                                            {
-                                                (_array, { add, remove }) => (
-                                                    <>
-                                                        {_array.map(({ key, name, ...rest }) => (
-                                                            <Space key={key} align="baseline">
-                                                                <Form.Item {...rest} name={[name]}>
-                                                                    {type_comp[datatype]}
-                                                                </Form.Item>
-                                                                <Select
-                                                                    allowClear
-                                                                    showSearch
-                                                                    style={{ width: 200 }}
-                                                                    placeholder="Операторы"
-                                                                    defaultValue={operator.eq}
-                                                                    onChange={(e) => {
-                                                                        onChangeSelect(e, key);
-                                                                    }}
-                                                                    options={op_type.number.map((item) => {
-                                                                        return operator[item];
-                                                                    })}
-                                                                />
-                                                                <DeleteForever
-                                                                    onClick={() => {
-                                                                        delete opInt[rest.fieldKey];
-                                                                        remove(name);
-                                                                    }}
-                                                                />
-                                                            </Space>
-                                                        ))}
-                                                        <Form.Item>
-                                                            <Button
-                                                                type="dashed"
-                                                                onClick={() => {
-                                                                    add();
-                                                                    if (_array.length > 0) {
-                                                                        setOpInt((prev) => ({
-                                                                            ...prev,
-                                                                            [_array.slice(-1)[0].fieldKey + 1]: operator.eq
-                                                                        }));
-                                                                    } else {
-                                                                        setOpInt((prev) => ({
-                                                                            ...prev,
-                                                                            0: operator.eq
-                                                                        }));
-                                                                    }
-                                                                }}
-                                                                block
-                                                                icon={<Add />}
-                                                            >
-                                                                Добавить фильтр для поля: {keyname}
-                                                            </Button>
-                                                        </Form.Item>
-                                                    </>
-                                                )
-                                            }
-                                        </Form.List>
-                                    </>)}
-                                    {NUMBER_TYPE.includes(datatype) && (
-                                        <>
+                            {fields.map(({ keyname, display_name, datatype }) => {
+
+                                return (
+                                    <Space key={keyname} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }} align="baseline">
+                                        {DATE_TYPE.includes(datatype) && (<>
                                             <Form.List name={keyname}>
                                                 {
                                                     (_array, { add, remove }) => (
@@ -338,8 +280,7 @@ export const FilterByData = observer(({
                                                             {_array.map(({ key, name, ...rest }) => (
                                                                 <Space key={key} align="baseline">
                                                                     <Form.Item {...rest} name={[name]}>
-                                                                        {/* {type_comp[datatype]} */}
-                                                                        <Input />
+                                                                        {type_comp[datatype]}
                                                                     </Form.Item>
                                                                     <Select
                                                                         allowClear
@@ -350,7 +291,8 @@ export const FilterByData = observer(({
                                                                         onChange={(e) => {
                                                                             onChangeSelect(e, key);
                                                                         }}
-                                                                        options={op_type.number.map((item) => {
+                                                                        filterOption={true}
+                                                                        options={op_type.number.filter((i) => i !== "in").map((item) => {
                                                                             return operator[item];
                                                                         })}
                                                                     />
@@ -389,73 +331,135 @@ export const FilterByData = observer(({
                                                     )
                                                 }
                                             </Form.List>
-                                        </>
-                                    )}
-                                    {datatype === "STRING" && (
-                                        <>
-                                            <Form.List name={keyname}>
-                                                {
-                                                    (_array, { add, remove }) => (
-                                                        <>
-                                                            {_array.map(({ key, name, ...rest }) => (
-                                                                <Space key={key} align="baseline">
-                                                                    <Form.Item {...rest} name={[name]}>
-                                                                        {type_comp[datatype]}
-                                                                    </Form.Item>
-                                                                    <Select
-                                                                        showSearch
-                                                                        style={{ width: 200 }}
-                                                                        placeholder="Операторы"
-                                                                        defaultValue={operator.ilike}
-                                                                        onChange={(e) => {
-                                                                            onChangeSelectStr(e, key)
-                                                                        }}
-                                                                        options={
-                                                                            op_type.string.map(item => {
+                                        </>)}
+                                        {NUMBER_TYPE.includes(datatype) && (
+                                            <>
+                                                <Form.List name={keyname}>
+                                                    {
+                                                        (_array, { add, remove }) => (
+                                                            <>
+                                                                {_array.map(({ key, name, ...rest }) => (
+                                                                    <Space key={key} align="baseline">
+                                                                        <Form.Item {...rest} name={[name]}>
+                                                                            {/* {type_comp[datatype]} */}
+                                                                            <Input />
+                                                                        </Form.Item>
+                                                                        <Select
+                                                                            allowClear
+                                                                            showSearch
+                                                                            style={{ width: 200 }}
+                                                                            placeholder="Операторы"
+                                                                            defaultValue={operator.eq}
+                                                                            onChange={(e) => {
+                                                                                onChangeSelect(e, key);
+                                                                            }}
+                                                                            options={op_type.number.map((item) => {
                                                                                 return operator[item];
-                                                                            })
-                                                                        }
-                                                                    />
-                                                                    <DeleteForever
+                                                                            })}
+                                                                        />
+                                                                        <DeleteForever
+                                                                            onClick={() => {
+                                                                                delete opInt[rest.fieldKey];
+                                                                                remove(name);
+                                                                            }}
+                                                                        />
+                                                                    </Space>
+                                                                ))}
+                                                                <Form.Item>
+                                                                    <Button
+                                                                        type="dashed"
                                                                         onClick={() => {
-                                                                            delete opStr[rest.fieldKey];
-                                                                            remove(name);
+                                                                            add();
+                                                                            if (_array.length > 0) {
+                                                                                setOpInt((prev) => ({
+                                                                                    ...prev,
+                                                                                    [_array.slice(-1)[0].fieldKey + 1]: operator.eq
+                                                                                }));
+                                                                            } else {
+                                                                                setOpInt((prev) => ({
+                                                                                    ...prev,
+                                                                                    0: operator.eq
+                                                                                }));
+                                                                            }
                                                                         }}
-                                                                    />
-                                                                </Space>
-                                                            ))}
-                                                            <Form.Item>
-                                                                <Button
-                                                                    type="dashed"
-                                                                    onClick={() => {
-                                                                        add();
-                                                                        if (_array.length > 0) {
-                                                                            setOpStr((prev) => ({
-                                                                                ...prev,
-                                                                                [_array.slice(-1)[0].fieldKey + 1]: operator.ilike
-                                                                            }));
-                                                                        } else {
-                                                                            setOpStr((prev) => ({
-                                                                                ...prev,
-                                                                                0: operator.ilike
-                                                                            }));
-                                                                        }
-                                                                    }}
-                                                                    block
-                                                                    icon={<Add />}
-                                                                >
-                                                                    Добавить фильтр для поля: {keyname}
-                                                                </Button>
-                                                            </Form.Item>
-                                                        </>
-                                                    )
-                                                }
-                                            </Form.List>
-                                        </>
+                                                                        block
+                                                                        icon={<Add />}
+                                                                    >
+                                                                        Добавить фильтр для поля: {keyname}
+                                                                    </Button>
+                                                                </Form.Item>
+                                                            </>
+                                                        )
+                                                    }
+                                                </Form.List>
+                                            </>
+                                        )}
+                                        {datatype === "STRING" && (
+                                            <>
+                                                <Form.List name={keyname}>
+                                                    {
+                                                        (_array, { add, remove }) => (
+                                                            <>
+                                                                {_array.map(({ key, name, ...rest }) => (
+                                                                    <Space key={key} align="baseline">
+                                                                        <Form.Item {...rest} name={[name]}>
+                                                                            {type_comp[datatype]}
+                                                                        </Form.Item>
+                                                                        <Select
+                                                                            showSearch
+                                                                            style={{ width: 200 }}
+                                                                            placeholder="Операторы"
+                                                                            defaultValue={operator.ilike}
+                                                                            onChange={(e) => {
+                                                                                onChangeSelectStr(e, key)
+                                                                            }}
+                                                                            options={
+                                                                                op_type.string.map(item => {
+                                                                                    return operator[item];
+                                                                                })
+                                                                            }
+                                                                        />
+                                                                        <DeleteForever
+                                                                            onClick={() => {
+                                                                                delete opStr[rest.fieldKey];
+                                                                                remove(name);
+                                                                            }}
+                                                                        />
+                                                                    </Space>
+                                                                ))}
+                                                                <Form.Item>
+                                                                    <Button
+                                                                        type="dashed"
+                                                                        onClick={() => {
+                                                                            add();
+                                                                            if (_array.length > 0) {
+                                                                                setOpStr((prev) => ({
+                                                                                    ...prev,
+                                                                                    [_array.slice(-1)[0].fieldKey + 1]: operator.ilike
+                                                                                }));
+                                                                            } else {
+                                                                                setOpStr((prev) => ({
+                                                                                    ...prev,
+                                                                                    0: operator.ilike
+                                                                                }));
+                                                                            }
+                                                                        }}
+                                                                        block
+                                                                        icon={<Add />}
+                                                                    >
+                                                                        Добавить фильтр для поля: {keyname}
+                                                                    </Button>
+                                                                </Form.Item>
+                                                            </>
+                                                        )
+                                                    }
+                                                </Form.List>
+                                            </>
 
-                                    )}
-                                </Space>
-                            ))}
+                                        )}
+                                    </Space>
+                                )
+                            })}
                         </>)}
                     </Form.List>
                     <Form.Item>
