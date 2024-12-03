@@ -205,10 +205,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 op = getattr(sa.sql.operators, o)
                 column = idcol if k == "id" else fields[k]
-                _where_filter.append((op(column, v)))
+                _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
-                where.append(sa.and_(*_where_filter))
+                where.append(sa.or_(*_where_filter))
 
         if self._like or self._ilike:
             operands = []
