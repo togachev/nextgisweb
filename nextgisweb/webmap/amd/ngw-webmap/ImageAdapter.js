@@ -19,7 +19,8 @@ define([
                         const paramsUrl = new URLSearchParams();
 
                         Object.entries(obj)?.map(([key, value]) => {
-                            paramsUrl.append(key, value);
+                            const reg = /\d+:/
+                            paramsUrl.append(key.replace(reg, ""), value);
                         })
                         p_filters = '&' + paramsUrl.toString();
                     } else {

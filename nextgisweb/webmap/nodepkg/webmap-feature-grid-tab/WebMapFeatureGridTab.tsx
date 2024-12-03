@@ -77,7 +77,7 @@ export function WebMapFeatureGridTab({
                 cleanSelectedOnFilter: false,
                 onDelete: reloadLayer,
                 onSave: () => {
-                    display.current.identify_module?.identifyStore.setUpdate(true)
+                    display.current.identify_module?.identifyStore?.setUpdate(true);
                     display.current.identify?._popup.widget?.reset();
                     reloadLayer();
                 },

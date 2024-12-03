@@ -1,4 +1,6 @@
 import re
+import json
+import requests 
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
@@ -366,22 +368,28 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
 def filter_feature_op(query, params, keynames):
     filter_ = []
     for param, value in params.items():
-        if param.startswith("fld_"):
-            fld_expr = re.sub("^fld_", "", param)
-        elif param == "id" or param.startswith("id__"):
-            fld_expr = param
-        else:
-            continue
-        try:
-            key, operator = fld_expr.rsplit("__", 1)
-        except ValueError:
-            key, operator = (fld_expr, "eq")
-        if keynames:
-            if key != "id" and key not in keynames:
-                raise ValidationError(message="Unknown field '%s'." % key)
-        filter_.append((key, operator, value))
+        if re.match("\d+:", param):
+            param = re.sub(r"\d+:", "", param)
+            if param.startswith("fld_"):
+                fld_expr = re.sub("^fld_", "", param)
+            elif param == "id" or param.startswith("id__"):
+                fld_expr = param
+            else:
+                continue
+
+            try:
+                key, operator = fld_expr.rsplit("__", 1)
+            except ValueError:
+                key, operator = (fld_expr, "eq")
+            if keynames:
+                if key != "id" and key not in keynames:
+                    raise ValidationError(message="Unknown field '%s'." % key)
+
+            filter_.append((key, operator, value))
+
     if len(filter_) > 0:
         query.filter(*filter_)
+
     if "like" in params and IFeatureQueryLike.providedBy(query):
         query.like(value)
     elif "ilike" in params and IFeatureQueryIlike.providedBy(query):
@@ -452,12 +460,13 @@ def cget(
     request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
-    query = dumper.feature_query()
+
+    keys = [fld.keyname for fld in resource.fields]
+    query = resource.feature_query()
 
     d = dict()
     for k,v in dict(request.GET).items():
         d[k] = v
-    keys = [fld.keyname for fld in resource.fields]
     filter_feature_op(query, d, keys)
 
     # Paging
@@ -480,7 +489,6 @@ def cget(
         query.order_by(*order_by_)
 
     return [dumper(feature) for feature in query()]
-
 
 def cpost(
     resource,
@@ -564,13 +572,10 @@ def count(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
-
     d = dict()
     for k,v in dict(request.GET).items():
         d[k] = v
-    keys = [fld.keyname for fld in resource.fields]
-    filter_feature_op(query, d, keys)
-
+    filter_feature_op(query, d, None)
     total_count = query().total_count
 
     return dict(total_count=total_count)
