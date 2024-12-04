@@ -98,7 +98,7 @@ export const FilterByData = observer(({
     store,
 }: FilterByDataProps) => {
 
-    const { fields, setStartDate, setStartFilter, setQueryParams, queryParams } = store;
+    const { fields, setStartDate, setStartFilter, modalFilter, setModalFilter, setQueryParams, queryParams } = store;
 
     const options: SelectProps['options'] = [];
 
@@ -106,13 +106,12 @@ export const FilterByData = observer(({
         options.push({ id: x.id, key: x.keyname, title: x.display_name, checked: false, datatype: x.datatype });
     });
 
-    const [openModal, setOpenModal] = useState(true);
     const [openRangePicker, setOpenRangePicker] = useState();
     const [changeRP, setChangeRP] = useState<boolean>(false);
     const [currentRangeOption, setCurrentRangeOption] = useState<string>({});
     const [opInt, setOpInt] = useState({ 0: operator.eq });
     const [opStr, setOpStr] = useState({ 0: operator.ilike });
-    const form = Form.useForm()[0];
+    const [form] = Form.useForm();
 
     const topicQueryParams = (params) => {
         topics.publish("query.params_" + id, params)
@@ -241,19 +240,16 @@ export const FilterByData = observer(({
         }))
     };
 
-    console.log(queryParams);
-
-
     return (
         <Modal
             maskClosable={true}
-            open={openModal}
+            open={modalFilter}
             onOk={() => {
-                setOpenModal(false);
+                setModalFilter(false);
                 topicQueryParams(queryParams)
             }}
             onCancel={() => {
-                setOpenModal(false);
+                setModalFilter(false);
                 setQueryParams(null);
                 setStartFilter(false);
             }}

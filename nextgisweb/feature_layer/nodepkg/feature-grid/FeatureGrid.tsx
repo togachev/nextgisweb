@@ -21,16 +21,18 @@ import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
-import FilterAltOff from "@nextgisweb/icon/material/filter_alt_off";
-import FilterAlt from "@nextgisweb/icon/material/filter_alt";
+
+import Filter from "@nextgisweb/icon/mdi/filter";
+import FilterOff from "@nextgisweb/icon/mdi/filter-off";
+import FilterPlus from "@nextgisweb/icon/mdi/filter-plus";
+
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import "./FeatureGrid.less";
 
-const msgFilter = gettext("Filter data");
-const msgClearFilter = gettext("Clear filter");
-const EnableFilter = gettext("Filter...")
-const DisableFilter = gettext("Set up filter")
+const msgEditFilter = gettext("Edit filter");
+const EnableFilter = gettext("Set up filter")
+const ResetFilter = gettext("Reset filter")
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -62,6 +64,7 @@ export const FeatureGrid = observer(
             onSelect,
             startFilter,
             setStartFilter,
+            setModalFilter,
         } = store;
 
         const { data: totalData, refresh: refreshTotal } =
@@ -122,32 +125,45 @@ export const FeatureGrid = observer(
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }
-        
+
         return (
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
-                    <Tooltip title={startFilter ? DisableFilter : EnableFilter}>
-                        <div className="filter-component">
+                    <div className="filter-component">
+                        <Tooltip title={startFilter ? ResetFilter : EnableFilter}>
                             <label className="icon-edit-auto">
-                                <Checkbox checked={startFilter} onChange={(e) => setStartFilter(e.target.checked)} className="input-button-none" />
-
+                                <Checkbox checked={startFilter} onChange={(e) => {
+                                    setStartFilter(e.target.checked); setModalFilter(true);
+                                }} className="input-button-none" />
                                 {startFilter ?
-                                    <span className="icon-edit icon-symbol">
-                                        <FilterAltOff />
-                                    </span> :
-                                    <span className="icon-symbol">
-                                        <FilterAlt />
-                                    </span>
+                                    (<span className="icon-edit icon-symbol">
+                                        <FilterOff />
+                                    </span>) :
+                                    (<span className="icon-symbol">
+                                        <Filter />
+                                    </span>)
                                 }
                             </label>
-                            {
-                                startFilter && <FilterByData
-                                    id={id}
-                                    store={store}
-                                />
+                        </Tooltip>
+                        <Tooltip title={msgEditFilter}>
+                            {startFilter &&
+                                (<Button
+                                    onClick={() => {
+                                        setModalFilter(true)
+                                    }}
+                                    type="text"
+                                    className="icon-edit icon-symbol"
+                                    size="small"
+                                    icon={<FilterPlus />} />)
                             }
-                        </div>
-                    </Tooltip>
+                        </Tooltip>
+                        {
+                            startFilter && (<FilterByData
+                                id={id}
+                                store={store}
+                            />)
+                        }
+                    </div>
                     <Tooltip title={msgRefreshTitle}>
                         <Button
                             type="text"

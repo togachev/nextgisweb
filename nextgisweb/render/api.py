@@ -282,7 +282,6 @@ def image(
 
                 for v in request.GET.dict_of_lists()[param]:
                     filter_.append((key, operator, v))
-            filter_ = tuple(i for i in filter_)
 
         if obj is None:
             raise ResourceNotFound(resid)

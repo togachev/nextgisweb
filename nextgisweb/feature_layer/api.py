@@ -573,7 +573,7 @@ def count(resource, request) -> JSONType:
     filter_feature_op(query, d, None)
     total_count = query().total_count
 
-    return dict(total_count=total_count, test=str(d))
+    return dict(total_count=total_count)
 
 
 class NgwExtent(Struct):
