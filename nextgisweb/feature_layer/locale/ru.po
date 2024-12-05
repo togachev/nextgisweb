@@ -6,15 +6,15 @@ msgstr "Н/Д"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: api.py:90
+#: api.py:92 api_identify.py:30 api_identify.py:87
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:340
+#: api.py:342
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:414 api_export.py:122
+#: api.py:441 api_export.py:122
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -160,15 +160,23 @@ msgstr "Загрузка..."
 msgid "Reset"
 msgstr "Сбросить"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:24
+#: nodepkg/feature-grid/FeatureGrid.tsx:30
+msgid "Edit filter"
+msgstr "Изменить фильтр"
+
+#: nodepkg/feature-grid/FeatureGrid.tsx:31
+msgid "Set up filter"
+msgstr "Настроить фильтр"
+
+#: nodepkg/feature-grid/FeatureGrid.tsx:32
 msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:25
+#: nodepkg/feature-grid/FeatureGrid.tsx:33
 msgid "Number of objects"
 msgstr "Количество объектов"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:26
+#: nodepkg/feature-grid/FeatureGrid.tsx:34
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 

@@ -2,7 +2,7 @@ import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 
-import { Button, Checkbox, Empty, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -21,18 +21,14 @@ import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
-
-import Filter from "@nextgisweb/icon/mdi/filter";
-import FilterOff from "@nextgisweb/icon/mdi/filter-off";
-import FilterPlus from "@nextgisweb/icon/mdi/filter-plus";
+import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import "./FeatureGrid.less";
 
 const msgEditFilter = gettext("Edit filter");
-const EnableFilter = gettext("Set up filter")
-const ResetFilter = gettext("Reset filter")
+const msgEnableFilter = gettext("Set up filter")
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -130,39 +126,18 @@ export const FeatureGrid = observer(
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
                     <div className="filter-component">
-                        <Tooltip title={startFilter ? ResetFilter : EnableFilter}>
-                            <label className="icon-edit-auto">
-                                <Checkbox checked={startFilter} onChange={(e) => {
-                                    setStartFilter(e.target.checked); setModalFilter(true);
-                                }} className="input-button-none" />
-                                {startFilter ?
-                                    (<span className="icon-edit icon-symbol">
-                                        <FilterOff />
-                                    </span>) :
-                                    (<span className="icon-symbol">
-                                        <Filter />
-                                    </span>)
-                                }
-                            </label>
+                        <Tooltip title={startFilter && queryParams?.fld_field_op ? msgEditFilter : msgEnableFilter}>
+                            <Button
+                                onClick={() => {
+                                    setModalFilter(true);
+                                    setStartFilter(true);
+                                }}
+                                type="text"
+                                className={queryParams?.fld_field_op && "icon-edit"}
+                                size="small"
+                                icon={<FilterIcon />} />
                         </Tooltip>
-                        <Tooltip title={msgEditFilter}>
-                            {startFilter &&
-                                (<Button
-                                    onClick={() => {
-                                        setModalFilter(true)
-                                    }}
-                                    type="text"
-                                    className="icon-edit icon-symbol"
-                                    size="small"
-                                    icon={<FilterPlus />} />)
-                            }
-                        </Tooltip>
-                        {
-                            startFilter && (<FilterByData
-                                id={id}
-                                store={store}
-                            />)
-                        }
+                        {startFilter && (<FilterByData id={id} store={store} />)}
                     </div>
                     <Tooltip title={msgRefreshTitle}>
                         <Button

@@ -370,22 +370,22 @@ def filter_feature_op(query, params, keynames):
     for param, value in params.items():
         if re.match("\d+:", param):
             param = re.sub(r"\d+:", "", param)
-            if param.startswith("fld_"):
-                fld_expr = re.sub("^fld_", "", param)
-            elif param == "id" or param.startswith("id__"):
-                fld_expr = param
-            else:
-                continue
+        if param.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", param)
+        elif param == "id" or param.startswith("id__"):
+            fld_expr = param
+        else:
+            continue
 
-            try:
-                key, operator = fld_expr.rsplit("__", 1)
-            except ValueError:
-                key, operator = (fld_expr, "eq")
-            if keynames:
-                if key != "id" and key not in keynames:
-                    raise ValidationError(message="Unknown field '%s'." % key)
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        if keynames:
+            if key != "id" and key not in keynames:
+                raise ValidationError(message="Unknown field '%s'." % key)
 
-            filter_.append((key, operator, value))
+        filter_.append((key, operator, value))
 
     if len(filter_) > 0:
         query.filter(*filter_)
@@ -587,6 +587,11 @@ def feature_extent(resource, request) -> NgwExtent:
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
+
+    d = dict()
+    for k,v in dict(request.GET).items():
+        d[k] = v
+    filter_feature_op(query, d, None)
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)

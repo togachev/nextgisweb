@@ -138,17 +138,21 @@ msgstr "Требуется ключ"
 msgid "Key not unique"
 msgstr "Ключ не уникален"
 
-#: nodepkg/error/ErrorModal.tsx:47
+#: nodepkg/error/ErrorModal.tsx:46 nodepkg/error/extractError.ts:49
 msgid "Error"
 msgstr "Ошибка"
 
-#: nodepkg/error/index.ts:58
+#: nodepkg/error/extractError.ts:40
 msgid "Unexpected error"
 msgstr "Неожиданная ошибка"
 
-#: nodepkg/error/index.ts:62
+#: nodepkg/error/extractError.ts:44 nodepkg/error/extractError.ts:50
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
+
+#: nodepkg/error/extractError.ts:54
+msgid "An unknown error occurred."
+msgstr ""
 
 #: nodepkg/error/shared.tsx:21
 msgid "Unknown Error"
