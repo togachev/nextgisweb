@@ -1,4 +1,58 @@
 .modal-filters {
+	.field-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin: 16px 0;
+
+		.icon-symbol {
+			font-size: 14px;
+			width: 24px;
+			height: 24px;
+			display: flex;
+			justify-items: center;
+			justify-content: center;
+			align-items: center;
+			flex: 0 0 auto;
+			border: 1px solid #d9d9d9;
+			border-radius: 3px;
+			cursor: pointer;
+
+			&:hover {
+				border: 1px solid var(--primary);
+				border-radius: 3px;
+			}
+		}
+
+		.padding-icon {
+			margin: 0 5px;
+		}
+
+		.card-row {
+			width: 100%;
+			padding: 0;
+			border: none;
+
+			.ant-card-head {
+				min-height: 38px;
+				padding: 0 5px 0 16px;
+				font-size: 14px;
+			}
+
+			.ant-card-body {
+				padding: 0;
+			}
+
+			.card-content {
+				display: flex;
+				width: 100%;
+				justify-content: space-between;
+				align-items: center;
+				padding: 5px 0px;
+			}
+		}
+	}
+
 	.control-filters {
 		display: flex;
 		justify-content: flex-end;

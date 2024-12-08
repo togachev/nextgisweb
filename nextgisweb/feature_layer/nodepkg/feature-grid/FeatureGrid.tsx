@@ -126,7 +126,7 @@ export const FeatureGrid = observer(
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
                     <div className="filter-component">
-                        <Tooltip title={startFilter && queryParams?.fld_field_op ? msgEditFilter : msgEnableFilter}>
+                        <Tooltip mouseLeaveDelay={0} title={startFilter && queryParams?.fld_field_op ? msgEditFilter : msgEnableFilter}>
                             <Button
                                 onClick={() => {
                                     setModalFilter(true);
@@ -139,7 +139,7 @@ export const FeatureGrid = observer(
                         </Tooltip>
                         {startFilter && (<FilterByData id={id} store={store} />)}
                     </div>
-                    <Tooltip title={msgRefreshTitle}>
+                    <Tooltip mouseLeaveDelay={0} title={msgRefreshTitle}>
                         <Button
                             type="text"
                             icon={<RefreshIcon />}
@@ -147,7 +147,7 @@ export const FeatureGrid = observer(
                             size={size}
                         />
                     </Tooltip>
-                    <Tooltip title={msgSettingsTitle}>
+                    <Tooltip mouseLeaveDelay={0} title={msgSettingsTitle}>
                         <Button
                             type="text"
                             icon={<TuneIcon />}
@@ -157,7 +157,7 @@ export const FeatureGrid = observer(
                             size={size}
                         />
                     </Tooltip>
-                    <Tooltip title={msgNumberOfObjects}>
+                    <Tooltip mouseLeaveDelay={0} title={msgNumberOfObjects}>
                         <span className="count-feature">#{totalData.total_count}</span>
                     </Tooltip>
                 </FeatureGridActions>
