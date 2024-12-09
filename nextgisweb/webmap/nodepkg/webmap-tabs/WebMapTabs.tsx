@@ -6,7 +6,7 @@ import type { ParamOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { WebMapTabsStore } from "./WebMapTabsStore";
-
+import { topics } from "@nextgisweb/webmap/identify-module"
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 
 interface WebMapTabsProps {
@@ -57,6 +57,7 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
             onEdit={(targetKey, action) => {
                 if (action === "remove") {
                     removeTab(String(targetKey));
+                    topics.publish("query.params_" + targetKey, null)
                 }
             }}
             parentHeight
