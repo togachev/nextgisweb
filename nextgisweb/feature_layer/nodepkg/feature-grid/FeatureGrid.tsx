@@ -157,7 +157,7 @@ export const FeatureGrid = observer(
                             size={size}
                         />
                     </Tooltip>
-                    <Tooltip mouseLeaveDelay={0} title={msgNumberOfObjects}>
+                    <Tooltip mouseLeaveDelay={0} title={msgNumberOfObjects} placement="topRight">
                         <span className="count-feature">#{totalData.total_count}</span>
                     </Tooltip>
                 </FeatureGridActions>

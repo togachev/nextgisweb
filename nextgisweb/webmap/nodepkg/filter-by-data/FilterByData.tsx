@@ -20,10 +20,12 @@ import { Form } from "@nextgisweb/gui/fields-form";
 
 import Add from "@nextgisweb/icon/material/add";
 import Remove from "@nextgisweb/icon/material/remove";
+import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import type { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
 
 import "./FilterByData.less";
 
+const msgTitleFilter = gettext("Filter");
 const msgAddFilterField = gettext("Add filter");
 const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
@@ -64,12 +66,12 @@ const NUMBER_TYPE = ["REAL", "INTEGER", "BIGINT"];
 const type_comp = (value, props) => {
     const inputComp = {
         STRING: <Input {...props} />,
-        REAL: <InputNumber {...props} />,
+        REAL: <InputNumber suffix {...props} />,
         INTEGER: <InputInteger {...props} />,
         BIGINT: <InputBigInteger {...props} />,
-        DATETIME: <DateTimePicker {...props} />,
-        DATE: <DatePicker {...props} />,
-        TIME: <TimePicker {...props} />,
+        DATETIME: <DateTimePicker suffixIcon={false} {...props} />,
+        DATE: <DatePicker suffixIcon={false} {...props} />,
+        TIME: <TimePicker suffixIcon={false} {...props} />,
     }
     return inputComp[value];
 };
@@ -126,7 +128,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     }
 
     const inputProps = {
-        style: { width: "-webkit-fill-available", margin: 5 },
+        style: { width: "100%", margin: "0 4px" },
         placeholder: field.display_name,
         onChange: onFilterChange,
         value: value.vals,
@@ -135,9 +137,17 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     return (
         <>
             {type_comp(field.datatype, inputProps)}
+            {value.vals && <span
+                className="icon-symbol padding-icon"
+                onClick={() => {
+                    triggerChange({ vals: undefined })
+                }}
+            >
+                <BackspaceIcon />
+            </span>}
             <Select
                 value={value.op || op}
-                style={{ width: 165 }}
+                style={{ width: 165, padding: "0 5px 0 0" }}
                 onChange={onOperatorsChange}
                 options={op_type[opt].map((item) => {
                     return operator[item];
@@ -153,8 +163,6 @@ export const FilterByData = observer(({
 }: FilterByDataProps) => {
 
     const { fields, setStartFilter, modalFilter, setModalFilter, setQueryParams, queryParams } = store;
-
-    const initialValues = fields.reduce((a, v) => ({ ...a, [v.keyname]: [{}] }), []);
 
     const [form] = Form.useForm();
 
@@ -172,6 +180,7 @@ export const FilterByData = observer(({
 
                 field?.map((item, index) => {
                     if (!field[index]?.vals) {
+                        setQueryParams(null)
                         return
                     };
                     let op = item?.vals ? "__" + item.op : ""; /* оператор */
@@ -199,10 +208,7 @@ export const FilterByData = observer(({
             fld_field_op: obj,
         }));
     };
-    const onFieldsChange = (values) => {
-        // updateForm();
-        console.log(values);
-    }
+
     const updateForm = () => {
         form
             .validateFields()
@@ -214,6 +220,7 @@ export const FilterByData = observer(({
     return (
         <Modal
             style={{ padding: 0 }}
+            styles={{ body: { overflowY: "auto", maxHeight: "calc(100vh - 206px)" } }}
             maskClosable={true}
             open={modalFilter}
             onOk={() => {
@@ -227,18 +234,45 @@ export const FilterByData = observer(({
             okButtonProps={{ style: { display: "none" } }}
             modalRender={(modal) => {
                 return React.cloneElement(modal, {
-                    style: { ...modal.props.style, ...{ padding: "5px 16px" } },
+                    style: { ...modal.props.style, ...{ padding: 16 } },
                 });
             }}
+            title={msgTitleFilter}
+            footer={
+                <div className="control-filters">
+                    <Button size="small" onClick={() => {
+                        form.submit();
+                    }}>
+                        {msgCheckForm}
+                    </Button>
+                    <Button size="small" onClick={() => {
+                        setQueryParams(null);
+                        form.resetFields();
+                    }}>
+                        {msgClearForm}
+                    </Button>
+                    <Button size="small" onClick={() => {
+                        setModalFilter(false);
+                        setQueryParams(null);
+                        setStartFilter(false);
+                    }}>
+                        {msgCancel}
+                    </Button>
+                    <Button size="small" onClick={() => {
+                        updateForm();
+                        setModalFilter(false);
+                    }}>
+                        {msgOk}
+                    </Button>
+                </div>
+            }
         >
             <div className="modal-filters">
                 <Form
                     form={form}
                     name="ngw_filter_layer"
                     onFinish={onFinish}
-                    onFieldsChange={onFieldsChange}
                     autoComplete="off"
-                    initialValues={initialValues}
                 >
                     {
                         fields.map((item) => (
@@ -267,42 +301,24 @@ export const FilterByData = observer(({
                                                     <span
                                                         className="icon-symbol padding-icon"
                                                         title={msgRemoveFilterField}
-                                                        onClick={() => { remove(name); }}>
+                                                        onClick={() => {
+                                                            remove(name);
+                                                            form
+                                                                .validateFields()
+                                                                .then((values) => {
+                                                                    onFinish(values);
+                                                                });
+                                                        }}>
                                                         <Remove />
                                                     </span>
                                                 </div>
                                             ))}
                                         </Card>
-
                                     </div>
                                 )}
                             </Form.List>
                         ))
                     }
-                    <div className="control-filters">
-                        <Button size="small" htmlType="submit">
-                            {msgCheckForm}
-                        </Button>
-                        <Button size="small" onClick={() => {
-                            setQueryParams(null);
-                            form.resetFields();
-                        }}>
-                            {msgClearForm}
-                        </Button>
-                        <Button size="small" onClick={() => {
-                            setModalFilter(false);
-                            setQueryParams(null);
-                            setStartFilter(false);
-                        }}>
-                            {msgCancel}
-                        </Button>
-                        <Button size="small" onClick={() => {
-                            updateForm();
-                            setModalFilter(false);
-                        }}>
-                            {msgOk}
-                        </Button>
-                    </div>
                 </Form>
             </div>
         </Modal >
