@@ -7,9 +7,6 @@ import {
     DateTimePicker,
     TimePicker,
     Input,
-    InputBigInteger,
-    InputInteger,
-    InputNumber,
     Modal,
     Select,
 } from "@nextgisweb/gui/antd";
@@ -18,7 +15,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { topics } from "@nextgisweb/webmap/identify-module"
 import { Form } from "@nextgisweb/gui/fields-form";
 
-import Add from "@nextgisweb/icon/material/add";
 import Remove from "@nextgisweb/icon/material/remove";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import type { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
@@ -66,9 +62,9 @@ const NUMBER_TYPE = ["REAL", "INTEGER", "BIGINT"];
 const type_comp = (value, props) => {
     const inputComp = {
         STRING: <Input {...props} />,
-        REAL: <InputNumber suffix {...props} />,
-        INTEGER: <InputInteger {...props} />,
-        BIGINT: <InputBigInteger {...props} />,
+        REAL: <Input {...props} />,
+        INTEGER: <Input {...props} />,
+        BIGINT: <Input {...props} />,
         DATETIME: <DateTimePicker suffixIcon={false} {...props} />,
         DATE: <DatePicker suffixIcon={false} {...props} />,
         TIME: <TimePicker suffixIcon={false} {...props} />,
@@ -103,7 +99,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     };
 
     const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newVal = field.datatype === "STRING" ? e.target.value : e;
+        const newVal = field.datatype === "STRING" || NUMBER_TYPE.includes(field.datatype) ? e.target.value : e;
 
         if (!("vals" in value)) {
             setVals(newVal);
@@ -274,51 +270,46 @@ export const FilterByData = observer(({
                     onFinish={onFinish}
                     autoComplete="off"
                 >
-                    {
-                        fields.map((item) => (
-                            <Form.List key={item.keyname} name={item.keyname}>
-                                {(field, { add, remove }) => (
-                                    <div className="field-row">
-                                        <Card
-                                            title={item.display_name}
-                                            size="small"
-                                            key={field.key}
-                                            className="card-row"
-                                            extra={
+                    {fields.map((item) => (
+                        <Form.List key={item.keyname} name={item.keyname}>
+                            {(field, { add, remove }) => (
+                                <div className="field-row">
+                                    <Card
+                                        title={
+                                            <span
+                                                className="title-button"
+                                                title={msgAddFilterField}
+                                                onClick={() => { add(); }}
+                                            >
+                                                {item.display_name}
+                                            </span>
+                                        }
+                                        size="small"
+                                        key={field.key}
+                                        className="card-row"
+
+                                    >
+                                        {field.map(({ key, name, ...restField }) => (
+                                            <div className="card-content" key={key}>
+                                                <Form.Item noStyle {...restField} name={[name]} >
+                                                    <FilterInput field={item} />
+                                                </Form.Item>
                                                 <span
-                                                    className="icon-symbol"
-                                                    title={msgAddFilterField}
-                                                    onClick={() => { add(); }}>
-                                                    <Add />
+                                                    className="icon-symbol padding-icon"
+                                                    title={msgRemoveFilterField}
+                                                    onClick={() => {
+                                                        remove(name);
+                                                        updateForm();
+                                                    }}>
+                                                    <Remove />
                                                 </span>
-                                            }
-                                        >
-                                            {field.map(({ key, name, ...restField }) => (
-                                                <div className="card-content" key={key}>
-                                                    <Form.Item noStyle {...restField} name={[name]} >
-                                                        <FilterInput field={item} />
-                                                    </Form.Item>
-                                                    <span
-                                                        className="icon-symbol padding-icon"
-                                                        title={msgRemoveFilterField}
-                                                        onClick={() => {
-                                                            remove(name);
-                                                            form
-                                                                .validateFields()
-                                                                .then((values) => {
-                                                                    onFinish(values);
-                                                                });
-                                                        }}>
-                                                        <Remove />
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </Card>
-                                    </div>
-                                )}
-                            </Form.List>
-                        ))
-                    }
+                                            </div>
+                                        ))}
+                                    </Card>
+                                </div>
+                            )}
+                        </Form.List>
+                    ))}
                 </Form>
             </div>
         </Modal >

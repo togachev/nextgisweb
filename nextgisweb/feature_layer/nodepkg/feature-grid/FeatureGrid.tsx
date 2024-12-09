@@ -2,7 +2,7 @@ import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 
-import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Dropdown, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -16,12 +16,14 @@ import FeatureTable from "./FeatureTable";
 import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID } from "./constant";
 import type { FeatureGridProps } from "./type";
+import type { MenuProps } from "@nextgisweb/gui/antd";
 
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import Clear from "@nextgisweb/icon/material/clear/outline";
 
 import { topics } from "@nextgisweb/webmap/identify-module"
 
@@ -29,6 +31,7 @@ import "./FeatureGrid.less";
 
 const msgEditFilter = gettext("Edit filter");
 const msgEnableFilter = gettext("Set up filter")
+const msgClearFilter = gettext("Clear filter")
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -122,20 +125,39 @@ export const FeatureGrid = observer(
             return <LoadingWrapper />;
         }
 
+        const items: MenuProps["items"] = queryParams?.fld_field_op ? [
+            {
+                key: "1",
+                label: msgClearFilter,
+                icon: <Clear />,
+            },
+        ] : [];
+
+        const menuProps = {
+            items,
+            onClick: () => {
+                setModalFilter(false);
+                setStartFilter(false);
+            },
+        };
+
         return (
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
                     <div className="filter-component">
                         <Tooltip mouseLeaveDelay={0} title={startFilter && queryParams?.fld_field_op ? msgEditFilter : msgEnableFilter}>
-                            <Button
-                                onClick={() => {
-                                    setModalFilter(true);
-                                    setStartFilter(true);
-                                }}
-                                type="text"
-                                className={queryParams?.fld_field_op && "icon-edit"}
-                                size="small"
-                                icon={<FilterIcon />} />
+                            <Dropdown menu={menuProps}>
+                                <Button
+                                    onClick={() => {
+                                        setModalFilter(true);
+                                        setStartFilter(true);
+                                    }}
+                                    type="text"
+                                    className={queryParams?.fld_field_op && "icon-edit"}
+                                    size="small"
+                                    icon={<FilterIcon />}
+                                />
+                            </Dropdown>
                         </Tooltip>
                         {startFilter && (<FilterByData id={id} store={store} />)}
                     </div>
