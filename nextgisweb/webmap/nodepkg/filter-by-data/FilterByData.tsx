@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Button,
     Card,
@@ -18,6 +18,7 @@ import { Form } from "@nextgisweb/gui/fields-form";
 import Remove from "@nextgisweb/icon/material/remove";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import type { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
+import type { InputRef } from "@nextgisweb/gui/antd";
 
 import "./FilterByData.less";
 
@@ -91,6 +92,14 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     const [vals, setVals] = useState();
     const [op, setOp] = useState<Operators>("eq");
 
+    const inputRef = useRef<InputRef>(null);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [inputRef.current]);
+
     const triggerChange = (changedValue: {
         vals?: TypeProps;
         op?: Operators;
@@ -128,6 +137,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
         placeholder: field.display_name,
         onChange: onFilterChange,
         value: value.vals,
+        ref: inputRef,
     };
 
     return (
@@ -157,9 +167,7 @@ export const FilterByData = observer(({
     id,
     store,
 }: FilterByDataProps) => {
-
     const { fields, setStartFilter, modalFilter, setModalFilter, setQueryParams, queryParams } = store;
-
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -279,7 +287,9 @@ export const FilterByData = observer(({
                                             <span
                                                 className="title-button"
                                                 title={msgAddFilterField}
-                                                onClick={() => { add(); }}
+                                                onClick={() => {
+                                                    add();
+                                                }}
                                             >
                                                 {item.display_name}
                                             </span>

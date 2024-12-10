@@ -23,7 +23,7 @@ import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-import Clear from "@nextgisweb/icon/material/clear/outline";
+import { CloseIcon } from "@nextgisweb/gui/icon";
 
 import { topics } from "@nextgisweb/webmap/identify-module"
 
@@ -129,7 +129,7 @@ export const FeatureGrid = observer(
             {
                 key: "1",
                 label: msgClearFilter,
-                icon: <Clear />,
+                icon: <CloseIcon />,
             },
         ] : [];
 
@@ -146,7 +146,7 @@ export const FeatureGrid = observer(
                 <FeatureGridActions store={store}>
                     <div className="filter-component">
                         <Tooltip mouseLeaveDelay={0} title={startFilter && queryParams?.fld_field_op ? msgEditFilter : msgEnableFilter}>
-                            <Dropdown menu={menuProps}>
+                            <Dropdown menu={menuProps} size="small">
                                 <Button
                                     onClick={() => {
                                         setModalFilter(true);
