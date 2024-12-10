@@ -208,7 +208,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
-                where.append(sa.or_(*_where_filter))
+                where.append(sa.and_(*_where_filter))
 
         if self._like or self._ilike:
             operands = []
