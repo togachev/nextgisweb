@@ -3,20 +3,16 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 class FilterLayerPlugin {
     private _display: DojoDisplay;
 
-    constructor(params: PluginParams) {
-        this._display = params.display;
-    }
-
-    private getPluginState = (nodeData) => {
-        const { type } = nodeData;
+    private getPluginState(nodeData) {
+        const { type, layerCls } = nodeData;
         const typeLayer = ["postgis_layer", "vector_layer"]
         return {
             enabled:
-                !this._display.tinyConfig && nodeData.type === "layer" && typeLayer.includes(nodeData.layerCls),
+                !this._display.tinyConfig && type === "layer" && typeLayer.includes(layerCls),
         };
     }
 
-    private getMenuItem = (nodeData) => {
+    private getMenuItem(nodeData) {
         return {
             icon: "material-filter_alt",
             title: gettext("Filter layer"),
@@ -28,8 +24,12 @@ class FilterLayerPlugin {
         };
     }
 
-    startup() {}
-    postCreate() {}
+    constructor(params: PluginParams) {
+        this._display = params.display;
+    }
+
+    startup() { }
+    postCreate() { }
 }
 
 export default FilterLayerPlugin;
