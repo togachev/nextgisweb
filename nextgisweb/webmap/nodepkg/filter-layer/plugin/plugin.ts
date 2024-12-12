@@ -3,6 +3,10 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 class FilterLayerPlugin {
     private _display: DojoDisplay;
 
+    constructor(params: PluginParams) {
+        this._display = params.display;
+    }
+
     private getPluginState(nodeData) {
         const { type, layerCls } = nodeData;
         const typeLayer = ["postgis_layer", "vector_layer"]
@@ -22,10 +26,6 @@ class FilterLayerPlugin {
                 return Promise.resolve(undefined);
             },
         };
-    }
-
-    constructor(params: PluginParams) {
-        this._display = params.display;
     }
 
     startup() { }
