@@ -7,21 +7,23 @@ class FilterLayerPlugin {
         this._display = params.display;
     }
 
-    getPluginState = (nodeData) => {
-        const { type, plugin } = nodeData;
+    private getPluginState = (nodeData) => {
+        const { type } = nodeData;
+        const typeLayer = ["postgis_layer", "vector_layer"]
         return {
-            enabled: type === "layer",
+            enabled:
+                !this._display.tinyConfig && nodeData.type === "layer" && typeLayer.includes(nodeData.layerCls),
         };
     }
 
-    getMenuItem = (nodeData) => {
+    private getMenuItem = (nodeData) => {
         return {
             icon: "material-filter_alt",
             title: gettext("Filter layer"),
             onClick: () => {
                 console.log(nodeData);
                 console.log(this._display);
-                // return Promise.resolve(undefined);
+                return Promise.resolve(undefined);
             },
         };
     }
