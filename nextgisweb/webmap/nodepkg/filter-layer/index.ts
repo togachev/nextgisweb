@@ -1,4 +1,4 @@
 /** @entrypoint */
-import { FilterLayer } from "./FilterLayer";
+import FilterLayer from "./FilterLayer";
 
 export default FilterLayer;
