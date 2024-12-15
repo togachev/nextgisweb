@@ -18,7 +18,7 @@ interface Tab {
 
 export class FilterLayerStore {
     valueRnd: Rnd | null = null;
-
+    styleOp: object;
     activeKey?: string | null = null;
 
     private _tabs: Tab[] = [];
@@ -84,6 +84,10 @@ export class FilterLayerStore {
 
     setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
         this.setValue("valueRnd", valueRnd);
+    };
+
+    setStyleOp = (styleOp: SetValue<object | null>) => {
+        this.setValue("styleOp", styleOp);
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

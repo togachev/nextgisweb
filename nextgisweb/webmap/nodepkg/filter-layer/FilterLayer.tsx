@@ -17,6 +17,9 @@ import {
 import { Rnd } from "react-rnd";
 import { FilterLayerStore } from "./FilterLayerStore";
 import CloseIcon from "@nextgisweb/icon/material/close";
+import Minimize from "@nextgisweb/icon/material/minimize";
+import OpenInFull from "@nextgisweb/icon/material/open_in_full";
+import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
@@ -33,19 +36,28 @@ const ComponentTest = ({ label }) => {
 export default observer(
     function FilterLayer(props) {
         const { item, position } = props;
-        // const { refs } = useVisible(); /*скрытие окна при нажатии за его пределами*/
+
+        /*скрытие окна при нажатии за его пределами*/
+        // const { refs } = useVisible();
 
         const [fields, setFields] = useState();
 
         const [store] = useState(
             () => new FilterLayerStore({
                 valueRnd: position,
+                styleOp: {
+                    minWidth: "50%",
+                    minHeight: "50%",
+                    collapse: false,
+                }
             }));
 
         const {
             activeKey, setActiveKey, removeTab,
             setValueRnd,
             valueRnd,
+            styleOp,
+            setStyleOp,
         } = store;
 
         const { data: resourceData } = useRouteGet<ResourceItem>(
@@ -71,15 +83,59 @@ export default observer(
 
         const close = () => {
             setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+            setStyleOp(prev => ({
+                ...prev,
+                minWidth: "50%",
+                minHeight: "50%",
+                collapse: false,
+            }));
         };
 
-        const operations =
-            <Button
-                type="text"
-                title={gettext("Close")}
-                onClick={close}
-                icon={<CloseIcon />}
-            />;
+        const collapse = () => {
+            setValueRnd(prev => ({ ...prev, width: 138, height: 40, x: window.innerWidth - 138, y: 40 }));
+            setStyleOp(prev => ({
+                ...prev,
+                minWidth: 138,
+                minHeight: 40,
+                collapse: true,
+            }));
+        };
+
+        const expand = () => {
+            setValueRnd(position);
+            setStyleOp(prev => ({
+                ...prev,
+                minWidth: "50%",
+                minHeight: "50%",
+                collapse: false,
+            }));
+        };
+
+        const operations = (
+            <span className={styleOp.collapse ? "op-button-collapse" : "op-button"}>
+                {styleOp.collapse && <span title={gettext("Filter layers")} className="icon-filter"><FilterIcon /></span>}
+                <Button
+                    disabled={styleOp.collapse ? true : false}
+                    type="text"
+                    title={gettext("Collapse")}
+                    onClick={collapse}
+                    icon={<Minimize />}
+                />
+                <Button
+                    disabled={styleOp.collapse ? false : true}
+                    type="text"
+                    title={gettext("Expand")}
+                    onClick={expand}
+                    icon={<OpenInFull />}
+                />
+                <Button
+                    type="text"
+                    title={gettext("Close")}
+                    onClick={close}
+                    icon={<CloseIcon />}
+                />
+            </span>
+        );
 
         useEffect(() => {
             if (items.length === 0) {
@@ -88,7 +144,10 @@ export default observer(
         }, [items]);
 
         useEffect(() => {
-            setValueRnd(position);
+            if (items.length === 0 || valueRnd.x < 0) {
+                setValueRnd(position);
+            }
+
             setActiveKey(item.layerId);
 
             store.addTab({
@@ -97,9 +156,11 @@ export default observer(
                 children: <ComponentTest label={item.label} />
             })
 
+            /*скрытие окна при нажатии за его пределами*/
             // if (refs.current) {
-            //     refs.current.hidden = false /*скрытие окна при нажатии за его пределами*/
+            //     refs.current.hidden = false 
             // }
+
         }, [position]);
 
         useEffect(() => {
@@ -125,10 +186,10 @@ export default observer(
                         topRight: "hover-angle-top-right",
                         topLeft: "hover-angle-top-left",
                     }}
-                    cancel=""
+                    cancel=".ant-tabs-content-holder,.op-button-collapse,.op-button"
                     bounds="window"
-                    minWidth={600}
-                    minHeight={600}
+                    minWidth={styleOp.minWidth}
+                    minHeight={styleOp.minHeight}
                     allowAnyClick={true}
                     enableResizing={true}
                     position={{ x: valueRnd.x, y: valueRnd.y }}
@@ -144,22 +205,20 @@ export default observer(
 
                 >
                     <div /*ref={refs}*/ /*скрытие окна при нажатии за его пределами*/ className="ngw-filter-layer">
-                        <div className="filter-container">
-                            <Tabs
-                                type="editable-card"
-                                hideAdd
-                                items={items}
-                                activeKey={activeKey || undefined}
-                                onChange={setActiveKey}
-                                onEdit={(targetKey, action) => {
-                                    if (action === "remove") {
-                                        removeTab(String(targetKey));
-                                    }
-                                }}
-                                parentHeight
-                                tabBarExtraContent={operations}
-                            />
-                        </div>
+                        <Tabs
+                            type="editable-card"
+                            hideAdd
+                            items={styleOp.collapse ? null : items}
+                            activeKey={activeKey || undefined}
+                            onChange={setActiveKey}
+                            onEdit={(targetKey, action) => {
+                                if (action === "remove") {
+                                    removeTab(String(targetKey));
+                                }
+                            }}
+                            parentHeight
+                            tabBarExtraContent={operations}
+                        />
                     </div>
                 </Rnd >,
                 document.body

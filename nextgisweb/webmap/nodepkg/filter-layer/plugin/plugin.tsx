@@ -21,15 +21,14 @@ class FilterLayerPlugin extends Component {
     }
 
     displayFilter = (nodeData) => {
-        const posX = window.innerWidth / 2 - 300;
-        const posY = window.innerHeight / 2 - 300;
+        const posX = window.innerWidth / 2 - window.innerWidth/100*50/2;
+        const posY = window.innerHeight / 2 - window.innerHeight/100*50/2;
         const position = {
             x: posX,
             y: posY,
-            width: 600,
-            height: 600,
+            width: "50%",
+            height: "50%",
         };
-
         this.root.render(<FilterLayer position={position} item={nodeData} />);
     };
 

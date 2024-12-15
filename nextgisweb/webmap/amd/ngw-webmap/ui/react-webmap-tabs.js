@@ -53,8 +53,6 @@ define([
 
         _runReactApp: function () {
             if (!this.component) {
-                console.log(this.display);
-                
                 this.component = reactApp.default(
                     WebMapTabs,
                     {
