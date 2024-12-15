@@ -191,7 +191,7 @@ export default observer(
                     minWidth={styleOp.minWidth}
                     minHeight={styleOp.minHeight}
                     allowAnyClick={true}
-                    enableResizing={true}
+                    enableResizing={styleOp.collapse ? false : true}
                     position={{ x: valueRnd.x, y: valueRnd.y }}
                     size={{ width: valueRnd.width, height: valueRnd.height }}
                     onDragStop={(e, d) => {
