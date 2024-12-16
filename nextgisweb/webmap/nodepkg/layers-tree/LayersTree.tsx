@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect, useMemo, useState } from "react";
 
-import { Col, Row, Tree } from "@nextgisweb/gui/antd";
+import { Button, Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 
 import type WebmapStore from "../store";
@@ -22,6 +22,9 @@ import {
     updateKeysForGroup,
     updateKeysForMutualExclusivity,
 } from "./util/treeItems";
+
+import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./LayersTree.less";
 
@@ -168,12 +171,25 @@ export const LayersTree = observer(
                         fileClickId={fileClickId}
                     />
                 );
+                const typeLayer = ["postgis_layer", "vector_layer"]
                 actions = (
                     <Col
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
                         {dropdownFile}
+                        {nodeData.treeItem.id === selectedKeys[0] && typeLayer.includes(nodeData.treeItem.layerCls) && (
+                            <span
+                                title={gettext("Filter layer")}
+                                className="more"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    console.log(selectedKeys[0]);
+                                }}
+                            >
+                                <FilterIcon />
+                            </span>
+                        )}
                         {dropdownAction}
                     </Col>
                 );

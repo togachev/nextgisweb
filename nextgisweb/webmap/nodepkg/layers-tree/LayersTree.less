@@ -3,7 +3,7 @@
         padding: 0;
 
         &.ant-tree-treenode-selected {
-            background-color: #e6f0f8;
+            background-color: #e6f0f800;
         }
     }
 
@@ -151,7 +151,7 @@
 .more,
 .legend {
     font-size: 18px;
-    color: #106a90;
+    color: var(--primary);
     width: 24px;
     height: 24px;
     display: flex;
@@ -159,6 +159,13 @@
     justify-content: center;
     align-items: center;
     flex: 0 0 auto;
+
+    &:hover {
+        background-color: var(--divider-color);
+        color: var(--text-base);
+        border-radius: 3px;
+        border: none;
+    }
 }
 
 .colSingleIconLegend {
