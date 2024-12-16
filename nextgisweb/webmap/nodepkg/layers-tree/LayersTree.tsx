@@ -78,6 +78,7 @@ export const LayersTree = observer(
         const [moreClickId, setMoreClickId] = useState<number>();
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
+        const [filterKeys, setFilterKeys] = useState<object>();
         const webmapItems = store.webmapItems;
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
@@ -147,7 +148,9 @@ export const LayersTree = observer(
             setSelectedKeys(val);
             if (onSelect) onSelect(val);
         };
-
+    
+        console.log(filterKeys);
+        
         const titleRender = (nodeData: TreeWebmapItem) => {
             const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
@@ -171,20 +174,24 @@ export const LayersTree = observer(
                         fileClickId={fileClickId}
                     />
                 );
-                const typeLayer = ["postgis_layer", "vector_layer"]
+                const typeLayer = ["postgis_layer", "vector_layer"];
+                const filterKey = selectedKeys[0];
                 actions = (
                     <Col
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
                         {dropdownFile}
-                        {nodeData.treeItem.id === selectedKeys[0] && typeLayer.includes(nodeData.treeItem.layerCls) && (
+                        {nodeData.treeItem.id === filterKey && typeLayer.includes(nodeData.treeItem.layerCls) && (
                             <span
                                 title={gettext("Filter layer")}
                                 className="more"
                                 onClick={(e) => {
                                     e.stopPropagation()
-                                    console.log(selectedKeys[0]);
+                                    setFilterKeys(prev => ({
+                                        ...prev,
+                                        [filterKey]: nodeData.treeItem,
+                                    }));
                                 }}
                             >
                                 <FilterIcon />
