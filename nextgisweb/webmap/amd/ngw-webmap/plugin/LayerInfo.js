@@ -8,7 +8,7 @@ define([
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             var type = nodeData.type;
-            var data = this.display.get("itemConfig").plugin[this.identity];
+            var data = nodeData.plugin[this.identity];
 
             return {
                 enabled:
@@ -38,7 +38,7 @@ define([
             const pm = this.display.panelsManager;
             const pkey = "resource-description";
             const item = this.display.dumpItem();
-            const data = this.display.get("itemConfig").plugin[this.identity];
+            const data = nodeData.plugin[this.identity];
             let content = [];
             const vectorType = ["postgis_layer", "vector_layer"];
             if (Object.values(data).length > 0) {

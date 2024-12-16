@@ -10,7 +10,7 @@ define([
     const title = !this.display ? gettext("Description") : "";
 
     return declare(DisplayWidget, {
-        title: `<div class="custom-popup-button" title="${gettext("Description")}">` + icon.html({ glyph: "description" }) + ` ${title}</div>`,
+        title: title,
 
         renderValue: function (value) {
             if (!value) {

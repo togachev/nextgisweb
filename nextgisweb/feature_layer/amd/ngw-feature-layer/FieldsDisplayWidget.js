@@ -34,7 +34,7 @@ define([
     var fieldsCache = {};
 
     return declare([DisplayWidget], {
-        title: `<div class="custom-popup-button" title="${gettext("Attributes")}">` + icon.html({ glyph: "table" }) + ` ${gettext("Attributes")}</div>`,
+        title: gettext("Attributes"),
         aliases: false,
         grid_visibility: false,
         urlRegex:

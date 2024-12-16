@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { WebmapPlugin } from "../type";
 import type { TreeItem } from "../type/TreeItems";
 
-import DotsVertical from "@nextgisweb/icon/material/more_vert";
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import "./DropdownActions.less";
 const AdditionalTools = gettext("Additional tools");
 
@@ -40,7 +40,7 @@ export function DropdownActions({
                     setMoreClickId(id);
                 }}
             >
-                <DotsVertical />
+                <MoreVertIcon />
             </span>
         );
     }
@@ -116,7 +116,7 @@ export function DropdownActions({
             )}
         >
             <span className="more">
-                <DotsVertical />
+                <MoreVertIcon />
             </span>
         </Dropdown>
     );

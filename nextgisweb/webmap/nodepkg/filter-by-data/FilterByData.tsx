@@ -197,9 +197,7 @@ export const FilterByData = observer(({
                         vf = field[index].vals.format("YYYY-MM-DD")
                     } else if (value.datatype === "DATETIME") {
                         vf = field[index].vals.format("YYYY-MM-DD H:m:s")
-                    } else if (value.datatype === "DATETIME") {
-                        vf = field[index].vals.format("YYYY-MM-DD H:m:s")
-                    };
+                    }
                     Object.assign(obj, {
                         [idx.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
                     });

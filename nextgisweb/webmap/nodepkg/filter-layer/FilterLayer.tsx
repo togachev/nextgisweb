@@ -1,18 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import useVisible from "./useVisible";
+// import useVisible from "./useVisible";
 import {
     Button,
-    Card,
-    DatePicker,
-    DateTimePicker,
     Tabs,
-    TimePicker,
-    Input,
-    Select,
 } from "@nextgisweb/gui/antd";
 import { Rnd } from "react-rnd";
 import { FilterLayerStore } from "./FilterLayerStore";
@@ -41,7 +35,7 @@ export default observer(
         // const { refs } = useVisible();
 
         const [fields, setFields] = useState();
-
+        
         const [store] = useState(
             () => new FilterLayerStore({
                 valueRnd: position,

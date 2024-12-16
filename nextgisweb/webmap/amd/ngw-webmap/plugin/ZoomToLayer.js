@@ -2,9 +2,9 @@ define([
     "dojo/_base/declare",
     "./_PluginBase",
     "dojo/request/xhr",
-    "@nextgisweb/pyramid/api",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
-], function (declare, _PluginBase, xhr, api, { gettext }) {
+], function (declare, _PluginBase, xhr, route, i18n) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             return {
@@ -22,7 +22,7 @@ define([
             var widget = this;
             return {
                 icon: "material-zoom_in_map",
-                title: gettext("Zoom to layer"),
+                title: i18n.gettext("Zoom to layer"),
                 onClick: function () {
                     return widget.run();
                 },
@@ -30,17 +30,17 @@ define([
         },
 
         zoomToLayer: function () {
-            const item = this.display.dumpItem();
+            var plugin = this,
+                item = this.display.dumpItem();
 
-            api.route("feature_layer.feature.extent", item.layerId)
-                .get()
-                .then((extent) => {
-                    if (!extent) return;
-                    this.display.map.zoomToNgwExtent(
-                        extent,
-                        this.display.displayProjection
-                    );
-                });
+            xhr.get(route.layer.extent({ id: item.styleId }), {
+                handleAs: "json",
+            }).then(function ({ extent }) {
+                plugin.display.map.zoomToNgwExtent(
+                    extent,
+                    plugin.display.displayProjection
+                );
+            });
         },
     });
 });
