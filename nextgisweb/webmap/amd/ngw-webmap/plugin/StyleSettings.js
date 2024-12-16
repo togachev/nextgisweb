@@ -7,9 +7,10 @@ define([
 ], function (declare, _PluginBase, xhr, api, { gettext }) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
+            const typeLayer = ["postgis_layer", "vector_layer"]
             return {
                 enabled:
-                    !this.display.tinyConfig && nodeData.type === "layer" && nodeData.plugin[this.identity],
+                !this.display.tinyConfig && nodeData.type === "layer" && nodeData.plugin[this.identity] && typeLayer.includes(nodeData.layerCls),
             };
         },
 
