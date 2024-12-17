@@ -1,6 +1,4 @@
 import re
-import json
-import requests 
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
@@ -457,7 +455,7 @@ def cget(
     dumper = Dumper(resource, dumper_params)
 
     keys = [fld.keyname for fld in resource.fields]
-    query = resource.feature_query()
+    query = dumper.feature_query()
 
     d = dict()
     for k,v in dict(request.GET).items():

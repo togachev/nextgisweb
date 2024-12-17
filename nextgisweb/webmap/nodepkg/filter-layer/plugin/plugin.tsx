@@ -20,7 +20,7 @@ class FilterLayerPlugin extends Component {
         this.root = createRoot(this.point);
     }
 
-    displayFilter = (nodeData) => {
+    run(nodeData) {
         this.root.render(<FilterLayer display={this._display} item={nodeData} loads={new Date} />);
     };
 
@@ -38,7 +38,7 @@ class FilterLayerPlugin extends Component {
             icon: "material-filter_alt",
             title: gettext("Filter layer"),
             onClick: () => {
-                this.displayFilter(nodeData);
+                this.run(nodeData);
                 return Promise.resolve(undefined);
             },
         };

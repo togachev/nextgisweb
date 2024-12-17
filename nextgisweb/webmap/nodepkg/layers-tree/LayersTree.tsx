@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
@@ -24,6 +24,7 @@ import {
 } from "./util/treeItems";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import FilterLayer from "@nextgisweb/webmap/filter-layer/FilterLayer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./LayersTree.less";
@@ -79,8 +80,11 @@ export const LayersTree = observer(
         const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const [filterKeys, setFilterKeys] = useState<object>();
-        const webmapItems = store.webmapItems;
 
+        const [isMouseOver, setIsMouseOver] = useState(false);
+
+        const webmapItems = store.webmapItems;
+        const nodeRef = useRef();
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
         const treeItems = useMemo(() => {
@@ -152,8 +156,9 @@ export const LayersTree = observer(
         const titleRender = (nodeData: TreeWebmapItem) => {
             const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
-
+            
             let actions;
+            let actionsFile;
             if (shouldActions) {
                 const dropdownAction = showDropdown && (
                     <DropdownActions
@@ -172,30 +177,21 @@ export const LayersTree = observer(
                         fileClickId={fileClickId}
                     />
                 );
-                const typeLayer = ["postgis_layer", "vector_layer"];
-                const filterKey = selectedKeys[0];
+
                 actions = (
                     <Col
                         className="tree-item-action"
                         style={{ alignItems: "center" }}
                     >
-                        {dropdownFile}
-                        {nodeData.treeItem.id === filterKey && typeLayer.includes(nodeData.treeItem.layerCls) && (
-                            <span
-                                title={gettext("Filter layer")}
-                                className="more"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    setFilterKeys(prev => ({
-                                        ...prev,
-                                        [filterKey]: nodeData.treeItem,
-                                    }));
-                                }}
-                            >
-                                <FilterIcon />
-                            </span>
-                        )}
                         {dropdownAction}
+                    </Col>
+                );
+                actionsFile = (
+                    <Col
+                        className="tree-item-action"
+                        style={{ alignItems: "center" }}
+                    >
+                        {dropdownFile}
                     </Col>
                 );
             }
@@ -205,13 +201,44 @@ export const LayersTree = observer(
                     onClick={() => setUpdate(!update)}
                 />
             );
+
+            const handleEnter = () => {
+                if (nodeRef.current) {
+                    console.log(nodeRef.current);
+                    setIsMouseOver(true);
+                }
+            };
+
+            const handleLeave = () => {
+                setIsMouseOver(false);
+            };
+            const handleClick = () => {
+                setIsMouseOver(true);
+            };
+
+            const typeLayer = ["postgis_layer", "vector_layer"];
+
             return (
                 <>
-                    <Row wrap={false}>
+                    <Row wrap={false} onClick={handleClick} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
                         <Col flex="auto" className="tree-item-title">
                             {legendAction}
                             <div className="legend-title">{title}</div>
+                            {isMouseOver && typeLayer.includes(nodeData.treeItem.layerCls) ? (
+                                <span
+                                    title={gettext("Filter layer")}
+                                    className="more"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsMouseOver(false);
+                                        display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
+                                    }}
+                                >
+                                    <FilterIcon />
+                                </span>
+                            ) : null}
                         </Col>
+                        {isMouseOver && actionsFile}
                         {actions}
                     </Row>
                     {showLegend && (
@@ -235,6 +262,7 @@ export const LayersTree = observer(
 
         return (
             <Tree
+                ref={nodeRef}
                 className={
                     "ngw-webmap-layers-tree" + (!shouldShowLine ? " flat" : "")
                 }
