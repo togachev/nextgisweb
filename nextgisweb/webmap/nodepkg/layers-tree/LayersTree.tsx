@@ -156,7 +156,7 @@ export const LayersTree = observer(
         const titleRender = (nodeData: TreeWebmapItem) => {
             const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
-            
+
             let actions;
             let actionsFile;
             if (shouldActions) {
@@ -203,10 +203,7 @@ export const LayersTree = observer(
             );
 
             const handleEnter = () => {
-                if (nodeRef.current) {
-                    console.log(nodeRef.current);
-                    setIsMouseOver(true);
-                }
+                setIsMouseOver(true);
             };
 
             const handleLeave = () => {
@@ -224,21 +221,21 @@ export const LayersTree = observer(
                         <Col flex="auto" className="tree-item-title">
                             {legendAction}
                             <div className="legend-title">{title}</div>
-                            {isMouseOver && typeLayer.includes(nodeData.treeItem.layerCls) ? (
-                                <span
-                                    title={gettext("Filter layer")}
-                                    className="more"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsMouseOver(false);
-                                        display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
-                                    }}
-                                >
-                                    <FilterIcon />
-                                </span>
-                            ) : null}
                         </Col>
-                        {isMouseOver && actionsFile}
+                        {actionsFile}
+                        {isMouseOver && typeLayer.includes(nodeData.treeItem.layerCls) ? (
+                            <span
+                                title={gettext("Filter layer")}
+                                className="more"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMouseOver(false);
+                                    display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
+                                }}
+                            >
+                                <FilterIcon />
+                            </span>
+                        ) : null}
                         {actions}
                     </Row>
                     {showLegend && (
