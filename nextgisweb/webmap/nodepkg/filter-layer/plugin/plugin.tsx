@@ -21,15 +21,7 @@ class FilterLayerPlugin extends Component {
     }
 
     displayFilter = (nodeData) => {
-        const posX = window.innerWidth / 2 - window.innerWidth/100*50/2;
-        const posY = window.innerHeight / 2 - window.innerHeight/100*50/2;
-        const position = {
-            x: posX,
-            y: posY,
-            width: "50%",
-            height: "50%",
-        };
-        this.root.render(<FilterLayer position={position} item={nodeData} />);
+        this.root.render(<FilterLayer display={this._display} item={nodeData} loads={new Date} />);
     };
 
     private getPluginState(nodeData) {
@@ -47,6 +39,7 @@ class FilterLayerPlugin extends Component {
             title: gettext("Filter layer"),
             onClick: () => {
                 this.displayFilter(nodeData);
+                return Promise.resolve(undefined);
             },
         };
     }

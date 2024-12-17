@@ -148,9 +148,7 @@ export const LayersTree = observer(
             setSelectedKeys(val);
             if (onSelect) onSelect(val);
         };
-    
-        console.log(filterKeys);
-        
+
         const titleRender = (nodeData: TreeWebmapItem) => {
             const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;

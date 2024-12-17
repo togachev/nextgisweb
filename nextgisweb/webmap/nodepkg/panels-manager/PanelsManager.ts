@@ -8,6 +8,8 @@ import { navigationMenuStore } from "@nextgisweb/webmap/navigation-menu/Navigati
 import type { NavigationPanelInfo } from "../navigation-menu/NavigationMenuStore";
 import type { DojoDisplay, DojoItem, PanelDojoItem } from "../type";
 
+import { topics } from "@nextgisweb/webmap/identify-module"
+
 interface PanelElements {
     main: DojoItem;
     leftPanel: PanelDojoItem;
@@ -128,6 +130,7 @@ export class PanelsManager {
         const { name } = panelToActivate;
         this._activePanelKey = name;
         navigationMenuStore.setActive(this._activePanelKey, "manager");
+        topics.publish("activePanel", true);
     }
 
     private _deactivatePanel(panel: string | PanelDojoItem): void {
@@ -152,6 +155,7 @@ export class PanelsManager {
 
         this._activePanelKey = undefined;
         navigationMenuStore.setActive(this._activePanelKey, "manager");
+        topics.publish("activePanel", false);
     }
 
     private _closePanel(panel: PanelDojoItem): void {

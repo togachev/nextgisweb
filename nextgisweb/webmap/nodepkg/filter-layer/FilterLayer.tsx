@@ -3,42 +3,67 @@ import { createPortal } from "react-dom";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-// import useVisible from "./useVisible";
-import {
-    Button,
-    Tabs,
-} from "@nextgisweb/gui/antd";
+import { Button, Tabs } from "@nextgisweb/gui/antd";
 import { Rnd } from "react-rnd";
 import { FilterLayerStore } from "./FilterLayerStore";
-import CloseIcon from "@nextgisweb/icon/material/close";
 import Minimize from "@nextgisweb/icon/material/minimize";
-import OpenInFull from "@nextgisweb/icon/material/open_in_full";
+
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import Close from "@nextgisweb/icon/material/close/outline";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
+import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen/outline";
 
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 
+import { topics } from "@nextgisweb/webmap/identify-module"
+
 import "./FilterLayer.less";
 
 const ComponentTest = ({ label }) => {
     return (
-        <div>{label}</div>
+        <div className="filter-content">Форма с фильтром для {label}</div>
     )
+}
+
+const offset = 40;
+const params = (activePanel, collapse) => {
+    const posX = collapse ?
+        activePanel ? 16 + 6 + 30 + 350 + offset : 16 + 6 + 30 + offset :
+        window.innerWidth / 2 - window.innerWidth / 100 * 50 / 2;
+
+    const posY = collapse ? 17 + offset :
+        window.innerHeight / 2 - window.innerHeight / 100 * 50 / 2;
+
+    const width = collapse ? 30 : "50%";
+    const height = collapse ? 30 : "50%";
+    const position = {
+        x: posX,
+        y: posY,
+        width: width,
+        height: height,
+    }
+    return position;
 }
 
 export default observer(
     function FilterLayer(props) {
-        const { item, position } = props;
-
-        /*скрытие окна при нажатии за его пределами*/
-        // const { refs } = useVisible();
+        const { display, item, loads } = props;
 
         const [fields, setFields] = useState();
-        
+        const [activePanel, setActivePanel] = useState(display.panelsManager._activePanelKey && true);
+
+        topics.subscribe("activePanel",
+            async (e) => {
+                setActivePanel(e.detail);
+            }
+        );
+
         const [store] = useState(
             () => new FilterLayerStore({
-                valueRnd: position,
+                valueRnd: params(activePanel, false),
                 styleOp: {
                     minWidth: "50%",
                     minHeight: "50%",
@@ -56,7 +81,7 @@ export default observer(
 
         const { data: resourceData } = useRouteGet<ResourceItem>(
             "resource.item",
-            { id: item.layerId },
+            { id: item?.layerId },
             { cache: true },
         );
 
@@ -85,51 +110,102 @@ export default observer(
             }));
         };
 
-        const collapse = () => {
-            setValueRnd(prev => ({ ...prev, width: 138, height: 40, x: window.innerWidth - 138, y: 40 }));
+        const openInFull = () => {
+            setValueRnd(prev => ({ ...prev, width: window.innerWidth - offset, height: window.innerHeight - offset, x: offset, y: offset }));
             setStyleOp(prev => ({
                 ...prev,
-                minWidth: 138,
-                minHeight: 40,
-                collapse: true,
+                open_in_full: true,
             }));
         };
 
-        const expand = () => {
-            setValueRnd(position);
+        const clearAllFilter = () => {
+            setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
             setStyleOp(prev => ({
                 ...prev,
                 minWidth: "50%",
                 minHeight: "50%",
                 collapse: false,
             }));
+
+            items.map(i => {
+                removeTab(String(i.key));
+            })
+        };
+
+        const collapse = () => {
+            setValueRnd(params(activePanel, true));
+            setStyleOp(prev => ({
+                ...prev,
+                minWidth: 30,
+                minHeight: 30,
+                collapse: true,
+            }));
+        };
+
+        const expand = () => {
+            setValueRnd(params(activePanel, false));
+            setStyleOp(prev => ({
+                ...prev,
+                minWidth: "50%",
+                minHeight: "50%",
+                collapse: false,
+                open_in_full: false,
+            }));
         };
 
         const operations = (
             <span className={styleOp.collapse ? "op-button-collapse" : "op-button"}>
-                {styleOp.collapse && <span title={gettext("Filter layers")} className="icon-filter"><FilterIcon /></span>}
-                <Button
-                    disabled={styleOp.collapse ? true : false}
-                    type="text"
-                    title={gettext("Collapse")}
-                    onClick={collapse}
-                    icon={<Minimize />}
-                />
-                <Button
-                    disabled={styleOp.collapse ? false : true}
-                    type="text"
-                    title={gettext("Expand")}
-                    onClick={expand}
-                    icon={<OpenInFull />}
-                />
-                <Button
-                    type="text"
-                    title={gettext("Close")}
-                    onClick={close}
-                    icon={<CloseIcon />}
-                />
+                {styleOp.collapse ?
+                    <Button
+                        icon={<FilterIcon />}
+                        type="text"
+                        title={gettext("Filter layers")}
+                        onClick={expand}
+                    /> :
+                    <>
+                        <Button
+                            disabled={styleOp.collapse ? true : false}
+                            type="text"
+                            title={gettext("Collapse")}
+                            onClick={collapse}
+                            icon={<Minimize />}
+                        />
+                        {
+                            styleOp.open_in_full ?
+                                <Button
+                                    type="text"
+                                    title={gettext("Close fullscreen")}
+                                    onClick={expand}
+                                    icon={<CloseFullscreen />}
+                                />
+                                :
+                                <Button
+                                    type="text"
+                                    title={gettext("Open in full")}
+                                    onClick={openInFull}
+                                    icon={<OpenInFull />}
+                                />
+                        }
+                        <Button
+                            type="text"
+                            title={gettext("Clear all filter")}
+                            onClick={clearAllFilter}
+                            icon={<DeleteForever />}
+                        />
+                        <Button
+                            type="text"
+                            title={gettext("Close")}
+                            onClick={close}
+                            icon={<Close />}
+                        />
+                    </>
+                }
             </span>
         );
+
+        useEffect(() => {
+            setValueRnd(params(activePanel, styleOp.collapse));
+        }, [activePanel]);
 
         useEffect(() => {
             if (items.length === 0) {
@@ -139,23 +215,19 @@ export default observer(
 
         useEffect(() => {
             if (items.length === 0 || valueRnd.x < 0) {
-                setValueRnd(position);
+                setValueRnd(params(activePanel, false));
+            } else {
+                expand()
             }
-
             setActiveKey(item.layerId);
 
             store.addTab({
                 key: String(item.layerId),
                 label: item.label,
-                children: <ComponentTest label={item.label} />
+                children: <ComponentTest label={item.label} operations={operations} />
             })
 
-            /*скрытие окна при нажатии за его пределами*/
-            // if (refs.current) {
-            //     refs.current.hidden = false 
-            // }
-
-        }, [position]);
+        }, [loads]);
 
         useEffect(() => {
             if (resourceData) {
@@ -198,9 +270,11 @@ export default observer(
                     }}
 
                 >
-                    <div /*ref={refs}*/ /*скрытие окна при нажатии за его пределами*/ className="ngw-filter-layer">
+                    <div className="ngw-filter-layer">
                         <Tabs
                             type="editable-card"
+                            tabPosition="top"
+                            size="small"
                             hideAdd
                             items={styleOp.collapse ? null : items}
                             activeKey={activeKey || undefined}
@@ -211,7 +285,7 @@ export default observer(
                                 }
                             }}
                             parentHeight
-                            tabBarExtraContent={operations}
+                            tabBarExtraContent={{ right: operations }}
                         />
                     </div>
                 </Rnd >,
