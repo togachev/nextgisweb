@@ -4,7 +4,6 @@ import { createRoot } from "react-dom/client";
 import FilterLayer from "../FilterLayer";
 
 import type { DojoDisplay, PluginParams } from "@nextgisweb/webmap/type";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
 class FilterLayerPlugin extends Component {
     private _display: DojoDisplay;
@@ -20,30 +19,10 @@ class FilterLayerPlugin extends Component {
         this.root = createRoot(this.point);
     }
 
-    async run(nodeData) {
-        await this.root.render(<FilterLayer display={this._display} item={nodeData} loads={new Date} />);
+    private run(nodeData) {
+        this.root.render(<FilterLayer display={this._display} item={nodeData} loads={new Date} />);
         return Promise.resolve(nodeData);
     };
-
-    private getPluginState(nodeData) {
-        const { type, layerCls } = nodeData;
-        const typeLayer = ["postgis_layer", "vector_layer"]
-        return {
-            enabled:
-                !this._display.tinyConfig && type === "layer" && typeLayer.includes(layerCls),
-        };
-    }
-
-    private getMenuItem(nodeData) {
-        return {
-            icon: "material-filter_alt",
-            title: gettext("Filter layer"),
-            onClick: () => {
-                this.run(nodeData);
-                return Promise.resolve(undefined);
-            },
-        };
-    }
 
     startup() { }
     postCreate() { }

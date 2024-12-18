@@ -177,8 +177,8 @@ export const FilterByData = observer(({
     const onFinish = (values) => {
 
         const keys_ = Object.keys(values || {});
-        let obj: object = {};
-        getEntries(fields).map(([key, value], idx) => {
+        const obj: object = {};
+        getEntries(fields).map(([_, value], idx) => {
             if (keys_.includes(value.keyname)) {
                 const field = values[value.keyname];
 
@@ -187,7 +187,7 @@ export const FilterByData = observer(({
                         setQueryParams(null)
                         return
                     };
-                    let op = item?.vals ? "__" + item.op : ""; /* оператор */
+                    const op = item?.vals ? "__" + item.op : ""; /* оператор */
                     let vf = field[index].vals; /* значение */
                     const opt_ = value.datatype === "STRING" && ["like", "ilike"].includes(item.op) ? "%" : ""; /* %like%, %ilike% */
 

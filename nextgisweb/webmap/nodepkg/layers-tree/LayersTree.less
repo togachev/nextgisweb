@@ -3,7 +3,7 @@
         padding: 0;
 
         &.ant-tree-treenode-selected {
-            background-color: #e6f0f8;
+            background-color: #e6f0f800;
         }
     }
 
@@ -35,6 +35,7 @@
         align-items: center;
         min-height: 30px;
         line-height: 30px;
+
         &:hover {
             background: transparent;
         }
@@ -97,7 +98,8 @@
     }
 }
 
-:where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-node-content-wrapper:hover, :where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-checkbox+span:hover {
+:where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-node-content-wrapper:hover,
+:where(.css-dev-only-do-not-override-1j0bb9m).ant-tree .ant-tree-checkbox+span:hover {
     background-color: #ffffff00;
 }
 
@@ -168,13 +170,13 @@
     &:hover {
         background-color: var(--divider-color);
         color: var(--text-base);
-        border-radius: 3px;
-        border: none;
+        border-radius: 50%;
     }
 }
+
 .more-grey {
     font-size: 18px;
-    color: var(--icon-color);
+    color: var(--text-secondary);
     width: 24px;
     height: 24px;
     display: flex;
@@ -196,13 +198,6 @@
     align-items: center;
     flex: 0 0 auto;
     border-radius: 3px;
-
-    &:hover {
-        background-color: var(--divider-color);
-        color: var(--text-base);
-        border-radius: 3px;
-        border: none;
-    }
 }
 
 .colSingleIconLegend {
