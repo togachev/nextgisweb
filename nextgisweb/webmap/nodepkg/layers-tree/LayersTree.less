@@ -3,7 +3,7 @@
         padding: 0;
 
         &.ant-tree-treenode-selected {
-            background-color: #e6f0f800;
+            background-color: #e6f0f8;
         }
     }
 
@@ -41,6 +41,8 @@
 
         .ant-row {
             margin: 0;
+            display: flex;
+            align-items: center;
         }
 
         .ant-tree-icon__customize {
@@ -162,6 +164,38 @@
     justify-content: center;
     align-items: center;
     flex: 0 0 auto;
+
+    &:hover {
+        background-color: var(--divider-color);
+        color: var(--text-base);
+        border-radius: 3px;
+        border: none;
+    }
+}
+.more-grey {
+    font-size: 18px;
+    color: var(--icon-color);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    border-radius: 3px;
+}
+
+.more-checked {
+    font-size: 18px;
+    color: var(--text-base);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    border-radius: 3px;
 
     &:hover {
         background-color: var(--divider-color);

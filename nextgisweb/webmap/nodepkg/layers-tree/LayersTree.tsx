@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { Button, Col, Row, Tree } from "@nextgisweb/gui/antd";
+import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 
 import type WebmapStore from "../store";
@@ -24,7 +24,7 @@ import {
 } from "./util/treeItems";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-import FilterLayer from "@nextgisweb/webmap/filter-layer/FilterLayer";
+import { topics } from "@nextgisweb/webmap/identify-module"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./LayersTree.less";
@@ -82,9 +82,11 @@ export const LayersTree = observer(
         const [filterKeys, setFilterKeys] = useState<object>();
 
         const [isMouseOver, setIsMouseOver] = useState(false);
-
+        const [selectedId, setSelectedId] = useState<number[]>([]);
         const webmapItems = store.webmapItems;
-        const nodeRef = useRef();
+
+        const ref = useRef<React.ComponentRef<typeof Tree>>();
+
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
         const treeItems = useMemo(() => {
@@ -153,6 +155,16 @@ export const LayersTree = observer(
             if (onSelect) onSelect(val);
         };
 
+        topics.subscribe("removeTabFilter",
+            async (e) => {
+                setFilterKeys(prev => {
+                    const state = { ...prev };
+                    delete state[e.detail];
+                    return state;
+                });
+            }
+        );
+
         const titleRender = (nodeData: TreeWebmapItem) => {
             const { title, fileResourceVisible } = nodeData.treeItem;
             const shouldActions = showLegend || showDropdown;
@@ -202,40 +214,78 @@ export const LayersTree = observer(
                 />
             );
 
-            const handleEnter = () => {
-                setIsMouseOver(true);
-            };
-
-            const handleLeave = () => {
-                setIsMouseOver(false);
-            };
-            const handleClick = () => {
-                setIsMouseOver(true);
-            };
-
             const typeLayer = ["postgis_layer", "vector_layer"];
+            const idNode = nodeData.treeItem.id
+            const filtered = filterKeys && Object.entries(filterKeys).filter(([key, value]) => value === idNode)[0];
+
+            const handleEnter = (id) => {
+                // setIsMouseOver(true);
+                setSelectedId(prev => [...prev, id]);
+            };
+
+            const handleLeave = (id) => {
+                // setIsMouseOver(false);
+                setSelectedId(prev => prev.filter(i => i !== id))
+            };
 
             return (
                 <>
-                    <Row wrap={false} onClick={handleClick} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+                    <Row key={idNode} wrap={false} onMouseEnter={() => handleEnter(idNode)} onMouseLeave={() => handleLeave(idNode)}>
                         <Col flex="auto" className="tree-item-title">
                             {legendAction}
                             <div className="legend-title">{title}</div>
+
                         </Col>
                         {actionsFile}
-                        {isMouseOver && typeLayer.includes(nodeData.treeItem.layerCls) ? (
-                            <span
-                                title={gettext("Filter layer")}
-                                className="more"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsMouseOver(false);
-                                    display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
-                                }}
-                            >
-                                <FilterIcon />
-                            </span>
-                        ) : null}
+                        {typeLayer.includes(nodeData.treeItem.layerCls) && (<>
+                            {selectedId.includes(idNode) ?
+                                <>
+                                    {filtered ?
+                                        <span title={gettext("Filter layer 3")} className="more-checked"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                topics.publish("removeTabFilter", filtered[0]);
+                                                setSelectedId(prev => prev.filter(i => i !== idNode))
+                                                setFilterKeys(prev => {
+                                                    const state = { ...prev };
+                                                    delete state[filtered[0]];
+                                                    return state;
+                                                });
+                                            }}>
+                                            <FilterIcon />
+                                        </span> :
+                                        <span title={gettext("Filter layer 2")} className="more-grey"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setIsMouseOver(false);
+                                                display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
+                                                    .then(item => {
+                                                        setFilterKeys(prev => ({ ...prev, [item.layerId]: item.id, }));
+                                                    })
+                                            }}>
+                                            <FilterIcon />
+                                        </span>
+                                    }
+                                </> : <>
+                                    {filtered ?
+                                        <span title={gettext("Filter layer 1")} className="more"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                topics.publish("removeTabFilter", filtered[0]);
+                                                setSelectedId(prev => prev.filter(i => i !== idNode))
+                                                setFilterKeys(prev => {
+                                                    const state = { ...prev };
+                                                    delete state[filtered[0]];
+                                                    return state;
+                                                });
+                                            }}>
+                                            <FilterIcon />
+                                        </span> :
+                                        <></>
+                                    }
+                                </>
+                            }
+                        </>)}
                         {actions}
                     </Row>
                     {showLegend && (
@@ -259,7 +309,7 @@ export const LayersTree = observer(
 
         return (
             <Tree
-                ref={nodeRef}
+
                 className={
                     "ngw-webmap-layers-tree" + (!shouldShowLine ? " flat" : "")
                 }

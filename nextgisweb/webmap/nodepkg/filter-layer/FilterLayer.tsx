@@ -61,6 +61,7 @@ export default observer(
             }
         );
 
+
         const [store] = useState(
             () => new FilterLayerStore({
                 valueRnd: params(activePanel, false),
@@ -78,6 +79,13 @@ export default observer(
             styleOp,
             setStyleOp,
         } = store;
+
+
+        topics.subscribe("removeTabFilter",
+            async (e) => {
+                removeTab(e.detail);
+            }
+        );
 
         const { data: resourceData } = useRouteGet<ResourceItem>(
             "resource.item",
@@ -129,6 +137,7 @@ export default observer(
 
             items.map(i => {
                 removeTab(String(i.key));
+                topics.publish("removeTabFilter", String(i.key));
             })
         };
 
@@ -281,6 +290,7 @@ export default observer(
                             onChange={setActiveKey}
                             onEdit={(targetKey, action) => {
                                 if (action === "remove") {
+                                    topics.publish("removeTabFilter", String(targetKey));
                                     removeTab(String(targetKey));
                                 }
                             }}

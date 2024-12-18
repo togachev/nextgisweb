@@ -20,8 +20,9 @@ class FilterLayerPlugin extends Component {
         this.root = createRoot(this.point);
     }
 
-    run(nodeData) {
-        this.root.render(<FilterLayer display={this._display} item={nodeData} loads={new Date} />);
+    async run(nodeData) {
+        await this.root.render(<FilterLayer display={this._display} item={nodeData} loads={new Date} />);
+        return Promise.resolve(nodeData);
     };
 
     private getPluginState(nodeData) {
