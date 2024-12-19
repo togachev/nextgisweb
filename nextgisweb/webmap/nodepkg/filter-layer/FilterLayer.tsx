@@ -150,31 +150,12 @@ export default observer(
         };
 
         const collapse = () => {
-            setValueRnd(params(activePanel, true, false));
-            setStyleOp(prev => ({
-                ...prev,
-                minWidth: 30,
-                minHeight: 30,
-                collapse: true,
-            }));
+            ref!.current!.resizableElement.current.hidden = true
         };
 
-        const expand = () => {
-            if (
-                pos_x === valueRnd.posX &&
-                pos_y === valueRnd.posY &&
-                width === valueRnd.width &&
-                height === valueRnd.height
-            ) {
-                setValueRnd(params(activePanel, false, false))
-            } else if (
-                window.innerWidth - offset === valueRnd.width &&
-                window.innerHeight - offset === valueRnd.height
-            ) {
-                setValueRnd(params(activePanel, false, false));
-            } else {
-                setValueRnd(params(activePanel, false, valueRnd));
-            }
+        const expand = (val) => {
+            ref!.current!.resizableElement.current.hidden = false
+            setValueRnd(params(activePanel, false, val));
             setStyleOp(prev => ({
                 ...prev,
                 minWidth: width,
@@ -206,7 +187,7 @@ export default observer(
                                 <Button
                                     type="text"
                                     title={gettext("Close fullscreen")}
-                                    onClick={expand}
+                                    onClick={() => { expand(false) }}
                                     icon={<CloseFullscreen />}
                                 />
                                 :
@@ -249,7 +230,7 @@ export default observer(
                     open_in_full: false,
                 }));
             } else {
-                expand()
+                expand(valueRnd)
             }
             setActiveKey(item.layerId);
 
