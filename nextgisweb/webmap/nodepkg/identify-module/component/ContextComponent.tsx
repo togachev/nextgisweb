@@ -1,6 +1,6 @@
 import { forwardRef, RefObject } from "react";
 import { createPortal } from "react-dom";
-import { useOutsideClick } from "../hook/useOutsideClick";
+import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -10,7 +10,7 @@ import type { Params } from "./type";
 export default forwardRef<Element>(function ContextComponent(props: Params, ref: RefObject<Element>) {
     const { params, visible, display, array_context } = props;
     const { op, position } = params;
-    useOutsideClick(ref, true);
+    useOutsideClick(ref);
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.identify_module;
     const lon = imodule.lonlat[0];

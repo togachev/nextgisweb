@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { observer } from "mobx-react-lite";
@@ -9,7 +9,7 @@ import { FilterLayerStore } from "./FilterLayerStore";
 import Minimize from "@nextgisweb/icon/material/minimize";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-import Close from "@nextgisweb/icon/material/close/outline";
+// import Close from "@nextgisweb/icon/material/close/outline";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen/outline";
@@ -19,6 +19,7 @@ import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 
 import { topics } from "@nextgisweb/webmap/identify-module"
+import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
 
 import "./FilterLayer.less";
 
@@ -29,21 +30,37 @@ const ComponentTest = ({ label }) => {
 }
 
 const offset = 40;
-const params = (activePanel, collapse) => {
+const width = 520;
+const height = 350;
+const collapseIcon = 30;
+const panelSize = 350;
+const x = 16 + 6 + collapseIcon + offset;
+const y = 17 + offset;
+
+const pos_x = window.innerWidth / 2 - width / 2;
+const pos_y = window.innerHeight / 2 - height / 2;
+
+const params = (activePanel, collapse, pos) => {
     const posX = collapse ?
-        activePanel ? 16 + 6 + 30 + 350 + offset : 16 + 6 + 30 + offset :
-        window.innerWidth / 2 - window.innerWidth / 100 * 50 / 2;
+        (activePanel ? x + panelSize : x) :
+        pos ? pos.x : pos_x;
+    const posY = collapse ?
+        y :
+        pos ? pos.y : pos_y;
 
-    const posY = collapse ? 17 + offset :
-        window.innerHeight / 2 - window.innerHeight / 100 * 50 / 2;
+    const width_calc = collapse ?
+        collapseIcon :
+        pos ? pos.width : width;
 
-    const width = collapse ? 30 : "50%";
-    const height = collapse ? 30 : "50%";
+    const height_calc = collapse ?
+        collapseIcon :
+        pos ? pos.height : height;
+
     const position = {
         x: posX,
         y: posY,
-        width: width,
-        height: height,
+        width: width_calc,
+        height: height_calc,
     }
     return position;
 }
@@ -51,9 +68,11 @@ const params = (activePanel, collapse) => {
 export default observer(
     function FilterLayer(props) {
         const { display, item, loads } = props;
-
         const [fields, setFields] = useState();
         const [activePanel, setActivePanel] = useState(display.panelsManager._activePanelKey && true);
+
+        const ref = useRef(null);
+        useOutsideClick(ref?.current?.resizableElement, "z-index");
 
         topics.subscribe("activePanel",
             async (e) => {
@@ -61,13 +80,12 @@ export default observer(
             }
         );
 
-
         const [store] = useState(
             () => new FilterLayerStore({
-                valueRnd: params(activePanel, false),
+                valueRnd: params(activePanel, false, false),
                 styleOp: {
-                    minWidth: "50%",
-                    minHeight: "50%",
+                    minWidth: width,
+                    minHeight: height,
                     collapse: false,
                 }
             }));
@@ -108,16 +126,6 @@ export default observer(
             return [];
         }, [store.tabs]);
 
-        const close = () => {
-            setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
-            setStyleOp(prev => ({
-                ...prev,
-                minWidth: "50%",
-                minHeight: "50%",
-                collapse: false,
-            }));
-        };
-
         const openInFull = () => {
             setValueRnd(prev => ({ ...prev, width: window.innerWidth - offset, height: window.innerHeight - offset, x: offset, y: offset }));
             setStyleOp(prev => ({
@@ -130,8 +138,8 @@ export default observer(
             setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
             setStyleOp(prev => ({
                 ...prev,
-                minWidth: "50%",
-                minHeight: "50%",
+                minWidth: width,
+                minHeight: height,
                 collapse: false,
             }));
 
@@ -142,7 +150,7 @@ export default observer(
         };
 
         const collapse = () => {
-            setValueRnd(params(activePanel, true));
+            setValueRnd(params(activePanel, true, false));
             setStyleOp(prev => ({
                 ...prev,
                 minWidth: 30,
@@ -152,11 +160,25 @@ export default observer(
         };
 
         const expand = () => {
-            setValueRnd(params(activePanel, false));
+            if (
+                pos_x === valueRnd.posX &&
+                pos_y === valueRnd.posY &&
+                width === valueRnd.width &&
+                height === valueRnd.height
+            ) {
+                setValueRnd(params(activePanel, false, false))
+            } else if (
+                window.innerWidth - offset === valueRnd.width &&
+                window.innerHeight - offset === valueRnd.height
+            ) {
+                setValueRnd(params(activePanel, false, false));
+            } else {
+                setValueRnd(params(activePanel, false, valueRnd));
+            }
             setStyleOp(prev => ({
                 ...prev,
-                minWidth: "50%",
-                minHeight: "50%",
+                minWidth: width,
+                minHeight: height,
                 collapse: false,
                 open_in_full: false,
             }));
@@ -201,30 +223,31 @@ export default observer(
                             onClick={clearAllFilter}
                             icon={<DeleteForever />}
                         />
-                        <Button
-                            type="text"
-                            title={gettext("Close")}
-                            onClick={close}
-                            icon={<Close />}
-                        />
                     </>
                 }
             </span>
         );
 
         useEffect(() => {
-            setValueRnd(params(activePanel, styleOp.collapse));
+            styleOp.collapse && setValueRnd(params(activePanel, styleOp.collapse, false));
         }, [activePanel]);
 
         useEffect(() => {
             if (items.length === 0) {
-                return close()
+                setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
             }
         }, [items]);
 
         useEffect(() => {
             if (items.length === 0 || valueRnd.x < 0) {
-                setValueRnd(params(activePanel, false));
+                setValueRnd(params(activePanel, false, false));
+                setStyleOp(prev => ({
+                    ...prev,
+                    minWidth: width,
+                    minHeight: height,
+                    collapse: false,
+                    open_in_full: false,
+                }));
             } else {
                 expand()
             }
@@ -235,7 +258,6 @@ export default observer(
                 label: item.label,
                 children: <ComponentTest label={item.label} operations={operations} />
             })
-
         }, [loads]);
 
         useEffect(() => {
@@ -251,6 +273,8 @@ export default observer(
         return (
             createPortal(
                 <Rnd
+                    ref={ref}
+                    onClick={() => ref.current.resizableElement.current.style.zIndex = 1}
                     resizeHandleClasses={{
                         right: "hover-right",
                         left: "hover-left",
@@ -277,7 +301,6 @@ export default observer(
                     onResize={(e, direction, ref, delta, position) => {
                         setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
                     }}
-
                 >
                     <div className="ngw-filter-layer">
                         <Tabs

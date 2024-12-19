@@ -1,4 +1,4 @@
-import { forwardRef, RefObject, useMemo, useState, useEffect } from "react";
+import { forwardRef, RefObject, useMemo, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
@@ -22,7 +22,7 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import type { WebmapItem } from "@nextgisweb/webmap/type";
 import type { DataProps, Params } from "./type";
 import topic from "dojo/topic";
-
+import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
 
@@ -52,10 +52,14 @@ export default observer(
             const { op, position, response, selectedValue } = params;
             const { getAttribute, generateUrl } = useSource();
             const { copyValue, contextHolder } = useCopy();
+
+            const refs = useRef(null);
+            useOutsideClick(refs?.current?.resizableElement, "z-index");
+
             const imodule = display.identify_module;
 
             const count = response.featureCount;
-            const urlParams = display.getUrlParams()
+            const urlParams = display.getUrlParams();
 
             const [store] = useState(
                 () => new IdentifyStore({
@@ -294,6 +298,8 @@ export default observer(
                     >
                         {contextHolder}
                         <Rnd
+                            ref={refs}
+                            onClick={() => refs!.current.resizableElement.current.style.zIndex = 1}
                             resizeHandleClasses={{
                                 right: "hover-right",
                                 left: "hover-left",
@@ -379,7 +385,7 @@ export default observer(
                                     )}
                                     <span
                                         title={gettext("Close")}
-                                        className={count > 0 && fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                        className="icon-symbol"
                                         onClick={() => {
                                             visible({ hidden: true, overlay: undefined, key: "popup" })
                                             topic.publish("feature.unhighlight");
