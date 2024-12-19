@@ -238,6 +238,7 @@ export const LayersTree = observer(
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 topics.publish("removeTabFilter", filtered[0]);
+                                                topics.publish("button_hidden");
                                                 setSelectedId(prev => prev.filter(i => i !== idNode))
                                                 setFilterKeys(prev => {
                                                     const state = { ...prev };
@@ -253,6 +254,7 @@ export const LayersTree = observer(
                                                 display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
                                                     .then(item => {
                                                         setFilterKeys(prev => ({ ...prev, [item.layerId]: item.id, }));
+                                                        topics.publish("button_hidden");
                                                     })
                                             }}>
                                             <FilterIcon />

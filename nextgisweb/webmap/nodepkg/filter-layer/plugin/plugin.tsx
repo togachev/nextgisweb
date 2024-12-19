@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { createRoot } from "react-dom/client";
 
-import FilterLayer from "../FilterLayer";
+import { FilterLayer } from "../FilterLayer";
 
 import type { DojoDisplay, PluginParams } from "@nextgisweb/webmap/type";
 

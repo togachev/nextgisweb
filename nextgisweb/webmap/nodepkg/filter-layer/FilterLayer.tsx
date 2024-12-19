@@ -65,97 +65,163 @@ const params = (activePanel, collapse, pos) => {
     return position;
 }
 
-export default observer(
-    function FilterLayer(props) {
-        const { display, item, loads } = props;
-        const [fields, setFields] = useState();
-        const [activePanel, setActivePanel] = useState(display.panelsManager._activePanelKey && true);
+export const FilterLayer = observer((props) => {
+    const { display, item, loads } = props;
+    const [fields, setFields] = useState();
+    const [activePanel, setActivePanel] = useState(display.panelsManager._activePanelKey && true);
 
-        const ref = useRef(null);
-        useOutsideClick(ref?.current?.resizableElement, "z-index");
+    const ref = useRef(null);
+    useOutsideClick(ref?.current?.resizableElement, "z-index");
 
-        topics.subscribe("activePanel",
-            async (e) => {
-                setActivePanel(e.detail);
-            }
-        );
+    topics.subscribe("activePanel",
+        (e) => { setActivePanel(e.detail); }
+    );
 
-        const [store] = useState(
-            () => new FilterLayerStore({
-                valueRnd: params(activePanel, false, false),
-                styleOp: {
-                    minWidth: width,
-                    minHeight: height,
-                    collapse: false,
-                }
-            }));
-
-        const {
-            activeKey, setActiveKey, removeTab,
-            setValueRnd,
-            valueRnd,
-            styleOp,
-            setStyleOp,
-        } = store;
-
-
-        topics.subscribe("removeTabFilter",
-            async (e) => {
-                removeTab(e.detail);
-            }
-        );
-
-        const { data: resourceData } = useRouteGet<ResourceItem>(
-            "resource.item",
-            { id: item?.layerId },
-            { cache: true },
-        );
-
-        const items = useMemo(() => {
-            if (store.tabs.length) {
-                const tabs: TabItems = [];
-                for (const { component, props, ...rest } of store.tabs) {
-                    const tab: TabItems[0] = {
-                        closable: true,
-                        ...rest,
-                    };
-                    tabs.push(tab);
-                }
-                return tabs;
-            }
-            return [];
-        }, [store.tabs]);
-
-        const openInFull = () => {
-            setValueRnd(prev => ({ ...prev, width: window.innerWidth - offset, height: window.innerHeight - offset, x: offset, y: offset }));
-            setStyleOp(prev => ({
-                ...prev,
-                open_in_full: true,
-            }));
-        };
-
-        const clearAllFilter = () => {
-            setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
-            setStyleOp(prev => ({
-                ...prev,
+    const [store] = useState(
+        () => new FilterLayerStore({
+            valueRnd: params(activePanel, false, false),
+            styleOp: {
                 minWidth: width,
                 minHeight: height,
                 collapse: false,
-            }));
+            }
+        }));
 
-            items.map(i => {
-                removeTab(String(i.key));
-                topics.publish("removeTabFilter", String(i.key));
-            })
-        };
+    const {
+        activeKey, setActiveKey, removeTab,
+        setValueRnd,
+        valueRnd,
+        styleOp,
+        setStyleOp,
+    } = store;
 
-        const collapse = () => {
-            ref!.current!.resizableElement.current.hidden = true
-        };
 
-        const expand = (val) => {
-            ref!.current!.resizableElement.current.hidden = false
-            setValueRnd(params(activePanel, false, val));
+    topics.subscribe("removeTabFilter",
+        (e) => { removeTab(e.detail); }
+    );
+
+    const { data: resourceData } = useRouteGet<ResourceItem>(
+        "resource.item",
+        { id: item?.layerId },
+        { cache: true },
+    );
+
+    const items = useMemo(() => {
+        if (store.tabs.length) {
+            const tabs: TabItems = [];
+            for (const { component, props, ...rest } of store.tabs) {
+                const tab: TabItems[0] = {
+                    closable: true,
+                    ...rest,
+                };
+                tabs.push(tab);
+            }
+            return tabs;
+        }
+        return [];
+    }, [store.tabs]);
+
+    const openInFull = () => {
+        setValueRnd(prev => ({ ...prev, width: window.innerWidth - offset, height: window.innerHeight - offset, x: offset, y: offset }));
+        setStyleOp(prev => ({
+            ...prev,
+            open_in_full: true,
+        }));
+    };
+
+    const clearAllFilter = () => {
+        setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+        setStyleOp(prev => ({
+            ...prev,
+            minWidth: width,
+            minHeight: height,
+            collapse: false,
+        }));
+
+        items.map(i => {
+            removeTab(String(i.key));
+            topics.publish("removeTabFilter", String(i.key));
+        })
+    };
+
+    topics.subscribe("filter_show",
+        (e) => { ref!.current!.resizableElement.current.hidden = false; }
+    );
+
+    const collapse = () => {
+        ref!.current!.resizableElement.current.hidden = true;
+        topics.publish("filter_hidden");
+    };
+
+    const expand = (val) => {
+        ref!.current!.resizableElement.current.hidden = false
+        setValueRnd(params(activePanel, false, val));
+        setStyleOp(prev => ({
+            ...prev,
+            minWidth: width,
+            minHeight: height,
+            collapse: false,
+            open_in_full: false,
+        }));
+    };
+
+    const operations = (
+        <span className={styleOp.collapse ? "op-button-collapse" : "op-button"}>
+            {styleOp.collapse ?
+                <Button
+                    icon={<FilterIcon />}
+                    type="text"
+                    title={gettext("Filter layers")}
+                    onClick={expand}
+                /> :
+                <>
+                    <Button
+                        disabled={styleOp.collapse ? true : false}
+                        type="text"
+                        title={gettext("Collapse")}
+                        onClick={collapse}
+                        icon={<Minimize />}
+                    />
+                    {
+                        styleOp.open_in_full ?
+                            <Button
+                                type="text"
+                                title={gettext("Close fullscreen")}
+                                onClick={() => { expand(false) }}
+                                icon={<CloseFullscreen />}
+                            />
+                            :
+                            <Button
+                                type="text"
+                                title={gettext("Open in full")}
+                                onClick={openInFull}
+                                icon={<OpenInFull />}
+                            />
+                    }
+                    <Button
+                        type="text"
+                        title={gettext("Clear all filter")}
+                        onClick={clearAllFilter}
+                        icon={<DeleteForever />}
+                    />
+                </>
+            }
+        </span>
+    );
+
+    useEffect(() => {
+        styleOp.collapse && setValueRnd(params(activePanel, styleOp.collapse, false));
+    }, [activePanel]);
+
+    useEffect(() => {
+        if (items.length === 0) {
+            setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+        }
+    }, [items]);
+
+    useEffect(() => {
+        if (items.length === 0 || valueRnd.x < 0) {
+            setValueRnd(params(activePanel, false, false));
             setStyleOp(prev => ({
                 ...prev,
                 minWidth: width,
@@ -163,148 +229,82 @@ export default observer(
                 collapse: false,
                 open_in_full: false,
             }));
-        };
+        } else {
+            expand(valueRnd)
+        }
+        setActiveKey(item.layerId);
 
-        const operations = (
-            <span className={styleOp.collapse ? "op-button-collapse" : "op-button"}>
-                {styleOp.collapse ?
-                    <Button
-                        icon={<FilterIcon />}
-                        type="text"
-                        title={gettext("Filter layers")}
-                        onClick={expand}
-                    /> :
-                    <>
-                        <Button
-                            disabled={styleOp.collapse ? true : false}
-                            type="text"
-                            title={gettext("Collapse")}
-                            onClick={collapse}
-                            icon={<Minimize />}
-                        />
-                        {
-                            styleOp.open_in_full ?
-                                <Button
-                                    type="text"
-                                    title={gettext("Close fullscreen")}
-                                    onClick={() => { expand(false) }}
-                                    icon={<CloseFullscreen />}
-                                />
-                                :
-                                <Button
-                                    type="text"
-                                    title={gettext("Open in full")}
-                                    onClick={openInFull}
-                                    icon={<OpenInFull />}
-                                />
-                        }
-                        <Button
-                            type="text"
-                            title={gettext("Clear all filter")}
-                            onClick={clearAllFilter}
-                            icon={<DeleteForever />}
-                        />
-                    </>
-                }
-            </span>
-        );
+        store.addTab({
+            key: String(item.layerId),
+            label: item.label,
+            children: <ComponentTest label={item.label} operations={operations} />
+        })
+    }, [loads]);
 
-        useEffect(() => {
-            styleOp.collapse && setValueRnd(params(activePanel, styleOp.collapse, false));
-        }, [activePanel]);
-
-        useEffect(() => {
-            if (items.length === 0) {
-                setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+    useEffect(() => {
+        if (resourceData) {
+            const featureLayer = resourceData.feature_layer!;
+            const fields_ = featureLayer?.fields;
+            if (fields_) {
+                setFields(fields_);
             }
-        }, [items]);
+        }
+    }, [resourceData]);
 
-        useEffect(() => {
-            if (items.length === 0 || valueRnd.x < 0) {
-                setValueRnd(params(activePanel, false, false));
-                setStyleOp(prev => ({
-                    ...prev,
-                    minWidth: width,
-                    minHeight: height,
-                    collapse: false,
-                    open_in_full: false,
-                }));
-            } else {
-                expand(valueRnd)
-            }
-            setActiveKey(item.layerId);
-
-            store.addTab({
-                key: String(item.layerId),
-                label: item.label,
-                children: <ComponentTest label={item.label} operations={operations} />
-            })
-        }, [loads]);
-
-        useEffect(() => {
-            if (resourceData) {
-                const featureLayer = resourceData.feature_layer!;
-                const fields_ = featureLayer?.fields;
-                if (fields_) {
-                    setFields(fields_);
-                }
-            }
-        }, [resourceData]);
-
-        return (
-            createPortal(
-                <Rnd
-                    ref={ref}
-                    onClick={() => ref.current.resizableElement.current.style.zIndex = 1}
-                    resizeHandleClasses={{
-                        right: "hover-right",
-                        left: "hover-left",
-                        top: "hover-top",
-                        bottom: "hover-bottom",
-                        bottomRight: "hover-angle-bottom-right",
-                        bottomLeft: "hover-angle-bottom-left",
-                        topRight: "hover-angle-top-right",
-                        topLeft: "hover-angle-top-left",
-                    }}
-                    cancel=".ant-tabs-content-holder,.op-button-collapse,.op-button"
-                    bounds="window"
-                    minWidth={styleOp.minWidth}
-                    minHeight={styleOp.minHeight}
-                    allowAnyClick={true}
-                    enableResizing={styleOp.collapse ? false : true}
-                    position={{ x: valueRnd.x, y: valueRnd.y }}
-                    size={{ width: valueRnd.width, height: valueRnd.height }}
-                    onDragStop={(e, d) => {
-                        if (valueRnd.x !== d.x || valueRnd.y !== d.y) {
-                            setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
-                        }
-                    }}
-                    onResize={(e, direction, ref, delta, position) => {
-                        setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
-                    }}
-                >
-                    <div className="ngw-filter-layer">
-                        <Tabs
-                            type="editable-card"
-                            tabPosition="top"
-                            size="small"
-                            hideAdd
-                            items={styleOp.collapse ? null : items}
-                            activeKey={activeKey || undefined}
-                            onChange={setActiveKey}
-                            onEdit={(targetKey, action) => {
-                                if (action === "remove") {
-                                    topics.publish("removeTabFilter", String(targetKey));
-                                    removeTab(String(targetKey));
-                                }
-                            }}
-                            parentHeight
-                            tabBarExtraContent={{ right: operations }}
-                        />
-                    </div>
-                </Rnd >,
-                document.body
-            )
-        );
-    }
+    return (
+        createPortal(
+            <Rnd
+                ref={ref}
+                onClick={() => ref.current.resizableElement.current.style.zIndex = 1}
+                resizeHandleClasses={{
+                    right: "hover-right",
+                    left: "hover-left",
+                    top: "hover-top",
+                    bottom: "hover-bottom",
+                    bottomRight: "hover-angle-bottom-right",
+                    bottomLeft: "hover-angle-bottom-left",
+                    topRight: "hover-angle-top-right",
+                    topLeft: "hover-angle-top-left",
+                }}
+                cancel=".ant-tabs-content-holder,.op-button-collapse,.op-button"
+                bounds="window"
+                minWidth={styleOp.minWidth}
+                minHeight={styleOp.minHeight}
+                allowAnyClick={true}
+                enableResizing={styleOp.collapse ? false : true}
+                position={{ x: valueRnd.x, y: valueRnd.y }}
+                size={{ width: valueRnd.width, height: valueRnd.height }}
+                onDragStop={(e, d) => {
+                    if (valueRnd.x !== d.x || valueRnd.y !== d.y) {
+                        setValueRnd(prev => ({ ...prev, x: d.x, y: d.y }));
+                    }
+                }}
+                onResize={(e, direction, ref, delta, position) => {
+                    setValueRnd(prev => ({ ...prev, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y }));
+                }}
+            >
+                <div className="ngw-filter-layer">
+                    <Tabs
+                        type="editable-card"
+                        tabPosition="top"
+                        size="small"
+                        hideAdd
+                        items={styleOp.collapse ? null : items}
+                        activeKey={activeKey || undefined}
+                        onChange={setActiveKey}
+                        onEdit={(targetKey, action) => {
+                            if (action === "remove") {
+                                topics.publish("removeTabFilter", String(targetKey));
+                                removeTab(String(targetKey));
+                            }
+                        }}
+                        parentHeight
+                        tabBarExtraContent={{ right: operations }}
+                    />
+                </div>
+            </Rnd >,
+            document.body
+        )
+    );
+}
 );

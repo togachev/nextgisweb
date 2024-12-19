@@ -16,6 +16,7 @@ import InfoScale from "ngw-webmap/controls/InfoScale";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import InitialExtent from "ngw-webmap/controls/InitialExtent";
+import { FilterControl } from "@nextgisweb/webmap/filter-layer/FilterControl";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import MyLocation from "ngw-webmap/controls/MyLocation";
@@ -114,6 +115,19 @@ export const ControlsInfo: ControlInfo[] = [
         olMapControl: true,
     },
     {
+        key: "fl",
+        ctor: (display) => {
+            return new FilterControl({
+                display: display,
+                target: display.leftTopControlPane,
+                tipLabel: gettext("Filter show"),
+            });
+        },
+        label: gettext("Filter show"),
+        embeddedShowMode: "customize",
+        olMapControl: true,
+    },
+    {
         key: "ml",
         ctor: (display) => {
             return new MyLocation({
@@ -129,7 +143,7 @@ export const ControlsInfo: ControlInfo[] = [
 ];
 
 if (!webmapSettings.identify_module) {
-    ControlsInfo.push(    {
+    ControlsInfo.push({
         label: gettext("Identification"),
         ctor: (display) => {
             return new Identify({ display });

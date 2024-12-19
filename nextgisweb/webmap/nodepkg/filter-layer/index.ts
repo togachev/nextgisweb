@@ -1,4 +1,3 @@
 /** @entrypoint */
-import FilterLayer from "./FilterLayer";
-
-export default FilterLayer;
+export { FilterControl } from "./FilterControl";
+export { FilterLayer } from "./FilterLayer";
