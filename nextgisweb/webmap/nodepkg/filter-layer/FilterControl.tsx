@@ -1,4 +1,4 @@
-import React from "react";
+import { ReactElement } from "react";
 import { Control } from "ol/control";
 import { createRoot } from "react-dom/client";
 import { Button } from "@nextgisweb/gui/antd";
@@ -10,7 +10,7 @@ import "./FilterControl.less";
 
 export class FilterControl extends Control {
     private element: HTMLDivElement;
-    private root: React.ReactElement;
+    private root: ReactElement;
 
     constructor(props) {
         super(props);
@@ -28,15 +28,11 @@ export class FilterControl extends Control {
         );
 
         topics.subscribe("button_hidden",
-            (e) => {
-                this.filter_show();
-            }
+            () => { this.filter_show(); }
         );
 
         topics.subscribe("filter_hidden",
-            (e) => {
-                this.element.className = "ol-control ol-unselectable show-button";
-            }
+            () => { this.element.className = "ol-control ol-unselectable show-button"; }
         );
     }
 

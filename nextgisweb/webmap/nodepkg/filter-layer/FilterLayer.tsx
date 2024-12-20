@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { observer } from "mobx-react-lite";
@@ -140,7 +140,7 @@ export const FilterLayer = observer((props) => {
     };
 
     topics.subscribe("filter_show",
-        (e) => { ref!.current!.resizableElement.current.hidden = false; }
+        () => { ref!.current!.resizableElement.current.hidden = false; }
     );
 
     const collapse = () => {
