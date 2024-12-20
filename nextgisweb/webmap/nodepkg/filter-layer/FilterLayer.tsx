@@ -236,7 +236,7 @@ export const FilterLayer = observer((props) => {
                     topRight: "hover-angle-top-right",
                     topLeft: "hover-angle-top-left",
                 }}
-                cancel=".ant-tabs-content-holder,.op-button-collapse,.op-button"
+                cancel=".ant-tabs-content-holder,.op-button"
                 bounds="window"
                 minWidth={styleOp.minWidth}
                 minHeight={styleOp.minHeight}
