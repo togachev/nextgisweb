@@ -124,7 +124,7 @@ export const FilterLayer = observer((props) => {
         }));
     };
 
-    const clearAllFilter = () => {
+    const removeAllFilter = () => {
         setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
         setStyleOp(prev => ({
             ...prev,
@@ -164,8 +164,8 @@ export const FilterLayer = observer((props) => {
         <span className="op-button">
             <Button
                 type="text"
-                title={gettext("Clear all filter")}
-                onClick={clearAllFilter}
+                title={gettext("Remove all filter")}
+                onClick={removeAllFilter}
                 icon={<DeleteForever />}
             />
             <Button
