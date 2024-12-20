@@ -13,9 +13,9 @@ import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen/outline";
 
-import type { TabsProps } from "@nextgisweb/gui/antd";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 
 import { topics } from "@nextgisweb/webmap/identify-module"
@@ -255,7 +255,11 @@ export const FilterLayer = observer((props) => {
             >
                 <div className="ngw-filter-layer">
                     <Tabs
-                        removeIcon={<FilterAltOffIcon />}
+                        removeIcon={
+                            <span title={gettext("Remove filter")}>
+                                <FilterAltOffIcon />
+                            </span>
+                        }
                         type="editable-card"
                         tabPosition="top"
                         size="small"
