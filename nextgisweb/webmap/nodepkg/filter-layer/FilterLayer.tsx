@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { observer } from "mobx-react-lite";
@@ -8,11 +8,12 @@ import { Rnd } from "react-rnd";
 import { FilterLayerStore } from "./FilterLayerStore";
 import Minimize from "@nextgisweb/icon/material/minimize";
 
-import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import FilterAltOffIcon from "@nextgisweb/icon/material/filter_alt_off";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen/outline";
 
+import type { TabsProps } from "@nextgisweb/gui/antd";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
@@ -28,32 +29,22 @@ const ComponentTest = ({ label }) => {
     )
 }
 
+const W = window.innerWidth;
+const H = window.innerHeight;
 const offset = 40;
 const width = 520;
 const height = 350;
-const collapseIcon = 30;
-const panelSize = 350;
-const x = 16 + 6 + collapseIcon + offset;
-const y = 17 + offset;
+const padding = 16;
 
-const pos_x = window.innerWidth / 2 - width / 2;
-const pos_y = window.innerHeight / 2 - height / 2;
+const pos_x = W - padding - width;
+const pos_y = padding + offset;
 
-const params = (activePanel, collapse, pos) => {
-    const posX = collapse ?
-        (activePanel ? x + panelSize : x) :
-        pos ? pos.x : pos_x;
-    const posY = collapse ?
-        y :
-        pos ? pos.y : pos_y;
+const params = (pos) => {
+    const posX = pos ? pos.x : pos_x;
+    const posY = pos ? pos.y : pos_y;
 
-    const width_calc = collapse ?
-        collapseIcon :
-        pos ? pos.width : width;
-
-    const height_calc = collapse ?
-        collapseIcon :
-        pos ? pos.height : height;
+    const width_calc = pos ? pos.width : width;
+    const height_calc = pos ? pos.height : height;
 
     const position = {
         x: posX,
@@ -78,7 +69,7 @@ export const FilterLayer = observer((props) => {
 
     const [store] = useState(
         () => new FilterLayerStore({
-            valueRnd: params(activePanel, false, false),
+            valueRnd: params(false),
             styleOp: {
                 minWidth: width,
                 minHeight: height,
@@ -120,7 +111,13 @@ export const FilterLayer = observer((props) => {
     }, [store.tabs]);
 
     const openInFull = () => {
-        setValueRnd(prev => ({ ...prev, width: window.innerWidth - offset, height: window.innerHeight - offset, x: offset, y: offset }));
+        setValueRnd(prev => ({
+            ...prev,
+            width: W - offset - padding * 2,
+            height: H - offset - padding * 2,
+            x: activePanel ? offset + padding : offset + padding,
+            y: offset + padding
+        }));
         setStyleOp(prev => ({
             ...prev,
             open_in_full: true,
@@ -153,7 +150,7 @@ export const FilterLayer = observer((props) => {
 
     const expand = (val) => {
         ref!.current!.resizableElement.current.hidden = false
-        setValueRnd(params(activePanel, false, val));
+        setValueRnd(params(val));
         setStyleOp(prev => ({
             ...prev,
             minWidth: width,
@@ -164,44 +161,27 @@ export const FilterLayer = observer((props) => {
     };
 
     const operations = (
-        <span className={styleOp.collapse ? "op-button-collapse" : "op-button"}>
-            {styleOp.collapse ?
-                <Button
-                    icon={<FilterIcon />}
-                    type="text"
-                    title={gettext("Filter layers")}
-                    onClick={expand}
-                /> :
-                <>
-                    <Button
-                        disabled={styleOp.collapse ? true : false}
-                        type="text"
-                        title={gettext("Collapse")}
-                        onClick={collapse}
-                        icon={<Minimize />}
-                    />
-                    {
-                        <Button
-                            type="text"
-                            title={styleOp.open_in_full ? gettext("Close fullscreen") : gettext("Open in full")}
-                            onClick={styleOp.open_in_full ? () => { expand(false) } : openInFull}
-                            icon={styleOp.open_in_full ? <CloseFullscreen /> : <OpenInFull />}
-                        />
-                    }
-                    <Button
-                        type="text"
-                        title={gettext("Clear all filter")}
-                        onClick={clearAllFilter}
-                        icon={<DeleteForever />}
-                    />
-                </>
-            }
+        <span className="op-button">
+            <Button
+                type="text"
+                title={gettext("Clear all filter")}
+                onClick={clearAllFilter}
+                icon={<DeleteForever />}
+            />
+            <Button
+                type="text"
+                title={styleOp.open_in_full ? gettext("Close fullscreen") : gettext("Open in full")}
+                onClick={styleOp.open_in_full ? () => { expand(false) } : openInFull}
+                icon={styleOp.open_in_full ? <CloseFullscreen /> : <OpenInFull />}
+            />
+            <Button
+                type="text"
+                title={gettext("Collapse")}
+                onClick={collapse}
+                icon={<Minimize />}
+            />
         </span>
     );
-
-    useEffect(() => {
-        styleOp.collapse && setValueRnd(params(activePanel, styleOp.collapse, false));
-    }, [activePanel]);
 
     useEffect(() => {
         if (items.length === 0) {
@@ -211,7 +191,7 @@ export const FilterLayer = observer((props) => {
 
     useEffect(() => {
         if (items.length === 0 || valueRnd.x < 0) {
-            setValueRnd(params(activePanel, false, false));
+            setValueRnd(params(false));
             setStyleOp(prev => ({
                 ...prev,
                 minWidth: width,
@@ -261,7 +241,7 @@ export const FilterLayer = observer((props) => {
                 minWidth={styleOp.minWidth}
                 minHeight={styleOp.minHeight}
                 allowAnyClick={true}
-                enableResizing={styleOp.collapse ? false : true}
+                enableResizing={true}
                 position={{ x: valueRnd.x, y: valueRnd.y }}
                 size={{ width: valueRnd.width, height: valueRnd.height }}
                 onDragStop={(e, d) => {
@@ -275,11 +255,12 @@ export const FilterLayer = observer((props) => {
             >
                 <div className="ngw-filter-layer">
                     <Tabs
+                        removeIcon={<FilterAltOffIcon />}
                         type="editable-card"
                         tabPosition="top"
                         size="small"
                         hideAdd
-                        items={styleOp.collapse ? null : items}
+                        items={items}
                         activeKey={activeKey || undefined}
                         onChange={setActiveKey}
                         onEdit={(targetKey, action) => {

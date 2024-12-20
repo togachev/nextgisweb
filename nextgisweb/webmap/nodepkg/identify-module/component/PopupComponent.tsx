@@ -311,7 +311,7 @@ export default observer(
                                 topLeft: "hover-angle-top-left",
                             }}
                             cancel=".select-feature,.select-feature-forbidden,.radio-block,.radio-group,.value-link,.value-email,.icon-symbol,.coordinate-value,.link-value,.content-item"
-                            bounds={valueRnd.width === W ? undefined : "window"}
+                            bounds="window"
                             minWidth={position.width}
                             minHeight={position.height}
                             allowAnyClick={true}

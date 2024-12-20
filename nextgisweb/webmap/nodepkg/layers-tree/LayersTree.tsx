@@ -24,6 +24,7 @@ import {
 } from "./util/treeItems";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import FilterAltOffIcon from "@nextgisweb/icon/material/filter_alt_off";
 import { topics } from "@nextgisweb/webmap/identify-module"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -246,7 +247,7 @@ export const LayersTree = observer(
                                                     return state;
                                                 });
                                             }}>
-                                            <FilterIcon />
+                                            <FilterAltOffIcon />
                                         </span> :
                                         <span title={gettext("Add filter")} className="more-grey"
                                             onClick={(e) => {
