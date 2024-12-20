@@ -9,7 +9,6 @@ import { FilterLayerStore } from "./FilterLayerStore";
 import Minimize from "@nextgisweb/icon/material/minimize";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-// import Close from "@nextgisweb/icon/material/close/outline";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen/outline";
@@ -94,7 +93,6 @@ export const FilterLayer = observer((props) => {
         styleOp,
         setStyleOp,
     } = store;
-
 
     topics.subscribe("removeTabFilter",
         (e) => { removeTab(e.detail); }
@@ -183,20 +181,12 @@ export const FilterLayer = observer((props) => {
                         icon={<Minimize />}
                     />
                     {
-                        styleOp.open_in_full ?
-                            <Button
-                                type="text"
-                                title={gettext("Close fullscreen")}
-                                onClick={() => { expand(false) }}
-                                icon={<CloseFullscreen />}
-                            />
-                            :
-                            <Button
-                                type="text"
-                                title={gettext("Open in full")}
-                                onClick={openInFull}
-                                icon={<OpenInFull />}
-                            />
+                        <Button
+                            type="text"
+                            title={styleOp.open_in_full ? gettext("Close fullscreen") : gettext("Open in full")}
+                            onClick={styleOp.open_in_full ? () => { expand(false) } : openInFull}
+                            icon={styleOp.open_in_full ? <CloseFullscreen /> : <OpenInFull />}
+                        />
                     }
                     <Button
                         type="text"
@@ -306,5 +296,4 @@ export const FilterLayer = observer((props) => {
             document.body
         )
     );
-}
-);
+});
