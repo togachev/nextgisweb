@@ -1,31 +1,320 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Button, Tabs } from "@nextgisweb/gui/antd";
+import { Form } from "@nextgisweb/gui/fields-form";
+import {
+    Button,
+    Card,
+    DatePicker,
+    DateTimePicker,
+    Tabs,
+    TimePicker,
+    Input,
+    Select,
+} from "@nextgisweb/gui/antd";
 import { Rnd } from "react-rnd";
+import { topics } from "@nextgisweb/webmap/identify-module"
+import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
+
 import { FilterLayerStore } from "./FilterLayerStore";
-import Minimize from "@nextgisweb/icon/material/minimize";
 
-import FilterAltOffIcon from "@nextgisweb/icon/material/filter_alt_off";
-import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
-import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
+import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen/outline";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+import FilterAltOffIcon from "@nextgisweb/icon/material/filter_alt_off";
+import Minimize from "@nextgisweb/icon/material/minimize";
+import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
+import Remove from "@nextgisweb/icon/material/remove";
 
+import type { InputRef } from "@nextgisweb/gui/antd";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
-
-import { topics } from "@nextgisweb/webmap/identify-module"
-import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
+type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
 import "./FilterLayer.less";
 
-const ComponentTest = ({ label }) => {
+const msgTitleFilter = gettext("Filter");
+const msgAddFilterField = gettext("Add filter");
+const msgRemoveFilterField = gettext("Remove filter");
+const msgCancel = gettext("Cancel");
+const msgOk = gettext("Ок");
+const msgClearForm = gettext("Clean");
+const msgCheckForm = gettext("Check");
+
+const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+
+const operator = {
+    eq: { label: "равно", value: "eq" },
+    in: { label: "массив", value: "in" },
+    ne: { label: "не равно", value: "ne" },
+    lt: { label: "меньше", value: "lt" },
+    gt: { label: "больше", value: "gt" },
+    le: { label: "меньше или равно", value: "le" },
+    ge: { label: "больше или равно", value: "ge" },
+    like: { label: "like", value: "like" },
+    ilike: { label: "ilike", value: "ilike" },
+};
+
+const op_type = {
+    string: ["like", "ilike", "ne", "eq", "in"],
+    number: ["eq", "in", "ne", "lt", "gt", "le", "ge"],
+    date: ["eq", "ne", "lt", "gt", "le", "ge"],
+};
+
+const DATE_TYPE = ["DATETIME", "DATE", "TIME"];
+const NUMBER_TYPE = ["REAL", "INTEGER", "BIGINT"];
+
+const type_comp = (value, props) => {
+    const inputComp = {
+        STRING: <Input {...props} />,
+        REAL: <Input {...props} />,
+        INTEGER: <Input {...props} />,
+        BIGINT: <Input {...props} />,
+        DATETIME: <DateTimePicker suffixIcon={false} {...props} />,
+        DATE: <DatePicker suffixIcon={false} {...props} />,
+        TIME: <TimePicker suffixIcon={false} {...props} />,
+    }
+    return inputComp[value];
+};
+
+type Operators = "like" | "ilike" | "eq" | "in" | "ne" | "lt" | "gt" | "le" | "ge";
+type TypeProps = "real" | "integer" | "bigint" | "string" | "date" | "datetime" | "time";
+
+interface FilterValue {
+    vals?: TypeProps;
+    operator?: Operators;
+};
+
+interface FilterInputProps {
+    id?: string;
+    value?: FilterValue;
+    onChange?: (value: FilterValue) => void;
+};
+
+const FilterInput: React.FC<FilterInputProps> = (props) => {
+    const { value = {}, onChange, field } = props;
+    const [vals, setVals] = useState();
+    const [op, setOp] = useState<Operators>("eq");
+
+    const inputRef = useRef<InputRef>(null);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [inputRef.current]);
+
+    const triggerChange = (changedValue: {
+        vals?: TypeProps;
+        op?: Operators;
+    }) => {
+        onChange?.({ vals, op, ...value, ...changedValue });
+    };
+
+    const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newVal = field.datatype === "STRING" || NUMBER_TYPE.includes(field.datatype) ? e.target.value : e;
+
+        if (!("vals" in value)) {
+            setVals(newVal);
+        };
+        triggerChange({ vals: newVal });
+    };
+
+    const onOperatorsChange = (newVal: Operators) => {
+        if (!("op" in value)) {
+            setOp(newVal);
+        };
+        triggerChange({ op: newVal });
+    };
+
+    let opt;
+    if (DATE_TYPE.includes(field.datatype)) {
+        opt = "date"
+    } else if (NUMBER_TYPE.includes(field.datatype)) {
+        opt = "number"
+    } else {
+        opt = "string"
+    }
+
+    const inputProps = {
+        style: { width: "100%", margin: "0 4px" },
+        placeholder: field.display_name,
+        onChange: onFilterChange,
+        value: value.vals,
+        ref: inputRef,
+    };
+
     return (
-        <div className="filter-content">Форма с фильтром для {label}</div>
+        <>
+            {type_comp(field.datatype, inputProps)}
+            {value.vals && <span
+                className="icon-symbol padding-icon"
+                onClick={() => {
+                    triggerChange({ vals: undefined })
+                }}
+            >
+                <BackspaceIcon />
+            </span>}
+            <Select
+                value={value.op || op}
+                style={{ width: 165, padding: "0 5px 0 0" }}
+                onChange={onOperatorsChange}
+                options={op_type[opt].map((item) => {
+                    return operator[item];
+                })}
+            />
+        </>
+    );
+}
+
+const ComponentFilter = (props) => {
+    const { item, store } = props;
+    // const { queryParams, setQueryParams } = store;
+    const [fields, setFields] = useState([]);
+    const [queryParams, setQueryParams] = useState([])
+    const [form] = Form.useForm();
+
+    const { data: resourceData } = useRouteGet<ResourceItem>(
+        "resource.item",
+        { id: item.layerId },
+        { cache: true },
+    );
+
+    useEffect(() => {
+        if (resourceData !== undefined) {
+            setFields(resourceData.feature_layer!.fields);
+        }
+    }, [resourceData]);
+
+    useEffect(() => {
+        topics.publish("query.params_" + item.layerId, queryParams);
+    }, [queryParams]);
+
+    const onFinish = (values) => {
+        const keys_ = Object.keys(values || {});
+        const obj: object = {};
+        getEntries(fields).map(([_, value], idx) => {
+            if (keys_.includes(value.keyname)) {
+                const field = values[value.keyname];
+
+                field?.map((item, index) => {
+                    if (!field[index]?.vals) {
+                        setQueryParams(null)
+                        return
+                    };
+                    const op = item?.vals ? "__" + item.op : ""; /* оператор */
+                    let vf = field[index].vals; /* значение */
+                    const opt_ = value.datatype === "STRING" && ["like", "ilike"].includes(item.op) ? "%" : ""; /* %like%, %ilike% */
+
+                    if (value.datatype === "TIME") {
+                        vf = field[index].vals.format("H:m:s")
+                    } else if (value.datatype === "DATE") {
+                        vf = field[index].vals.format("YYYY-MM-DD")
+                    } else if (value.datatype === "DATETIME") {
+                        vf = field[index].vals.format("YYYY-MM-DD H:m:s")
+                    }
+                    Object.assign(obj, {
+                        [idx.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
+                    });
+                });
+            }
+        });
+
+        Object.keys(obj).length > 0 && setQueryParams((prev) => ({
+            ...prev,
+            fld_field_op: obj,
+        }));
+    };
+
+    const updateForm = () => {
+        form
+            .validateFields()
+            .then((values) => {
+                onFinish(values);
+            });
+    }
+    console.log(queryParams);
+    
+    return (
+        <div className="component-filter">
+            <div className="form-filters">
+                <Form
+                    form={form}
+                    name={item.key}
+                    onFinish={onFinish}
+                    autoComplete="off"
+                >
+                    {fields.map((item) => (
+                        <Form.List key={item.keyname} name={item.keyname}>
+                            {(field, { add, remove }) => (
+                                <div className="field-row">
+                                    <Card
+                                        title={
+                                            <span
+                                                className="title-button"
+                                                title={msgAddFilterField}
+                                                onClick={() => {
+                                                    add();
+                                                }}
+                                            >
+                                                {item.display_name}
+                                            </span>
+                                        }
+                                        size="small"
+                                        key={field.key}
+                                        className="card-row"
+                                    >
+                                        {field.map(({ key, name, ...restField }) => (
+                                            <div className="card-content" key={key}>
+                                                <Form.Item noStyle {...restField} name={[name]} >
+                                                    <FilterInput field={item} />
+                                                </Form.Item>
+                                                <span
+                                                    className="icon-symbol padding-icon"
+                                                    title={msgRemoveFilterField}
+                                                    onClick={() => {
+                                                        remove(name);
+                                                        updateForm();
+                                                    }}>
+                                                    <Remove />
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </Card>
+                                </div>
+                            )}
+                        </Form.List>
+                    ))}
+                </Form>
+            </div>
+            <div className="control-filters">
+                <Button size="small" onClick={() => {
+                    form.submit();
+                }}>
+                    {msgCheckForm}
+                </Button>
+                <Button size="small" onClick={() => {
+                    setQueryParams(null);
+                    form.resetFields();
+                }}>
+                    {msgClearForm}
+                </Button>
+                <Button size="small" onClick={() => {
+                    setQueryParams(null);
+                }}>
+                    {msgCancel}
+                </Button>
+                <Button size="small" onClick={() => {
+                    updateForm();
+                }}>
+                    {msgOk}
+                </Button>
+            </div>
+        </div>
     )
 }
 
@@ -57,8 +346,6 @@ const params = (pos) => {
 
 export const FilterLayer = observer((props) => {
     const { display, item, loads } = props;
-    const [fields, setFields] = useState();
-    const [activePanel, setActivePanel] = useState(display.panelsManager._activePanelKey && true);
 
     const ref = useRef(null);
     useOutsideClick(ref?.current?.resizableElement, "z-index");
@@ -69,6 +356,7 @@ export const FilterLayer = observer((props) => {
 
     const [store] = useState(
         () => new FilterLayerStore({
+            activePanel: display.panelsManager._activePanelKey && true,
             valueRnd: params(false),
             styleOp: {
                 minWidth: width,
@@ -78,22 +366,17 @@ export const FilterLayer = observer((props) => {
         }));
 
     const {
-        activeKey, setActiveKey, removeTab,
-        setValueRnd,
-        valueRnd,
-        styleOp,
-        setStyleOp,
+        activeKey, setActiveKey,
+        activePanel, setActivePanel,
+        removeTab,
+        styleOp, setStyleOp,
+        valueRnd, setValueRnd,
     } = store;
 
     topics.subscribe("removeTabFilter",
         (e) => { removeTab(e.detail); }
     );
 
-    const { data: resourceData } = useRouteGet<ResourceItem>(
-        "resource.item",
-        { id: item?.layerId },
-        { cache: true },
-    );
 
     const items = useMemo(() => {
         if (store.tabs.length) {
@@ -207,19 +490,9 @@ export const FilterLayer = observer((props) => {
         store.addTab({
             key: String(item.layerId),
             label: item.label,
-            children: <ComponentTest label={item.label} operations={operations} />
+            children: <ComponentFilter item={item} store={store} />
         })
     }, [loads]);
-
-    useEffect(() => {
-        if (resourceData) {
-            const featureLayer = resourceData.feature_layer!;
-            const fields_ = featureLayer?.fields;
-            if (fields_) {
-                setFields(fields_);
-            }
-        }
-    }, [resourceData]);
 
     return (
         createPortal(
