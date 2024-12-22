@@ -1,4 +1,2 @@
 /** @entrypoint */
-import FilterLayerPlugin from "./plugin";
-
-export default FilterLayerPlugin;
+export { FilterControl, FilterLayerPlugin as default } from "./plugin";

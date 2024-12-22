@@ -24,7 +24,9 @@ export class FilterLayerStore {
     activeKey?: string | null = null;    
     activePanel?: boolean;
     queryParams: QueryParams | null = null;
-    fields: FeatureLayerFieldRead[] = [];
+    qObj: QueryParams[] = [];
+
+    visible?: (val: boolean) => void;
 
     private _tabs: Tab[] = [];
 
@@ -48,7 +50,7 @@ export class FilterLayerStore {
         this.activePanel = value;
     };
 
-    setActiveKey = (activeKey?: string) => {
+    setActiveKey = (activeKey?: string) => {       
         if (activeKey) {
             const exist = this._tabs.find((t) => t.key === activeKey);
             if (exist) {
@@ -103,8 +105,8 @@ export class FilterLayerStore {
         this.setValue("queryParams", queryParams);
     };
 
-    setFields = (fields: FeatureLayerFieldRead[]) => {
-        this.fields = fields;
+    setQObj = (qObj: QueryParams[]) => {
+        this.qObj = qObj;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

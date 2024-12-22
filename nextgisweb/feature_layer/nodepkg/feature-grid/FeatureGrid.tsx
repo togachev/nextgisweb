@@ -121,6 +121,10 @@ export const FeatureGrid = observer(
             }
         }, [startFilter]);
 
+        topics.subscribe("query.params_" + id,
+            (e) => { setQueryParams(e.detail); }
+        );
+
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }

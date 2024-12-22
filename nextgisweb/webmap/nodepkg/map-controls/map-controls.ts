@@ -16,7 +16,7 @@ import InfoScale from "ngw-webmap/controls/InfoScale";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import InitialExtent from "ngw-webmap/controls/InitialExtent";
-import { FilterControl } from "@nextgisweb/webmap/filter-layer/FilterControl";
+import { FilterControl } from "@nextgisweb/webmap/filter-layer/plugin";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import MyLocation from "ngw-webmap/controls/MyLocation";

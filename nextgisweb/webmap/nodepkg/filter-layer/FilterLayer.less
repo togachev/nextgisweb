@@ -54,12 +54,6 @@
         border: 0px solid #f0f0f0;
     }
 
-    .ant-card-head {
-        min-height: 24px;
-        padding: 0;
-        font-size: 14px;
-    }
-
     .ant-card-body {
         padding: 0;
         height: 100%;
@@ -146,7 +140,13 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-end;
-                margin: 0;
+                margin: 0 0 10px 0;
+                border-bottom: 1px solid var(--divider-color);
+
+                .ant-card-head {
+                    border: 0px solid;
+                    padding: 0;
+                }
 
                 .icon-symbol {
                     font-size: 14px;
@@ -173,23 +173,12 @@
                 }
 
                 .title-button {
-                    min-height: 24px;
-                    width: 100%;
-                    display: flex;
-                    padding: 5px 16px;
-                    align-items: center;
+                    padding: 2px;
                     cursor: pointer;
                 }
 
                 .card-row {
                     width: 100%;
-                    margin: 5px;
-
-                    .ant-card-head {
-                        padding: 0;
-                        font-size: 14px;
-                        border-radius: 3px;
-                    }
 
                     .ant-card-body {
                         padding: 0;
@@ -214,6 +203,7 @@
         position: fixed;
         bottom: 0;
         padding: 5px;
+        right: 0;
 
         button {
             margin: 0 0 0 10px;

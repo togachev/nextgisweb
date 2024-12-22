@@ -212,9 +212,9 @@ export const LayersTree = observer(
             );
 
             const typeLayer = ["postgis_layer", "vector_layer"];
-            const idNode = nodeData.treeItem.id
-            const filtered = filterKeys && Object.entries(filterKeys).filter(([_, value]) => value === idNode)[0];
-
+            const idNode = String(nodeData.treeItem.id)
+            const filtered = filterKeys && Object.entries(filterKeys).find(([key, _]) => key === idNode);
+            
             const handleEnter = (id) => {
                 setSelectedId(prev => [...prev, id]);
             };
@@ -254,7 +254,7 @@ export const LayersTree = observer(
                                                 e.stopPropagation();
                                                 display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
                                                     .then(item => {
-                                                        setFilterKeys(prev => ({ ...prev, [item.layerId]: item.id, }));
+                                                        setFilterKeys(prev => ({ ...prev, [item.id]: item.layerId, }));
                                                         topics.publish("button_hidden");
                                                     })
                                             }}>
