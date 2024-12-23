@@ -119,7 +119,7 @@ export const ControlsInfo: ControlInfo[] = [
         ctor: (display) => {
             return new FilterControl({
                 display: display,
-                target: display.rightTopControlPane,
+                target: display.leftTopControlPane,
                 tipLabel: gettext("Filter show"),
             });
         },

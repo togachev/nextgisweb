@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Form } from "@nextgisweb/gui/fields-form";
+import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
 import {
     Button,
     Card,
@@ -16,8 +17,10 @@ import { topics } from "@nextgisweb/webmap/identify-module"
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import Remove from "@nextgisweb/icon/material/remove";
+import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
 import type { InputRef } from "@nextgisweb/gui/antd";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
@@ -29,6 +32,7 @@ const msgCancel = gettext("Cancel");
 const msgOk = gettext("Ок");
 const msgClearForm = gettext("Clean");
 const msgCheckForm = gettext("Check");
+const msgZoomToFiltered = gettext("Zoom to filtered features");
 
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
@@ -157,7 +161,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
 }
 
 export const ComponentFilter = observer((props) => {
-    const { item, fields, store } = props;
+    const { display, item, fields, store } = props;
     const { activeKey, visible, removeTab } = store;
     const { id, layerId } = item;
 
@@ -168,6 +172,10 @@ export const ComponentFilter = observer((props) => {
     useEffect(() => {
         topics.publish("query.params_" + layerId, queryParams);
     }, [queryParams]);
+
+    const { route, isLoading } = useRoute("feature_layer.feature.extent", {
+        id: layerId,
+    });
 
     const onFinish = (values) => {
         const keys_ = Object.keys(values || {});
@@ -213,6 +221,32 @@ export const ComponentFilter = observer((props) => {
                 onFinish(values);
             });
     }
+
+    const onZoomToFiltered = (ngwExtent: NgwExtent) => {
+        display.map.zoomToNgwExtent(
+            ngwExtent,
+            display.displayProjection
+        );
+    }
+
+    const click = async () => {
+        if (!onZoomToFiltered) {
+            return;
+        }
+        if (!queryParams?.fld_field_op) {
+            const resp = await route.get<NgwExtent>({
+                query: queryParams || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);
+        } else {
+            const resp = await route.get<NgwExtent>({
+                query: queryParams?.fld_field_op || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);
+        }
+    };
 
     return (
         <div key={id} className="component-filter">
@@ -267,6 +301,13 @@ export const ComponentFilter = observer((props) => {
                 </Form>
             </div>
             <div className="control-filters">
+                <Button
+                    title={msgZoomToFiltered}
+                    icon={<ZoomInMap />}
+                    onClick={click}
+                    size="small"
+                    loading={isLoading}
+                />
                 <Button size="small" onClick={() => {
                     form.submit();
                 }}>

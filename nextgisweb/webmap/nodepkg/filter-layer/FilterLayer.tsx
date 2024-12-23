@@ -29,7 +29,7 @@ const width = 600;
 const height = 350;
 const padding = 16;
 
-const pos_x = W - padding - width;
+const pos_x = W / 2 - width / 2;
 const pos_y = padding + offset;
 
 const params = (pos) => {
@@ -195,7 +195,7 @@ export const FilterLayer = observer(
                         key: String(item.id),
                         label: item.label,
                         layerId: item.layerId,
-                        children: <ComponentFilter item={item} fields={fields} store={store} />
+                        children: <ComponentFilter display={display} item={item} fields={fields} store={store} />
                     })
                 });
         }, [loads]);
