@@ -1,7 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { ReactElement } from "react";
-import type { QueryParams } from "@nextgisweb/feature-layer/feature-grid/hook/useFeatureTable";
-import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
@@ -23,9 +21,6 @@ export class FilterLayerStore {
     styleOp: object;
     activeKey?: string | null = null;    
     activePanel?: boolean;
-    queryParams: QueryParams | null = null;
-    qObj: QueryParams[] = [];
-
     visible?: (val: boolean) => void;
 
     private _tabs: Tab[] = [];
@@ -99,14 +94,6 @@ export class FilterLayerStore {
 
     setStyleOp = (styleOp: SetValue<object | null>) => {
         this.setValue("styleOp", styleOp);
-    };
-
-    setQueryParams = (queryParams: SetValue<QueryParams | null>) => {
-        this.setValue("queryParams", queryParams);
-    };
-
-    setQObj = (qObj: QueryParams[]) => {
-        this.qObj = qObj;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

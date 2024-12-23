@@ -238,6 +238,7 @@ export const LayersTree = observer(
                                         <span title={gettext("Delete filter")} className="more"
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                topics.publish("query.params_" + filtered[1], null)
                                                 topics.publish("removeTabFilter", filtered[0]);
                                                 topics.publish("button_hidden");
                                                 setSelectedId(prev => prev.filter(i => i !== idNode))

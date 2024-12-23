@@ -10,7 +10,6 @@ define([
     return declare(Adapter, {
         createLayer: function (item) {
             const queue = util.imageQueue;
-            console.log(item);
             
             let p_filters = ""
             topics.subscribe("query.params_" + item.layerId,
