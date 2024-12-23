@@ -31,7 +31,7 @@ const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
 const msgOk = gettext("Ок");
 const msgClearForm = gettext("Clean");
-const msgCheckForm = gettext("Check");
+const msgApplyForm = gettext("Apply");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
@@ -163,7 +163,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
 export const ComponentFilter = observer((props) => {
     const { display, item, fields, store } = props;
     const { activeKey, visible, removeTab } = store;
-    const { id, layerId } = item;
+    const { layerId } = item;
 
     const [form] = Form.useForm();
 
@@ -202,7 +202,7 @@ export const ComponentFilter = observer((props) => {
                         vf = field[index].vals.format("YYYY-MM-DD H:m:s")
                     }
                     Object.assign(obj, {
-                        [id.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
+                        [layerId.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
                     });
                 });
             }
@@ -230,9 +230,6 @@ export const ComponentFilter = observer((props) => {
     }
 
     const click = async () => {
-        if (!onZoomToFiltered) {
-            return;
-        }
         if (!queryParams?.fld_field_op) {
             const resp = await route.get<NgwExtent>({
                 query: queryParams || undefined,
@@ -249,11 +246,11 @@ export const ComponentFilter = observer((props) => {
     };
 
     return (
-        <div key={id} className="component-filter">
+        <div key={layerId} className="component-filter">
             <div className="form-filters">
                 <Form
                     form={form}
-                    name={"ngw_filter_layer_" + id}
+                    name={"ngw_filter_layer_" + layerId}
                     onFinish={onFinish}
                     autoComplete="off"
                 >
@@ -304,14 +301,16 @@ export const ComponentFilter = observer((props) => {
                 <Button
                     title={msgZoomToFiltered}
                     icon={<ZoomInMap />}
-                    onClick={click}
+                    onClick={() => {
+                        click();
+                    }}
                     size="small"
                     loading={isLoading}
                 />
                 <Button size="small" onClick={() => {
                     form.submit();
                 }}>
-                    {msgCheckForm}
+                    {msgApplyForm}
                 </Button>
                 <Button size="small" onClick={() => {
                     setQueryParams(null);

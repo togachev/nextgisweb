@@ -187,12 +187,12 @@ export const FilterLayer = observer(
             } else {
                 expand(valueRnd)
             }
-            setActiveKey(String(item.id));
+            setActiveKey(String(item.layerId));
 
             getFields(item)
                 .then(({ item, fields }) => {
                     store.addTab({
-                        key: String(item.id),
+                        key: String(item.layerId),
                         label: item.label,
                         layerId: item.layerId,
                         children: <ComponentFilter display={display} item={item} fields={fields} store={store} />

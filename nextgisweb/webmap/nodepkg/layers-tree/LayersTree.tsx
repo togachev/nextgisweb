@@ -212,7 +212,7 @@ export const LayersTree = observer(
             );
 
             const typeLayer = ["postgis_layer", "vector_layer"];
-            const idNode = String(nodeData.treeItem.id)
+            const idNode = String(nodeData.treeItem.layerId)
             const filtered = filterKeys && Object.entries(filterKeys).find(([key, _]) => key === idNode);
             
             const handleEnter = (id) => {
@@ -238,7 +238,7 @@ export const LayersTree = observer(
                                         <span title={gettext("Delete filter")} className="more"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                topics.publish("query.params_" + filtered[1], null)
+                                                topics.publish("query.params_" + filtered[0], null)
                                                 topics.publish("removeTabFilter", filtered[0]);
                                                 topics.publish("button_hidden");
                                                 setSelectedId(prev => prev.filter(i => i !== idNode))
@@ -255,7 +255,7 @@ export const LayersTree = observer(
                                                 e.stopPropagation();
                                                 display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
                                                     .then(item => {
-                                                        setFilterKeys(prev => ({ ...prev, [item.id]: item.layerId, }));
+                                                        setFilterKeys(prev => ({ ...prev, [item.layerId]: item.layerId, }));
                                                         topics.publish("button_hidden");
                                                     })
                                             }}>
