@@ -3,12 +3,14 @@ import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Form } from "@nextgisweb/gui/fields-form";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
+import { route } from "@nextgisweb/pyramid/api";
 import {
     Button,
     Card,
     DatePicker,
     DateTimePicker,
     Empty,
+    Table,
     TimePicker,
     Input,
     Select,
@@ -22,6 +24,14 @@ import FilterPlusIcon from "@nextgisweb/icon/mdi/filter-plus";
 
 import type { InputRef } from "@nextgisweb/gui/antd";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
+
+interface FeatureLayerQuery {
+    limit?: number;
+    geom?: boolean;
+    extensions?: string[] | undefined;
+    dt_format?: string;
+}
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
@@ -173,12 +183,14 @@ export const ComponentFilter = observer((props) => {
     const [form] = Form.useForm();
 
     const [queryParams, setQueryParams] = useState();
+    const [activeFields, setActiveFields] = useState();
+    const [loadValue, setloadValue] = useState([]);
 
     useEffect(() => {
         topics.publish("query.params_" + styleId, queryParams);
     }, [queryParams]);
 
-    const { route, isLoading } = useRoute("feature_layer.feature.extent", {
+    const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", {
         id: layerId,
     });
 
@@ -227,8 +239,6 @@ export const ComponentFilter = observer((props) => {
             });
     }
 
-
-
     const onZoomToFiltered = (ngwExtent: NgwExtent) => {
         display.map.zoomToNgwExtent(
             ngwExtent,
@@ -239,19 +249,61 @@ export const ComponentFilter = observer((props) => {
 
     const click = async () => {
         if (!queryParams?.fld_field_op) {
-            const resp = await route.get<NgwExtent>({
+            const resp = await extent.get<NgwExtent>({
                 query: queryParams || undefined,
                 cache: true,
             });
             onZoomToFiltered(resp);
         } else {
-            const resp = await route.get<NgwExtent>({
+            const resp = await extent.get<NgwExtent>({
                 query: queryParams?.fld_field_op || undefined,
                 cache: true,
             });
             onZoomToFiltered(resp);
         }
     };
+
+    const query: FeatureLayerQuery = {
+        geom: false,
+        extensions: [],
+        limit: 10,
+        dt_format: "iso",
+    };
+
+
+    const LoadValues = ({ activeFields }) => {
+        const load = async (
+            resourceId: number,
+            field,
+        ) => {
+            const featureCollection = await route("feature_layer.feature.collection", resourceId).get({
+                query,
+            })
+            const keyname = field.keyname;
+            let result = featureCollection.map(a => a.fields).map(a => a[keyname]).filter(x => x);
+            let data = result.reduce((a, v, index) => ([...a, {
+                key: index,
+                name: v,
+            }]), []);
+            setloadValue(data)
+        };
+        const columns = [
+            {
+                title: activeFields.keyname,
+                dataIndex: activeFields.keyname,
+                key: activeFields.keyname,
+            },
+        ];
+        return (
+            <div>
+                {loadValue && <Table columns={columns} dataSource={loadValue} />}
+                <Button onClick={() => {
+                    load(layerId, activeFields)
+                }}>Образец</Button>
+            </div>
+        )
+    }
+
 
     return (
         <div key={styleId} className="component-filter">
@@ -287,6 +339,7 @@ export const ComponentFilter = observer((props) => {
                                                                 size={size}
                                                                 onClick={() => {
                                                                     add();
+                                                                    setActiveFields(itm)
                                                                 }}
                                                             />
                                                         </div>
@@ -306,6 +359,7 @@ export const ComponentFilter = observer((props) => {
                                                                 title={msgRemoveFilterField}
                                                                 onClick={() => {
                                                                     remove(name);
+                                                                    setActiveFields(undefined)
                                                                     updateForm();
                                                                 }}>
                                                                 <Remove />
@@ -323,7 +377,7 @@ export const ComponentFilter = observer((props) => {
                             className="value-filter-fields"
                             title="Значения"
                         >
-                            Форма значений
+                            {activeFields && <LoadValues activeFields={activeFields} />}
                         </Card>
                     </div>
                     <div className="control-filters">
