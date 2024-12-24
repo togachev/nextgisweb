@@ -3,14 +3,13 @@ import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Form } from "@nextgisweb/gui/fields-form";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
-import { route } from "@nextgisweb/pyramid/api";
+import { useSource } from "./hook/useSource";
 import {
     Button,
     Card,
     DatePicker,
     DateTimePicker,
     Empty,
-    Table,
     TimePicker,
     Input,
     Select,
@@ -24,19 +23,12 @@ import FilterPlusIcon from "@nextgisweb/icon/mdi/filter-plus";
 
 import type { InputRef } from "@nextgisweb/gui/antd";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
-import type { FeatureItem } from "@nextgisweb/feature-layer/type";
-
-interface FeatureLayerQuery {
-    limit?: number;
-    geom?: boolean;
-    extensions?: string[] | undefined;
-    dt_format?: string;
-}
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
 import "./FilterLayer.less";
 
+const msgLoadValue = gettext("Load values");
 const msgAddFilterField = gettext("Add filter");
 const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
@@ -44,7 +36,7 @@ const msgOk = gettext("Ок");
 const msgClearForm = gettext("Clean");
 const msgApplyForm = gettext("Apply");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
-const emptyFields = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 const size = "small"
@@ -157,7 +149,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
             {value.vals && <span
                 className="icon-symbol padding-icon"
                 onClick={() => {
-                    triggerChange({ vals: undefined })
+                    triggerChange({ vals: undefined });
                 }}
             >
                 <BackspaceIcon />
@@ -180,11 +172,14 @@ export const ComponentFilter = observer((props) => {
     const { activeKey, visible, removeTab } = store;
     const { layerId, styleId } = item;
 
+    const { getFeature } = useSource();
+
     const [form] = Form.useForm();
 
     const [queryParams, setQueryParams] = useState();
     const [activeFields, setActiveFields] = useState();
-    const [loadValue, setloadValue] = useState([]);
+    const [loadValue, setloadValue] = useState(false);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         topics.publish("query.params_" + styleId, queryParams);
@@ -263,46 +258,34 @@ export const ComponentFilter = observer((props) => {
         }
     };
 
-    const query: FeatureLayerQuery = {
-        geom: false,
-        extensions: [],
-        limit: 10,
-        dt_format: "iso",
-    };
+    useEffect(() => {
+        if (loadValue) {
+            getFeature(layerId)
+                .then(item => {
+                    const result = item.reduce((acc, obj) => {
+                        if (obj[activeFields.keyname] && !acc.some(o => o[activeFields.keyname] === obj[activeFields.keyname])) {
+                            acc.push(obj);
+                        }
+                        return acc;
+                    }, []);
+                    setData(result)
+                    setloadValue(false)
+                });
+        }
+    }, [loadValue]);
 
+    const LoadValues = () => (
+        data.length > 0 ?
+            <div className="load-values">{data.map((itm, index) => {
+                return (
+                    <span className="title-button" key={index}>
+                        {itm[activeFields.keyname]}
+                    </span>
+                )
+            })}</div> :
+            emptyValue
+    )
 
-    const LoadValues = ({ activeFields }) => {
-        const load = async (
-            resourceId: number,
-            field,
-        ) => {
-            const featureCollection = await route("feature_layer.feature.collection", resourceId).get({
-                query,
-            })
-            const keyname = field.keyname;
-            let result = featureCollection.map(a => a.fields).map(a => a[keyname]).filter(x => x);
-            let data = result.reduce((a, v, index) => ([...a, {
-                key: index,
-                name: v,
-            }]), []);
-            setloadValue(data)
-        };
-        const columns = [
-            {
-                title: activeFields.keyname,
-                dataIndex: activeFields.keyname,
-                key: activeFields.keyname,
-            },
-        ];
-        return (
-            <div>
-                {loadValue && <Table columns={columns} dataSource={loadValue} />}
-                <Button onClick={() => {
-                    load(layerId, activeFields)
-                }}>Образец</Button>
-            </div>
-        )
-    }
 
 
     return (
@@ -326,7 +309,14 @@ export const ComponentFilter = observer((props) => {
                                             <div className="field-row">
                                                 <Card
                                                     title={
-                                                        <div className="field-add">
+                                                        <div
+                                                            title={msgLoadValue}
+                                                            className="field-add"
+                                                            onClick={() => {
+                                                                setActiveFields(itm)
+                                                                setloadValue(true)
+                                                            }}
+                                                        >
                                                             <span
                                                                 title={itm.display_name}
                                                                 className="title-field"
@@ -339,7 +329,6 @@ export const ComponentFilter = observer((props) => {
                                                                 size={size}
                                                                 onClick={() => {
                                                                     add();
-                                                                    setActiveFields(itm)
                                                                 }}
                                                             />
                                                         </div>
@@ -377,7 +366,7 @@ export const ComponentFilter = observer((props) => {
                             className="value-filter-fields"
                             title="Значения"
                         >
-                            {activeFields && <LoadValues activeFields={activeFields} />}
+                            {activeFields && <LoadValues />}
                         </Card>
                     </div>
                     <div className="control-filters">

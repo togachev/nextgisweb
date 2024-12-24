@@ -29,8 +29,8 @@ const size = "small"
 const W = window.innerWidth;
 const H = window.innerHeight;
 const offset = 40;
-const width = 520;
-const height = 350;
+const width = 600;
+const height = 400;
 const padding = 16;
 
 const pos_x = W / 2 - width / 2;

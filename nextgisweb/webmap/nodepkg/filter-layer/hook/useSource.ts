@@ -10,5 +10,20 @@ export const useSource = () => {
             })
         return { item, fields: fields.feature_layer.fields };
     }
-    return { getFields };
+
+    const getFeature = async (layerId) => {
+        const feature = await route("feature_layer.feature.collection", { id: layerId })
+            .get({
+                cache: false,
+                query: {
+                    geom: false,
+                    extensions: [],
+                    limit: 10,
+                    dt_format: "iso",
+                },
+            })
+        return feature.map(item => item.fields);
+    }
+
+    return { getFeature, getFields };
 };
