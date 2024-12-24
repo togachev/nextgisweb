@@ -7,6 +7,8 @@ import { Rnd } from "react-rnd";
 import { topics } from "@nextgisweb/webmap/identify-module"
 import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
 import { useSource } from "./hook/useSource";
+import { getUid } from "ol/util";
+
 import { FilterLayerStore } from "./FilterLayerStore";
 import { ComponentFilter } from "./ComponentFilter";
 
@@ -49,6 +51,8 @@ const params = (pos) => {
     }
     return position;
 }
+
+
 
 export const FilterLayer = observer(
     forwardRef<Element>((props, ref: RefObject<Element>) => {
@@ -115,6 +119,15 @@ export const FilterLayer = observer(
             }));
         };
 
+        const refreshLayer = (key) => {
+            const uid = getUid(display._layers[key].olLayer);
+            display.map.olMap.getLayers().forEach((layer) => {
+                if (getUid(layer) === uid) {
+                    layer.getSource().refresh();
+                }
+            })
+        }
+
         const removeAllFilter = () => {
             setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
             setStyleOp(prev => ({
@@ -125,6 +138,7 @@ export const FilterLayer = observer(
             }));
 
             items.map(i => {
+                refreshLayer(i.ikey);
                 removeTab(String(i.key));
                 topics.publish("removeTabFilter", String(i.key));
                 topics.publish("query.params_" + i.styleId, null)
@@ -195,10 +209,11 @@ export const FilterLayer = observer(
                 .then(({ item, fields }) => {
                     store.addTab({
                         key: String(item.styleId),
+                        ikey: String(item.key),
                         label: item.label,
                         layerId: item.layerId,
                         styleId: item.styleId,
-                        children: <ComponentFilter display={display} item={item} fields={fields} store={store} />
+                        children: <ComponentFilter refreshLayer={refreshLayer} display={display} item={item} fields={fields} store={store} />
                     })
                 });
         }, [loads]);

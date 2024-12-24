@@ -13,7 +13,6 @@ import {
     Input,
     Select,
 } from "@nextgisweb/gui/antd";
-import { getUid } from "ol/util";
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -38,7 +37,7 @@ const msgZoomToFiltered = gettext("Zoom to filtered features");
 const emptyFields = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
-const size="small"
+const size = "small"
 
 const operator = {
     eq: { label: "равно", value: "eq" },
@@ -167,7 +166,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
 }
 
 export const ComponentFilter = observer((props) => {
-    const { display, item, fields, store } = props;
+    const { display, item, fields, refreshLayer, store } = props;
     const { activeKey, visible, removeTab } = store;
     const { layerId, styleId } = item;
 
@@ -228,21 +227,14 @@ export const ComponentFilter = observer((props) => {
             });
     }
 
-    const refreshLayer = (display, key) => {
-        const uid = getUid(display._layers[key].olLayer);
-        display.map.olMap.getLayers().forEach((layer) => {
-            if (getUid(layer) === uid) {
-                layer.getSource().refresh();
-            }
-        })
-    }
+
 
     const onZoomToFiltered = (ngwExtent: NgwExtent) => {
         display.map.zoomToNgwExtent(
             ngwExtent,
             display.displayProjection
         );
-        refreshLayer(display, item.key);
+        refreshLayer(item.key);
     }
 
     const click = async () => {
@@ -266,59 +258,73 @@ export const ComponentFilter = observer((props) => {
             {fields.length > 0 ?
                 (<>
                     <div className="form-filters">
-                        <Form
-                            form={form}
-                            name={"ngw_filter_layer_" + styleId}
-                            onFinish={onFinish}
-                            autoComplete="off"
+                        <Card
+                            className="card-filter-fields"
+                            title="Поля"
                         >
-                            {fields.map((itm) => (
-                                <Form.List key={itm.keyname} name={itm.keyname}>
-                                    {(field, { add, remove }) => (
-                                        <div className="field-row">
-                                            <Card
-                                                title={
-                                                    <div className="field-add">
-                                                        <span>
-                                                            {itm.display_name}
-                                                        </span>
-                                                        <Button
-                                                            icon={<FilterPlusIcon />}
-                                                            title={msgAddFilterField}
-                                                            size={size}
-                                                            onClick={() => {
-                                                                add();
-                                                            }}
-                                                        />
-                                                    </div>
+                            <Form
+                                form={form}
+                                name={"ngw_filter_layer_" + styleId}
+                                onFinish={onFinish}
+                                autoComplete="off"
+                            >
+                                {fields.map((itm) => (
+                                    <Form.List key={itm.keyname} name={itm.keyname}>
+                                        {(field, { add, remove }) => (
+                                            <div className="field-row">
+                                                <Card
+                                                    title={
+                                                        <div className="field-add">
+                                                            <span
+                                                                title={itm.display_name}
+                                                                className="title-field"
+                                                            >
+                                                                {itm.display_name}
+                                                            </span>
+                                                            <Button
+                                                                icon={<FilterPlusIcon />}
+                                                                title={msgAddFilterField}
+                                                                size={size}
+                                                                onClick={() => {
+                                                                    add();
+                                                                }}
+                                                            />
+                                                        </div>
 
-                                                }
-                                                size={size}
-                                                key={field.key}
-                                                className="card-row"
-                                            >
-                                                {field.map(({ key, name, ...restField }) => (
-                                                    <div className="card-content" key={key}>
-                                                        <Form.Item noStyle {...restField} name={[name]} >
-                                                            <FilterInput field={itm} />
-                                                        </Form.Item>
-                                                        <span
-                                                            className="icon-symbol padding-icon"
-                                                            title={msgRemoveFilterField}
-                                                            onClick={() => {
-                                                                remove(name);
-                                                                updateForm();
-                                                            }}>
-                                                            <Remove />
-                                                        </span>
-                                                    </div>
-                                                ))}
-                                            </Card>
-                                        </div>
-                                    )}
-                                </Form.List>
-                            ))}
-                        </Form>
+                                                    }
+                                                    size={size}
+                                                    key={field.key}
+                                                    className="card-row"
+                                                >
+                                                    {field.map(({ key, name, ...restField }) => (
+                                                        <div className="card-content" key={key}>
+                                                            <Form.Item noStyle {...restField} name={[name]} >
+                                                                <FilterInput field={itm} />
+                                                            </Form.Item>
+                                                            <span
+                                                                className="icon-symbol padding-icon"
+                                                                title={msgRemoveFilterField}
+                                                                onClick={() => {
+                                                                    remove(name);
+                                                                    updateForm();
+                                                                }}>
+                                                                <Remove />
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </Card>
+                                            </div>
+                                        )}
+                                    </Form.List>
+                                ))}
+                            </Form>
+                        </Card>
+                        <Card
+                            className="value-filter-fields"
+                            title="Значения"
+                        >
+                            Форма значений
+                        </Card>
                     </div>
                     <div className="control-filters">
                         <Button
@@ -332,14 +338,14 @@ export const ComponentFilter = observer((props) => {
                         />
                         <Button size={size} onClick={() => {
                             form.submit();
-                            refreshLayer(display, item.key);
+                            refreshLayer(item.key);
                         }}>
                             {msgApplyForm}
                         </Button>
                         <Button size={size} onClick={() => {
                             setQueryParams(null);
                             form.resetFields();
-                            refreshLayer(display, item.key);
+                            refreshLayer(item.key);
                         }}>
                             {msgClearForm}
                         </Button>
@@ -348,13 +354,13 @@ export const ComponentFilter = observer((props) => {
                             topics.publish("query.params_" + styleId, null)
                             removeTab(activeKey)
                             topics.publish("removeTabFilter", activeKey);
-                            refreshLayer(display, item.key);
+                            refreshLayer(item.key);
                         }}>
                             {msgCancel}
                         </Button>
                         <Button size={size} onClick={() => {
                             updateForm();
-                            refreshLayer(display, item.key);
+                            refreshLayer(item.key);
                             visible(true)
                         }}>
                             {msgOk}
