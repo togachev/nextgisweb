@@ -12,7 +12,7 @@ import {
     Input,
     Select,
 } from "@nextgisweb/gui/antd";
-
+import { getUid } from 'ol/util';
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -222,11 +222,22 @@ export const ComponentFilter = observer((props) => {
             });
     }
 
+    const refreshLayer = (display, key) => {
+        const uid = display.map.layers[key].olLayer.ol_uid;
+        display.map.olMap.getLayers().forEach((layer) => {
+            if (layer.ol_uid === uid) {
+                console.log(layer);
+                layer.getSource().refresh();
+            }
+        })
+    }
+
     const onZoomToFiltered = (ngwExtent: NgwExtent) => {
         display.map.zoomToNgwExtent(
             ngwExtent,
             display.displayProjection
         );
+        refreshLayer(display, item.key);
     }
 
     const click = async () => {

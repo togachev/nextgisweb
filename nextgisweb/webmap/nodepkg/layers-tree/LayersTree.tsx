@@ -222,7 +222,6 @@ export const LayersTree = observer(
             const handleLeave = (id) => {
                 setSelectedId(prev => prev.filter(i => i !== id))
             };
-            console.log(selectedId);
             
             return (
                 <>
