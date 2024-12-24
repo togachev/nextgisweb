@@ -23,8 +23,8 @@ import {
     updateKeysForMutualExclusivity,
 } from "./util/treeItems";
 
-import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-import FilterAltOffIcon from "@nextgisweb/icon/material/filter_alt_off";
+import FilterIcon from "@nextgisweb/icon/mdi/filter-outline";
+import FilterAltOffIcon from "@nextgisweb/icon/mdi/filter-off-outline";
 import { topics } from "@nextgisweb/webmap/identify-module"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 

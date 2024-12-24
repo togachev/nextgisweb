@@ -9,7 +9,7 @@ import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../../hook/useExportFeatureLayer";
 import type { QueryParams } from "../hook/useFeatureTable";
 
-import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import FilterIcon from "@nextgisweb/icon/mdi/filter-outline";
 
 type MenuItems = ParamsOf<typeof Dropdown>["menu"];
 

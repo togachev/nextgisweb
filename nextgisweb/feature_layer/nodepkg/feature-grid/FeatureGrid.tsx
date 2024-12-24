@@ -22,7 +22,7 @@ import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import FilterByData from "@nextgisweb/webmap/filter-by-data";
-import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import FilterIcon from "@nextgisweb/icon/mdi/filter-outline";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 
 import { topics } from "@nextgisweb/webmap/identify-module"

@@ -4,7 +4,7 @@ import { Control } from "ol/control";
 import { Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { topics } from "@nextgisweb/webmap/identify-module"
-import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import FilterIcon from "@nextgisweb/icon/mdi/filter-outline";
 
 import { FilterLayer } from "../FilterLayer";
 

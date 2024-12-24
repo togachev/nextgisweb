@@ -22,10 +22,12 @@ type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 
 import "./FilterLayer.less";
 
+const size = "small"
+
 const W = window.innerWidth;
 const H = window.innerHeight;
 const offset = 40;
-const width = 600;
+const width = 520;
 const height = 350;
 const padding = 16;
 
@@ -242,7 +244,7 @@ export const FilterLayer = observer(
                             }
                             type="editable-card"
                             tabPosition="top"
-                            size="small"
+                            size={size}
                             hideAdd
                             items={items}
                             activeKey={activeKey || undefined}

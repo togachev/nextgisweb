@@ -8,6 +8,7 @@ import {
     Card,
     DatePicker,
     DateTimePicker,
+    Empty,
     TimePicker,
     Input,
     Select,
@@ -18,6 +19,7 @@ import { topics } from "@nextgisweb/webmap/identify-module"
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import Remove from "@nextgisweb/icon/material/remove";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
+import FilterPlusIcon from "@nextgisweb/icon/mdi/filter-plus";
 
 import type { InputRef } from "@nextgisweb/gui/antd";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
@@ -33,8 +35,10 @@ const msgOk = gettext("Ок");
 const msgClearForm = gettext("Clean");
 const msgApplyForm = gettext("Apply");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
-
+const emptyFields = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+
+const size="small"
 
 const operator = {
     eq: { label: "равно", value: "eq" },
@@ -131,6 +135,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
 
     const inputProps = {
         style: { width: "100%", margin: "0 4px 0 0" },
+        size: size,
         placeholder: field.display_name,
         onChange: onFilterChange,
         value: value.vals,
@@ -149,6 +154,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
                 <BackspaceIcon />
             </span>}
             <Select
+                size={size}
                 value={value.op || op}
                 style={{ width: 165, padding: "0 5px 0 0" }}
                 onChange={onOperatorsChange}
@@ -257,96 +263,105 @@ export const ComponentFilter = observer((props) => {
 
     return (
         <div key={styleId} className="component-filter">
-            <div className="form-filters">
-                <Form
-                    form={form}
-                    name={"ngw_filter_layer_" + styleId}
-                    onFinish={onFinish}
-                    autoComplete="off"
-                >
-                    {fields.map((itm) => (
-                        <Form.List key={itm.keyname} name={itm.keyname}>
-                            {(field, { add, remove }) => (
-                                <div className="field-row">
-                                    <Card
-                                        title={
-                                            <Button
-                                                title={msgAddFilterField}
-                                                size="small"
-                                                onClick={() => {
-                                                    add();
-                                                }}
+            {fields.length > 0 ?
+                (<>
+                    <div className="form-filters">
+                        <Form
+                            form={form}
+                            name={"ngw_filter_layer_" + styleId}
+                            onFinish={onFinish}
+                            autoComplete="off"
+                        >
+                            {fields.map((itm) => (
+                                <Form.List key={itm.keyname} name={itm.keyname}>
+                                    {(field, { add, remove }) => (
+                                        <div className="field-row">
+                                            <Card
+                                                title={
+                                                    <div className="field-add">
+                                                        <span>
+                                                            {itm.display_name}
+                                                        </span>
+                                                        <Button
+                                                            icon={<FilterPlusIcon />}
+                                                            title={msgAddFilterField}
+                                                            size={size}
+                                                            onClick={() => {
+                                                                add();
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                }
+                                                size={size}
+                                                key={field.key}
+                                                className="card-row"
                                             >
-                                                {itm.display_name}
-                                            </Button>
-                                        }
-                                        size="small"
-                                        key={field.key}
-                                        className="card-row"
-                                    >
-                                        {field.map(({ key, name, ...restField }) => (
-                                            <div className="card-content" key={key}>
-                                                <Form.Item noStyle {...restField} name={[name]} >
-                                                    <FilterInput field={itm} />
-                                                </Form.Item>
-                                                <span
-                                                    className="icon-symbol padding-icon"
-                                                    title={msgRemoveFilterField}
-                                                    onClick={() => {
-                                                        remove(name);
-                                                        updateForm();
-                                                    }}>
-                                                    <Remove />
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </Card>
-                                </div>
-                            )}
-                        </Form.List>
-                    ))}
-                </Form>
-            </div>
-            <div className="control-filters">
-                <Button
-                    title={msgZoomToFiltered}
-                    icon={<ZoomInMap />}
-                    onClick={() => {
-                        click();
-                    }}
-                    size="small"
-                    loading={isLoading}
-                />
-                <Button size="small" onClick={() => {
-                    form.submit();
-                    refreshLayer(display, item.key);
-                }}>
-                    {msgApplyForm}
-                </Button>
-                <Button size="small" onClick={() => {
-                    setQueryParams(null);
-                    form.resetFields();
-                    refreshLayer(display, item.key);
-                }}>
-                    {msgClearForm}
-                </Button>
-                <Button size="small" onClick={() => {
-                    setQueryParams(null);
-                    topics.publish("query.params_" + styleId, null)
-                    removeTab(activeKey)
-                    topics.publish("removeTabFilter", activeKey);
-                    refreshLayer(display, item.key);
-                }}>
-                    {msgCancel}
-                </Button>
-                <Button size="small" onClick={() => {
-                    updateForm();
-                    refreshLayer(display, item.key);
-                    visible(true)
-                }}>
-                    {msgOk}
-                </Button>
-            </div>
+                                                {field.map(({ key, name, ...restField }) => (
+                                                    <div className="card-content" key={key}>
+                                                        <Form.Item noStyle {...restField} name={[name]} >
+                                                            <FilterInput field={itm} />
+                                                        </Form.Item>
+                                                        <span
+                                                            className="icon-symbol padding-icon"
+                                                            title={msgRemoveFilterField}
+                                                            onClick={() => {
+                                                                remove(name);
+                                                                updateForm();
+                                                            }}>
+                                                            <Remove />
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </Card>
+                                        </div>
+                                    )}
+                                </Form.List>
+                            ))}
+                        </Form>
+                    </div>
+                    <div className="control-filters">
+                        <Button
+                            title={msgZoomToFiltered}
+                            icon={<ZoomInMap />}
+                            onClick={() => {
+                                click();
+                            }}
+                            size={size}
+                            loading={isLoading}
+                        />
+                        <Button size={size} onClick={() => {
+                            form.submit();
+                            refreshLayer(display, item.key);
+                        }}>
+                            {msgApplyForm}
+                        </Button>
+                        <Button size={size} onClick={() => {
+                            setQueryParams(null);
+                            form.resetFields();
+                            refreshLayer(display, item.key);
+                        }}>
+                            {msgClearForm}
+                        </Button>
+                        <Button size={size} onClick={() => {
+                            setQueryParams(null);
+                            topics.publish("query.params_" + styleId, null)
+                            removeTab(activeKey)
+                            topics.publish("removeTabFilter", activeKey);
+                            refreshLayer(display, item.key);
+                        }}>
+                            {msgCancel}
+                        </Button>
+                        <Button size={size} onClick={() => {
+                            updateForm();
+                            refreshLayer(display, item.key);
+                            visible(true)
+                        }}>
+                            {msgOk}
+                        </Button>
+                    </div>
+                </>) :
+                emptyFields}
         </div>
     )
 });
