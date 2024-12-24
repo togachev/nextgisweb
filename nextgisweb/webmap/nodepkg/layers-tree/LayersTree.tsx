@@ -253,6 +253,7 @@ export const LayersTree = observer(
                                         <span title={gettext("Add filter")} className="more-grey"
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                setSelectedId(prev => prev.filter(i => i !== idNode))
                                                 display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
                                                     .then(item => {
                                                         setFilterKeys(prev => ({ ...prev, [item.styleId]: item.layerId, }));
