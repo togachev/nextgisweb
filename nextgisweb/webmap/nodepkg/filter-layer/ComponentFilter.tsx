@@ -319,12 +319,14 @@ export const ComponentFilter = observer((props) => {
                 />
                 <Button size="small" onClick={() => {
                     form.submit();
+                    refreshLayer(display, item.key);
                 }}>
                     {msgApplyForm}
                 </Button>
                 <Button size="small" onClick={() => {
                     setQueryParams(null);
                     form.resetFields();
+                    refreshLayer(display, item.key);
                 }}>
                     {msgClearForm}
                 </Button>
@@ -333,12 +335,13 @@ export const ComponentFilter = observer((props) => {
                     topics.publish("query.params_" + styleId, null)
                     removeTab(activeKey)
                     topics.publish("removeTabFilter", activeKey);
-
+                    refreshLayer(display, item.key);
                 }}>
                     {msgCancel}
                 </Button>
                 <Button size="small" onClick={() => {
                     updateForm();
+                    refreshLayer(display, item.key);
                     visible(true)
                 }}>
                     {msgOk}
