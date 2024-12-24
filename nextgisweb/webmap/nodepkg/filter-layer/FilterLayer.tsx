@@ -125,7 +125,7 @@ export const FilterLayer = observer(
             items.map(i => {
                 removeTab(String(i.key));
                 topics.publish("removeTabFilter", String(i.key));
-                topics.publish("query.params_" + i.layerId, null)
+                topics.publish("query.params_" + i.styleId, null)
             })
         };
 
@@ -187,14 +187,15 @@ export const FilterLayer = observer(
             } else {
                 expand(valueRnd)
             }
-            setActiveKey(String(item.layerId));
+            setActiveKey(String(item.styleId));
 
             getFields(item)
                 .then(({ item, fields }) => {
                     store.addTab({
-                        key: String(item.layerId),
+                        key: String(item.styleId),
                         label: item.label,
                         layerId: item.layerId,
+                        styleId: item.styleId,
                         children: <ComponentFilter display={display} item={item} fields={fields} store={store} />
                     })
                 });
@@ -250,7 +251,7 @@ export const FilterLayer = observer(
                                 if (action === "remove") {
                                     topics.publish("removeTabFilter", String(targetKey));
                                     removeTab(String(targetKey));
-                                    topics.publish("query.params_" + item.layerId, null)
+                                    topics.publish("query.params_" + item.styleId, null)
                                 }
                             }}
                             parentHeight

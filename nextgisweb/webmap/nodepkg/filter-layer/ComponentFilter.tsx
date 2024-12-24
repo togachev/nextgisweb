@@ -163,14 +163,14 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
 export const ComponentFilter = observer((props) => {
     const { display, item, fields, store } = props;
     const { activeKey, visible, removeTab } = store;
-    const { layerId } = item;
+    const { layerId, styleId } = item;
 
     const [form] = Form.useForm();
 
     const [queryParams, setQueryParams] = useState();
 
     useEffect(() => {
-        topics.publish("query.params_" + layerId, queryParams);
+        topics.publish("query.params_" + styleId, queryParams);
     }, [queryParams]);
 
     const { route, isLoading } = useRoute("feature_layer.feature.extent", {
@@ -202,7 +202,7 @@ export const ComponentFilter = observer((props) => {
                         vf = field[index].vals.format("YYYY-MM-DD H:m:s")
                     }
                     Object.assign(obj, {
-                        [layerId.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
+                        [styleId.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
                     });
                 });
             }
@@ -246,11 +246,11 @@ export const ComponentFilter = observer((props) => {
     };
 
     return (
-        <div key={layerId} className="component-filter">
+        <div key={styleId} className="component-filter">
             <div className="form-filters">
                 <Form
                     form={form}
-                    name={"ngw_filter_layer_" + layerId}
+                    name={"ngw_filter_layer_" + styleId}
                     onFinish={onFinish}
                     autoComplete="off"
                 >
@@ -320,7 +320,7 @@ export const ComponentFilter = observer((props) => {
                 </Button>
                 <Button size="small" onClick={() => {
                     setQueryParams(null);
-                    topics.publish("query.params_" + layerId, null)
+                    topics.publish("query.params_" + styleId, null)
                     removeTab(activeKey)
                     topics.publish("removeTabFilter", activeKey);
 

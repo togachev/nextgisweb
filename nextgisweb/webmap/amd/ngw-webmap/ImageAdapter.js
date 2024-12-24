@@ -12,7 +12,7 @@ define([
             const queue = util.imageQueue;
             
             let p_filters = ""
-            topics.subscribe("query.params_" + item.layerId,
+            topics.subscribe("query.params_" + item.styleId,
                 async (e) => {
                     if (e?.detail?.fld_field_op) {
                         const obj = e.detail.fld_field_op

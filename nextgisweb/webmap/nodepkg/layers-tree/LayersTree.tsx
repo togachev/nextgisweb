@@ -212,7 +212,7 @@ export const LayersTree = observer(
             );
 
             const typeLayer = ["postgis_layer", "vector_layer"];
-            const idNode = String(nodeData.treeItem.layerId)
+            const idNode = String(nodeData.treeItem.styleId)
             const filtered = filterKeys && Object.entries(filterKeys).find(([key, _]) => key === idNode);
             
             const handleEnter = (id) => {
@@ -222,7 +222,8 @@ export const LayersTree = observer(
             const handleLeave = (id) => {
                 setSelectedId(prev => prev.filter(i => i !== id))
             };
-
+            console.log(selectedId);
+            
             return (
                 <>
                     <Row key={idNode} wrap={false} onMouseEnter={() => handleEnter(idNode)} onMouseLeave={() => handleLeave(idNode)}>
@@ -255,7 +256,7 @@ export const LayersTree = observer(
                                                 e.stopPropagation();
                                                 display._plugins["@nextgisweb/webmap/filter-layer/plugin"].run?.(nodeData.treeItem)
                                                     .then(item => {
-                                                        setFilterKeys(prev => ({ ...prev, [item.layerId]: item.layerId, }));
+                                                        setFilterKeys(prev => ({ ...prev, [item.styleId]: item.layerId, }));
                                                         topics.publish("button_hidden");
                                                     })
                                             }}>
