@@ -239,7 +239,6 @@ export const LayersTree = observer(
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 topics.publish("query.params_" + filtered[0], { queryParams: null, nd: "204" })
-                                                console.log("q");
                                                 display.map.layers[nodeData.treeItem.id].olLayer.getSource().refresh();
                                                 topics.publish("removeTabFilter", filtered[0]);
                                                 topics.publish("button_hidden");
