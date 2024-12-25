@@ -2,20 +2,22 @@ define([
     "dojo/_base/declare",
     "dojo/io-query",
     "./Adapter",
+    "openlayers/ol",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
     "@nextgisweb/webmap/identify-module",
-], function (declare, ioQuery, Adapter, api, util, Image, topics) {
+], function (declare, ioQuery, Adapter, ol, api, util, Image, topics) {
     return declare(Adapter, {
         createLayer: function (item) {
             const queue = util.imageQueue;
-            
+            let nd = "204"
             let p_filters = ""
             topics.subscribe("query.params_" + item.styleId,
                 async (e) => {
-                    if (e?.detail?.fld_field_op) {
-                        const obj = e.detail.fld_field_op
+                    nd = e.detail.nd
+                    if (e?.detail?.queryParams?.fld_field_op) {
+                        const obj = e.detail.queryParams.fld_field_op
                         const paramsUrl = new URLSearchParams();
 
                         Object.entries(obj)?.map(([key, value]) => {
@@ -75,7 +77,7 @@ define([
                             "," +
                             queryObject["HEIGHT"] +
                             filter +
-                            "&nd=204" +
+                            "&nd=" + nd +
                             symbols;
                         // Use a timeout to prevent the queue from aborting right after adding, especially in cases with zoomToExtent.
                         setTimeout(() => {

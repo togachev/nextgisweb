@@ -4,12 +4,14 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Form } from "@nextgisweb/gui/fields-form";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
 import { useSource } from "./hook/useSource";
+import { transformExtent } from "ol/proj";
 import {
     Button,
     Card,
     DatePicker,
     DateTimePicker,
     Empty,
+    Table,
     TimePicker,
     Input,
     Select,
@@ -29,6 +31,8 @@ type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 import "./FilterLayer.less";
 
 const msgLoadValue = gettext("Load values");
+const msgSample = gettext("Sample");
+const msgAll = gettext("All");
 const msgAddFilterField = gettext("Add filter");
 const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
@@ -40,7 +44,6 @@ const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IM
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 const size = "small"
-
 const operator = {
     eq: { label: "равно", value: "eq" },
     in: { label: "массив", value: "in" },
@@ -178,16 +181,41 @@ export const ComponentFilter = observer((props) => {
 
     const [queryParams, setQueryParams] = useState();
     const [activeFields, setActiveFields] = useState();
-    const [loadValue, setloadValue] = useState(false);
+    const [loadValue, setloadValue] = useState({load: false, limit: 25});
     const [data, setData] = useState([]);
-
-    useEffect(() => {
-        topics.publish("query.params_" + styleId, queryParams);
-    }, [queryParams]);
 
     const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", {
         id: layerId,
     });
+
+    const renderFilter = async () => {
+        const olMap = display.map.olMap
+        const cExt = transformExtent(
+            olMap.getView().calculateExtent(olMap.getSize()),
+            display.displayProjection,
+            display.lonlatProjection
+        );
+        const cExtent = { maxLon: cExt[2], minLon: cExt[0], maxLat: cExt[3], minLat: cExt[1] };
+
+        await extent.get<NgwExtent>({
+            query: queryParams?.fld_field_op || undefined,
+            cache: true,
+        })
+            .then(fExtent => {
+                const left = Math.max(fExtent.minLon, cExtent.minLon)
+                const right = Math.min(fExtent.maxLon, cExtent.maxLon)
+                const bottom = Math.max(fExtent.minLat, cExtent.minLat)
+                const top = Math.min(fExtent.maxLat, cExtent.maxLat)
+                const nd = left >= right || bottom >= top ? "200" : "204"
+
+                topics.publish("query.params_" + styleId, { queryParams, nd });
+                refreshLayer(item.key);
+            })
+    }
+
+    useEffect(() => {
+        renderFilter();
+    }, [queryParams]);
 
     const onFinish = (values) => {
         const keys_ = Object.keys(values || {});
@@ -259,34 +287,24 @@ export const ComponentFilter = observer((props) => {
     };
 
     useEffect(() => {
-        if (loadValue) {
-            getFeature(layerId)
+        if (loadValue.load) {
+            getFeature(layerId, loadValue.limit)
                 .then(item => {
-                    const result = item.reduce((acc, obj) => {
-                        if (obj[activeFields.keyname] && !acc.some(o => o[activeFields.keyname] === obj[activeFields.keyname])) {
-                            acc.push(obj);
-                        }
-                        return acc;
-                    }, []);
-                    setData(result)
-                    setloadValue(false)
+                    setData(item)
+                    setloadValue({load: false, limit: 25})
                 });
         }
     }, [loadValue]);
 
-    const LoadValues = () => (
-        data.length > 0 ?
-            <div className="load-values">{data.map((itm, index) => {
-                return (
-                    <span className="title-button" key={index}>
-                        {itm[activeFields.keyname]}
-                    </span>
-                )
-            })}</div> :
-            emptyValue
-    )
-
-
+    const LoadValues = () => {
+        const column = [{
+            title: activeFields,
+            dataIndex: activeFields,
+            key: activeFields,
+        }];
+        const dataTable = data.map((item, index) => ({key: index, [activeFields]: item[activeFields]}))
+        return (<Table size={size} columns={column} dataSource={dataTable} />)
+    }
 
     return (
         <div key={styleId} className="component-filter">
@@ -312,10 +330,6 @@ export const ComponentFilter = observer((props) => {
                                                         <div
                                                             title={msgLoadValue}
                                                             className="field-add"
-                                                            onClick={() => {
-                                                                setActiveFields(itm)
-                                                                setloadValue(true)
-                                                            }}
                                                         >
                                                             <span
                                                                 title={itm.display_name}
@@ -329,10 +343,11 @@ export const ComponentFilter = observer((props) => {
                                                                 size={size}
                                                                 onClick={() => {
                                                                     add();
+                                                                    setData([]);
+                                                                    setActiveFields(itm.keyname);
                                                                 }}
                                                             />
                                                         </div>
-
                                                     }
                                                     size={size}
                                                     key={field.key}
@@ -348,7 +363,8 @@ export const ComponentFilter = observer((props) => {
                                                                 title={msgRemoveFilterField}
                                                                 onClick={() => {
                                                                     remove(name);
-                                                                    setActiveFields(undefined)
+                                                                    setData([]);
+                                                                    setActiveFields(undefined);
                                                                     updateForm();
                                                                 }}>
                                                                 <Remove />
@@ -365,6 +381,10 @@ export const ComponentFilter = observer((props) => {
                         <Card
                             className="value-filter-fields"
                             title="Значения"
+                            actions={[
+                                <Button onClick={() => { setloadValue({load: true, limit: 25}); }} size={size} title={msgSample}>{msgSample}</Button>,
+                                <Button onClick={() => { setloadValue({load: true, limit: null}) }} size={size} title={msgAll}>{msgAll}</Button>,
+                            ]}
                         >
                             {activeFields && <LoadValues />}
                         </Card>
@@ -381,7 +401,6 @@ export const ComponentFilter = observer((props) => {
                         />
                         <Button size={size} onClick={() => {
                             form.submit();
-                            refreshLayer(item.key);
                         }}>
                             {msgApplyForm}
                         </Button>
@@ -389,15 +408,17 @@ export const ComponentFilter = observer((props) => {
                             setQueryParams(null);
                             form.resetFields();
                             refreshLayer(item.key);
+                            setData([]);
                         }}>
                             {msgClearForm}
                         </Button>
                         <Button size={size} onClick={() => {
                             setQueryParams(null);
-                            topics.publish("query.params_" + styleId, null)
+                            topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
                             removeTab(activeKey)
                             topics.publish("removeTabFilter", activeKey);
                             refreshLayer(item.key);
+                            setData([]);
                         }}>
                             {msgCancel}
                         </Button>
@@ -410,7 +431,7 @@ export const ComponentFilter = observer((props) => {
                         </Button>
                     </div>
                 </>) :
-                emptyFields}
+                emptyValue}
         </div>
     )
 });

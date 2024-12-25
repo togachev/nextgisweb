@@ -117,7 +117,7 @@ export const FeatureGrid = observer(
         useEffect(() => {
             if (startFilter === false) {
                 setQueryParams(null);
-                topics.publish("query.params_" + id, null)
+                topics.publish("query.params_" + id, { queryParams: null, nd: "204" })
             }
         }, [startFilter]);
 

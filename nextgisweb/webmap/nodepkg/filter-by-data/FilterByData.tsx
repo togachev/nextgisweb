@@ -171,7 +171,7 @@ export const FilterByData = observer(({
     const [form] = Form.useForm();
 
     useEffect(() => {
-        topics.publish("query.params_" + id, queryParams);
+        topics.publish("query.params_" + id, { queryParams, nd: "204" });
     }, [queryParams]);
 
     const onFinish = (values) => {

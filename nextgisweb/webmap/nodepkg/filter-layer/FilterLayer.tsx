@@ -52,8 +52,6 @@ const params = (pos) => {
     return position;
 }
 
-
-
 export const FilterLayer = observer(
     forwardRef<Element>((props, ref: RefObject<Element>) => {
         const { display, item, loads, visible } = props;
@@ -120,12 +118,7 @@ export const FilterLayer = observer(
         };
 
         const refreshLayer = (key) => {
-            const uid = getUid(display._layers[key].olLayer);
-            display.map.olMap.getLayers().forEach((layer) => {
-                if (getUid(layer) === uid) {
-                    layer.getSource().refresh();
-                }
-            })
+            display.map.layers[key].olSource.refresh();
         }
 
         const removeAllFilter = () => {
@@ -141,7 +134,7 @@ export const FilterLayer = observer(
                 refreshLayer(i.ikey);
                 removeTab(String(i.key));
                 topics.publish("removeTabFilter", String(i.key));
-                topics.publish("query.params_" + i.styleId, null)
+                topics.publish("query.params_" + i.styleId, { queryParams: null, nd: "204" })
             })
         };
 
@@ -268,7 +261,8 @@ export const FilterLayer = observer(
                                 if (action === "remove") {
                                     topics.publish("removeTabFilter", String(targetKey));
                                     removeTab(String(targetKey));
-                                    topics.publish("query.params_" + item.styleId, null)
+                                    refreshLayer(item.key);
+                                    topics.publish("query.params_" + item.styleId, { queryParams: null, nd: "204" })
                                 }
                             }}
                             parentHeight
