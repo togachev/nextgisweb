@@ -2,12 +2,11 @@ define([
     "dojo/_base/declare",
     "dojo/io-query",
     "./Adapter",
-    "openlayers/ol",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
     "@nextgisweb/webmap/identify-module",
-], function (declare, ioQuery, Adapter, ol, api, util, Image, topics) {
+], function (declare, ioQuery, Adapter, api, util, Image, topics) {
     return declare(Adapter, {
         createLayer: function (item) {
             const queue = util.imageQueue;
