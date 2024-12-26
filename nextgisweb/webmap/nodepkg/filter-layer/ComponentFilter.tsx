@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Form } from "@nextgisweb/gui/fields-form";
@@ -11,7 +11,6 @@ import {
     DatePicker,
     DateTimePicker,
     Empty,
-    Table,
     TimePicker,
     Input,
     Select,
@@ -138,7 +137,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     }
 
     const inputProps = {
-        style: { width: "100%", margin: "0 4px 0 0" },
+        style: { width: "100%", margin: "0 4px" },
         size: size,
         placeholder: field.display_name,
         onChange: onFilterChange,
@@ -168,11 +167,36 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
             />
         </>
     );
+};
+
+const LoadValues = ({ name, data }) => {
+    const [value, setValue] = useState(undefined);
+
+    const getData = useCallback((data, value) => {
+        if (!value) {
+            return data;
+        }
+        return data.filter((item) => item[name].toLowerCase().includes(value.toLowerCase()));
+    }, [data]);
+
+    return (
+        <>
+            {getData(data, value)?.length > 10 &&
+                <Input
+                    allowClear
+                    placeholder={name}
+                    size={size}
+                    value={value}
+                    onChange={(e) => { setValue(e.target.value) }}
+                />}
+            {getData(data, value)?.map(item => (<div key={item.key}>{item[name]}</div>))}
+        </>
+    );
 }
 
 export const ComponentFilter = observer((props) => {
     const { display, item, fields, refreshLayer, store } = props;
-    const { activeKey, visible, removeTab } = store;
+    const { activeKey, visible, removeTab, activeFields, setActiveFields, data, setData } = store;
     const { layerId, styleId } = item;
 
     const { getFeature } = useSource();
@@ -180,9 +204,7 @@ export const ComponentFilter = observer((props) => {
     const [form] = Form.useForm();
 
     const [queryParams, setQueryParams] = useState();
-    const [activeFields, setActiveFields] = useState();
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
-    const [data, setData] = useState([]);
 
     const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", {
         id: layerId,
@@ -207,7 +229,7 @@ export const ComponentFilter = observer((props) => {
                 const bottom = Math.max(fExtent.minLat, cExtent.minLat)
                 const top = Math.min(fExtent.maxLat, cExtent.maxLat)
                 const nd = left >= right || bottom >= top ? "200" : "204"
-                
+
                 topics.publish("query.params_" + styleId, { queryParams, nd });
                 refreshLayer(item.key);
             })
@@ -290,24 +312,11 @@ export const ComponentFilter = observer((props) => {
         if (loadValue.load) {
             getFeature(layerId, loadValue)
                 .then(item => {
-                    setData(item)
-                    setloadValue({ load: false, limit: 25, distinct: activeFields })
+                    setData(item.map((i, idx) => ({ ...i, key: String(idx) })))
+                    setloadValue({ load: false })
                 });
         }
     }, [loadValue]);
-
-    const LoadValues = () => {
-        const column = [{
-            title: activeFields,
-            dataIndex: activeFields,
-            key: activeFields,
-        }];
-        const dataTable = data.map((item, index) => ({ key: index, [activeFields]: item[activeFields] })).filter(x => x[activeFields])
-        return (<>{
-            dataTable.length > 0 &&
-            <Table size={size} columns={column} dataSource={dataTable} locale={{ emptyText: false }} bordered={false} />
-        }</>)
-    }
 
     return (
         <div key={styleId} className="component-filter">
@@ -346,7 +355,6 @@ export const ComponentFilter = observer((props) => {
                                                                 size={size}
                                                                 onClick={() => {
                                                                     add();
-                                                                    setData([]);
                                                                     setActiveFields(itm.keyname);
                                                                     setloadValue({ load: true, limit: 25, distinct: itm.keyname });
                                                                 }}
@@ -390,7 +398,7 @@ export const ComponentFilter = observer((props) => {
                                 <Button key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
                             ]}
                         >
-                            {activeFields && <LoadValues />}
+                            <LoadValues name={activeFields} data={data} />
                         </Card>
                     </div>
                     <div className="control-filters">
