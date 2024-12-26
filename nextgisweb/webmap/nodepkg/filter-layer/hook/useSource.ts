@@ -11,13 +11,13 @@ export const useSource = () => {
         return { item, fields: fields.feature_layer.fields };
     }
 
-    const getFeature = async (layerId, limit) => {
+    const getFeature = async (layerId, loadValue) => {
         const json = {
             geom: false,
             extensions: [],
             dt_format: "iso",
         };
-        limit > 0 && Object.assign(json, { limit: limit })
+        loadValue.distinct && loadValue.limit > 0 && Object.assign(json, { limit: loadValue.limit, distinct: loadValue.distinct });
         const feature = await route("feature_layer.feature.collection", { id: layerId })
             .get({
                 cache: false,

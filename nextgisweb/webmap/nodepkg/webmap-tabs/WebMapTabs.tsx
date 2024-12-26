@@ -46,7 +46,6 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
     if (!items.length) {
         return <></>;
     }
-    console.log(activeKey);
     
     return (
         <Tabs

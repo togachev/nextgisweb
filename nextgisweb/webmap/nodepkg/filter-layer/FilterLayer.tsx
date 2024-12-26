@@ -7,7 +7,6 @@ import { Rnd } from "react-rnd";
 import { topics } from "@nextgisweb/webmap/identify-module"
 import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
 import { useSource } from "./hook/useSource";
-import { getUid } from "ol/util";
 
 import { FilterLayerStore } from "./FilterLayerStore";
 import { ComponentFilter } from "./ComponentFilter";

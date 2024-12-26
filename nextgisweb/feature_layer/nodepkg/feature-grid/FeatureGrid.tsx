@@ -2,7 +2,7 @@ import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 
-import { Button, Dropdown, Empty, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -16,22 +16,14 @@ import FeatureTable from "./FeatureTable";
 import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID } from "./constant";
 import type { FeatureGridProps } from "./type";
-import type { MenuProps } from "@nextgisweb/gui/antd";
 
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
-
-import FilterByData from "@nextgisweb/webmap/filter-by-data";
-import FilterIcon from "@nextgisweb/icon/mdi/filter-outline";
-import { CloseIcon } from "@nextgisweb/gui/icon";
 
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import "./FeatureGrid.less";
 
-const msgEditFilter = gettext("Edit filter");
-const msgEnableFilter = gettext("Set up filter")
-const msgClearFilter = gettext("Clear filter")
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -51,6 +43,7 @@ export const FeatureGrid = observer(
 
         const {
             id,
+            styleId,
             size,
             fields,
             version,
@@ -61,9 +54,6 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
-            startFilter,
-            setStartFilter,
-            setModalFilter,
         } = store;
 
         const { data: totalData, refresh: refreshTotal } =
@@ -114,57 +104,26 @@ export const FeatureGrid = observer(
             }
         }, [onSelect, selectedIds]);
 
-        useEffect(() => {
-            if (startFilter === false) {
-                setQueryParams(null);
-                topics.publish("query.params_" + id, { queryParams: null, nd: "204" })
+        topics.subscribe("query.params_" + styleId,
+            async (e) => {
+                if (e?.detail?.queryParams?.fld_field_op) {
+                    setQueryParams((prev) => ({
+                        ...prev,
+                        fld_field_op: e?.detail?.queryParams?.fld_field_op,
+                    }));
+                } else if(e?.detail?.queryParams === null) {
+                    setQueryParams(null);
+                }
             }
-        }, [startFilter]);
-
-        topics.subscribe("query.params_" + id,
-            (e) => { setQueryParams(e.detail); }
         );
 
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }
 
-        const items: MenuProps["items"] = queryParams?.fld_field_op ? [
-            {
-                key: "1",
-                label: msgClearFilter,
-                icon: <CloseIcon />,
-            },
-        ] : [];
-
-        const menuProps = {
-            items,
-            onClick: () => {
-                setModalFilter(false);
-                setStartFilter(false);
-            },
-        };
-
         return (
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
-                    <div className="filter-component">
-                        <Tooltip mouseLeaveDelay={0} title={startFilter && queryParams?.fld_field_op ? msgEditFilter : msgEnableFilter}>
-                            <Dropdown menu={menuProps} size="small">
-                                <Button
-                                    onClick={() => {
-                                        setModalFilter(true);
-                                        setStartFilter(true);
-                                    }}
-                                    type="text"
-                                    className={queryParams?.fld_field_op && "icon-edit"}
-                                    size="small"
-                                    icon={<FilterIcon />}
-                                />
-                            </Dropdown>
-                        </Tooltip>
-                        {startFilter && (<FilterByData id={id} store={store} />)}
-                    </div>
                     <Tooltip mouseLeaveDelay={0} title={msgRefreshTitle}>
                         <Button
                             type="text"

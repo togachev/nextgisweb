@@ -27,6 +27,7 @@ const msgGoto = gettext("Go to");
 interface WebMapFeatureGridTabProps {
     plugin: Record<string, unknown>;
     layerId: number;
+    styleId: number;
     topic: DojoTopic;
 }
 
@@ -34,6 +35,7 @@ export function WebMapFeatureGridTab({
     topic,
     plugin,
     layerId,
+    styleId,
 }: WebMapFeatureGridTabProps) {
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
@@ -72,6 +74,7 @@ export function WebMapFeatureGridTab({
         () =>
             new FeatureGridStore({
                 id: layerId,
+                styleId: styleId,
                 readonly: data.current?.readonly ?? true,
                 size: "small",
                 cleanSelectedOnFilter: false,

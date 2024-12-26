@@ -36,7 +36,6 @@ ParamGeomFormat = Literal["wkt", "geojson"]
 ParamDtFormat = Literal["iso", "obj"]
 ParamSrs = Optional[Annotated[int, Meta(gt=0)]]
 
-
 class LoaderParams(Struct, kw_only=True):
     geom_null: bool = False
     geom_format: ParamGeomFormat = "wkt"
@@ -124,6 +123,7 @@ class DumperParams(Struct, kw_only=True):
     version: Optional[Annotated[int, Meta(gt=0)]] = None
     epoch: Optional[Annotated[int, Meta(gt=0)]] = None
     relation: bool = False
+    distinct: Optional[List[str]] = None
 
 
 @dataclass
@@ -156,6 +156,7 @@ class Dumper:
             else:
                 fld_dump = lambda val: val
             result[fld_keyname] = fld_dump
+
         return result
 
     @cached_property
@@ -461,6 +462,9 @@ def cget(
     for k,v in dict(request.GET).items():
         d[k] = v
     filter_feature_op(query, d, keys)
+
+    if dumper_params.distinct is not None:
+        query.distinct(dumper_params.distinct)
 
     # Paging
     if limit is not None:

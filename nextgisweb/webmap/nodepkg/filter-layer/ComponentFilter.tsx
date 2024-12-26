@@ -181,7 +181,7 @@ export const ComponentFilter = observer((props) => {
 
     const [queryParams, setQueryParams] = useState();
     const [activeFields, setActiveFields] = useState();
-    const [loadValue, setloadValue] = useState({load: false, limit: 25});
+    const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
     const [data, setData] = useState([]);
 
     const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", {
@@ -207,7 +207,7 @@ export const ComponentFilter = observer((props) => {
                 const bottom = Math.max(fExtent.minLat, cExtent.minLat)
                 const top = Math.min(fExtent.maxLat, cExtent.maxLat)
                 const nd = left >= right || bottom >= top ? "200" : "204"
-
+                
                 topics.publish("query.params_" + styleId, { queryParams, nd });
                 refreshLayer(item.key);
             })
@@ -288,10 +288,10 @@ export const ComponentFilter = observer((props) => {
 
     useEffect(() => {
         if (loadValue.load) {
-            getFeature(layerId, loadValue.limit)
+            getFeature(layerId, loadValue)
                 .then(item => {
                     setData(item)
-                    setloadValue({load: false, limit: 25})
+                    setloadValue({ load: false, limit: 25, distinct: activeFields })
                 });
         }
     }, [loadValue]);
@@ -302,8 +302,11 @@ export const ComponentFilter = observer((props) => {
             dataIndex: activeFields,
             key: activeFields,
         }];
-        const dataTable = data.map((item, index) => ({key: index, [activeFields]: item[activeFields]}))
-        return (<Table size={size} columns={column} dataSource={dataTable} />)
+        const dataTable = data.map((item, index) => ({ key: index, [activeFields]: item[activeFields] })).filter(x => x[activeFields])
+        return (<>{
+            dataTable.length > 0 &&
+            <Table size={size} columns={column} dataSource={dataTable} locale={{ emptyText: false }} bordered={false} />
+        }</>)
     }
 
     return (
@@ -345,6 +348,7 @@ export const ComponentFilter = observer((props) => {
                                                                     add();
                                                                     setData([]);
                                                                     setActiveFields(itm.keyname);
+                                                                    setloadValue({ load: true, limit: 25, distinct: itm.keyname });
                                                                 }}
                                                             />
                                                         </div>
@@ -382,8 +386,8 @@ export const ComponentFilter = observer((props) => {
                             className="value-filter-fields"
                             title="Значения"
                             actions={[
-                                <Button onClick={() => { setloadValue({load: true, limit: 25}); }} size={size} title={msgSample}>{msgSample}</Button>,
-                                <Button onClick={() => { setloadValue({load: true, limit: null}) }} size={size} title={msgAll}>{msgAll}</Button>,
+                                <Button key={msgSample} onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>{msgSample}</Button>,
+                                <Button key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
                             ]}
                         >
                             {activeFields && <LoadValues />}
@@ -409,6 +413,7 @@ export const ComponentFilter = observer((props) => {
                             form.resetFields();
                             refreshLayer(item.key);
                             setData([]);
+                            setActiveFields(undefined);
                         }}>
                             {msgClearForm}
                         </Button>

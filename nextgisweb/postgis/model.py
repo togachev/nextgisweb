@@ -613,6 +613,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         self._order_by = None
 
+        self._distinct = None
+
     def srs(self, srs):
         self._srs = srs
 
@@ -641,6 +643,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def order_by(self, *args):
         self._order_by = args
 
+    def distinct(self, *args):
+        self._distinct = args
+
     def like(self, value):
         self._like = value
 
@@ -653,6 +658,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         idcol = tab.columns[self.layer.column_id]
         columns = [idcol.label("id")]
         where = [idcol.isnot(None)]
+        distinct_fields = []
 
         geomcol = tab.columns[self.layer.column_geom]
 
@@ -761,6 +767,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             where.append(func.st_intersects(geomcol, int_geom))
 
+        if self._distinct:
+            for idx, fld in enumerate(self.layer.fields):
+                for v in self._distinct:
+                    for k in v:
+                        if fld.column_name == k:
+                            label = f"fld_{idx}"
+                            # raise ValueError(str())
+                            distinct_fields.append(getattr(tab.columns, fld.column_name))
+
         if self._box:
             columns.extend(
                 (
@@ -806,17 +821,22 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             _fields = self._fields
             _limit = self._limit
             _offset = self._offset
+            _distinct = self._distinct
 
             def __iter__(self):
                 query = (
                     sql.select(*columns)
                     .limit(self._limit)
                     .offset(self._offset)
-                    .order_by(*order_criterion)
+                    # .order_by(*order_criterion)
                 )
-
+                if self._distinct is not None:
+                    # raise ValueError(str(*distinct_fields))
+                    query = query.distinct(*distinct_fields)
                 if len(where) > 0:
                     query = query.where(sa.and_(*where))
+
+
 
                 with self.layer.connection.get_connection() as conn:
                     result = conn.execute(query)

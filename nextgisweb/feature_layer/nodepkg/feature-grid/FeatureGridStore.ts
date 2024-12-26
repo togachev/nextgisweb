@@ -11,8 +11,6 @@ import type { ActionProps, FeatureGridProps, SetValue } from "./type";
 
 export class FeatureGridStore {
     id: number;
-    startFilter: boolean = false;
-    modalFilter: boolean = false;
     versioning: boolean = false;
     size: SizeType = "middle";
     actions: ActionToolbarAction<ActionProps>[] = [];
@@ -59,14 +57,6 @@ export class FeatureGridStore {
 
     setDataType = (dataType:  SetValue<string | null>) => {
         this.setValue("dataType", dataType);
-    };
-
-    setStartFilter = (value: boolean) => {
-        this.startFilter = value;
-    };
-
-    setModalFilter = (value: boolean) => {
-        this.modalFilter = value;
     };
 
     setVersioning = (value: boolean) => {

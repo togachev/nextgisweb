@@ -1,8 +1,8 @@
 import sqlalchemy as sa
 from msgspec import UNSET
 from shapely.geometry import box
-from sqlalchemy import cast, func
-from sqlalchemy.sql import alias, literal_column, null, select
+from sqlalchemy import cast, func, tuple_
+from sqlalchemy.sql import alias, literal_column, null, select, text
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
@@ -60,6 +60,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         self._order_by = None
 
+        self._distinct = None
+
     def pit(self, version):
         self._pit_version = version
 
@@ -97,6 +99,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def order_by(self, *args):
         self._order_by = args
 
+    def distinct(self, *args):
+        self._distinct = args
+
     def like(self, value):
         self._like = value
 
@@ -115,6 +120,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         fields = table.fields
         columns = []
         where = []
+        distinct_fields = []
 
         srs = self.layer.srs if self._srs is None else self._srs
         if srs.id != self.layer.srs_id:
@@ -131,7 +137,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         if self._simplify is not None:
             geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
-
+    
         if self._box:
             columns.extend(
                 (
@@ -241,6 +247,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             where.append(func.st_intersects(geomcol, int_geom))
 
+        if self._distinct:
+            for idx, (fld_k, fld_c) in enumerate(fields.items(), start=1):
+                for v in self._distinct:
+                    for k in v:
+                        if fld_k == k:
+                            distinct_fields.append(fld_c.label(label))
+
         order_by = []
         if self._order_by:
             for order, fld_k in self._order_by:
@@ -266,10 +279,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             _box = self._box
             _limit = self._limit
             _offset = self._offset
+            _distinct = self._distinct
 
             def __iter__(self):
+
                 query = qbase.where(*where).order_by(*order_by)
+                if self._distinct is not None:
+                    query = qbase.distinct(*distinct_fields)
                 query = query.limit(self._limit).offset(self._offset)
+
 
                 result = DBSession.execute(query)
                 for row in result.mappings():
