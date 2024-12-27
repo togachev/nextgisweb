@@ -20,7 +20,7 @@ export const useSource = () => {
         loadValue.distinct && loadValue.limit > 0 && Object.assign(json, { limit: loadValue.limit, distinct: loadValue.distinct });
         const feature = await route("feature_layer.feature.collection", { id: layerId })
             .get({
-                cache: false,
+                cache: true,
                 query: json,
             })
         return feature.map(item => item.fields);

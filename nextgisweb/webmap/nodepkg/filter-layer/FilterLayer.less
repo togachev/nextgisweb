@@ -122,14 +122,6 @@
         }
     }
 
-    .ant-card .ant-card-head {
-        border: 0px solid;
-        padding: 0;
-        min-height: 32px;
-        font-weight: 500;
-        font-size: 14px;
-    }
-
     .ant-card-actions {
         width: 35%;
         position: fixed;
@@ -163,11 +155,24 @@
                 flex-direction: column;
                 align-items: center;
                 position: fixed;
-                top: 26px;
+                top: 51px;
                 left: 0px;
                 overflow: auto;
-                height: calc(100% - 60px);
+                height: calc(100% - 114px);
                 box-sizing: border-box;
+
+                .ant-card-head {
+                    border: 0px solid;
+                    border-radius: 0px;
+                    padding: 0;
+                    min-height: 24px;
+                    position: fixed;
+                    left: 0;
+                    width: 65%;
+                    top: 25px;
+                    text-align: center;
+                    font-weight: 400;
+                }
 
                 .field-row {
                     display: flex;
@@ -175,6 +180,12 @@
                     align-items: flex-end;
                     margin: 0 0 10px 0;
                     border-bottom: 1px solid var(--divider-color);
+
+                    .ant-card-head {
+                        position: initial;
+                        width: 100%;
+                        padding: 0 0 0 8px;
+                    }
 
                     .field-add {
                         display: flex;
@@ -229,11 +240,6 @@
                     .card-row {
                         width: 100%;
 
-                        .ant-card-body {
-                            padding: 0;
-                            margin: 0;
-                        }
-
                         .card-content {
                             display: flex;
                             width: 100%;
@@ -252,49 +258,37 @@
                 flex-direction: column;
                 align-items: center;
                 position: fixed;
-                top: 58px;
+                top: 51px;
                 right: 0px;
                 overflow: auto;
-                height: calc(100% - 122px);
+                height: calc(100% - 114px);
                 box-sizing: border-box;
+                border: 0px solid;
 
                 .ant-card-head {
                     border: 0px solid;
+                    border-radius: 0px;
                     padding: 0;
-                    min-height: 32px;
+                    min-height: 24px;
                     position: fixed;
                     right: 0;
                     width: 35%;
-                    top: 26px;
+                    top: 25px;
                     text-align: center;
+                    font-weight: 400;
                 }
+                .ant-card-actions>li:not(:last-child) {
+                    border-inline-end: 0px solid #f0f0f0;
+                }
+                .load-content {
+                    padding: 5px;
 
-                .load-values {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-
-                    .title-button {
-                        // border: 1px solid var(--divider-color);
-                        padding: 0 5px;
-                        margin: 3px 5px;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        display: inline;
-                        font: inherit;
-                        background: none;
-                        width: calc(100% - 10px);
-                        box-sizing: border-box;
-                        // cursor: pointer;
-                        border-radius: 3px;
-                        // user-select: none;
+                    .item-load {
 
                         &:hover {
-                            // border-radius: 3px;
-                            // cursor: move;
-                            background: #00000010;
-                            // border: 1px solid #d9d9d9;
+                            cursor: pointer;
+                            border-radius: 3px;
+                            background: #00000005;
                         }
                     }
                 }

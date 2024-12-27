@@ -19,9 +19,7 @@ interface Tab {
 export class FilterLayerStore {
     valueRnd: Rnd | null = null;
     styleOp: object;
-    data: object;
     activeKey?: string | null = null;
-    activeFields?: string | null = null;  
     activePanel?: boolean;
     visible?: (val: boolean) => void;
 
@@ -56,10 +54,6 @@ export class FilterLayerStore {
                 });
             }
         }
-    };
-
-    setActiveFields = (activeFields: string) => {
-        this.activeFields = activeFields;
     };
 
     setTabs = (tabs: Tab[]) => {
@@ -100,10 +94,6 @@ export class FilterLayerStore {
 
     setStyleOp = (styleOp: SetValue<object | null>) => {
         this.setValue("styleOp", styleOp);
-    };
-
-    setData = (data: SetValue<object | null>) => {
-        this.setValue("data", data);
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

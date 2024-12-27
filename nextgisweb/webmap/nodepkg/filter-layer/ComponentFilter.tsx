@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Form } from "@nextgisweb/gui/fields-form";
@@ -96,14 +96,6 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     const [vals, setVals] = useState();
     const [op, setOp] = useState<Operators>(field.datatype === "STRING" ? "ilike" : "eq");
 
-    const inputRef = useRef<InputRef>(null);
-
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, [inputRef.current]);
-
     const triggerChange = (changedValue: {
         vals?: TypeProps;
         op?: Operators;
@@ -142,7 +134,6 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
         placeholder: field.display_name,
         onChange: onFilterChange,
         value: value.vals,
-        ref: inputRef,
     };
 
     return (
@@ -172,15 +163,15 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
 const LoadValues = ({ name, data }) => {
     const [value, setValue] = useState(undefined);
 
-    const getData = useCallback((data, value) => {
+    const getData = (data, value) => {
         if (!value) {
             return data;
         }
         return data.filter((item) => item[name].toLowerCase().includes(value.toLowerCase()));
-    }, [data]);
+    };
 
     return (
-        <>
+        <div className="load-content">
             {getData(data, value)?.length > 10 &&
                 <Input
                     allowClear
@@ -189,14 +180,25 @@ const LoadValues = ({ name, data }) => {
                     value={value}
                     onChange={(e) => { setValue(e.target.value) }}
                 />}
-            {getData(data, value)?.map(item => (<div key={item.key}>{item[name]}</div>))}
-        </>
+            {getData(data, value)?.map(item => (
+                <div
+                    className="item-load"
+                    key={item.key}
+                    title={item[name]}
+                    onClick={() => {
+                        console.log(item);
+                    }}
+                >
+                    <span>{item[name]}</span>
+                </div>
+            ))}
+        </div>
     );
 }
 
 export const ComponentFilter = observer((props) => {
     const { display, item, fields, refreshLayer, store } = props;
-    const { activeKey, visible, removeTab, activeFields, setActiveFields, data, setData } = store;
+    const { activeKey, visible, removeTab } = store;
     const { layerId, styleId } = item;
 
     const { getFeature } = useSource();
@@ -204,6 +206,9 @@ export const ComponentFilter = observer((props) => {
     const [form] = Form.useForm();
 
     const [queryParams, setQueryParams] = useState();
+    const [data, setData] = useState();
+    const [activeFields, setActiveFields] = useState();
+
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
 
     const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", {
@@ -318,6 +323,8 @@ export const ComponentFilter = observer((props) => {
         }
     }, [loadValue]);
 
+    const disableLoad = activeFields ? true : false;
+
     return (
         <div key={styleId} className="component-filter">
             {fields.length > 0 ?
@@ -394,11 +401,11 @@ export const ComponentFilter = observer((props) => {
                             className="value-filter-fields"
                             title="Значения"
                             actions={[
-                                <Button key={msgSample} onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>{msgSample}</Button>,
-                                <Button key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
+                                <Button disabled={!disableLoad} key={msgSample} onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>{msgSample}</Button>,
+                                <Button disabled={!disableLoad} key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
                             ]}
                         >
-                            <LoadValues name={activeFields} data={data} />
+                            {disableLoad ? <LoadValues name={activeFields} data={data} /> : emptyValue}
                         </Card>
                     </div>
                     <div className="control-filters">
