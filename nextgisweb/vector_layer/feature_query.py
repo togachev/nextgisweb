@@ -283,9 +283,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             def __iter__(self):
 
-                query = qbase.where(*where).order_by(*order_by)
+                query = qbase.where(*where)
                 if self._distinct is not None:
-                    query = qbase.distinct(*distinct_fields)
+                    query = query.distinct(*distinct_fields).order_by(*distinct_fields)
+                else:
+                    query = query.order_by(*order_by)
                 query = query.limit(self._limit).offset(self._offset)
 
 

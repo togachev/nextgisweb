@@ -828,11 +828,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     sql.select(*columns)
                     .limit(self._limit)
                     .offset(self._offset)
-                    # .order_by(*order_criterion)
                 )
                 if self._distinct is not None:
-                    # raise ValueError(str(*distinct_fields))
-                    query = query.distinct(*distinct_fields)
+                    query = query.distinct(*distinct_fields).order_by(*distinct_fields).order_by(*order_criterion)
+                else:
+                    query = query.order_by(*order_criterion)
+
                 if len(where) > 0:
                     query = query.where(sa.and_(*where))
 
