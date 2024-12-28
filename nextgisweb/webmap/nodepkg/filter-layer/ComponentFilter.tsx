@@ -324,7 +324,7 @@ export const ComponentFilter = observer((props) => {
             <div className="component-filter">
                 <Row className="title-field">
                     <Col span={16}>Поля</Col>
-                    <Col span={8}>Значения</Col>
+                    <Col flex="auto">Значения</Col>
                 </Row>
                 <Row className="fields-block">
                     <Col className="field-items" span={16}>
@@ -366,9 +366,7 @@ export const ComponentFilter = observer((props) => {
                                 </span>
                             )
                         })}
-
                     </Col>
-                    <Divider type="vertical" className="divider-item" />
                     <Col flex="auto">col-8</Col>
                 </Row>
                 <Row className="control-filter">
