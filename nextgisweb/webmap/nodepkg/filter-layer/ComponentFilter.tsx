@@ -359,15 +359,22 @@ export const ComponentFilter = observer((props) => {
                                                 return (
                                                     <div
                                                         className="child-item"
-                                                        onClick={() => {
-                                                            setInputField((prev) => {
-                                                                const rField = { ...prev };
-                                                                delete rField[key];
-                                                                return rField;
-                                                            })
-                                                        }}
                                                         key={key}>
                                                         {value.keyname}
+                                                        <span
+                                                            className="icon-symbol padding-icon"
+                                                            title={msgRemoveFilterField}
+                                                            onClick={() => {
+                                                                setInputField((prev) => {
+                                                                    const rField = { ...prev };
+                                                                    delete rField[key];
+                                                                    return rField;
+                                                                })
+                                                                setData([]);
+                                                                setActiveFields(undefined);
+                                                            }}>
+                                                            <Remove />
+                                                        </span>
                                                     </div>
                                                 )
                                             }
