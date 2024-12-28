@@ -356,7 +356,20 @@ export const ComponentFilter = observer((props) => {
                                     >
                                         {Object.keys(inputField).length > 0 && getEntries(inputField).map(([key, value]) => {
                                             if (value.keyname === item.keyname) {
-                                                return (<div key={key}>{value.keyname}</div>)
+                                                return (
+                                                    <div
+                                                        className="child-item"
+                                                        onClick={() => {
+                                                            setInputField((prev) => {
+                                                                const rField = { ...prev };
+                                                                delete rField[key];
+                                                                return rField;
+                                                            })
+                                                        }}
+                                                        key={key}>
+                                                        {value.keyname}
+                                                    </div>
+                                                )
                                             }
                                         })}
                                     </Card>
