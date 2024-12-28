@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Form } from "@nextgisweb/gui/fields-form";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
 import { useSource } from "./hook/useSource";
 import { transformExtent } from "ol/proj";
 import {
     Button,
+    Col, Row,
+    Divider,
     Card,
     DatePicker,
     DateTimePicker,
@@ -14,6 +15,7 @@ import {
     TimePicker,
     Input,
     Select,
+    Space,
 } from "@nextgisweb/gui/antd";
 import { topics } from "@nextgisweb/webmap/identify-module"
 
@@ -92,6 +94,7 @@ interface FilterInputProps {
 };
 
 const FilterInput: React.FC<FilterInputProps> = (props) => {
+
     const { value = {}, onChange, field } = props;
     const [vals, setVals] = useState();
     const [op, setOp] = useState<Operators>(field.datatype === "STRING" ? "ilike" : "eq");
@@ -203,11 +206,10 @@ export const ComponentFilter = observer((props) => {
 
     const { getFeature } = useSource();
 
-    const [form] = Form.useForm();
-
     const [queryParams, setQueryParams] = useState();
     const [data, setData] = useState();
     const [activeFields, setActiveFields] = useState();
+    const [inputField, setInputField] = useState([]);
 
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
 
@@ -281,14 +283,6 @@ export const ComponentFilter = observer((props) => {
         }));
     };
 
-    const updateForm = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                onFinish(values);
-            });
-    }
-
     const onZoomToFiltered = (ngwExtent: NgwExtent) => {
         display.map.zoomToNgwExtent(
             ngwExtent,
@@ -325,133 +319,234 @@ export const ComponentFilter = observer((props) => {
 
     const disableLoad = activeFields ? true : false;
 
-    return (
-        <div key={styleId} className="component-filter">
-            {fields.length > 0 ?
-                (<>
-                    <div className="form-filters">
-                        <Card
-                            className="card-filter-fields"
-                            title="Поля"
-                        >
-                            <Form
-                                form={form}
-                                name={"ngw_filter_layer_" + styleId}
-                                onFinish={onFinish}
-                                autoComplete="off"
-                            >
-                                {fields.map((itm) => (
-                                    <Form.List key={itm.keyname} name={itm.keyname}>
-                                        {(field, { add, remove }) => (
-                                            <div className="field-row">
-                                                <Card
-                                                    title={
-                                                        <div
-                                                            title={msgLoadValue}
-                                                            className="field-add"
-                                                        >
-                                                            <span
-                                                                title={itm.display_name}
-                                                                className="title-field"
-                                                            >
-                                                                {itm.display_name}
-                                                            </span>
-                                                            <Button
-                                                                icon={<FilterPlusIcon />}
-                                                                title={msgAddFilterField}
-                                                                size={size}
-                                                                onClick={() => {
-                                                                    add();
-                                                                    setActiveFields(itm.keyname);
-                                                                    setloadValue({ load: true, limit: 25, distinct: itm.keyname });
-                                                                }}
-                                                            />
-                                                        </div>
+    return (<div className="ngw-filter-layer">
+        {fields.length > 0 ?
+            <div className="component-filter">
+                <Row className="title-field">
+                    <Col span={16}>Поля</Col>
+                    <Col span={8}>Значения</Col>
+                </Row>
+                <Row className="fields-block">
+                    <Col className="field-items" span={16}>
+                        {fields.map((item) => {
+                            return (
+                                <span className="item-field" key={item.id}>
+                                    <Card
+                                        className="card-block"
+                                        extra={<Button
+                                            icon={<FilterPlusIcon />}
+                                            title={msgAddFilterField}
+                                            size={size}
+                                            onClick={() => {
+                                                setActiveFields(item.keyname);
+                                                setInputField((prev) => {
+                                                    if (Object.keys(prev).length > 0) {
+                                                        const count = Object.keys(prev).length;
+                                                        return ({ ...prev, [count + 1]: item });
+                                                    } else {
+                                                        return ({ ...prev, 1: item });
                                                     }
-                                                    size={size}
-                                                    key={field.key}
-                                                    className="card-row"
-                                                >
-                                                    {field.map(({ key, name, ...restField }) => (
-                                                        <div className="card-content" key={key}>
-                                                            <Form.Item noStyle {...restField} name={[name]} >
-                                                                <FilterInput field={itm} />
-                                                            </Form.Item>
-                                                            <span
-                                                                className="icon-symbol padding-icon"
-                                                                title={msgRemoveFilterField}
-                                                                onClick={() => {
-                                                                    remove(name);
-                                                                    setData([]);
-                                                                    setActiveFields(undefined);
-                                                                    updateForm();
-                                                                }}>
-                                                                <Remove />
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                                </Card>
-                                            </div>
-                                        )}
-                                    </Form.List>
-                                ))}
-                            </Form>
-                        </Card>
-                        <Card
-                            className="value-filter-fields"
-                            title="Значения"
-                            actions={[
-                                <Button disabled={!disableLoad} key={msgSample} onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>{msgSample}</Button>,
-                                <Button disabled={!disableLoad} key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
-                            ]}
-                        >
-                            {disableLoad ? <LoadValues name={activeFields} data={data} /> : emptyValue}
-                        </Card>
-                    </div>
-                    <div className="control-filters">
-                        <Button
-                            title={msgZoomToFiltered}
-                            icon={<ZoomInMap />}
-                            onClick={() => {
-                                click();
-                            }}
-                            size={size}
-                            loading={isLoading}
-                        />
-                        <Button size={size} onClick={() => {
-                            form.submit();
-                        }}>
-                            {msgApplyForm}
-                        </Button>
-                        <Button size={size} onClick={() => {
-                            setQueryParams(null);
-                            form.resetFields();
-                            refreshLayer(item.key);
-                            setData([]);
-                            setActiveFields(undefined);
-                        }}>
-                            {msgClearForm}
-                        </Button>
-                        <Button size={size} onClick={() => {
-                            setQueryParams(null);
-                            topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
-                            removeTab(activeKey)
-                            topics.publish("removeTabFilter", activeKey);
-                            refreshLayer(item.key);
-                            setData([]);
-                        }}>
-                            {msgCancel}
-                        </Button>
-                        <Button size={size} onClick={() => {
-                            updateForm();
-                            refreshLayer(item.key);
-                            visible(true)
-                        }}>
-                            {msgOk}
-                        </Button>
-                    </div>
-                </>) :
-                emptyValue}
-        </div>
-    )
+                                                })
+                                                setloadValue({ load: true, limit: 25, distinct: item.keyname });
+                                            }}
+                                        />}
+                                        title={<span title={item.display_name}>
+                                            {item.display_name}
+                                        </span>}
+                                    >
+                                        {Object.keys(inputField).length > 0 && getEntries(inputField).map(([key, value]) => {
+                                            if (value.keyname === item.keyname) {
+                                                return (<div key={key}>{value.keyname}</div>)
+                                            }
+                                        })}
+                                    </Card>
+
+                                    {/* <FilterInput items={inputField} /> */}
+
+                                </span>
+                            )
+                        })}
+
+                    </Col>
+                    <Divider type="vertical" className="divider-item" />
+                    <Col flex="auto">col-8</Col>
+                </Row>
+                <Row className="control-filter">
+                    <Col span={24}>
+                        <div className="control-filters">
+                            <Button
+                                title={msgZoomToFiltered}
+                                icon={<ZoomInMap />}
+                                onClick={() => {
+                                    click();
+                                }}
+                                size={size}
+                                loading={isLoading}
+                            />
+                            <Button size={size} onClick={() => {
+                                console.log(msgApplyForm)
+                            }}>
+                                {msgApplyForm}
+                            </Button>
+                            <Button size={size} onClick={() => {
+                                setQueryParams(null);
+                                refreshLayer(item.key);
+                                setData([]);
+                                setActiveFields(undefined);
+                            }}>
+                                {msgClearForm}
+                            </Button>
+                            <Button size={size} onClick={() => {
+                                setQueryParams(null);
+                                topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
+                                removeTab(activeKey)
+                                topics.publish("removeTabFilter", activeKey);
+                                refreshLayer(item.key);
+                                setData([]);
+                            }}>
+                                {msgCancel}
+                            </Button>
+                            <Button size={size} onClick={() => {
+                                refreshLayer(item.key);
+                                visible(true)
+                            }}>
+                                {msgOk}
+                            </Button>
+                        </div>
+                    </Col>
+                </Row>
+            </div > :
+            emptyValue
+        }
+    </div>)
+
+    // return (
+    //     <div key={styleId} className="component-filter">
+    //         {fields.length > 0 ?
+    //             (<>
+    //                 <div className="form-filters">
+    // <Card
+    //     className="card-filter-fields"
+    //     title="Поля"
+    // >
+    //                         <Form
+    //                             form={form}
+    //                             name={"ngw_filter_layer_" + styleId}
+    //                             onFinish={onFinish}
+    //                             autoComplete="off"
+    //                         >
+    //                             {fields.map((itm) => (
+    //                                 <Form.List key={itm.keyname} name={itm.keyname}>
+    //                                     {(field, { add, remove }) => (
+    //                                         <div className="field-row">
+    //                                             <Card
+    //                                                 title={
+    // <div
+    //     title={msgLoadValue}
+    //     className="field-add"
+    // >
+    //     <span
+    //         title={itm.display_name}
+    //         className="title-field"
+    //     >
+    //         {itm.display_name}
+    //     </span>
+    //     <Button
+    //         icon={<FilterPlusIcon />}
+    //         title={msgAddFilterField}
+    //         size={size}
+    //         onClick={() => {
+    //             add();
+    //             setActiveFields(itm.keyname);
+    //             setloadValue({ load: true, limit: 25, distinct: itm.keyname });
+    //         }}
+    //     />
+    // </div>
+    //                                                 }
+    //                                                 size={size}
+    //                                                 key={field.key}
+    //                                                 className="card-row"
+    //                                             >
+    //                                                 {field.map(({ key, name, ...restField }) => (
+    //                                                     <div className="card-content" key={key}>
+    //                                                         <Form.Item noStyle {...restField} name={[name]} >
+    //                                                             <FilterInput field={itm} />
+    //                                                         </Form.Item>
+    //                                                         <span
+    //                                                             className="icon-symbol padding-icon"
+    //                                                             title={msgRemoveFilterField}
+    //                                                             onClick={() => {
+    //                                                                 remove(name);
+    //                                                                 setData([]);
+    //                                                                 setActiveFields(undefined);
+    //                                                                 updateForm();
+    //                                                             }}>
+    //                                                             <Remove />
+    //                                                         </span>
+    //                                                     </div>
+    //                                                 ))}
+    //                                             </Card>
+    //                                         </div>
+    //                                     )}
+    //                                 </Form.List>
+    //                             ))}
+    //                         </Form>
+    //                     </Card>
+    //                     <Card
+    //                         className="value-filter-fields"
+    //                         title="Значения"
+    //                         actions={[
+    //                             <Button disabled={!disableLoad} key={msgSample} onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>{msgSample}</Button>,
+    //                             <Button disabled={!disableLoad} key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
+    //                         ]}
+    //                     >
+    //                         {disableLoad ? <LoadValues name={activeFields} data={data} /> : emptyValue}
+    //                     </Card>
+    //                 </div>
+    //                 <div className="control-filters">
+    //                     <Button
+    //                         title={msgZoomToFiltered}
+    //                         icon={<ZoomInMap />}
+    //                         onClick={() => {
+    //                             click();
+    //                         }}
+    //                         size={size}
+    //                         loading={isLoading}
+    //                     />
+    //                     <Button size={size} onClick={() => {
+    //                         form.submit();
+    //                     }}>
+    //                         {msgApplyForm}
+    //                     </Button>
+    //                     <Button size={size} onClick={() => {
+    //                         setQueryParams(null);
+    //                         form.resetFields();
+    //                         refreshLayer(item.key);
+    //                         setData([]);
+    //                         setActiveFields(undefined);
+    //                     }}>
+    //                         {msgClearForm}
+    //                     </Button>
+    //                     <Button size={size} onClick={() => {
+    //                         setQueryParams(null);
+    //                         topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
+    //                         removeTab(activeKey)
+    //                         topics.publish("removeTabFilter", activeKey);
+    //                         refreshLayer(item.key);
+    //                         setData([]);
+    //                     }}>
+    //                         {msgCancel}
+    //                     </Button>
+    //                     <Button size={size} onClick={() => {
+    //                         updateForm();
+    //                         refreshLayer(item.key);
+    //                         visible(true)
+    //                     }}>
+    //                         {msgOk}
+    //                     </Button>
+    //                 </div>
+    //             </>) :
+    //             emptyValue}
+    //     </div>
+    // )
 });
