@@ -44,6 +44,7 @@ const msgZoomToFiltered = gettext("Zoom to filtered features");
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
+const maxCountFieldInput = 10;
 const size = "small"
 const operator = {
     eq: { label: "равно", value: "eq" },
@@ -341,7 +342,7 @@ export const ComponentFilter = observer((props) => {
                                             onClick={() => {
                                                 setActiveFields(item.keyname);
                                                 setInputField((prev) => {
-                                                    if (Object.keys(prev).length > 0) {
+                                                    if (Object.keys(prev).length > 0 && Object.keys(prev).length < maxCountFieldInput) {
                                                         const keys = Object.keys(prev).map(i => Number(i))
                                                         return ({ ...prev, [Math.max(...keys) + 1]: item });
                                                     } else {
