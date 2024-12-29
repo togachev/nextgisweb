@@ -210,7 +210,8 @@ export const ComponentFilter = observer((props) => {
     const [queryParams, setQueryParams] = useState();
     const [data, setData] = useState();
     const [activeFields, setActiveFields] = useState();
-    const [inputField, setInputField] = useState([]);
+    const defaultInputField = fields.reduce((a, v) => ({ ...a, [v.keyname]: {} }), {});
+    const [inputField, setInputField] = useState(defaultInputField);
 
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
 
@@ -319,7 +320,6 @@ export const ComponentFilter = observer((props) => {
     }, [loadValue]);
 
     const disableLoad = activeFields ? true : false;
-    console.log(inputField);
 
     return (<div className="ngw-filter-layer">
         {fields.length > 0 ?
@@ -341,12 +341,13 @@ export const ComponentFilter = observer((props) => {
                                             size={size}
                                             onClick={() => {
                                                 setActiveFields(item.keyname);
-                                                setInputField((prev) => {
-                                                    if (Object.keys(prev).length > 0 && Object.keys(prev).length < maxCountFieldInput) {
-                                                        const keys = Object.keys(prev).map(i => Number(i))
-                                                        return ({ ...prev, [Math.max(...keys) + 1]: item });
+                                                setInputField(prev => {
+                                                    const length = Object.keys(prev[item.keyname]).length;
+                                                    if (length > 0) {
+                                                        const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
+                                                        return ({ ...prev, [item.keyname]: { ...prev[item.keyname], [Math.max(...keys) + 1]: item } });
                                                     } else {
-                                                        return ({ ...prev, 1: item });
+                                                        return ({ ...prev, [item.keyname]: { 1: item } });
                                                     }
                                                 })
                                                 setloadValue({ load: true, limit: 25, distinct: item.keyname });
@@ -356,28 +357,32 @@ export const ComponentFilter = observer((props) => {
                                             {item.display_name}
                                         </span>}
                                     >
-                                        {Object.keys(inputField).length > 0 && getEntries(inputField).map(([key, value]) => {
-                                            if (value.keyname === item.keyname) {
-                                                return (
-                                                    <div
-                                                        className="child-item"
-                                                        key={key}>
-                                                        {value.keyname}
-                                                        <Button
-                                                            title={msgRemoveFilterField}
-                                                            onClick={() => {
-                                                                setInputField((prev) => {
-                                                                    const rField = { ...prev };
-                                                                    delete rField[key];
-                                                                    return rField;
-                                                                })
-                                                                setData([]);
-                                                                setActiveFields(undefined);
-                                                            }}
-                                                            icon={<Remove />}
-                                                        />
-                                                    </div>
-                                                )
+                                        {getEntries(inputField).map(([key, value]) => {
+                                            if (key === item.keyname) {
+                                                return getEntries(value).map(([k, v]) => {
+                                                    if (v.keyname === item.keyname) {
+                                                        return (
+                                                            <div
+                                                                className="child-item"
+                                                                key={k}>
+                                                                {v.keyname}
+                                                                <Button
+                                                                    title={msgRemoveFilterField}
+                                                                    onClick={() => {
+                                                                        setInputField((prev) => {
+                                                                            const rField = { ...prev };
+                                                                            delete rField[item.keyname][k];
+                                                                            return rField;
+                                                                        })
+                                                                        setData([]);
+                                                                        setActiveFields(undefined);
+                                                                    }}
+                                                                    icon={<Remove />}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    }
+                                                })
                                             }
                                         })}
                                     </Card>
@@ -412,6 +417,7 @@ export const ComponentFilter = observer((props) => {
                                 refreshLayer(item.key);
                                 setData([]);
                                 setActiveFields(undefined);
+                                setInputField(defaultInputField);
                             }}>
                                 {msgClearForm}
                             </Button>
