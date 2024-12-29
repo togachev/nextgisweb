@@ -342,8 +342,8 @@ export const ComponentFilter = observer((props) => {
                                                 setActiveFields(item.keyname);
                                                 setInputField((prev) => {
                                                     if (Object.keys(prev).length > 0) {
-                                                        const count = Object.keys(prev).length;
-                                                        return ({ ...prev, [count + 1]: item });
+                                                        const keys = Object.keys(prev).map(i => Number(i))
+                                                        return ({ ...prev, [Math.max(...keys) + 1]: item });
                                                     } else {
                                                         return ({ ...prev, 1: item });
                                                     }
@@ -436,7 +436,7 @@ export const ComponentFilter = observer((props) => {
             </div > :
             emptyValue
         }
-    </div>)
+    </div >)
 
     // return (
     //     <div key={styleId} className="component-filter">
