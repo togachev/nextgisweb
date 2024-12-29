@@ -318,6 +318,7 @@ export const ComponentFilter = observer((props) => {
     }, [loadValue]);
 
     const disableLoad = activeFields ? true : false;
+    console.log(inputField);
 
     return (<div className="ngw-filter-layer">
         {fields.length > 0 ?
@@ -361,8 +362,7 @@ export const ComponentFilter = observer((props) => {
                                                         className="child-item"
                                                         key={key}>
                                                         {value.keyname}
-                                                        <span
-                                                            className="icon-symbol padding-icon"
+                                                        <Button
                                                             title={msgRemoveFilterField}
                                                             onClick={() => {
                                                                 setInputField((prev) => {
@@ -372,9 +372,9 @@ export const ComponentFilter = observer((props) => {
                                                                 })
                                                                 setData([]);
                                                                 setActiveFields(undefined);
-                                                            }}>
-                                                            <Remove />
-                                                        </span>
+                                                            }}
+                                                            icon={<Remove />}
+                                                        />
                                                     </div>
                                                 )
                                             }
