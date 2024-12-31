@@ -6,8 +6,6 @@ import { useSource } from "./hook/useSource";
 import { transformExtent } from "ol/proj";
 import {
     Button,
-    Col, Row,
-    Divider,
     Card,
     DatePicker,
     DateTimePicker,
@@ -17,6 +15,13 @@ import {
     Select,
     Space,
 } from "@nextgisweb/gui/antd";
+import dayjs from "dayjs";
+import type {
+    NgwDate,
+    NgwDateTime,
+    NgwTime,
+} from "@nextgisweb/feature-layer/type";
+import { parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -38,8 +43,8 @@ const msgAddFilterField = gettext("Add filter");
 const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
 const msgOk = gettext("Ок");
-const msgClearForm = gettext("Clean");
-const msgApplyForm = gettext("Apply");
+const msgClear = gettext("Clean");
+const msgApply = gettext("Apply");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
@@ -83,78 +88,76 @@ const type_comp = (value, props) => {
 type Operators = "like" | "ilike" | "eq" | "in" | "ne" | "lt" | "gt" | "le" | "ge";
 type TypeProps = "real" | "integer" | "bigint" | "string" | "date" | "datetime" | "time";
 
-interface FilterValue {
-    vals?: TypeProps;
-    operator?: Operators;
-};
+const FilterInput = (props) => {
+    const { id, field, setInputField, setActiveId } = props;
+    const [vals, setVals] = useState(field.value);
+    const [op, setOp] = useState<Operators>();
 
-interface FilterInputProps {
-    id?: string;
-    value?: FilterValue;
-    onChange?: (value: FilterValue) => void;
-};
+    useEffect(() => {
+        setActiveId(id);
+    }, [])
 
-const FilterInput: React.FC<FilterInputProps> = (props) => {
-
-    const { value = {}, onChange, field } = props;
-    const [vals, setVals] = useState();
-    const [op, setOp] = useState<Operators>(field.datatype === "STRING" ? "ilike" : "eq");
+    const onChange = (e) => {
+        setInputField(prev => ({ ...prev, [field.item.keyname]: { ...prev[field.item.keyname], [id]: { item: field.item, value: e } } }));
+    }
 
     const triggerChange = (changedValue: {
         vals?: TypeProps;
         op?: Operators;
     }) => {
-        onChange?.({ vals, op, ...value, ...changedValue });
+        onChange?.({ vals, op, ...field.value, ...changedValue });
     };
 
     const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newVal = field.datatype === "STRING" || NUMBER_TYPE.includes(field.datatype) ? e.target.value : e;
+        const newVal = field.item.datatype === "STRING" || NUMBER_TYPE.includes(field.item.datatype) ? e.target.value : e;
 
-        if (!("vals" in value)) {
+        if (!("vals" in field.value)) {
             setVals(newVal);
         };
         triggerChange({ vals: newVal });
     };
 
     const onOperatorsChange = (newVal: Operators) => {
-        if (!("op" in value)) {
+        if (!("op" in field.value)) {
             setOp(newVal);
         };
         triggerChange({ op: newVal });
     };
 
     let opt;
-    if (DATE_TYPE.includes(field.datatype)) {
+    if (DATE_TYPE.includes(field.item.datatype)) {
         opt = "date"
-    } else if (NUMBER_TYPE.includes(field.datatype)) {
+    } else if (NUMBER_TYPE.includes(field.item.datatype)) {
         opt = "number"
     } else {
         opt = "string"
     }
 
     const inputProps = {
-        style: { width: "100%", margin: "0 4px" },
+        style: { width: "100%", margin: "4px 0" },
         size: size,
-        placeholder: field.display_name,
+        placeholder: field.item.display_name,
         onChange: onFilterChange,
-        value: value.vals,
+        value: field.value.vals || undefined,
     };
 
     return (
         <>
-            {type_comp(field.datatype, inputProps)}
-            {value.vals && <span
-                className="icon-symbol padding-icon"
-                onClick={() => {
-                    triggerChange({ vals: undefined });
-                }}
-            >
-                <BackspaceIcon />
-            </span>}
+            {type_comp(field.item.datatype, inputProps)}
+            <div className="button-filter">
+                <Button
+                    size={size}
+                    type="text"
+                    icon={<BackspaceIcon />}
+                    onClick={() => {
+                        triggerChange({ vals: undefined });
+                    }}
+                />
+            </div>
             <Select
                 size={size}
-                value={value.op || op}
-                style={{ width: 165, padding: "0 5px 0 0" }}
+                value={field.value.op || op}
+                style={{ width: 165, padding: "0 0 0 4px" }}
                 onChange={onOperatorsChange}
                 options={op_type[opt].map((item) => {
                     return operator[item];
@@ -164,7 +167,7 @@ const FilterInput: React.FC<FilterInputProps> = (props) => {
     );
 };
 
-const LoadValues = ({ name, data }) => {
+const LoadValues = ({ activeId, inputField, setInputField, name, data }) => {
     const [value, setValue] = useState(undefined);
 
     const getData = (data, value) => {
@@ -174,28 +177,64 @@ const LoadValues = ({ name, data }) => {
         return data.filter((item) => item[name].toLowerCase().includes(value.toLowerCase()));
     };
 
+    const valDT = (item) => {
+        const _item = inputField[name][activeId].item;
+        let val = item[name];
+
+        if (_item.datatype === "DATE") {
+            const { year, month, day } = val as NgwDate;
+            const dt = new Date(year, month - 1, day);
+            val = dayjs(dt).format("YYYY-MM-DD");
+        } else if (val && _item.datatype === "TIME") {
+            const { hour, minute, second } = val as NgwTime;
+            const dt = new Date(0, 0, 0, hour, minute, second);
+            val = dayjs(dt).format("HH:mm:ss");
+        } else if (val && _item.datatype === "DATETIME") {
+            const { year, month, day, hour, minute, second } =
+                val as NgwDateTime;
+            const dt = new Date(year, month - 1, day, hour, minute, second);
+            val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
+        }
+        return val;
+    }
+
     return (
         <div className="load-content">
-            {getData(data, value)?.length > 10 &&
+            <div className="load-search">
                 <Input
                     allowClear
                     placeholder={name}
                     size={size}
                     value={value}
                     onChange={(e) => { setValue(e.target.value) }}
-                />}
-            {getData(data, value)?.map(item => (
-                <div
-                    className="item-load"
-                    key={item.key}
-                    title={item[name]}
-                    onClick={() => {
-                        console.log(item);
-                    }}
-                >
-                    <span>{item[name]}</span>
-                </div>
-            ))}
+                />
+            </div>
+            <div className="content">
+                {getData(data, value)?.map(item => (
+                    <div
+                        className="item-load"
+                        key={item.key}
+                        title={item[name]}
+                        onClick={(e) => {
+                            if (e.detail === 2) {
+                                const _item = inputField[name][activeId].item;
+                                const val = parseNgwAttribute(_item.datatype, item[name]);
+                                setInputField(prev => ({
+                                    ...prev, [_item.keyname]: {
+                                        ...prev[_item.keyname], [activeId]: {
+                                            item: _item, value: {
+                                                op: prev[_item.keyname][activeId].value.op, vals: val
+                                            }
+                                        }
+                                    }
+                                }));
+                            }
+                        }}
+                    >
+                        <span>{valDT(item)}</span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
@@ -212,6 +251,7 @@ export const ComponentFilter = observer((props) => {
     const [activeFields, setActiveFields] = useState();
     const defaultInputField = fields.reduce((a, v) => ({ ...a, [v.keyname]: {} }), {});
     const [inputField, setInputField] = useState(defaultInputField);
+    const [activeId, setActiveId] = useState();
 
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
 
@@ -324,30 +364,32 @@ export const ComponentFilter = observer((props) => {
     return (<div className="ngw-filter-layer">
         {fields.length > 0 ?
             <div className="component-filter">
-                <Row className="title-field">
-                    <Col span={16}>Поля</Col>
-                    <Col flex="auto">Значения</Col>
-                </Row>
-                <Row className="fields-block">
-                    <Col className="field-items" span={16}>
+                <div className="title-field">
+                    <div className="field">Поля</div>
+                    <div className="load">Значения</div>
+                </div>
+                <div className="fields-block">
+                    <div className="field-items" span={16}>
                         {fields.map((item) => {
                             return (
                                 <span className="item-field" key={item.id}>
                                     <Card
                                         className="card-block"
-                                        extra={<Button
+                                        extra={<Button type="text"
                                             icon={<FilterPlusIcon />}
                                             title={msgAddFilterField}
                                             size={size}
                                             onClick={() => {
+                                                const op = item.datatype === "STRING" ? "ilike" : "eq"
                                                 setActiveFields(item.keyname);
                                                 setInputField(prev => {
                                                     const length = Object.keys(prev[item.keyname]).length;
                                                     if (length > 0) {
                                                         const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
-                                                        return ({ ...prev, [item.keyname]: { ...prev[item.keyname], [Math.max(...keys) + 1]: item } });
+                                                        return ({ ...prev, [item.keyname]: { ...prev[item.keyname], [Math.max(...keys) + 1]: { item: item, value: { vals: "", op: op } } } });
                                                     } else {
-                                                        return ({ ...prev, [item.keyname]: { 1: item } });
+
+                                                        return ({ ...prev, [item.keyname]: { 1: { item: item, value: { vals: "", op: op } } } });
                                                     }
                                                 })
                                                 setloadValue({ load: true, limit: 25, distinct: item.keyname });
@@ -360,25 +402,27 @@ export const ComponentFilter = observer((props) => {
                                         {getEntries(inputField).map(([key, value]) => {
                                             if (key === item.keyname) {
                                                 return getEntries(value).map(([k, v]) => {
-                                                    if (v.keyname === item.keyname) {
+                                                    if (v.item.keyname === item.keyname) {
                                                         return (
-                                                            <div
-                                                                className="child-item"
-                                                                key={k}>
-                                                                {v.keyname}
-                                                                <Button
-                                                                    title={msgRemoveFilterField}
-                                                                    onClick={() => {
-                                                                        setInputField((prev) => {
-                                                                            const rField = { ...prev };
-                                                                            delete rField[item.keyname][k];
-                                                                            return rField;
-                                                                        })
-                                                                        setData([]);
-                                                                        setActiveFields(undefined);
-                                                                    }}
-                                                                    icon={<Remove />}
-                                                                />
+                                                            <div className="child-item" id={k} key={k}>
+                                                                <FilterInput setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
+                                                                <div className="button-filter">
+                                                                    <Button
+                                                                        type="text"
+                                                                        size={size}
+                                                                        title={msgRemoveFilterField}
+                                                                        onClick={() => {
+                                                                            setInputField((prev) => {
+                                                                                const rField = { ...prev };
+                                                                                delete rField[item.keyname][k];
+                                                                                return rField;
+                                                                            })
+                                                                            setData([]);
+                                                                            setActiveFields(undefined);
+                                                                        }}
+                                                                        icon={<Remove />}
+                                                                    />
+                                                                </div>
                                                             </div>
                                                         )
                                                     }
@@ -386,192 +430,73 @@ export const ComponentFilter = observer((props) => {
                                             }
                                         })}
                                     </Card>
-
-                                    {/* <FilterInput items={inputField} /> */}
-
                                 </span>
                             )
                         })}
-                    </Col>
-                    <Col flex="auto">col-8</Col>
-                </Row>
-                <Row className="control-filter">
-                    <Col span={24}>
-                        <div className="control-filters">
-                            <Button
-                                title={msgZoomToFiltered}
-                                icon={<ZoomInMap />}
-                                onClick={() => {
-                                    click();
-                                }}
-                                size={size}
-                                loading={isLoading}
-                            />
-                            <Button size={size} onClick={() => {
-                                console.log(msgApplyForm)
-                            }}>
-                                {msgApplyForm}
-                            </Button>
-                            <Button size={size} onClick={() => {
-                                setQueryParams(null);
-                                refreshLayer(item.key);
-                                setData([]);
-                                setActiveFields(undefined);
-                                setInputField(defaultInputField);
-                            }}>
-                                {msgClearForm}
-                            </Button>
-                            <Button size={size} onClick={() => {
-                                setQueryParams(null);
-                                topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
-                                removeTab(activeKey)
-                                topics.publish("removeTabFilter", activeKey);
-                                refreshLayer(item.key);
-                                setData([]);
-                            }}>
-                                {msgCancel}
-                            </Button>
-                            <Button size={size} onClick={() => {
-                                refreshLayer(item.key);
-                                visible(true)
-                            }}>
-                                {msgOk}
-                            </Button>
-                        </div>
-                    </Col>
-                </Row>
+                    </div>
+                    <div className="value-loads">
+                        {disableLoad ? <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} name={activeFields} data={data} /> : emptyValue}
+                        {disableLoad &&
+                            <div className="load-button">
+                                <div className="button-text">
+                                    <Button type="text" onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>
+                                        {msgSample}
+                                    </Button>
+                                    <Button type="text" onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>
+                                        {msgAll}
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div className="control-buttons">
+                    <div className="button-filter">
+                        <Button type="text"
+                            title={msgZoomToFiltered}
+                            icon={<ZoomInMap />}
+                            onClick={() => {
+                                click();
+                            }}
+                            size={size}
+                            loading={isLoading}
+                        />
+                    </div>
+                    <div className="button-text">
+                        <Button type="text" size={size} onClick={() => {
+                            console.log(inputField);
+                        }}>
+                            {msgApply}
+                        </Button>
+                        <Button type="text" size={size} onClick={() => {
+                            setQueryParams(null);
+                            refreshLayer(item.key);
+                            setData([]);
+                            setActiveFields(undefined);
+                            setInputField(defaultInputField);
+                        }}>
+                            {msgClear}
+                        </Button>
+                        <Button type="text" size={size} onClick={() => {
+                            setQueryParams(null);
+                            topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
+                            removeTab(activeKey)
+                            topics.publish("removeTabFilter", activeKey);
+                            refreshLayer(item.key);
+                            setData([]);
+                        }}>
+                            {msgCancel}
+                        </Button>
+                        <Button type="text" size={size} onClick={() => {
+                            refreshLayer(item.key);
+                            visible(true)
+                        }}>
+                            {msgOk}
+                        </Button>
+                    </div>
+                </div>
             </div > :
             emptyValue
         }
     </div >)
-
-    // return (
-    //     <div key={styleId} className="component-filter">
-    //         {fields.length > 0 ?
-    //             (<>
-    //                 <div className="form-filters">
-    // <Card
-    //     className="card-filter-fields"
-    //     title="Поля"
-    // >
-    //                         <Form
-    //                             form={form}
-    //                             name={"ngw_filter_layer_" + styleId}
-    //                             onFinish={onFinish}
-    //                             autoComplete="off"
-    //                         >
-    //                             {fields.map((itm) => (
-    //                                 <Form.List key={itm.keyname} name={itm.keyname}>
-    //                                     {(field, { add, remove }) => (
-    //                                         <div className="field-row">
-    //                                             <Card
-    //                                                 title={
-    // <div
-    //     title={msgLoadValue}
-    //     className="field-add"
-    // >
-    //     <span
-    //         title={itm.display_name}
-    //         className="title-field"
-    //     >
-    //         {itm.display_name}
-    //     </span>
-    //     <Button
-    //         icon={<FilterPlusIcon />}
-    //         title={msgAddFilterField}
-    //         size={size}
-    //         onClick={() => {
-    //             add();
-    //             setActiveFields(itm.keyname);
-    //             setloadValue({ load: true, limit: 25, distinct: itm.keyname });
-    //         }}
-    //     />
-    // </div>
-    //                                                 }
-    //                                                 size={size}
-    //                                                 key={field.key}
-    //                                                 className="card-row"
-    //                                             >
-    //                                                 {field.map(({ key, name, ...restField }) => (
-    //                                                     <div className="card-content" key={key}>
-    //                                                         <Form.Item noStyle {...restField} name={[name]} >
-    //                                                             <FilterInput field={itm} />
-    //                                                         </Form.Item>
-    //                                                         <span
-    //                                                             className="icon-symbol padding-icon"
-    //                                                             title={msgRemoveFilterField}
-    //                                                             onClick={() => {
-    //                                                                 remove(name);
-    //                                                                 setData([]);
-    //                                                                 setActiveFields(undefined);
-    //                                                                 updateForm();
-    //                                                             }}>
-    //                                                             <Remove />
-    //                                                         </span>
-    //                                                     </div>
-    //                                                 ))}
-    //                                             </Card>
-    //                                         </div>
-    //                                     )}
-    //                                 </Form.List>
-    //                             ))}
-    //                         </Form>
-    //                     </Card>
-    //                     <Card
-    //                         className="value-filter-fields"
-    //                         title="Значения"
-    //                         actions={[
-    //                             <Button disabled={!disableLoad} key={msgSample} onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>{msgSample}</Button>,
-    //                             <Button disabled={!disableLoad} key={msgAll} onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>{msgAll}</Button>,
-    //                         ]}
-    //                     >
-    //                         {disableLoad ? <LoadValues name={activeFields} data={data} /> : emptyValue}
-    //                     </Card>
-    //                 </div>
-    //                 <div className="control-filters">
-    //                     <Button
-    //                         title={msgZoomToFiltered}
-    //                         icon={<ZoomInMap />}
-    //                         onClick={() => {
-    //                             click();
-    //                         }}
-    //                         size={size}
-    //                         loading={isLoading}
-    //                     />
-    //                     <Button size={size} onClick={() => {
-    //                         form.submit();
-    //                     }}>
-    //                         {msgApplyForm}
-    //                     </Button>
-    //                     <Button size={size} onClick={() => {
-    //                         setQueryParams(null);
-    //                         form.resetFields();
-    //                         refreshLayer(item.key);
-    //                         setData([]);
-    //                         setActiveFields(undefined);
-    //                     }}>
-    //                         {msgClearForm}
-    //                     </Button>
-    //                     <Button size={size} onClick={() => {
-    //                         setQueryParams(null);
-    //                         topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
-    //                         removeTab(activeKey)
-    //                         topics.publish("removeTabFilter", activeKey);
-    //                         refreshLayer(item.key);
-    //                         setData([]);
-    //                     }}>
-    //                         {msgCancel}
-    //                     </Button>
-    //                     <Button size={size} onClick={() => {
-    //                         updateForm();
-    //                         refreshLayer(item.key);
-    //                         visible(true)
-    //                     }}>
-    //                         {msgOk}
-    //                     </Button>
-    //                 </div>
-    //             </>) :
-    //             emptyValue}
-    //     </div>
-    // )
 });

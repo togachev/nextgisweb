@@ -10,6 +10,7 @@
     flex-direction: column;
     background: #fff;
     box-sizing: border-box;
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
 
     .ant-tabs-content-holder {
         cursor: auto;
@@ -48,11 +49,10 @@
         width: 24px;
         height: 24px;
         color: var(--text-secondary);
-        margin-inline-start: 2px;
+        border-radius: 50%;
 
         &:hover {
             color: var(--primary);
-            border-radius: 3px;
         }
     }
 
@@ -99,6 +99,39 @@
         }
     }
 
+    .ant-card-bordered {
+        border: 0px solid #f0f0f0;
+    }
+
+    .ant-card-body {
+        padding: 0;
+        height: 100%;
+        position: relative;
+        width: 100%;
+    }
+
+    .button-filter {
+        button {
+            margin: 0 0px 0px 4px;
+        }
+    }
+
+    .button-text {
+        width: 100%;
+        display: inline-flex;
+        justify-content: space-evenly;
+
+        button {
+            margin: 0 10px;
+            border: 1px solid var(--divider-color);
+            border-radius: 3px;
+
+            &:hover {
+                color: var(--primary);
+            }
+        }
+    }
+
     .component-filter {
         height: 100%;
         width: 100%;
@@ -107,27 +140,40 @@
         display: flex;
 
         .title-field {
-            position: fixed;
-            top: 24px;
+            position: absolute;
+            top: 0;
             left: 0;
             right: 0;
             text-align: center;
             border-bottom: 1px solid var(--divider-color);
+            display: flex;
+            justify-content: space-around;
+
+            .field {
+                width: 65%;
+            }
+
+            .load {
+                width: 35%;
+            }
         }
 
         .fields-block {
-            position: fixed;
-            top: 48px;
+            position: absolute;
+            top: 22px;
             bottom: 32px;
             left: 0;
             right: 0;
             border-bottom: 1px solid var(--divider-color);
+            display: flex;
+            justify-content: space-around;
 
             .field-items {
                 height: 100%;
                 overflow-y: scroll;
                 display: flex;
                 flex-direction: column;
+                width: 65%;
 
                 .item-field {
                     padding: 5px;
@@ -154,15 +200,59 @@
                         }
 
                         .ant-card-body {
-                            padding: 4px;
+                            padding: 0px;
                         }
 
                         .child-item {
                             display: flex;
                             justify-content: space-between;
                             align-items: center;
+                            padding: 4px 4px 4px 0;
                         }
                     }
+                }
+            }
+
+            .value-loads {
+                width: 35%;
+                position: relative;
+
+                .load-content {
+                    padding: 0;
+
+                    .load-search {
+                        position: absolute;
+                        top: 2px;
+                        right: 4px;
+                        left: 4px;
+                        width: auto;
+                    }
+
+                    .content {
+                        position: absolute;
+                        top: 28px;
+                        right: 0;
+                        left: 4px;
+                        bottom: 32px;
+                        width: auto;
+                        overflow: auto;
+
+                        .item-load {
+
+                            &:hover {
+                                cursor: pointer;
+                                border-radius: 3px;
+                                background: #00000005;
+                            }
+                        }
+                    }
+                }
+
+                .load-button {
+                    position: absolute;
+                    bottom: 4px;
+                    right: 0;
+                    left: 0;
                 }
             }
 
@@ -173,31 +263,13 @@
             }
         }
 
-        .control-filter {
-            position: fixed;
-            bottom: 0px;
-            right: 0;
-            padding: 0 4px 4px 0px;
-
-            button {
-                margin: 0 0 0 10px;
-            }
+        .control-buttons {
+            display: flex;
+            position: absolute;
+            bottom: 3px;
+            right: 10px;
+            align-items: center;
         }
-
-        //     .control-filters {
-        //         display: flex;
-        //         justify-content: flex-end;
-        //         position: fixed;
-        //         bottom: 0;
-        //         padding: 5px;
-        //         right: 0;
-
-        //         button {
-        //             margin: 0 0 0 10px;
-        //         }
-        //     }
-
-
     }
 }
 

@@ -13,7 +13,7 @@ const DateTimePicker = forwardRef<PickerRef, DatePickerProps>((props, ref) => {
     return (
         <DatePicker
             showTime
-            format={[localizedDateTime, "YYYY-MM-DDTHH:mm:ss"]}
+            format={[localizedDateTime, "YYYY-MM-DD HH:mm:ss"]}
             ref={ref}
             {...props}
         />

@@ -15,7 +15,7 @@ export const useSource = () => {
         const json = {
             geom: false,
             extensions: [],
-            dt_format: "iso",
+            // dt_format: "iso",
         };
         loadValue.distinct && loadValue.limit > 0 && Object.assign(json, { limit: loadValue.limit, distinct: loadValue.distinct });
         const feature = await route("feature_layer.feature.collection", { id: layerId })
