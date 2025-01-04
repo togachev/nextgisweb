@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
@@ -13,7 +13,6 @@ import {
     TimePicker,
     Input,
     Select,
-    Space,
 } from "@nextgisweb/gui/antd";
 import dayjs from "dayjs";
 import type {
@@ -29,14 +28,12 @@ import Remove from "@nextgisweb/icon/material/remove";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import FilterPlusIcon from "@nextgisweb/icon/mdi/filter-plus";
 
-import type { InputRef } from "@nextgisweb/gui/antd";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
 import "./FilterLayer.less";
 
-const msgLoadValue = gettext("Load values");
 const msgSample = gettext("Sample");
 const msgAll = gettext("All");
 const msgAddFilterField = gettext("Add filter");
@@ -47,9 +44,9 @@ const msgClear = gettext("Clean");
 const msgApply = gettext("Apply");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
-const maxCountFieldInput = 10;
 const size = "small"
 const operator = {
     eq: { label: "равно", value: "eq" },
@@ -89,7 +86,7 @@ type Operators = "like" | "ilike" | "eq" | "in" | "ne" | "lt" | "gt" | "le" | "g
 type TypeProps = "real" | "integer" | "bigint" | "string" | "date" | "datetime" | "time";
 
 const FilterInput = (props) => {
-    const { id, field, setInputField, setActiveId } = props;
+    const { id, field, setActiveFields, setInputField, setActiveId } = props;
     const [vals, setVals] = useState(field.value);
     const [op, setOp] = useState<Operators>();
 
@@ -142,7 +139,7 @@ const FilterInput = (props) => {
     };
 
     return (
-        <>
+        <div className="item-control" onClick={() => { setActiveId(id); setActiveFields(field.item.keyname); }}>
             {type_comp(field.item.datatype, inputProps)}
             <div className="button-filter">
                 <Button
@@ -163,33 +160,44 @@ const FilterInput = (props) => {
                     return operator[item];
                 })}
             />
-        </>
+        </div>
     );
 };
 
-const LoadValues = ({ activeId, inputField, setInputField, name, data }) => {
+const LoadValues = ({ activeId, inputField, setInputField, activeFields, data }) => {
     const [value, setValue] = useState(undefined);
+    const _item = inputField[activeFields][activeId]?.item;
 
     const getData = (data, value) => {
         if (!value) {
             return data;
         }
-        return data.filter((item) => item[name].toLowerCase().includes(value.toLowerCase()));
+        if (DATE_TYPE.includes(_item.datatype)) {
+            return data.filter((item) => {
+                if (valDT(item).toLowerCase().includes(value.toLowerCase())) {
+                    return item;
+                }
+            })
+        } else {
+            return data.filter((item) => {
+                if (String(item[activeFields]).toLowerCase().includes(value.toLowerCase())) {
+                    return item;
+                }
+            })
+        }
     };
 
     const valDT = (item) => {
-        const _item = inputField[name][activeId].item;
-        let val = item[name];
-
-        if (_item.datatype === "DATE") {
+        let val = item[activeFields];
+        if (_item?.datatype === "DATE") {
             const { year, month, day } = val as NgwDate;
             const dt = new Date(year, month - 1, day);
             val = dayjs(dt).format("YYYY-MM-DD");
-        } else if (val && _item.datatype === "TIME") {
+        } else if (val && _item?.datatype === "TIME") {
             const { hour, minute, second } = val as NgwTime;
             const dt = new Date(0, 0, 0, hour, minute, second);
             val = dayjs(dt).format("HH:mm:ss");
-        } else if (val && _item.datatype === "DATETIME") {
+        } else if (val && _item?.datatype === "DATETIME") {
             const { year, month, day, hour, minute, second } =
                 val as NgwDateTime;
             const dt = new Date(year, month - 1, day, hour, minute, second);
@@ -203,22 +211,22 @@ const LoadValues = ({ activeId, inputField, setInputField, name, data }) => {
             <div className="load-search">
                 <Input
                     allowClear
-                    placeholder={name}
+                    placeholder={activeFields}
                     size={size}
                     value={value}
                     onChange={(e) => { setValue(e.target.value) }}
                 />
             </div>
             <div className="content">
-                {getData(data, value)?.map(item => (
+                {_item && getData(data, value)?.map((item, i) => (
                     <div
                         className="item-load"
-                        key={item.key}
-                        title={item[name]}
+                        key={i}
+                        title={valDT(item)}
                         onClick={(e) => {
                             if (e.detail === 2) {
-                                const _item = inputField[name][activeId].item;
-                                const val = parseNgwAttribute(_item.datatype, item[name]);
+                                const _item = inputField[activeFields][activeId]?.item;
+                                const val = parseNgwAttribute(_item.datatype, item[activeFields]);
                                 setInputField(prev => ({
                                     ...prev, [_item.keyname]: {
                                         ...prev[_item.keyname], [activeId]: {
@@ -243,13 +251,13 @@ export const ComponentFilter = observer((props) => {
     const { display, item, fields, refreshLayer, store } = props;
     const { activeKey, visible, removeTab } = store;
     const { layerId, styleId } = item;
+    const defaultInputField = fields.reduce((a, v) => ({ ...a, [v.keyname]: {} }), {});
 
     const { getFeature } = useSource();
 
     const [queryParams, setQueryParams] = useState();
     const [data, setData] = useState();
     const [activeFields, setActiveFields] = useState();
-    const defaultInputField = fields.reduce((a, v) => ({ ...a, [v.keyname]: {} }), {});
     const [inputField, setInputField] = useState(defaultInputField);
     const [activeId, setActiveId] = useState();
 
@@ -291,29 +299,30 @@ export const ComponentFilter = observer((props) => {
     const onFinish = (values) => {
         const keys_ = Object.keys(values || {});
         const obj: object = {};
+
         getEntries(fields).map(([_, value]) => {
             if (keys_.includes(value.keyname)) {
                 const field = values[value.keyname];
+                Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
 
-                field?.map((item, index) => {
-                    if (!field[index]?.vals) {
+                    if (!v.value?.vals) {
                         setQueryParams(null)
                         return
                     };
-                    const op = item?.vals ? "__" + item.op : ""; /* оператор */
-                    let vf = field[index].vals; /* значение */
+                    const op = v.value?.vals ? "__" + v.value.op : ""; /* оператор */
+                    let vf = v.value.vals; /* значение */
 
-                    const opt_ = value.datatype === "STRING" && ["like", "ilike"].includes(item.op) ? "%" : ""; /* %like%, %ilike% */
+                    const opt_ = v.item.datatype === "STRING" && ["like", "ilike"].includes(v.value.op) ? "%" : ""; /* %like%, %ilike% */
 
-                    if (value.datatype === "TIME") {
-                        vf = field[index].vals.format("H:m:s")
+                    if (v.item.datatype === "TIME") {
+                        vf = v.value.vals.format("H:m:s")
                     } else if (value.datatype === "DATE") {
-                        vf = field[index].vals.format("YYYY-MM-DD")
+                        vf = v.value.vals.format("YYYY-MM-DD")
                     } else if (value.datatype === "DATETIME") {
-                        vf = field[index].vals.format("YYYY-MM-DD H:m:s")
+                        vf = v.value.vals.format("YYYY-MM-DD H:m:s")
                     }
                     Object.assign(obj, {
-                        [styleId.toString() + index.toString() + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
+                        [styleId.toString() + k + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
                     });
                 });
             }
@@ -351,7 +360,7 @@ export const ComponentFilter = observer((props) => {
 
     useEffect(() => {
         if (loadValue.load) {
-            getFeature(layerId, loadValue)
+            getFeature(layerId, loadValue, queryParams)
                 .then(item => {
                     setData(item.map((i, idx) => ({ ...i, key: String(idx) })))
                     setloadValue({ load: false })
@@ -386,10 +395,20 @@ export const ComponentFilter = observer((props) => {
                                                     const length = Object.keys(prev[item.keyname]).length;
                                                     if (length > 0) {
                                                         const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
-                                                        return ({ ...prev, [item.keyname]: { ...prev[item.keyname], [Math.max(...keys) + 1]: { item: item, value: { vals: "", op: op } } } });
+                                                        return ({
+                                                            ...prev, [item.keyname]: {
+                                                                ...prev[item.keyname], [Math.max(...keys) + 1]: {
+                                                                    item: item, value: { vals: "", op: op }
+                                                                }
+                                                            }
+                                                        });
                                                     } else {
 
-                                                        return ({ ...prev, [item.keyname]: { 1: { item: item, value: { vals: "", op: op } } } });
+                                                        return ({
+                                                            ...prev, [item.keyname]: {
+                                                                1: { item: item, value: { vals: "", op: op } }
+                                                            }
+                                                        });
                                                     }
                                                 })
                                                 setloadValue({ load: true, limit: 25, distinct: item.keyname });
@@ -405,7 +424,7 @@ export const ComponentFilter = observer((props) => {
                                                     if (v.item.keyname === item.keyname) {
                                                         return (
                                                             <div className="child-item" id={k} key={k}>
-                                                                <FilterInput setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
+                                                                <FilterInput setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
                                                                 <div className="button-filter">
                                                                     <Button
                                                                         type="text"
@@ -435,7 +454,7 @@ export const ComponentFilter = observer((props) => {
                         })}
                     </div>
                     <div className="value-loads">
-                        {disableLoad ? <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} name={activeFields} data={data} /> : emptyValue}
+                        {disableLoad ? <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> : emptyValue}
                         {disableLoad &&
                             <div className="load-button">
                                 <div className="button-text">
@@ -464,7 +483,7 @@ export const ComponentFilter = observer((props) => {
                     </div>
                     <div className="button-text">
                         <Button type="text" size={size} onClick={() => {
-                            console.log(inputField);
+                            onFinish(inputField)
                         }}>
                             {msgApply}
                         </Button>
