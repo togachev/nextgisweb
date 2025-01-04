@@ -368,6 +368,10 @@ export const ComponentFilter = observer((props) => {
         }
     }, [loadValue]);
 
+    useEffect(() => {
+        !activeFields && setQueryParams(null);
+    }, [activeFields]);
+
     const disableLoad = activeFields ? true : false;
 
     return (<div className="ngw-filter-layer">
@@ -483,7 +487,8 @@ export const ComponentFilter = observer((props) => {
                     </div>
                     <div className="button-text">
                         <Button type="text" size={size} onClick={() => {
-                            onFinish(inputField)
+                            onFinish(inputField);
+                            setloadValue({ load: true, limit: 25, distinct: activeFields });
                         }}>
                             {msgApply}
                         </Button>
