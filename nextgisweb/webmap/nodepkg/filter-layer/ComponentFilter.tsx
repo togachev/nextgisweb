@@ -369,8 +369,13 @@ export const ComponentFilter = observer((props) => {
     }, [loadValue]);
 
     useEffect(() => {
-        !activeFields && setQueryParams(null);
-    }, [activeFields]);
+        let a: object = {}
+        getEntries(inputField).map(([_, value]) => {
+            Object.assign(a, value)
+        });
+        Object.keys(a).length === 0 && setQueryParams(null)
+    }, [inputField]);
+
 
     const disableLoad = activeFields ? true : false;
 
