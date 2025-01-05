@@ -145,9 +145,9 @@
             left: 0;
             right: 0;
             text-align: center;
-            border-bottom: 1px solid var(--divider-color);
             display: flex;
             justify-content: space-around;
+            border-bottom: 1px solid var(--divider-color);
 
             .field {
                 width: 65%;
@@ -160,7 +160,7 @@
 
         .fields-block {
             position: absolute;
-            top: 22px;
+            top: 23px;
             bottom: 32px;
             left: 0;
             right: 0;
@@ -168,50 +168,57 @@
             display: flex;
             justify-content: space-around;
 
-            .field-items {
-                height: 100%;
-                overflow-y: scroll;
-                display: flex;
-                flex-direction: column;
+            .field-content {
+                position: relative;
                 width: 65%;
 
-                .item-field {
-                    padding: 5px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
+                .field-items {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    left: 0;
+                    bottom: 0;
+                    width: auto;
+                    overflow-y: scroll;
 
-                    .ant-card {
-                        box-sizing: border-box;
-                        font-size: 14px;
-                        border-radius: 3px;
-                    }
+                    .item-field {
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
 
-                    .card-block {
-                        width: 100%;
-
-                        .ant-card-head {
-                            position: initial;
-                            width: 100%;
-                            padding: 4px;
-                            min-height: 32px;
-                            font-weight: 400;
+                        .ant-card {
+                            box-sizing: border-box;
                             font-size: 14px;
+                            border-radius: 3px;
                         }
 
-                        .ant-card-body {
-                            padding: 0px;
-                        }
+                        .card-block {
+                            width: 100%;
 
-                        .child-item {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 4px 4px 4px 0;
+                            .ant-card-head {
+                                position: initial;
+                                width: 100%;
+                                padding: 4px 8px 4px 4px;
+                                min-height: 32px;
+                                font-weight: 400;
+                                font-size: 14px;
+                            }
 
-                            .item-control {
-                                display: inline-flex;
+                            .ant-card-body {
+                                padding: 5px;
+                            }
+
+                            .child-item {
+                                display: flex;
+                                justify-content: space-between;
                                 align-items: center;
+                                padding: 4px 4px 4px 0;
+
+                                .item-control {
+                                    display: inline-flex;
+                                    align-items: center;
+                                }
                             }
                         }
                     }
@@ -227,7 +234,7 @@
 
                     .load-search {
                         position: absolute;
-                        top: 2px;
+                        top: 4px;
                         right: 4px;
                         left: 4px;
                         width: auto;
@@ -235,7 +242,7 @@
 
                     .content {
                         position: absolute;
-                        top: 28px;
+                        top: 30px;
                         right: 0;
                         left: 4px;
                         bottom: 32px;
@@ -259,12 +266,6 @@
                     right: 0;
                     left: 0;
                 }
-            }
-
-            .divider-item {
-                height: 100%;
-                margin-inline: 0;
-                flex: 0;
             }
         }
 

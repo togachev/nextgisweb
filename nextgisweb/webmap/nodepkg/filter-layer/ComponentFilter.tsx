@@ -20,7 +20,7 @@ import type {
     NgwDateTime,
     NgwTime,
 } from "@nextgisweb/feature-layer/type";
-import { parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
+import { formatNgwAttribute, parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { topics } from "@nextgisweb/webmap/identify-module"
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -189,21 +189,22 @@ const LoadValues = ({ activeId, inputField, setInputField, activeFields, data })
 
     const valDT = (item) => {
         let val = item[activeFields];
-        if (_item?.datatype === "DATE") {
-            const { year, month, day } = val as NgwDate;
-            const dt = new Date(year, month - 1, day);
-            val = dayjs(dt).format("YYYY-MM-DD");
-        } else if (val && _item?.datatype === "TIME") {
-            const { hour, minute, second } = val as NgwTime;
-            const dt = new Date(0, 0, 0, hour, minute, second);
-            val = dayjs(dt).format("HH:mm:ss");
-        } else if (val && _item?.datatype === "DATETIME") {
-            const { year, month, day, hour, minute, second } =
-                val as NgwDateTime;
-            const dt = new Date(year, month - 1, day, hour, minute, second);
-            val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
+        if (val) {
+            if (_item?.datatype === "DATE") {
+                const { year, month, day } = val as NgwDate;
+                const dt = new Date(year, month - 1, day);
+                val = dayjs(dt).format("YYYY-MM-DD");
+            } else if (val && _item?.datatype === "TIME") {
+                const { hour, minute, second } = val as NgwTime;
+                const dt = new Date(0, 0, 0, hour, minute, second);
+                val = dayjs(dt).format("HH:mm:ss");
+            } else if (val && _item?.datatype === "DATETIME") {
+                const { year, month, day, hour, minute, second } = val as NgwDateTime;
+                const dt = new Date(year, month - 1, day, hour, minute, second);
+                val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
+            }
+            return val;
         }
-        return val;
     }
 
     return (
@@ -263,9 +264,7 @@ export const ComponentFilter = observer((props) => {
 
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
 
-    const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", {
-        id: layerId,
-    });
+    const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", { id: layerId });
 
     const renderFilter = async () => {
         const olMap = display.map.olMap
@@ -304,25 +303,17 @@ export const ComponentFilter = observer((props) => {
             if (keys_.includes(value.keyname)) {
                 const field = values[value.keyname];
                 Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
-
                     if (!v.value?.vals) {
                         setQueryParams(null)
                         return
                     };
-                    const op = v.value?.vals ? "__" + v.value.op : ""; /* оператор */
-                    let vf = v.value.vals; /* значение */
 
-                    const opt_ = v.item.datatype === "STRING" && ["like", "ilike"].includes(v.value.op) ? "%" : ""; /* %like%, %ilike% */
+                    const op = v.value?.vals ? "__" + v.value.op : "";
+                    const string_op = v.item.datatype === "STRING" && ["like", "ilike"].includes(v.value.op) ? "%" : "";
+                    const val = formatNgwAttribute(v.item.datatype, v.value.vals);
 
-                    if (v.item.datatype === "TIME") {
-                        vf = v.value.vals.format("H:m:s")
-                    } else if (value.datatype === "DATE") {
-                        vf = v.value.vals.format("YYYY-MM-DD")
-                    } else if (value.datatype === "DATETIME") {
-                        vf = v.value.vals.format("YYYY-MM-DD H:m:s")
-                    }
                     Object.assign(obj, {
-                        [styleId.toString() + k + ":" + "fld_" + value.keyname + op]: opt_ + vf + opt_
+                        [styleId.toString() + k + ":" + "fld_" + value.keyname + op]: string_op + val + string_op
                     });
                 });
             }
@@ -369,11 +360,11 @@ export const ComponentFilter = observer((props) => {
     }, [loadValue]);
 
     useEffect(() => {
-        let a: object = {}
+        const obj: object = {}
         getEntries(inputField).map(([_, value]) => {
-            Object.assign(a, value)
+            Object.assign(obj, value)
         });
-        Object.keys(a).length === 0 && setQueryParams(null)
+        Object.keys(obj).length === 0 && setQueryParams(null)
     }, [inputField]);
 
 
@@ -387,80 +378,82 @@ export const ComponentFilter = observer((props) => {
                     <div className="load">Значения</div>
                 </div>
                 <div className="fields-block">
-                    <div className="field-items" span={16}>
-                        {fields.map((item) => {
-                            return (
-                                <span className="item-field" key={item.id}>
-                                    <Card
-                                        className="card-block"
-                                        extra={<Button type="text"
-                                            icon={<FilterPlusIcon />}
-                                            title={msgAddFilterField}
-                                            size={size}
-                                            onClick={() => {
-                                                const op = item.datatype === "STRING" ? "ilike" : "eq"
-                                                setActiveFields(item.keyname);
-                                                setInputField(prev => {
-                                                    const length = Object.keys(prev[item.keyname]).length;
-                                                    if (length > 0) {
-                                                        const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
-                                                        return ({
-                                                            ...prev, [item.keyname]: {
-                                                                ...prev[item.keyname], [Math.max(...keys) + 1]: {
-                                                                    item: item, value: { vals: "", op: op }
+                    <div className="field-content" span={16}>
+                        <div className="field-items">
+                            {fields.map((item) => {
+                                return (
+                                    <span className="item-field" key={item.id}>
+                                        <Card
+                                            className="card-block"
+                                            extra={<Button type="text"
+                                                icon={<FilterPlusIcon />}
+                                                title={msgAddFilterField}
+                                                size={size}
+                                                onClick={() => {
+                                                    const op = item.datatype === "STRING" ? "ilike" : "eq"
+                                                    setActiveFields(item.keyname);
+                                                    setInputField(prev => {
+                                                        const length = Object.keys(prev[item.keyname]).length;
+                                                        if (length > 0) {
+                                                            const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
+                                                            return ({
+                                                                ...prev, [item.keyname]: {
+                                                                    ...prev[item.keyname], [Math.max(...keys) + 1]: {
+                                                                        item: item, value: { vals: "", op: op }
+                                                                    }
                                                                 }
-                                                            }
-                                                        });
-                                                    } else {
+                                                            });
+                                                        } else {
 
-                                                        return ({
-                                                            ...prev, [item.keyname]: {
-                                                                1: { item: item, value: { vals: "", op: op } }
-                                                            }
-                                                        });
-                                                    }
-                                                })
-                                                setloadValue({ load: true, limit: 25, distinct: item.keyname });
-                                            }}
-                                        />}
-                                        title={<span title={item.display_name}>
-                                            {item.display_name}
-                                        </span>}
-                                    >
-                                        {getEntries(inputField).map(([key, value]) => {
-                                            if (key === item.keyname) {
-                                                return getEntries(value).map(([k, v]) => {
-                                                    if (v.item.keyname === item.keyname) {
-                                                        return (
-                                                            <div className="child-item" id={k} key={k}>
-                                                                <FilterInput setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
-                                                                <div className="button-filter">
-                                                                    <Button
-                                                                        type="text"
-                                                                        size={size}
-                                                                        title={msgRemoveFilterField}
-                                                                        onClick={() => {
-                                                                            setInputField((prev) => {
-                                                                                const rField = { ...prev };
-                                                                                delete rField[item.keyname][k];
-                                                                                return rField;
-                                                                            })
-                                                                            setData([]);
-                                                                            setActiveFields(undefined);
-                                                                        }}
-                                                                        icon={<Remove />}
-                                                                    />
+                                                            return ({
+                                                                ...prev, [item.keyname]: {
+                                                                    1: { item: item, value: { vals: "", op: op } }
+                                                                }
+                                                            });
+                                                        }
+                                                    })
+                                                    setloadValue({ load: true, limit: 25, distinct: item.keyname });
+                                                }}
+                                            />}
+                                            title={<span title={item.display_name}>
+                                                {item.display_name}
+                                            </span>}
+                                        >
+                                            {getEntries(inputField).map(([key, value]) => {
+                                                if (key === item.keyname) {
+                                                    return getEntries(value).map(([k, v]) => {
+                                                        if (v.item.keyname === item.keyname) {
+                                                            return (
+                                                                <div className="child-item" id={k} key={k}>
+                                                                    <FilterInput setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
+                                                                    <div className="button-filter">
+                                                                        <Button
+                                                                            type="text"
+                                                                            size={size}
+                                                                            title={msgRemoveFilterField}
+                                                                            onClick={() => {
+                                                                                setInputField((prev) => {
+                                                                                    const rField = { ...prev };
+                                                                                    delete rField[item.keyname][k];
+                                                                                    return rField;
+                                                                                })
+                                                                                setData([]);
+                                                                                setActiveFields(undefined);
+                                                                            }}
+                                                                            icon={<Remove />}
+                                                                        />
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )
-                                                    }
-                                                })
-                                            }
-                                        })}
-                                    </Card>
-                                </span>
-                            )
-                        })}
+                                                            )
+                                                        }
+                                                    })
+                                                }
+                                            })}
+                                        </Card>
+                                    </span>
+                                )
+                            })}
+                        </div>
                     </div>
                     <div className="value-loads">
                         {disableLoad ? <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> : emptyValue}
