@@ -58,12 +58,14 @@ const operator = {
     ge: { label: "больше или равно", value: "ge" },
     like: { label: "like", value: "like" },
     ilike: { label: "ilike", value: "ilike" },
+    isnull: { label: "нет данных", value: "isnull" },
+    notin: { label: "notin", value: "notin" },
 };
 
 const op_type = {
-    string: ["like", "ilike", "ne", "eq", "in"],
-    number: ["eq", "in", "ne", "lt", "gt", "le", "ge"],
-    date: ["eq", "ne", "lt", "gt", "le", "ge"],
+    string: ["like", "ilike", "ne", "eq", "in", "isnull", "notin"],
+    number: ["eq", "in", "ne", "lt", "gt", "le", "ge", "isnull", "notin"],
+    date: ["eq", "ne", "lt", "gt", "le", "ge", "isnull"],
 };
 
 const DATE_TYPE = ["DATETIME", "DATE", "TIME"];
@@ -82,17 +84,31 @@ const type_comp = (value, props) => {
     return inputComp[value];
 };
 
-type Operators = "like" | "ilike" | "eq" | "in" | "ne" | "lt" | "gt" | "le" | "ge";
+type Operators = "like" | "ilike" | "eq" | "in" | "ne" | "lt" | "gt" | "le" | "ge" | "isnull" | "notin";
 type TypeProps = "real" | "integer" | "bigint" | "string" | "date" | "datetime" | "time";
+type OperatorsIsNull = "yes" | "no";
 
 const FilterInput = (props) => {
     const { id, field, setActiveFields, setInputField, setActiveId } = props;
     const [vals, setVals] = useState(field.value);
     const [op, setOp] = useState<Operators>();
 
+    const [isNullValue, setIsNullValue] = useState<OperatorsIsNull>("yes");
+    const [isNull, setIsNull] = useState(false);
+
     useEffect(() => {
         setActiveId(id);
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (isNull === true) {
+            triggerChange({ vals: isNullValue });
+        } else {
+            triggerChange({ vals: undefined });
+            setIsNullValue("yes")
+        }
+    }, [isNull]);
+
 
     const onChange = (e) => {
         setInputField(prev => ({ ...prev, [field.item.keyname]: { ...prev[field.item.keyname], [id]: { item: field.item, value: e } } }));
@@ -105,20 +121,20 @@ const FilterInput = (props) => {
         onChange?.({ vals, op, ...field.value, ...changedValue });
     };
 
-    const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newVal = field.item.datatype === "STRING" || NUMBER_TYPE.includes(field.item.datatype) ? e.target.value : e;
-
-        if (!("vals" in field.value)) {
-            setVals(newVal);
-        };
-        triggerChange({ vals: newVal });
-    };
-
     const onOperatorsChange = (newVal: Operators) => {
         if (!("op" in field.value)) {
             setOp(newVal);
-        };
+        }
+
+        newVal === "isnull" ? setIsNull(true) : setIsNull(false);
         triggerChange({ op: newVal });
+    };
+
+    const onChangeIsNull = (value) => {
+        if (field.value.op === "isnull") {
+            triggerChange({ vals: value });
+            setIsNullValue(value)
+        }
     };
 
     let opt;
@@ -134,13 +150,13 @@ const FilterInput = (props) => {
         style: { width: "100%", margin: "4px 0" },
         size: size,
         placeholder: field.item.display_name,
-        onChange: onFilterChange,
+        onChange: onChange,
         value: field.value.vals || undefined,
     };
 
     return (
         <div className="item-control" onClick={() => { setActiveId(id); setActiveFields(field.item.keyname); }}>
-            {type_comp(field.item.datatype, inputProps)}
+            {type_comp(typeof field.value.vals === "string" ? "STRING" : field.item.datatype, inputProps)}
             <div className="button-filter">
                 <Button
                     size={size}
@@ -160,6 +176,15 @@ const FilterInput = (props) => {
                     return operator[item];
                 })}
             />
+            {isNull && <Select
+                size={size}
+                value={isNullValue}
+                onChange={onChangeIsNull}
+                options={[
+                    { value: "yes", label: gettext("Yes") },
+                    { value: "no", label: gettext("No") },
+                ]}
+            />}
         </div>
     );
 };
@@ -204,6 +229,9 @@ const LoadValues = ({ activeId, inputField, setInputField, activeFields, data })
                 val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
             }
             return val;
+        }
+        else if (val === null) {
+            return gettext("N/D")
         }
     }
 
@@ -303,6 +331,8 @@ export const ComponentFilter = observer((props) => {
             if (keys_.includes(value.keyname)) {
                 const field = values[value.keyname];
                 Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
+                    console.log(v.value);
+
                     if (!v.value?.vals) {
                         setQueryParams(null)
                         return
@@ -310,7 +340,7 @@ export const ComponentFilter = observer((props) => {
 
                     const op = v.value?.vals ? "__" + v.value.op : "";
                     const string_op = v.item.datatype === "STRING" && ["like", "ilike"].includes(v.value.op) ? "%" : "";
-                    const val = formatNgwAttribute(v.item.datatype, v.value.vals);
+                    const val = typeof v.value.vals === "string" ? v.value.vals : formatNgwAttribute(v.item.datatype, v.value.vals);
 
                     Object.assign(obj, {
                         [styleId.toString() + k + ":" + "fld_" + value.keyname + op]: string_op + val + string_op
