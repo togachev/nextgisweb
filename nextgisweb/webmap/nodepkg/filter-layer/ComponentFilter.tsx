@@ -35,6 +35,8 @@ type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
 import "./FilterLayer.less";
 
+const msgFields = gettext("Fields");
+const msgValues = gettext("Values");
 const msgSample = gettext("Sample");
 const msgIgnoreFilter = gettext("Ignore filter");
 const msgAll = gettext("All");
@@ -49,19 +51,32 @@ const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IM
 
 const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
+const msgEq = gettext("Equal")
+const msgInArray = gettext("Array")
+const msgNotInArray = gettext("Not in array")
+const msgNotEqual = gettext("Not equal")
+const msgLess = gettext("Less")
+const msgGreater = gettext("Greater")
+const msgLessOrEqual = gettext("Less or equal")
+const msgGreaterOrEqual = gettext("Greater or equal")
+const msgNoData = gettext("No data")
+const msgLike = gettext("LIKE")
+const msgIlike = gettext("ILIKE")
+
 const size = "small"
+
 const operator = {
-    eq: { label: "равно", value: "eq" },
-    in: { label: "массив", value: "in" },
-    ne: { label: "не равно", value: "ne" },
-    lt: { label: "меньше", value: "lt" },
-    gt: { label: "больше", value: "gt" },
-    le: { label: "меньше или равно", value: "le" },
-    ge: { label: "больше или равно", value: "ge" },
-    like: { label: "like", value: "like" },
-    ilike: { label: "ilike", value: "ilike" },
-    isnull: { label: "нет данных", value: "isnull" },
-    notin: { label: "notin", value: "notin" },
+    eq: { label: msgEq, value: "eq" },
+    in: { label: msgInArray, value: "in" },
+    ne: { label: msgNotEqual, value: "ne" },
+    lt: { label: msgLess, value: "lt" },
+    gt: { label: msgGreater, value: "gt" },
+    le: { label: msgLessOrEqual, value: "le" },
+    ge: { label: msgGreaterOrEqual, value: "ge" },
+    like: { label: msgLike, value: "like" },
+    ilike: { label: msgIlike, value: "ilike" },
+    isnull: { label: msgNoData, value: "isnull" },
+    notin: { label: msgNotInArray, value: "notin" },
 };
 
 const op_type = {
@@ -159,7 +174,7 @@ const FilterInput = (props) => {
     }
 
     const inputProps = {
-        style: { width: "100%", margin: "4px 0" },
+        style: { width: "100%" },
         size: size,
         placeholder: field.item.display_name,
         onChange: onInputChange,
@@ -426,11 +441,11 @@ export const ComponentFilter = observer((props) => {
         {fields.length > 0 ?
             <div className="component-filter">
                 <div className="title-field">
-                    <div className="field">Поля</div>
-                    <div className="load">Значения</div>
+                    <div className="field">{msgFields}</div>
+                    <div className="load">{msgValues}</div>
                 </div>
                 <div className="fields-block">
-                    <div className="field-content" span={16}>
+                    <div className="field-content">
                         <div className="field-items">
                             {fields.map((item) => {
                                 return (
