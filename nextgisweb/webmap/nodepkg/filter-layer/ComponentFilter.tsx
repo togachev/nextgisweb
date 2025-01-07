@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
@@ -7,6 +7,7 @@ import { transformExtent } from "ol/proj";
 import {
     Button,
     Card,
+    Checkbox,
     DatePicker,
     DateTimePicker,
     Empty,
@@ -35,6 +36,7 @@ type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 import "./FilterLayer.less";
 
 const msgSample = gettext("Sample");
+const msgIgnoreFilter = gettext("Ignore filter");
 const msgAll = gettext("All");
 const msgAddFilterField = gettext("Add filter");
 const msgRemoveFilterField = gettext("Remove filter");
@@ -89,8 +91,7 @@ type TypeProps = "real" | "integer" | "bigint" | "string" | "date" | "datetime" 
 type OperatorsIsNull = "yes" | "no";
 
 const FilterInput = (props) => {
-    const { id, field, setActiveFields, setInputField, setActiveId } = props;
-    const [vals, setVals] = useState(field.value);
+    const { id, field, setActiveFields, setInputField, setActiveId, setLock } = props;
     const [op, setOp] = useState<Operators>();
 
     const [isNullValue, setIsNullValue] = useState<OperatorsIsNull>("yes");
@@ -109,7 +110,6 @@ const FilterInput = (props) => {
         }
     }, [isNull]);
 
-
     const onChange = (e) => {
         setInputField(prev => ({ ...prev, [field.item.keyname]: { ...prev[field.item.keyname], [id]: { item: field.item, value: e } } }));
     }
@@ -118,7 +118,7 @@ const FilterInput = (props) => {
         vals?: TypeProps;
         op?: Operators;
     }) => {
-        onChange?.({ vals, op, ...field.value, ...changedValue });
+        onChange?.({ op, ...field.value, ...changedValue });
     };
 
     const onOperatorsChange = (newVal: Operators) => {
@@ -154,6 +154,14 @@ const FilterInput = (props) => {
         value: field.value.vals || undefined,
     };
 
+    useEffect(() => {
+        if (typeof field.value.vals === "string" && field.value.op === "isnull") {
+            setLock(prev => ({ ...prev, [field.item.keyname + ":" + id]: true }))
+        } else {
+            setLock(prev => ({ ...prev, [field.item.keyname + ":" + id]: false }))
+        }
+    }, [field.value.vals, id])
+
     return (
         <div className="item-control" onClick={() => { setActiveId(id); setActiveFields(field.item.keyname); }}>
             {type_comp(typeof field.value.vals === "string" ? "STRING" : field.item.datatype, inputProps)}
@@ -170,7 +178,8 @@ const FilterInput = (props) => {
             <Select
                 size={size}
                 value={field.value.op || op}
-                style={{ width: 165, padding: "0 0 0 4px" }}
+                style={{ padding: "0 0 0 4px" }}
+                dropdownStyle={{ width: "auto", minWidth: "165px" }}
                 onChange={onOperatorsChange}
                 options={op_type[opt].map((item) => {
                     return operator[item];
@@ -180,6 +189,8 @@ const FilterInput = (props) => {
                 size={size}
                 value={isNullValue}
                 onChange={onChangeIsNull}
+                style={{ padding: "0 0 0 4px" }}
+                dropdownStyle={{ width: "auto" }}
                 options={[
                     { value: "yes", label: gettext("Yes") },
                     { value: "no", label: gettext("No") },
@@ -254,7 +265,6 @@ const LoadValues = ({ activeId, inputField, setInputField, activeFields, data })
                         title={valDT(item)}
                         onClick={(e) => {
                             if (e.detail === 2) {
-                                const _item = inputField[activeFields][activeId]?.item;
                                 const val = parseNgwAttribute(_item.datatype, item[activeFields]);
                                 setInputField(prev => ({
                                     ...prev, [_item.keyname]: {
@@ -270,7 +280,8 @@ const LoadValues = ({ activeId, inputField, setInputField, activeFields, data })
                     >
                         <span>{valDT(item)}</span>
                     </div>
-                ))}
+                )
+                )}
             </div>
         </div>
     );
@@ -289,8 +300,9 @@ export const ComponentFilter = observer((props) => {
     const [activeFields, setActiveFields] = useState();
     const [inputField, setInputField] = useState(defaultInputField);
     const [activeId, setActiveId] = useState();
-
+    const [filter, setFilter] = useState(false);
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
+    const [lock, setLock] = useState();
 
     const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", { id: layerId });
 
@@ -331,8 +343,6 @@ export const ComponentFilter = observer((props) => {
             if (keys_.includes(value.keyname)) {
                 const field = values[value.keyname];
                 Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
-                    console.log(v.value);
-
                     if (!v.value?.vals) {
                         setQueryParams(null)
                         return
@@ -380,8 +390,8 @@ export const ComponentFilter = observer((props) => {
     };
 
     useEffect(() => {
-        if (loadValue.load) {
-            getFeature(layerId, loadValue, queryParams)
+        if (loadValue.load && activeFields) {
+            getFeature(layerId, loadValue, queryParams, activeFields, filter)
                 .then(item => {
                     setData(item.map((i, idx) => ({ ...i, key: String(idx) })))
                     setloadValue({ load: false })
@@ -394,9 +404,8 @@ export const ComponentFilter = observer((props) => {
         getEntries(inputField).map(([_, value]) => {
             Object.assign(obj, value)
         });
-        Object.keys(obj).length === 0 && setQueryParams(null)
+        Object.keys(obj).length === 0 && (setQueryParams(null), setFilter(false))
     }, [inputField]);
-
 
     const disableLoad = activeFields ? true : false;
 
@@ -455,7 +464,7 @@ export const ComponentFilter = observer((props) => {
                                                         if (v.item.keyname === item.keyname) {
                                                             return (
                                                                 <div className="child-item" id={k} key={k}>
-                                                                    <FilterInput setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
+                                                                    <FilterInput lock={lock} setLock={setLock} setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
                                                                     <div className="button-filter">
                                                                         <Button
                                                                             type="text"
@@ -486,7 +495,9 @@ export const ComponentFilter = observer((props) => {
                         </div>
                     </div>
                     <div className="value-loads">
-                        {disableLoad ? <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> : emptyValue}
+                        {activeId && disableLoad && !lock[activeFields + ":" + activeId] ?
+                            <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
+                            emptyValue}
                         {disableLoad &&
                             <div className="load-button">
                                 <div className="button-text">
@@ -498,6 +509,11 @@ export const ComponentFilter = observer((props) => {
                                     </Button>
                                 </div>
                             </div>
+                        }
+                        {disableLoad &&
+                            <Checkbox className="ignore-filter" checked={filter} onChange={(e) => {
+                                setFilter(e.target.checked)
+                            }}>{msgIgnoreFilter}</Checkbox>
                         }
                     </div>
                 </div>
@@ -526,6 +542,7 @@ export const ComponentFilter = observer((props) => {
                             setData([]);
                             setActiveFields(undefined);
                             setInputField(defaultInputField);
+                            setFilter(false);
                         }}>
                             {msgClear}
                         </Button>
@@ -536,6 +553,7 @@ export const ComponentFilter = observer((props) => {
                             topics.publish("removeTabFilter", activeKey);
                             refreshLayer(item.key);
                             setData([]);
+                            setFilter(false);
                         }}>
                             {msgCancel}
                         </Button>

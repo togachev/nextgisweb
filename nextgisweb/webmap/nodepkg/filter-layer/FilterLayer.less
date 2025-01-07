@@ -119,12 +119,13 @@
     .button-text {
         width: 100%;
         display: inline-flex;
-        justify-content: space-evenly;
+        justify-content: flex-end;
 
         button {
-            margin: 0 10px;
+            margin: 0 5px;
             border: 1px solid var(--divider-color);
             border-radius: 3px;
+            width: 100%;
 
             &:hover {
                 color: var(--primary);
@@ -199,25 +200,31 @@
                             .ant-card-head {
                                 position: initial;
                                 width: 100%;
-                                padding: 4px 8px 4px 4px;
+                                padding: 4px 4px 4px 4px;
                                 min-height: 32px;
                                 font-weight: 400;
                                 font-size: 14px;
+                                border-bottom: 0px solid;
                             }
 
                             .ant-card-body {
-                                padding: 5px;
+                                padding: 0px;
                             }
 
                             .child-item {
                                 display: flex;
                                 justify-content: space-between;
                                 align-items: center;
-                                padding: 4px 4px 4px 0;
+                                padding: 4px 4px 4px 4px;
+
+                                &:hover {
+                                    background: #00000005;
+                                }
 
                                 .item-control {
                                     display: inline-flex;
                                     align-items: center;
+                                    width: 100%;
                                 }
                             }
                         }
@@ -228,6 +235,9 @@
             .value-loads {
                 width: 35%;
                 position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
 
                 .load-content {
                     padding: 0;
@@ -243,13 +253,14 @@
                     .content {
                         position: absolute;
                         top: 30px;
-                        right: 0;
+                        right: 4px;
                         left: 4px;
-                        bottom: 32px;
+                        bottom: 56px;
                         width: auto;
                         overflow: auto;
 
                         .item-load {
+                            user-select: none;
 
                             &:hover {
                                 cursor: pointer;
@@ -258,13 +269,23 @@
                             }
                         }
                     }
+
+
                 }
 
                 .load-button {
                     position: absolute;
+                    bottom: 32px;
+                    right: 4px;
+                    left: 4px;
+                }
+
+                .ignore-filter {
+                    position: absolute;
                     bottom: 4px;
-                    right: 0;
-                    left: 0;
+                    left: 4px;
+                    width: auto;
+                    margin: 0 5px;
                 }
             }
         }
@@ -273,7 +294,7 @@
             display: flex;
             position: absolute;
             bottom: 3px;
-            right: 10px;
+            right: 4px;
             align-items: center;
         }
     }
