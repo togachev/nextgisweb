@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
@@ -92,6 +92,7 @@ type OperatorsIsNull = "yes" | "no";
 
 const FilterInput = (props) => {
     const { id, field, setActiveFields, setInputField, setActiveId, setLock } = props;
+    const [vals, setVals] = useState(field.value);
     const [op, setOp] = useState<Operators>();
 
     const [isNullValue, setIsNullValue] = useState<OperatorsIsNull>("yes");
@@ -110,15 +111,26 @@ const FilterInput = (props) => {
         }
     }, [isNull]);
 
-    const onChange = (e) => {
-        setInputField(prev => ({ ...prev, [field.item.keyname]: { ...prev[field.item.keyname], [id]: { item: field.item, value: e } } }));
-    }
+
+    const onInputChange = (e) => {
+        const newVal = e.target.value;
+
+        if (!("vals" in field.value)) {
+            setVals(newVal);
+        }
+
+        triggerChange({ vals: newVal });
+    };
 
     const triggerChange = (changedValue: {
         vals?: TypeProps;
         op?: Operators;
     }) => {
-        onChange?.({ op, ...field.value, ...changedValue });
+        setInputField(prev => ({
+            ...prev, [field.item.keyname]: {
+                ...prev[field.item.keyname], [id]: { item: field.item, value: { vals, op, ...field.value, ...changedValue } }
+            }
+        }));
     };
 
     const onOperatorsChange = (newVal: Operators) => {
@@ -150,7 +162,7 @@ const FilterInput = (props) => {
         style: { width: "100%", margin: "4px 0" },
         size: size,
         placeholder: field.item.display_name,
-        onChange: onChange,
+        onChange: onInputChange,
         value: field.value.vals || undefined,
     };
 
@@ -299,6 +311,7 @@ export const ComponentFilter = observer((props) => {
     const [data, setData] = useState();
     const [activeFields, setActiveFields] = useState();
     const [inputField, setInputField] = useState(defaultInputField);
+
     const [activeId, setActiveId] = useState();
     const [filter, setFilter] = useState(false);
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
