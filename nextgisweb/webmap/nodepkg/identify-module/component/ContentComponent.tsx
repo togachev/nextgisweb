@@ -15,7 +15,7 @@ import { observer } from "mobx-react-lite";
 import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 
-const { Link } = Typography;
+const { Link, Text } = Typography;
 const settings = webmapSettings;
 
 export const ContentComponent: FC = observer(({ store: storeProp, display, linkToGeometry }) => {
@@ -40,11 +40,11 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             if (urlRegex.test(val)) {
                 return (<Link title={val} href={val} target="_blank">{val}</Link>)
             } else if (emailRegex.test(val)) {
-                return (<div className="value-email" title={val} onClick={() => {
+                return (<div style={{ whiteSpace: "pre-wrap" }} className="value-email" title={val} onClick={() => {
                     copyValue(val, gettext("Email address copied"));
                 }} >{val}</div>)
             } else {
-                return val
+                return (<Text style={{ whiteSpace: "pre-wrap" }}>{val}</Text>)
             }
         }
     };

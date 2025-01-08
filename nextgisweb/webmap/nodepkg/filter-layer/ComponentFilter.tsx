@@ -46,6 +46,7 @@ const msgCancel = gettext("Cancel");
 const msgOk = gettext("Ок");
 const msgClear = gettext("Clean");
 const msgApply = gettext("Apply");
+const msgNA = gettext("N/A");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
@@ -87,6 +88,7 @@ const op_type = {
 
 const DATE_TYPE = ["DATETIME", "DATE", "TIME"];
 const NUMBER_TYPE = ["REAL", "INTEGER", "BIGINT"];
+const ARRAY_OP = ["in", "notin"];
 
 const type_comp = (value, props) => {
     const inputComp = {
@@ -125,7 +127,6 @@ const FilterInput = (props) => {
             setIsNullValue("yes")
         }
     }, [isNull]);
-
 
     const onInputChange = (e) => {
         const newVal = e.target.value;
@@ -191,46 +192,48 @@ const FilterInput = (props) => {
 
     return (
         <div className="item-control" onClick={() => { setActiveId(id); setActiveFields(field.item.keyname); }}>
-            {type_comp(typeof field.value.vals === "string" ? "STRING" : field.item.datatype, inputProps)}
-            <div className="button-filter">
-                <Button
-                    size={size}
-                    type="text"
-                    icon={<BackspaceIcon />}
-                    onClick={() => {
-                        triggerChange({ vals: undefined });
-                    }}
-                />
-            </div>
+            {field.value.op !== "isnull" &&
+                <>
+                    {type_comp(typeof field.value.vals === "string" ? "STRING" : field.item.datatype, inputProps)}
+                    < div className="button-filter">
+                        <Button
+                            size={size}
+                            type="text"
+                            icon={<BackspaceIcon />}
+                            onClick={() => {
+                                triggerChange({ vals: undefined });
+                            }}
+                        />
+                    </div>
+                </>}
             <Select
                 size={size}
                 value={field.value.op || op}
-                style={{ padding: "0 0 0 4px" }}
                 dropdownStyle={{ width: "auto", minWidth: "165px" }}
                 onChange={onOperatorsChange}
                 options={op_type[opt].map((item) => {
                     return operator[item];
                 })}
             />
-            {isNull && <Select
-                size={size}
-                value={isNullValue}
-                onChange={onChangeIsNull}
-                style={{ padding: "0 0 0 4px" }}
-                dropdownStyle={{ width: "auto" }}
-                options={[
-                    { value: "yes", label: gettext("Yes") },
-                    { value: "no", label: gettext("No") },
-                ]}
-            />}
-        </div>
+            {isNull &&
+                <Select
+                    size={size}
+                    value={isNullValue}
+                    onChange={onChangeIsNull}
+                    dropdownStyle={{ width: "auto" }}
+                    options={[
+                        { value: "yes", label: gettext("Yes") },
+                        { value: "no", label: gettext("No") },
+                    ]}
+                />}
+        </div >
     );
 };
 
-const LoadValues = ({ activeId, inputField, setInputField, activeFields, data }) => {
+const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, data }) => {
     const [value, setValue] = useState(undefined);
     const _item = inputField[activeFields][activeId]?.item;
-
+    const _value = inputField[activeFields][activeId]?.value
     const getData = (data, value) => {
         if (!value) {
             return data;
@@ -268,8 +271,8 @@ const LoadValues = ({ activeId, inputField, setInputField, activeFields, data })
             }
             return val;
         }
-        else if (val === null) {
-            return gettext("N/D")
+        else if (val === null || val === "" || val === undefined) {
+            return msgNA;
         }
     }
 
@@ -287,21 +290,45 @@ const LoadValues = ({ activeId, inputField, setInputField, activeFields, data })
             <div className="content">
                 {_item && getData(data, value)?.map((item, i) => (
                     <div
-                        className="item-load"
+                        className={!lock[activeFields + ":" + activeId] ? "item-load" : "item-disable-load"}
                         key={i}
                         title={valDT(item)}
                         onClick={(e) => {
-                            if (e.detail === 2) {
+                            if (!lock[activeFields + ":" + activeId] && e.detail === 2) {
                                 const val = parseNgwAttribute(_item.datatype, item[activeFields]);
-                                setInputField(prev => ({
-                                    ...prev, [_item.keyname]: {
-                                        ...prev[_item.keyname], [activeId]: {
-                                            item: _item, value: {
-                                                op: prev[_item.keyname][activeId].value.op, vals: val
+                                if (ARRAY_OP.includes(_value.op)) {
+                                    if (_value.vals) {
+                                        setInputField(prev => ({
+                                            ...prev, [_item.keyname]: {
+                                                ...prev[_item.keyname], [activeId]: {
+                                                    item: _item, value: {
+                                                        op: prev[_item.keyname][activeId].value.op, vals: String(_value.vals)?.concat(',', String(val))
+                                                    }
+                                                }
+                                            }
+                                        }));
+                                    } else {
+                                        setInputField(prev => ({
+                                            ...prev, [_item.keyname]: {
+                                                ...prev[_item.keyname], [activeId]: {
+                                                    item: _item, value: {
+                                                        op: prev[_item.keyname][activeId].value.op, vals: val
+                                                    }
+                                                }
+                                            }
+                                        }));
+                                    }
+                                } else {
+                                    setInputField(prev => ({
+                                        ...prev, [_item.keyname]: {
+                                            ...prev[_item.keyname], [activeId]: {
+                                                item: _item, value: {
+                                                    op: prev[_item.keyname][activeId].value.op, vals: val
+                                                }
                                             }
                                         }
-                                    }
-                                }));
+                                    }));
+                                }
                             }
                         }}
                     >
@@ -482,9 +509,7 @@ export const ComponentFilter = observer((props) => {
                                                     setloadValue({ load: true, limit: 25, distinct: item.keyname });
                                                 }}
                                             />}
-                                            title={<span title={item.display_name}>
-                                                {item.display_name}
-                                            </span>}
+                                            title={<span title={item.display_name}>{item.display_name}</span>}
                                         >
                                             {getEntries(inputField).map(([key, value]) => {
                                                 if (key === item.keyname) {
@@ -492,7 +517,7 @@ export const ComponentFilter = observer((props) => {
                                                         if (v.item.keyname === item.keyname) {
                                                             return (
                                                                 <div className="child-item" id={k} key={k}>
-                                                                    <FilterInput lock={lock} setLock={setLock} setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
+                                                                    <FilterInput setLock={setLock} setActiveFields={setActiveFields} setActiveId={setActiveId} setInputField={setInputField} id={k} field={v} />
                                                                     <div className="button-filter">
                                                                         <Button
                                                                             type="text"
@@ -523,8 +548,8 @@ export const ComponentFilter = observer((props) => {
                         </div>
                     </div>
                     <div className="value-loads">
-                        {activeId && disableLoad && !lock[activeFields + ":" + activeId] ?
-                            <LoadValues setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
+                        {activeId && disableLoad ?
+                            <LoadValues lock={lock} setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
                             emptyValue}
                         {disableLoad &&
                             <div className="load-button">
@@ -536,13 +561,11 @@ export const ComponentFilter = observer((props) => {
                                         {msgAll}
                                     </Button>
                                 </div>
-                            </div>
-                        }
+                            </div>}
                         {disableLoad &&
                             <Checkbox className="ignore-filter" checked={filter} onChange={(e) => {
                                 setFilter(e.target.checked)
-                            }}>{msgIgnoreFilter}</Checkbox>
-                        }
+                            }}>{msgIgnoreFilter}</Checkbox>}
                     </div>
                 </div>
                 <div className="control-buttons">
@@ -550,9 +573,7 @@ export const ComponentFilter = observer((props) => {
                         <Button type="text"
                             title={msgZoomToFiltered}
                             icon={<ZoomInMap />}
-                            onClick={() => {
-                                click();
-                            }}
+                            onClick={click}
                             size={size}
                             loading={isLoading}
                         />
