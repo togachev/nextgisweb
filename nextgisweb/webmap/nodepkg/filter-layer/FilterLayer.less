@@ -184,10 +184,10 @@
                     bottom: 0px;
                     width: auto;
                     overflow: overlay;
-                    scrollbar-gutter: stable both-edges;
+                    scrollbar-gutter: stable;
 
                     .item-field {
-                        margin: 7px 0;
+                        margin: 7px;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
@@ -206,7 +206,7 @@
                             .ant-card-head {
                                 position: initial;
                                 width: 100%;
-                                padding: 4px 8px 4px 4px;
+                                padding: 4px 9px 4px 4px;
                                 min-height: 32px;
                                 font-weight: 400;
                                 font-size: 14px;
@@ -262,12 +262,13 @@
 
                     .content {
                         position: absolute;
-                        top: 31px;
-                        right: 4px;
+                        top: 34px;
+                        right: 0px;
                         left: 4px;
                         bottom: 60px;
                         width: auto;
-                        overflow-y: overlay;
+                        overflow: overlay;
+                        scrollbar-gutter: stable;
 
                         .item-load {
                             user-select: none;
@@ -276,7 +277,6 @@
                             &:hover {
                                 cursor: pointer;
                                 background: #00000005;
-                                border-radius: 3px;
                             }
                         }
 

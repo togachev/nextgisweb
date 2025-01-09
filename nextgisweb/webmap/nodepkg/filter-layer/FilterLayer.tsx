@@ -35,12 +35,9 @@ const width = 600;
 const height = 400;
 const padding = 16;
 
-const pos_x = W / 2 - width / 2;
-const pos_y = padding + offset;
-
 const params = (pos) => {
-    const posX = pos ? pos.x : pos_x;
-    const posY = pos ? pos.y : pos_y;
+    const posX = pos ? pos.x : W / 2 - width / 2;
+    const posY = pos ? pos.y : padding + offset;
 
     const width_calc = pos ? pos.width : width;
     const height_calc = pos ? pos.height : height;

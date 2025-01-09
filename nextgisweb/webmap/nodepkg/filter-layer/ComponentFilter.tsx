@@ -8,10 +8,12 @@ import {
     Button,
     Card,
     Checkbox,
+    ConfigProvider,
     DatePicker,
     DateTimePicker,
     Empty,
     TimePicker,
+    Typography,
     Input,
     Select,
 } from "@nextgisweb/gui/antd";
@@ -29,11 +31,16 @@ import Remove from "@nextgisweb/icon/material/remove";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 import FilterPlusIcon from "@nextgisweb/icon/mdi/filter-plus";
 
+import "./FilterLayer.less";
+
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
+const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
-import "./FilterLayer.less";
+
+const { Text } = Typography;
+const { TextArea } = Input;
 
 const msgFields = gettext("Fields");
 const msgValues = gettext("Values");
@@ -48,9 +55,16 @@ const msgClear = gettext("Clean");
 const msgApply = gettext("Apply");
 const msgNA = gettext("N/A");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
-const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+const msgInfo = gettext("Add one or more filters.");
+const msgNoFields = gettext("The layer has no fields.");
+
+const EmptyValue = ({ text }) => (
+    <Empty
+        image={false}
+        description={<Text type="secondary" strong>{text}</Text>}
+    />
+);
 
 const msgEq = gettext("Equal")
 const msgInArray = gettext("Array")
@@ -92,7 +106,7 @@ const ARRAY_OP = ["in", "notin"];
 
 const type_comp = (value, props) => {
     const inputComp = {
-        STRING: <Input {...props} />,
+        STRING: <TextArea {...props} autoSize={{ minRows: 1, maxRows: 10 }} />,
         REAL: <Input {...props} />,
         INTEGER: <Input {...props} />,
         BIGINT: <Input {...props} />,
@@ -129,7 +143,7 @@ const FilterInput = (props) => {
     }, [isNull]);
 
     const onInputChange = (e) => {
-        const newVal = e.target.value;
+        const newVal = field.item.datatype === "STRING" || NUMBER_TYPE.includes(field.item.datatype) ? e.target.value : e;
 
         if (!("vals" in field.value)) {
             setVals(newVal);
@@ -183,11 +197,10 @@ const FilterInput = (props) => {
     };
 
     useEffect(() => {
-        if (typeof field.value.vals === "string" && field.value.op === "isnull") {
-            setLock(prev => ({ ...prev, [field.item.keyname + ":" + id]: true }))
-        } else {
-            setLock(prev => ({ ...prev, [field.item.keyname + ":" + id]: false }))
-        }
+        setLock(prev => ({
+            ...prev, [field.item.keyname + ":" + id]:
+                typeof field.value.vals === "string" && field.value.op === "isnull" ? true : false
+        }))
     }, [field.value.vals, id])
 
     return (
@@ -464,7 +477,49 @@ export const ComponentFilter = observer((props) => {
 
     const disableLoad = activeFields ? true : false;
 
-    return (<>
+    return (<ConfigProvider
+        theme={{
+            components: {
+                Select: {
+                    optionSelectedBg: "var(--divider-color)",
+                    colorPrimaryHover: "var(--divider-color)",
+                    colorPrimary: "var(--primary)",
+                    controlOutline: "var(--divider-color)",
+                    colorBorder: "var(--divider-color)",
+                    activeBorderColor: "var(--primary)",
+                },
+                Input: {
+                    activeBorderColor: "var(--primary)",
+                    hoverBorderColor: "var(--primary)",
+                    activeShadow: "0 0 0 2px var(--divider-color)",
+                    colorPrimaryHover: "var(--divider-color)",
+                },
+                DatePicker: {
+                    activeBorderColor: "var(--primary)",
+                    hoverBorderColor: "var(--primary)",
+                    activeShadow: "0 0 0 2px var(--divider-color)",
+                    colorPrimaryHover: "var(--divider-color)",
+                },
+                DateTimePicker: {
+                    activeBorderColor: "var(--primary)",
+                    hoverBorderColor: "var(--primary)",
+                    activeShadow: "0 0 0 2px var(--divider-color)",
+                    colorPrimaryHover: "var(--divider-color)",
+                },
+                TimePicker: {
+                    activeBorderColor: "var(--primary)",
+                    hoverBorderColor: "var(--primary)",
+                    activeShadow: "0 0 0 2px var(--divider-color)",
+                    colorPrimaryHover: "var(--divider-color)",
+                },
+                Button: {
+                    colorLink: "var(--text-base)",
+                    colorLinkHover: "var(--primary)",
+                    defaultHoverColor: "var(--primary)",
+                },
+            }
+        }}
+    >
         {fields.length > 0 ?
             <div className="component-filter">
                 <div className="title-field">
@@ -550,7 +605,7 @@ export const ComponentFilter = observer((props) => {
                     <div className="value-loads">
                         {activeId && disableLoad ?
                             <LoadValues lock={lock} setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
-                            emptyValue}
+                            <EmptyValue text={msgInfo} />}
                         {disableLoad &&
                             <div className="load-button">
                                 <div className="button-text">
@@ -563,9 +618,9 @@ export const ComponentFilter = observer((props) => {
                                 </div>
                             </div>}
                         {disableLoad &&
-                            <Checkbox className="ignore-filter" checked={filter} onChange={(e) => {
+                            <span title={msgIgnoreFilter}><Checkbox className="ignore-filter" checked={filter} onChange={(e) => {
                                 setFilter(e.target.checked)
-                            }}>{msgIgnoreFilter}</Checkbox>}
+                            }}>{msgIgnoreFilter}</Checkbox></span>}
                     </div>
                 </div>
                 <div className="control-buttons">
@@ -615,7 +670,7 @@ export const ComponentFilter = observer((props) => {
                     </div>
                 </div>
             </div > :
-            emptyValue
+            <EmptyValue text={msgNoFields} />
         }
-    </>)
+    </ConfigProvider>)
 });
