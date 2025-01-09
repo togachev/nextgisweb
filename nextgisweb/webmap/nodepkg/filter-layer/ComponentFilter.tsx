@@ -106,7 +106,8 @@ const ARRAY_OP = ["in", "notin"];
 
 const type_comp = (value, props) => {
     const inputComp = {
-        STRING: <TextArea {...props} autoSize={{ minRows: 1, maxRows: 10 }} />,
+        STRING: <Input {...props} />,
+        STRING_ARRAY: <TextArea {...props} autoSize={{ minRows: 1, maxRows: 10 }} />,
         REAL: <Input {...props} />,
         INTEGER: <Input {...props} />,
         BIGINT: <Input {...props} />,
@@ -189,7 +190,7 @@ const FilterInput = (props) => {
     }
 
     const inputProps = {
-        style: { width: "100%" },
+        style: { width: "100%", minHeight: 24 },
         size: size,
         placeholder: field.item.display_name,
         onChange: onInputChange,
@@ -207,7 +208,9 @@ const FilterInput = (props) => {
         <div className="item-control" onClick={() => { setActiveId(id); setActiveFields(field.item.keyname); }}>
             {field.value.op !== "isnull" &&
                 <>
-                    {type_comp(typeof field.value.vals === "string" ? "STRING" : field.item.datatype, inputProps)}
+                    {type_comp(typeof field.value.vals === "string" && !ARRAY_OP.includes(field.value.op) ? "STRING" :
+                        ARRAY_OP.includes(field.value.op) ? "STRING_ARRAY" :
+                            field.item.datatype, inputProps)}
                     < div className="button-filter">
                         <Button
                             size={size}

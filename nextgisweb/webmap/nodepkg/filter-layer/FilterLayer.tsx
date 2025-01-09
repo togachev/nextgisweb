@@ -28,15 +28,13 @@ const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<
 
 const size = "small"
 
-const W = window.innerWidth;
-const H = window.innerHeight;
 const offset = 40;
 const width = 600;
 const height = 400;
 const padding = 16;
 
 const params = (pos) => {
-    const posX = pos ? pos.x : W / 2 - width / 2;
+    const posX = pos ? pos.x : window.innerWidth / 2 - width / 2;
     const posY = pos ? pos.y : padding + offset;
 
     const width_calc = pos ? pos.width : width;
@@ -63,23 +61,19 @@ export const FilterLayer = observer(
             (e) => { setActivePanel(e.detail); }
         );
 
+        const [styleOp, setStyleOp] = useState({ minWidth: width, minHeight: height, collapse: false })
+
         const [store] = useState(
             () => new FilterLayerStore({
                 visible: visible,
                 activePanel: display.panelsManager._activePanelKey && true,
                 valueRnd: params(false),
-                styleOp: {
-                    minWidth: width,
-                    minHeight: height,
-                    collapse: false,
-                }
             }));
 
         const {
             activeKey, setActiveKey,
             activePanel, setActivePanel,
             removeTab,
-            styleOp, setStyleOp,
             valueRnd, setValueRnd,
         } = store;
 
@@ -105,8 +99,8 @@ export const FilterLayer = observer(
         const openInFull = () => {
             setValueRnd(prev => ({
                 ...prev,
-                width: W - offset - padding * 2,
-                height: H - offset - padding * 2,
+                width: window.innerWidth - offset - padding * 2,
+                height: window.innerHeight - offset - padding * 2,
                 x: activePanel ? offset + padding : offset + padding,
                 y: offset + padding
             }));
