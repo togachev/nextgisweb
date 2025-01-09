@@ -464,7 +464,7 @@ export const ComponentFilter = observer((props) => {
 
     const disableLoad = activeFields ? true : false;
 
-    return (<div className="ngw-filter-layer">
+    return (<>
         {fields.length > 0 ?
             <div className="component-filter">
                 <div className="title-field">
@@ -617,5 +617,5 @@ export const ComponentFilter = observer((props) => {
             </div > :
             emptyValue
         }
-    </div >)
+    </>)
 });
