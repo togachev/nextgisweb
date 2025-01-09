@@ -261,7 +261,9 @@ export class IdentifyModule extends Component {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
                 styles: styles,
+                qParam: this.display.webmapStore.qParam ? this.display.webmapStore.qParam : {},
             }
+            
         }
 
         if (op === "popup" && p && p.value.attribute === true) {
@@ -283,6 +285,7 @@ export class IdentifyModule extends Component {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
                 styles: p.value.params,
+                qParam: this.display.webmapStore.qParam ? this.display.webmapStore.qParam : {},
             }
         }
 

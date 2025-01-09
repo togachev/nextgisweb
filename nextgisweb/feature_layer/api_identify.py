@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from msgspec import Struct
 
@@ -10,6 +10,7 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
+from .api import filter_feature_op
 
 
 class IdentifyBody(Struct, kw_only=True):
@@ -21,6 +22,7 @@ class IdentifyModuleBody(Struct, kw_only=True):
     geom: str
     srs: int
     styles: List[object]
+    qParam: Dict[int, Dict[str,str]]
 
 def identify(request, *, body: IdentifyBody) -> JSONType:
 
@@ -94,6 +96,13 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
         if hasattr(layer, "feature_query"):
             if not layer.has_permission(DataScope.read, request.user):
                 query = layer.feature_query()
+                d = dict()
+                for k,v in body.qParam.items():
+                    if k == style.id:
+                        for e,r in v.items():
+                            d[e] = r
+                filter_feature_op(query, d, None)
+
                 query.intersects(geom)
                 query.limit(100)
                 for f in query():
@@ -113,9 +122,15 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                 options.append(dict(value="Not implemented"))
             else:
                 query = layer.feature_query()
+                d = dict()
+                for k,v in body.qParam.items():
+                    if k == style.id:
+                        for e,r in v.items():
+                            d[e] = r
+                filter_feature_op(query, d, None)
+
                 query.intersects(geom)
                 query.limit(100)
-
                 for f in query():
                     options.append(
                         dict(

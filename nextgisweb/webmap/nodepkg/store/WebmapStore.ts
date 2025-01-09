@@ -12,6 +12,7 @@ import type {
 import type { TreeItem } from "../type/TreeItems";
 
 type LegendSymbols = { [layerId: number]: { [symbolIndex: number]: boolean } };
+type SetValue<T> = ((prevValue: T) => T) | T;
 
 export class WebmapStore {
     _webmapItems: StoreItem[] = [];
@@ -21,6 +22,8 @@ export class WebmapStore {
     _itemStore: CustomItemFileWriteStore;
     _layers: Record<number, WebmapLayer> = {};
     _legendSymbols: LegendSymbols = {};
+
+    qParam: object = {};
 
     constructor({
         itemStore,
@@ -320,4 +323,22 @@ export class WebmapStore {
             layer.set("opacity", opacity);
         }
     };
+
+    setQParam = (qParam: SetValue<object>) => {
+        this.setValue("qParam", qParam);
+    };
+
+    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
+        const isUpdaterFunction = (
+            input: unknown
+        ): input is (prevValue: T) => T => {
+            return typeof input === "function";
+        };
+
+        const newValue = isUpdaterFunction(valueOrUpdater)
+            ? valueOrUpdater(this[property] as T)
+            : valueOrUpdater;
+
+        Object.assign(this, { [property]: newValue });
+    }
 }

@@ -404,6 +404,7 @@ export const ComponentFilter = observer((props) => {
 
     useEffect(() => {
         renderFilter();
+        queryParams?.fld_field_op && display.webmapStore.setQParam(prev => ({ ...prev, [styleId]: queryParams.fld_field_op }));
     }, [queryParams]);
 
     const onFinish = (values) => {
@@ -416,6 +417,7 @@ export const ComponentFilter = observer((props) => {
                 Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
                     if (!v.value?.vals) {
                         setQueryParams(null)
+                        display.webmapStore.setQParam(null);
                         return
                     };
 
@@ -424,7 +426,7 @@ export const ComponentFilter = observer((props) => {
                     const val = typeof v.value.vals === "string" ? v.value.vals : formatNgwAttribute(v.item.datatype, v.value.vals);
 
                     Object.assign(obj, {
-                        [styleId.toString() + k + ":" + "fld_" + value.keyname + op]: string_op + val + string_op
+                        [styleId.toString() + ":" + k + ":" + "fld_" + value.keyname + op]: string_op + val + string_op
                     });
                 });
             }
@@ -475,7 +477,7 @@ export const ComponentFilter = observer((props) => {
         getEntries(inputField).map(([_, value]) => {
             Object.assign(obj, value)
         });
-        Object.keys(obj).length === 0 && (setQueryParams(null), setFilter(false))
+        Object.keys(obj).length === 0 && (display.webmapStore.setQParam(null), setQueryParams(null), setFilter(false))
     }, [inputField]);
 
     const disableLoad = activeFields ? true : false;
@@ -645,6 +647,7 @@ export const ComponentFilter = observer((props) => {
                         </Button>
                         <Button type="text" size={size} onClick={() => {
                             setQueryParams(null);
+                            display.webmapStore.setQParam(null);
                             refreshLayer(item.key);
                             setData([]);
                             setActiveFields(undefined);
@@ -655,6 +658,7 @@ export const ComponentFilter = observer((props) => {
                         </Button>
                         <Button type="text" size={size} onClick={() => {
                             setQueryParams(null);
+                            display.webmapStore.setQParam(null);
                             topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
                             removeTab(activeKey)
                             topics.publish("removeTabFilter", activeKey);

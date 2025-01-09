@@ -367,8 +367,8 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
 def filter_feature_op(query, params, keynames):
     filter_ = []
     for param, value in params.items():
-        if re.match("\d+:", param):
-            param = re.sub(r"\d+:", "", param)
+        if re.match("\d+:\d+:", param):
+            param = re.sub(r"\d+:\d+:", "", param)
         if param.startswith("fld_"):
             fld_expr = re.sub("^fld_", "", param)
         elif param == "id" or param.startswith("id__"):
