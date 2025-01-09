@@ -17,11 +17,14 @@ import FilterAltOffIcon from "@nextgisweb/icon/material/filter_alt_off";
 import Minimize from "@nextgisweb/icon/material/minimize";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full/outline";
 
+import "./FilterLayer.less";
+
 import type { ParamOf } from "@nextgisweb/gui/type";
 
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 
-import "./FilterLayer.less";
+type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
+const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 const size = "small"
 
@@ -260,8 +263,9 @@ export const FilterLayer = observer(
                                 if (action === "remove") {
                                     topics.publish("removeTabFilter", String(targetKey));
                                     removeTab(String(targetKey));
-                                    refreshLayer(item.key);
-                                    topics.publish("query.params_" + item.styleId, { queryParams: null, nd: "204" })
+                                    topics.publish("query.params_" + targetKey, { queryParams: null, nd: "204" });
+                                    const key = getEntries(display.map.layers).find(([_, value]) => String(value?.itemConfig?.styleId) === targetKey)?.[0];
+                                    refreshLayer(key);
                                 }
                             }}
                             parentHeight
