@@ -318,7 +318,7 @@ const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, d
                                             ...prev, [_item.keyname]: {
                                                 ...prev[_item.keyname], [activeId]: {
                                                     item: _item, value: {
-                                                        op: prev[_item.keyname][activeId].value.op, vals: String(_value.vals)?.concat(',', String(val))
+                                                        op: prev[_item.keyname][activeId].value.op, vals: String(_value.vals)?.concat(",", String(val))
                                                     }
                                                 }
                                             }
@@ -358,7 +358,7 @@ const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, d
 }
 
 export const ComponentFilter = observer((props) => {
-    const { display, item, fields, refreshLayer, store } = props;
+    const { delQParams, display, item, fields, refreshLayer, store } = props;
     const { activeKey, visible, removeTab } = store;
     const { layerId, styleId } = item;
     const defaultInputField = fields.reduce((a, v) => ({ ...a, [v.keyname]: {} }), {});
@@ -404,7 +404,6 @@ export const ComponentFilter = observer((props) => {
 
     useEffect(() => {
         renderFilter();
-        queryParams?.fld_field_op && display.webmapStore.setQParam(prev => ({ ...prev, [styleId]: queryParams.fld_field_op }));
     }, [queryParams]);
 
     const onFinish = (values) => {
@@ -416,9 +415,9 @@ export const ComponentFilter = observer((props) => {
                 const field = values[value.keyname];
                 Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
                     if (!v.value?.vals) {
-                        setQueryParams(null)
-                        display.webmapStore.setQParam(null);
-                        return
+                        setQueryParams(null);
+                        delQParams(styleId);
+                        return;
                     };
 
                     const op = v.value?.vals ? "__" + v.value.op : "";
@@ -431,6 +430,11 @@ export const ComponentFilter = observer((props) => {
                 });
             }
         });
+
+        Object.keys(obj).length > 0 && display.webmapStore.setQParam(prev => ({
+            ...prev,
+            [styleId]: obj
+        }));
 
         Object.keys(obj).length > 0 && setQueryParams((prev) => ({
             ...prev,
@@ -477,7 +481,11 @@ export const ComponentFilter = observer((props) => {
         getEntries(inputField).map(([_, value]) => {
             Object.assign(obj, value)
         });
-        Object.keys(obj).length === 0 && (display.webmapStore.setQParam(null), setQueryParams(null), setFilter(false))
+        Object.keys(obj).length === 0 && (
+            delQParams(styleId),
+            setQueryParams(null),
+            setFilter(false)
+        );
     }, [inputField]);
 
     const disableLoad = activeFields ? true : false;
@@ -647,7 +655,7 @@ export const ComponentFilter = observer((props) => {
                         </Button>
                         <Button type="text" size={size} onClick={() => {
                             setQueryParams(null);
-                            display.webmapStore.setQParam(null);
+                            delQParams(styleId);
                             refreshLayer(item.key);
                             setData([]);
                             setActiveFields(undefined);
@@ -658,7 +666,7 @@ export const ComponentFilter = observer((props) => {
                         </Button>
                         <Button type="text" size={size} onClick={() => {
                             setQueryParams(null);
-                            display.webmapStore.setQParam(null);
+                            delQParams(styleId);
                             topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
                             removeTab(activeKey)
                             topics.publish("removeTabFilter", activeKey);

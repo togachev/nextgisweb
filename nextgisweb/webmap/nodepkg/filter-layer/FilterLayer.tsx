@@ -114,6 +114,14 @@ export const FilterLayer = observer(
             display.map.layers[key].olSource.refresh();
         }
 
+        const delQParams = (key) => {
+            display.webmapStore.setQParam((prev) => {
+                const qP = { ...prev };
+                delete qP[key];
+                return qP;
+            })
+        }
+
         const removeAllFilter = () => {
             setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
             setStyleOp(prev => ({
@@ -127,7 +135,8 @@ export const FilterLayer = observer(
                 refreshLayer(i.ikey);
                 removeTab(String(i.key));
                 topics.publish("removeTabFilter", String(i.key));
-                topics.publish("query.params_" + i.styleId, { queryParams: null, nd: "204" })
+                topics.publish("query.params_" + i.styleId, { queryParams: null, nd: "204" });
+                delQParams(i.styleId)
             })
         };
 
@@ -199,10 +208,12 @@ export const FilterLayer = observer(
                         label: item.label,
                         layerId: item.layerId,
                         styleId: item.styleId,
-                        children: <ComponentFilter refreshLayer={refreshLayer} display={display} item={item} fields={fields} store={store} />
+                        children: <ComponentFilter delQParams={delQParams} refreshLayer={refreshLayer} display={display} item={item} fields={fields} store={store} />
                     })
                 });
         }, [loads]);
+
+
 
         return (
             createPortal(
@@ -255,6 +266,7 @@ export const FilterLayer = observer(
                                     topics.publish("removeTabFilter", String(targetKey));
                                     removeTab(String(targetKey));
                                     topics.publish("query.params_" + targetKey, { queryParams: null, nd: "204" });
+                                    delQParams(targetKey)
                                     const key = getEntries(display.map.layers).find(([_, value]) => String(value?.itemConfig?.styleId) === targetKey)?.[0];
                                     refreshLayer(key);
                                 }

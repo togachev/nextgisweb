@@ -705,16 +705,25 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     "lt",
                     "like",
                     "ilike",
+                    "in",
+                    "notin",
                 )
                 if o not in supported_operators:
                     raise ValueError(
                         "Invalid operator '%s'. Only %r are supported." % (o, supported_operators)
                     )
 
+                if v and o in ["in", "notin"]:
+                    v = v.split(",")
+
                 if o == "like":
                     o = "like_op"
                 elif o == "ilike":
                     o = "ilike_op"
+                elif o == "in":
+                    o = "in_op"
+                elif o == "notin":
+                    o = "notin_op"
                 elif o == "isnull":
                     if v == "yes":
                         o = "is_"
