@@ -211,7 +211,7 @@ const FilterInput = (props) => {
                     {type_comp(typeof field.value.vals === "string" && !ARRAY_OP.includes(field.value.op) ? "STRING" :
                         ARRAY_OP.includes(field.value.op) ? "STRING_ARRAY" :
                             field.item.datatype, inputProps)}
-                    < div className="button-filter">
+                    <div className="button-filter">
                         <Button
                             size={size}
                             type="text"
@@ -374,6 +374,7 @@ export const ComponentFilter = observer((props) => {
     const [filter, setFilter] = useState(false);
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
     const [lock, setLock] = useState();
+    const [start, setStart] = useState(false);
 
     const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", { id: layerId });
 
@@ -450,22 +451,6 @@ export const ComponentFilter = observer((props) => {
         refreshLayer(item.key);
     }
 
-    const click = async () => {
-        if (!queryParams?.fld_field_op) {
-            const resp = await extent.get<NgwExtent>({
-                query: queryParams || undefined,
-                cache: true,
-            });
-            onZoomToFiltered(resp);
-        } else {
-            const resp = await extent.get<NgwExtent>({
-                query: queryParams?.fld_field_op || undefined,
-                cache: true,
-            });
-            onZoomToFiltered(resp);
-        }
-    };
-
     useEffect(() => {
         if (loadValue.load && activeFields) {
             getFeature(layerId, loadValue, queryParams, activeFields, filter)
@@ -489,6 +474,32 @@ export const ComponentFilter = observer((props) => {
     }, [inputField]);
 
     const disableLoad = activeFields ? true : false;
+
+    const click = async () => {
+        if (!queryParams?.fld_field_op) {
+            const resp = await extent.get<NgwExtent>({
+                query: queryParams || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);
+        } else {
+            const resp = await extent.get<NgwExtent>({
+                query: queryParams?.fld_field_op || undefined,
+                cache: true,
+            });
+            onZoomToFiltered(resp);
+        }
+    };
+
+    const apply = (zoom) => {
+        onFinish(inputField);
+        setloadValue({ load: true, limit: 25, distinct: activeFields });
+        zoom && setStart(zoom)
+    }
+
+    useEffect(() => {
+        start && (click(), setStart(false))
+    }, [start]);
 
     return (<ConfigProvider
         theme={{
@@ -543,40 +554,56 @@ export const ComponentFilter = observer((props) => {
                     <div className="field-content">
                         <div className="field-items">
                             {fields.map((item) => {
+                                const vals = getEntries(inputField[item.keyname]).find(([key, _]) => String(key) === activeId)?.[1].value.vals;
+
                                 return (
                                     <span className="item-field" key={item.id}>
                                         <Card
                                             className="card-block"
-                                            extra={<Button type="text"
-                                                icon={<FilterPlusIcon />}
-                                                title={msgAddFilterField}
-                                                size={size}
-                                                onClick={() => {
-                                                    const op = item.datatype === "STRING" ? "ilike" : "eq"
-                                                    setActiveFields(item.keyname);
-                                                    setInputField(prev => {
-                                                        const length = Object.keys(prev[item.keyname]).length;
-                                                        if (length > 0) {
-                                                            const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
-                                                            return ({
-                                                                ...prev, [item.keyname]: {
-                                                                    ...prev[item.keyname], [Math.max(...keys) + 1]: {
-                                                                        item: item, value: { vals: "", op: op }
+                                            extra={[
+                                                vals &&
+                                                <Button
+                                                    key="zoom-filtered"
+                                                    type="text"
+                                                    size={size}
+                                                    title={msgZoomToFiltered}
+                                                    icon={<ZoomInMap />}
+                                                    onClick={() => { apply(true) }}
+                                                    loading={isLoading}
+                                                />,
+                                                <Button
+                                                    key="add-filter"
+                                                    type="text"
+                                                    icon={<FilterPlusIcon />}
+                                                    title={msgAddFilterField}
+                                                    size={size}
+                                                    onClick={() => {
+                                                        const op = item.datatype === "STRING" ? "ilike" : "eq"
+                                                        setActiveFields(item.keyname);
+                                                        setInputField(prev => {
+                                                            const length = Object.keys(prev[item.keyname]).length;
+                                                            if (length > 0) {
+                                                                const keys = Object.keys(prev[item.keyname]).map(i => Number(i))
+                                                                return ({
+                                                                    ...prev, [item.keyname]: {
+                                                                        ...prev[item.keyname], [Math.max(...keys) + 1]: {
+                                                                            item: item, value: { vals: "", op: op }
+                                                                        }
                                                                     }
-                                                                }
-                                                            });
-                                                        } else {
+                                                                });
+                                                            } else {
 
-                                                            return ({
-                                                                ...prev, [item.keyname]: {
-                                                                    1: { item: item, value: { vals: "", op: op } }
-                                                                }
-                                                            });
-                                                        }
-                                                    })
-                                                    setloadValue({ load: true, limit: 25, distinct: item.keyname });
-                                                }}
-                                            />}
+                                                                return ({
+                                                                    ...prev, [item.keyname]: {
+                                                                        1: { item: item, value: { vals: "", op: op } }
+                                                                    }
+                                                                });
+                                                            }
+                                                        })
+                                                        setloadValue({ load: true, limit: 25, distinct: item.keyname });
+                                                    }}
+                                                />,
+                                            ]}
                                             title={<span title={item.display_name}>{item.display_name}</span>}
                                         >
                                             {getEntries(inputField).map(([key, value]) => {
@@ -637,20 +664,8 @@ export const ComponentFilter = observer((props) => {
                     </div>
                 </div>
                 <div className="control-buttons">
-                    <div className="button-filter">
-                        <Button type="text"
-                            title={msgZoomToFiltered}
-                            icon={<ZoomInMap />}
-                            onClick={click}
-                            size={size}
-                            loading={isLoading}
-                        />
-                    </div>
                     <div className="button-text">
-                        <Button type="text" size={size} onClick={() => {
-                            onFinish(inputField);
-                            setloadValue({ load: true, limit: 25, distinct: activeFields });
-                        }}>
+                        <Button type="text" size={size} onClick={() => { apply(false) }}>
                             {msgApply}
                         </Button>
                         <Button type="text" size={size} onClick={() => {
