@@ -4,6 +4,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
 import { useSource } from "./hook/useSource";
 import { transformExtent } from "ol/proj";
+import Feature from "ol/Feature";
+import WKT from "ol/format/WKT";
 import {
     Button,
     Card,
@@ -24,7 +26,8 @@ import type {
     NgwTime,
 } from "@nextgisweb/feature-layer/type";
 import { formatNgwAttribute, parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
-import { topics } from "@nextgisweb/webmap/identify-module"
+import { topics } from "@nextgisweb/webmap/identify-module";
+import { route } from "@nextgisweb/pyramid/api/route";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import Remove from "@nextgisweb/icon/material/remove";
@@ -33,6 +36,7 @@ import FilterPlusIcon from "@nextgisweb/icon/mdi/filter-plus";
 
 import "./FilterLayer.less";
 
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
@@ -55,6 +59,7 @@ const msgClear = gettext("Clean");
 const msgApply = gettext("Apply");
 const msgNA = gettext("N/A");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
+const msgZoomToFeature = gettext("Zoom to feature");
 
 const msgInfo = gettext("Add one or more filters.");
 const msgNoFields = gettext("The layer has no fields.");
@@ -246,7 +251,28 @@ const FilterInput = (props) => {
     );
 };
 
-const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, data }) => {
+const zoomToFeature = (display, layerId, fid) => {
+    if (fid !== undefined) {
+        route("feature_layer.feature.item", {
+            id: layerId,
+            fid,
+        })
+            .get<FeatureItem>({})
+            .then((feature) => {
+                if (feature.geom !== null) {
+                    const wkt = new WKT();
+                    const geometry = wkt.readGeometry(
+                        feature.geom
+                    );
+                    display.map.zoomToFeature(
+                        new Feature({ geometry })
+                    );
+                }
+            });
+    }
+};
+
+const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputField, activeFields, data }) => {
     const [value, setValue] = useState(undefined);
     const _item = inputField[activeFields][activeId]?.item;
     const _value = inputField[activeFields][activeId]?.value
@@ -291,7 +317,6 @@ const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, d
             return msgNA;
         }
     }
-
     return (
         <div className="load-content">
             <div className="load-search">
@@ -310,7 +335,11 @@ const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, d
                         key={i}
                         title={valDT(item)}
                         onClick={(e) => {
-                            if (!lock[activeFields + ":" + activeId] && e.detail === 2) {
+                            if (
+                                !String(_value.vals).toLowerCase().includes(String(item[activeFields]).toLowerCase()) &&
+                                !lock[activeFields + ":" + activeId]
+                                && e.detail === 2
+                            ) {
                                 const val = parseNgwAttribute(_item.datatype, item[activeFields]);
                                 if (ARRAY_OP.includes(_value.op)) {
                                     if (_value.vals) {
@@ -348,7 +377,19 @@ const LoadValues = ({ lock, activeId, inputField, setInputField, activeFields, d
                             }
                         }}
                     >
-                        <span>{valDT(item)}</span>
+                        {valDT(item)}
+                        <span className="button-filter">
+                            <Button
+                                type="text"
+                                size={size}
+                                title={msgZoomToFeature}
+                                icon={<ZoomInMap />}
+                                onClick={() => {
+                                    console.log(item);
+                                    zoomToFeature(display, layerId, item.key)
+                                }}
+                            />
+                        </span>
                     </div>
                 )
                 )}
@@ -455,7 +496,7 @@ export const ComponentFilter = observer((props) => {
         if (loadValue.load && activeFields) {
             getFeature(layerId, loadValue, queryParams, activeFields, filter)
                 .then(item => {
-                    setData(item.map((i, idx) => ({ ...i, key: String(idx) })))
+                    setData(item.map((i) => ({ ...i.fields, key: String(i.id) })))
                     setloadValue({ load: false })
                 });
         }
@@ -644,7 +685,7 @@ export const ComponentFilter = observer((props) => {
                     </div>
                     <div className="value-loads">
                         {activeId && disableLoad ?
-                            <LoadValues lock={lock} setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
+                            <LoadValues display={display} layerId={layerId} lock={lock} setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
                             <EmptyValue text={msgInfo} />}
                         {disableLoad &&
                             <div className="load-button">

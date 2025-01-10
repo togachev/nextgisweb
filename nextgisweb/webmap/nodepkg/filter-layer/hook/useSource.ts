@@ -26,7 +26,7 @@ export const useSource = () => {
                 cache: true,
                 query: json,
             })
-        return feature.map(item => item.fields);
+        return feature;
     }
 
     return { getFeature, getFields };
