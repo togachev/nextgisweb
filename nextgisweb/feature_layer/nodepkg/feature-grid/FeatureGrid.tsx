@@ -103,15 +103,21 @@ export const FeatureGrid = observer(
                 }
             }
         }, [onSelect, selectedIds]);
+        
+        topics.subscribe("selected_" + id,
+            (e) => {
+                store.setSelectedIds([Number(e?.detail)])
+            }
+        );
 
         topics.subscribe("query.params_" + styleId,
-            async (e) => {
+            (e) => {
                 if (e?.detail?.queryParams?.fld_field_op) {
                     setQueryParams((prev) => ({
                         ...prev,
                         fld_field_op: e?.detail?.queryParams?.fld_field_op,
                     }));
-                } else if(e?.detail?.queryParams === null) {
+                } else if (e?.detail?.queryParams === null) {
                     setQueryParams(null);
                 }
             }

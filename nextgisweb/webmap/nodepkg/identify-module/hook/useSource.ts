@@ -13,10 +13,10 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
-const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
-const msgNA = gettext("N/A");
+export const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 export const valDT = (val, field) => {
+    const msgNA = gettext("N/A");
     if (val) {
         if (field?.datatype === "DATE") {
             const { year, month, day } = val as NgwDate;
@@ -39,7 +39,6 @@ export const valDT = (val, field) => {
 }
 
 export const useSource = () => {
-
     const generateUrl = (display: DojoDisplay, { res, st, pn }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];

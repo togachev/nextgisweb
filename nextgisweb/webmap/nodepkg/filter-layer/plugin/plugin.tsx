@@ -64,13 +64,9 @@ export class FilterControl extends Control {
             </Button>
         );
 
-        topics.subscribe("button_hidden",
-            () => { this.filter_show(); }
-        );
+        topics.subscribe("button_hidden", () => { this.filter_show() });
 
-        topics.subscribe("filter_hidden",
-            () => { this.element.className = "ol-control ol-unselectable show-button"; }
-        );
+        topics.subscribe("filter_hidden", () => { this.element.className = "ol-control ol-unselectable show-button" });
     }
 
     filter_show = () => {

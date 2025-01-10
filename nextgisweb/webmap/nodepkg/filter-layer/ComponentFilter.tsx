@@ -19,14 +19,10 @@ import {
     Input,
     Select,
 } from "@nextgisweb/gui/antd";
-import dayjs from "dayjs";
-import type {
-    NgwDate,
-    NgwDateTime,
-    NgwTime,
-} from "@nextgisweb/feature-layer/type";
+
 import { formatNgwAttribute, parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { topics } from "@nextgisweb/webmap/identify-module";
+import { getEntries, valDT } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { route } from "@nextgisweb/pyramid/api/route";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -38,10 +34,6 @@ import "./FilterLayer.less";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
-
-type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
-const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
-
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -57,19 +49,13 @@ const msgCancel = gettext("Cancel");
 const msgOk = gettext("Ок");
 const msgClear = gettext("Clean");
 const msgApply = gettext("Apply");
-const msgNA = gettext("N/A");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 const msgZoomToFeature = gettext("Zoom to feature");
 
 const msgInfo = gettext("Add one or more filters.");
 const msgNoFields = gettext("The layer has no fields.");
 
-const EmptyValue = ({ text }) => (
-    <Empty
-        image={false}
-        description={<Text type="secondary" strong>{text}</Text>}
-    />
-);
+const EmptyValue = ({ text }) => (<Empty image={false} description={<Text type="secondary" strong>{text}</Text>} />);
 
 const msgEq = gettext("Equal")
 const msgInArray = gettext("Array")
@@ -135,9 +121,7 @@ const FilterInput = (props) => {
     const [isNullValue, setIsNullValue] = useState<OperatorsIsNull>("yes");
     const [isNull, setIsNull] = useState(false);
 
-    useEffect(() => {
-        setActiveId(id);
-    }, []);
+    useEffect(() => { setActiveId(id) }, []);
 
     useEffect(() => {
         if (isNull === true) {
@@ -150,10 +134,7 @@ const FilterInput = (props) => {
 
     const onInputChange = (e) => {
         const newVal = field.item.datatype === "STRING" || NUMBER_TYPE.includes(field.item.datatype) ? e.target.value : e;
-
-        if (!("vals" in field.value)) {
-            setVals(newVal);
-        }
+        if (!("vals" in field.value)) { setVals(newVal) };
 
         triggerChange({ vals: newVal });
     };
@@ -170,11 +151,9 @@ const FilterInput = (props) => {
     };
 
     const onOperatorsChange = (newVal: Operators) => {
-        if (!("op" in field.value)) {
-            setOp(newVal);
-        }
-
         newVal === "isnull" ? setIsNull(true) : setIsNull(false);
+        if (!("op" in field.value)) { setOp(newVal) };
+
         triggerChange({ op: newVal });
     };
 
@@ -253,22 +232,13 @@ const FilterInput = (props) => {
 
 const zoomToFeature = (display, layerId, fid) => {
     if (fid !== undefined) {
-        route("feature_layer.feature.item", {
-            id: layerId,
-            fid,
-        })
+        route("feature_layer.feature.item", { id: layerId, fid })
             .get<FeatureItem>({})
             .then((feature) => {
                 if (feature.geom !== null) {
                     const wkt = new WKT();
-                    const geometry = wkt.readGeometry(
-                        feature.geom
-                    );
-                    display.map.zoomToFeature(
-                        new Feature({ geometry })
-                    );
-                    display.featureHighlighter
-                        .highlightFeatureById(fid, layerId)
+                    const geometry = wkt.readGeometry(feature.geom);
+                    display.map.zoomToFeature(new Feature({ geometry }));
                 }
             });
     }
@@ -284,7 +254,7 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
         }
         if (DATE_TYPE.includes(_item.datatype)) {
             return data.filter((item) => {
-                if (valDT(item).toLowerCase().includes(value.toLowerCase())) {
+                if (valDT(item[activeFields], _item).toLowerCase().includes(value.toLowerCase())) {
                     return item;
                 }
             })
@@ -297,28 +267,6 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
         }
     };
 
-    const valDT = (item) => {
-        let val = item[activeFields];
-        if (val) {
-            if (_item?.datatype === "DATE") {
-                const { year, month, day } = val as NgwDate;
-                const dt = new Date(year, month - 1, day);
-                val = dayjs(dt).format("YYYY-MM-DD");
-            } else if (val && _item?.datatype === "TIME") {
-                const { hour, minute, second } = val as NgwTime;
-                const dt = new Date(0, 0, 0, hour, minute, second);
-                val = dayjs(dt).format("HH:mm:ss");
-            } else if (val && _item?.datatype === "DATETIME") {
-                const { year, month, day, hour, minute, second } = val as NgwDateTime;
-                const dt = new Date(year, month - 1, day, hour, minute, second);
-                val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
-            }
-            return val;
-        }
-        else if (val === null || val === "" || val === undefined) {
-            return msgNA;
-        }
-    }
     return (
         <div className="load-content">
             <div className="load-search">
@@ -335,7 +283,12 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
                     <div
                         className={!lock[activeFields + ":" + activeId] ? "item-load" : "item-disable-load"}
                         key={i}
-                        title={valDT(item)}
+                        title={valDT(item[activeFields], _item)}
+                        onMouseDown={(e) => {
+                            if (e.detail > 1) {
+                                e.preventDefault();
+                            }
+                        }}
                         onClick={(e) => {
                             if (
                                 !String(_value.vals).toLowerCase().includes(String(item[activeFields]).toLowerCase()) &&
@@ -379,7 +332,7 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
                             }
                         }}
                     >
-                        {valDT(item)}
+                        {valDT(item[activeFields], _item)}
                         <span className="button-filter">
                             <Button
                                 type="text"
@@ -387,7 +340,10 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
                                 title={msgZoomToFeature}
                                 icon={<ZoomInMap />}
                                 onClick={() => {
-                                    zoomToFeature(display, layerId, item.key)
+                                    zoomToFeature(display, layerId, item.key);
+                                    topics.publish("selected_" + layerId, item.key);
+                                    display.featureHighlighter
+                                        .highlightFeatureById(item.key, layerId)
                                 }}
                             />
                         </span>
@@ -597,7 +553,6 @@ export const ComponentFilter = observer((props) => {
                         <div className="field-items">
                             {fields.map((item) => {
                                 const vals = getEntries(inputField[item.keyname]).find(([key, _]) => String(key) === activeId)?.[1].value.vals;
-
                                 return (
                                     <span className="item-field" key={item.id}>
                                         <Card
@@ -634,7 +589,6 @@ export const ComponentFilter = observer((props) => {
                                                                     }
                                                                 });
                                                             } else {
-
                                                                 return ({
                                                                     ...prev, [item.keyname]: {
                                                                         1: { item: item, value: { vals: "", op: op } }

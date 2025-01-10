@@ -6,6 +6,7 @@ import { Button, Tabs } from "@nextgisweb/gui/antd";
 import { Rnd } from "react-rnd";
 import { topics } from "@nextgisweb/webmap/identify-module"
 import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
+import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { useSource } from "./hook/useSource";
 
 import { FilterLayerStore } from "./FilterLayerStore";
@@ -22,9 +23,6 @@ import "./FilterLayer.less";
 import type { ParamOf } from "@nextgisweb/gui/type";
 
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
-
-type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
-const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 const size = "small"
 
@@ -57,9 +55,7 @@ export const FilterLayer = observer(
 
         const { getFields } = useSource();
 
-        topics.subscribe("activePanel",
-            (e) => { setActivePanel(e.detail); }
-        );
+        topics.subscribe("activePanel", (e) => { setActivePanel(e.detail) });
 
         const [styleOp, setStyleOp] = useState({ minWidth: width, minHeight: height, collapse: false })
 
@@ -77,9 +73,7 @@ export const FilterLayer = observer(
             valueRnd, setValueRnd,
         } = store;
 
-        topics.subscribe("removeTabFilter",
-            (e) => { removeTab(e.detail); }
-        );
+        topics.subscribe("removeTabFilter", (e) => { removeTab(e.detail) });
 
         const items = useMemo(() => {
             if (store.tabs.length) {
@@ -140,9 +134,7 @@ export const FilterLayer = observer(
             })
         };
 
-        topics.subscribe("filter_show",
-            () => { visible(false); }
-        );
+        topics.subscribe("filter_show", () => { visible(false) });
 
         const expand = (val) => {
             visible(false);
@@ -212,8 +204,6 @@ export const FilterLayer = observer(
                     })
                 });
         }, [loads]);
-
-
 
         return (
             createPortal(
