@@ -385,7 +385,6 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
                                 title={msgZoomToFeature}
                                 icon={<ZoomInMap />}
                                 onClick={() => {
-                                    console.log(item);
                                     zoomToFeature(display, layerId, item.key)
                                 }}
                             />
