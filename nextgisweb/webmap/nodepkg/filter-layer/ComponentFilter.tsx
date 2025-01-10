@@ -267,6 +267,8 @@ const zoomToFeature = (display, layerId, fid) => {
                     display.map.zoomToFeature(
                         new Feature({ geometry })
                     );
+                    display.featureHighlighter
+                        .highlightFeatureById(fid, layerId)
                 }
             });
     }

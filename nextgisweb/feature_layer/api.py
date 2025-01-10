@@ -569,10 +569,10 @@ def count(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
-    d = dict()
-    for k,v in dict(request.GET).items():
-        d[k] = v
-    filter_feature_op(query, d, None)
+    # d = dict()
+    # for k,v in dict(request.GET).items():
+    #     d[k] = v
+    # filter_feature_op(query, d, None)
     total_count = query().total_count
 
     return dict(total_count=total_count)

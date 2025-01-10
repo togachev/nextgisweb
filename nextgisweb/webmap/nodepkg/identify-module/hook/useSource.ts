@@ -3,6 +3,40 @@ import lookupTableCached from "ngw-lookup-table/cached";
 import type { StoreItem } from "@nextgisweb/webmap/type";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { DataProps } from "./type";
+import dayjs from "dayjs";
+import type {
+    NgwDate,
+    NgwDateTime,
+    NgwTime,
+} from "@nextgisweb/feature-layer/type";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
+
+const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+const msgNA = gettext("N/A");
+
+export const valDT = (val, field) => {
+    if (val) {
+        if (field?.datatype === "DATE") {
+            const { year, month, day } = val as NgwDate;
+            const dt = new Date(year, month - 1, day);
+            val = dayjs(dt).format("YYYY-MM-DD");
+        } else if (val && field?.datatype === "TIME") {
+            const { hour, minute, second } = val as NgwTime;
+            const dt = new Date(0, 0, 0, hour, minute, second);
+            val = dayjs(dt).format("HH:mm:ss");
+        } else if (val && field?.datatype === "DATETIME") {
+            const { year, month, day, hour, minute, second } = val as NgwDateTime;
+            const dt = new Date(year, month - 1, day, hour, minute, second);
+            val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
+        }
+        return val;
+    }
+    else if (val === null || val === "" || val === undefined) {
+        return msgNA;
+    }
+}
 
 export const useSource = () => {
 
@@ -23,7 +57,7 @@ export const useSource = () => {
 
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
         const result = [...new Set(st?.map(a => a.styleId))];
-        
+
         const panel = display.panelsManager._activePanelKey;
         const obj = res !== null ?
             { attribute: true, lon, lat, zoom, styles: styles, panel, st: result, slf: selected, pn: pn, base: display._baseLayer.name } :
@@ -43,16 +77,11 @@ export const useSource = () => {
 
     const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
-        const query = {
-            dt_format: "iso",
-        };
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: res.layerId,
             fid: res.id,
         })
-            .get({
-                query,
-            })
+            .get()
             .then(item => {
                 return item;
             }) :
@@ -70,14 +99,13 @@ export const useSource = () => {
             .then(data => {
                 const deferreds: string[] = [];
                 const fieldmap = {};
-
                 data.feature_layer.fields.map(itm => {
                     if (itm.grid_visibility) {
                         fieldmap[itm.keyname] = itm;
                     } else {
                         delete feature.fields[itm.keyname]
                     }
-                    
+
                     if (itm.lookup_table !== null) {
                         deferreds.push(
                             lookupTableCached.load(
@@ -89,7 +117,6 @@ export const useSource = () => {
 
                 return Promise.all(deferreds).then(
                     () => {
-                        const value = feature.fields;
                         const rename = (renameKeys, currentObject) => {
                             return Object.keys(currentObject).reduce(
                                 (acc, key) => ({
@@ -99,23 +126,27 @@ export const useSource = () => {
                                 {}
                             );
                         };
+
                         const renameKeys = {};
-                        for (const k in value) {
-                            const val = value[k];
-                            const field = fieldmap[k];
+                        const values = {};
+
+                        getEntries(feature.fields).map(([key, val]) => {
+                            const field = fieldmap[key];
+                            let value = valDT(val, field);
 
                             if (field.lookup_table !== null) {
                                 const lval = lookupTableCached.lookup(
                                     field.lookup_table.id,
                                     val
                                 );
-                                if (lval !== null) {
-                                    value[k] = lval;
-                                }
+                                value = lval !== null && lval
                             }
-                            Object.assign(renameKeys, { [k]: fieldmap[k].display_name })
-                        }
-                        const updateName = rename(renameKeys, value)
+                            Object.assign(values, { [key]: value })
+                            Object.assign(renameKeys, { [key]: field.display_name })
+                        })
+
+                        const updateName = rename(renameKeys, values);
+
                         return { updateName, feature, resourceId };
                     }
                 );
