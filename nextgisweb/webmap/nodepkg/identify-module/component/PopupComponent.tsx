@@ -23,6 +23,8 @@ import type { WebmapItem } from "@nextgisweb/webmap/type";
 import type { DataProps, Params } from "./type";
 import topic from "dojo/topic";
 import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
+import * as fflate from 'fflate';
+import * as pako from 'pako';
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
 
@@ -124,11 +126,16 @@ export default observer(
                 setExtensions(res.feature.extensions);
                 setAttribute(res.updateName);
 
+                let compressedData = Uint8Array.from(atob(val.highlight_geom), (c) => c.charCodeAt(0));
+                const decompressed = fflate.decompressSync(compressedData);
+                const dec = new TextDecoder();
+                const geomWkt = dec.decode(decompressed);
+                
                 topic.publish("feature.highlight", {
-                    geom: res.feature.geom,
+                    geom: geomWkt,
                     featureId: res.feature.id,
                     layerId: res.resourceId,
-                })
+                });
 
                 LinkToGeometry(res)
                 setContextUrl(generateUrl(display, { res: val, st: response.data, pn: fixPanel }));
@@ -146,7 +153,7 @@ export default observer(
                     setSelected(selectVal);
                     setData(response.data);
                     getContent(selectVal, false);
-                    LinkToGeometry(selectVal)
+                    LinkToGeometry(selectVal);
                 } else {
                     setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
                     setSelected(null);

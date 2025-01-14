@@ -177,7 +177,7 @@ export class IdentifyModule extends Component {
                     return { data: item.data, featureCount: item.featureCount };
                 });
             count = this.response.featureCount;
-            
+
         } else {
             count = 0;
             this.response = { data: [], featureCount: 0 }
@@ -259,11 +259,12 @@ export class IdentifyModule extends Component {
                 })
             request = {
                 srs: this.displaySrid,
+                geom_ext: wkt.writeGeometry(fromExtent(this.display.map.olMap.getView().calculateExtent())),
                 geom: this._requestGeomString(e.pixel),
                 styles: styles,
                 qParam: this.display.webmapStore.qParam ? this.display.webmapStore.qParam : {},
             }
-            
+
         }
 
         if (op === "popup" && p && p.value.attribute === true) {
@@ -284,6 +285,7 @@ export class IdentifyModule extends Component {
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
+                geom_ext: wkt.writeGeometry(fromExtent(this.display.map.olMap.getView().calculateExtent())),
                 styles: p.value.params,
                 qParam: this.display.webmapStore.qParam ? this.display.webmapStore.qParam : {},
             }
@@ -364,7 +366,7 @@ export class IdentifyModule extends Component {
                 }
 
                 const p = { value, coordinate: transformedCoord };
-                
+
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent = {
                     coordinate: p && p.coordinate,

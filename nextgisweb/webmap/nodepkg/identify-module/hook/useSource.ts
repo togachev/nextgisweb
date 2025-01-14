@@ -80,7 +80,12 @@ export const useSource = () => {
             id: res.layerId,
             fid: res.id,
         })
-            .get()
+            .get({
+                cache: true,
+                query: {
+                    geom: "no",
+                },
+            })
             .then(item => {
                 return item;
             }) :

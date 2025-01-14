@@ -1,6 +1,7 @@
 from typing import List, Dict
-
+import zlib
 from msgspec import Struct
+import base64
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid
@@ -11,7 +12,7 @@ from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 from .api import filter_feature_op
-
+from osgeo import ogr
 
 class IdentifyBody(Struct, kw_only=True):
     geom: str
@@ -20,6 +21,7 @@ class IdentifyBody(Struct, kw_only=True):
 
 class IdentifyModuleBody(Struct, kw_only=True):
     geom: str
+    geom_ext: str
     srs: int
     styles: List[object]
     qParam: Dict[int, Dict[str,str]]
@@ -102,7 +104,7 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                         for e,r in v.items():
                             d[e] = r
                 filter_feature_op(query, d, None)
-
+                query.geom()
                 query.intersects(geom)
                 query.limit(100)
                 for f in query():
@@ -116,6 +118,7 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                             label="Forbidden",
                             permission="Forbidden",
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
+                            highlight_geom=base64.b64encode(zlib.compress(str(f.geom.ogr.Intersection(ogr.CreateGeometryFromWkt(body.geom_ext))).encode('utf-8'))).decode("utf-8"),
                         )
                     )
             elif not IFeatureLayer.providedBy(layer):
@@ -128,7 +131,7 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                         for e,r in v.items():
                             d[e] = r
                 filter_feature_op(query, d, None)
-
+                query.geom()
                 query.intersects(geom)
                 query.limit(100)
                 for f in query():
@@ -144,6 +147,7 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                             fields=f.fields,
                             relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None,
+                            highlight_geom=base64.b64encode(zlib.compress(str(f.geom.ogr.Intersection(ogr.CreateGeometryFromWkt(body.geom_ext))).encode('utf-8'), level=-1)).decode("utf-8"),
                         )
                     )
 
