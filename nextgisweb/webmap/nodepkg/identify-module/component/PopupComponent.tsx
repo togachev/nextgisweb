@@ -24,7 +24,7 @@ import type { DataProps, Params } from "./type";
 import topic from "dojo/topic";
 import { useOutsideClick } from "@nextgisweb/webmap/useOutsideClick";
 import * as fflate from 'fflate';
-import * as pako from 'pako';
+
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
 
@@ -52,7 +52,7 @@ export default observer(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
             const { params, visible, display } = props;
             const { op, position, response, selectedValue } = params;
-            const { getAttribute, generateUrl } = useSource();
+            const { getAttribute, generateUrl } = useSource(display);
             const { copyValue, contextHolder } = useCopy();
 
             const refs = useRef(null);
@@ -126,19 +126,19 @@ export default observer(
                 setExtensions(res.feature.extensions);
                 setAttribute(res.updateName);
 
-                let compressedData = Uint8Array.from(atob(val.highlight_geom), (c) => c.charCodeAt(0));
-                const decompressed = fflate.decompressSync(compressedData);
-                const dec = new TextDecoder();
-                const geomWkt = dec.decode(decompressed);
+                // let compressedData = Uint8Array.from(atob(val.highlight_geom), (c) => c.charCodeAt(0));
+                // const decompressed = fflate.decompressSync(compressedData);
+                // const dec = new TextDecoder();
+                // const geomWkt = dec.decode(decompressed);
                 
                 topic.publish("feature.highlight", {
-                    geom: geomWkt,
+                    geom: res.feature.geom,
                     featureId: res.feature.id,
                     layerId: res.resourceId,
                 });
 
                 LinkToGeometry(res)
-                setContextUrl(generateUrl(display, { res: val, st: response.data, pn: fixPanel }));
+                setContextUrl(generateUrl({ res: val, st: response.data, pn: fixPanel }));
 
                 if (key === true) {
                     setUpdate(false);
@@ -155,7 +155,7 @@ export default observer(
                     getContent(selectVal, false);
                     LinkToGeometry(selectVal);
                 } else {
-                    setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
+                    setContextUrl(generateUrl({ res: null, st: null, pn: null }));
                     setSelected(null);
                     setData([]);
                     topic.publish("feature.unhighlight");
@@ -163,7 +163,7 @@ export default observer(
             }, [response]);
 
             useEffect(() => {
-                setContextUrl(generateUrl(display, { res: response.data[0], st: response.data, pn: fixPanel }));
+                setContextUrl(generateUrl({ res: response.data[0], st: response.data, pn: fixPanel }));
             }, [currentUrlParams]);
 
             useEffect(() => {

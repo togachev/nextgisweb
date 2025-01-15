@@ -1,5 +1,6 @@
 import Feature from "ol/Feature";
-import WKT from "ol/format/WKT";
+import { fromExtent } from "ol/geom/Polygon";
+import { WKT } from "ol/format";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
@@ -23,6 +24,7 @@ import type {
 import type { DojoDisplay } from "../type";
 
 const msgGoto = gettext("Go to");
+const wkt = new WKT();
 
 interface WebMapFeatureGridTabProps {
     plugin: Record<string, unknown>;
@@ -89,11 +91,16 @@ export function WebMapFeatureGridTab({
                     store.setSelectedIds(newVal);
                     const fid = newVal[0];
                     if (fid !== undefined) {
+                        const geom_ext = wkt.writeGeometry(fromExtent(display.current.map.olMap.getView().calculateExtent()));
                         route("feature_layer.feature.item", {
                             id: layerId,
                             fid,
                         })
-                            .get<FeatureItem>({})
+                            .get<FeatureItem>({
+                                query: {
+                                    geom_ext: geom_ext,
+                                }
+                            })
                             .then((feature) => {
                                 display.current.featureHighlighter.highlightFeature(
                                     {
@@ -115,7 +122,6 @@ export function WebMapFeatureGridTab({
                         icon: "material-center_focus_weak",
                         disabled: (params) => !params?.selectedIds?.length,
                         action: () => {
-                            const wkt = new WKT();
                             const fid = store.selectedIds[0];
                             if (fid !== undefined) {
                                 route("feature_layer.feature.item", {
@@ -130,6 +136,13 @@ export function WebMapFeatureGridTab({
                                             );
                                             display.current.map.zoomToFeature(
                                                 new Feature({ geometry })
+                                            );
+                                            display.current.featureHighlighter.highlightFeature(
+                                                {
+                                                    geom: feature.geom,
+                                                    featureId: feature.id,
+                                                    layerId,
+                                                }
                                             );
                                         } else {
                                             showMessage(
