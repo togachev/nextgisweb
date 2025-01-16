@@ -247,7 +247,9 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
 
     const [value, setValue] = useState(undefined);
     const _item = inputField[activeFields][activeId]?.item;
-    const _value = inputField[activeFields][activeId]?.value
+    const _value = inputField[activeFields][activeId]?.value;
+    const itemConfig = getEntries(display._layers).find(([_, itm]) => itm.itemConfig.layerId === layerId)?.[1].itemConfig;
+
     const getData = (data, value) => {
         if (!value) {
             return data;
@@ -343,7 +345,9 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
                                 onClick={() => {
                                     zoomToFeature(display, layerId, item.key);
                                     topics.publish("selected_" + layerId, item.key);
-                                    display.featureHighlighter.highlightFeatureById(item.key, layerId)
+                                    if (itemConfig.layerHighligh === true) {
+                                        display.featureHighlighter.highlightFeatureById(item.key, layerId);
+                                    }
                                 }}
                             />
                         </span>

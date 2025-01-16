@@ -172,6 +172,7 @@ class WebMapItem(Base):
     draw_order_position = sa.Column(sa.Integer, nullable=True)
     legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
     file_resource_visible = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
+    layer_highligh = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", True))
 
     parent = orm.relationship(
         "WebMapItem",
@@ -227,6 +228,7 @@ class WebMapItem(Base):
                 legend_symbols=self.legend_symbols,
                 style_parent_id=style_parent_id,
                 file_resource_visible=self.file_resource_visible,
+                layer_highligh=self.layer_highligh,
             )
 
         return data
@@ -265,6 +267,7 @@ class WebMapItem(Base):
                     "layer_adapter",
                     "legend_symbols",
                     "file_resource_visible",
+                    "layer_highligh",
                 ):
                     _set(item, k, True)
 
@@ -327,6 +330,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
     display_name: str
     layer_enabled: bool
     file_resource_visible: bool
+    layer_highligh: bool
     layer_identifiable: bool
     layer_transparency: Union[float, None]
     layer_style_id: int
@@ -347,6 +351,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
             display_name=obj.display_name,
             layer_enabled=bool(obj.layer_enabled),
             file_resource_visible=bool(obj.file_resource_visible),
+            layer_highligh=bool(obj.layer_highligh),
             layer_identifiable=bool(obj.layer_identifiable),
             layer_transparency=obj.layer_transparency,
             layer_style_id=obj.layer_style_id,
@@ -363,6 +368,7 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
     display_name: str
     layer_enabled: bool = False
     file_resource_visible: bool = False
+    layer_highligh: bool = True
     layer_identifiable: bool = True
     layer_transparency: Union[float, None] = None
     layer_style_id: int

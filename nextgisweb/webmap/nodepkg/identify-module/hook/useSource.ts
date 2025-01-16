@@ -76,6 +76,7 @@ export const useSource = (display: DojoDisplay) => {
 
     const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
+        const item = getEntries(display._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
         
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: res.layerId,
@@ -84,7 +85,7 @@ export const useSource = (display: DojoDisplay) => {
             .get({
                 cache: true,
                 query: {
-                    // geom: "no",
+                    geom: item.itemConfig.layerHighligh === true ? true : false
                 },
             })
             .then(item => {
