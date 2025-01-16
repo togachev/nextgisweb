@@ -152,7 +152,7 @@ export default observer(
                     setContextUrl(generateUrl({ res: null, st: null, pn: null }));
                     setSelected(null);
                     setData([]);
-                    // topic.publish("feature.unhighlight");
+                    topic.publish("feature.unhighlight");
                 }
             }, [response]);
 

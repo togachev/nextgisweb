@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
+import { route } from "@nextgisweb/pyramid/api";
 import { useSource } from "./hook/useSource";
 import { transformExtent } from "ol/proj";
 import Feature from "ol/Feature";
@@ -23,7 +23,6 @@ import {
 import { formatNgwAttribute, parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { topics } from "@nextgisweb/webmap/identify-module";
 import { getEntries, valDT } from "@nextgisweb/webmap/identify-module/hook/useSource";
-import { route } from "@nextgisweb/pyramid/api/route";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import Remove from "@nextgisweb/icon/material/remove";
@@ -42,7 +41,6 @@ const msgFields = gettext("Fields");
 const msgValues = gettext("Values");
 const msgSample = gettext("Sample");
 const msgIgnoreFilter = gettext("Ignore filter");
-const msgAll = gettext("All");
 const msgAddFilterField = gettext("Add filter");
 const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
@@ -246,6 +244,7 @@ const zoomToFeature = (display, layerId, fid) => {
 };
 
 const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputField, activeFields, data }) => {
+
     const [value, setValue] = useState(undefined);
     const _item = inputField[activeFields][activeId]?.item;
     const _value = inputField[activeFields][activeId]?.value
@@ -270,6 +269,7 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
 
     return (
         <div className="load-content">
+
             <div className="load-search">
                 <Input
                     allowClear
@@ -399,14 +399,9 @@ export const ComponentFilter = observer((props) => {
             })
     }
 
-    useEffect(() => {
-        renderFilter();
-    }, [queryParams?.fld_field_op]);
+
 
     const onFinish = (values) => {
-        if (values === false) {
-            setQueryParams(null);
-        }
         const keys_ = Object.keys(values || {});
         const obj: object = {};
 
@@ -415,7 +410,7 @@ export const ComponentFilter = observer((props) => {
                 const field = values[value.keyname];
                 Object.keys(field).length > 0 && getEntries(field)?.map(([k, v]) => {
                     if (!v.value?.vals) {
-                        setQueryParams(null);
+                        setQueryParams({ fld_field_op: null });
                         delQParams(styleId);
                         return;
                     };
@@ -467,7 +462,7 @@ export const ComponentFilter = observer((props) => {
         });
         Object.keys(obj).length === 0 && (
             delQParams(styleId),
-            setQueryParams(null),
+            setQueryParams({ fld_field_op: null }),
             setFilter(false)
         );
     }, [inputField]);
@@ -490,19 +485,24 @@ export const ComponentFilter = observer((props) => {
         }
     };
 
+    useEffect(() => {
+        activeFields && renderFilter();
+    }, [queryParams]);
+
     const apply = (value) => {
+        onFinish(inputField);
         if (value === true) {
-            setStart(value);
+            setStart(true);
         } else if (value === false) {
-            onFinish(false);
-        } else {
-            onFinish(inputField);
             setloadValue({ load: true, limit: 25, distinct: activeFields });
         }
     }
 
     useEffect(() => {
-        start && (clickZoomToFiltered(), setStart(false))
+        if (start === true) {
+            clickZoomToFiltered();
+            setStart(false);
+        }
     }, [start]);
 
     return (<ConfigProvider
@@ -666,15 +666,16 @@ export const ComponentFilter = observer((props) => {
                 </div>
                 <div className="control-buttons">
                     <div className="button-text">
-                        <Button disabled={queryParams?.fld_field_op ? false : true} type="text" size={size} onClick={() => { apply(false) }}>
+                        <Button disabled={queryParams?.fld_field_op ? false : true} type="text" size={size} onClick={() => { setQueryParams({ fld_field_op: null }); }}>
                             {msgDisable}
                         </Button>
-                        <Button type="text" size={size} onClick={() => { apply(undefined) }}>
+                        <Button type="text" size={size} onClick={() => { apply(false) }}>
                             {msgApply}
                         </Button>
                         <Button type="text" size={size} onClick={() => {
-                            setQueryParams(null);
+                            setQueryParams({ fld_field_op: null });
                             delQParams(styleId);
+                            topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
                             refreshLayer(item.key);
                             setData([]);
                             setActiveFields(undefined);
@@ -684,7 +685,7 @@ export const ComponentFilter = observer((props) => {
                             {msgClear}
                         </Button>
                         <Button type="text" size={size} onClick={() => {
-                            setQueryParams(null);
+                            setQueryParams({ fld_field_op: null });
                             delQParams(styleId);
                             topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
                             removeTab(activeKey)
