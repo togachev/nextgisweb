@@ -1,5 +1,4 @@
 import Feature from "ol/Feature";
-import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -91,16 +90,11 @@ export function WebMapFeatureGridTab({
                     store.setSelectedIds(newVal);
                     const fid = newVal[0];
                     if (fid !== undefined) {
-                        const geom_ext = wkt.writeGeometry(fromExtent(display.current.map.olMap.getView().calculateExtent()));
                         route("feature_layer.feature.item", {
                             id: layerId,
                             fid,
                         })
-                            .get<FeatureItem>({
-                                query: {
-                                    geom_ext: geom_ext,
-                                }
-                            })
+                            .get<FeatureItem>({})
                             .then((feature) => {
                                 display.current.featureHighlighter.highlightFeature(
                                     {
@@ -136,13 +130,6 @@ export function WebMapFeatureGridTab({
                                             );
                                             display.current.map.zoomToFeature(
                                                 new Feature({ geometry })
-                                            );
-                                            display.current.featureHighlighter.highlightFeature(
-                                                {
-                                                    geom: feature.geom,
-                                                    featureId: feature.id,
-                                                    layerId,
-                                                }
                                             );
                                         } else {
                                             showMessage(
@@ -242,8 +229,7 @@ export function WebMapFeatureGridTab({
     useEffect(() => {
         subscribe();
 
-        const highlightedFeatures =
-            display.current.featureHighlighter.getHighlighted();
+        const highlightedFeatures = display.current.featureHighlighter.getHighlighted();
         const selected: number[] = highlightedFeatures
             .filter((f) => f.getProperties?.()?.layerId === layerId)
             .map((f) => f.getProperties().featureId);

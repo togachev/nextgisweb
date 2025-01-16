@@ -259,7 +259,6 @@ export class IdentifyModule extends Component {
                 })
             request = {
                 srs: this.displaySrid,
-                // geom_ext: wkt.writeGeometry(fromExtent(this.display.map.olMap.getView().calculateExtent())),
                 geom: this._requestGeomString(e.pixel),
                 styles: styles,
                 qParam: this.display.webmapStore.qParam ? this.display.webmapStore.qParam : {},
@@ -285,7 +284,6 @@ export class IdentifyModule extends Component {
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
-                // geom_ext: wkt.writeGeometry(fromExtent(this.display.map.olMap.getView().calculateExtent())),
                 styles: p.value.params,
                 qParam: this.display.webmapStore.qParam ? this.display.webmapStore.qParam : {},
             }

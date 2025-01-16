@@ -11,12 +11,6 @@ import type {
 } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import * as fflate from 'fflate';
-import { fromExtent } from "ol/geom/Polygon";
-import { WKT } from "ol/format";
-
-const wkt = new WKT();
-
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
 export const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
@@ -79,15 +73,9 @@ export const useSource = (display: DojoDisplay) => {
 
         return link;
     };
-    const zip_encode = (str) => {
-        const ascii = encodeURIComponent(str)
-        const array = new TextEncoder().encode(ascii)
-        const zip = fflate.compressSync(array, { level: 9, mem: 12 })
-        return window.btoa(String.fromCharCode(...zip))
-    }
+
     const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
-        const geom_ext = wkt.writeGeometry(fromExtent(display.map.olMap.getView().calculateExtent()));
         
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: res.layerId,
@@ -96,9 +84,7 @@ export const useSource = (display: DojoDisplay) => {
             .get({
                 cache: true,
                 query: {
-                    // geom_ext: geom_ext,
-                    geom_ext: zip_encode(geom_ext),
-                    map_zoom: display.map.position.zoom,
+                    // geom: "no",
                 },
             })
             .then(item => {

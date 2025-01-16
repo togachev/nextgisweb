@@ -1,10 +1,4 @@
 import re
-import gzip
-import base64
-import urllib.parse
-from shapely import wkb, wkt
-from shapely.geometry import Polygon, MultiPolygon 
-from shapely.wkt import loads
 
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -36,8 +30,6 @@ from .interface import (
     IWritableFeatureLayer,
 )
 from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
-
-from osgeo import ogr
 
 FeatureID = Annotated[int, Meta(description="Feature ID")]
 
@@ -133,8 +125,6 @@ class DumperParams(Struct, kw_only=True):
     epoch: Optional[Annotated[int, Meta(gt=0)]] = None
     relation: bool = False
     distinct: Optional[List[str]] = None
-    geom_ext: str = None
-    map_zoom: int = None
 
 
 @dataclass
@@ -237,25 +227,14 @@ class Dumper:
         return result
 
 
-def query_feature_or_not_found(query, resource_id, feature_id, geom_ext, map_zoom):
+def query_feature_or_not_found(query, resource_id, feature_id):
     """Query one feature by id or return FeatureNotFound exception."""
     query.filter_by(id=feature_id)
     query.limit(1)
 
     for feat in query():
-        if geom_ext is not None:
-            # decompress = urllib.parse.unquote(geom_ext).replace(" "," ")
-            decompress = urllib.parse.unquote(gzip.decompress(base64.b64decode(str.encode(geom_ext))).decode("utf-8")).replace(" "," ")
-            feature_geom = feat.geom.shape
-            feature_ext = wkt.loads(decompress)
-            feat.geom = feature_geom.simplify((6/map_zoom)*48).intersection(feature_ext)
-
-            # multi_polygon = loads(feature_geom.simplify((6/map_zoom)*20).intersection(feature_ext).wkt)
-            # multi_polygon = loads(feature_geom.intersection(feature_ext).wkt)
-            # feat.geom  = MultiPolygon(Polygon(geom.exterior) for geom in multi_polygon)
-            # no_holes = MultiPolygon(Polygon(geom.exterior) for geom in multi_polygon.geoms)
-            # raise ValueError((multi_polygon.interiors))
         return feat
+
     raise FeatureNotFound(resource_id, feature_id)
 
 
@@ -287,7 +266,7 @@ def iget(
     request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
-    feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid, dumper_params.geom_ext, dumper_params.map_zoom)
+    feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid)
     return dumper(feature)
 
 def iput(

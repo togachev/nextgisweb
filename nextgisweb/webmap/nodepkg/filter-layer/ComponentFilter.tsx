@@ -342,8 +342,7 @@ const LoadValues = ({ display, layerId, lock, activeId, inputField, setInputFiel
                                 onClick={() => {
                                     zoomToFeature(display, layerId, item.key);
                                     topics.publish("selected_" + layerId, item.key);
-                                    display.featureHighlighter
-                                        .highlightFeatureById(item.key, layerId)
+                                    display.featureHighlighter.highlightFeatureById(item.key, layerId)
                                 }}
                             />
                         </span>
@@ -374,8 +373,6 @@ export const ComponentFilter = observer((props) => {
     const [lock, setLock] = useState();
     const [start, setStart] = useState(false);
 
-    const { route: extent, isLoading } = useRoute("feature_layer.feature.extent", { id: layerId });
-
     const renderFilter = async () => {
         const olMap = display.map.olMap
         const cExt = transformExtent(
@@ -385,7 +382,7 @@ export const ComponentFilter = observer((props) => {
         );
         const cExtent = { maxLon: cExt[2], minLon: cExt[0], maxLat: cExt[3], minLat: cExt[1] };
 
-        await extent.get<NgwExtent>({
+        await route("feature_layer.feature.extent", { id: layerId }).get<NgwExtent>({
             query: queryParams?.fld_field_op || undefined,
             cache: true,
         })
@@ -402,7 +399,8 @@ export const ComponentFilter = observer((props) => {
     }
 
     useEffect(() => {
-        renderFilter();
+        if (queryParams?.fld_field_op)
+            renderFilter();
     }, [queryParams]);
 
     const onFinish = (values) => {
@@ -475,13 +473,13 @@ export const ComponentFilter = observer((props) => {
 
     const click = async () => {
         if (!queryParams?.fld_field_op) {
-            const resp = await extent.get<NgwExtent>({
+            const resp = await route("feature_layer.feature.extent", { id: layerId }).get<NgwExtent>({
                 query: queryParams || undefined,
                 cache: true,
             });
             onZoomToFiltered(resp);
         } else {
-            const resp = await extent.get<NgwExtent>({
+            const resp = await route("feature_layer.feature.extent", { id: layerId }).get<NgwExtent>({
                 query: queryParams?.fld_field_op || undefined,
                 cache: true,
             });
@@ -566,7 +564,6 @@ export const ComponentFilter = observer((props) => {
                                                     title={msgZoomToFiltered}
                                                     icon={<ZoomInMap />}
                                                     onClick={() => { apply(true) }}
-                                                    loading={isLoading}
                                                 />,
                                                 <Button
                                                     key="add-filter"
