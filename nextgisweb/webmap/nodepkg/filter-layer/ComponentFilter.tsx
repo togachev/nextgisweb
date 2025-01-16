@@ -48,6 +48,7 @@ const msgRemoveFilterField = gettext("Remove filter");
 const msgCancel = gettext("Cancel");
 const msgOk = gettext("Ок");
 const msgClear = gettext("Clean");
+const msgDisable = gettext("Disable");
 const msgApply = gettext("Apply");
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 const msgZoomToFeature = gettext("Zoom to feature");
@@ -399,11 +400,13 @@ export const ComponentFilter = observer((props) => {
     }
 
     useEffect(() => {
-        if (queryParams?.fld_field_op)
-            renderFilter();
-    }, [queryParams]);
+        renderFilter();
+    }, [queryParams?.fld_field_op]);
 
     const onFinish = (values) => {
+        if (values === false) {
+            setQueryParams(null);
+        }
         const keys_ = Object.keys(values || {});
         const obj: object = {};
 
@@ -471,7 +474,7 @@ export const ComponentFilter = observer((props) => {
 
     const disableLoad = activeFields ? true : false;
 
-    const click = async () => {
+    const clickZoomToFiltered = async () => {
         if (!queryParams?.fld_field_op) {
             const resp = await route("feature_layer.feature.extent", { id: layerId }).get<NgwExtent>({
                 query: queryParams || undefined,
@@ -487,14 +490,19 @@ export const ComponentFilter = observer((props) => {
         }
     };
 
-    const apply = (zoom) => {
-        onFinish(inputField);
-        setloadValue({ load: true, limit: 25, distinct: activeFields });
-        zoom && setStart(zoom)
+    const apply = (value) => {
+        if (value === true) {
+            setStart(value);
+        } else if (value === false) {
+            onFinish(false);
+        } else {
+            onFinish(inputField);
+            setloadValue({ load: true, limit: 25, distinct: activeFields });
+        }
     }
 
     useEffect(() => {
-        start && (click(), setStart(false))
+        start && (clickZoomToFiltered(), setStart(false))
     }, [start]);
 
     return (<ConfigProvider
@@ -645,9 +653,9 @@ export const ComponentFilter = observer((props) => {
                                     <Button type="text" onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>
                                         {msgSample}
                                     </Button>
-                                    <Button type="text" onClick={() => { setloadValue({ load: true, limit: null, distinct: activeFields }) }} size={size} title={msgAll}>
+                                    {/* <Button type="text" onClick={() => { setloadValue({ load: true, limit: 100, distinct: activeFields }) }} size={size} title={msgAll}>
                                         {msgAll}
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>}
                         {disableLoad &&
@@ -658,7 +666,10 @@ export const ComponentFilter = observer((props) => {
                 </div>
                 <div className="control-buttons">
                     <div className="button-text">
-                        <Button type="text" size={size} onClick={() => { apply(false) }}>
+                        <Button disabled={queryParams?.fld_field_op ? false : true} type="text" size={size} onClick={() => { apply(false) }}>
+                            {msgDisable}
+                        </Button>
+                        <Button type="text" size={size} onClick={() => { apply(undefined) }}>
                             {msgApply}
                         </Button>
                         <Button type="text" size={size} onClick={() => {
