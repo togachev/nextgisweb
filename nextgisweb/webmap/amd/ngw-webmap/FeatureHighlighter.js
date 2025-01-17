@@ -40,7 +40,7 @@ define([
                     color: "rgba(255,255,0,1)",
                 }),
                 fill: new ol.style.Fill({
-                    color: "rgba(255,255,255,0.5)",
+                    color: "rgba(255, 255, 255, 0)",
                 }),
                 image: new ol.style.Circle({
                     stroke: new ol.style.Stroke({
@@ -49,7 +49,7 @@ define([
                     }),
                     radius: settings.identify_radius,
                     fill: new ol.style.Fill({
-                        color: "rgba(255,255,255,0.5)",
+                        color: "rgba(255, 255, 255, 0)",
                     }),
                 }),
             });

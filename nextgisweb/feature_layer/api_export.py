@@ -1,6 +1,7 @@
 import os
 import tempfile
 import zipfile
+import re
 
 from osgeo import gdal
 from pyramid.response import FileResponse
@@ -69,6 +70,7 @@ class ExportOptions:
         "fid_field",
         "use_display_name",
         "ilike",
+        "fld_field_op"
     )
 
     def __init__(
@@ -82,6 +84,7 @@ class ExportOptions:
         ilike=None,
         fields=None,
         fid="",
+        fld_field_op=None,
         display_name="false",
         **params,
     ):
@@ -132,6 +135,10 @@ class ExportOptions:
         self.ilike = ilike
 
         self.fields = fields.split(",") if fields is not None else None
+
+        # options to filter function returns using the operation operator
+        self.fld_field_op = params
+
         self.fid_field = fid if fid != "" else None
 
         self.use_display_name = display_name.lower() == "true"
@@ -170,6 +177,23 @@ def export(resource, options, filepath):
 
     if options.fields is not None:
         query.fields(*options.fields)
+
+    filter_ = []
+    for k, v in options.fld_field_op.items():
+        if re.match("\d+:\d+:", k):
+            k = re.sub(r"\d+:\d+:", "", k)
+        if k.startswith("fld_"):
+            fld_expr = re.sub("^fld_", "", k)
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit("__", 1)
+        except ValueError:
+            key, operator = (fld_expr, "eq")
+        filter_.append((key, operator, v))
+    if len(filter_) > 0:
+        query.filter(*filter_)
 
     ogr_ds = _ogr_memory_ds()
     _ogr_layer = _ogr_layer_from_features(
