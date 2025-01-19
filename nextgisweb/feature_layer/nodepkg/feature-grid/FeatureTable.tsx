@@ -39,6 +39,7 @@ interface FeatureTableProps {
     setSelectedIds: (ids: SetValue<number[]>) => void;
     loadingCol: () => string;
     empty: () => ReactNode;
+    setValueInput: (valueInput: SetValue<object>) => void;
 }
 
 const RESIZE_HANDLE_WIDTH = 6;
@@ -58,6 +59,7 @@ const FeatureTable = observer(
         setSelectedIds,
         loadingCol,
         empty,
+        setValueInput,
     }: FeatureTableProps) => {
         const tbodyRef = useRef<HTMLDivElement>(null);
         const theadRef = useRef<HTMLDivElement>(null);
@@ -112,7 +114,7 @@ const FeatureTable = observer(
             }
 
             for (const f of fields_) {
-                if (visibleFields.includes(f.id)) {
+                if (visibleFields?.includes(f.id)) {
                     cols.push(f);
                 }
             }
@@ -139,7 +141,7 @@ const FeatureTable = observer(
             version,
             total,
         });
-
+        
         useEffect(() => {
             if (cleanSelectedOnFilter) {
                 setSelectedIds([]);
@@ -354,6 +356,7 @@ const FeatureTable = observer(
                                         loadingCol,
                                         measureElement,
                                         setSelectedIds,
+                                        setValueInput,
                                     }}
                                 />
                             )}

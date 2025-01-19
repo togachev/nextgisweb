@@ -11,22 +11,30 @@ export const useSource = () => {
         return { item, fields: fields.feature_layer.fields };
     }
 
-    const getFeature = async (layerId, loadValue, queryParams, fields, filter) => {
+    const getFeature = async (layerId, loadValue, queryParams, fields, filter, offset) => {
         const json = {
             geom: false,
             extensions: [],
             fields: fields
         };
 
-        !filter && queryParams?.fld_field_op && Object.assign(json, queryParams?.fld_field_op)
+        !filter && queryParams?.fld_field_op && Object.assign(json, queryParams?.fld_field_op);
 
-        loadValue.distinct && loadValue.limit > 0 && Object.assign(json, { limit: loadValue.limit, distinct: loadValue.distinct });
+        loadValue.limit === 25 ?
+            Object.assign(json, { limit: loadValue.limit, distinct: loadValue.distinct, offset: 0 }) :
+            Object.assign(json, { limit: loadValue.limit, offset: offset });
+
         const feature = await route("feature_layer.feature.collection", { id: layerId })
             .get({
                 cache: true,
                 query: json,
-            })
-        return feature;
+            });
+        const count = await route("feature_layer.feature.count", { id: layerId })
+            .get({
+                cache: true,
+            });
+
+        return { feature, count };
     }
 
     return { getFeature, getFields };

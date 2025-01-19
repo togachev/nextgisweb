@@ -55,6 +55,7 @@ interface RowsProps {
     loadingCol: () => string;
     setSelectedIds: (ids: SetValue<number[]>) => void;
     measureElement: (node: Element | null) => void;
+    setValueInput: (valueInput: SetValue<object>) => void;
 }
 
 export function FeatureTableRows({
@@ -68,6 +69,7 @@ export function FeatureTableRows({
     loadingCol,
     measureElement,
     setSelectedIds,
+    setValueInput,
 }: RowsProps) {
     const firstVirtual = virtualItems[0];
 
@@ -142,7 +144,15 @@ export function FeatureTableRows({
                             minHeight: `${rowMinHeight}px`,
                             transform: `translateY(${virtualRow.start}px)`,
                         }}
+                        onMouseDown={(e) => {
+                            if (e.detail > 1) {
+                                e.preventDefault();
+                            }
+                        }}
                         onClick={(e) => {
+                            if (e.detail === 2) {
+                                setValueInput && setValueInput(row);
+                            }
                             // When you finish selecting text in a single row, it triggers a click event.
                             // However, when selecting text across multiple rows, no click event is triggered.
                             // The following technique is used to prevent the click event from firing during text selection within a single row.

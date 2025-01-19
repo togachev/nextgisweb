@@ -2,7 +2,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import type { ReactElement } from "react";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
-
+export const KEY_FIELD_ID = 0;
 interface Rnd {
     x: number;
     y: number;
@@ -21,6 +21,9 @@ export class FilterLayerStore {
     activeKey?: string | null = null;
     activePanel?: boolean;
     visible?: (val: boolean) => void;
+    selectedIds: number[] = [];
+    visibleFields: number[] = [KEY_FIELD_ID];
+    valueInput: object | null = null;
 
     private _tabs: Tab[] = [];
 
@@ -44,7 +47,7 @@ export class FilterLayerStore {
         this.activePanel = value;
     };
 
-    setActiveKey = (activeKey?: string) => {       
+    setActiveKey = (activeKey?: string) => {
         if (activeKey) {
             const exist = this._tabs.find((t) => t.key === activeKey);
             if (exist) {
@@ -89,6 +92,18 @@ export class FilterLayerStore {
 
     setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
         this.setValue("valueRnd", valueRnd);
+    };
+
+    setValueInput = (valueInput: SetValue<object | null>) => {
+        this.setValue("valueInput", valueInput);
+    };
+
+    setSelectedIds = (selectedIds: SetValue<number[]>) => {
+        this.setValue("selectedIds", selectedIds);
+    };
+
+    setVisibleFields = (visibleFields: number[]) => {
+        this.visibleFields = visibleFields;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

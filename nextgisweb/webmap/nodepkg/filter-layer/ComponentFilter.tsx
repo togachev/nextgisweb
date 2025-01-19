@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { debounce } from "lodash-es";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
@@ -14,6 +15,7 @@ import {
     DatePicker,
     DateTimePicker,
     Empty,
+    Flex,
     Space,
     Table,
     TimePicker,
@@ -21,7 +23,7 @@ import {
     Input,
     Select,
 } from "@nextgisweb/gui/antd";
-
+import FeatureTable from "@nextgisweb/feature-layer/feature-grid/FeatureTable";
 import { formatNgwAttribute, parseNgwAttribute } from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { topics } from "@nextgisweb/webmap/identify-module";
 import { getEntries, valDT } from "@nextgisweb/webmap/identify-module/hook/useSource";
@@ -59,6 +61,7 @@ const msgZoomToFeature = gettext("Zoom to feature");
 const msgInfo = gettext("Add one or more filters.");
 const msgNoFields = gettext("The layer has no fields.");
 
+const loadingCol = () => "...";
 const EmptyValue = ({ text }) => (<Empty image={false} description={<Text type="secondary" strong>{text}</Text>} />);
 
 const msgEq = gettext("Equal")
@@ -248,260 +251,303 @@ const zoomToFeature = (display, layerId, fid) => {
     }
 };
 
-const LoadValues = ({ width, display, layerId, lock, activeId, inputField, setInputField, activeFields, data }) => {
+// const LoadValues = observer(({ valueRnd, setloadValue, loadValue, count, totalCount, setOffset, offset, width, display, layerId, lock, activeId, inputField, setInputField, activeFields, data }) => {
 
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInput = useRef(null);
+//     const [searchText, setSearchText] = useState("");
+//     const [searchedColumn, setSearchedColumn] = useState("");
+//     const searchInput = useRef(null);
 
-    const handleSearch = (
-        selectedKeys: string[],
-        confirm,
-        dataIndex
-    ) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
+//     const handleSearch = (
+//         selectedKeys: string[],
+//         confirm,
+//         dataIndex
+//     ) => {
+//         confirm();
+//         setSearchText(selectedKeys[0]);
+//         setSearchedColumn(dataIndex);
+//     };
 
-    const handleReset = (clearFilters: () => void) => {
-        clearFilters();
-        setSearchText("");
-    };
+//     const handleReset = (clearFilters: () => void) => {
+//         clearFilters();
+//         setSearchText("");
+//     };
 
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({
-            setSelectedKeys,
-            selectedKeys,
-            confirm,
-            clearFilters,
-            close,
-        }) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) =>
-                        setSelectedKeys(e.target.value ? [e.target.value] : [])
-                    }
-                    onPressEnter={() =>
-                        handleSearch(selectedKeys as string[], confirm, dataIndex)
-                    }
-                    style={{ marginBottom: 8, display: "block" }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() =>
-                            handleSearch(selectedKeys as string[], confirm, dataIndex)
-                        }
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters)}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({ closeDropdown: false });
-                            setSearchText((selectedKeys as string[])[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered: boolean) => (
-            <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes((value as string).toLowerCase()),
-        filterDropdownProps: {
-            onOpenChange(open) {
-                if (open) {
-                    setTimeout(() => searchInput.current?.select(), 100);
-                }
-            },
-        },
-    });
+//     const getColumnSearchProps = (dataIndex) => ({
+//         filterDropdown: ({
+//             setSelectedKeys,
+//             selectedKeys,
+//             confirm,
+//             clearFilters,
+//             close,
+//         }) => (
+//             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+//                 <Input
+//                     ref={searchInput}
+//                     placeholder={`Search ${dataIndex}`}
+//                     value={selectedKeys[0]}
+//                     onChange={(e) =>
+//                         setSelectedKeys(e.target.value ? [e.target.value] : [])
+//                     }
+//                     onPressEnter={() =>
+//                         handleSearch(selectedKeys as string[], confirm, dataIndex)
+//                     }
+//                     style={{ marginBottom: 8, display: "block" }}
+//                 />
+//                 <Space>
+//                     <Button
+//                         type="primary"
+//                         onClick={() =>
+//                             handleSearch(selectedKeys as string[], confirm, dataIndex)
+//                         }
+//                         icon={<SearchOutlined />}
+//                         size="small"
+//                         style={{ width: 90 }}
+//                     >
+//                         Search
+//                     </Button>
+//                     <Button
+//                         onClick={() => clearFilters && handleReset(clearFilters)}
+//                         size="small"
+//                         style={{ width: 90 }}
+//                     >
+//                         Reset
+//                     </Button>
+//                     <Button
+//                         type="link"
+//                         size="small"
+//                         onClick={() => {
+//                             confirm({ closeDropdown: false });
+//                             setSearchText((selectedKeys as string[])[0]);
+//                             setSearchedColumn(dataIndex);
+//                         }}
+//                     >
+//                         Filter
+//                     </Button>
+//                     <Button
+//                         type="link"
+//                         size="small"
+//                         onClick={() => {
+//                             close();
+//                         }}
+//                     >
+//                         close
+//                     </Button>
+//                 </Space>
+//             </div>
+//         ),
+//         filterIcon: (filtered: boolean) => (
+//             <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+//         ),
+//         onFilter: (value, record) =>
+//             record[dataIndex]
+//                 .toString()
+//                 .toLowerCase()
+//                 .includes((value as string).toLowerCase()),
+//         filterDropdownProps: {
+//             onOpenChange(open) {
+//                 if (open) {
+//                     setTimeout(() => searchInput.current?.select(), 100);
+//                 }
+//             },
+//         },
+//     });
 
-    const columns = [
-        {
-            title: activeFields,
-            dataIndex: activeFields,
-            key: activeFields,
-            width: 100,
-            fixed: 'left',
-            ...getColumnSearchProps(activeFields),
-        },
-    ];
+//     const columns = [
+//         {
+//             title: activeFields,
+//             dataIndex: activeFields,
+//             key: activeFields,
+//             width: 100,
+//             ...getColumnSearchProps(activeFields),
+//         },
+//     ];
 
-    return (
-        <div className="load-content" >
-            <Table
-                className="content"
-                virtual
-                size={size}
-                columns={columns}
-                dataSource={data}
-                pagination={false}
-                scroll={{ x: 200, y: 200 }}
-            />
-        </div>
-    )
+//     const updateTableOffset = () => {
+//         setOffset(prev => {
+//             if (count > prev + 100 && loadValue.limit > 25) {
+//                 setloadValue(prev => ({ ...prev, load: true }));
+//                 return prev + 100;
+//             } else {
+//                 return prev;
+//             }
+//         });
+//     };
 
-    // const [value, setValue] = useState(undefined);
-    // const _item = inputField[activeFields][activeId]?.item;
-    // const _value = inputField[activeFields][activeId]?.value;
-    // const itemConfig = getEntries(display._layers).find(([_, itm]) => itm.itemConfig.layerId === layerId)?.[1].itemConfig;
+//     const onScroll = (e) => {
+//         const tb = e.target;
+//         let scrollBottom = tb.scrollHeight - tb.scrollTop - tb.clientHeight;
+//         console.log(tb.scrollHeight, tb.scrollTop, scrollBottom, tb.clientHeight);
+//         // console.log((Math.round(totalCount/100)*100)-100);
+//         // console.log(tb.scrollHeight / 2, tb.scrollTop);
+
+//         if (
+//             // Math.abs(tb.scrollHeight - tb.scrollTop - tb.clientHeight) < 1
+//             // (totalCount/100*35)-100
+//             (tb.scrollHeight / 2) < tb.scrollTop
+//             ||
+//             (tb.scrollHeight / 2) < scrollBottom
+//         ) {
+//             console.log("center");
+
+//             // debouncedUpdateOffset();
+//         }
+//     };
+
+//     const ww = ((valueRnd.width / 100) * 35)
+
+//     return (
+//         <Flex gap="middle" vertical>
+//             <Table
+//                 bordered
+//                 virtual
+//                 total={totalCount}
+//                 size={size}
+//                 columns={columns}
+//                 dataSource={data}
+//                 pagination={false}
+//                 scroll={{ y: valueRnd.height - 185 }}
+//                 onRow={(record, rowIndex) => {
+//                     return {
+//                         onClick: (event) => { }, // click row
+//                         onDoubleClick: (event) => { console.log(record, rowIndex); }, // double click row
+//                         onContextMenu: (event) => { }, // right button click row
+//                         onMouseEnter: (event) => { }, // mouse enter row
+//                         onMouseLeave: (event) => { }, // mouse leave row
+//                     };
+//                 }}
+//                 onScroll={onScroll}
+//             />
+//         </Flex>
+//     )
+
+//     // const [value, setValue] = useState(undefined);
+//     // const _item = inputField[activeFields][activeId]?.item;
+//     // const _value = inputField[activeFields][activeId]?.value;
+//     // const itemConfig = getEntries(display._layers).find(([_, itm]) => itm.itemConfig.layerId === layerId)?.[1].itemConfig;
 
 
 
-    // const getData = (data, value) => {
-    //     if (!value) {
-    //         return data;
-    //     }
-    //     if (DATE_TYPE.includes(_item.datatype)) {
-    //         return data.filter((item) => {
-    //             if (valDT(item[activeFields], _item).toLowerCase().includes(value.toLowerCase())) {
-    //                 return item;
-    //             }
-    //         })
-    //     } else {
-    //         return data.filter((item) => {
-    //             if (String(item[activeFields]).toLowerCase().includes(value.toLowerCase())) {
-    //                 return item;
-    //             }
-    //         })
-    //     }
-    // };
+//     // const getData = (data, value) => {
+//     //     if (!value) {
+//     //         return data;
+//     //     }
+//     //     if (DATE_TYPE.includes(_item.datatype)) {
+//     //         return data.filter((item) => {
+//     //             if (valDT(item[activeFields], _item).toLowerCase().includes(value.toLowerCase())) {
+//     //                 return item;
+//     //             }
+//     //         })
+//     //     } else {
+//     //         return data.filter((item) => {
+//     //             if (String(item[activeFields]).toLowerCase().includes(value.toLowerCase())) {
+//     //                 return item;
+//     //             }
+//     //         })
+//     //     }
+//     // };
 
-    // const onChange = (e) => {
-    //     setValue(e.target.value);
-    // };
+//     // const onChange = (e) => {
+//     //     setValue(e.target.value);
+//     // };
 
-    // useEffect(()=>{
-    //     console.log(data);
+//     // useEffect(()=>{
+//     //     console.log(data);
 
-    // }, [value])
+//     // }, [value])
 
-    // return (
-    //     <div className="load-content">
+//     // return (
+//     //     <div className="load-content">
 
-    //         {/* <div className="load-search">
-    //             <Input
-    //                 allowClear
-    //                 placeholder={activeFields}
-    //                 size={size}
-    //                 value={value}
-    //                 onChange={onChange}
-    //             />
-    //         </div>
-    //         <div className="content">
-    //             {_item && getData(data, value)?.map((item, i) => (
-    //                 <div
-    //                     className={!lock[activeFields + ":" + activeId] ? "item-load" : "item-disable-load"}
-    //                     key={i}
-    //                     title={valDT(item[activeFields], _item)}
-    //                     onMouseDown={(e) => {
-    //                         if (e.detail > 1) {
-    //                             e.preventDefault();
-    //                         }
-    //                     }}
-    //                     onClick={(e) => {
-    //                         if (
-    //                             !String(_value.vals).toLowerCase().includes(String(item[activeFields]).toLowerCase()) &&
-    //                             !lock[activeFields + ":" + activeId]
-    //                             && e.detail === 2
-    //                         ) {
-    //                             const val = parseNgwAttribute(_item.datatype, item[activeFields]);
-    //                             if (ARRAY_OP.includes(_value.op)) {
-    //                                 if (_value.vals) {
-    //                                     setInputField(prev => ({
-    //                                         ...prev, [_item.keyname]: {
-    //                                             ...prev[_item.keyname], [activeId]: {
-    //                                                 item: _item, value: {
-    //                                                     op: prev[_item.keyname][activeId].value.op, vals: String(_value.vals)?.concat(",", String(val))
-    //                                                 }
-    //                                             }
-    //                                         }
-    //                                     }));
-    //                                 } else {
-    //                                     setInputField(prev => ({
-    //                                         ...prev, [_item.keyname]: {
-    //                                             ...prev[_item.keyname], [activeId]: {
-    //                                                 item: _item, value: {
-    //                                                     op: prev[_item.keyname][activeId].value.op, vals: val
-    //                                                 }
-    //                                             }
-    //                                         }
-    //                                     }));
-    //                                 }
-    //                             } else {
-    //                                 setInputField(prev => ({
-    //                                     ...prev, [_item.keyname]: {
-    //                                         ...prev[_item.keyname], [activeId]: {
-    //                                             item: _item, value: {
-    //                                                 op: prev[_item.keyname][activeId].value.op, vals: val
-    //                                             }
-    //                                         }
-    //                                     }
-    //                                 }));
-    //                             }
-    //                         }
-    //                     }}
-    //                 >
-    //                     {valDT(item[activeFields], _item)}
-    //                     <span className="button-filter">
-    //                         <Button
-    //                             type="text"
-    //                             size={size}
-    //                             title={msgZoomToFeature}
-    //                             icon={<ZoomInMap />}
-    //                             onClick={() => {
-    //                                 zoomToFeature(display, layerId, item.key);
-    //                                 topics.publish("selected_" + layerId, item.key);
-    //                                 if (itemConfig.layerHighligh === true) {
-    //                                     display.featureHighlighter.highlightFeatureById(item.key, layerId);
-    //                                 }
-    //                             }}
-    //                         />
-    //                     </span>
-    //                 </div>
-    //             )
-    //             )}
-    //         </div> */}
-    //     </div>
-    // );
-}
+//     //         {/* <div className="load-search">
+//     //             <Input
+//     //                 allowClear
+//     //                 placeholder={activeFields}
+//     //                 size={size}
+//     //                 value={value}
+//     //                 onChange={onChange}
+//     //             />
+//     //         </div>
+//     //         <div className="content">
+//     //             {_item && getData(data, value)?.map((item, i) => (
+//     //                 <div
+//     //                     className={!lock[activeFields + ":" + activeId] ? "item-load" : "item-disable-load"}
+//     //                     key={i}
+//     //                     title={valDT(item[activeFields], _item)}
+//     //                     onMouseDown={(e) => {
+//     //                         if (e.detail > 1) {
+//     //                             e.preventDefault();
+//     //                         }
+//     //                     }}
+//     //                     onClick={(e) => {
+//     //                         if (
+//     //                             !String(_value.vals).toLowerCase().includes(String(item[activeFields]).toLowerCase()) &&
+//     //                             !lock[activeFields + ":" + activeId]
+//     //                             && e.detail === 2
+//     //                         ) {
+//     //                             const val = parseNgwAttribute(_item.datatype, item[activeFields]);
+//     //                             if (ARRAY_OP.includes(_value.op)) {
+//     //                                 if (_value.vals) {
+//     //                                     setInputField(prev => ({
+//     //                                         ...prev, [_item.keyname]: {
+//     //                                             ...prev[_item.keyname], [activeId]: {
+//     //                                                 item: _item, value: {
+//     //                                                     op: prev[_item.keyname][activeId].value.op, vals: String(_value.vals)?.concat(",", String(val))
+//     //                                                 }
+//     //                                             }
+//     //                                         }
+//     //                                     }));
+//     //                                 } else {
+//     //                                     setInputField(prev => ({
+//     //                                         ...prev, [_item.keyname]: {
+//     //                                             ...prev[_item.keyname], [activeId]: {
+//     //                                                 item: _item, value: {
+//     //                                                     op: prev[_item.keyname][activeId].value.op, vals: val
+//     //                                                 }
+//     //                                             }
+//     //                                         }
+//     //                                     }));
+//     //                                 }
+//     //                             } else {
+//     //                                 setInputField(prev => ({
+//     //                                     ...prev, [_item.keyname]: {
+//     //                                         ...prev[_item.keyname], [activeId]: {
+//     //                                             item: _item, value: {
+//     //                                                 op: prev[_item.keyname][activeId].value.op, vals: val
+//     //                                             }
+//     //                                         }
+//     //                                     }
+//     //                                 }));
+//     //                             }
+//     //                         }
+//     //                     }}
+//     //                 >
+//     //                     {valDT(item[activeFields], _item)}
+//     //                     <span className="button-filter">
+//     //                         <Button
+//     //                             type="text"
+//     //                             size={size}
+//     //                             title={msgZoomToFeature}
+//     //                             icon={<ZoomInMap />}
+//     //                             onClick={() => {
+//     //                                 zoomToFeature(display, layerId, item.key);
+//     //                                 topics.publish("selected_" + layerId, item.key);
+//     //                                 if (itemConfig.layerHighligh === true) {
+//     //                                     display.featureHighlighter.highlightFeatureById(item.key, layerId);
+//     //                                 }
+//     //                             }}
+//     //                         />
+//     //                     </span>
+//     //                 </div>
+//     //             )
+//     //             )}
+//     //         </div> */}
+//     //     </div>
+//     // );
+// })
 
 export const ComponentFilter = observer((props) => {
     const { delQParams, display, item, fields, refreshLayer, store } = props;
-    const { activeKey, visible, removeTab, valueRnd } = store;
+    const { activeKey, visible, removeTab, valueInput, setVisibleFields, setValueInput } = store;
     const { layerId, styleId } = item;
     const defaultInputField = fields.reduce((a, v) => ({ ...a, [v.keyname]: {} }), {});
 
@@ -515,7 +561,9 @@ export const ComponentFilter = observer((props) => {
     const [activeId, setActiveId] = useState();
     const [filter, setFilter] = useState(false);
     const [loadValue, setloadValue] = useState({ load: false, limit: 25, distinct: null });
-    const [offset, setOffset] = useState(100);
+    const [totalCount, setTotalCount] = useState(0)
+    const [count, setCount] = useState(0)
+    const [offset, setOffset] = useState(0);
     const [lock, setLock] = useState();
     const [start, setStart] = useState(false);
 
@@ -543,8 +591,6 @@ export const ComponentFilter = observer((props) => {
                 refreshLayer(item.key);
             })
     }
-
-
 
     const onFinish = (values) => {
         const keys_ = Object.keys(values || {});
@@ -592,10 +638,26 @@ export const ComponentFilter = observer((props) => {
 
     useEffect(() => {
         if (loadValue.load && activeFields) {
-            getFeature(layerId, loadValue, queryParams, activeFields, filter)
+            const offsetValue = loadValue.limit === 25 ? 0 : offset;
+            getFeature(layerId, loadValue, queryParams, activeFields, filter, offsetValue)
                 .then(item => {
-                    setData(item.map((i) => ({ ...i.fields, key: String(i.id) })))
-                    setloadValue({ load: false })
+                    let value = item.feature.map((i) => ({ ...i.fields, key: String(i.id) }));
+                    setData(prev => {
+                        if (loadValue.limit > 25) {
+                            return [...prev, ...value];
+                        } else {
+                            return value;
+                        }
+                    });
+                    setCount(prev => {
+                        if (loadValue.limit > 25) {
+                            return prev + value.length;
+                        } else {
+                            return value.length;
+                        }
+                    });
+                    setTotalCount(item.count.total_count);
+                    setloadValue(prev => ({ ...prev, load: false }));
                 });
         }
     }, [loadValue]);
@@ -649,6 +711,52 @@ export const ComponentFilter = observer((props) => {
             setStart(false);
         }
     }, [start]);
+
+    useEffect(() => {
+        if (activeFields) {
+            const _item = inputField[activeFields][activeId]?.item;
+            const _value = inputField[activeFields][activeId]?.value;
+            if (valueInput) {
+                const val = parseNgwAttribute(_item.datatype, valueInput[activeFields]);
+                if (ARRAY_OP.includes(_value.op)) {
+                    if (_value.vals) {
+                        setInputField(prev => ({
+                            ...prev, [_item.keyname]: {
+                                ...prev[_item.keyname], [activeId]: {
+                                    item: _item, value: {
+                                        op: prev[_item.keyname][activeId].value.op, vals: String(_value.vals)?.concat(",", String(val))
+                                    }
+                                }
+                            }
+                        }));
+                    } else {
+                        setInputField(prev => ({
+                            ...prev, [_item.keyname]: {
+                                ...prev[_item.keyname], [activeId]: {
+                                    item: _item, value: {
+                                        op: prev[_item.keyname][activeId].value.op, vals: val
+                                    }
+                                }
+                            }
+                        }));
+                    }
+                } else {
+                    setInputField(prev => ({
+                        ...prev, [_item.keyname]: {
+                            ...prev[_item.keyname], [activeId]: {
+                                item: _item, value: {
+                                    op: prev[_item.keyname][activeId].value.op, vals: val
+                                }
+                            }
+                        }
+                    }));
+                }
+            }
+        }
+    }, [valueInput]);
+
+    const cleanSelectedOnFilter = true;
+    const version = 0;
 
     return (<ConfigProvider
         theme={{
@@ -727,6 +835,12 @@ export const ComponentFilter = observer((props) => {
                                                     onClick={() => {
                                                         const op = item.datatype === "STRING" ? "ilike" : "eq"
                                                         setActiveFields(item.keyname);
+                                                        setVisibleFields([
+                                                            // 0,
+                                                            ...fields
+                                                                .filter((f) => f.keyname === item.keyname)
+                                                                .map((f) => f.id),
+                                                        ]);
                                                         setInputField(prev => {
                                                             const length = Object.keys(prev[item.keyname]).length;
                                                             if (length > 0) {
@@ -790,15 +904,32 @@ export const ComponentFilter = observer((props) => {
                     </div>
                     <div className="value-loads">
                         {activeId && disableLoad ?
-                            <LoadValues width={valueRnd.width} display={display} layerId={layerId} lock={lock} setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} /> :
-                            <EmptyValue text={msgInfo} />}
+                            // <LoadValues valueRnd={valueRnd} setloadValue={setloadValue} loadValue={loadValue} count={count} totalCount={totalCount} offset={offset} setOffset={setOffset} width={valueRnd.width} display={display} layerId={layerId} lock={lock} setInputField={setInputField} activeId={activeId} inputField={inputField} activeFields={activeFields} data={data} />
+                            <div className="load-content">
+                                <FeatureTable
+                                    setValueInput={setValueInput}
+                                    resourceId={layerId}
+                                    fields={fields}
+                                    versioning={false}
+                                    empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                                    total={totalCount}
+                                    version={version}
+                                    selectedIds={store.selectedIds}
+                                    loadingCol={loadingCol}
+                                    setSelectedIds={store.setSelectedIds}
+                                    queryParams={queryParams || undefined}
+                                    visibleFields={store.visibleFields}
+                                    cleanSelectedOnFilter={cleanSelectedOnFilter}
+                                />
+                            </div>
+                            : <EmptyValue text={msgInfo} />}
                         {disableLoad &&
                             <div className="load-button">
                                 <div className="button-text">
-                                    <Button type="text" onClick={() => { setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>
+                                    <Button type="text" onClick={() => { setOffset(0); setloadValue({ load: true, limit: 25, distinct: activeFields }); }} size={size} title={msgSample}>
                                         {msgSample}
                                     </Button>
-                                    <Button type="text" onClick={() => { setloadValue({ load: true, limit: 100, distinct: activeFields }) }} size={size} title={msgAll}>
+                                    <Button type="text" onClick={() => { setData([]); setloadValue({ load: true, limit: 100 }); }} size={size} title={msgAll}>
                                         {msgAll}
                                     </Button>
                                 </div>
@@ -811,7 +942,7 @@ export const ComponentFilter = observer((props) => {
                 </div>
                 <div className="control-buttons">
                     <div className="button-text">
-                        <Button disabled={queryParams?.fld_field_op ? false : true} type="text" size={size} onClick={() => { setQueryParams({ fld_field_op: null }); }}>
+                        <Button disabled={queryParams?.fld_field_op ? false : true} type="text" size={size} onClick={() => { setQueryParams({ fld_field_op: null }); topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" }); }}>
                             {msgDisable}
                         </Button>
                         <Button type="text" size={size} onClick={() => { apply(false) }}>
@@ -820,7 +951,7 @@ export const ComponentFilter = observer((props) => {
                         <Button type="text" size={size} onClick={() => {
                             setQueryParams({ fld_field_op: null });
                             delQParams(styleId);
-                            topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" })
+                            topics.publish("query.params_" + styleId, { queryParams: null, nd: "204" });
                             refreshLayer(item.key);
                             setData([]);
                             setActiveFields(undefined);
