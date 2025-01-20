@@ -127,7 +127,7 @@ export default observer(
                 })
 
                 LinkToGeometry(res)
-                setContextUrl(generateUrl(display, { res: val, st: response.data, pn: fixPanel }));
+                setContextUrl(generateUrl({ res: val, st: response.data, pn: fixPanel }));
 
                 if (key === true) {
                     setUpdate(false);
@@ -144,7 +144,7 @@ export default observer(
                     getContent(selectVal, false);
                     LinkToGeometry(selectVal)
                 } else {
-                    setContextUrl(generateUrl(display, { res: null, st: null, pn: null }));
+                    setContextUrl(generateUrl({ res: null, st: null, pn: null }));
                     setSelected(null);
                     setData([]);
                     topic.publish("feature.unhighlight");
@@ -152,7 +152,7 @@ export default observer(
             }, [response]);
 
             useEffect(() => {
-                setContextUrl(generateUrl(display, { res: response.data[0], st: response.data, pn: fixPanel }));
+                setContextUrl(generateUrl({ res: response.data[0], st: response.data, pn: fixPanel }));
             }, [currentUrlParams]);
 
             useEffect(() => {
