@@ -299,12 +299,12 @@ const FeatureSelector = ({
 
     const onSelectChange = (
         value: string,
-        featureInfoSelected: FeatureInfo | FeatureInfo[]
+        featureInfoSelected: FeatureInfo | FeatureInfo[] | undefined
     ) => {
         const selected = Array.isArray(featureInfoSelected)
             ? featureInfoSelected[0]
             : featureInfoSelected;
-        onFeatureChange(selected);
+        onFeatureChange(selected as FeatureInfo);
     };
 
     return (
@@ -390,17 +390,6 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
         );
     }
 
-    const coordinatesPanel = (
-        <div className="panel-content-container margin-all">
-            <div className="fill">
-                <CoordinatesSwitcher
-                    display={display}
-                    identifyInfo={identifyInfo}
-                />
-            </div>
-        </div>
-    );
-
     let noFoundElement = null;
     if (isNotFound) {
         noFoundElement = (
@@ -456,7 +445,10 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
                 {tabsElement}
                 {noFoundElement}
             </div>
-            <div className="bottom">{coordinatesPanel}</div>
+            <CoordinatesSwitcher
+                display={display}
+                identifyInfo={identifyInfo}
+            />
         </>
     );
 };

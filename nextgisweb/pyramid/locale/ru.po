@@ -11,11 +11,11 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: api.py:243
+#: api.py:259
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:321
+#: api.py:344
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -23,11 +23,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:329
+#: api.py:352
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:524
+#: api.py:547
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -35,15 +35,15 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:652
+#: api.py:675
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:655
+#: api.py:678
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:806
+#: api.py:844
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -59,11 +59,11 @@ msgstr "Включено"
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:204
+#: exception.py:213
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:205
+#: exception.py:214
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -71,37 +71,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:238
+#: exception.py:247
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:239
+#: exception.py:248
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:247
+#: exception.py:256
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:248
+#: exception.py:257
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:253
+#: exception.py:262
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:254
+#: exception.py:263
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:259
+#: exception.py:268
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:260
+#: exception.py:269
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -110,23 +110,23 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:268
+#: exception.py:277
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:269
+#: exception.py:278
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:274 exception.py:275
+#: exception.py:283 exception.py:284
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:280
+#: exception.py:289
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:281
+#: exception.py:290
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -225,7 +225,7 @@ msgstr ""
 "Здесь можно задать стили CSS. Они будут использованы для оформления всех "
 "страниц вашей Веб ГИС."
 
-#: nodepkg/fonts/FontsPanel.tsx:28
+#: nodepkg/fonts/FontsPanel.tsx:29
 msgid ""
 "During operation, the Web GIS will restart. All existing requests will be "
 "aborted. Proceed?"
@@ -233,35 +233,35 @@ msgstr ""
 "Во время выполнения Веб ГИС будет перезапущена. Все текущие запросы будут "
 "прерваны. Продолжить?"
 
-#: nodepkg/fonts/FontsPanel.tsx:29
+#: nodepkg/fonts/FontsPanel.tsx:30
 msgid "Web GIS is restarting, please wait..."
 msgstr "Веб ГИС перезапускается, подождите..."
 
-#: nodepkg/fonts/FontsPanel.tsx:30
+#: nodepkg/fonts/FontsPanel.tsx:31
 msgid "Custom"
 msgstr "Пользовательский"
 
-#: nodepkg/fonts/FontsPanel.tsx:30
+#: nodepkg/fonts/FontsPanel.tsx:31
 msgid "System"
 msgstr "Системный"
 
-#: nodepkg/fonts/FontsPanel.tsx:81
+#: nodepkg/fonts/FontsPanel.tsx:105
 msgid "Font"
 msgstr "Шрифт"
 
-#: nodepkg/fonts/FontsPanel.tsx:86
+#: nodepkg/fonts/FontsPanel.tsx:110
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/fonts/FontsPanel.tsx:91
+#: nodepkg/fonts/FontsPanel.tsx:115
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/fonts/FontsPanel.tsx:166
+#: nodepkg/fonts/FontsPanel.tsx:175
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/fonts/FontsPanel.tsx:173
+#: nodepkg/fonts/FontsPanel.tsx:182
 msgid "Show system fonts"
 msgstr "Показать системные шрифты"
 
@@ -274,8 +274,8 @@ msgctxt "test"
 msgid "unit"
 msgid_plural "units"
 msgstr[0] "штука"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[1] "штуки"
+msgstr[2] "штук"
 
 #: nodepkg/layout/Avatar.tsx:12
 msgid "Sign in"
@@ -297,7 +297,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:54 view.py:170
+#: nodepkg/layout/store.ts:54 view.py:171
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -349,53 +349,55 @@ msgstr "Номер счетчика"
 msgid "Webvisor"
 msgstr "Вебвизор"
 
-#: nodepkg/metrics/tab.ts:27
+#: nodepkg/metrics/tab.ts:25
 msgid "Google Analytics"
 msgstr "Google Аналитика"
 
-#: nodepkg/metrics/tab.ts:36
+#: nodepkg/metrics/tab.ts:30
 msgid "Yandex.Metrica"
 msgstr "Яндекс.Метрика"
 
-#: nodepkg/storage-summary/StorageSummary.js:96
-msgid "Kind of data"
-msgstr "Вид данных"
-
-#: nodepkg/storage-summary/StorageSummary.js:102
-msgid "Volume"
-msgstr "Размер"
-
-#: nodepkg/storage-summary/StorageSummary.js:118
-msgid "Total"
-msgstr "Итого"
-
-#: nodepkg/storage-summary/StorageSummary.js:123
-msgid "of"
-msgstr "из"
-
-#: nodepkg/storage-summary/StorageSummary.js:140
-msgid "Storage usage was fully estimated at %s and updated at %s."
-msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
-
-#: nodepkg/storage-summary/StorageSummary.js:146
-msgid "Storage usage was fully estimated at %s."
-msgstr "Использование хранилища было полностью оценено в %s."
-
-#: nodepkg/storage-summary/StorageSummary.js:151
-msgid "Storage usage hasn't been estimated yet but was updated at %s."
-msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
-
-#: nodepkg/storage-summary/StorageSummary.js:155
-msgid "Storage usage hasn't been estimated yet."
-msgstr "Использование хранилища еще не было полностью оценено."
-
-#: nodepkg/storage-summary/StorageSummary.js:160
+#: nodepkg/storage-summary/StorageSummary.tsx:22
 msgid "Some changes may be reflected only after full estimation."
 msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: nodepkg/storage-summary/StorageSummary.js:184
+#: nodepkg/storage-summary/StorageSummary.tsx:23
+msgid "Storage usage was fully estimated at {f}."
+msgstr "Использование хранилища было полностью оценено в {f}."
+
+#: nodepkg/storage-summary/StorageSummary.tsx:24
+msgid "Storage usage was fully estimated at {f} and updated at {u}."
+msgstr "Использование хранилища было полностью оценено в {f} и обновлено в {u}."
+
+#: nodepkg/storage-summary/StorageSummary.tsx:25
+msgid "Storage usage hasn't been estimated yet but was updated at {u}."
+msgstr ""
+"Использование хранилища еще не было полностью оценено, но было обновлено в "
+"{u}."
+
+#: nodepkg/storage-summary/StorageSummary.tsx:26
+msgid "Storage usage hasn't been estimated yet."
+msgstr "Использование хранилища еще не было полностью оценено."
+
+#: nodepkg/storage-summary/StorageSummary.tsx:114
+msgid "Kind of data"
+msgstr "Вид данных"
+
+#: nodepkg/storage-summary/StorageSummary.tsx:120
+msgid "Volume"
+msgstr "Размер"
+
+#: nodepkg/storage-summary/StorageSummary.tsx:140
+msgid "Total"
+msgstr "Итого"
+
+#: nodepkg/storage-summary/StorageSummary.tsx:145
+msgid "of"
+msgstr "из"
+
+#: nodepkg/storage-summary/StorageSummary.tsx:210
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
@@ -443,7 +445,7 @@ msgstr "Доступна новая версия {distribution}: {version}."
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
-#: permission.py:5 view.py:234 view.py:589
+#: permission.py:5 view.py:235 view.py:592
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -572,53 +574,50 @@ msgstr "Некорректный параметр"
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
-#: view.py:158
+#: view.py:159
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:190 view.py:598
+#: view.py:191 view.py:601
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:197 view.py:604
+#: view.py:198 view.py:607
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:208 view.py:641
+#: view.py:209 view.py:644
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:219 view.py:648
+#: view.py:220 view.py:651
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:246 view.py:616
+#: view.py:247 view.py:619
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:256 view.py:622
+#: view.py:257 view.py:625
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:266 view.py:610
+#: view.py:267 view.py:613
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:276 view.py:628
+#: view.py:277 view.py:631
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:286 view.py:634
+#: view.py:287 view.py:637
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:578
+#: view.py:581
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:579
+#: view.py:582
 msgid "Settings"
 msgstr "Настройки"
-
-#~ msgid "Enter the correct scale value, e.g. 1:"
-#~ msgstr "Введите корректное значение масштаба, например 1:"

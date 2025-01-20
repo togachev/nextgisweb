@@ -11,6 +11,7 @@ interface PanelHeaderProps {
     disableIdentifyModule?: string;
 }
 
+/** @deprecated Use components from @nextgisweb/panel/component */
 export function PanelHeader({ title, close, children, disableIdentifyModule }: PanelHeaderProps) {
     let info = null;
     if (disableIdentifyModule) {

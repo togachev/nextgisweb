@@ -1,4 +1,9 @@
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:180
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
+#: nodepkg/attribute-editor/plugin.ts:11 view.py:192
+msgid "Attributes"
+msgstr "Атрибуты"
+
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:178
 msgid "N/A"
 msgstr "Н/Д"
 
@@ -6,35 +11,27 @@ msgstr "Н/Д"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: api.py:90
+#: api.py:99 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:340
+#: api.py:347
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:414 api_export.py:122
+#: api.py:422 api_export.py:151
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api_export.py:89
-msgid "Output format is not provided."
-msgstr "Выходной формат не указан."
-
-#: api_export.py:91
-msgid "Format '%s' is not supported."
-msgstr "Формат '%s' не поддерживается."
-
-#: api_export.py:148
+#: api_export.py:186
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:162
+#: api_export.py:200
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:305
+#: api_export.py:369
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -136,19 +133,19 @@ msgstr "Сохранить"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:19
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:20
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:20
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:21
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
-#: nodepkg/feature-editor/FeatureEditorStore.ts:18
+#: nodepkg/feature-editor/FeatureEditorStore.ts:21
 msgid "Feature saved"
 msgstr "Объект сохранен"
 
-#: nodepkg/feature-editor/FeatureEditorStore.ts:19
+#: nodepkg/feature-editor/FeatureEditorStore.ts:22
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
@@ -157,6 +154,10 @@ msgid "Loading..."
 msgstr "Загрузка..."
 
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:34
+msgid "OK"
+msgstr "OK"
+
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:35
 msgid "Reset"
 msgstr "Сбросить"
 
@@ -197,8 +198,8 @@ msgstr "Поиск..."
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:108 view.py:119
-#: view.py:209
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:94 view.py:105
+#: view.py:187
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -330,7 +331,7 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: template/resource_section_fields.mako:21 view.py:197
+#: template/resource_section_fields.mako:21 view.py:176
 msgid "Table"
 msgstr "Таблица"
 
@@ -401,11 +402,11 @@ msgstr "Некорректный диапазон"
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:127
+#: view.py:113
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:128
+#: view.py:114
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -413,6 +414,6 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:192
+#: view.py:171
 msgid "Features"
 msgstr "Объекты"

@@ -41,6 +41,11 @@ from .util import indented
 ModuleName = str
 TypeName = str
 Export = Tuple[ModuleName, TypeName]
+
+# FIXME: Placeholder to indicate a field is defined in __post_init__. However,
+# this approach is problematic and likely requires refactoring, as MsgSpec
+# 0.19.0 introduced a change where __post_init__ is now called not only during
+# construction but also during conversion (deserialization).
 POST_INIT = cast(Any, UNSET)
 
 
@@ -106,8 +111,9 @@ class TSGenerator:
             result = TSStruct(cls=otype, **defaults)
         elif (origin := get_origin(otype)) is Union:
             result = TSUnion(args=get_args(otype), **defaults)
-        elif origin is list:
-            result = TSList(arg=get_args(otype)[0], **defaults)
+        elif origin in (list, set):
+            comment = None if origin is list else origin.__name__
+            result = TSList(arg=get_args(otype)[0], comment=comment, **defaults)
         elif origin is tuple:
             result = TSTuple(args=get_args(otype), **defaults)
         elif origin is dict:

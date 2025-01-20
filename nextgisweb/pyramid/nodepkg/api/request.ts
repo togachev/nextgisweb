@@ -6,12 +6,13 @@ import {
     LunkwillError,
     LunkwillRequestCancelled,
     LunkwillRequestFailed,
-    NetworksResponseError,
+    NetworkResponseError,
     ServerResponseError,
 } from "./error";
 import type { ServerResponseErrorData } from "./error";
 import type {
     LunkwillData,
+    Method,
     RequestOptions,
     ResponseType,
     ToReturn,
@@ -87,7 +88,7 @@ async function lunkwillFetch(lwRespUrl: string) {
     try {
         return await window.fetch(lwRespUrl, { credentials: "same-origin" });
     } catch (e) {
-        throw new NetworksResponseError();
+        throw new NetworkResponseError();
     }
 }
 
@@ -108,9 +109,9 @@ type QueryScalar = string | number | boolean;
 type QueryList = QueryScalar[];
 type QueryRecord = Record<string, QueryScalar | QueryList>;
 
-export function encodeQueryParams(
-    value: Record<string, QueryScalar | QueryList | QueryRecord>
-): string {
+export type QueryParams = Record<string, QueryScalar | QueryList | QueryRecord>;
+
+export function encodeQueryParams(value: QueryParams): string {
     const result = [];
     for (const [k, v] of Object.entries(value)) {
         if (
@@ -171,7 +172,6 @@ export async function request<
     options?: RequestOptions<RT, ReturnUrl>
 ): Promise<ToReturn<T, RT, ReturnUrl>> {
     const defaults: RequestOptions<RT, ReturnUrl> = {
-        method: "GET",
         credentials: "same-origin",
         headers: {},
     };
@@ -183,6 +183,8 @@ export async function request<
         json,
         ...opt
     } = { ...defaults, ...options };
+
+    opt.method = opt.method ? (opt.method.toUpperCase() as Method) : "GET";
 
     let useLunkwill = false;
     if (lunkwill !== undefined) {
@@ -210,7 +212,7 @@ export async function request<
             if ((e as Error).name === "AbortError") {
                 throw e;
             }
-            throw new NetworksResponseError();
+            throw new NetworkResponseError();
         }
 
         if (useLunkwill && lunkwillCheckResponse(response)) {

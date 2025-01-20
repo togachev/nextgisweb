@@ -1,11 +1,18 @@
 /** @registry */
-import { pluginRegistry } from "../../plugin";
+import { loaderRegistry } from "../../plugin";
+import type { ImportCallback } from "../../plugin";
 
-export const registry = pluginRegistry<
-    (module: string, el: HTMLElement) => void,
+export interface DriverValue {}
+
+export const registry = loaderRegistry<
+    (value: any, element: HTMLElement) => void,
     { identity: string }
 >(MODULE_NAME);
 
-registry.register(COMP_ID, () => import("./mocha"), {
+registry.registerLoader(COMP_ID, () => import("./mocha"), {
     identity: "mocha",
 });
+
+export interface DriverValue {
+    mocha: ImportCallback<(...args: []) => void>;
+}

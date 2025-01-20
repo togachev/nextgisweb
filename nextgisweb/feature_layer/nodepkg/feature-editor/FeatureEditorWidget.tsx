@@ -31,15 +31,19 @@ type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
 
 const msgLoading = gettext("Loading...");
 const msgSave = gettext("Save");
+const msgOk = gettext("OK");
 const msgReset = gettext("Reset");
 
 export const FeatureEditorWidget = observer(
     ({
         resourceId,
         featureId,
+        okBtnMsg = msgOk,
         toolbar,
-        onSave,
         store: storeProp,
+        mode = "save",
+        onOk,
+        onSave,
     }: FeatureEditorWidgetProps) => {
         const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
         const store = useState<FeatureEditorStore>(() => {
@@ -94,10 +98,9 @@ export const FeatureEditorWidget = observer(
 
         useEffect(() => {
             const loadWidgets = async () => {
-                const newTabs: TabItem[] = [];
-                for (const p of registry.query()) {
-                    newTabs.push(await createEditorTab(await p.load()));
-                }
+                const newTabs = await Promise.all(
+                    registry.queryAll().map(createEditorTab)
+                );
                 newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
                 setItems(newTabs);
             };
@@ -113,17 +116,21 @@ export const FeatureEditorWidget = observer(
                 key="save"
                 loading={store.saving}
                 onClick={async () => {
-                    try {
-                        const res = await store.save();
-                        if (onSave) {
-                            onSave(res);
+                    if (mode === "save") {
+                        try {
+                            const res = await store.save();
+                            if (onSave) {
+                                onSave(res);
+                            }
+                        } catch (error) {
+                            showModal(ErrorModal, { error: error as ApiError });
                         }
-                    } catch (error) {
-                        showModal(ErrorModal, { error: error as ApiError });
+                    } else if (onOk) {
+                        onOk(store.preparePayload());
                     }
                 }}
             >
-                {msgSave}
+                {mode === "save" ? msgSave : okBtnMsg}
             </SaveButton>,
         ];
         const rightActions: ActionToolbarAction[] = [];

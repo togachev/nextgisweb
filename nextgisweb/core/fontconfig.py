@@ -2,7 +2,7 @@ import re
 from io import StringIO
 from os import environ, sep
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, copyfileobj
 from subprocess import check_output
 from textwrap import dedent
 from typing import List
@@ -13,6 +13,7 @@ from typing_extensions import Annotated
 
 from nextgisweb.env import gettextf
 
+from .backup import BackupBase
 from .component import CoreComponent
 from .exception import ValidationError
 
@@ -70,18 +71,26 @@ class FontConfig:
         root_prefix = str(self.root_path.absolute()) + sep
         for node in root.findall(".//item"):
             rec = {p: node.find(p).text for p in props}
+            file = Path(rec["file"])
 
             # Some fonts have multiple families and styles, last ones look
-            # better, so let's use only last ones.
-            family = rec["family"].split(",")[-1]
-            style = rec["style"].split(",")[-1]
+            # better, so let's use only last ones. Some fonts have variable
+            # width, and by extension, don't always have a defined style
+
+            if family := rec["family"]:
+                family = rec["family"].split(",")[-1]
+            else:
+                # Try to get the name of the font from filepath
+                family = file.with_suffix("").name
+
+            if style := rec["style"]:
+                style = style.split(",")[-1]
 
             kwargs = dict(
-                label=f"{family} {style}".strip(),
+                label=(family + (f" {style}" if style else "")).strip(),
                 format=rec["fontformat"],
             )
 
-            file = Path(rec["file"])
             if str(file).startswith(root_prefix):
                 result.append(CustomFont(key=file.name, **kwargs))
             else:
@@ -103,3 +112,33 @@ class FontConfig:
             raise ValidationError(gettextf("Font not found: {}!")(key))
 
         path.unlink()
+
+    def iterfiles(self):
+        for file in self.root_path.iterdir():
+            if re.match(FONT_PATTERN, file.name) and file.is_file():
+                yield file
+
+    def backup_objects(self):
+        for file in self.iterfiles():
+            yield FontBackup(dict(component="core", filename=file.name))
+
+    def restore_prepare(self):
+        for file in self.iterfiles():
+            file.unlink()
+
+
+class FontBackup(BackupBase):
+    identity = "font"
+
+    def blob(self):
+        return True
+
+    def backup(self, dst):
+        src = self.component.fontconfig.root_path / self.payload["filename"]
+        with src.open("rb") as fd:
+            copyfileobj(fd, dst)
+
+    def restore(self, src):
+        dst = self.component.fontconfig.root_path / self.payload["filename"]
+        with dst.open("wb") as fd:
+            copyfileobj(src, fd)

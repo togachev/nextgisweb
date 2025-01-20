@@ -23,6 +23,7 @@ class IdentifyModuleBody(Struct, kw_only=True):
     styles: List[object]
 
 def identify(request, *, body: IdentifyBody) -> JSONType:
+    """Find features intersecting geometry"""
 
     try:
         geom = Geometry.from_wkt(body.geom, srid=body.srs)

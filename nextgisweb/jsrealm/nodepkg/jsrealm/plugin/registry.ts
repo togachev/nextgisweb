@@ -1,57 +1,13 @@
 import { matches } from "lodash-es";
 
-type Value = NonNullable<unknown>;
-type Metadata = NonNullable<unknown>;
+type Query<M extends NonNullable<unknown>> = ((i: M) => boolean) | Partial<M>;
 
-interface NoMetadata {}
-
-type PromiseLoader<V extends Value> = () => Promise<V>;
-type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;
-
-class PluginObject<V extends Value, M extends Metadata> {
-    readonly component: string;
-    readonly #loader: PromiseLoader<V>;
-
-    #promise?: Promise<V>;
-    #value?: V;
-
-    constructor(component: string, loader: PromiseLoader<V>, meta?: M) {
-        this.component = component;
-        this.#loader = loader;
-        Object.assign(this, meta);
-    }
-
-    async load(): Promise<V> {
-        if (this.#value !== undefined) return this.#value;
-        if (this.#promise === undefined) this.#promise = this.#loader();
-        this.#value = await this.#promise;
-        return this.#value;
-    }
-}
-
-type Plugin<V extends Value, M extends Metadata> = PluginObject<V, M> &
-    Readonly<M>;
-
-type RegisterValue<V extends Value> = V | PromiseLoader<V> | ImportLoader<V>;
-
-type Selector<M> = { component: string } & M;
-
-type Query<M extends Metadata> =
-    | ((i: Selector<M>) => boolean)
-    | Partial<Selector<M>>;
-
-function isAsyncLoader<V extends Value = Value>(
-    fn: unknown
-): fn is ImportLoader<V> | PromiseLoader<V> {
-    return typeof fn === "function" && fn().then instanceof Function;
-}
-
-export class PluginRegistry<
-    V extends Value = Value,
-    M extends Metadata = NoMetadata,
+export class BaseRegistry<
+    P extends NonNullable<unknown> = NonNullable<unknown>,
+    M extends NonNullable<unknown> = NonNullable<unknown>,
 > {
     readonly identity: string;
-    protected readonly items = new Array<Plugin<V, M>>();
+    protected readonly items = new Array<P>();
     protected _sealed = false;
     protected _skipped = 0;
 
@@ -59,53 +15,36 @@ export class PluginRegistry<
         this.identity = identity;
     }
 
-    register(component: string, value: RegisterValue<V>, meta?: M): void {
-        if (this._sealed)
+    protected _register(component: string, fn: () => P): void {
+        if (this._sealed) {
             throw new Error(`Registry '${this.identity}' already sealed`);
+        }
 
         if (!ngwConfig.components.includes(component)) {
             this._skipped += 1;
             return;
         }
 
-        let loader: PromiseLoader<V>;
-
-        if (isAsyncLoader(value)) {
-            loader = () =>
-                value().then((mod) => {
-                    if (mod && typeof mod === "object" && "default" in mod) {
-                        return mod.default;
-                    }
-                    return mod;
-                });
-        } else {
-            loader = () => Promise.resolve(value);
-        }
-
-        const plugin = new PluginObject<V, M>(component, loader, meta);
-
-        this.items.push(plugin as Plugin<V, M>);
+        this.items.push(fn());
     }
 
+    /** Seal registry to prevent future plugin registrations */
     seal() {
         this._sealed = true;
         console.debug(
             `Registry '${this.identity}': ` +
-                `${this.items.length} plugins registered, ` +
+                `${this.items.length} registered, ` +
                 `${this._skipped} skipped`
         );
     }
 
-    get sealed() {
-        return this._sealed;
-    }
-
-    get count() {
-        return this.items.length;
-    }
-
-    get skipped() {
-        return this._skipped;
+    /** Get registry status for testing purposes */
+    status() {
+        return {
+            sealed: this._sealed,
+            count: this.items.length,
+            skipped: this._skipped,
+        };
     }
 
     *query(query?: Query<M>) {
@@ -116,7 +55,7 @@ export class PluginRegistry<
         else if (typeof query !== "function") query = matches(query);
 
         for (const itm of this.items) {
-            if (query(itm as Selector<M>)) yield itm;
+            if (query(itm as unknown as M)) yield itm;
         }
     }
 
@@ -124,21 +63,54 @@ export class PluginRegistry<
         return Array.from(this.query(query));
     }
 
-    load(query?: Query<M>): Promise<V> {
-        const item = this.queryAll(query)[0];
-        if (item === undefined)
-            throw new Error(
-                `No plugin found for selector: ${JSON.stringify(query)}`
-            );
-        return item.load();
+    queryOne(query?: Query<M>) {
+        let found = undefined;
+        for (const plugin of this.query(query)) {
+            if (found === undefined) {
+                found = plugin;
+            } else {
+                throw new Error("Multiple plugins found!");
+            }
+        }
+
+        if (found === undefined) {
+            throw new Error("No plugin found!");
+        }
+
+        return found;
     }
 }
 
-export function pluginRegistry<
-    V extends Value,
-    M extends Metadata = NoMetadata,
->(
+export class PluginRegistry<
+    P extends NonNullable<unknown>,
+> extends BaseRegistry<P, P> {
+    /**
+     * Register plugin in registry
+     *
+     * @param component Use {@link COMP_ID} global
+     * @param value Plugin value
+     *
+     * @example
+     * registry.register(COMP_ID, {
+     *     store: () => import("./Store"),
+     *     widget: () => import("./Widget"),
+     * })
+     */
+    register(component: string, value: P): void {
+        this._register(component, () => value);
+    }
+}
+
+/**
+ * Construct plugin registry
+ *
+ * @typeParam P Type of plugin
+ *
+ * @param identity Use {@link MODULE_NAME} global
+ * @returns PluginRegistry instance
+ */
+export function pluginRegistry<P extends NonNullable<unknown>>(
     identity: string
-): Pick<PluginRegistry<V, M>, "register" | "query" | "queryAll" | "load"> {
-    return new PluginRegistry<V, M>(identity);
+): PluginRegistry<P> {
+    return new PluginRegistry<P>(identity);
 }

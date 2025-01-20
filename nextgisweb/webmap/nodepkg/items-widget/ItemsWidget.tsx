@@ -28,7 +28,6 @@ import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
-import { useEffect } from "react";
 
 const msgDisplayName = gettext("Display name");
 const msgExpanded = gettext("Expanded");

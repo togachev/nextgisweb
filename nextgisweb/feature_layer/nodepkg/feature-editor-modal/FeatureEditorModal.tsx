@@ -16,10 +16,10 @@ export interface FeatureEditorModalProps extends ModalProps {
 }
 
 const msgCancel = gettext("Cancel");
-const msgConfirmTitle = gettext("Are you sure?");
-const msgConfirmContent = gettext(
-    "Unsaved changes will be lost if you close the window."
-);
+const [msgConfirmTitle, msgConfirmContent] = [
+    gettext("Are you sure?"),
+    gettext("Unsaved changes will be lost if you close the window."),
+];
 
 export function FeatureEditorModal({
     open: open_,
@@ -27,16 +27,18 @@ export function FeatureEditorModal({
     ...modalProps
 }: FeatureEditorModalProps) {
     const [open, setOpen] = useState(open_);
-    const { resourceId, featureId, onSave } = editorOptions || {};
+    const { resourceId, featureId, onSave, mode, onOk } = editorOptions || {};
     const [modal, contextHolder] = Modal.useModal();
 
-    if (!resourceId || !featureId) {
-        throw new Error(
-            "The `editorOptions.resourceId` and `editorOptions.featureId` are reuqired"
-        );
+    if (typeof resourceId !== "number") {
+        throw new Error("The `editorOptions.resourceId` are reuqired");
     }
     const [store] = useState(
-        () => new FeatureEditorStore({ resourceId, featureId })
+        () =>
+            new FeatureEditorStore({
+                resourceId,
+                featureId: typeof featureId === "number" ? featureId : null,
+            })
     );
 
     const close = () => {
@@ -65,6 +67,7 @@ export function FeatureEditorModal({
             <Modal
                 className="ngw-feature-layer-feature-editor-modal"
                 width="" // Do not set the default (520px) width
+                centered={true}
                 open={open}
                 destroyOnClose
                 footer={null}
@@ -76,11 +79,14 @@ export function FeatureEditorModal({
                     resourceId={resourceId}
                     featureId={featureId}
                     store={store}
+                    mode={mode}
                     onSave={(e) => {
                         close();
-                        if (onSave) {
-                            onSave(e);
-                        }
+                        onSave?.(e);
+                    }}
+                    onOk={(e) => {
+                        close();
+                        onOk?.(e);
                     }}
                     toolbar={{
                         rightActions: [

@@ -2,14 +2,14 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import Any, List, Literal, Optional
+from typing import Any, List, Literal, Union
 
-from msgspec import UNSET, Meta, Struct
+from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
 from nextgisweb.env import gettext
-from nextgisweb.lib.apitype import Query
+from nextgisweb.lib.apitype import AsJSON, Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 
 from nextgisweb.core.exception import ValidationError
@@ -32,16 +32,25 @@ from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 
 FeatureID = Annotated[int, Meta(description="Feature ID")]
 
-ParamGeomFormat = Literal["wkt", "geojson"]
-ParamDtFormat = Literal["iso", "obj"]
-ParamSrs = Optional[Annotated[int, Meta(gt=0)]]
+ParamGeomNull = Annotated[
+    bool, Meta(description="Write NULL geometries if true, and skip them otherwise")
+]
+ParamGeomFormat = Annotated[
+    Literal["wkt", "geojson"],
+    Meta(description="Geometry serialization format"),
+]
+ParamDtFormat = Annotated[
+    Literal["iso", "obj"],
+    Meta(description="Date and time serialization format"),
+]
+ParamSrs = Union[Annotated[int, Meta(gt=0)], None]
 
 
 class LoaderParams(Struct, kw_only=True):
-    geom_null: bool = False
+    geom_null: ParamGeomNull = False
     geom_format: ParamGeomFormat = "wkt"
     dt_format: ParamDtFormat = "obj"
-    srs: ParamSrs = None
+    srs: Annotated[ParamSrs, Meta(description="SRS ID of input geometry")] = None
 
 
 @dataclass
@@ -114,15 +123,21 @@ class Loader:
 
 
 class DumperParams(Struct, kw_only=True):
-    label: bool = False
-    geom: bool = True
+    label: Annotated[bool, Meta(description="Return feature label")] = False
+    geom: Annotated[bool, Meta(description="Return feature geometry")] = True
     geom_format: ParamGeomFormat = "wkt"
     dt_format: ParamDtFormat = "obj"
-    fields: Optional[List[str]] = None
-    extensions: Optional[List[str]] = None
-    srs: ParamSrs = None
-    version: Optional[Annotated[int, Meta(gt=0)]] = None
-    epoch: Optional[Annotated[int, Meta(gt=0)]] = None
+    fields: Annotated[
+        Union[List[str], None],
+        Meta(description="Field keynames to return, all fields returned by default"),
+    ] = None
+    extensions: Annotated[
+        Union[List[str], None],
+        Meta(description="Extensions to return, all extensions returned by default"),
+    ] = None
+    srs: Annotated[ParamSrs, Meta(description="SRS ID of output geometry")] = None
+    version: Union[Annotated[int, Meta(gt=0)], None] = None
+    epoch: Union[Annotated[int, Meta(gt=0)], None] = None
     relation: bool = False
 
 
@@ -268,13 +283,23 @@ def iget(
     feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid)
     return dumper(feature)
 
+
+class FeatureChangeResult(Struct, kw_only=True):
+    id: FeatureID
+    version: Union[int, UnsetType] = UNSET
+
+    def version_from(self, vobj):
+        if vobj:
+            self.version = vobj.version_id
+
+
 def iput(
     resource,
     request,
     fid: FeatureID,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
-) -> JSONType:
+) -> FeatureChangeResult:
     """Update feature"""
     request.resource_permission(DataScope.write)
 
@@ -282,38 +307,30 @@ def iput(
     feature = query_feature_or_not_found(query, resource.id, fid)
     loader = Loader(resource, loader_params)
 
-    vinfo = dict()
+    result = FeatureChangeResult(id=feature.id)
     with versioning(resource, request) as vobj:
         updated = loader.extensions(feature, request.json_body)
         loader(feature, request.json_body)
-        if (feature.geom or feature.fields) and IWritableFeatureLayer.providedBy(resource):
+        if (
+            feature.geom is not UNSET or len(feature.fields) > 0
+        ) and IWritableFeatureLayer.providedBy(resource):
             updated = resource.feature_put(feature) or updated
-        if updated is True and vobj:
-            vinfo["version"] = vobj.version_id
+        if updated is True:
+            result.version_from(vobj)
 
-    return dict(id=feature.id, **vinfo)
+    return result
 
 
-def idelete(resource, request, fid: FeatureID) -> JSONType:
+def idelete(resource, request, fid: FeatureID) -> FeatureChangeResult:
     """Delete feature"""
     request.resource_permission(DataScope.write)
 
     with versioning(resource, request) as vobj:
         resource.feature_delete(fid)
-        result = dict(id=fid)
-        if vobj:
-            result["version"] = vobj.version_id
-        return result
+        result = FeatureChangeResult(id=fid)
+        result.version_from(vobj)
 
-
-def item_extent(resource, request, fid: FeatureID) -> JSONType:
-    request.resource_permission(DataScope.read)
-    if bounds := get_box_bounds(resource, fid, 4326):
-        minLon, minLat, maxLon, maxLat = bounds
-        extent = dict(minLon=minLon, minLat=minLat, maxLon=maxLon, maxLat=maxLat)
-    else:
-        extent = None
-    return dict(extent=extent)
+    return result
 
 
 def get_box_bounds(resource, feature_id, srs_id):
@@ -326,6 +343,7 @@ def get_box_bounds(resource, feature_id, srs_id):
 
 
 def geometry_info(resource, request, fid: FeatureID) -> JSONType:
+    """Read feature geometry properties"""
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
@@ -420,8 +438,8 @@ def cget(
     request,
     *,
     dumper_params: Annotated[DumperParams, Query(spread=True)],
-    order_by: Optional[str] = None,
-    limit: Optional[Annotated[int, Meta(ge=0)]] = None,
+    order_by: Union[str, None] = None,
+    limit: Union[Annotated[int, Meta(ge=0)], None] = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
 ) -> JSONType:
     """Read features"""
@@ -457,7 +475,7 @@ def cpost(
     request,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
-) -> JSONType:
+) -> FeatureChangeResult:
     """Create feature"""
     request.resource_permission(DataScope.write)
 
@@ -467,9 +485,10 @@ def cpost(
         loader(feature, request.json_body)
         feature.id = resource.feature_create(feature)
         loader.extensions(feature, request.json_body)
-        vinfo = dict(version=vobj.version_id) if vobj else dict()
+        result = FeatureChangeResult(id=feature.id)
+        result.version_from(vobj)
 
-    return dict(id=feature.id, **vinfo)
+    return result
 
 
 def cpatch(
@@ -477,15 +496,14 @@ def cpatch(
     request,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
-) -> JSONType:
+) -> AsJSON[List[FeatureChangeResult]]:
     """Update features"""
     request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
 
-    result = list()
+    result: List[FeatureChangeResult] = list()
     with versioning(resource, request) as vobj:
-        vinfo = dict(version=vobj.version_id) if vobj else dict()
         for fdata in request.json_body:
             if "id" not in fdata:
                 # Create new feature
@@ -503,10 +521,15 @@ def cpatch(
                     vobj.mark_changed()
 
                 loader(feature, fdata)
-                if (feature.geom or feature.fields) and IWritableFeatureLayer.providedBy(resource):
+                if (
+                    feature.geom is not UNSET or len(feature.fields) > 0
+                ) and IWritableFeatureLayer.providedBy(resource):
                     resource.feature_put(feature)
 
-            result.append(dict(id=feature.id, **vinfo))
+            assert isinstance(feature.id, int)
+            feature_result = FeatureChangeResult(id=feature.id)
+            feature_result.version_from(vobj)
+            result.append(feature_result)
 
     return result
 
@@ -530,13 +553,18 @@ def cdelete(resource, request) -> JSONType:
     return result
 
 
-def count(resource, request) -> JSONType:
+class CountResponse(Struct, kw_only=True):
+    total_count: int
+
+
+def count(resource, request) -> CountResponse:
+    """Count total number of features"""
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
     total_count = query().total_count
 
-    return dict(total_count=total_count)
+    return CountResponse(total_count=total_count)
 
 
 class NgwExtent(Struct):
@@ -546,7 +574,23 @@ class NgwExtent(Struct):
     minLat: float
 
 
-def feature_extent(resource, request) -> NgwExtent:
+class FeatureItemExtent(Struct, kw_only=True):
+    extent: Union[NgwExtent, None]
+
+
+def iextent(resource, request, fid: FeatureID) -> FeatureItemExtent:
+    """Get feature extent"""
+    request.resource_permission(DataScope.read)
+    if bounds := get_box_bounds(resource, fid, 4326):
+        minLon, minLat, maxLon, maxLat = bounds
+        extent = NgwExtent(minLon=minLon, minLat=minLat, maxLon=maxLon, maxLat=maxLat)
+    else:
+        extent = None
+    return FeatureItemExtent(extent=extent)
+
+
+def cextent(resource, request) -> NgwExtent:
+    """Get extent of features"""
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
@@ -571,14 +615,6 @@ def setup_pyramid(comp, config):
     ).delete(idelete, context=IWritableFeatureLayer)
 
     config.add_route(
-        "feature_layer.feature.item_extent",
-        "/api/resource/{id}/feature/{fid}/extent",
-        factory=feature_layer_factory,
-        types=dict(fid=FeatureID),
-        get=item_extent,
-    )
-
-    config.add_route(
         "feature_layer.feature.geometry_info",
         "/api/resource/{id}/feature/{fid}/geometry_info",
         factory=feature_layer_factory,
@@ -586,16 +622,15 @@ def setup_pyramid(comp, config):
         get=geometry_info,
     )
 
-    config.add_route(
+    croute = config.add_route(
         "feature_layer.feature.collection",
         "/api/resource/{id}/feature/",
         factory=feature_layer_factory,
         get=cget,
-    ).post(cpost, context=IWritableFeatureLayer).patch(
-        cpatch, context=IWritableFeatureLayer
-    ).delete(
-        cdelete, context=IWritableFeatureLayer
     )
+    croute.post(cpost, context=IWritableFeatureLayer)
+    croute.patch(cpatch, context=IWritableFeatureLayer)
+    croute.delete(cdelete, context=IWritableFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.count",
@@ -608,7 +643,15 @@ def setup_pyramid(comp, config):
         "feature_layer.feature.extent",
         "/api/resource/{id}/feature_extent",
         factory=feature_layer_factory,
-        get=feature_extent,
+        get=cextent,
+    )
+
+    config.add_route(
+        "feature_layer.feature.item_extent",
+        "/api/resource/{id}/feature/{fid}/extent",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=iextent,
     )
 
     from . import api_export, api_identify, api_mvt

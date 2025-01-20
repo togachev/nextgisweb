@@ -29,7 +29,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
         fixPanel,
     } = store ?? {};
 
-    const [sizeFont, setSizeFont] = useState(16);
+    const sizeFont = 16;
     const [hideLegend, setHideLegend] = useState(true);
     const [result, setResult] = useState();
 
