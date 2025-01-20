@@ -50,7 +50,7 @@ export default observer(
         function PopupComponent(props: Params, ref: RefObject<Element>) {
             const { params, visible, display } = props;
             const { op, position, response, selectedValue } = params;
-            const { getAttribute, generateUrl } = useSource();
+            const { getAttribute, generateUrl } = useSource(display);
             const { copyValue, contextHolder } = useCopy();
             const imodule = display.identify_module;
 

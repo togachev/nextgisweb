@@ -34,6 +34,7 @@ const msgExpanded = gettext("Expanded");
 const msgExclusive = gettext("Exclusive");
 const msgEnabled = gettext("Enabled");
 const msgIdentifiable = gettext("Identifiable");
+const msgLayerHighligh = gettext("Layer highligh");
 const msgResource = gettext("Resource");
 const msgTransparency = gettext("Transparency");
 const msgMinScaleDenom = gettext("Min scale");
@@ -92,6 +93,9 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                         </CheckboxValue>
                         <CheckboxValue {...item.layerIdentifiable.cprops()}>
                             {msgIdentifiable}
+                        </CheckboxValue>
+                        <CheckboxValue {...item.layerHighligh.cprops()}>
+                            {msgLayerHighligh}
                         </CheckboxValue>
                     </Space>
                 </Lot>

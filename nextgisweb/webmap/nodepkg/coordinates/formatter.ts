@@ -65,7 +65,7 @@ export const DDtoDM = (
 
 export const lonLatToDM = (lonLat: [number, number]): string => {
     const [lon, lat] = lonLat;
-    const strLon = `${lon.toFixed(3)} ${lon > 0 ? "E" : lon < 0 ? "W" : ""}`;
-    const strLat = `${lat.toFixed(3)} ${lat > 0 ? "N" : lat < 0 ? "S" : ""}`;
+    const strLon = `${lon.toFixed(6)} ${lon > 0 ? "E" : lon < 0 ? "W" : ""}`;
+    const strLat = `${lat.toFixed(6)} ${lat > 0 ? "N" : lat < 0 ? "S" : ""}`;
     return `${strLon}, ${strLat}`;
 };

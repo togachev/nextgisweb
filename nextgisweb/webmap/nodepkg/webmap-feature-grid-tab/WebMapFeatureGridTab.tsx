@@ -43,7 +43,7 @@ export function WebMapFeatureGridTab({
     );
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current.plugin[
-            plugin.identity as string
+        plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
 
@@ -90,7 +90,11 @@ export function WebMapFeatureGridTab({
                             id: layerId,
                             fid,
                         })
-                            .get<FeatureItem>({})
+                            .get<FeatureItem>({
+                                query: {
+                                    geom: itemConfig.layerHighligh === true ? true : false
+                                }
+                            })
                             .then((feature) => {
                                 display.current.featureHighlighter.highlightFeature(
                                     {
