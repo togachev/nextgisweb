@@ -5,10 +5,11 @@ define([
     "dojo/topic",
     "dojo/Deferred",
     "@nextgisweb/pyramid/api",
+    "@nextgisweb/webmap/utils",
     "ngw-webmap/ol/layer/Vector",
     "openlayers/ol",
     "@nextgisweb/pyramid/settings!webmap",
-], function (declare, lang, xhr, topic, Deferred, api, Vector, ol, settings) {
+], function (declare, lang, xhr, topic, Deferred, api, { decompressed }, Vector, ol, settings) {
     return declare("ngw-webmap.FeatureHighlighter", [], {
         _map: null,
         _source: null,
@@ -72,7 +73,7 @@ define([
             this._source.clear();
 
             if (e.geom) {
-                geometry = this._wkt.readGeometry(e.geom);
+                geometry = this._wkt.readGeometry(decompressed(e.geom));
             } else if (e.olGeometry) {
                 geometry = e.olGeometry;
             }

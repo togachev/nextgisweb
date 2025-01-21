@@ -163,7 +163,8 @@ def display(obj, request):
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
-                layerHighligh=item.layer_highligh
+                layerHighligh=item.layer_highligh,
+                layerHighlighExtent=item.layer_highligh_extent,
             )
 
             if item.file_resource_visible:

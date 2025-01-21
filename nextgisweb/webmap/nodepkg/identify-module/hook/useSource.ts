@@ -10,6 +10,12 @@ import type {
     NgwTime,
 } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { fromExtent } from "ol/geom/Polygon";
+import { WKT } from "ol/format";
+
+import { compressed } from "@nextgisweb/webmap/utils";
+
+const wkt = new WKT();
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
@@ -77,6 +83,14 @@ export const useSource = (display: DojoDisplay) => {
     const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const item = getEntries(display._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
+
+        const geom_ext = wkt.writeGeometry(fromExtent(display.map.olMap.getView().calculateExtent()));
+
+        const query = { geom: item.itemConfig.layerHighligh === true ? true : false };
+
+        item.itemConfig.layerHighlighExtent === true ? Object.assign(query, { geom_ext: compressed(geom_ext) }) : null;
+
+        console.log(query);
         
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: res.layerId,
@@ -84,9 +98,7 @@ export const useSource = (display: DojoDisplay) => {
         })
             .get({
                 cache: true,
-                query: {
-                    geom: item.itemConfig.layerHighligh === true ? true : false
-                },
+                query,
             })
             .then(item => {
                 return item;

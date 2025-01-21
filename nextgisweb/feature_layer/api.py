@@ -1,4 +1,11 @@
 import re
+import base64
+import zlib
+import gzip
+import urllib.parse
+from shapely import wkb, wkt
+from shapely.geometry import Polygon, MultiPolygon 
+from shapely.wkt import loads
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
@@ -139,6 +146,7 @@ class DumperParams(Struct, kw_only=True):
     version: Union[Annotated[int, Meta(gt=0)], None] = None
     epoch: Union[Annotated[int, Meta(gt=0)], None] = None
     relation: bool = False
+    geom_ext: str = None
 
 
 @dataclass
@@ -149,7 +157,7 @@ class Dumper:
     @cached_property
     def geom_dumper(self):
         if self.params.geom_format == "wkt":
-            return lambda val: val.wkt
+            return lambda val: zlib_compress(val.wkt)
         elif self.params.geom_format == "geojson":
             return lambda val: val.to_geojson()
         else:
@@ -195,7 +203,7 @@ class Dumper:
         feature_query_pit(self.resource, query, self.params.version, self.params.epoch)
         query.fields(*(self.field_dumpers.keys() if self.field_dumpers is not None else ()))
 
-        if self.resource.cls != 'tablenogeom_layer':
+        if self.resource.cls != "tablenogeom_layer":
             if self.params.geom:
                 query.geom()
                 if self.params.geom_format == "wkt":
@@ -214,7 +222,7 @@ class Dumper:
         if self.params.label:
             result["label"] = feature.label
 
-        if self.resource.cls != 'tablenogeom_layer':
+        if self.resource.cls != "tablenogeom_layer":
             if self.params.geom:
                 geom = feature.geom
                 result["geom"] = self.geom_dumper(geom) if geom is not None else None
@@ -239,14 +247,28 @@ class Dumper:
 
         return result
 
+def zlib_compress(val):
+    val = str(val).encode("utf-8")
+    compress_data = base64.b64encode(zlib.compress(val)).decode("utf-8")
+    return compress_data
 
-def query_feature_or_not_found(query, resource_id, feature_id):
+def zlib_decompress(val):
+    val = str.encode(val)
+    compress_data = gzip.decompress(base64.b64decode(val)).decode("utf-8")
+    return compress_data
+
+def query_feature_or_not_found(query, resource_id, feature_id, geom_ext):
     """Query one feature by id or return FeatureNotFound exception."""
 
     query.filter_by(id=feature_id)
     query.limit(1)
 
     for feat in query():
+        if geom_ext is not None:
+            decompress = urllib.parse.unquote(zlib_decompress(geom_ext)).replace(" "," ")
+            feature_geom = feat.geom.shape
+            feature_ext = wkt.loads(decompress)
+            feat.geom = feature_geom.intersection(feature_ext)
         return feat
 
     raise FeatureNotFound(resource_id, feature_id)
@@ -280,7 +302,7 @@ def iget(
     request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
-    feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid)
+    feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid, dumper_params.geom_ext)
     return dumper(feature)
 
 

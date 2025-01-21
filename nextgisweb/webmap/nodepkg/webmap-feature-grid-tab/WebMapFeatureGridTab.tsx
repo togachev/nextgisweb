@@ -1,5 +1,7 @@
 import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
+import { fromExtent } from "ol/geom/Polygon";
+import { compressed } from "@nextgisweb/webmap/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
@@ -13,6 +15,7 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
+import { decompressed } from "@nextgisweb/webmap/utils";
 
 import type {
     DisplayItemConfig,
@@ -30,13 +33,14 @@ interface WebMapFeatureGridTabProps {
     topic: DojoTopic;
 }
 
+const wkt = new WKT();
+
 export function WebMapFeatureGridTab({
     topic,
     plugin,
     layerId,
 }: WebMapFeatureGridTabProps) {
     const topicHandlers = useRef<TopicSubscription[]>([]);
-
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
     const itemConfig = useRef<DisplayItemConfig>(
         display.current.get("itemConfig") as DisplayItemConfig
@@ -85,15 +89,19 @@ export function WebMapFeatureGridTab({
                 onSelect: (newVal) => {
                     store.setSelectedIds(newVal);
                     const fid = newVal[0];
+
+
                     if (fid !== undefined) {
+                        const geom_ext = wkt.writeGeometry(fromExtent(display.current.map.olMap.getView().calculateExtent()));
+                        const geom_extent = itemConfig.current.layerHighlighExtent === true ? { geom_ext: compressed(geom_ext) } : {}
+                        const query = itemConfig.current.layerHighligh === true ? { geom: true, geom_extent } : { geom: false };
+                        
                         route("feature_layer.feature.item", {
                             id: layerId,
                             fid,
                         })
                             .get<FeatureItem>({
-                                query: {
-                                    geom: itemConfig.layerHighligh === true ? true : false
-                                }
+                                query
                             })
                             .then((feature) => {
                                 display.current.featureHighlighter.highlightFeature(
@@ -116,18 +124,21 @@ export function WebMapFeatureGridTab({
                         icon: "material-center_focus_weak",
                         disabled: (params) => !params?.selectedIds?.length,
                         action: () => {
-                            const wkt = new WKT();
                             const fid = store.selectedIds[0];
+                            const query = { geom: true };
                             if (fid !== undefined) {
                                 route("feature_layer.feature.item", {
                                     id: layerId,
                                     fid,
                                 })
-                                    .get<FeatureItem>({})
+                                    .get<FeatureItem>({
+                                        cache: true,
+                                        query
+                                    })
                                     .then((feature) => {
                                         if (feature.geom !== null) {
                                             const geometry = wkt.readGeometry(
-                                                feature.geom
+                                                decompressed(feature.geom)
                                             );
                                             display.current.map.zoomToFeature(
                                                 new Feature({ geometry })
