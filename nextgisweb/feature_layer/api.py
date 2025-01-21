@@ -325,7 +325,7 @@ def iput(
     request.resource_permission(DataScope.write)
 
     query = resource.feature_query()
-    feature = query_feature_or_not_found(query, resource.id, fid)
+    feature = query_feature_or_not_found(query, resource.id, fid, geom_ext=None)
     loader = Loader(resource, loader_params)
 
     result = FeatureChangeResult(id=feature.id)
@@ -359,7 +359,7 @@ def get_box_bounds(resource, feature_id, srs_id):
     query.srs(SRS.filter_by(id=srs_id).one())
     query.box()
 
-    feature = query_feature_or_not_found(query, resource.id, feature_id)
+    feature = query_feature_or_not_found(query, resource.id, feature_id, geom_ext=None)
     return feature.box.bounds if feature.box else None
 
 
@@ -380,7 +380,7 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
         )
     query.srs(srs)
 
-    feature = query_feature_or_not_found(query, resource.id, fid)
+    feature = query_feature_or_not_found(query, resource.id, fid, geom_ext=None)
 
     geom = feature.geom
     if geom is None:
@@ -535,7 +535,7 @@ def cpatch(
             else:
                 # Update existing feature
                 query = resource.feature_query()
-                feature = query_feature_or_not_found(query, resource.id, fdata["id"])
+                feature = query_feature_or_not_found(query, resource.id, fdata["id"], geom_ext=None)
 
                 have_changes = loader.extensions(feature, fdata)
                 if have_changes and vobj:
