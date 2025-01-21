@@ -3,9 +3,8 @@ import base64
 import zlib
 import gzip
 import urllib.parse
-from shapely import wkb, wkt
-from shapely.geometry import Polygon, MultiPolygon 
-from shapely.wkt import loads
+from shapely import wkt
+
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
