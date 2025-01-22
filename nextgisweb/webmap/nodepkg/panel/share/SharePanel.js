@@ -12,7 +12,7 @@ import {
     Switch,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
+import { CopyToClipboardButton, SetValueButton } from "@nextgisweb/gui/buttons";
 import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -23,6 +23,7 @@ import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelContainer, PanelSection } from "../component";
 
+import UpdateIcon from "@nextgisweb/icon/material/update";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 import FavoriteIcon from "@nextgisweb/icon/material/star";
@@ -300,6 +301,13 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     >
                         {gettext("Copy link")}
                     </CopyToClipboardButton>
+                    <SetValueButton
+                        getTextToValue={() => window.history.pushState({}, "", mapLink)}
+                        icon={<UpdateIcon />}
+                        iconOnly={false}
+                    >
+                        {gettext("Update link")}
+                    </SetValueButton>
                     {!ngwConfig.isGuest && (
                         <Tooltip title={msgAddFragmentToFavorites}>
                             <Button
