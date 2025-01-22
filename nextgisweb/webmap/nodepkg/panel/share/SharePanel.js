@@ -12,7 +12,7 @@ import {
     Switch,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import { CopyToClipboardButton, SetValueButton } from "@nextgisweb/gui/buttons";
+import { CopyToClipboardButton, UpdateMapUrl } from "@nextgisweb/gui/buttons";
 import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -301,13 +301,20 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     >
                         {gettext("Copy link")}
                     </CopyToClipboardButton>
-                    <SetValueButton
-                        getTextToValue={() => window.history.pushState({}, "", mapLink)}
+                    <UpdateMapUrl
+                        panel={display.panelsManager._activePanelKey}
+                        mapLink={mapLink}
+                        setUrlValue={() => {
+                            window.history.pushState({}, "", mapLink);
+                        }}
+                        resetUrlValue={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
                         icon={<UpdateIcon />}
                         iconOnly={false}
+                        messageUpdateValue={gettext("The map link updated.")}
+                        messageResetValue={gettext("The map link reset.")}
                     >
                         {gettext("Update link")}
-                    </SetValueButton>
+                    </UpdateMapUrl>
                     {!ngwConfig.isGuest && (
                         <Tooltip title={msgAddFragmentToFavorites}>
                             <Button

@@ -1,2 +1,2 @@
 export { CopyToClipboardButton } from "./CopyToClipboardButton";
-export { SetValueButton } from "./SetValueButton";
+export { UpdateMapUrl } from "./UpdateMapUrl";
