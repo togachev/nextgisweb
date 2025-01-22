@@ -164,7 +164,6 @@ def display(obj, request):
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=_legend(item, style),
                 layerHighligh=item.layer_highligh,
-                layerHighlighExtent=item.layer_highligh_extent,
             )
 
             if item.file_resource_visible:

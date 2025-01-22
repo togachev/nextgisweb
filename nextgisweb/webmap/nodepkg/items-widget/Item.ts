@@ -117,7 +117,6 @@ const {
     layer_transparency: layerTransparency,
     file_resource_visible: fileResourceVisible,
     layer_highligh: layerHighligh,
-    layer_highligh_extent: layerHighlighExtent,
     layer_min_scale_denom: layerMinScaleDenom,
     layer_max_scale_denom: layerMaxScaleDenom,
     layer_adapter: layerAdapter,
@@ -136,7 +135,6 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
     readonly layerTransparency = layerTransparency.init(null, this);
     readonly fileResourceVisible = fileResourceVisible.init(false, this);
     readonly layerHighligh = layerHighligh.init(true, this);
-    readonly layerHighlighExtent = layerHighlighExtent.init(false, this);
     readonly layerMinScaleDenom = layerMinScaleDenom.init(null, this);
     readonly layerMaxScaleDenom = layerMaxScaleDenom.init(null, this);
     readonly layerAdapter = layerAdapter.init("image", this);
@@ -157,7 +155,6 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
             ...this.layerTransparency.jsonPart(),
             ...this.fileResourceVisible.jsonPart(),
             ...this.layerHighligh.jsonPart(),
-            ...this.layerHighlighExtent.jsonPart(),
             ...this.layerMinScaleDenom.jsonPart(),
             ...this.layerMaxScaleDenom.jsonPart(),
             ...this.layerAdapter.jsonPart(),

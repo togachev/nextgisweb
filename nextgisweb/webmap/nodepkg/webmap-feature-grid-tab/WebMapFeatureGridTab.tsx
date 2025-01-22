@@ -1,7 +1,5 @@
 import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
-import { fromExtent } from "ol/geom/Polygon";
-import { compressed } from "@nextgisweb/webmap/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
@@ -89,13 +87,8 @@ export function WebMapFeatureGridTab({
                 onSelect: (newVal) => {
                     store.setSelectedIds(newVal);
                     const fid = newVal[0];
-
-
                     if (fid !== undefined) {
-                        const geom_ext = wkt.writeGeometry(fromExtent(display.current.map.olMap.getView().calculateExtent()));
-                        const geom_extent = itemConfig.current.layerHighlighExtent === true ? { geom_ext: compressed(geom_ext) } : {}
-                        const query = itemConfig.current.layerHighligh === true ? { geom: true, geom_extent } : { geom: false };
-                        
+                        const query = itemConfig.current.layerHighligh === true ? { geom: true } : { geom: false };
                         route("feature_layer.feature.item", {
                             id: layerId,
                             fid,

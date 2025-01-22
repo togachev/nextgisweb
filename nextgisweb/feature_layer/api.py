@@ -2,8 +2,6 @@ import re
 import base64
 import zlib
 import gzip
-import urllib.parse
-from shapely import wkt
 
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -145,7 +143,6 @@ class DumperParams(Struct, kw_only=True):
     version: Union[Annotated[int, Meta(gt=0)], None] = None
     epoch: Union[Annotated[int, Meta(gt=0)], None] = None
     relation: bool = False
-    geom_ext: str = None
 
 
 @dataclass
@@ -256,18 +253,13 @@ def zlib_decompress(val):
     compress_data = gzip.decompress(base64.b64decode(val)).decode("utf-8")
     return compress_data
 
-def query_feature_or_not_found(query, resource_id, feature_id, geom_ext):
+def query_feature_or_not_found(query, resource_id, feature_id):
     """Query one feature by id or return FeatureNotFound exception."""
 
     query.filter_by(id=feature_id)
     query.limit(1)
 
     for feat in query():
-        if geom_ext is not None:
-            decompress = urllib.parse.unquote(zlib_decompress(geom_ext)).replace(" "," ")
-            feature_geom = feat.geom.shape
-            feature_ext = wkt.loads(decompress)
-            feat.geom = feature_geom.intersection(feature_ext)
         return feat
 
     raise FeatureNotFound(resource_id, feature_id)
@@ -301,7 +293,7 @@ def iget(
     request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
-    feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid, dumper_params.geom_ext)
+    feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid)
     return dumper(feature)
 
 
@@ -325,7 +317,7 @@ def iput(
     request.resource_permission(DataScope.write)
 
     query = resource.feature_query()
-    feature = query_feature_or_not_found(query, resource.id, fid, geom_ext=None)
+    feature = query_feature_or_not_found(query, resource.id, fid)
     loader = Loader(resource, loader_params)
 
     result = FeatureChangeResult(id=feature.id)
@@ -359,7 +351,7 @@ def get_box_bounds(resource, feature_id, srs_id):
     query.srs(SRS.filter_by(id=srs_id).one())
     query.box()
 
-    feature = query_feature_or_not_found(query, resource.id, feature_id, geom_ext=None)
+    feature = query_feature_or_not_found(query, resource.id, feature_id)
     return feature.box.bounds if feature.box else None
 
 
@@ -380,7 +372,7 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
         )
     query.srs(srs)
 
-    feature = query_feature_or_not_found(query, resource.id, fid, geom_ext=None)
+    feature = query_feature_or_not_found(query, resource.id, fid)
 
     geom = feature.geom
     if geom is None:
@@ -535,7 +527,7 @@ def cpatch(
             else:
                 # Update existing feature
                 query = resource.feature_query()
-                feature = query_feature_or_not_found(query, resource.id, fdata["id"], geom_ext=None)
+                feature = query_feature_or_not_found(query, resource.id, fdata["id"])
 
                 have_changes = loader.extensions(feature, fdata)
                 if have_changes and vobj:
