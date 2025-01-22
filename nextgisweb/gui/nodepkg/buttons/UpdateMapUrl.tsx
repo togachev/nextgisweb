@@ -74,7 +74,7 @@ export function UpdateMapUrl({
             <Tooltip
                 open={showTooltip}
                 onOpenChange={setShowTooltip}
-                title={statusUrl && currentUrl ? msgResetCurrentValue : msgUpdateCurrentValue}
+                title={currentUrl === "" ? msgUpdateCurrentValue : [msgUpdateCurrentValue, msgResetCurrentValue].join(' or \n')}
             >
                 <Button
                     type={statusUrl ? "primary" : "default"}
