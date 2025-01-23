@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Button, message, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
+import { routeURL } from "@nextgisweb/pyramid/api";
 
 interface UpdateMapUrlProps extends ButtonProps {
     children?: React.ReactNode;
@@ -11,14 +14,14 @@ interface UpdateMapUrlProps extends ButtonProps {
     setUrlValue: () => string;
     resetUrlValue: () => string;
     icon?: React.ReactNode;
+    display: DojoDisplay;
     mapLink: string;
-    panel: string;
 }
 
 const msgResetCurrentValue = gettext("Double click will return to original value")
 const msgUpdateCurrentValue = gettext("Click to update current map address")
 
-export function UpdateMapUrl({
+export const UpdateMapUrl = ({
     children,
     messageUpdateValue,
     messageResetValue,
@@ -26,14 +29,19 @@ export function UpdateMapUrl({
     resetUrlValue,
     iconOnly,
     icon,
+    display,
     mapLink,
-    panel,
-}: UpdateMapUrlProps) {
+}: UpdateMapUrlProps) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const [statusUrl, setStatusUrl] = useState(false);
-    const [currentUrl, setCurrentUrl] = useState("");
+    const [link, setLink] = useState();
 
-    const link = mapLink + "&panel=" + panel;
+    const webmapId = display.config.webmapId;
+
+    const wlh = window.location.href.replace("panel=share", "")
+    const currentUrl = ["?", "&"].includes(wlh.slice(-1)) ? wlh.slice(0, -1) : wlh;
+
+    const panelUrl = ngwConfig.applicationUrl + routeURL("webmap.display", webmapId);
 
     const [messageApi, contextHolder] = message.useMessage();
     const messageInfo = (text) => {
@@ -44,19 +52,24 @@ export function UpdateMapUrl({
         });
     };
 
+    useEffect(() => {
+        display.getVisibleItems().then((visibleItems) => {
+            const permalink = getPermalink(display, visibleItems);
+            setLink(decodeURIComponent(permalink));
+        });
+    }, [mapLink]);
+
     const valueSet = async () => {
         await navigator.clipboard.writeText(setUrlValue())
         messageInfo(messageUpdateValue || gettext("Value set"));
         setStatusUrl(true);
         setShowTooltip(false);
-        setCurrentUrl(mapLink)
     };
 
     const resetValue = async () => {
         await navigator.clipboard.writeText(resetUrlValue());
         messageInfo(messageResetValue || gettext("Reset current value"));
         setStatusUrl(false);
-        setCurrentUrl("");
     };
 
     let buttonContent: React.ReactNode | null = null;
@@ -65,8 +78,15 @@ export function UpdateMapUrl({
     }
 
     useEffect(() => {
-        link === window.location.href ? setStatusUrl(true) : setStatusUrl(false)
+        link + "&panel=share" === currentUrl ? setStatusUrl(true) : setStatusUrl(false)
     }, [link]);
+
+    const colorButton = link === currentUrl ? "primary" :
+        currentUrl !== panelUrl ? "volcano" :
+            "default"
+    const variantButton = link === currentUrl ? "outlined" :
+        currentUrl !== panelUrl ? "outlined" :
+            "outlined"
 
     return (
         <>
@@ -74,10 +94,11 @@ export function UpdateMapUrl({
             <Tooltip
                 open={showTooltip}
                 onOpenChange={setShowTooltip}
-                title={currentUrl === "" ? msgUpdateCurrentValue : [msgUpdateCurrentValue, msgResetCurrentValue].join(' or \n')}
+                title={statusUrl ? [msgUpdateCurrentValue, msgResetCurrentValue].join(' or \n') : msgUpdateCurrentValue}
             >
                 <Button
-                    type={statusUrl ? "primary" : "default"}
+                    color={colorButton}
+                    variant={variantButton}
                     icon={icon}
                     onClick={(e) => {
                         if (e.detail === 1) {
@@ -92,4 +113,4 @@ export function UpdateMapUrl({
             </Tooltip>
         </>
     );
-}
+};

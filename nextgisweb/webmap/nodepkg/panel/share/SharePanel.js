@@ -12,7 +12,7 @@ import {
     Switch,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import { CopyToClipboardButton, UpdateMapUrl } from "@nextgisweb/gui/buttons";
+import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -27,6 +27,8 @@ import UpdateIcon from "@nextgisweb/icon/material/update";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 import FavoriteIcon from "@nextgisweb/icon/material/star";
+
+import { UpdateMapUrl } from "./UpdateMapUrl";
 
 import "../styles/panels.less";
 import "./SharePanel.less";
@@ -166,7 +168,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
             setMapLink(decodeURIComponent(permalink));
         });
     };
-
+    
     const updateEmbedCode = () => {
         display.getVisibleItems().then((visibleItems) => {
             const permalinkOptions = {
@@ -302,8 +304,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         {gettext("Copy link")}
                     </CopyToClipboardButton>
                     <UpdateMapUrl
-                        panel={display.panelsManager._activePanelKey}
                         mapLink={mapLink}
+                        display={display}
                         setUrlValue={() => {
                             window.history.pushState({}, "", mapLink);
                         }}
