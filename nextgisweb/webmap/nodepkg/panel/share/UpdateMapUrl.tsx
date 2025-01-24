@@ -40,7 +40,7 @@ export const UpdateMapUrl = ({
 
     const wlh = window.location.href.replace("panel=share", "")
     const currentUrl = ["?", "&"].includes(wlh.slice(-1)) ? wlh.slice(0, -1) : wlh;
-
+    const popupContext = !currentUrl.includes("attribute");
     const panelUrl = ngwConfig.applicationUrl + routeURL("webmap.display", webmapId);
 
     const [messageApi, contextHolder] = message.useMessage();
@@ -82,10 +82,10 @@ export const UpdateMapUrl = ({
     }, [link]);
 
     const colorButton = link === currentUrl ? "primary" :
-        currentUrl !== panelUrl ? "volcano" :
+        currentUrl !== panelUrl && popupContext ? "orange" :
             "default"
-    const variantButton = link === currentUrl ? "outlined" :
-        currentUrl !== panelUrl ? "outlined" :
+    const variantButton = link === currentUrl ? "solid" :
+        currentUrl !== panelUrl && popupContext ? "solid" :
             "outlined"
 
     return (
