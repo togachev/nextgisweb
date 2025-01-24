@@ -144,10 +144,10 @@ a[class*=" icon-"]:hover:before {
                         overflow: hidden;
                         -webkit-line-clamp: 2;
                         display: -webkit-box;
-                        -webkit-box-orient: vertical;  
+                        -webkit-box-orient: vertical;
                     }
 
-                    &.pull-right > *:first-child {
+                    &.pull-right>*:first-child {
                         margin-right: auto;
                     }
                 }
@@ -232,7 +232,7 @@ a[class*=" icon-"]:hover:before {
         }
     }
 
-    > div.text {
+    >div.text {
         flex-grow: 1;
         color: var(--primary);
         font-weight: var(--ngw-head-font-weight);
@@ -409,6 +409,7 @@ dl.ngw-pyramid-kv {
 
 @import (css) "@{node_modules}/dijit/themes/claro/claro.css";
 @import "override-claro.less";
+@import "override-antd.less";
 
 @import "include.less";
 
@@ -462,39 +463,18 @@ div.descClass img {
     padding: 4px 3px;
 }
 
-.ant-image-preview-img {
-    background: #ffffff;
-    border-radius: 2px;
-}
+// .ant-image-preview-close {
+//     background-color: var(--primary) !important;
+// }
 
-.ant-image-preview-mask {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.25) !important;
-    pointer-events: none;
-}
+// .ant-image-preview-operations {
+//     background-color: var(--primary) !important;
+// }
 
-.ant-image-preview-close {
-    position: fixed;
-    top: 72px !important;
-    right: 32px;
-    display: flex;
-    color: #fff;
-    background-color: var(--primary) !important;
-    border-radius: 50%;
-    padding: 12px;
-    outline: 0;
-    border: 0;
-    cursor: pointer;
-    transition: all 0s;
-}
+// .ant-image-preview-mask {
+//     pointer-events: auto !important;
+// }
 
-.ant-image-preview-operations {
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    background-color: var(--primary) !important;
-    border-radius: 100px;
-}
+// .ant-image-preview {
+//     pointer-events: auto !important;
+// }

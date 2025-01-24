@@ -33,7 +33,6 @@ export const UpdateMapUrl = ({
     mapLink,
 }: UpdateMapUrlProps) => {
     const [showTooltip, setShowTooltip] = useState(false);
-    const [statusUrl, setStatusUrl] = useState(false);
     const [link, setLink] = useState();
 
     const webmapId = display.config.webmapId;
@@ -62,14 +61,12 @@ export const UpdateMapUrl = ({
     const valueSet = async () => {
         await navigator.clipboard.writeText(setUrlValue())
         messageInfo(messageUpdateValue || gettext("Value set"));
-        setStatusUrl(true);
         setShowTooltip(false);
     };
 
     const resetValue = async () => {
         await navigator.clipboard.writeText(resetUrlValue());
         messageInfo(messageResetValue || gettext("Reset current value"));
-        setStatusUrl(false);
     };
 
     let buttonContent: React.ReactNode | null = null;
@@ -77,17 +74,16 @@ export const UpdateMapUrl = ({
         buttonContent = children || gettext("Set value");
     }
 
-    useEffect(() => {
-        link + "&panel=share" === currentUrl ? setStatusUrl(true) : setStatusUrl(false)
-    }, [link]);
-
     const colorButton = link === currentUrl ? "primary" :
         currentUrl !== panelUrl && popupContext ? "orange" :
             "default"
     const variantButton = link === currentUrl ? "solid" :
         currentUrl !== panelUrl && popupContext ? "solid" :
             "outlined"
-
+    console.log(link);
+    console.log(currentUrl);
+    console.log(popupContext);
+    console.log(panelUrl);
     return (
         <>
             {contextHolder}
