@@ -94,7 +94,7 @@ export const UpdateMapUrl = ({
             <Tooltip
                 open={showTooltip}
                 onOpenChange={setShowTooltip}
-                title={statusUrl ? [msgUpdateCurrentValue, msgResetCurrentValue].join(' or \n') : msgUpdateCurrentValue}
+                title={link === currentUrl || currentUrl !== panelUrl && popupContext ? [msgUpdateCurrentValue, msgResetCurrentValue].join(' or \n') : msgUpdateCurrentValue}
             >
                 <Button
                     color={colorButton}
