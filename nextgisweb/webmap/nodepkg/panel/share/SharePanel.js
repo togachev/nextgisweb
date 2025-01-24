@@ -27,7 +27,7 @@ import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 import FavoriteIcon from "@nextgisweb/icon/material/star";
 
-import { UpdateMapUrl } from "./UpdateMapUrl.tsx";
+import { UpdateMapUrl } from "./UpdateMapUrl";
 
 import "../styles/panels.less";
 import "./SharePanel.less";
