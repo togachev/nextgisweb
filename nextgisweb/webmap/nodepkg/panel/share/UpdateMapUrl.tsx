@@ -1,46 +1,39 @@
 import { useEffect, useState } from "react";
 import { Button, message, Tooltip } from "@nextgisweb/gui/antd";
-import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 import { routeURL } from "@nextgisweb/pyramid/api";
 
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ButtonProps } from "@nextgisweb/gui/antd";
+
+import UpdateIcon from "@nextgisweb/icon/material/update";
+import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+
 interface UpdateMapUrlProps extends ButtonProps {
-    children?: React.ReactNode;
-    iconOnly?: boolean;
-    messageUpdateValue?: string;
-    messageResetValue?: string;
-    setUrlValue: () => string;
-    resetUrlValue: () => string;
-    icon?: React.ReactNode;
+    setUrl: () => string;
+    resetUrl: () => string;
     display: DojoDisplay;
     mapLink: string;
 }
 
-const msgResetCurrentValue = gettext("Double click will return to original value")
-const msgUpdateCurrentValue = gettext("Click to update current map address")
+const msgOriginalAddress = gettext("Click to return to original map address");
+const msgUpdateAddress = gettext("Click to update current map address");
+const msgUpdateValue = gettext("The map link updated.")
+const msgResetValue = gettext("The map link reset.")
+const msgUpdateUrl = gettext("Update url");
+const msgClearUrl = gettext("Clear url");
 
 export const UpdateMapUrl = ({
-    children,
-    messageUpdateValue,
-    messageResetValue,
-    setUrlValue,
-    resetUrlValue,
-    iconOnly,
-    icon,
+    setUrl,
+    resetUrl,
     display,
     mapLink,
 }: UpdateMapUrlProps) => {
-    const [showTooltip, setShowTooltip] = useState(false);
-    const [link, setLink] = useState();
-
-    const webmapId = display.config.webmapId;
-
-    const wlh = window.location.href.replace("panel=share", "")
-    const currentUrl = ["?", "&"].includes(wlh.slice(-1)) ? wlh.slice(0, -1) : wlh;
-    const popupContext = !currentUrl.includes("attribute");
-    const panelUrl = ngwConfig.applicationUrl + routeURL("webmap.display", webmapId);
+    const [showTooltip, setShowTooltip] = useState<boolean>(false);
+    const [link, setLink] = useState<string>();
+    const [currentUrl, setCurrentUrl] = useState<string>();
+    const [popupContext, setPopupContext] = useState<boolean>();
 
     const [messageApi, contextHolder] = message.useMessage();
     const messageInfo = (text) => {
@@ -51,6 +44,19 @@ export const UpdateMapUrl = ({
         });
     };
 
+    const webmapId = display.config.webmapId;
+    const panelUrl = ngwConfig.applicationUrl + routeURL("webmap.display", webmapId);
+
+    useEffect(() => {
+        const wlh = window.location.href.replace("panel=share", "")
+        if (["?", "&"].includes(wlh.slice(-1))) {
+            setCurrentUrl(wlh.slice(0, -1))
+        } else {
+            setCurrentUrl(wlh)
+        }
+        setPopupContext(!window.location.href.includes("attribute"))
+    }, [window.location.href, mapLink])
+
     useEffect(() => {
         display.getVisibleItems().then((visibleItems) => {
             const permalink = getPermalink(display, visibleItems);
@@ -59,53 +65,43 @@ export const UpdateMapUrl = ({
     }, [mapLink]);
 
     const valueSet = async () => {
-        await navigator.clipboard.writeText(setUrlValue())
-        messageInfo(messageUpdateValue || gettext("Value set"));
+        await navigator.clipboard.writeText(setUrl())
+        messageInfo(msgUpdateValue || gettext("Value set"));
         setShowTooltip(false);
     };
 
     const resetValue = async () => {
-        await navigator.clipboard.writeText(resetUrlValue());
-        messageInfo(messageResetValue || gettext("Reset current value"));
+        await navigator.clipboard.writeText(resetUrl());
+        messageInfo(msgResetValue || gettext("Reset current value"));
+        setCurrentUrl(panelUrl)
     };
 
-    let buttonContent: React.ReactNode | null = null;
-    if (!iconOnly) {
-        buttonContent = children || gettext("Set value");
-    }
-
-    const colorButton = link === currentUrl ? "primary" :
-        currentUrl !== panelUrl && popupContext ? "orange" :
-            "default"
-    const variantButton = link === currentUrl ? "solid" :
-        currentUrl !== panelUrl && popupContext ? "solid" :
-            "outlined"
-    console.log(link);
-    console.log(currentUrl);
-    console.log(popupContext);
-    console.log(panelUrl);
     return (
         <>
             {contextHolder}
             <Tooltip
                 open={showTooltip}
                 onOpenChange={setShowTooltip}
-                title={link === currentUrl || currentUrl !== panelUrl && popupContext ? [msgUpdateCurrentValue, msgResetCurrentValue].join(' or \n') : msgUpdateCurrentValue}
+                title={link === currentUrl && popupContext ? msgOriginalAddress : currentUrl !== panelUrl && popupContext ? msgUpdateAddress : msgUpdateAddress}
             >
-                <Button
-                    color={colorButton}
-                    variant={variantButton}
-                    icon={icon}
-                    onClick={(e) => {
-                        if (e.detail === 1) {
-                            valueSet();
-                        } else if (e.detail === 2) {
-                            resetValue();
-                        }
-                    }}
-                >
-                    {buttonContent}
-                </Button>
+                {link === currentUrl && popupContext ?
+                    <Button
+                        color="primary"
+                        variant="solid"
+                        onClick={resetValue}
+                        icon={<DeleteForever />}
+                    >
+                        {msgClearUrl}
+                    </Button> :
+                    <Button
+                        color={currentUrl !== panelUrl && popupContext ? "orange" : "default"}
+                        variant={currentUrl !== panelUrl && popupContext ? "solid" : "outlined"}
+                        onClick={valueSet}
+                        icon={<UpdateIcon />}
+                    >
+                        {msgUpdateUrl}
+                    </Button>
+                }
             </Tooltip>
         </>
     );

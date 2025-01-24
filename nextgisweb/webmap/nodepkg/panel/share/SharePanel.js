@@ -23,12 +23,11 @@ import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelContainer, PanelSection } from "../component";
 
-import UpdateIcon from "@nextgisweb/icon/material/update";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 import FavoriteIcon from "@nextgisweb/icon/material/star";
 
-import { UpdateMapUrl } from "./UpdateMapUrl";
+import { UpdateMapUrl } from "./UpdateMapUrl.tsx";
 
 import "../styles/panels.less";
 import "./SharePanel.less";
@@ -306,17 +305,11 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     <UpdateMapUrl
                         mapLink={mapLink}
                         display={display}
-                        setUrlValue={() => {
+                        setUrl={() => {
                             window.history.pushState({}, "", mapLink);
                         }}
-                        resetUrlValue={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
-                        icon={<UpdateIcon />}
-                        iconOnly={false}
-                        messageUpdateValue={gettext("The map link updated.")}
-                        messageResetValue={gettext("The map link reset.")}
-                    >
-                        {gettext("Update link")}
-                    </UpdateMapUrl>
+                        resetUrl={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
+                    />
                     {!ngwConfig.isGuest && (
                         <Tooltip title={msgAddFragmentToFavorites}>
                             <Button
