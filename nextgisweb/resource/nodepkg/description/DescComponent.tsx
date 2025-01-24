@@ -11,6 +11,7 @@ import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import ZoomOut from "@nextgisweb/icon/material/zoom_out/outline";
 import RotateRight from "@nextgisweb/icon/material/rotate_right/outline";
 import RotateLeft from "@nextgisweb/icon/material/rotate_left/outline";
+import CloseIcon from "@nextgisweb/icon/material/close";
 
 import "./DescComponent.less";
 import "./react-photo-view.less";
@@ -56,15 +57,23 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 }
 
 const Image = (props) => (
-    <PhotoProvider maskOpacity={0.5}
-        toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+    <PhotoProvider
+        maskOpacity={0.5}
+        bannerVisible={false}
+        overlayRender={({ onScale, scale, rotate, onRotate, onClose }) => {
             return (
-                <>
-                    <span className="icon-desc-symbol" onClick={() => onRotate(rotate + 90)}><RotateRight /></span>
-                    <span className="icon-desc-symbol" onClick={() => onRotate(rotate - 90)}><RotateLeft /></span>
-                    <span className="icon-desc-symbol" onClick={() => onScale(scale + 1)}><ZoomIn /></span>
-                    <span className={scale > 1 ? "icon-desc-symbol" : "icon-desc-disabled"} onClick={() => onScale(scale - 1)}><ZoomOut /></span>
-                </>
+                <div className="PhotoView-Slider__BannerWrap">
+                    <div className="PhotoView-Slider__BannerRight"></div>
+                    <div className="PhotoView-Slider__BannerRight">
+                        <span className="icon-desc-symbol" onClick={() => onRotate(rotate + 90)}><RotateRight /></span>
+                        <span className="icon-desc-symbol" onClick={() => onRotate(rotate - 90)}><RotateLeft /></span>
+                        <span className="icon-desc-symbol" onClick={() => onScale(scale + 1)}><ZoomIn /></span>
+                        <span className={scale > 1 ? "icon-desc-symbol" : "icon-desc-disabled"} onClick={() => onScale(scale - 1)}><ZoomOut /></span>
+                    </div>
+                    <div className="PhotoView-Slider__BannerRight">
+                        <span className="icon-desc-symbol" onClick={() => onClose()}><CloseIcon /></span>
+                    </div>
+                </div>
             );
         }}
     >
