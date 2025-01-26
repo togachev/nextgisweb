@@ -2,19 +2,13 @@ import parse, { attributesToProps, Element, domToReact } from "html-react-parser
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Divider } from "@nextgisweb/gui/antd";
-import { PhotoProvider, PhotoView } from "react-photo-view";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import type { WebmapItemConfig } from "@nextgisweb/webmap/type";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
-import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
-import ZoomOut from "@nextgisweb/icon/material/zoom_out/outline";
-import RotateRight from "@nextgisweb/icon/material/rotate_right/outline";
-import RotateLeft from "@nextgisweb/icon/material/rotate_left/outline";
-import CloseIcon from "@nextgisweb/icon/material/close";
+import { ImageView } from "./ImageView";
 
 import "./DescComponent.less";
-import "./react-photo-view.less";
 
 const title = gettext("Description");
 const msgLayer = gettext("Layer description");
@@ -56,33 +50,6 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
     }
 }
 
-const Image = (props) => (
-    <PhotoProvider
-        maskOpacity={0.5}
-        bannerVisible={false}
-        overlayRender={({ onScale, scale, rotate, onRotate, onClose }) => {
-            return (
-                <div className="PhotoView-Slider__BannerWrap">
-                    <div className="PhotoView-Slider__BannerRight"></div>
-                    <div className="PhotoView-Slider__BannerRight">
-                        <span className="icon-desc-symbol" onClick={() => onRotate(rotate + 90)}><RotateRight /></span>
-                        <span className="icon-desc-symbol" onClick={() => onRotate(rotate - 90)}><RotateLeft /></span>
-                        <span className="icon-desc-symbol" onClick={() => onScale(scale + 1)}><ZoomIn /></span>
-                        <span className={scale > 1 ? "icon-desc-symbol" : "icon-desc-disabled"} onClick={() => onScale(scale - 1)}><ZoomOut /></span>
-                    </div>
-                    <div className="PhotoView-Slider__BannerRight">
-                        <span className="icon-desc-symbol" onClick={() => onClose()}><CloseIcon /></span>
-                    </div>
-                </div>
-            );
-        }}
-    >
-        <PhotoView src={props.src}>
-            <img src={props.src} style={{ objectFit: "cover", cursor: "pointer" }} alt="" />
-        </PhotoView>
-    </PhotoProvider>
-)
-
 export const DescComponent = (props) => {
     const { display, content, type, close } = props;
 
@@ -110,11 +77,11 @@ export const DescComponent = (props) => {
             const types = ["map", undefined, "home_page"];
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_width && type === "feature") {
-                return (<Image {...props} />);
+                return (<ImageView {...item} />);
             }
 
             if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && types.includes(type)) {
-                return (<Image {...props} />);
+                return (<ImageView {...item} />);
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {
