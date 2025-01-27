@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button, Flex } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
@@ -12,30 +11,6 @@ const ImagePortal = ({
 }) => {
 
     const { refs } = useControls();
-
-    const [sizeBlock, setSizeBlock] = useState({ height: "80%" });
-    const [sizeImage, setSizeImage] = useState({ width: "auto", height: "100%" });
-    const H = window.innerHeight;
-    const W = window.innerWidth;
-    useEffect(() => {
-        const updateWindowDimensions = () => {
-
-            W >= H ?
-                setSizeBlock({ height: "80%", width: undefined }) :
-                setSizeBlock({ width: "80%", height: undefined })
-            W >= H ?
-                setSizeImage({ width: "auto", height: "100%" }) :
-                setSizeImage({ width: "100%", height: "auto" })
-        };
-
-        window.addEventListener("resize", updateWindowDimensions);
-
-        return () => window.removeEventListener("resize", updateWindowDimensions)
-
-    }, []);
-
-    console.log(sizeBlock, sizeImage, "H", H, "W", W);
-
 
     return (
         createPortal(
@@ -77,8 +52,8 @@ const ImagePortal = ({
                         />
                     </Flex>
                 </div>
-                <div style={sizeBlock} className="image-block">
-                    <img style={{ width: sizeImage?.width, height: sizeImage?.height }} src={attribs.src} alt="" />
+                <div className="image-block">
+                    <img src={attribs.src} alt="" />
                 </div>
             </div>,
             document.body

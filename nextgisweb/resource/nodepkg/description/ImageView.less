@@ -49,14 +49,17 @@
     }
 
     .image-block {
-
-        position: absolute;
+        position: fixed;
         top: 50%;
+        right: auto;
+        bottom: auto;
         left: 50%;
         transform: translate(-50%, -50%);
+        outline: 0;
 
         img {
-
+            max-height: 85vh;
+            max-width: 85vw;
         }
     }
 
