@@ -1,14 +1,12 @@
 import { createPortal } from "react-dom";
-import { Button, Flex } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { useControls } from "./controls/useControls";
 
 import "./ImageView.less";
 
-const ImagePortal = ({
-    attribs,
-}) => {
+const ImagePortal = ({ attribs }) => {
 
     const { refs } = useControls();
 
@@ -21,37 +19,40 @@ const ImagePortal = ({
                         refs.current.remove();
                     }}
                 ></div>
-                <div className="close-block">
+                <span className="close-block">
                     <Button
+                        className="size-button"
                         type="text"
                         icon={<CloseIcon />}
                         onClick={() => {
                             refs.current.remove();
                         }}
                     />
-                </div>
-                <div
+                </span>
+                <span
                     className="controls"
                 >
-                    <Flex wrap gap="small" className="site-button-ghost-wrapper">
-                        <Button
-                            type="text"
-                            icon={<CloseIcon />}
-                        />
-                        <Button
-                            type="text"
-                            icon={<CloseIcon />}
-                        />
-                        <Button
-                            type="text"
-                            icon={<CloseIcon />}
-                        />
-                        <Button
-                            type="text"
-                            icon={<CloseIcon />}
-                        />
-                    </Flex>
-                </div>
+                    <Button
+                        className="size-button"
+                        type="text"
+                        icon={<CloseIcon />}
+                    />
+                    <Button
+                        className="margin-button size-button"
+                        type="text"
+                        icon={<CloseIcon />}
+                    />
+                    <Button
+                        className="margin-button size-button"
+                        type="text"
+                        icon={<CloseIcon />}
+                    />
+                    <Button
+                        className="margin-button size-button"
+                        type="text"
+                        icon={<CloseIcon />}
+                    />
+                </span>
                 <div className="image-block">
                     <img src={attribs.src} alt="" />
                 </div>
