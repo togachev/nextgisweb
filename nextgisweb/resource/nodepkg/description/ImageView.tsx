@@ -3,12 +3,13 @@ import { Button } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { useControls } from "./controls/useControls";
-
+import { useState } from 'react';
+import { List, arrayMove } from 'react-movable';
 import "./ImageView.less";
 
 const ImagePortal = ({ attribs }) => {
-
     const { refs } = useControls();
+    const [items, setItems] = useState([<img key="img" src={attribs.src} alt="" />]);
 
     return (
         createPortal(
@@ -19,7 +20,7 @@ const ImagePortal = ({ attribs }) => {
                         refs.current.remove();
                     }}
                 ></div>
-                <span className="close-block">
+                <div className="close-block">
                     <Button
                         className="size-button"
                         type="text"
@@ -28,10 +29,8 @@ const ImagePortal = ({ attribs }) => {
                             refs.current.remove();
                         }}
                     />
-                </span>
-                <span
-                    className="controls"
-                >
+                </div>
+                <div className="controls">
                     <Button
                         className="size-button"
                         type="text"
@@ -52,11 +51,37 @@ const ImagePortal = ({ attribs }) => {
                         type="text"
                         icon={<CloseIcon />}
                     />
-                </span>
-                <div className="image-block">
-                    <img src={attribs.src} alt="" />
                 </div>
-            </div>,
+                <div className="image-block">
+                    <List
+                        values={items}
+                        onChange={({ oldIndex, newIndex }) =>
+                            setItems(arrayMove(items, oldIndex, newIndex))
+                        }
+                        renderList={({ children, props, isDragged }) => (
+                            <div
+                                {...props}
+                                style={{ padding: 0, cursor: isDragged ? 'grabbing' : undefined }}
+                            >
+                                {children}
+                            </div>
+                        )}
+                        renderItem={({ value, props, isDragged }) => (
+                            <div
+                                {...props}
+                                key={props.key}
+                                style={{
+                                    ...props.style,
+                                    cursor: isDragged ? 'grabbing' : 'grab',
+                                    zIndex: 1081,
+                                }}
+                            >
+                                {value}
+                            </div>
+                        )}
+                    />
+                </div>
+            </div >,
             document.body
         )
     )
@@ -66,7 +91,7 @@ export function ImageView(props) {
     const { attribs } = props;
 
     return (
-        <span
+        <div
             className="preview-image"
             onClick={() => {
                 showModal(ImagePortal, {
@@ -75,6 +100,6 @@ export function ImageView(props) {
             }}
         >
             <img src={attribs.src} alt="" />
-        </span>
+        </div>
     );
 }
