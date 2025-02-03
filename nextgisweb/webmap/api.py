@@ -1,8 +1,10 @@
+from inspect import findsource, getfile, signature
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Union, cast
+from warnings import warn_explicit
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -17,9 +19,15 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
+from nextgisweb.render import IRenderableScaleRange
+from nextgisweb.render.api import LegendSymbol, legend_symbols_by_resource
+from nextgisweb.render.legend import ILegendSymbols
+from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
 
-from .model import WebMap, WebMapAnnotation, WebMapScope
+from .adapter import WebMapAdapter
+from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
+from .plugin import WebmapLayerPlugin, WebmapPlugin
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
 
@@ -383,10 +391,305 @@ csetting("degree_format", DegreeFormat, default="dd")
 csetting("measurement_srid", int, default=4326)
 csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
-csetting("identify_panel", bool, default=False)
 csetting("max_count_file_upload", float, default=10)
 csetting("identify_module", bool, default=False)
 csetting("offset_point", int, default=10)
+
+AnnotationVisibleMode = Literal["no", "yes", "messages"]
+LegendVisibleMode = Literal["collapse", "expand"]
+
+
+class LegendInfo(Struct, kw_only=True):
+    visible: LegendVisibleMode
+    has_legend: bool
+    symbols: List[LegendSymbol]
+    single: bool
+    open: Union[bool, None] = None
+
+
+class AnnotationsPermissions(Struct, kw_only=True):
+    read: bool
+    write: bool
+    manage: bool
+
+
+class AnnotationsConfig(Struct, kw_only=True):
+    enabled: bool
+    default: AnnotationVisibleMode
+    scope: AnnotationsPermissions
+
+
+class MidConfig(Struct, kw_only=True):
+    adapter: Set[str]
+    basemap: Set[str]
+    plugin: Set[str]
+
+
+class BaseItem(Struct, kw_only=True):
+    id: int
+    key: int
+    label: str
+    title: str
+
+
+class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
+    layerId: int
+    styleId: int
+    visibility: bool
+    identifiable: bool
+    transparency: Union[float, None]
+    minScaleDenom: Union[float, None]
+    maxScaleDenom: Union[float, None]
+    drawOrderPosition: Union[int, None]
+    legendInfo: LegendInfo
+    adapter: str
+    plugin: Dict[str, Any]
+    minResolution: Union[float, None] = None
+    maxResolution: Union[float, None] = None
+    editable: Union[bool, None] = None
+
+
+class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
+    expanded: bool
+    exclusive: bool
+    children: List[Union["GroupItemConfig", LayerItemConfig]]
+
+
+class RootItemConfig(BaseItem, tag="root", tag_field="type"):
+    children: List[Union[GroupItemConfig, LayerItemConfig]]
+
+class InfoMapConfig(Struct, kw_only=True):
+    resource: str
+    link: str
+    update: bool
+    scope: bool
+
+
+class DisplayConfig(Struct, kw_only=True):
+    webmapId: int
+    webmapTitle: str
+    active_panel: str
+    infomap: InfoMapConfig
+    webmapPlugin: Dict[str, Any]
+    initialExtent: ExtentWSEN
+    constrainingExtent: Union[ExtentWSEN, None]
+    rootItem: RootItemConfig
+    checkedItems: Set[int]
+    expandedItems: Set[int]
+    mid: MidConfig
+    annotations: AnnotationsConfig
+    webmapDescription: str
+    webmapEditable: bool
+    webmapLegendVisible: str
+    drawOrderEnabled: Union[Any, None] = None
+    measureSrsId: Union[int, None] = None
+    # units: str
+    printMaxSize: int
+    bookmarkLayerId: Union[Any, None] = None
+
+
+def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
+    attrs = tuple((prefix + i) for i in ("left", "bottom", "right", "top"))
+    parts = [getattr(obj, a) for a in attrs]
+    return ExtentWSEN(*parts) if None not in parts else None
+
+
+def _amd_free(iterable):
+    for item in iterable:
+        if getattr(item, "amd_free", False):
+            yield item
+        else:
+            warn_explicit(
+                f"Unsupported plugin {item.__name__} ignored!",
+                category=DeprecationWarning,
+                filename=getfile(item),
+                lineno=findsource(item)[1] + 1,
+                module=item.__module__,
+            )
+
+
+def display_config(obj, request) -> DisplayConfig:
+    request.resource_permission(ResourceScope.read)
+
+    # Map level plugins
+    plugin = dict()
+    for p_cls in _amd_free(WebmapPlugin.registry):
+        if p_mid_data := p_cls.is_supported(obj):
+            p_mid, p_payload = p_mid_data
+            plugin[p_mid] = p_payload
+
+    ls_webmap = request.env.webmap.effective_legend_symbols() + obj.legend_symbols
+
+    def _legend(layer, style):
+        ls_layer = ls_webmap + obj.legend_symbols + layer.legend_symbols
+        result = dict(visible=ls_layer)
+        if ls_layer in (LegendSymbolsEnum.EXPAND, LegendSymbolsEnum.COLLAPSE):
+            has_legend = result["has_legend"] = ILegendSymbols.providedBy(style)
+            if has_legend:
+                legend_symbols = legend_symbols_by_resource(style, 20, request.translate)
+                result.update(symbols=legend_symbols)
+                is_single = len(legend_symbols) == 1
+                result.update(single=is_single)
+                if not is_single:
+                    result.update(open=ls_layer == LegendSymbolsEnum.EXPAND)
+
+        return result
+
+    mid = MidConfig(adapter=set(), basemap=set(), plugin=set())
+    checked_items: Set[int] = set()
+    expanded_items: Set[int] = set()
+
+    def traverse(item):
+        data = dict(
+            id=item.id,
+            key=item.id,
+            type=item.item_type,
+            label=item.display_name,
+            title=item.display_name,
+        )
+
+        if item.item_type == "layer":
+            style = item.style
+            layer = style.parent if style.cls.endswith("_style") else style
+
+            if not style.has_permission(DataScope.read, request.user):
+                # Skip webmap item if there are no necessary permissions, so it
+                # won't be shown in the tree.
+                return None
+
+            layer_enabled = bool(item.layer_enabled)
+            if layer_enabled:
+                checked_items.add(item.id)
+
+            scale_range = item.scale_range()
+            if IRenderableScaleRange.providedBy(style):
+                scale_range = scale_range_intersection(scale_range, style.scale_range())
+
+            # Main element parameters
+            data.update(
+                layerId=style.parent_id,
+                styleId=style.id,
+                cls=style.cls,
+                layerCls=layer.cls,
+                visibility=layer_enabled,
+                identifiable=item.layer_identifiable,
+                transparency=item.layer_transparency,
+                minScaleDenom=scale_range[0],
+                maxScaleDenom=scale_range[1],
+                drawOrderPosition=item.draw_order_position,
+                legendInfo=_legend(item, style),
+                layerHighligh=item.layer_highligh,
+            )
+
+            if item.file_resource_visible:
+                data.update(
+                    fileResourceVisible=item.file_resource_visible, # Прикрепленные файлы (показать/скрыть)
+                )
+
+            if layer.check_relation(layer):
+                data.update(
+                    relation=layer.check_relation(layer)
+                )
+
+            data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid
+            mid.adapter.add(data["adapter"])
+
+            # Layer level plugins
+            plugin = dict()
+            plugin_base_kwargs = dict(layer=layer, webmap=obj)
+            for pcls in _amd_free(WebmapLayerPlugin.registry):
+                fn = pcls.is_layer_supported
+                plugin_kwargs = (
+                    dict(plugin_base_kwargs, style=style)
+                    if "style" in signature(fn).parameters
+                    else plugin_base_kwargs
+                )
+
+                if p_mid_data := fn(**plugin_kwargs):
+                    p_mid, p_payload = p_mid_data
+                    plugin[p_mid] = p_payload
+
+            data.update(plugin=plugin)
+            mid.plugin.update(plugin.keys())
+
+        elif item.item_type in ("root", "group"):
+            expanded = item.group_expanded
+            exclusive = item.group_exclusive
+            if expanded:
+                expanded_items.add(item.id)
+
+            # Recursively run all elements excluding those with no permissions
+            data.update(
+                expanded=expanded,
+                exclusive=exclusive,
+                children=list(filter(None, map(traverse, item.children))),
+            )
+
+            # Hide empty groups
+            if (item.item_type in "group") and not data["children"]:
+                return None
+
+        return data
+
+    def get_relation(item):
+        list = []
+        def traverse_relation(item):
+            if item.item_type in ("root", "group"):
+                if item.children:
+                    for child in item.children:
+                        traverse_relation(child) # Traverse child nodes.
+            elif item.item_type == "layer":
+                layer=item.style.parent
+                if not layer.has_permission(DataScope.read, request.user):
+                    return None
+                if layer.check_relation(layer):
+                    list.append(layer.check_relation(layer))
+
+        traverse_relation(item)
+        return list if len(list) > 0 else None
+
+    initial_extent = _extent_wsen_from_attrs(obj, prefix="extent_")
+    if initial_extent is None:
+        initial_extent = ExtentWSEN(-180, -90, 180, 90)
+    constraining_extent = _extent_wsen_from_attrs(obj, prefix="extent_const_")
+    root_item = cast(RootItemConfig, traverse(obj.root_item))
+    permissions = obj.permissions(request.user)
+
+    return DisplayConfig(
+        webmapId=obj.id,
+        webmapTitle=obj.display_name if obj.title is None else obj.title,
+        webmapPlugin=plugin,
+        initialExtent=initial_extent,
+        constrainingExtent=constraining_extent,
+        rootItem=root_item,
+        checkedItems=checked_items,
+        expandedItems=expanded_items,
+        active_panel=obj.active_panel,
+        infomap=dict(
+            resource=request.route_url("resource.show", id=0),
+            link=request.route_url("resource.show", id=obj.id),
+            update=request.route_url("resource.update", id=obj.id),
+            scope=obj.has_permission(ResourceScope.update, request.user)
+        ),
+        mid=mid,
+        annotations=AnnotationsConfig(
+            enabled=obj.annotation_enabled and request.env.webmap.options["annotation"],
+            default=obj.annotation_default,
+            scope=AnnotationsPermissions(
+                read=WebMapScope.annotation_read in permissions,
+                write=WebMapScope.annotation_write in permissions,
+                manage=WebMapScope.annotation_manage in permissions,
+            ),
+        ),
+        webmapDescription=obj.description,
+        webmapEditable=obj.editable,
+        webmapLegendVisible=obj.legend_symbols,
+        drawOrderEnabled=obj.draw_order_enabled,
+        measureSrsId=obj.measure_srs_id,
+        bookmarkLayerId=obj.bookmark_resource_id,
+        printMaxSize=request.env.webmap.options["print.max_size"],
+    )
+
 
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
@@ -421,4 +724,11 @@ def setup_pyramid(comp, config):
         "/api/component/{id}/webmap/print",
         factory=webmap_factory,
         post=print,
+    )
+
+    config.add_route(
+        "webmap.display_config",
+        "/api/resource/{id}/webmap/display_config",
+        factory=webmap_factory,
+        get=display_config,
     )

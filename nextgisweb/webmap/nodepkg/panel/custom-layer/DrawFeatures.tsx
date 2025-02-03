@@ -14,23 +14,17 @@ import VertexIcon from "@nextgisweb/icon/mdi/vector-point";
 import EdgeIcon from "@nextgisweb/icon/mdi/vector-polyline";
 import ModifyIcon from "@nextgisweb/icon/mdi/vector-polyline-edit";
 import AutoMode from "@nextgisweb/icon/mdi/auto-mode";
-
+import topic from "@nextgisweb/webmap/compat/topic";
 import { useDraw } from "./hook/useDraw";
 
 import "./DrawFeatures.less";
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
-import type { DojoDisplay } from "../type";
-import type { DojoTopic } from "../panels-manager/type";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { ItemType, ItemProps } from "./type";
 
 import { DrawStore } from "./DrawStore";
 import { observer } from "mobx-react-lite";
-
-type DrawFeaturesProps = {
-    display: DojoDisplay;
-    topic: DojoTopic;
-}
 
 const { Text } = Typography;
 
@@ -91,7 +85,7 @@ const geomTypesInfo = [
 
 let id = 0;
 
-export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => {
+export const DrawFeatures = observer(({ display }: Display) => {
 
     const { addLayerMap, interactionClear, drawInteraction, featureCount, modifyInteraction, olmap, removeItem, removeItems, selectFeatureInfo, snapInteraction, saveLayer, snapBuild, visibleLayer, zoomToLayer } = useDraw(display);
 
@@ -419,6 +413,8 @@ export const DrawFeatures = observer(({ display, topic }: DrawFeaturesProps) => 
                 },
             }}>
             <Modal
+                transitionName=""
+                maskTransitionName=""
                 mask={false}
                 title={SaveAs}
                 open={open}

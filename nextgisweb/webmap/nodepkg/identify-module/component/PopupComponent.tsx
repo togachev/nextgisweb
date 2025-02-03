@@ -13,15 +13,15 @@ import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import showModal from "@nextgisweb/gui/showModal";
-import { DisplayItemConfig } from "@nextgisweb/webmap/panels-manager/type";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
-import type { WebmapItem } from "@nextgisweb/webmap/type";
+
 import type { DataProps, Params } from "./type";
-import topic from "dojo/topic";
+import topic from "@nextgisweb/webmap/compat/topic";
 
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading")
@@ -107,7 +107,7 @@ export default observer(
             const LinkToGeometry = (value: DataProps) => {
                 const styles: number[] = [];
                 display.getVisibleItems()
-                    .then((items: WebmapItem[]) => {
+                    .then((items) => {
                         items.map(i => {
                             styles.push(i.styleId[0]);
                         });
@@ -189,7 +189,7 @@ export default observer(
 
             const linkToGeometryFeature = useMemo(() => {
                 if (count > 0 && selected) {
-                    const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === selected.styleId);
+                    const item = Object.values(display.webmapStore._layers).find((itm) => itm.itemConfig.styleId === selected.styleId);
                     if (count > 0 && selected) {
                         if (!imodule._isEditEnabled(display, item)) { return false; }
                         return (
@@ -210,7 +210,7 @@ export default observer(
             const editFeature = useMemo(() => {
                 if (count > 0 && selected) {
                     const { id, layerId, styleId } = selected;
-                    const item = Object.values(display._layers).find((itm: DisplayItemConfig) => itm.itemConfig.styleId === styleId);
+                    const item = Object.values(display.webmapStore._layers).find((itm) => itm.itemConfig.styleId === styleId);
 
                     if (display.isTinyMode() && !display.isTinyModePlugin("ngw-webmap/plugin/FeatureLayer")) {
                         return false;
@@ -227,6 +227,8 @@ export default observer(
                                     const featureId = id;
                                     const resourceId = layerId;
                                     showModal(FeatureEditorModal, {
+                                        transitionName: "",
+                                        maskTransitionName: "",
                                         editorOptions: {
                                             featureId,
                                             resourceId: resourceId,
@@ -294,6 +296,7 @@ export default observer(
                     >
                         {contextHolder}
                         <Rnd
+                            style={{ zIndex: 10 }}
                             resizeHandleClasses={{
                                 right: "hover-right",
                                 left: "hover-left",

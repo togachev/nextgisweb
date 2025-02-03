@@ -1,3 +1,3 @@
 /** @entrypoint */
-import { CustomLayer } from "./CustomLayer";
+import CustomLayer from "./CustomLayer";
 export default CustomLayer;

@@ -25,6 +25,8 @@ export function CarouselModal({
 }: CarouselModalOptions) {
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             rootClassName="ngw-feature-attachment-carousel-modal"
             open={open}
             footer={null}

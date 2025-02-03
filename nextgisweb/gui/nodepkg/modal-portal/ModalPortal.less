@@ -1,0 +1,62 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.portal {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.45);
+
+    .block {
+        margin: auto;
+        background: #fff;
+        border: 1px solid #f0f0f0;
+        border-radius: var(--border-radius-root);
+        padding: 0px 0px 12px 12px;
+        position: relative;
+        display: flex;
+        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+        flex-direction: column;
+
+        .close {
+            display: inline-flex;
+            justify-content: flex-end;
+            height: 32px;
+            align-items: center;
+
+            button {
+                border-radius: 50%;
+            }
+        }
+
+        .content-block {
+            overflow: auto;
+            overscroll-behavior-y: contain;
+
+            .content {
+                position: relative;
+                max-width: 100%;
+
+                &>p:first-child,
+                &>p:last-child,
+                &>div>p:first-child,
+                &>div>p:last-child {
+                    margin-top: 0;
+                    margin-bottom: 0;
+                }
+            }
+
+            .content img {
+                max-width: 100%;
+            }
+        }
+    }
+}

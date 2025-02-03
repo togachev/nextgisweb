@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { Button, message, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 import { routeURL } from "@nextgisweb/pyramid/api";
 
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 
 import UpdateIcon from "@nextgisweb/icon/material/update";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 
 interface UpdateMapUrlProps extends ButtonProps {
-    setUrl: () => string;
-    resetUrl: () => string;
-    display: DojoDisplay;
+    setUrl: () => any;
+    resetUrl: () => any;
+    display: Display;
     mapLink: string;
 }
 
@@ -31,7 +30,6 @@ export const UpdateMapUrl = ({
     mapLink,
 }: UpdateMapUrlProps) => {
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
-    const [link, setLink] = useState<string>();
     const [currentUrl, setCurrentUrl] = useState<string>();
     const [popupContext, setPopupContext] = useState<boolean>();
 
@@ -55,14 +53,7 @@ export const UpdateMapUrl = ({
             setCurrentUrl(wlh)
         }
         setPopupContext(!window.location.href.includes("attribute"))
-    }, [window.location.href, mapLink])
-
-    useEffect(() => {
-        display.getVisibleItems().then((visibleItems) => {
-            const permalink = getPermalink(display, visibleItems);
-            setLink(decodeURIComponent(permalink));
-        });
-    }, [mapLink]);
+    }, [window.location.href, mapLink]);
 
     const valueSet = async () => {
         await navigator.clipboard.writeText(setUrl())
@@ -82,9 +73,9 @@ export const UpdateMapUrl = ({
             <Tooltip
                 open={showTooltip}
                 onOpenChange={setShowTooltip}
-                title={link === currentUrl && popupContext ? msgOriginalAddress : currentUrl !== panelUrl && popupContext ? msgUpdateAddress : msgUpdateAddress}
+                title={mapLink === currentUrl && popupContext ? msgOriginalAddress : currentUrl !== panelUrl && popupContext ? msgUpdateAddress : msgUpdateAddress}
             >
-                {link === currentUrl && popupContext ?
+                {mapLink === currentUrl && popupContext ?
                     <Button
                         color="primary"
                         variant="solid"

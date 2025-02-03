@@ -8,12 +8,11 @@ import { PanelHeader } from "../header";
 
 import { UploadLayer } from "./UploadLayer";
 import { DrawFeatures } from "./DrawFeatures";
-import type { DojoDisplay } from "../type";
-import type { DojoTopic } from "../panels-manager/type";
+
+import type { Display } from "@nextgisweb/webmap/display";
 
 interface CustomLayerProps {
-    display: DojoDisplay;
-    topic: DojoTopic;
+    display: Display;
     close: () => void;
 }
 
@@ -23,21 +22,21 @@ const creation = gettext("Creation")
 
 const disableIdentifyModule = gettext("When the panel is active, layer identification is disabled.");
 
-export function CustomLayer({ display, close, topic }: CustomLayerProps) {
+function CustomLayer({ display, close }: CustomLayerProps) {
 
     const items = [
         {
             key: "1",
             label: loading,
             children:
-                <UploadLayer display={display} topic={topic} />,
+                <UploadLayer display={display} />,
             icon: <UploadIcon />,
         },
         {
             key: "2",
             label: creation,
             children:
-                <DrawFeatures display={display} topic={topic} />,
+                <DrawFeatures display={display} />,
             icon: <Draw />,
         },
     ];
@@ -53,3 +52,6 @@ export function CustomLayer({ display, close, topic }: CustomLayerProps) {
         </div>
     );
 };
+
+CustomLayer.displayName = "CustomLayer";
+export default CustomLayer;

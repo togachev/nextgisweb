@@ -1,31 +1,20 @@
-/// <reference types="dojo/dijit" />
-
 import { orderBy } from "lodash-es";
+import { Control } from "ol/control";
 import Attribution from "ol/control/Attribution";
 import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";
 import Zoom from "ol/control/Zoom";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
 import { html } from "@nextgisweb/pyramid/icon";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import InfoScale from "ngw-webmap/controls/InfoScale";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import InitialExtent from "ngw-webmap/controls/InitialExtent";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import MyLocation from "ngw-webmap/controls/MyLocation";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import Identify from "ngw-webmap/tool/Identify";
-import { IdentifyModule } from "@nextgisweb/webmap/identify-module";
-import type { DojoDisplay, MapControl } from "../type";
 
+import type { Display } from "../display";
+import { IdentifyModule } from "@nextgisweb/webmap/identify-module";
+import { InfoScale } from "./control/InfoScale";
+import { InitialExtent } from "./control/InitialExtent";
+import { MyLocation } from "./control/MyLocation";
 import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
+import { Identify } from "./tool/Identify";
 import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
@@ -152,20 +141,19 @@ if (!webmapSettings.identify_module) {
     })
 }
 
-export const buildControls = (
-    display: DojoDisplay
-): Map<string, ControlReady> => {
+export const buildControls = (display: Display): Map<string, ControlReady> => {
     const controlsMap = new Map<string, ControlReady>();
 
     const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);
-    const controlsToMap: MapControl[] = [];
+    const controlsToMap: Control[] = [];
     controlsInfo.forEach((c: ControlInfo) => {
         const control = c.ctor(display);
         if (c.postCreate) {
             c.postCreate(display, control);
         }
         controlsMap.set(c.key, { info: c, control });
-        if (c.olMapControl) {
+
+        if (control instanceof Control) {
             controlsToMap.push(control);
         }
     });
@@ -173,7 +161,9 @@ export const buildControls = (
 
     const toolsInfo = getToolsInfo(display);
     const mapToolbar = buildTools(display, toolsInfo, controlsMap);
-    display._mapAddControls([mapToolbar]);
+    if (mapToolbar) {
+        display._mapAddControls([mapToolbar]);
+    }
 
     return controlsMap;
 };

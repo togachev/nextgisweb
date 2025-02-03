@@ -12,23 +12,21 @@ import type { NoticeType } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
+import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 import { decompressed } from "@nextgisweb/webmap/utils";
 
-import type {
-    DisplayItemConfig,
-    DojoTopic,
-    FeatureLayerWebMapPluginConfig,
-    TopicSubscription,
-} from "../panels-manager/type";
-import type { DojoDisplay } from "../type";
+import type topic from "../compat/topic";
+import type { Display } from "../display";
+import type { PluginBase } from "../plugin/PluginBase";
 
 const msgGoto = gettext("Go to");
 
 interface WebMapFeatureGridTabProps {
-    plugin: Record<string, unknown>;
+    plugin: PluginBase;
     layerId: number;
-    topic: DojoTopic;
+    topic: typeof topic;
 }
 
 const wkt = new WKT();
@@ -38,14 +36,13 @@ export function WebMapFeatureGridTab({
     plugin,
     layerId,
 }: WebMapFeatureGridTabProps) {
-    const topicHandlers = useRef<TopicSubscription[]>([]);
-    const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
-    const itemConfig = useRef<DisplayItemConfig>(
-        display.current.get("itemConfig") as DisplayItemConfig
-    );
+    const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
+
+    const display = useRef<Display>(plugin.display);
+    const itemConfig = useRef<LayerItemConfig>(display.current.itemConfig);
     const data = useRef<FeatureLayerWebMapPluginConfig>(
-        itemConfig.current.plugin[
-        plugin.identity as string
+        itemConfig.current?.plugin[
+            plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
 
@@ -158,7 +155,11 @@ export function WebMapFeatureGridTab({
                                 onZoomToFiltered={(ngwExtent: NgwExtent) => {
                                     display.current.map.zoomToNgwExtent(
                                         ngwExtent,
-                                        display.current.displayProjection
+                                        {
+                                            displayProjection:
+                                                display.current
+                                                    .displayProjection,
+                                        }
                                     );
                                 }}
                             />

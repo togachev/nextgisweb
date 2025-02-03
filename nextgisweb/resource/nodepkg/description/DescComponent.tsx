@@ -3,10 +3,9 @@ import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Divider } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type { WebmapItemConfig } from "@nextgisweb/webmap/type";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
-import { ImageView } from "./ImageView";
+import { ImageView } from "@nextgisweb/gui/modal-portal";
 
 import "./DescComponent.less";
 
@@ -19,7 +18,7 @@ const zoomToFeature = (display, resourceId, featureId, result) => {
         .highlightFeatureById(featureId, resourceId)
         .then((feature) => {
             const styles: number[] = [];
-            const itemConfig: WebmapItemConfig = display.getItemConfig();
+            const itemConfig = display.getItemConfig();
             Object.keys(itemConfig).forEach(function (key) {
                 if (result.includes(itemConfig[key].styleId)) {
                     styles.push(itemConfig[key].id);

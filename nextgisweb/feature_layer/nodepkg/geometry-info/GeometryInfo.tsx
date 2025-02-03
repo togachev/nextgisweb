@@ -109,7 +109,7 @@ export function GeometryInfo({
                     error || !geometryInfo ?
                         (<div className="error"><div>{gettext("Failed to get information about the geometry")}</div></div>) :
                         (<Descriptions
-                            labelStyle={{ wordBreak: "break-all", width: "calc(50%)" }}
+                            styles={{ label: { wordBreak: "break-all", width: "calc(50%)" } }}
                             bordered
                             size="small"
                             column={1}

@@ -15,7 +15,7 @@ import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatia
 import { positionContext } from "./positionContext"
 import OlGeomPoint from "ol/geom/Point";
 
-import type { DojoDisplay, WebmapItemConfig, WebmapItem } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { EventProps, ParamsProps, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
 
 import "./IdentifyModule.less";
@@ -58,7 +58,7 @@ Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
 };
 
 export class IdentifyModule extends Component {
-    private display: DojoDisplay;
+    private display: Display;
     private displaySrid: number;
     private lonlat: number[];
     private offHP: number;
@@ -177,7 +177,7 @@ export class IdentifyModule extends Component {
                     return { data: item.data, featureCount: item.featureCount };
                 });
             count = this.response.featureCount;
-            
+
         } else {
             count = 0;
             this.response = { data: [], featureCount: 0 }
@@ -217,7 +217,7 @@ export class IdentifyModule extends Component {
         }
     };
 
-    _isEditEnabled = (display: DojoDisplay, item: WebmapItem) => {
+    _isEditEnabled = (display: Display, item) => {
         const pluginName = "ngw-webmap/plugin/FeatureLayer";
 
         if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
@@ -242,8 +242,8 @@ export class IdentifyModule extends Component {
         if (op === "popup" && p === false) {
             const styles: StylesRequest[] = [];
             this.display.getVisibleItems()
-                .then((items: WebmapItem[]) => {
-                    const itemConfig: WebmapItemConfig = this.display.getItemConfig();
+                .then((items) => {
+                    const itemConfig = this.display.getItemConfig();
                     const mapResolution = this.olmap.getView().getResolution();
                     items.map(i => {
                         const item = itemConfig[i.id];
@@ -266,13 +266,13 @@ export class IdentifyModule extends Component {
 
         if (op === "popup" && p && p.value.attribute === true) {
             this.display.getVisibleItems()
-                .then((items: WebmapItem[]) => {
-                    const itemConfig: WebmapItemConfig = this.display.getItemConfig();
+                .then((items) => {
+                    const itemConfig = this.display.getItemConfig();
                     p.value.params.map(itm => {
                         items.some(x => {
                             if (itemConfig[x.id].styleId === itm.id) {
-                                const label = items.find(x => itemConfig[x.id].styleId === itm.id).label[0];
-                                const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position[0];
+                                const label = items.find(x => itemConfig[x.id].styleId === itm.id).label;
+                                const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position;
                                 itm.label = label;
                                 itm.dop = dop;
                             }
@@ -291,7 +291,7 @@ export class IdentifyModule extends Component {
             request: request,
         }
 
-        if (this.display.panelsManager._activePanelKey !== "custom-layer") {
+        if (this.display.panelManager.getActivePanelName() !== "custom-layer") {
             this.displayFeatureInfo(e, op, p);
         }
     };
@@ -361,15 +361,15 @@ export class IdentifyModule extends Component {
                 }
 
                 const p = { value, coordinate: transformedCoord };
-                
+
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
                     target: "map",
                     pixel: [
-                        this.display.panelsManager._activePanelKey ?
-                            (pixel[0] + this.display.leftPanelPane.w + this.offHP) :
+                        this.display.panelManager.getActivePanelName() ?
+                            (pixel[0] + 340 + this.offHP) :
                             (pixel[0] + this.offHP), (pixel[1] + this.offHP)
                     ],
                     type: "singleclick"

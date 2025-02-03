@@ -1,9 +1,9 @@
 import type { EventDataNode } from "rc-tree/lib/interface";
 
-import { EditIcon } from "@nextgisweb/gui/icon";
 import { getChildrenDeep, getParent } from "@nextgisweb/gui/util/tree";
+import type { GroupItemConfig } from "@nextgisweb/webmap/type/api";
 
-import type { GroupItem, LayerItem, TreeItem } from "../../type/TreeItems";
+import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
 import FolderClosedIcon from "../icons/folder.svg";
@@ -11,114 +11,19 @@ import FolderOpenIcon from "../icons/folder_open.svg";
 
 type Node = EventDataNode<TreeWebmapItem>;
 
-const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
-    const { key, title } = webMapItem;
-    const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-    if (item.treeItem.type === "layer") {
-        item.isLeaf = true;
-
-        if ("legendInfo" in item.treeItem) {
-            const { legendInfo } = item.treeItem;
-            if (legendInfo && legendInfo.visible && legendInfo.single) {
-                item.legendIcon = (
-                    <img
-                        width={20}
-                        height={20}
-                        src={
-                            "data:image/png;base64," +
-                            legendInfo.symbols[0].icon.data
-                        }
-                    />
-                );
-            }
-        }
-
-        item.icon = (item_) => {
-            const item = item_ as TreeWebmapItem;
-            if ((item.treeItem as LayerItem).editable === true) {
-                return <EditIcon />;
-            } else {
-                if (item.legendIcon) {
-                    return item.legendIcon;
-                }
-            }
-        };
-    }
-
-    if ("children" in webMapItem) {
-        item.children = webMapItem.children.map(handleWebMapItem);
-    }
-    return item;
-};
-
-const handleWebMapItemCustom = (webMapItem: TreeItem): TreeWebmapItem => {
-    const { key, title } = webMapItem;
-    const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-
-    if (item.treeItem.type === "root" || item.treeItem.type === "group") {
-        item.icon = ({ expanded }) =>
-            expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
-
-    } else if (item.treeItem.type === "layer") {
-        item.isLeaf = true;
-        
-        if ("legendInfo" in item.treeItem) {
-            const { legendInfo } = item.treeItem;
-            if (legendInfo && legendInfo.visible && legendInfo.single) {
-                item.legendIcon = (
-                    <img
-                        width={20}
-                        height={20}
-                        src={
-                            "data:image/png;base64," +
-                            legendInfo.symbols[0].icon.data
-                        }
-                    />
-                );
-            }
-        }
-
-        item.icon = (item_) => {
-            const item = item_ as TreeWebmapItem;
-            if ((item.treeItem as LayerItem).editable === true) {
-                return <EditIcon />;
-            } else {
-                if (item.legendIcon) {
-                    return item.legendIcon;
-                }
-            }
-        };
-    }
-    if ("children" in webMapItem) {
-        item.children = webMapItem.children.map(handleWebMapItemCustom);
-    }
-    // if ("children" in webMapItem) {
-    //     item.children = webMapItem.children.map(handleWebMapItem);
-    // }
-    return item;
-};
-
-export const prepareWebMapItems = (webMapItems: TreeItem[]) => {
-    return webMapItems.map(handleWebMapItem);
-};
-
-export const prepareWebMapItemsCustom = (webMapItems: TreeItem[]) => {
-    return webMapItems.map(handleWebMapItemCustom);
-};
-
 export function isExclusiveGroup(
-    treeItem: TreeItem
-): treeItem is GroupItem & { exclusive: true } {
+    treeItem: TreeItemConfig
+): treeItem is GroupItemConfig & { exclusive: true } {
     return treeItem.type === "group" && treeItem.exclusive;
 }
 
-export function itemIsMutalGroup(treeItem: TreeItem) {
+export function itemIsMutalGroup(treeItem: TreeItemConfig) {
     return isExclusiveGroup(treeItem) ? treeItem : false;
 }
 
 export function itemInMutuallyExclusiveGroup(
-    item: TreeItem,
-    treeItems: TreeItem[]
+    item: TreeItemConfig,
+    treeItems: TreeItemConfig[]
 ) {
     const parent = getParent(treeItems, (i) => i.key === item.key);
     if (parent) {
@@ -130,10 +35,10 @@ export function itemInMutuallyExclusiveGroup(
 
 export function keyInMutuallyExclusiveGroupDeep(
     itemKey: number,
-    treeItems: TreeItem[]
-): TreeItem[] | false {
+    treeItems: TreeItemConfig[]
+): TreeItemConfig[] | false {
     let currentNode = getParent(treeItems, (i) => i.key === itemKey);
-    const parents: TreeItem[] = [];
+    const parents: TreeItemConfig[] = [];
     let lastMutualGroupIndex: number | null = null;
 
     while (currentNode) {
@@ -154,7 +59,7 @@ export function keyInMutuallyExclusiveGroupDeep(
 
 export function determineAdditionalKeys(
     node: Node,
-    firstParent: TreeItem,
+    firstParent: TreeItemConfig,
     keys: number[]
 ) {
     const treeItem = node.treeItem;
@@ -172,7 +77,7 @@ export function determineAdditionalKeys(
 
 export function updateKeysForMutualExclusivity(
     node: Node,
-    parents: TreeItem[],
+    parents: TreeItemConfig[],
     keys: number[]
 ) {
     const mutuallyExclusive = parents[parents.length - 1];

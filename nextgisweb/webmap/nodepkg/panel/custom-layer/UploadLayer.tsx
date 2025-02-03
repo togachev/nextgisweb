@@ -5,22 +5,17 @@ import "./UploadLayer.less";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
-
+import topic from "@nextgisweb/webmap/compat/topic";
 import { useFeatures } from "./hook/useFeatures";
 
-import type { DojoDisplay } from "../type";
-import type { DojoTopic } from "../panels-manager/type";
+import type { Display } from "@nextgisweb/webmap/display";
+
 import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import type { Feature, Features } from "ol/Feature";
 import type { FeatureContext } from "./type";
 import { TYPE_FILE } from "./constant";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
-
-type UploadLayerProps = {
-    display: DojoDisplay;
-    topic: DojoTopic;
-}
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -45,7 +40,7 @@ const MaxFiles = gettext("Maximum files/loaded:");
 
 let id = 0;
 
-export function UploadLayer({ display, topic }: UploadLayerProps) {
+export function UploadLayer({ display }: Display) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
     const maxCount = webmapSettings.max_count_file_upload;
@@ -138,7 +133,7 @@ export function UploadLayer({ display, topic }: UploadLayerProps) {
             if (e.dragging) return;
             setCustomStyle(null, false);
 
-            if (display.panelsManager._activePanelKey === "custom-layer") {
+            if (display.panelManager.getActivePanelName() === "custom-layer") {
                 setFeatures(displayFeatureInfo(e.pixel));
                 if (display.identify_module?.identifyStore) {
                     const imodule = display.identify_module

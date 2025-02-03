@@ -1,13 +1,15 @@
 import { theme } from "antd";
 import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
 import type WebmapStore from "../store";
-import type { TreeItem } from "../type/TreeItems";
+import type { TreeItemConfig } from "../type/TreeItems";
+
+
 import type { DisplayMap } from "../type/DisplayMap";
 import { route } from "@nextgisweb/pyramid/api";
 import "./Legend.less";
 
 interface LegendProps {
-    nodeData: TreeItem;
+    nodeData: TreeItemConfig;
     zoomToNgwExtent: DisplayMap;
     store: WebmapStore;
     checkable: boolean;

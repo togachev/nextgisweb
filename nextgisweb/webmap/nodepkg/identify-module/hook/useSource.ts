@@ -1,7 +1,7 @@
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import lookupTableCached from "ngw-lookup-table/cached";
 import type { StoreItem } from "@nextgisweb/webmap/type";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps } from "./type";
 import dayjs from "dayjs";
 import type {
@@ -38,18 +38,18 @@ export const valDT = (val, field) => {
     }
 }
 
-export const useSource = (display: DojoDisplay) => {
+export const useSource = (display: Display) => {
     const generateUrl = ({ res, st, pn }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
         const webmapId = display.config.webmapId;
-        const zoom = display.map.view.getZoom();
+        const zoom = display.map.zoom;
 
         const styles: string[] = [];
         Object.entries(display.webmapStore._layers).find(item => {
             const itm: StoreItem = item[1];
-            if (itm._visibility === true) {
+            if (itm.itemConfig.visibility === true) {
                 styles.push(itm.itemConfig.styleId);
             }
         });
@@ -57,11 +57,11 @@ export const useSource = (display: DojoDisplay) => {
         const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
         const result = [...new Set(st?.map(a => a.styleId))];
 
-        const panel = display.panelsManager._activePanelKey;
+        const panel = display.panelManager.getActivePanelName();
 
         const obj = res ?
-            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: display._baseLayer.name } :
-            { attribute: false, lon, lat, zoom, styles: styles, base: display._baseLayer.name };
+            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: display.baseLayer?.name } :
+            { attribute: false, lon, lat, zoom, styles: styles, base: display.baseLayer?.name };
 
         panel !== "share" && Object.assign(obj, { panel: panel });
 
@@ -79,7 +79,7 @@ export const useSource = (display: DojoDisplay) => {
 
     const getAttribute = async (res: DataProps) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
-        const item = getEntries(display._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
+        const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
 
         const query = { geom: item.itemConfig.layerHighligh === true ? true : false };
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {

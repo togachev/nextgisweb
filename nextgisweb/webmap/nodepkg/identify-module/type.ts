@@ -1,6 +1,5 @@
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
-import type { DojoTopic } from "@nextgisweb/webmap/panels-manager/type";
+import type { Display } from "@nextgisweb/webmap/display";
 
 export interface RelationProps {
     external_resource_id: number;
@@ -21,8 +20,8 @@ export interface DataProps {
 }
 
 export interface UrlParamsProps {
-    lon: number;
-    lat: number;
+    lon: number | string;
+    lat: number | string;
     attribute: string | boolean;
     st?: string;
     slf?: string;
@@ -94,20 +93,8 @@ export interface ContextProps {
 export interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
-    display: DojoDisplay;
+    display: Display;
     array_context: ContextProps[];
-}
-
-
-export type DiagramProps = {
-    display: DojoDisplay;
-    topic: DojoTopic;
-    close: () => void;
-}
-
-export type GraphProps = {
-    display: DojoDisplay;
-    topic: DojoTopic;
 }
 
 export type RequestProps = {
