@@ -1,13 +1,20 @@
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { useControls } from "./controls/useControls";
 import { DescComponent } from "@nextgisweb/resource/description";
+import { Store } from "./Store";
 
 import "./ModalPortal.less"
 export function ModalPortal(props) {
     const { content, width, height, type, upath_info } = props;
-    const { refs, close } = useControls();
+    const [store] = useState(
+        () => new Store({
+            scale: 1,
+        })
+    );
+    const { refs, close } = useControls(store);
 
     return (
         createPortal(
