@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@nextgisweb/gui/antd";
 import showModal from "@nextgisweb/gui/showModal";
-import { useControls } from "./controls/useControls";
+import { useImage } from "./controls/useImage";
 import { observer } from "mobx-react-lite";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import RotateLeft from "@nextgisweb/icon/mdi/file-rotate-left-outline";
@@ -23,7 +23,7 @@ const ImagePortal = observer(({ attribs }) => {
 
     const { refImg, scale } = store;
 
-    const { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate } = useControls(store);
+    const { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate } = useImage(store);
 
     return (
         createPortal(
