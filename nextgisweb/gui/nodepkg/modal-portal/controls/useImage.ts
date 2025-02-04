@@ -12,10 +12,9 @@ export const useImage = (store) => {
     const rotateLeft = (e) => {
         setPropsImage(prev => ({
             ...prev,
-            ...{
-                transform: {
-                    rotate: prev.transform.rotate - 90
-                }
+            transform: {
+                ...prev.transform,
+                rotate: prev.transform.rotate - 90
             }
         }));
         e.stopPropagation();
@@ -25,6 +24,7 @@ export const useImage = (store) => {
         setPropsImage(prev => ({
             ...prev,
             transform: {
+                ...prev.transform,
                 rotate: prev.transform.rotate + 90
             }
         }));
@@ -35,6 +35,7 @@ export const useImage = (store) => {
         setPropsImage(prev => ({
             ...prev,
             transform: {
+                ...prev.transform,
                 rotateX: prev.transform.rotateX + 180
             }
         }));
@@ -44,10 +45,9 @@ export const useImage = (store) => {
     const verticalRotate = (e) => {
         setPropsImage(prev => ({
             ...prev,
-            ...{
-                [prev.transform]: {
-                    [prev.transform.rotateY]: prev.transform.rotateY + 180
-                }
+            transform: {
+                ...prev.transform,
+                rotateY: prev.transform.rotateY + 180
             }
         }));
         e.stopPropagation();
