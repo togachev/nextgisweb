@@ -19,9 +19,9 @@ import "./ImageView.less";
 const ImagePortal = observer(({ attribs }) => {
     const refImage = useRef<HTMLDivElement>(null);
 
-    const [store] = useState(() => new Store({ refImg: refImage, scale: 1, rotate: 0 }));
+    const [store] = useState(() => new Store({ refImg: refImage, scale: 1, rotate: 0, propsImage: { scale: 1, transform: { rotate: 0, rotateX: 0, rotateY: 0 } } }));
 
-    const { refImg, scale } = store;
+    const { propsImage, scale } = store;
 
     const { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate } = useImage(store);
 
@@ -82,7 +82,7 @@ const ImagePortal = observer(({ attribs }) => {
                             onClick={(e) => {
                                 e.stopPropagation();
                             }}
-                            ref={refImg} key="img" src={attribs.src} alt="" />
+                            /*style={propsImage}*/ key="img" src={attribs.src} alt="" />
                     </div>
                 </div>
             </div >,

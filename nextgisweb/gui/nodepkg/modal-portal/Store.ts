@@ -3,10 +3,22 @@ import { RefObject } from "react";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
+
+type TransformProps = {
+    rotate: number;
+    rotateX: number;
+    rotateY: number;
+};
+
+type ImageProps = {
+    scale: number;
+    transform: TransformProps;
+};
+
 export class Store {
     scale: number | null = null;
     rotate: number | null = null;
-    refImg: RefObject;
+    propsImage: ImageProps;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -20,16 +32,16 @@ export class Store {
         makeAutoObservable(this, {});
     }
 
+    setPropsImage = (propsImage: SetValue<ImageProps | null>) => {
+        this.setValue("propsImage", propsImage);
+    };
+
     setScale = (scale: SetValue<number | null>) => {
         this.setValue("scale", scale);
     };
 
     setRotate = (rotate: SetValue<number | null>) => {
         this.setValue("rotate", rotate);
-    };
-
-    setRefImg = (refImg: SetValue<RefObject | null>) => {
-        this.setValue("refImg", refImg);
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
