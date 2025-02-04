@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 
 export const useImage = (store) => {
-    const refs = useRef<HTMLDivElement>(null);
-    const { setPropsImage, propsImage } = store;
+    const refPortal = useRef<HTMLDivElement>(null);
+    const { setPropsImage } = store;
 
     const close = (e) => {
-        refs.current.remove();
+        refPortal.current.remove();
         e.stopPropagation();
     }
 
@@ -70,11 +70,12 @@ export const useImage = (store) => {
                 scaleMinus(e);
             }
         }
-        refs.current.addEventListener("wheel", onWheel, false);
+
+        refPortal.current.addEventListener("wheel", onWheel, { passive: false });
         return () => {
-            refs.current.removeEventListener("wheel", onWheel, false);
+            refPortal.current.removeEventListener("wheel", onWheel, false);
         };
     }, []);
 
-    return { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate };
+    return { close, horizontalRotate, refPortal, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate };
 }

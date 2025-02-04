@@ -1,21 +1,30 @@
 import { useEffect, useRef } from "react";
 
 export const useModal = () => {
-    const refs = useRef<HTMLDivElement>(null);
+    const refPortal = useRef<HTMLDivElement>(null);
+    const refContent = useRef<HTMLDivElement>(null);
+    const refBlock = useRef<HTMLDivElement>(null);
+
     const close = (e) => {
-        refs.current.remove(); e.stopPropagation();
+        refPortal.current.remove();
+        e.stopPropagation();
     }
 
     useEffect(() => {
-        const onWheel = (e) => {
-            e.preventDefault();
+        const onWheel = (e) => e.preventDefault();
+        const onWheelContent = (e) => e.stopPropagation();
+
+        refPortal.current.addEventListener("wheel", onWheel, { passive: false });
+        if (refBlock.current.clientHeight - 44 < refContent.current.clientHeight) {
+            refContent.current.addEventListener("wheel", onWheelContent, { passive: true });
         }
-        refs.current.addEventListener("wheel", onWheel, false);
+
         return () => {
-            refs.current.removeEventListener("wheel", onWheel, false);
+            refPortal.current.removeEventListener("wheel", onWheel, false);
+            refContent.current.removeEventListener("wheel", onWheelContent, true);
         };
     }, []);
 
 
-    return { close, refs };
+    return { close, refPortal, refBlock, refContent };
 }

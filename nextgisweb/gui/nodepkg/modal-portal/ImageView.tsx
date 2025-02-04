@@ -17,13 +17,11 @@ import { Store } from "./Store";
 import "./ImageView.less";
 
 const ImagePortal = observer(({ attribs }) => {
-    const refImage = useRef<HTMLDivElement>(null);
-
-    const [store] = useState(() => new Store({ refImg: refImage, propsImage: { scale: 1, transform: { rotate: 0, rotateX: 0, rotateY: 0 } } }));
+    const [store] = useState(() => new Store({ propsImage: { scale: 1, transform: { rotate: 0, rotateX: 0, rotateY: 0 } } }));
 
     const { propsImage } = store;
     const { transform, scale } = propsImage;
-    const { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate } = useImage(store);
+    const { close, horizontalRotate, refPortal, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate } = useImage(store);
 
     const styleImage = {
         scale: String(scale),
@@ -32,7 +30,7 @@ const ImagePortal = observer(({ attribs }) => {
 
     return (
         createPortal(
-            <div ref={refs} className="image-portal" onClick={close}>
+            <div ref={refPortal} className="image-portal" onClick={close}>
                 <div className="image-block">
                     <div className="close">
                         <Button

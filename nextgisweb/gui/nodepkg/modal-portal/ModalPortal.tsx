@@ -8,12 +8,12 @@ import "./ModalPortal.less"
 export function ModalPortal(props) {
     const { content, width, height, type, upath_info } = props;
 
-    const { refs, close } = useModal();
+    const { refPortal, refBlock, refContent, close } = useModal();
 
     return (
         createPortal(
-            <div ref={refs} className="portal" onClick={close}>
-                <div className="block"
+            <div ref={refPortal} className="portal" onClick={close}>
+                <div className="block" ref={refBlock}
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
@@ -30,7 +30,7 @@ export function ModalPortal(props) {
                         />
                     </div>
                     <div className="content-block">
-                        <div className="content">
+                        <div className="content" ref={refContent}>
                             <DescComponent type={type} upath_info={upath_info} content={content} />
                         </div>
                     </div>
