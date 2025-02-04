@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import { RefObject } from "react";
 
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
@@ -16,7 +15,6 @@ type ImageProps = {
 };
 
 export class Store {
-    scale: number | null = null;
     rotate: number | null = null;
     propsImage: ImageProps;
 
@@ -36,10 +34,6 @@ export class Store {
         this.setValue("propsImage", propsImage);
     };
 
-    setScale = (scale: SetValue<number | null>) => {
-        this.setValue("scale", scale);
-    };
-
     setRotate = (rotate: SetValue<number | null>) => {
         this.setValue("rotate", rotate);
     };
@@ -57,5 +51,4 @@ export class Store {
 
         Object.assign(this, { [property]: newValue });
     }
-
 }

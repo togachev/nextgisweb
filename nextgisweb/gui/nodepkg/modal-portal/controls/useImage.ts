@@ -1,21 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export const useImage = (store) => {
     const refs = useRef<HTMLDivElement>(null);
-    const { setRefImg, setRotate, setScale, setPropsImage, propsImage } = store;
-    const { rotate, rotateX, rotateY, scale } = propsImage;
-    console.log(propsImage);
+    const { setPropsImage, propsImage } = store;
 
     const close = (e) => {
-        refs.current.remove(); e.stopPropagation();
+        refs.current.remove();
+        e.stopPropagation();
     }
+
     const rotateLeft = (e) => {
         setPropsImage(prev => ({
             ...prev,
-            transform: {
-                ...prev.transform,
-                rotate: prev.transform.rotate - 90
-            }
+            transform: { ...prev.transform, rotate: prev.transform.rotate - 90 }
         }));
         e.stopPropagation();
     }
@@ -23,10 +20,7 @@ export const useImage = (store) => {
     const rotateRight = (e) => {
         setPropsImage(prev => ({
             ...prev,
-            transform: {
-                ...prev.transform,
-                rotate: prev.transform.rotate + 90
-            }
+            transform: { ...prev.transform, rotate: prev.transform.rotate + 90 }
         }));
         e.stopPropagation();
     }
@@ -34,10 +28,7 @@ export const useImage = (store) => {
     const horizontalRotate = (e) => {
         setPropsImage(prev => ({
             ...prev,
-            transform: {
-                ...prev.transform,
-                rotateX: prev.transform.rotateX + 180
-            }
+            transform: { ...prev.transform, rotateX: prev.transform.rotateX + 180 }
         }));
         e.stopPropagation();
     }
@@ -45,93 +36,45 @@ export const useImage = (store) => {
     const verticalRotate = (e) => {
         setPropsImage(prev => ({
             ...prev,
-            transform: {
-                ...prev.transform,
-                rotateY: prev.transform.rotateY + 180
-            }
+            transform: { ...prev.transform, rotateY: prev.transform.rotateY + 180 }
         }));
         e.stopPropagation();
     }
 
     const scalePlus = (e) => {
-        if (scale <= 1.9) {
-            setPropsImage(prev => ({
-                ...prev,
-                ...{ scale: prev.scale + 0.1 }
-            }));
-        } else {
-            setPropsImage(prev => ({
-                ...prev,
-                ...{ scale: 2 }
-            }));
-        }
+        setPropsImage(prev => {
+            if (prev.scale <= 1.6) {
+                return { ...prev, ...{ scale: prev.scale + 0.2 } }
+            }
+            return prev;
+        });
         e.stopPropagation();
     }
 
     const scaleMinus = (e) => {
-        if (scale >= 0.1) {
-            setPropsImage(prev => ({
-                ...prev,
-                ...{ scale: prev.scale - 0.1 }
-            }));
-        } else {
-            setPropsImage(prev => ({
-                ...prev,
-                ...{ scale: 0.1 }
-            }));
-        }
+        setPropsImage(prev => {
+            if (prev.scale >= 0.4) {
+                return { ...prev, ...{ scale: prev.scale - 0.2 } }
+            }
+            return prev;
+        });
         e.stopPropagation();
     }
 
-    // useEffect(() => {
-    //     if (refImg && refImg.current) {
-    //         setRefImg(prev => {
-    //             prev.current.style.transform = `rotate(${rotate}deg)`;
-    //             return prev;
-    //         })
-    //     }
-    // }, [rotate]);
-
-    // useEffect(() => {
-    //     if (refImg && refImg.current) {
-    //         setRefImg(prev => {
-    //             prev.current.style.transform = `rotateX(${rotateX}deg)`;
-    //             return prev;
-    //         })
-    //     }
-    // }, [rotateX]);
-
-    // useEffect(() => {
-    //     if (refImg && refImg.current) {
-    //         setRefImg(prev => {
-    //             prev.current.style.transform = `rotateY(${rotateY}deg)`;
-    //             return prev;
-    //         })
-    //     }
-    // }, [rotateY]);
-
-    // useEffect(() => {
-    //     if (refImg && refImg.current) {
-    //         setRefImg(prev => {
-    //             prev.current.style.scale = scale;
-    //             return prev;
-    //         })
-    //         const onWheel = (e) => {
-    //             e.preventDefault();
-    //             if (e.deltaY < 0 && scale <= 2) {
-    //                 setScale(scale + 0.1)
-    //             }
-    //             if (e.deltaY > 0 && scale >= 0.2) {
-    //                 setScale(scale - 0.1)
-    //             }
-    //         }
-
-    //         refs.current.addEventListener("wheel", onWheel, false);
-    //         return () => {
-    //             refs.current.removeEventListener("wheel", onWheel, false);
-    //         };
-    //     }
-    // }, [scale]);
+    useEffect(() => {
+        const onWheel = (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                scalePlus(e);
+            } else if (e.deltaY > 0) {
+                scaleMinus(e);
+            }
+        }
+        refs.current.addEventListener("wheel", onWheel, false);
+        return () => {
+            refs.current.removeEventListener("wheel", onWheel, false);
+        };
+    }, []);
 
     return { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate };
 }

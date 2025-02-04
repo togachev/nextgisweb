@@ -19,11 +19,16 @@ import "./ImageView.less";
 const ImagePortal = observer(({ attribs }) => {
     const refImage = useRef<HTMLDivElement>(null);
 
-    const [store] = useState(() => new Store({ refImg: refImage, scale: 1, rotate: 0, propsImage: { scale: 1, transform: { rotate: 0, rotateX: 0, rotateY: 0 } } }));
+    const [store] = useState(() => new Store({ refImg: refImage, propsImage: { scale: 1, transform: { rotate: 0, rotateX: 0, rotateY: 0 } } }));
 
-    const { propsImage, scale } = store;
-
+    const { propsImage } = store;
+    const { transform, scale } = propsImage;
     const { close, horizontalRotate, refs, rotateLeft, rotateRight, scalePlus, scaleMinus, verticalRotate } = useImage(store);
+
+    const styleImage = {
+        scale: String(scale),
+        transform: `rotate(${transform.rotate}deg) rotateX(${transform.rotateX}deg) rotateY(${transform.rotateY}deg)`,
+    }
 
     return (
         createPortal(
@@ -63,26 +68,24 @@ const ImagePortal = observer(({ attribs }) => {
                             onClick={verticalRotate}
                         />
                         <Button
-                            disabled={scale >= 2 && true}
+                            disabled={scale >= 1.6 && true}
                             className="margin-button size-button"
                             type="text"
                             icon={<MagnifyPlus />}
                             onClick={scalePlus}
                         />
                         <Button
-                            disabled={scale <= 0.2 && true}
+                            disabled={scale < 0.4 && true}
                             className="margin-button size-button"
                             type="text"
                             icon={<MagnifyMinus />}
                             onClick={scaleMinus}
                         />
                     </div>
-                    <div className="content-block">
+                    <div className="content-block" style={{ ...styleImage }} >
                         <img
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                            /*style={propsImage}*/ key="img" src={attribs.src} alt="" />
+                            onClick={(e) => e.stopPropagation()}
+                            key="img" src={attribs.src} alt="" />
                     </div>
                 </div>
             </div >,

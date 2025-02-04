@@ -6,5 +6,16 @@ export const useModal = () => {
         refs.current.remove(); e.stopPropagation();
     }
 
+    useEffect(() => {
+        const onWheel = (e) => {
+            e.preventDefault();
+        }
+        refs.current.addEventListener("wheel", onWheel, false);
+        return () => {
+            refs.current.removeEventListener("wheel", onWheel, false);
+        };
+    }, []);
+
+
     return { close, refs };
 }
