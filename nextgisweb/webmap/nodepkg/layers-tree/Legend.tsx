@@ -57,7 +57,7 @@ export function Legend({ nodeData, store, checkable, zoomToNgwExtent }: LegendPr
                     },
                 }}
             >
-                {legendInfo.symbols.map((s, idx) => {
+                {legendInfo.symbols?.map((s, idx) => {
                     const id = nodeData.id;
                     const layerId = nodeData.layerId;
                     const layerCls = nodeData.layerCls;

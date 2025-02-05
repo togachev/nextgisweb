@@ -20,7 +20,7 @@ from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.render import IRenderableScaleRange
-from nextgisweb.render.api import LegendSymbol, legend_symbols_by_resource
+from nextgisweb.render.api import LegendSymbol
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
@@ -402,8 +402,10 @@ LegendVisibleMode = Literal["collapse", "expand"]
 class LegendInfo(Struct, kw_only=True):
     visible: LegendVisibleMode
     has_legend: bool
-    symbols: List[LegendSymbol]
-    single: bool
+    # FIXME: The attributes below exist only for TypeScript types. We need to
+    # refactor them and remove these.
+    symbols: Union[List[LegendSymbol], None] = None
+    single: Union[bool, None] = None
     open: Union[bool, None] = None
 
 
@@ -524,14 +526,7 @@ def display_config(obj, request) -> DisplayConfig:
         ls_layer = ls_webmap + obj.legend_symbols + layer.legend_symbols
         result = dict(visible=ls_layer)
         if ls_layer in (LegendSymbolsEnum.EXPAND, LegendSymbolsEnum.COLLAPSE):
-            has_legend = result["has_legend"] = ILegendSymbols.providedBy(style)
-            if has_legend:
-                legend_symbols = legend_symbols_by_resource(style, 20, request.translate)
-                result.update(symbols=legend_symbols)
-                is_single = len(legend_symbols) == 1
-                result.update(single=is_single)
-                if not is_single:
-                    result.update(open=ls_layer == LegendSymbolsEnum.EXPAND)
+            result["has_legend"] = ILegendSymbols.providedBy(style)
 
         return result
 
@@ -565,6 +560,8 @@ def display_config(obj, request) -> DisplayConfig:
             if IRenderableScaleRange.providedBy(style):
                 scale_range = scale_range_intersection(scale_range, style.scale_range())
 
+            legend_info = _legend(item, style)
+
             # Main element parameters
             data.update(
                 layerId=style.parent_id,
@@ -577,7 +574,7 @@ def display_config(obj, request) -> DisplayConfig:
                 minScaleDenom=scale_range[0],
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
-                legendInfo=_legend(item, style),
+                legendInfo=legend_info,
                 layerHighligh=item.layer_highligh,
             )
 

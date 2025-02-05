@@ -10,7 +10,6 @@ import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic.js";
 import Strikethrough from "@ckeditor/ckeditor5-basic-styles/src/strikethrough.js";
 import Underline from "@ckeditor/ckeditor5-basic-styles/src/underline.js";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote.js";
-import CKFinder from "@ckeditor/ckeditor5-ckfinder/src/ckfinder.js";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor.js";
 import Font from "@ckeditor/ckeditor5-font/src/font.js";
 import FontFamily from "@ckeditor/ckeditor5-font/src/fontfamily.js";
@@ -64,13 +63,12 @@ Editor.builtinPlugins = [
     UploadAdapter,
     Autoformat,
     Bold,
+    Font,
+    FontFamily,
     Italic,
     Strikethrough,
     Underline,
     BlockQuote,
-    CKFinder,
-    Font,
-    FontFamily,
     Essentials,
     Heading,
     AutoImage,
@@ -140,7 +138,23 @@ Editor.defaultConfig = {
         shouldNotGroupWhenFull: true,
     },
     fontFamily: {
+
         supportAllValues: true
+    },
+    fontSize: {
+        options: [
+            'tiny',
+            'default',
+            'small',
+            'huge',
+            'big'
+        ],
+    },
+    fontColor: {
+        colorPicker: {
+            // Use 'hex' format for output instead of 'hsl'.
+            format: 'hex'
+        }
     },
     image: {
         insert: {
