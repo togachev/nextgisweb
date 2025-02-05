@@ -2,12 +2,13 @@ import { Feature } from "ol";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
 import type VectorSource from "ol/source/Vector";
-import { Circle, Stroke, Style } from "ol/style";
+import { Circle, Fill, Stroke, Style } from "ol/style";
 
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 import { decompressed } from "@nextgisweb/webmap/utils";
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
 import type { MapStore } from "../ol/MapStore";
 
@@ -53,15 +54,19 @@ export class FeatureHighlighter {
 
     private _getDefaultStyle(): Style {
         const strokeStyle = new Stroke({
-            width: 3,
+            width: 2.26,
             color: "rgba(255,255,0,1)",
         });
-
+        const fill = new Fill({
+            color: "rgba(255, 255, 255, 0.1)",
+        });
         return new Style({
             stroke: strokeStyle,
+            fill: fill,
             image: new Circle({
                 stroke: strokeStyle,
-                radius: 5,
+                radius: webmapSettings.identify_radius,
+                fill: fill,
             }),
         });
     }
