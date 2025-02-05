@@ -13,7 +13,7 @@ export function ModalPortal(props) {
     return (
         createPortal(
             <div ref={refPortal} className="portal" onClick={close}>
-                <div className="block" ref={refBlock}
+                <div className="block"
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
@@ -29,7 +29,7 @@ export function ModalPortal(props) {
                             onClick={close}
                         />
                     </div>
-                    <div className="content-block">
+                    <div className="content-block" ref={refBlock}>
                         <div className="content" ref={refContent}>
                             <DescComponent type={type} upath_info={upath_info} content={content} />
                         </div>

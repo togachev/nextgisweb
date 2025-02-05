@@ -113,8 +113,8 @@ export const MapTile = (props) => {
                                                 content: descValue,
                                                 upath_info: upath_info,
                                                 type: "home_page",
-                                                width: "70%",
-                                                height: "70%",
+                                                width: "50%",
+                                                height: "50%",
                                             });
                                         }
                                     }}>
