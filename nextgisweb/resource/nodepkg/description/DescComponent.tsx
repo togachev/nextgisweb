@@ -2,8 +2,10 @@ import parse, { attributesToProps, Element, domToReact } from "html-react-parser
 import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Divider } from "@nextgisweb/gui/antd";
+
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import type { PreviewProps } from '@/Preview';
 
 import { ImageView } from "@nextgisweb/gui/modal-portal";
 

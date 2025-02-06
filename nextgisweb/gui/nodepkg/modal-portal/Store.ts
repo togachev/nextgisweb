@@ -12,6 +12,8 @@ type TransformProps = {
 type ImageProps = {
     scale: number;
     transform: TransformProps;
+    x: number;
+    y: number;
 };
 
 export class Store {
