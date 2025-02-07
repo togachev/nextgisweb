@@ -8,7 +8,7 @@ import AxisZRotate from "@nextgisweb/icon/mdi/axis-z-rotate-clockwise";
 import MagnifyPlus from "@nextgisweb/icon/mdi/magnify-plus-outline";
 import MagnifyMinus from "@nextgisweb/icon/mdi/magnify-minus-outline";
 import WaterOff from "@nextgisweb/icon/mdi/water-off";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import ImagePreview from "@nextgisweb/icon/material/remove_red_eye";
 
 import "./ImageView.less";
 
@@ -31,7 +31,7 @@ export function ImageView(props) {
             src={attribs.src}
             preview={{
                 src: attribs.src,
-                mask: gettext("Click to Preview"),
+                mask: <span className="icon-preview"><ImagePreview /></span>,
                 maskClassName: "mask-class-name",
                 icons: defaultIcons,
                 toolbarRender: (

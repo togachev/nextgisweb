@@ -103,7 +103,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
             key: "geom_info",
             title: gettext("Geometry info"),
             hidden: !settings.show_geometry_info,
-            children: settings.show_geometry_info ? (<GeometryInfo layerId={layerId} featureId={id} />) : emptyValue
+            children: settings.show_geometry_info ? (<GeometryInfo showPreview resourceId={layerId} featureId={id} srid={4326} />) : emptyValue
         },
         {
             label: (<span className="icon-style"><Info /></span>),

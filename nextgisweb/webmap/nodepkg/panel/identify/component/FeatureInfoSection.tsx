@@ -1,15 +1,12 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info/";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";
 
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
-
-import { FeatureEditButton } from "../FeatureEditButton";
 import { getExtensionsComps } from "../extensions";
-import type { FeatureTabsProps as FeatureInfoProps } from "../identification";
 
 import { FieldsTable } from "./FieldsTable";
 
@@ -18,15 +15,26 @@ import EarthIcon from "@nextgisweb/icon/material/public/outline";
 
 const msgLoading = gettext("Loading...");
 
-export function FeatureInfoSection({
-    display,
-    featureInfo,
-    featureItem,
-    onUpdate,
-}: FeatureInfoProps) {
-    const [extComps, setExtComps] = useState<JSX.Element[]>([]);
+export interface FeatureInfoSectionProps {
+    resourceId: number;
+    featureItem: FeatureItem;
+    showAttributes?: boolean;
+    measurementSrid?: number;
+    showGeometryInfo?: boolean;
+    attributePanelAction?: ReactElement;
+    highlights: boolean;
+}
 
-    const highlights = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureInfo.layerId)?.[1].itemConfig.layerHighligh;
+export function FeatureInfoSection({
+    resourceId,
+    featureItem,
+    showAttributes = true,
+    measurementSrid,
+    showGeometryInfo = false,
+    attributePanelAction,
+    highlights,
+}: FeatureInfoSectionProps) {
+    const [extComps, setExtComps] = useState<JSX.Element[]>([]);
 
     useEffect(() => {
         if (!featureItem.extensions) {
@@ -46,7 +54,7 @@ export function FeatureInfoSection({
                     >
                         <ExtensionComponent
                             featureItem={featureItem}
-                            resourceId={featureInfo.layerId}
+                            resourceId={resourceId}
                         ></ExtensionComponent>
                     </Suspense>
                 );
@@ -55,30 +63,20 @@ export function FeatureInfoSection({
         };
 
         makeExtensionComps();
-    }, [featureInfo.layerId, featureItem]);
+    }, [resourceId, featureItem]);
 
     const items = useMemo(() => {
         const items_ = [];
-        if (
-            webmapSettings.identify_attributes &&
-            Object.keys(featureItem.fields).length > 0
-        ) {
+        if (showAttributes && Object.keys(featureItem.fields).length > 0) {
             const attrElement = (
                 <PanelSection
                     key="attributes"
                     icon={<ListIcon />}
                     title={gettext("Attributes")}
-                    suffix={
-                        <FeatureEditButton
-                            display={display}
-                            resourceId={featureInfo.layerId}
-                            featureId={featureItem.id}
-                            onUpdate={onUpdate}
-                        />
-                    }
+                    suffix={attributePanelAction}
                 >
                     <FieldsTable
-                        featureInfo={featureInfo}
+                        resourceId={resourceId}
                         featureItem={featureItem}
                     />
                 </PanelSection>
@@ -86,7 +84,7 @@ export function FeatureInfoSection({
             items_.push(attrElement);
         }
 
-        if (webmapSettings.show_geometry_info && highlights === true) {
+        if (showGeometryInfo && highlights === true) {
             const geomElement = (
                 <PanelSection
                     key="geometry"
@@ -94,7 +92,9 @@ export function FeatureInfoSection({
                     title={gettext("Geometry")}
                 >
                     <GeometryInfo
-                        layerId={featureInfo.layerId}
+                        srid={measurementSrid}
+                        showPreview
+                        resourceId={resourceId}
                         featureId={featureItem.id}
                     />
                 </PanelSection>
@@ -102,7 +102,14 @@ export function FeatureInfoSection({
             items_.push(geomElement);
         }
         return items_;
-    }, [display, featureInfo, featureItem, onUpdate]);
+    }, [
+        attributePanelAction,
+        showGeometryInfo,
+        measurementSrid,
+        showAttributes,
+        featureItem,
+        resourceId,
+    ]);
 
     return <>{[...items, ...extComps]}</>;
 }
