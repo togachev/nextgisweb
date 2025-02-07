@@ -1,5 +1,5 @@
 @prefixCls: rc-image;
-@zindex-preview-mask: 1000;
+@zindex-preview-mask: 1081;
 @preview-mask-bg: fade(#000, 100%);
 @text-color: #bbb;
 @text-color-disabled: darken(@text-color, 30%);
@@ -12,56 +12,38 @@
 }
 
 .controls {
-    height: 44px;
-    bottom: 0;
-    width: fit-content;
-    position: fixed;
-    background-color: var(--primary);
-    right: 50%;
-    transform: translate(50%, -50%);
-    display: flex;
-    align-items: center;
-    padding: 0px 22px;
-    border-radius: 22px;
-    z-index: 1081;
+  height: 44px;
+  bottom: 0;
+  width: fit-content;
+  position: fixed;
+  background-color: var(--primary);
+  right: 50%;
+  transform: translate(50%, -50%);
+  display: flex;
+  align-items: center;
+  padding: 0px 22px;
+  border-radius: 22px;
+  z-index: 1081;
 
-    button {
-        color: rgb(200, 200, 200);
-        font-size: 24px;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0) !important;
+  button {
+    color: rgb(200, 200, 200);
+    font-size: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0) !important;
 
-        &:hover {
-            background: rgba(0, 0, 0, 0) !important;
-            color: rgba(255, 255, 255, 1) !important;
-        }
+    &:hover {
+      background: rgba(0, 0, 0, 0) !important;
+      color: rgba(255, 255, 255, 1) !important;
     }
+  }
 
-    .margin-button {
-        margin: 0 0 0 10px;
-    }
+  .margin-button {
+    margin: 0 0 0 10px;
+  }
 }
 
-.close {
-    right: 16px;
-    display: flex;
-    top: 16px;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    z-index: 1081;
-
-    button {
-        color: rgb(200, 200, 200);
-        background-color: var(--primary);
-        font-size: 24px;
-        border-radius: 50%;
-
-        &:hover {
-            background-color: var(--primary) !important;
-            color: rgba(255, 255, 255, 1) !important;
-        }
-    }
+.mask-class-name {
+  font-size: 14px;
 }
 
 .box() {
@@ -79,6 +61,7 @@
   &-img {
     width: 100%;
     height: auto;
+
     &-placeholder {
       background-color: @background-color;
       background-repeat: no-repeat;
@@ -159,7 +142,7 @@
         justify-content: center;
         align-items: center;
 
-        & > * {
+        &>* {
           pointer-events: auto;
         }
       }
@@ -168,6 +151,7 @@
     &-moving {
       .@{prefixCls}-preview-img {
         cursor: grabbing;
+
         &-wrapper {
           transition-duration: 0s;
         }
@@ -192,7 +176,7 @@
       right: 32px;
       display: flex;
       color: #fff;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: var(--primary);
       border-radius: 50%;
       padding: 15px;
       outline: 0;
@@ -236,10 +220,12 @@
         cursor: pointer;
         margin-left: 10px;
         font-size: 18px;
+
         &-disabled {
           pointer-events: none;
           color: @text-color-disabled;
         }
+
         &:first-of-type {
           margin-left: 0;
         }
@@ -261,15 +247,18 @@
       z-index: @zindex-preview-mask + 1;
       cursor: pointer;
       color: @text-color;
+
       &-disabled {
         background: fade(@text-color, 30%);
         color: @text-color-disabled;
         cursor: not-allowed;
-        > .anticon {
+
+        >.anticon {
           cursor: not-allowed;
         }
       }
-      > .anticon {
+
+      >.anticon {
         font-size: 24px;
       }
     }
@@ -289,15 +278,18 @@
       z-index: @zindex-preview-mask + 1;
       cursor: pointer;
       color: @text-color;
+
       &-disabled {
         background: fade(@text-color, 20%);
         color: @text-color-disabled;
         cursor: not-allowed;
-        > .anticon {
+
+        >.anticon {
           cursor: not-allowed;
         }
       }
-      > .anticon {
+
+      >.anticon {
         font-size: 24px;
       }
     }
@@ -310,26 +302,31 @@
   animation-fill-mode: both;
   animation-play-state: paused;
 }
+
 .fade-leave {
   animation-duration: 0.3s;
   animation-fill-mode: both;
   animation-play-state: paused;
 }
+
 .fade-enter.fade-enter-active,
 .fade-appear.fade-appear-active {
   animation-name: rcImageFadeIn;
   animation-play-state: running;
 }
+
 .fade-leave.fade-leave-active {
   animation-name: rcImageFadeOut;
   animation-play-state: running;
   pointer-events: none;
 }
+
 .fade-enter,
 .fade-appear {
   opacity: 0;
   animation-timing-function: linear;
 }
+
 .fade-leave {
   animation-timing-function: linear;
 }
@@ -338,6 +335,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -347,6 +345,7 @@
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
@@ -358,27 +357,32 @@
   animation-fill-mode: both;
   animation-play-state: paused;
 }
+
 .zoom-leave {
   animation-duration: 0.3s;
   animation-fill-mode: both;
   animation-play-state: paused;
 }
+
 .zoom-enter.zoom-enter-active,
 .zoom-appear.zoom-appear-active {
   animation-name: rcImageZoomIn;
   animation-play-state: running;
 }
+
 .zoom-leave.zoom-leave-active {
   animation-name: rcImageZoomOut;
   animation-play-state: running;
   pointer-events: none;
 }
+
 .zoom-enter,
 .zoom-appear {
   transform: scale(0);
   opacity: 0;
   animation-timing-function: cubic-bezier(0.08, 0.82, 0.17, 1);
 }
+
 .zoom-leave {
   animation-timing-function: cubic-bezier(0.78, 0.14, 0.15, 0.86);
 }
@@ -388,6 +392,7 @@
     transform: scale(0.2);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -398,6 +403,7 @@
   0% {
     transform: scale(1);
   }
+
   100% {
     transform: scale(0.2);
     opacity: 0;

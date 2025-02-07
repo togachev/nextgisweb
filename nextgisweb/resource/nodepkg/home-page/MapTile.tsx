@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
+import { Card, ConfigProvider, Empty, Modal, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import Info from "@nextgisweb/icon/material/info";
-import { ModalPortal } from "@nextgisweb/gui/modal-portal";
+import { DescComponent } from "@nextgisweb/resource/description";
 import { useSource } from "./hook/useSource";
-import showModal from "@nextgisweb/gui/showModal";
 
 import MapIcon from "@nextgisweb/icon/material/map";
 import "./MapTile.less";
@@ -20,6 +19,7 @@ const { Meta } = Card;
 const { Text, Link } = Typography;
 
 export const MapTile = (props) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
     const [perm, setPerm] = useState();
     const { id, display_name, preview_fileobj_id, description_status } = props.item;
@@ -50,6 +50,18 @@ export const MapTile = (props) => {
     }, [id])
 
     const urlWebmapSettings = routeURL("resource.update", id);
+
+    const showDescription = async () => {
+        const value = await route("resource.item", id).get({
+            cache: true,
+        });
+        setDescValue(value.resource.description)
+        setIsModalOpen(true);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <ConfigProvider
@@ -106,18 +118,7 @@ export const MapTile = (props) => {
                                     </Link>
                                 )}
                                 {description_status === true && (
-                                    <span key="test" title={descTitle} className="icon-info-map" onClick={() => {
-                                        const container = descRef.current;
-                                        if (container) {
-                                            showModal(ModalPortal, {
-                                                content: descValue,
-                                                upath_info: upath_info,
-                                                type: "home_page",
-                                                width: "50%",
-                                                height: "50%",
-                                            });
-                                        }
-                                    }}>
+                                    <span title={descTitle} className="icon-info-map" onClick={showDescription}>
                                         <Info />
                                     </span>
                                 )}
@@ -125,6 +126,18 @@ export const MapTile = (props) => {
                         }
                     />
                 </Card>
+                <Modal
+                    transitionName=""
+                    maskTransitionName=""
+                    width="max-content"
+                    className="modal-desc-home-page"
+                    centered
+                    title={display_name}
+                    footer={null}
+                    open={isModalOpen}
+                    onCancel={handleCancel}>
+                    <DescComponent type="home_page" upath_info={upath_info} content={descValue} />
+                </Modal>
             </div>
         </ConfigProvider>
     )

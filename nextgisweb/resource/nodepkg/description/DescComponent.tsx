@@ -5,9 +5,8 @@ import { Divider } from "@nextgisweb/gui/antd";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
-import type { PreviewProps } from '@/Preview';
 
-import { ImageView } from "@nextgisweb/gui/modal-portal";
+import { ImageView } from "@nextgisweb/gui/image-view";
 
 import "./DescComponent.less";
 
