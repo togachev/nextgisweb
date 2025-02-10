@@ -131,10 +131,12 @@ export class Identify extends ToolBase {
         };
         this.setHighlightedFeature(featureHightlight);
 
-        highlights === true && topic.publish<FeatureHighlightEvent>(
-            "feature.highlight",
-            featureHightlight
-        );
+        highlights === true ?
+            topic.publish<FeatureHighlightEvent>(
+                "feature.highlight",
+                featureHightlight
+            ) :
+            topic.publish("feature.unhighlight")
 
         return featureItem;
     }
