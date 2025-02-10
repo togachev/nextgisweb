@@ -5,18 +5,8 @@
 	.menu-button {
 		height: 40px;
 		width: 100%;
-		padding: 0;
-		position: absolute;
-		top: 0;
-		padding-right: 10%;
-		right: 0;
 		display: flex;
 		justify-content: flex-end;
-		align-items: center;
-		border-radius: 3px;
-		z-index: 0;
-		font-weight: 500;
-		letter-spacing: normal;
 
 		.menu-component {
 			display: flex;
@@ -193,12 +183,14 @@
 }
 
 .ant-btn-primary {
-	background-color: #2a388c;
-	font-family: "Montserrat";
-	font-weight: 500;
+	background-color: transparent;
+    font-family: "Montserrat";
+    font-weight: 500;
+    border-color: var(--text-secondary);
+	color: #000 !important;
 
 	&:hover {
-		color: #000 !important;
+		color: #2a388c !important;
 		background: #ffffff !important;
 		border-color: #2a388c !important;
 	}
@@ -215,47 +207,19 @@
 		font-weight: 500;
 		margin: -9px 0 9px 0;
 	}
+
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	input:-webkit-autofill:active {
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: #2a388c !important;
+		transition: background-color 5000s ease-in-out 0s;
+		box-shadow: inset 0 0 20px 20px #ffffff00;
+	}
 }
 
-// .ant-modal .ant-modal-content {
-// 	position: relative;
-// 	background-color: #ffffff;
-// 	background-clip: padding-box;
-// 	border: 0;
-// 	border-radius: 3px;
-// 	box-shadow: none;
-// 	pointer-events: auto;
-// 	padding: 18px;
-// 	min-width: 350px;
-// 	min-height: 250px;
-// }
-
-// .ant-modal .ant-modal-close {
-// 	position: absolute;
-// 	top: 10px;
-// 	inset-inline-end: 10px;
-// 	z-index: 1010;
-// 	padding: 0;
-// 	color: rgba(0, 0, 0, 0.45);
-// 	font-weight: 500;
-// 	line-height: 1;
-// 	text-decoration: none;
-// 	background: transparent;
-// 	border-radius: 4px;
-// 	width: 22px;
-// 	height: 22px;
-// 	border: 0;
-// 	outline: 0;
-// 	cursor: pointer;
-// 	transition: color 0s, background-color 0s;
-// }
-
-// .ant-modal .ant-modal-close-x {
-// 	display: flex;
-// 	font-size: 14px;
-// 	font-style: normal;
-// 	line-height: 22px;
-// 	justify-content: center;
-// 	text-transform: none;
-// 	text-rendering: auto;
-// }
+.ant-modal .ant-modal-close {
+    top: 0px;
+    inset-inline-end: 0px;
+}

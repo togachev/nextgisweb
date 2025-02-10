@@ -47,7 +47,7 @@ export const Header = observer(() => {
     const url = routeURL("resource.show", 0);
 
     return (
-        <div className="header" style={{ background: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
+        <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="menu-button">
                 <div className="menu-component">
                     <Space className="button-link">
@@ -100,8 +100,8 @@ export const Header = observer(() => {
                 </div>
             </div>
             <div className="name-site">
-                <Title className="name-site-a" level={1} >Геопортал Центра космических услуг</Title>
-                <Title className="name-site-b" level={5} >цифровые карты Ханты-мансийского автономного округа - Югры</Title>
+                <Title ellipsis={{ suffix: "" }} className="name-site-a" level={1} >Геопортал Центра космических услуг</Title>
+                <Title ellipsis={{ suffix: "" }} className="name-site-b" level={5} >цифровые карты Ханты-мансийского автономного округа - Югры</Title>
             </div>
         </div >
     );
