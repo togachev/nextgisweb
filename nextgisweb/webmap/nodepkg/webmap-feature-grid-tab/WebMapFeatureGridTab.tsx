@@ -80,6 +80,13 @@ export function WebMapFeatureGridTab({
                     display.current.identify?._popup.widget?.reset();
                     reloadLayer();
                 },
+                onOpen: ({ featureId, resourceId }) => {
+                    display.current.identify?.identifyFeatureByAttrValue(
+                        resourceId,
+                        "id",
+                        featureId
+                    );
+                },
 
                 onSelect: (newVal) => {
                     store.setSelectedIds(newVal);

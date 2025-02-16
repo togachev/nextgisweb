@@ -8,7 +8,6 @@ from nextgisweb.resource import DataScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
-from .extension import FeatureExtension
 from .interface import IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
 
@@ -75,7 +74,6 @@ def feature_update(request):
         dynmenu=False,
     )
 
-
 def field_collection(request) -> JSONType:
     request.resource_permission(DataScope.read)
     fields = []
@@ -89,11 +87,6 @@ def field_collection(request) -> JSONType:
         ))
 
     return fields
-
-@viewargs(renderer="mako")
-def test_mvt(request):
-    return dict()
-
 
 @viewargs(renderer="react")
 def export(request):
@@ -176,8 +169,6 @@ def setup_pyramid(comp, config):
         route_name="resource.export.page",
         context=IFeatureLayer,
     )
-
-    config.add_route("feature_layer.test_mvt", "/feature_layer/test_mvt").add_view(test_mvt)
 
     # Layer menu extension
     @Resource.__dynmenu__.add

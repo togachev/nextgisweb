@@ -11,26 +11,14 @@ import FolderOpenIcon from "../icons/folder_open.svg";
 
 type Node = EventDataNode<TreeWebmapItem>;
 
-export function isExclusiveGroup(
+function isExclusiveGroup(
     treeItem: TreeItemConfig
-): treeItem is GroupItemConfig & { exclusive: true } {
+): treeItem is GroupItemConfig {
     return treeItem.type === "group" && treeItem.exclusive;
 }
 
-export function itemIsMutalGroup(treeItem: TreeItemConfig) {
+function itemIsMutalGroup(treeItem: TreeItemConfig) {
     return isExclusiveGroup(treeItem) ? treeItem : false;
-}
-
-export function itemInMutuallyExclusiveGroup(
-    item: TreeItemConfig,
-    treeItems: TreeItemConfig[]
-) {
-    const parent = getParent(treeItems, (i) => i.key === item.key);
-    if (parent) {
-        return itemIsMutalGroup(parent);
-    }
-
-    return false;
 }
 
 export function keyInMutuallyExclusiveGroupDeep(
@@ -57,7 +45,7 @@ export function keyInMutuallyExclusiveGroupDeep(
     return false;
 }
 
-export function determineAdditionalKeys(
+function determineAdditionalKeys(
     node: Node,
     firstParent: TreeItemConfig,
     keys: number[]

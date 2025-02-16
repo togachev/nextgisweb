@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { Fragment, useMemo, useRef, useState } from "react";
 
+import { Splitter } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ComplexTree } from "./ComplexTree";
@@ -85,8 +86,8 @@ export function FocusTable<
     const itemActionsArray = selected ? getItemActionsDetail(selected) : [];
 
     return (
-        <div className={classNames("ngw-gui-focus-table", rootClassName)}>
-            <div className="table">
+        <Splitter className={classNames("ngw-gui-focus-table", rootClassName)}>
+            <Splitter.Panel className="table" min="20%" defaultSize="35%">
                 <FocusToolbar
                     environmentRef={environmentRef}
                     actions={tableActionsArray}
@@ -108,9 +109,10 @@ export function FocusTable<
                         onPrimaryAction={() => setShowDetails(true)}
                     />
                 </div>
-            </div>
+            </Splitter.Panel>
+
             {showDetails && selected && environmentRef.current && (
-                <div className="detail">
+                <Splitter.Panel className="detail" min="20%" defaultSize="65%">
                     <FocusToolbar
                         actions={[hideDetail, ...itemActionsArray]}
                         environmentRef={environmentRef}
@@ -120,8 +122,8 @@ export function FocusTable<
                     <Fragment key={environmentRef.current.indexFor(selected)}>
                         <Detail item={selected} />
                     </Fragment>
-                </div>
+                </Splitter.Panel>
             )}
-        </div>
+        </Splitter>
     );
 }

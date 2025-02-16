@@ -21,6 +21,7 @@ export interface FeatureInfoSectionProps {
     showAttributes?: boolean;
     measurementSrid?: number;
     showGeometryInfo?: boolean;
+    showGeometryPreview?: boolean;
     attributePanelAction?: ReactElement;
     highlights: boolean;
 }
@@ -31,6 +32,7 @@ export function FeatureInfoSection({
     showAttributes = true,
     measurementSrid,
     showGeometryInfo = false,
+    showGeometryPreview,
     attributePanelAction,
     highlights,
 }: FeatureInfoSectionProps) {
@@ -84,7 +86,7 @@ export function FeatureInfoSection({
             items_.push(attrElement);
         }
 
-        if (showGeometryInfo && highlights === true) {
+        if (showGeometryInfo || showGeometryPreview && highlights === true) {
             const geomElement = (
                 <PanelSection
                     key="geometry"
@@ -93,7 +95,8 @@ export function FeatureInfoSection({
                 >
                     <GeometryInfo
                         srid={measurementSrid}
-                        showPreview
+                        showInfo={showGeometryInfo}
+                        showPreview={showGeometryPreview}
                         resourceId={resourceId}
                         featureId={featureItem.id}
                     />
@@ -104,6 +107,7 @@ export function FeatureInfoSection({
         return items_;
     }, [
         attributePanelAction,
+        showGeometryPreview,
         showGeometryInfo,
         measurementSrid,
         showAttributes,
