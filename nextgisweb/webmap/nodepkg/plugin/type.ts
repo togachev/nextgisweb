@@ -34,5 +34,7 @@ declare module "@nextgisweb/webmap/type/TreeItems" {
                 opacity: number | null;
             }>;
         };
+        "@nextgisweb/webmap/plugin/layer-settings": Record<string, never>;
+        "@nextgisweb/webmap/plugin/style-settings": Record<string, never>;
     }
 }

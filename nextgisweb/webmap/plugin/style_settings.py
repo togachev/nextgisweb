@@ -5,6 +5,8 @@ from .base import WebmapLayerPlugin
 from nextgisweb.resource import DataScope
 
 class StyleSettingsPlugin(WebmapLayerPlugin):
+    amd_free = True
+
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IBboxLayer.providedBy(layer):
@@ -12,4 +14,4 @@ class StyleSettingsPlugin(WebmapLayerPlugin):
             write_permission = layer.has_permission(DataScope.write, request.user)
             if not write_permission:
                 return False
-            return ("ngw-webmap/plugin/StyleSettings", dict())
+            return ("@nextgisweb/webmap/plugin/style-settings", dict())
