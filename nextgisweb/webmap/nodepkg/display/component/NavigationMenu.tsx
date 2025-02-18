@@ -1,12 +1,20 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { Typography } from "@nextgisweb/gui/antd";
 
 import type { PanelManager } from "../../panel/PanelManager";
+import type { Display } from "../Display";
+
+import Information from "@nextgisweb/icon/mdi/information";
+import Cogs from "@nextgisweb/icon/mdi/cogs";
 
 import "./NavigationMenu.less";
 
-export const NavigationMenu = observer(({ store }: { store: PanelManager }) => {
+const { Link } = Typography;
+
+export const NavigationMenu = observer(({ store, display }: { store: PanelManager, display: Display }) => {
     const onClickItem = useCallback(
         (name: string) => {
             if (store.activePanelName === name) {
@@ -17,6 +25,8 @@ export const NavigationMenu = observer(({ store }: { store: PanelManager }) => {
         },
         [store]
     );
+
+    const infomap = display.config.infomap;
 
     const active = store.activePanel;
     return (
@@ -34,6 +44,12 @@ export const NavigationMenu = observer(({ store }: { store: PanelManager }) => {
                     {plugin.icon}
                 </div>
             ))}
+            {!display.tinyConfig && infomap.scope ? (
+                <div className="infoblock">
+                    <Link target="_blank" href={infomap.link}><span title={gettext("Map properties")} className="iconLinks"><Information /></span></Link>
+                    <Link target="_blank" href={infomap.update}><span title={gettext("Map settings")} className="iconLinks"><Cogs /></span></Link>
+                </div>
+            ) : null}
         </div>
     );
 });

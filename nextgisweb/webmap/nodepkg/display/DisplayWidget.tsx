@@ -80,7 +80,7 @@ export const DisplayWidget = observer(
                         size="50px"
                         style={{ flexGrow: 0, flexShrink: 0 }}
                     >
-                        <NavigationMenu store={display.panelManager} />
+                        <NavigationMenu display={display} store={display.panelManager} />
                     </Panel>
                 )}
                 <Panel
