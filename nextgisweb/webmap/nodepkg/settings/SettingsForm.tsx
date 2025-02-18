@@ -170,7 +170,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             <Title level={4}>{gettext("Custom map settings")}</Title>
 
             <Row gutter={[16, 16]}>
-                <Col>
+                <Col span={8}>
                     <Space direction="horizontal">
                         <Form.Item
                             noStyle
@@ -182,39 +182,36 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                         {identifyModuleMsg}
                     </Space>
                 </Col>
-                <Row gutter={[16, 16]}>
-                    <Col span={8}>
-                        <Space>
-                            <Form.Item
-                                name="max_count_file_upload"
-                                label={gettext("Maximum uploaded files")}
-                                rules={[
-                                    {
-                                        required: true,
-                                    },
-                                ]}
-                            >
-                                <InputNumber min="1" style={INPUT_DEFAULT_WIDTH} />
-                            </Form.Item>
-                        </Space>
-                    </Col>
-                    <Col span={8}>
-                        <Space>
-                            <Form.Item
-                                name="offset_point"
-                                label={gettext("Offset of popup relative to click point, px")}
-                                rules={[
-                                    {
-                                        required: true,
-                                    },
-                                ]}
-                            >
-                                <InputNumber min="0" max="50" addonAfter={offsetInfo} style={INPUT_DEFAULT_WIDTH} />
-                            </Form.Item>
-
-                        </Space>
-                    </Col>
-                </Row>
+                <Col span={8}>
+                    <Space>
+                        <Form.Item
+                            name="max_count_file_upload"
+                            label={gettext("Maximum uploaded files")}
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}
+                        >
+                            <InputNumber min="1" style={INPUT_DEFAULT_WIDTH} />
+                        </Form.Item>
+                    </Space>
+                </Col>
+                <Col span={8}>
+                    <Space>
+                        <Form.Item
+                            name="offset_point"
+                            label={gettext("Offset of popup relative to click point, px")}
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}
+                        >
+                            <InputNumber min="0" max="50" addonAfter={offsetInfo} style={INPUT_DEFAULT_WIDTH} />
+                        </Form.Item>
+                    </Space>
+                </Col>
             </Row>
 
             <Title level={4}>{gettext("Measurement")}</Title>
