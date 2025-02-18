@@ -69,7 +69,6 @@ export const LayersTree = observer(
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
-        const [fileClickId, setFileClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const { webmapItems, checked, layersWithoutLegendInfo } = store;
 
@@ -182,8 +181,6 @@ export const LayersTree = observer(
                     const dropdownFile = showDropdown && fileResourceVisible === true && (
                         <DropdownFile
                             nodeData={nodeData.treeItem}
-                            setFileClickId={setFileClickId}
-                            fileClickId={fileClickId}
                         />
                     );
                     actions = (

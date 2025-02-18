@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dropdown } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import Paperclip from "@nextgisweb/icon/mdi/paperclip";
-
-import "./DropdownFile.less";
-import { route } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import Paperclip from "@nextgisweb/icon/mdi/paperclip";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import "./DropdownFile.less";
 
-import type { MenuProps } from "@nextgisweb/gui/antd";
+import type { RootItemConfig } from "@nextgisweb/webmap/type/api";
+import type { TreeItemConfig } from "../type/TreeItems";
+import type { DropdownProps, MenuProps } from "@nextgisweb/gui/antd";
 
 const DownloadAttachedFiles = gettext("Download attached files");
 
@@ -26,94 +26,60 @@ interface FileProps {
     size: string;
 }
 
-export function DropdownFile({
-    nodeData,
-    fileClickId,
-    setFileClickId,
-}) {
-    const { id, type } = nodeData;
-    const [value, setValue] = useState([]);
+interface DropdownFileProps {
+    nodeData: TreeItemConfig | RootItemConfig;
+}
 
-    useEffect(() => {
-        let isSubscribed = true;
-        const getData = async () => {
-            if (nodeData.type === 'layer') {
-                const value = await route("file_resource.group_show", nodeData.styleId).get();
-                if (isSubscribed) {
-                    let files: FileProps[] = [];
-                    getEntries(value).map(([_, itm]) => {
-                        files.push(itm[0])
-                    })
-                    setValue(files);
-                }
-            }
+export function DropdownFile({ nodeData }: DropdownFileProps) {
+    const [open, setOpen] = useState(false);
+
+    const handleMenuClick: MenuProps['onClick'] = (e) => {
+        e.domEvent.stopPropagation();
+        setOpen(false);
+    };
+
+    const handleOpenChange: DropdownProps['onOpenChange'] = (nextOpen, info) => {
+        if (info.source === 'trigger' || nextOpen) {
+            setOpen(nextOpen);
         }
-        getData().catch(console.error);
-        return () => isSubscribed = false;
-    }, []);
+    };
 
-    if (type === "root" || type === "group" || value.length === 0) {
-        return <></>;
-    }
-    if (fileClickId === undefined || fileClickId !== id) {
-        return (
-            <span
-                title={DownloadAttachedFiles}
-                className="more"
-                onClick={(e) => {
-                    setFileClickId(id);
-                    e.stopPropagation();
-                }}
-            >
-                <Paperclip style={{ rotate: "45deg" }} />
-            </span>
-        );
-    }
-    
-    const menuItems: MenuProps["items"] = [];
-    value.length !== 0 && value.map((i) => {
-        menuItems.push({
-            key: i.id,
-            label: (
-                <>
+    const { data: data } = useRouteGet("file_resource.group_show", { id: nodeData.styleId });
+
+    const items: MenuProps["items"] = [];
+    data && getEntries(data).map(([_, itm]) => {
+        itm.map((i: FileProps) => {
+            items.push({
+                key: i.id,
+                label: (
                     <div className="linkFile" title={i.name}>
                         <a className="a-linkFile" target="_blank" href={i.link} download>
                             <span className="fileTitle">{i.res_name}</span>
                             <span className="fileName">{i.name}</span>
                         </a>
                     </div>
-                </>
-            )
+                )
+            })
         })
     })
 
-    const menuProps = {
-        items: menuItems,
-    };
-
     return (
-        <>
-            {value.length !== 0 && (<Dropdown
-                menu={menuProps}
-                onOpenChange={() => {
-                    setFileClickId(undefined);
-                }}
-                trigger={["click"]}
-                open
-                dropdownRender={(menu) => (
-                    <div className="dropdown-content customFile" onClick={(e) => { e.stopPropagation(); }}>
-                        {menu}
-                    </div>
-                )}
+        <Dropdown
+            menu={{
+                items,
+                onClick: handleMenuClick,
+            }}
+            trigger={["click"]}
+            onOpenChange={handleOpenChange}
+            open={open}
+        >
+            <span
+                title={DownloadAttachedFiles}
+                className="more"
+                onClick={(e) => { e.stopPropagation(); }}
             >
-                <span
-                    title={DownloadAttachedFiles}
-                    className="more"
-                    onClick={(e) => { e.stopPropagation(); }}
-                >
-                    <Paperclip style={{ rotate: "45deg" }} />
-                </span>
-            </Dropdown>)}
-        </>
+                <Paperclip style={{ rotate: "45deg" }} />
+            </span>
+        </Dropdown>
     );
 }
