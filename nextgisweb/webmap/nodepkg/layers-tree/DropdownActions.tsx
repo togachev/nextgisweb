@@ -5,10 +5,9 @@ import type { RootItemConfig } from "@nextgisweb/webmap/type/api";
 
 import type { PluginBase } from "../plugin/PluginBase";
 import type { TreeItemConfig } from "../type/TreeItems";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import DotsVertical from "@nextgisweb/icon/material/more_vert";
+
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import "./DropdownActions.less";
-const AdditionalTools = gettext("Additional tools");
 
 interface DropdownActionsProps {
     nodeData: TreeItemConfig | RootItemConfig;
@@ -34,13 +33,12 @@ export function DropdownActions({
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
-                title={AdditionalTools}
                 className="more"
                 onClick={() => {
                     setMoreClickId(id);
                 }}
             >
-                <DotsVertical />
+                <MoreVertIcon />
             </span>
         );
     }
@@ -96,7 +94,7 @@ export function DropdownActions({
 
     return (
         <Dropdown
-            menu={{ items: menuItems.sort((a, b) => (a.label > b.label) ? 1 : -1) }}
+            menu={{ items: menuItems }}
             onOpenChange={() => {
                 setMoreClickId(undefined);
             }}
@@ -119,7 +117,7 @@ export function DropdownActions({
             )}
         >
             <span className="more">
-                <DotsVertical />
+                <MoreVertIcon />
             </span>
         </Dropdown>
     );

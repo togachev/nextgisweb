@@ -1,11 +1,30 @@
 import { useState, useEffect } from "react";
 import { Dropdown } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { PaperClipOutlined } from '@ant-design/icons';
+
+import Paperclip from "@nextgisweb/icon/mdi/paperclip";
+
 import "./DropdownFile.less";
 import { route } from "@nextgisweb/pyramid/api";
+import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+
+import type { MenuProps } from "@nextgisweb/gui/antd";
 
 const DownloadAttachedFiles = gettext("Download attached files");
+
+interface FileProps {
+    file_bucket_id: number;
+    file_resource_id: number;
+    fileobj_id: number;
+    id: number;
+    key: number;
+    link: string;
+    mime_type: string;
+    name: string;
+    res_name: string;
+    resource_id: number;
+    size: string;
+}
 
 export function DropdownFile({
     nodeData,
@@ -21,11 +40,9 @@ export function DropdownFile({
             if (nodeData.type === 'layer') {
                 const value = await route("file_resource.group_show", nodeData.styleId).get();
                 if (isSubscribed) {
-                    let files = []
-                    Object.values(value).map(item => {
-                        item.map(x => {
-                            files.push(x)
-                        })
+                    let files: FileProps[] = [];
+                    getEntries(value).map(([_, itm]) => {
+                        files.push(itm[0])
                     })
                     setValue(files);
                 }
@@ -43,14 +60,17 @@ export function DropdownFile({
             <span
                 title={DownloadAttachedFiles}
                 className="more"
-                onClick={(e) => { setFileClickId(id); e.stopPropagation(); }}
+                onClick={(e) => {
+                    setFileClickId(id);
+                    e.stopPropagation();
+                }}
             >
-                <PaperClipOutlined />
+                <Paperclip style={{ rotate: "45deg" }} />
             </span>
         );
     }
-
-    const menuItems = [];
+    
+    const menuItems: MenuProps["items"] = [];
     value.length !== 0 && value.map((i) => {
         menuItems.push({
             key: i.id,
@@ -71,15 +91,13 @@ export function DropdownFile({
         items: menuItems,
     };
 
-    const onOpenChange = () => {
-        setFileClickId(undefined);
-    };
-
     return (
         <>
             {value.length !== 0 && (<Dropdown
                 menu={menuProps}
-                onOpenChange={onOpenChange}
+                onOpenChange={() => {
+                    setFileClickId(undefined);
+                }}
                 trigger={["click"]}
                 open
                 dropdownRender={(menu) => (
@@ -93,7 +111,7 @@ export function DropdownFile({
                     className="more"
                     onClick={(e) => { e.stopPropagation(); }}
                 >
-                    <PaperClipOutlined />
+                    <Paperclip style={{ rotate: "45deg" }} />
                 </span>
             </Dropdown>)}
         </>

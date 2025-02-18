@@ -9,11 +9,6 @@ import type { PluginBase } from "../plugin/PluginBase";
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
 
-import type { TreeItem } from "../type/TreeItems";
-import type { WebmapPlugin } from "../type/WebmapPlugin";
-import type { Display } from "../display";
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
-
 import { DropdownActions } from "./DropdownActions";
 import { DropdownFile } from "./DropdownFile";
 import { Legend } from "./Legend";
@@ -21,8 +16,6 @@ import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
 import { useWebmapItems } from "./hook/useWebmapItems";
 import {
-    // prepareWebMapItems,
-    prepareWebMapItemsCustom,
     keyInMutuallyExclusiveGroupDeep,
     updateKeysForGroup,
     updateKeysForMutualExclusivity,
@@ -56,7 +49,6 @@ interface LayersTreeProps {
     draggable?: boolean;
     selectable?: boolean;
     showLine?: boolean;
-    display: Display;
 }
 
 export const LayersTree = observer(
@@ -74,7 +66,6 @@ export const LayersTree = observer(
         draggable = true,
         selectable = true,
         showLine = true,
-        display,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
@@ -87,8 +78,6 @@ export const LayersTree = observer(
         const { preparedWebMapItems } = useWebmapItems({ webmapItems });
 
         const treeItems = useMemo(() => {
-            // let _webmapItems = prepareWebMapItems(webmapItems);
-            // let _webmapItems = prepareWebMapItemsCustom(webMapItems);
             if (onFilterItems) {
                 return onFilterItems(store, preparedWebMapItems);
             }
@@ -162,7 +151,7 @@ export const LayersTree = observer(
             (nodeData: TreeWebmapItem) => {
                 const { title, fileResourceVisible } = nodeData.treeItem;
                 const shouldActions = showLegend || showDropdown;
-
+                
                 let actions;
 
                 if (shouldActions) {
@@ -181,35 +170,35 @@ export const LayersTree = observer(
                     }
 
                     const dropdownAction = showDropdown && (
-                    <DropdownActions
-                        nodeData={nodeData.treeItem}
-                        getWebmapPlugins={getWebmapPlugins}
-                        setMoreClickId={setMoreClickId}
-                        moreClickId={moreClickId}
-                        update={update}
-                        setUpdate={setUpdate}
-                    />
+                        <DropdownActions
+                            nodeData={nodeData.treeItem}
+                            getWebmapPlugins={getWebmapPlugins}
+                            setMoreClickId={setMoreClickId}
+                            moreClickId={moreClickId}
+                            update={update}
+                            setUpdate={setUpdate}
+                        />
                     );
-                    const dropdownFile = showDropdown && fileResourceVisible && (
-                    <DropdownFile
-                        nodeData={nodeData.treeItem}
-                        setFileClickId={setFileClickId}
-                        fileClickId={fileClickId}
-                    />
-                );
+                    const dropdownFile = showDropdown && fileResourceVisible === true && (
+                        <DropdownFile
+                            nodeData={nodeData.treeItem}
+                            setFileClickId={setFileClickId}
+                            fileClickId={fileClickId}
+                        />
+                    );
                     actions = (
-                    <Col
-                        className="tree-item-action"
-                        style={{ alignItems: "center" }}
-                    >
-                        {legendAction}
-                        {dropdownFile}
-                        {dropdownAction}
-                    </Col>
+                        <Col
+                            className="tree-item-action"
+                            style={{ alignItems: "center" }}
+                        >
+                            {legendAction}
+                            {dropdownFile}
+                            {dropdownAction}
+                        </Col>
                     );
                 }
 
-                    return (
+                return (
                     <>
                         <Row wrap={false}>
                             <Col flex="auto" className="tree-item-title">
@@ -225,18 +214,18 @@ export const LayersTree = observer(
                             />
                         )}
                     </>
-                    );
+                );
             },
-                    [
-                    checkable,
-                    getWebmapPlugins,
-                    moreClickId,
-                    showDropdown,
-                    showLegend,
-                    store,
-                    update,
-                    ]
-                    );
+            [
+                checkable,
+                getWebmapPlugins,
+                moreClickId,
+                showDropdown,
+                showLegend,
+                store,
+                update,
+            ]
+        );
 
         const checkedKeys = useMemo(() => {
             const ch = checked.filter((id) =>

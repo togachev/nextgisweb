@@ -6,9 +6,6 @@ import type { GroupItemConfig } from "@nextgisweb/webmap/type/api";
 import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
-import FolderClosedIcon from "../icons/folder.svg";
-import FolderOpenIcon from "../icons/folder_open.svg";
-
 type Node = EventDataNode<TreeWebmapItem>;
 
 function isExclusiveGroup(
