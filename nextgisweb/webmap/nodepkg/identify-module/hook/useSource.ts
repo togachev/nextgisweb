@@ -115,7 +115,11 @@ export const useSource = (display: Display) => {
                     }
 
                     if (itm.lookup_table !== null) {
-                        deferreds.push(load(itm.lookup_table.id));
+                        deferreds.push(
+                            load(
+                                itm.lookup_table.id
+                            )
+                        );
                     }
                 })
 
@@ -139,8 +143,11 @@ export const useSource = (display: Display) => {
                             let value = valDT(val, field);
 
                             if (field.lookup_table !== null) {
-                                const lval = lookup(field.lookup_table.id, val);
-                                lval !== null && lval.then(i => value = i)
+                                const lval = lookup(
+                                    field.lookup_table.id,
+                                    val
+                                );
+                                lval.then( result => value = result);
                             }
                             Object.assign(values, { [key]: value })
                             Object.assign(renameKeys, { [key]: field.display_name })
