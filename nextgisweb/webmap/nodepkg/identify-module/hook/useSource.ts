@@ -1,5 +1,5 @@
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import lookupTableCached from "ngw-lookup-table/cached";
+import { load, lookup } from "@nextgisweb/webmap/panel/identify/lookup";
 import type { StoreItem } from "@nextgisweb/webmap/type";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps } from "./type";
@@ -115,11 +115,7 @@ export const useSource = (display: Display) => {
                     }
 
                     if (itm.lookup_table !== null) {
-                        deferreds.push(
-                            lookupTableCached.load(
-                                itm.lookup_table.id
-                            )
-                        );
+                        deferreds.push(load(itm.lookup_table.id));
                     }
                 })
 
@@ -143,11 +139,8 @@ export const useSource = (display: Display) => {
                             let value = valDT(val, field);
 
                             if (field.lookup_table !== null) {
-                                const lval = lookupTableCached.lookup(
-                                    field.lookup_table.id,
-                                    val
-                                );
-                                value = lval !== null && lval
+                                const lval = lookup(field.lookup_table.id, val);
+                                lval !== null && lval.then(i => value = i)
                             }
                             Object.assign(values, { [key]: value })
                             Object.assign(renameKeys, { [key]: field.display_name })

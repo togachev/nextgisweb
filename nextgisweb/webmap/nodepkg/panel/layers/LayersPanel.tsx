@@ -47,6 +47,7 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                     onSelect={display.handleSelect.bind(display)}
                     setLayerZIndex={display.setLayerZIndex.bind(display)}
                     getWebmapPlugins={() => ({ ...display.plugins })}
+                    display={display}
                     {...props}
                 />
             </PanelContainer>

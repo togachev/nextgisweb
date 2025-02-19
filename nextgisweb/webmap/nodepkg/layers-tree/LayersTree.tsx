@@ -9,6 +9,8 @@ import type { PluginBase } from "../plugin/PluginBase";
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
 
+import type { Display } from "@nextgisweb/webmap/display";
+
 import { DropdownActions } from "./DropdownActions";
 import { DropdownFile } from "./DropdownFile";
 import { Legend } from "./Legend";
@@ -49,6 +51,7 @@ interface LayersTreeProps {
     draggable?: boolean;
     selectable?: boolean;
     showLine?: boolean;
+    display: Display;
 }
 
 export const LayersTree = observer(
@@ -66,6 +69,7 @@ export const LayersTree = observer(
         draggable = true,
         selectable = true,
         showLine = true,
+        display,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
@@ -206,6 +210,7 @@ export const LayersTree = observer(
                         {showLegend && (
                             <Legend
                                 checkable={checkable}
+                                display={display}
                                 nodeData={nodeData.treeItem}
                                 store={store}
                             />
