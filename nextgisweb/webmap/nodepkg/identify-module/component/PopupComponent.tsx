@@ -212,8 +212,8 @@ export default observer(
                 if (count > 0 && selected) {
                     const { id, layerId, styleId } = selected;
                     const item = Object.values(display.webmapStore._layers).find((itm) => itm.itemConfig.styleId === styleId);
-
-                    if (display.isTinyMode() && !display.isTinyModePlugin("ngw-webmap/plugin/FeatureLayer")) {
+                    
+                    if (display.isTinyMode() && !display.isTinyModePlugin("@nextgisweb/webmap/plugin/feature-layer")) {
                         return false;
                     } else if (!imodule._isEditEnabled(display, item)) {
                         return false;

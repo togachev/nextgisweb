@@ -218,13 +218,13 @@ export class IdentifyModule extends Component {
     };
 
     _isEditEnabled = (display: Display, item) => {
-        const pluginName = "ngw-webmap/plugin/FeatureLayer";
+        const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
 
         if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
             return false;
         }
 
-        const configLayerPlugin = item?.itemConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
+        const configLayerPlugin = item?.itemConfig.plugin["@nextgisweb/webmap/plugin/feature-layer"];
         const readOnly = configLayerPlugin?.readonly;
         return !readOnly;
     };
