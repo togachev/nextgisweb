@@ -1,8 +1,4 @@
 import re
-import base64
-import zlib
-import gzip
-
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
@@ -153,7 +149,7 @@ class Dumper:
     @cached_property
     def geom_dumper(self):
         if self.params.geom_format == "wkt":
-            return lambda val: zlib_compress(val.wkt)
+            return lambda val: val.wkt
         elif self.params.geom_format == "geojson":
             return lambda val: val.to_geojson()
         else:
@@ -243,15 +239,6 @@ class Dumper:
 
         return result
 
-def zlib_compress(val):
-    val = str(val).encode("utf-8")
-    compress_data = base64.b64encode(zlib.compress(val)).decode("utf-8")
-    return compress_data
-
-def zlib_decompress(val):
-    val = str.encode(val)
-    compress_data = gzip.decompress(base64.b64decode(val)).decode("utf-8")
-    return compress_data
 
 def query_feature_or_not_found(query, resource_id, feature_id):
     """Query one feature by id or return FeatureNotFound exception."""

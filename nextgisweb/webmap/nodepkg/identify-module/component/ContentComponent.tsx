@@ -34,41 +34,39 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
     const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-    const RenderValue = (value) => {
-        for (const k in value) {
-            const val = value[k];
-            if (urlRegex.test(val)) {
-                return (<Link title={val} href={val} target="_blank">{val}</Link>)
-            } else if (emailRegex.test(val)) {
-                return (<div className="value-email" title={val} onClick={() => {
-                    copyValue(val, gettext("Email address copied"));
-                }} >{val}</div>)
-            } else {
-                return val
-            }
+    const RenderValue = ({ value }) => {
+        const val = value;
+        if (urlRegex.test(val)) {
+            return (<Link title={val} href={val} target="_blank">{val}</Link>)
+        } else if (emailRegex.test(val)) {
+            return (<div className="value-email" title={val} onClick={() => {
+                copyValue(val, gettext("Email address copied"));
+            }} >{val}</div>)
+        } else {
+            return val
         }
     };
 
     const AttributeColumns = ({ attribute }) => {
         const items: DescriptionsProps["items"] = [];
-        if (Object.keys(attribute).length > 0) {
-            if (Object.keys(attribute).length > 1) {
-                Object.keys(attribute).map((key) => {
-                    if (attribute[key] !== null) {
+        if (attribute.length > 0) {
+            if (attribute.length > 1) {
+                attribute.map((item) => {
+                    if (item.value !== null) {
                         items.push({
-                            key: key,
-                            label: key,
-                            children: (<RenderValue value={attribute[key]} />),
+                            key: item.key,
+                            label: item.attr,
+                            children: (<RenderValue value={item.value} />),
                         })
                     }
                 })
             } else {
-                Object.keys(attribute).map((key) => {
-                    if (attribute[key] !== null) {
+                attribute.map((item) => {
+                    if (item.value !== null) {
                         items.push({
-                            key: key,
-                            label: key,
-                            children: (<RenderValue value={attribute[key]} />),
+                            key: item.key,
+                            label: item.attr,
+                            children: (<RenderValue value={attribute.value} />),
                         })
                     }
                 })

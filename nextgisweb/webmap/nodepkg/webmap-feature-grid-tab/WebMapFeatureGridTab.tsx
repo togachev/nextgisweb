@@ -15,7 +15,6 @@ import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
-import { decompressed } from "@nextgisweb/webmap/utils";
 
 import type topic from "../compat/topic";
 import type { Display } from "../display";
@@ -134,9 +133,7 @@ export function WebMapFeatureGridTab({
                                     })
                                     .then((feature) => {
                                         if (feature.geom !== null) {
-                                            const geometry = wkt.readGeometry(
-                                                decompressed(feature.geom)
-                                            );
+                                            const geometry = wkt.readGeometry(feature.geom);
                                             display.current.map.zoomToFeature(
                                                 new Feature({ geometry })
                                             );

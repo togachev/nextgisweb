@@ -7,7 +7,6 @@ import { Circle, Fill, Stroke, Style } from "ol/style";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
-import { decompressed } from "@nextgisweb/webmap/utils";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
 import type { MapStore } from "../ol/MapStore";
@@ -89,7 +88,7 @@ export class FeatureHighlighter {
             feature = e.feature;
         } else {
             if (e.geom) {
-                geometry = this._wkt.readGeometry(decompressed(e.geom));
+                geometry = this._wkt.readGeometry(e.geom);
             } else if (e.olGeometry) {
                 geometry = e.olGeometry;
             } else {

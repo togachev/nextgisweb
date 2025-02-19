@@ -118,7 +118,10 @@ export default observer(
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val);
                 setExtensions(res.feature.extensions);
-                setAttribute(res.updateName);
+                
+                res?.dataSource?.then(i => {
+                    setAttribute(i);
+                })
 
                 topic.publish("feature.highlight", {
                     geom: res.feature.geom,
@@ -169,8 +172,6 @@ export default observer(
                     setFixPos(null);
                 }
             }, [fixPopup]);
-
-
 
             const onChangeSelect = (value: { value: number; label: string }) => {
                 const selectedValue = data.find(item => item.value === value.value);

@@ -1,5 +1,6 @@
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { load, lookup } from "@nextgisweb/webmap/panel/identify/lookup";
+import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
+
 import type { StoreItem } from "@nextgisweb/webmap/type";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps } from "./type";
@@ -81,9 +82,10 @@ export const useSource = (display: Display) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
 
-        const query = { geom: item.itemConfig.layerHighligh === true ? true : false };
+        const query = { geom: item && item.itemConfig.layerHighligh === true ? true : false };
+
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
-            id: res.layerId,
+            id: resourceId,
             fid: res.id,
         })
             .get({
@@ -99,68 +101,17 @@ export const useSource = (display: Display) => {
                 fields: { Forbidden: "Forbidden" },
                 extensions: null
             }
-
-        const fieldmap = res.permission !== "Forbidden" ? await route("resource.item", { id: resourceId })
-            .get({
-                cache: true,
-            })
-            .then(data => {
-                const deferreds: string[] = [];
-                const fieldmap = {};
-                data.feature_layer.fields.map(itm => {
-                    if (itm.grid_visibility) {
-                        fieldmap[itm.keyname] = itm;
-                    } else {
-                        delete feature.fields[itm.keyname]
-                    }
-
-                    if (itm.lookup_table !== null) {
-                        deferreds.push(
-                            load(
-                                itm.lookup_table.id
-                            )
-                        );
-                    }
-                })
-
-                return Promise.all(deferreds).then(
-                    () => {
-                        const rename = (renameKeys, currentObject) => {
-                            return Object.keys(currentObject).reduce(
-                                (acc, key) => ({
-                                    ...acc,
-                                    ...{ [renameKeys[key] || key]: currentObject[key] },
-                                }),
-                                {}
-                            );
-                        };
-
-                        const renameKeys = {};
-                        const values = {};
-
-                        getEntries(feature.fields).map(([key, val]) => {
-                            const field = fieldmap[key];
-                            let value = valDT(val, field);
-
-                            if (field.lookup_table !== null) {
-                                const lval = lookup(
-                                    field.lookup_table.id,
-                                    val
-                                );
-                                lval.then( result => value = result);
-                            }
-                            Object.assign(values, { [key]: value })
-                            Object.assign(renameKeys, { [key]: field.display_name })
-                        })
-
-                        const updateName = rename(renameKeys, values);
-
-                        return { updateName, feature, resourceId };
-                    }
-                );
-
-            }) : { updateName: undefined, feature: feature, resourceId: -1 };
-        return fieldmap;
+        if (res.permission !== "Forbidden") {
+            const fieldsInfo = await getFieldsInfo(resourceId);
+            const { fields } = feature;
+            const abortController = new AbortController();
+            const dataSource = fieldValuesToDataSource(fields, fieldsInfo, {
+                signal: abortController.signal,
+            });
+            return { dataSource, feature, resourceId };
+        } else {
+            return { updateName: undefined, feature: feature, resourceId: -1 };
+        }
     }
 
     return { generateUrl, getAttribute };
