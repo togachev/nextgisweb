@@ -94,7 +94,7 @@ export function DropdownActions({
 
     return (
         <Dropdown
-            menu={{ items: menuItems }}
+            menu={{ items: menuItems.sort((a, b) => (a.label > b.label) ? 1 : -1) }}
             onOpenChange={() => {
                 setMoreClickId(undefined);
             }}

@@ -154,11 +154,11 @@ export const LayersTree = observer(
             (nodeData: TreeWebmapItem) => {
                 const { title, fileResourceVisible } = nodeData.treeItem;
                 const shouldActions = showLegend || showDropdown;
-                
-                let actions;
 
+                let actions;
+                let legendAction;
                 if (shouldActions) {
-                    let legendAction;
+                    
                     if (nodeData.treeItem.type === "layer") {
                         const treeLayer = nodeData.treeItem;
 
@@ -192,7 +192,6 @@ export const LayersTree = observer(
                             className="tree-item-action"
                             style={{ alignItems: "center" }}
                         >
-                            {legendAction}
                             {dropdownFile}
                             {dropdownAction}
                         </Col>
@@ -203,7 +202,8 @@ export const LayersTree = observer(
                     <>
                         <Row wrap={false}>
                             <Col flex="auto" className="tree-item-title">
-                                {title}
+                                {legendAction}
+                                <div className="legend-title">{title}</div>
                             </Col>
                             {actions}
                         </Row>
