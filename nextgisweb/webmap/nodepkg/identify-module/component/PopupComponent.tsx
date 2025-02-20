@@ -116,7 +116,7 @@ export default observer(
             }
 
             const getContent = async (val: DataProps, key: boolean) => {
-                const res = await getAttribute(val);
+                const res = await getAttribute(val, key);
                 setExtensions(res.feature.extensions);
                 
                 res?.dataSource?.then(i => {

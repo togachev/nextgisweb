@@ -78,7 +78,7 @@ export const useSource = (display: Display) => {
         return link;
     };
 
-    const getAttribute = async (res: DataProps) => {
+    const getAttribute = async (res: DataProps, key) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
 
@@ -89,7 +89,7 @@ export const useSource = (display: Display) => {
             fid: res.id,
         })
             .get({
-                cache: true,
+                cache: !key ? true : false,
                 query,
             })
             .then(item => {
