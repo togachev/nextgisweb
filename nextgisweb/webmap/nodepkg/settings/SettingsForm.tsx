@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import {
-    Button,
     Col,
+    FloatButton,
     Form,
     Input,
     InputNumber,
@@ -367,7 +367,8 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
 
             <Row className="row-submit">
                 <Col>
-                    <Button
+                    <FloatButton
+                        tooltip={gettext("Save")}
                         htmlType="submit"
                         type={"primary"}
                         danger={status === "saved-error"}
@@ -381,7 +382,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                         loading={status === "saving"}
                     >
                         {gettext("Save")}
-                    </Button>
+                    </FloatButton>
                 </Col>
             </Row>
         </Form>
