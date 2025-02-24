@@ -1,62 +1,332 @@
-import { Divider } from "@nextgisweb/gui/antd";
+import { useEffect, useState } from "react";
+import { Divider, FloatButton, Input, Space } from "@nextgisweb/gui/antd";
 import LogoUriit from "./icons/uriit_logo.svg";
-import { RightOutlined } from "@ant-design/icons";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { route } from "@nextgisweb/pyramid/api";
+
+import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
+import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
+import ContentSave from "@nextgisweb/icon/mdi/content-save";
+import Pencil from "@nextgisweb/icon/mdi/pencil";
+import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
+import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
+import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./Footer.less";
 
 const LogoUriitComp = () => (
     <span className="uriit-logo">
         <LogoUriit />
     </span>
-)
-
-const info = [
-    { key: "address", label: "", value: "Россия, 628011 Ханты-Мансийск ул. Мира, д. 151" },
-    { key: "reception", label: i18n.gettext("Приемная"), value: "+7 (3467) 360-100" },
-    { key: "office", label: i18n.gettext("Канцелярия"), value: "+7 (3467) 360-100 доб. 6030" },
-    { key: "fax", label: i18n.gettext("Факс"), value: "+7 (3467) 360-101" },
-    { key: "email", label: "E-mail", value: "OFFICE@URIIT.RU" },
-    {
-        key: "services", label: "", value: i18n.gettext("Услуги Центра космических услуг"),
-        list: [
-            {
-                key: "lesnyeresursy", label: i18n.gettext("Космический мониторинг лесных ресурсов"),
-                value: "https://uriit.ru/services/122-kosmicheskiy-monitoring-lesnykh-resursov/"
-            },
-            {
-                key: "vodnyeresursy", label: i18n.gettext("Расчет площади рыбоводного участка"),
-                value: "https://uriit.ru/services/123-razrabotka-tsifrovoy-karty-rybovodnogo-uchastka/"
-            },
-        ]
-    },
-]
+);
 
 export const Footer = () => {
+    const [edit, setEdit] = useState(true);
+    // const [value, setValue] = useState({
+    //     services: {
+    //         value: "Услуги Центра космических услуг",
+    //         list: {
+    //             1: {
+    //                 name: "Космический мониторинг лесных ресурсов",
+    //                 value:
+    //                     "https://uriit.ru/services/122-kosmicheskiy-monitoring-lesnykh-resursov/",
+    //             },
+    //             2: {
+    //                 name: "Расчет площади рыбоводного участка",
+    //                 value:
+    //                     "https://uriit.ru/services/123-razrabotka-tsifrovoy-karty-rybovodnogo-uchastka/",
+    //             },
+    //         },
+    //     },
+    //     address: {
+    //         value: "Россия, 628011 Ханты-Мансийск ул. Мира, д. 151",
+    //         phone: {
+    //             1: {
+    //                 name: "Приемная",
+    //                 value: "+7 (3467) 360-100",
+    //             },
+    //             2: {
+    //                 name: "Канцелярия",
+    //                 value: "+7 (3467) 360-100 доб. 6030",
+    //             },
+    //             3: {
+    //                 name: "Факс",
+    //                 value: "+7 (3467) 360-101",
+    //             },
+    //             4: {
+    //                 name: "E-mail",
+    //                 value: "OFFICE@URIIT.RU",
+    //             },
+    //         },
+    //     },
+    // });
+    const [value, setValue] = useState({
+        services: {
+            value: "",
+            list: {},
+        },
+        address: {
+            value: "",
+            phone: {},
+        }
+    });
+
+    const save = async () => {
+        const payload = Object.fromEntries(
+            Object.entries(value || {}).filter(([, v]) => v)
+        );
+
+        await route("pyramid.csettings").put({
+            json: { resource: { footers: payload } },
+        });
+    };
+
+
+
     return (
         <div className="footer-home-page">
             <div className="footer-info">
                 <LogoUriitComp />
                 <div className="block-info">
-                    <div className="content-services">
-                        <div className="services-a">{info.find((e) => e.key === "services").value}</div>
-                        <div className="services-b">{info.find((e) => e.key === "services").list.map(item => {
+                    <div className="footer-content">
+                        {edit ? (
+                            <Space align="baseline">{value.services.value}</Space>
+                        ) : (
+                            <Input
+                                disabled={edit}
+                                type="text"
+                                value={value.services.value}
+                                onChange={(e) => {
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        services: {
+                                            ...prev.services,
+                                            value: e.target.value,
+                                        },
+                                    }));
+                                }}
+                            />
+                        )}
+                        {getEntries(value.services.list).map((item) => {
                             return (
-                                <span key={item.key}><a href={item.value} target="_blank"><RightOutlined />{item.label}</a></span>
-                            )
-                        })}</div>
-                    </div>
-                    <Divider />
-                    <div className="content-info">
-                        <div className="info-a">{info.find((e) => e.key === "address").value}</div>
-                        <div className="info-b">{info.filter((e) => e.key !== "address" && e.key !== "services").map(item => {
-                            return (
-                                <div key={item.key} className="info-b-item">
-                                    <div className="item-c">{item.label}</div>
-                                    <div className="item-d">{item.value}</div>
+                                <div key={item[0]} className="services-list">
+                                    {edit ? (
+                                        <span className="services-url">
+                                            <a href={item[1]?.value} target="_blank">
+                                                <span className="icon-link">
+                                                    <ChevronRight />
+                                                </span>
+                                                {item[1]?.name}
+                                            </a>
+                                        </span>
+                                    ) : (
+                                        <div className="item-edit">
+                                            <Input
+                                                type="text"
+                                                value={item[1]?.name}
+                                                disabled={edit}
+                                                onChange={(e) => {
+                                                    setValue((prev) => ({
+                                                        ...prev,
+                                                        services: {
+                                                            ...prev.services,
+                                                            list: {
+                                                                ...prev.services.list,
+                                                                [item[0]]: {
+                                                                    ...prev.services.list[item[0]],
+                                                                    name: e.target.value,
+                                                                },
+                                                            },
+                                                        },
+                                                    }));
+                                                }}
+                                            />
+                                            <Input
+                                                type="text"
+                                                value={item[1]?.value}
+                                                disabled={edit}
+                                                onChange={(e) => {
+                                                    setValue((prev) => ({
+                                                        ...prev,
+                                                        services: {
+                                                            ...prev.services,
+                                                            list: {
+                                                                ...prev.services.list,
+                                                                [item[0]]: {
+                                                                    ...prev.services.list[item[0]],
+                                                                    value: e.target.value,
+                                                                },
+                                                            },
+                                                        },
+                                                    }));
+                                                }}
+                                            />
+                                            <span
+                                                onClick={() => {
+                                                    const state = { ...value };
+                                                    delete state.services.list[item[0]];
+                                                    setValue(state);
+                                                }}
+                                                className="icon-edit"
+                                            >
+                                                <DeleteOffOutline />
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             )
-                        })}</div>
-
+                        })}
+                        <Divider />
+                        <div className={!edit ? "address-edit" : "address-content"}>
+                            <div className="address">
+                                {edit ? (
+                                    <Space align="baseline">{value.address.value}</Space>
+                                ) : (
+                                    <Input
+                                        disabled={edit}
+                                        type="text"
+                                        value={value.address.value}
+                                        onChange={(e) => {
+                                            setValue((prev) => ({
+                                                ...prev,
+                                                address: {
+                                                    ...prev.address,
+                                                    value: e.target.value,
+                                                },
+                                            }));
+                                        }}
+                                    />
+                                )}
+                            </div>
+                            <div className="phone">
+                                {getEntries(value.address.phone).map((item) => {
+                                    return (
+                                        <div key={item[0]}>
+                                            {edit ? (
+                                                <div className="phone-item">
+                                                    <span>{item[1]?.name}</span>
+                                                    <span>{item[1]?.value}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="item-edit">
+                                                    <Input
+                                                        type="text"
+                                                        value={item[1]?.name}
+                                                        disabled={edit}
+                                                        onChange={(e) => {
+                                                            setValue((prev) => ({
+                                                                ...prev,
+                                                                address: {
+                                                                    ...prev.address,
+                                                                    phone: {
+                                                                        ...prev.address.phone,
+                                                                        [item[0]]: {
+                                                                            ...prev.address.phone[item[0]],
+                                                                            name: e.target.value,
+                                                                        },
+                                                                    },
+                                                                },
+                                                            }));
+                                                        }}
+                                                    />
+                                                    <Input
+                                                        type="text"
+                                                        value={item[1]?.value}
+                                                        disabled={edit}
+                                                        onChange={(e) => {
+                                                            setValue((prev) => ({
+                                                                ...prev,
+                                                                address: {
+                                                                    ...prev.address,
+                                                                    phone: {
+                                                                        ...prev.address.phone,
+                                                                        [item[0]]: {
+                                                                            ...prev.address.phone[item[0]],
+                                                                            value: e.target.value,
+                                                                        },
+                                                                    },
+                                                                },
+                                                            }));
+                                                        }}
+                                                    />
+                                                    <span
+                                                        onClick={() => {
+                                                            const state = { ...value };
+                                                            delete state.address.phone[item[0]];
+                                                            setValue(state);
+                                                        }}
+                                                        className="icon-edit"
+                                                    >
+                                                        <DeleteOffOutline />
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                        {!edit && (
+                            <FloatButton
+                                tooltip={gettext("Add contacts")}
+                                type="primary"
+                                style={{ left: 10, bottom: 110, justifyContent: "flex-start" }}
+                                onClick={() => {
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        address: {
+                                            ...prev.address,
+                                            phone: {
+                                                ...prev.address.phone,
+                                                [Object.keys(prev.address.phone).length + 1]: {
+                                                    ...prev.address.phone[
+                                                    Object.keys(prev.address.phone).length + 1
+                                                    ],
+                                                    name: "",
+                                                    value: "",
+                                                },
+                                            },
+                                        },
+                                    }));
+                                }}
+                                icon={<CardAccountPhone />}
+                            />
+                        )}
+                        {!edit && (
+                            <FloatButton
+                                tooltip={gettext("Add urls")}
+                                type="primary"
+                                style={{ left: 10, bottom: 60, justifyContent: "flex-start" }}
+                                onClick={() => {
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        services: {
+                                            ...prev.services,
+                                            list: {
+                                                ...prev.services.list,
+                                                [Object.keys(prev.services.list).length + 1]: {
+                                                    ...prev.services.list[
+                                                    Object.keys(prev.services.list).length + 1
+                                                    ],
+                                                    name: "",
+                                                    value: "",
+                                                },
+                                            },
+                                        },
+                                    }));
+                                }}
+                                icon={<LinkEdit />}
+                            />
+                        )}
+                        <FloatButton
+                            tooltip={edit ? gettext("Edit footer") : gettext("Save footer")}
+                            type="primary"
+                            style={{ left: 10, bottom: 10, justifyContent: "flex-start" }}
+                            icon={edit ? <Pencil /> : <ContentSave />}
+                            onClick={() => {
+                                setEdit(!edit);
+                                save()
+                            }}
+                        />
                     </div>
                 </div>
             </div>

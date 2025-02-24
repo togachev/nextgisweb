@@ -26,81 +26,103 @@
 
 	.block-info {
 		width: calc(100% - 50px);
-	}
 
-	.title-info {
-		text-transform: uppercase;
-	}
+		.footer-content {
 
-	.content-services {
-		display: flex;
-		flex-direction: column;
+			.ant-input[disabled] {
+				cursor: auto !important;
+				margin: 5px;
+			}
 
-		.services-a {
-			text-transform: uppercase;
-		}
+			.item-edit {
+				display: flex;
+				align-items: center;
+			}
 
-		.services-b {
-			padding: 0 0 0 5px;
-			display: flex;
-			flex-direction: column;
-			text-decoration: none;
-
-			a {
+			.services-url {
+				padding: 0 0 0 5px;
+				display: flex;
+				flex-direction: column;
 				text-decoration: none;
-				color: #fff;
+
+				.icon-url {
+					font-size: 12px;
+				}
+
+				a {
+					text-decoration: none;
+					color: #ffffff;
+				}
+			}
+
+			.services-list {
+				width: 100%;
+				display: flex;
+				flex-direction: column-reverse;
+			}
+
+			.icon-edit {
+				font-size: 18px;
+				color: var(--danger);
+				width: 24px;
+				height: 24px;
+				display: flex;
+				justify-items: center;
+				justify-content: center;
+				align-items: center;
+				flex: 0 0 auto;
+				cursor: pointer;
+			}
+
+			.address-content {
+				display: flex;
+				justify-content: space-between;
+
+				.phone {
+					width: 100%;
+
+					.phone-item {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+					}
+				}
+			}
+
+			.address-edit {
+				display: flex;
+				flex-wrap: wrap;
+
+				.phone {
+					width: 100%;
+
+					.item-edit {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+					}
+				}
+			}
+
+			.address {
+				width: 100%;
 			}
 		}
-	}
 
-	.content-info {
-		display: flex;
-		flex-flow: row wrap;
-		min-width: 0;
-		flex-wrap: nowrap;
-
-		.info-a {
-			margin: 0 64px 0 0;
+		.logo-uriit {
+			font-size: 64px;
 		}
 
-		.info-b {
-			width: 450px;
+		.ant-divider {
+			background-color: #fff;
+			padding: 0;
+			margin: 10px 0;
 		}
 
-		.info-b-item {
+		.uriit-footer-name {
 			display: flex;
-			justify-content: space-between;
+			height: 50px;
+			align-items: center;
 		}
-
-		.item-c {
-			width: 100px;
-		}
-
-		.item-d {
-			width: 250px;
-		}
-
-	}
-
-	.list-link {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
-	.logo-uriit {
-		font-size: 64px;
-	}
-
-	.ant-divider {
-		background-color: #fff;
-		padding: 0;
-		margin: 10px 0;
-	}
-
-	.uriit-footer-name {
-		display: flex;
-		height: 50px;
-		align-items: center;
 	}
 }

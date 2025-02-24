@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { ContainerMenu } from "./ContainerMenu";
@@ -181,7 +181,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                 <Input
                                     prefix={<SearchOutlined />}
                                     size="middle"
-                                    placeholder={i18n.gettext("Enter card name")}
+                                    placeholder={gettext("Enter card name")}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     allowClear
