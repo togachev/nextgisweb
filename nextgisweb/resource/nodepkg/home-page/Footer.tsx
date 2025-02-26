@@ -21,44 +21,6 @@ const LogoUriitComp = () => (
 
 export const Footer = () => {
     const [edit, setEdit] = useState(true);
-    // const [value, setValue] = useState({
-    //     services: {
-    //         value: "Услуги Центра космических услуг",
-    //         list: {
-    //             1: {
-    //                 name: "Космический мониторинг лесных ресурсов",
-    //                 value:
-    //                     "https://uriit.ru/services/122-kosmicheskiy-monitoring-lesnykh-resursov/",
-    //             },
-    //             2: {
-    //                 name: "Расчет площади рыбоводного участка",
-    //                 value:
-    //                     "https://uriit.ru/services/123-razrabotka-tsifrovoy-karty-rybovodnogo-uchastka/",
-    //             },
-    //         },
-    //     },
-    //     address: {
-    //         value: "Россия, 628011 Ханты-Мансийск ул. Мира, д. 151",
-    //         phone: {
-    //             1: {
-    //                 name: "Приемная",
-    //                 value: "+7 (3467) 360-100",
-    //             },
-    //             2: {
-    //                 name: "Канцелярия",
-    //                 value: "+7 (3467) 360-100 доб. 6030",
-    //             },
-    //             3: {
-    //                 name: "Факс",
-    //                 value: "+7 (3467) 360-101",
-    //             },
-    //             4: {
-    //                 name: "E-mail",
-    //                 value: "OFFICE@URIIT.RU",
-    //             },
-    //         },
-    //     },
-    // });
     const [value, setValue] = useState({
         services: {
             value: "",
@@ -70,17 +32,27 @@ export const Footer = () => {
         }
     });
 
+    useEffect(() => {
+        route("pyramid.csettings")
+            .get({
+                query: { pyramid: ["home_page_footer"] },
+            })
+            .then((data) => {
+                if (data.pyramid) {
+                    setValue(data.pyramid.home_page_footer);
+                }
+            });
+    }, []);
+
     const save = async () => {
         const payload = Object.fromEntries(
             Object.entries(value || {}).filter(([, v]) => v)
         );
 
         await route("pyramid.csettings").put({
-            json: { resource: { footers: payload } },
+            json: { pyramid: { home_page_footer: payload } },
         });
     };
-
-
 
     return (
         <div className="footer-home-page">
@@ -88,24 +60,27 @@ export const Footer = () => {
                 <LogoUriitComp />
                 <div className="block-info">
                     <div className="footer-content">
-                        {edit ? (
-                            <Space align="baseline">{value.services.value}</Space>
-                        ) : (
-                            <Input
-                                disabled={edit}
-                                type="text"
-                                value={value.services.value}
-                                onChange={(e) => {
-                                    setValue((prev) => ({
-                                        ...prev,
-                                        services: {
-                                            ...prev.services,
-                                            value: e.target.value,
-                                        },
-                                    }));
-                                }}
-                            />
-                        )}
+                        <div className="service">
+                            {edit ? (
+                                <Space align="baseline">{value.services.value}</Space>
+                            ) : (
+                                <Input
+                                    placeholder={gettext("Name company")}
+                                    disabled={edit}
+                                    type="text"
+                                    value={value.services.value}
+                                    onChange={(e) => {
+                                        setValue((prev) => ({
+                                            ...prev,
+                                            services: {
+                                                ...prev.services,
+                                                value: e.target.value,
+                                            },
+                                        }));
+                                    }}
+                                />
+                            )}
+                        </div>
                         {getEntries(value.services.list).map((item) => {
                             return (
                                 <div key={item[0]} className="services-list">
@@ -121,6 +96,7 @@ export const Footer = () => {
                                     ) : (
                                         <div className="item-edit">
                                             <Input
+                                                placeholder={gettext("Name url")}
                                                 type="text"
                                                 value={item[1]?.name}
                                                 disabled={edit}
@@ -141,6 +117,7 @@ export const Footer = () => {
                                                 }}
                                             />
                                             <Input
+                                                placeholder={gettext("Url")}
                                                 type="text"
                                                 value={item[1]?.value}
                                                 disabled={edit}
@@ -167,6 +144,7 @@ export const Footer = () => {
                                                     setValue(state);
                                                 }}
                                                 className="icon-edit"
+                                                title={gettext("Delete urls")}
                                             >
                                                 <DeleteOffOutline />
                                             </span>
@@ -182,6 +160,7 @@ export const Footer = () => {
                                     <Space align="baseline">{value.address.value}</Space>
                                 ) : (
                                     <Input
+                                        placeholder={gettext("Full address")}
                                         disabled={edit}
                                         type="text"
                                         value={value.address.value}
@@ -200,15 +179,16 @@ export const Footer = () => {
                             <div className="phone">
                                 {getEntries(value.address.phone).map((item) => {
                                     return (
-                                        <div key={item[0]}>
+                                        <>
                                             {edit ? (
-                                                <div className="phone-item">
-                                                    <span>{item[1]?.name}</span>
-                                                    <span>{item[1]?.value}</span>
+                                                <div key={item[0]} className="phone-item">
+                                                    <div className="name">{item[1]?.name}</div>
+                                                    <div className="value">{item[1]?.value}</div>
                                                 </div>
                                             ) : (
-                                                <div className="item-edit">
+                                                <div key={item[0]} className="item-edit">
                                                     <Input
+                                                        placeholder={gettext("Name contacts")}
                                                         type="text"
                                                         value={item[1]?.name}
                                                         disabled={edit}
@@ -229,6 +209,7 @@ export const Footer = () => {
                                                         }}
                                                     />
                                                     <Input
+                                                        placeholder={gettext("Number phone")}
                                                         type="text"
                                                         value={item[1]?.value}
                                                         disabled={edit}
@@ -255,47 +236,22 @@ export const Footer = () => {
                                                             setValue(state);
                                                         }}
                                                         className="icon-edit"
+                                                        title={gettext("Delete contacts")}
                                                     >
                                                         <DeleteOffOutline />
                                                     </span>
                                                 </div>
                                             )}
-                                        </div>
+                                        </>
                                     )
                                 })}
                             </div>
                         </div>
                         {!edit && (
                             <FloatButton
-                                tooltip={gettext("Add contacts")}
-                                type="primary"
-                                style={{ left: 10, bottom: 110, justifyContent: "flex-start" }}
-                                onClick={() => {
-                                    setValue((prev) => ({
-                                        ...prev,
-                                        address: {
-                                            ...prev.address,
-                                            phone: {
-                                                ...prev.address.phone,
-                                                [Object.keys(prev.address.phone).length + 1]: {
-                                                    ...prev.address.phone[
-                                                    Object.keys(prev.address.phone).length + 1
-                                                    ],
-                                                    name: "",
-                                                    value: "",
-                                                },
-                                            },
-                                        },
-                                    }));
-                                }}
-                                icon={<CardAccountPhone />}
-                            />
-                        )}
-                        {!edit && (
-                            <FloatButton
                                 tooltip={gettext("Add urls")}
-                                type="primary"
-                                style={{ left: 10, bottom: 60, justifyContent: "flex-start" }}
+                                type="default"
+                                style={{ left: 10, bottom: 110, justifyContent: "flex-start" }}
                                 onClick={() => {
                                     setValue((prev) => ({
                                         ...prev,
@@ -303,9 +259,9 @@ export const Footer = () => {
                                             ...prev.services,
                                             list: {
                                                 ...prev.services.list,
-                                                [Object.keys(prev.services.list).length + 1]: {
+                                                [String(Object.keys(prev.services.list).length + 1)]: {
                                                     ...prev.services.list[
-                                                    Object.keys(prev.services.list).length + 1
+                                                    String(Object.keys(prev.services.list).length + 1)
                                                     ],
                                                     name: "",
                                                     value: "",
@@ -317,9 +273,35 @@ export const Footer = () => {
                                 icon={<LinkEdit />}
                             />
                         )}
+                        {!edit && (
+                            <FloatButton
+                                tooltip={gettext("Add contacts")}
+                                type="default"
+                                style={{ left: 10, bottom: 60, justifyContent: "flex-start" }}
+                                onClick={() => {
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        address: {
+                                            ...prev.address,
+                                            phone: {
+                                                ...prev.address.phone,
+                                                [String(Object.keys(prev.address.phone).length + 1)]: {
+                                                    ...prev.address.phone[
+                                                    String(Object.keys(prev.address.phone).length + 1)
+                                                    ],
+                                                    name: "",
+                                                    value: "",
+                                                },
+                                            },
+                                        },
+                                    }));
+                                }}
+                                icon={<CardAccountPhone />}
+                            />
+                        )}
                         <FloatButton
                             tooltip={edit ? gettext("Edit footer") : gettext("Save footer")}
-                            type="primary"
+                            type="default"
                             style={{ left: 10, bottom: 10, justifyContent: "flex-start" }}
                             icon={edit ? <Pencil /> : <ContentSave />}
                             onClick={() => {

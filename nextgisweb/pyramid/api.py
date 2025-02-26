@@ -699,10 +699,25 @@ class Metrics(Struct):
     yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
 
 
+class Services(Struct):
+    value: str
+    list: Dict[str, Any]
+
+
+class Address(Struct):
+    value: str
+    phone: Dict[str, Any]
+
+
+class HomePageFooters(Struct):
+    services: Union[Services, UnsetType] = UNSET
+    address: Union[Address, UnsetType] = UNSET
+
+
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))
 csetting("home_path", Optional[str])
 csetting("metrics", Metrics, default={})
-
+csetting("home_page_footer", HomePageFooters, default={})
 
 def setup_pyramid(comp, config):
     config.add_request_method(check_origin)
