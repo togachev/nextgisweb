@@ -249,6 +249,7 @@ export const Footer = () => {
                         </div>
                         {!edit && (
                             <FloatButton
+                                shape="square"
                                 tooltip={gettext("Add urls")}
                                 type="default"
                                 style={{ left: 10, bottom: 110, justifyContent: "flex-start" }}
@@ -275,6 +276,7 @@ export const Footer = () => {
                         )}
                         {!edit && (
                             <FloatButton
+                                shape="square"
                                 tooltip={gettext("Add contacts")}
                                 type="default"
                                 style={{ left: 10, bottom: 60, justifyContent: "flex-start" }}
@@ -300,6 +302,7 @@ export const Footer = () => {
                             />
                         )}
                         <FloatButton
+                            shape="square"
                             tooltip={edit ? gettext("Edit footer") : gettext("Save footer")}
                             type="default"
                             style={{ left: 10, bottom: 10, justifyContent: "flex-start" }}
