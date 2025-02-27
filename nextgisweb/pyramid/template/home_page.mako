@@ -2,16 +2,13 @@
     try:
         user = request.user
         is_administrator = user.is_administrator
-        is_guest = user.keyname == 'guest'
     except Exception:
         is_administrator = False
-        is_guest = True
     upath_info = request.upath_info,
     config = {
         "isAdministrator": is_administrator,
         "upath_info": upath_info,
         "type": "home_page",
-        "isGuest": is_guest,
     }
 %>
 

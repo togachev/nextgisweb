@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Divider, FloatButton, Input, Space } from "@nextgisweb/gui/antd";
 import LogoUriit from "./icons/uriit_logo.svg";
 import { route } from "@nextgisweb/pyramid/api";
-
+import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import ContentSave from "@nextgisweb/icon/mdi/content-save";
@@ -12,43 +12,49 @@ import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./Footer.less";
-
+import { HomeStore } from "./HomeStore";
 const LogoUriitComp = () => (
     <span className="uriit-logo">
         <LogoUriit />
     </span>
 );
 
-export const Footer = ({ store, config }) => {
+export const Footer = observer(({ config }) => {
     const [edit, setEdit] = useState(true);
-    const [value, setValue] = useState({
-        services: {
-            value: "",
-            list: {},
-        },
-        address: {
-            value: "",
-            phone: {},
-        }
-    });
+    const [store] = useState(
+        () => new HomeStore({
+            valueFooter: {
+                services: {
+                    value: "",
+                    list: {},
+                },
+                address: {
+                    value: "",
+                    phone: {},
+                }
+            },
+        }));
+
+    const {
+        valueFooter,
+        setValueFooter,
+    } = store;
 
     useEffect(() => {
-        console.log(config);
-        
-        config.isGuest && route("pyramid.csettings")
+        route("pyramid.csettings")
             .get({
                 query: { pyramid: ["home_page_footer"] },
             })
             .then((data) => {
                 if (data.pyramid) {
-                    setValue(data.pyramid.home_page_footer);
+                    setValueFooter(data.pyramid.home_page_footer);
                 }
             });
     }, []);
 
     const save = async () => {
         const payload = Object.fromEntries(
-            Object.entries(value || {}).filter(([, v]) => v)
+            Object.entries(valueFooter || {}).filter(([, v]) => v)
         );
 
         await route("pyramid.csettings").put({
@@ -64,15 +70,15 @@ export const Footer = ({ store, config }) => {
                     <div className="footer-content">
                         <div className="service">
                             {edit ? (
-                                <Space align="baseline">{value.services.value}</Space>
+                                <Space align="baseline">{valueFooter.services.value}</Space>
                             ) : (
                                 <Input
                                     placeholder={gettext("Name company")}
                                     disabled={edit}
                                     type="text"
-                                    value={value.services.value}
+                                    value={valueFooter.services.value}
                                     onChange={(e) => {
-                                        setValue((prev) => ({
+                                        setValueFooter((prev) => ({
                                             ...prev,
                                             services: {
                                                 ...prev.services,
@@ -83,7 +89,7 @@ export const Footer = ({ store, config }) => {
                                 />
                             )}
                         </div>
-                        {getEntries(value.services.list).map((item) => {
+                        {getEntries(valueFooter.services.list).map((item) => {
                             return (
                                 <div key={item[0]} className="services-list">
                                     {edit ? (
@@ -103,7 +109,7 @@ export const Footer = ({ store, config }) => {
                                                 value={item[1]?.name}
                                                 disabled={edit}
                                                 onChange={(e) => {
-                                                    setValue((prev) => ({
+                                                    setValueFooter((prev) => ({
                                                         ...prev,
                                                         services: {
                                                             ...prev.services,
@@ -124,7 +130,7 @@ export const Footer = ({ store, config }) => {
                                                 value={item[1]?.value}
                                                 disabled={edit}
                                                 onChange={(e) => {
-                                                    setValue((prev) => ({
+                                                    setValueFooter((prev) => ({
                                                         ...prev,
                                                         services: {
                                                             ...prev.services,
@@ -141,9 +147,9 @@ export const Footer = ({ store, config }) => {
                                             />
                                             <span
                                                 onClick={() => {
-                                                    const state = { ...value };
+                                                    const state = { ...valueFooter };
                                                     delete state.services.list[item[0]];
-                                                    setValue(state);
+                                                    setValueFooter(state);
                                                 }}
                                                 className="icon-edit"
                                                 title={gettext("Delete urls")}
@@ -159,15 +165,15 @@ export const Footer = ({ store, config }) => {
                         <div className={!edit ? "address-edit" : "address-content"}>
                             <div className="address">
                                 {edit ? (
-                                    <Space align="baseline">{value.address.value}</Space>
+                                    <Space align="baseline">{valueFooter.address.value}</Space>
                                 ) : (
                                     <Input
                                         placeholder={gettext("Full address")}
                                         disabled={edit}
                                         type="text"
-                                        value={value.address.value}
+                                        value={valueFooter.address.value}
                                         onChange={(e) => {
-                                            setValue((prev) => ({
+                                            setValueFooter((prev) => ({
                                                 ...prev,
                                                 address: {
                                                     ...prev.address,
@@ -179,7 +185,7 @@ export const Footer = ({ store, config }) => {
                                 )}
                             </div>
                             <div className="phone">
-                                {getEntries(value.address.phone).map((item) => {
+                                {getEntries(valueFooter.address.phone).map((item) => {
                                     return (
                                         <>
                                             {edit ? (
@@ -195,7 +201,7 @@ export const Footer = ({ store, config }) => {
                                                         value={item[1]?.name}
                                                         disabled={edit}
                                                         onChange={(e) => {
-                                                            setValue((prev) => ({
+                                                            setValueFooter((prev) => ({
                                                                 ...prev,
                                                                 address: {
                                                                     ...prev.address,
@@ -216,7 +222,7 @@ export const Footer = ({ store, config }) => {
                                                         value={item[1]?.value}
                                                         disabled={edit}
                                                         onChange={(e) => {
-                                                            setValue((prev) => ({
+                                                            setValueFooter((prev) => ({
                                                                 ...prev,
                                                                 address: {
                                                                     ...prev.address,
@@ -233,9 +239,9 @@ export const Footer = ({ store, config }) => {
                                                     />
                                                     <span
                                                         onClick={() => {
-                                                            const state = { ...value };
+                                                            const state = { ...valueFooter };
                                                             delete state.address.phone[item[0]];
-                                                            setValue(state);
+                                                            setValueFooter(state);
                                                         }}
                                                         className="icon-edit"
                                                         title={gettext("Delete contacts")}
@@ -256,7 +262,7 @@ export const Footer = ({ store, config }) => {
                                 type="default"
                                 style={{ left: 10, bottom: 110, justifyContent: "flex-start" }}
                                 onClick={() => {
-                                    setValue((prev) => ({
+                                    setValueFooter((prev) => ({
                                         ...prev,
                                         services: {
                                             ...prev.services,
@@ -283,7 +289,7 @@ export const Footer = ({ store, config }) => {
                                 type="default"
                                 style={{ left: 10, bottom: 60, justifyContent: "flex-start" }}
                                 onClick={() => {
-                                    setValue((prev) => ({
+                                    setValueFooter((prev) => ({
                                         ...prev,
                                         address: {
                                             ...prev.address,
@@ -320,4 +326,4 @@ export const Footer = ({ store, config }) => {
             <div className="uriit-footer-name">© 2002-{new Date().getFullYear()} АУ «Югорский НИИ информационных технологий»</div>
         </div>
     );
-}
+})

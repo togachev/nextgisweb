@@ -547,6 +547,7 @@ def setup_pyramid_csettings(comp, config):
         for cid, attrs in kwargs.items():
             cgetters = getters[cid]
             cread = read[cid]
+
             if "all" in attrs:
                 if len(attrs) > 1:
                     raise ValidationError(
@@ -562,7 +563,12 @@ def setup_pyramid_csettings(comp, config):
             for a in attrs:
                 if (ap := cread[a]) is None:
                     if not is_administrator:
-                        request.require_administrator()
+                        if "home_page_header" in attrs:
+                            sf[cid] = cgetters["home_page_header"]()
+                        if "home_page_footer" in attrs:
+                            sf[cid] = cgetters["home_page_footer"]()
+                        else:
+                            request.require_administrator()
                 else:
                     require_permission(ap)
                 av[a] = cgetters[a]()

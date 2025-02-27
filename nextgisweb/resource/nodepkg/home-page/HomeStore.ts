@@ -33,12 +33,33 @@ export interface GroupMapsGridProps {
     position_group: LayoutProps;
 }
 
+export interface UrlPhoneProps {
+    name: string;
+    value: string;
+}
+
+export interface ServicesProps {
+    value: string;
+    list: UrlPhoneProps[];
+}
+
+export interface AddressProps {
+    value: string;
+    phone: UrlPhoneProps[];
+}
+
+export interface FooterProps {
+    services: ServicesProps;
+    address: AddressProps;
+}
+
 export class HomeStore {
-    sourceMaps = false; 
-    sourceGroup = false; 
-    listMaps: ListMapProps[] = []; 
+    sourceMaps = false;
+    sourceGroup = false;
+    listMaps: ListMapProps[] = [];
     groupMapsGrid: GroupMapsGridProps[] = [];
     itemsMapsGroup: ListMapProps[] = [];
+    valueFooter: FooterProps | null = null;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -51,6 +72,10 @@ export class HomeStore {
 
         makeAutoObservable(this, {});
     }
+
+    setValueFooter = (valueFooter: SetValue<FooterProps | null>) => {
+        this.setValue("valueFooter", valueFooter);
+    };
 
     setSourceMaps = (sourceMaps: boolean) => {
         this.sourceMaps = sourceMaps;
