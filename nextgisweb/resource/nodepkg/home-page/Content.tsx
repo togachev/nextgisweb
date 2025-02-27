@@ -199,7 +199,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     </div>
                     <FloatButton.BackTop />
                 </div>
-                <Footer />
+                <Footer config={config} store={store} />
             </ConfigProvider >
         </>
     )

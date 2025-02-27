@@ -19,7 +19,7 @@ const LogoUriitComp = () => (
     </span>
 );
 
-export const Footer = () => {
+export const Footer = ({ store, config }) => {
     const [edit, setEdit] = useState(true);
     const [value, setValue] = useState({
         services: {
@@ -33,7 +33,9 @@ export const Footer = () => {
     });
 
     useEffect(() => {
-        route("pyramid.csettings")
+        console.log(config);
+        
+        config.isGuest && route("pyramid.csettings")
             .get({
                 query: { pyramid: ["home_page_footer"] },
             })
@@ -301,7 +303,7 @@ export const Footer = () => {
                                 icon={<CardAccountPhone />}
                             />
                         )}
-                        <FloatButton
+                        {config.isAdministrator === true && (<FloatButton
                             shape="square"
                             tooltip={edit ? gettext("Edit footer") : gettext("Save footer")}
                             type="default"
@@ -311,7 +313,7 @@ export const Footer = () => {
                                 setEdit(!edit);
                                 save()
                             }}
-                        />
+                        />)}
                     </div>
                 </div>
             </div>
