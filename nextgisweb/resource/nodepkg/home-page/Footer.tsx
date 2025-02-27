@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Divider, FloatButton, Input, Space } from "@nextgisweb/gui/antd";
+import { Divider, Button, Input, Space } from "@nextgisweb/gui/antd";
 import LogoUriit from "./icons/uriit_logo.svg";
 import { route } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
-import ContentSave from "@nextgisweb/icon/mdi/content-save";
-import Pencil from "@nextgisweb/icon/mdi/pencil";
+import Save from "@nextgisweb/icon/material/save";
+import Edit from "@nextgisweb/icon/material/edit";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
@@ -64,6 +64,73 @@ export const Footer = observer(({ config }) => {
 
     return (
         <div className="footer-home-page">
+            <div className="control-button">
+                {config.isAdministrator === true && (<Button
+                    size="small"
+                    shape="square"
+                    title={edit ? gettext("Edit footer") : gettext("Save footer")}
+                    type="default"
+                    icon={edit ? <Edit /> : <Save />}
+                    onClick={() => {
+                        setEdit(!edit);
+                        save()
+                    }}
+                />)}
+                {!edit && (
+                    <Button
+                        size="small"
+                        shape="square"
+                        title={gettext("Add urls")}
+                        type="default"
+                        onClick={() => {
+                            setValueFooter((prev) => ({
+                                ...prev,
+                                services: {
+                                    ...prev.services,
+                                    list: {
+                                        ...prev.services.list,
+                                        [String(Object.keys(prev.services.list).length + 1)]: {
+                                            ...prev.services.list[
+                                            String(Object.keys(prev.services.list).length + 1)
+                                            ],
+                                            name: "",
+                                            value: "",
+                                        },
+                                    },
+                                },
+                            }));
+                        }}
+                        icon={<LinkEdit />}
+                    />
+                )}
+                {!edit && (
+                    <Button
+                        size="small"
+                        shape="square"
+                        title={gettext("Add contacts")}
+                        type="default"
+                        onClick={() => {
+                            setValueFooter((prev) => ({
+                                ...prev,
+                                address: {
+                                    ...prev.address,
+                                    phone: {
+                                        ...prev.address.phone,
+                                        [String(Object.keys(prev.address.phone).length + 1)]: {
+                                            ...prev.address.phone[
+                                            String(Object.keys(prev.address.phone).length + 1)
+                                            ],
+                                            name: "",
+                                            value: "",
+                                        },
+                                    },
+                                },
+                            }));
+                        }}
+                        icon={<CardAccountPhone />}
+                    />
+                )}
+            </div>
             <div className="footer-info">
                 <LogoUriitComp />
                 <div className="block-info">
@@ -187,7 +254,7 @@ export const Footer = observer(({ config }) => {
                             <div className="phone">
                                 {getEntries(valueFooter.address.phone).map((item) => {
                                     return (
-                                        <>
+                                        <div key={item[0]}>
                                             {edit ? (
                                                 <div key={item[0]} className="phone-item">
                                                     <div className="name">{item[1]?.name}</div>
@@ -250,76 +317,12 @@ export const Footer = observer(({ config }) => {
                                                     </span>
                                                 </div>
                                             )}
-                                        </>
+                                        </div>
                                     )
                                 })}
                             </div>
                         </div>
-                        {!edit && (
-                            <FloatButton
-                                shape="square"
-                                tooltip={gettext("Add urls")}
-                                type="default"
-                                style={{ left: 10, bottom: 110, justifyContent: "flex-start" }}
-                                onClick={() => {
-                                    setValueFooter((prev) => ({
-                                        ...prev,
-                                        services: {
-                                            ...prev.services,
-                                            list: {
-                                                ...prev.services.list,
-                                                [String(Object.keys(prev.services.list).length + 1)]: {
-                                                    ...prev.services.list[
-                                                    String(Object.keys(prev.services.list).length + 1)
-                                                    ],
-                                                    name: "",
-                                                    value: "",
-                                                },
-                                            },
-                                        },
-                                    }));
-                                }}
-                                icon={<LinkEdit />}
-                            />
-                        )}
-                        {!edit && (
-                            <FloatButton
-                                shape="square"
-                                tooltip={gettext("Add contacts")}
-                                type="default"
-                                style={{ left: 10, bottom: 60, justifyContent: "flex-start" }}
-                                onClick={() => {
-                                    setValueFooter((prev) => ({
-                                        ...prev,
-                                        address: {
-                                            ...prev.address,
-                                            phone: {
-                                                ...prev.address.phone,
-                                                [String(Object.keys(prev.address.phone).length + 1)]: {
-                                                    ...prev.address.phone[
-                                                    String(Object.keys(prev.address.phone).length + 1)
-                                                    ],
-                                                    name: "",
-                                                    value: "",
-                                                },
-                                            },
-                                        },
-                                    }));
-                                }}
-                                icon={<CardAccountPhone />}
-                            />
-                        )}
-                        {config.isAdministrator === true && (<FloatButton
-                            shape="square"
-                            tooltip={edit ? gettext("Edit footer") : gettext("Save footer")}
-                            type="default"
-                            style={{ left: 10, bottom: 10, justifyContent: "flex-start" }}
-                            icon={edit ? <Pencil /> : <ContentSave />}
-                            onClick={() => {
-                                setEdit(!edit);
-                                save()
-                            }}
-                        />)}
+
                     </div>
                 </div>
             </div>
