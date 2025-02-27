@@ -50,7 +50,22 @@ const resourcesToOptions = (resourcesInfo) => {
 const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
-    const [store] = useState(() => new HomeStore({}));
+    const [store] = useState(() => new HomeStore({
+        valueFooter: {
+            services: {
+                value: "",
+                list: {},
+            },
+            address: {
+                value: "",
+                phone: {},
+            },
+            footer_name: {
+                base_year: "",
+                name: ""
+            },
+        },
+    }));
 
     const { getListMap, getGroupMap } = useSource();
 
@@ -199,7 +214,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     </div>
                     <FloatButton.BackTop />
                 </div>
-                <Footer config={config} />
+                <Footer store={store} config={config} />
             </ConfigProvider >
         </>
     )

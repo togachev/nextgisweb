@@ -48,9 +48,15 @@ export interface AddressProps {
     phone: UrlPhoneProps[];
 }
 
+export interface FooterNameProps {
+    base_year: string;
+    name: string;
+}
+
 export interface FooterProps {
     services: ServicesProps;
     address: AddressProps;
+    footer_name: FooterNameProps;
 }
 
 export class HomeStore {

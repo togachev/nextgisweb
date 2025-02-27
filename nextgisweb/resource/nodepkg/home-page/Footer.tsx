@@ -12,29 +12,15 @@ import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import "./Footer.less";
-import { HomeStore } from "./HomeStore";
+
 const LogoUriitComp = () => (
     <span className="uriit-logo">
         <LogoUriit />
     </span>
 );
 
-export const Footer = observer(({ config }) => {
+export const Footer = observer(({ store, config }) => {
     const [edit, setEdit] = useState(true);
-    const [store] = useState(
-        () => new HomeStore({
-            valueFooter: {
-                services: {
-                    value: "",
-                    list: {},
-                },
-                address: {
-                    value: "",
-                    phone: {},
-                }
-            },
-        }));
-
     const {
         valueFooter,
         setValueFooter,
@@ -47,7 +33,9 @@ export const Footer = observer(({ config }) => {
             })
             .then((data) => {
                 if (data.pyramid) {
-                    setValueFooter(data.pyramid.home_page_footer);
+                    if (Object.keys(data.pyramid.home_page_footer).length > 0) {
+                        setValueFooter(data.pyramid.home_page_footer);
+                    }
                 }
             });
     }, []);
@@ -137,13 +125,14 @@ export const Footer = observer(({ config }) => {
                     <div className="footer-content">
                         <div className="service">
                             {edit ? (
-                                <Space align="baseline">{valueFooter.services.value}</Space>
+                                <Space align="baseline">{valueFooter?.services?.value}</Space>
                             ) : (
                                 <Input
                                     placeholder={gettext("Name company")}
                                     disabled={edit}
                                     type="text"
-                                    value={valueFooter.services.value}
+                                    value={valueFooter?.services?.value}
+                                    allowClear
                                     onChange={(e) => {
                                         setValueFooter((prev) => ({
                                             ...prev,
@@ -156,7 +145,7 @@ export const Footer = observer(({ config }) => {
                                 />
                             )}
                         </div>
-                        {getEntries(valueFooter.services.list).map((item) => {
+                        {valueFooter?.services?.list && getEntries(valueFooter.services.list).map((item) => {
                             return (
                                 <div key={item[0]} className="services-list">
                                     {edit ? (
@@ -174,6 +163,7 @@ export const Footer = observer(({ config }) => {
                                                 placeholder={gettext("Name url")}
                                                 type="text"
                                                 value={item[1]?.name}
+                                                allowClear
                                                 disabled={edit}
                                                 onChange={(e) => {
                                                     setValueFooter((prev) => ({
@@ -195,6 +185,7 @@ export const Footer = observer(({ config }) => {
                                                 placeholder={gettext("Url")}
                                                 type="text"
                                                 value={item[1]?.value}
+                                                allowClear
                                                 disabled={edit}
                                                 onChange={(e) => {
                                                     setValueFooter((prev) => ({
@@ -232,13 +223,14 @@ export const Footer = observer(({ config }) => {
                         <div className={!edit ? "address-edit" : "address-content"}>
                             <div className="address">
                                 {edit ? (
-                                    <Space align="baseline">{valueFooter.address.value}</Space>
+                                    <Space align="baseline">{valueFooter?.address?.value}</Space>
                                 ) : (
                                     <Input
                                         placeholder={gettext("Full address")}
                                         disabled={edit}
                                         type="text"
-                                        value={valueFooter.address.value}
+                                        value={valueFooter?.address?.value}
+                                        allowClear
                                         onChange={(e) => {
                                             setValueFooter((prev) => ({
                                                 ...prev,
@@ -252,7 +244,7 @@ export const Footer = observer(({ config }) => {
                                 )}
                             </div>
                             <div className="phone">
-                                {getEntries(valueFooter.address.phone).map((item) => {
+                                {valueFooter?.services?.list && getEntries(valueFooter.address.phone).map((item) => {
                                     return (
                                         <div key={item[0]}>
                                             {edit ? (
@@ -266,6 +258,7 @@ export const Footer = observer(({ config }) => {
                                                         placeholder={gettext("Name contacts")}
                                                         type="text"
                                                         value={item[1]?.name}
+                                                        allowClear
                                                         disabled={edit}
                                                         onChange={(e) => {
                                                             setValueFooter((prev) => ({
@@ -287,6 +280,7 @@ export const Footer = observer(({ config }) => {
                                                         placeholder={gettext("Number phone")}
                                                         type="text"
                                                         value={item[1]?.value}
+                                                        allowClear
                                                         disabled={edit}
                                                         onChange={(e) => {
                                                             setValueFooter((prev) => ({
@@ -326,7 +320,48 @@ export const Footer = observer(({ config }) => {
                     </div>
                 </div>
             </div>
-            <div className="uriit-footer-name">© 2002-{new Date().getFullYear()} АУ «Югорский НИИ информационных технологий»</div>
+            <div className="uriit-footer-name">
+                {edit ? (
+                    <Space.Compact block>© {valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {valueFooter?.footer_name?.name}</Space.Compact>
+                ) : (
+                    <Space.Compact style={{ width: "100%" }}>
+                        <Input
+                            style={{ width: "20%" }}
+                            placeholder={gettext("Footer base year")}
+                            disabled={edit}
+                            type="text"
+                            value={valueFooter?.footer_name?.base_year}
+                            allowClear
+                            onChange={(e) => {
+                                setValueFooter((prev) => ({
+                                    ...prev,
+                                    footer_name: {
+                                        ...prev.footer_name,
+                                        base_year: e.target.value,
+                                    },
+                                }));
+                            }}
+                        />
+                        <Input
+                            style={{ width: "80%" }}
+                            placeholder={gettext("Footer name")}
+                            disabled={edit}
+                            type="text"
+                            value={valueFooter?.footer_name?.name}
+                            allowClear
+                            onChange={(e) => {
+                                setValueFooter((prev) => ({
+                                    ...prev,
+                                    footer_name: {
+                                        ...prev.footer_name,
+                                        name: e.target.value,
+                                    },
+                                }));
+                            }}
+                        />
+                    </Space.Compact>
+                )}
+            </div>
         </div>
     );
 })
