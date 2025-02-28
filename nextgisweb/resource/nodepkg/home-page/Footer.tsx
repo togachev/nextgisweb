@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Divider, Button, Input, Space } from "@nextgisweb/gui/antd";
+import { Button, ColorPicker, Divider, Image, Input, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 import LogoUriit from "./icons/uriit_logo.svg";
 import { route } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
+import UploadOutline from "@nextgisweb/icon/mdi/upload-outline";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
@@ -11,17 +12,154 @@ import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
+
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+
+const { Dragger } = Upload;
+const { Text } = Typography;
+
 import "./Footer.less";
 
-const LogoUriitComp = () => (
-    <span className="uriit-logo">
-        <LogoUriit />
-    </span>
-);
+const selectFile = gettext("Select File");
+
+const LogoUriitComp = ({ store }) => {
+
+    const {
+        edit,
+        valueFooter,
+        setValueFooter,
+    } = store;
+
+    const TYPE_FILE = [
+        {
+            label: "SVG",
+            title: "SVG",
+            value: "image/svg+xml",
+            extension: ".svg",
+            disabled: false,
+        },
+    ];
+
+    const getBase64 = async (file: FileType, callback: (url: string) => void) => {
+        const reader = new FileReader();
+        reader.addEventListener("load", () => callback(reader.result as string));
+        reader.readAsDataURL(file as Blob);
+    };
+
+    const props: UploadProps = {
+        customRequest: async (options) => {
+            const { onSuccess, onError, file } = options;
+            try {
+                await getBase64(file as FileType, (url) => {
+                    setValueFooter((prev) => ({
+                        ...prev,
+                        logo: {
+                            ...prev.logo,
+                            value: [{
+                                url: url,
+                                name: file.name,
+                                value: file.uid,
+                            }],
+                        },
+                    }));
+                });
+
+                if (onSuccess) {
+                    onSuccess("Ok");
+                }
+            } catch (err) {
+                if (onError) {
+                    onError(new Error("Exception download"));
+                }
+            }
+        },
+        onChange: ({ fileList }) => {
+            setValueFooter((prev) => ({
+                ...prev,
+                logo: {
+                    ...prev.logo,
+                    value: fileList,
+                },
+            }));
+        },
+        defaultFileList: valueFooter?.logo?.value,
+        multiple: false,
+        beforeUpload: (file, info) => {
+            const fileName = file.name;
+            const extension = fileName.slice(fileName.lastIndexOf("."));
+
+            const isValidType = TYPE_FILE.some((e) => e.extension === extension);
+            const isMaxCount = info.length <= 1;
+
+            const isLimitVolume = file.size / 1024 < 2;
+            if (!isLimitVolume) {
+                message.error("Exceeding the volume of 2mb");
+            }
+            return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
+        },
+        maxCount: 1,
+        listType: "picture",
+        name: "file",
+        onRemove: (file) => {
+            setValueFooter((prev) => ({
+                ...prev,
+                logo: {
+                    ...prev.logo,
+                    value: prev.logo.value.filter((item) => item.uid !== file.uid),
+                },
+            }));
+        }
+    };
+
+    const onChangeColorLogo = (c) => {
+        setValueFooter((prev) => ({
+            ...prev,
+            logo: {
+                ...prev.logo,
+                colorLogo: c.toHexString(),
+            },
+        }));
+    }
+
+    const onChangeColorBackground = (c) => {
+        console.log(c.toCssString(),
+        c.toHsbString(),
+        c.equals())
+        
+        setValueFooter((prev) => ({
+            ...prev,
+            logo: {
+                ...prev.logo,
+                colorBackground: c.toHexString(),
+            },
+        }));
+    }
+
+    return (
+        <>
+            {!edit ?
+                <><Upload {...props} accept=".svg">
+                    <Button icon={<UploadOutline />}>{selectFile}</Button>
+                </Upload>
+                    <ColorPicker value={valueFooter?.logo?.colorLogo} onChange={onChangeColorLogo} />
+                    <ColorPicker value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
+                </> :
+                valueFooter?.logo?.value.length > 0 &&
+                // <img style={{ fill: valueFooter?.logo?.colorLogo }} className="uriit-logo" src={valueFooter?.logo?.value[0].url} />
+                // <img id="logo" style={{ fill: valueFooter?.logo?.colorLogo }} src={valueFooter?.logo?.value[0].url} />
+                <Image preview={false} style={{ fill: valueFooter?.logo?.colorLogo }} className="uriit-logo" src={valueFooter?.logo?.value[0].url} />
+            }
+        </>
+    );
+};
 
 export const Footer = observer(({ store, config }) => {
-    const [edit, setEdit] = useState(true);
+
     const {
+        edit,
+        setEdit,
         valueFooter,
         setValueFooter,
     } = store;
@@ -51,7 +189,7 @@ export const Footer = observer(({ store, config }) => {
     };
 
     return (
-        <div className="footer-home-page">
+        <div className="footer-home-page" style={{ backgroundColor: store.valueFooter.logo.colorBackground }}>
             <div className="control-button">
                 {config.isAdministrator === true && (<Button
                     size="small"
@@ -120,7 +258,7 @@ export const Footer = observer(({ store, config }) => {
                 )}
             </div>
             <div className="footer-info">
-                <LogoUriitComp />
+                <LogoUriitComp store={store} />
                 <div className="block-info">
                     <div className="footer-content">
                         <div className="service">

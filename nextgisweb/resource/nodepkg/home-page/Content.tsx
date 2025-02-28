@@ -64,6 +64,11 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                 base_year: "",
                 name: ""
             },
+            logo: {
+                value: [],
+                colorLogo: "#FFFFFF",
+                colorBackground: "#212020",
+            },
         },
     }));
 

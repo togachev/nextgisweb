@@ -714,15 +714,23 @@ class Address(Struct):
     value: str
     phone: Dict[str, Any]
 
+
 class FooterName(Struct):
     base_year: str
     name: str
+
+
+class FooterLogo(Struct):
+    value: List[Dict[str, Any]]
+    colorLogo: str
+    colorBackground: str
 
 
 class HomePageFooters(Struct):
     services: Union[Services, UnsetType] = UNSET
     address: Union[Address, UnsetType] = UNSET
     footer_name: Union[FooterName, UnsetType] = UNSET
+    logo: Union[FooterLogo, UnsetType] = UNSET
 
 
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))

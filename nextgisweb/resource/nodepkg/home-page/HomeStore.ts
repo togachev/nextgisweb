@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-
+import type { UploadFile } from "@nextgisweb/gui/antd";
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export interface LayoutProps {
@@ -53,13 +53,21 @@ export interface FooterNameProps {
     name: string;
 }
 
+export interface FooterLogoProps {
+    value: UploadFile[];
+    colorLogo: string;
+    colorBackground: string;
+}
+
 export interface FooterProps {
     services: ServicesProps;
     address: AddressProps;
     footer_name: FooterNameProps;
+    logo: FooterLogoProps;
 }
 
 export class HomeStore {
+    edit = true;
     sourceMaps = false;
     sourceGroup = false;
     listMaps: ListMapProps[] = [];
@@ -78,6 +86,10 @@ export class HomeStore {
 
         makeAutoObservable(this, {});
     }
+
+    setEdit = (edit: boolean) => {
+        this.edit = edit;
+    };
 
     setValueFooter = (valueFooter: SetValue<FooterProps | null>) => {
         this.setValue("valueFooter", valueFooter);
