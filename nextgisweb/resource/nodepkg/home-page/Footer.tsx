@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
-import { Button, ColorPicker, Divider, Image, Input, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
-import LogoUriit from "./icons/uriit_logo.svg";
+import { Button, ColorPicker, Divider, Input, message, Space, Upload } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
-import UploadOutline from "@nextgisweb/icon/mdi/upload-outline";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
@@ -13,19 +10,13 @@ import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { GetProp, UploadFile, UploadProps } from "@nextgisweb/gui/antd";
+import type { GetProp, UploadProps } from "@nextgisweb/gui/antd";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
-const { Dragger } = Upload;
-const { Text } = Typography;
-
 import "./Footer.less";
 
-const selectFile = gettext("Select File");
-
 const LogoUriitComp = ({ store }) => {
-
     const {
         edit,
         valueFooter,
@@ -65,7 +56,6 @@ const LogoUriitComp = ({ store }) => {
                         },
                     }));
                 });
-
                 if (onSuccess) {
                     onSuccess("Ok");
                 }
@@ -84,6 +74,7 @@ const LogoUriitComp = ({ store }) => {
                 },
             }));
         },
+        showUploadList: false,
         defaultFileList: valueFooter?.logo?.value,
         multiple: false,
         beforeUpload: (file, info) => {
@@ -100,7 +91,7 @@ const LogoUriitComp = ({ store }) => {
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
         maxCount: 1,
-        listType: "picture",
+        listType: "text",
         name: "file",
         onRemove: (file) => {
             setValueFooter((prev) => ({
@@ -113,21 +104,11 @@ const LogoUriitComp = ({ store }) => {
         }
     };
 
-    const onChangeColorLogo = (c) => {
-        setValueFooter((prev) => ({
-            ...prev,
-            logo: {
-                ...prev.logo,
-                colorLogo: c.toHexString(),
-            },
-        }));
-    }
-
     const onChangeColorBackground = (c) => {
         console.log(c.toCssString(),
-        c.toHsbString(),
-        c.equals())
-        
+            c.toHsbString(),
+            c.equals())
+
         setValueFooter((prev) => ({
             ...prev,
             logo: {
@@ -138,20 +119,49 @@ const LogoUriitComp = ({ store }) => {
     }
 
     return (
-        <>
+        <div className="logo-block">
             {!edit ?
-                <><Upload {...props} accept=".svg">
-                    <Button icon={<UploadOutline />}>{selectFile}</Button>
-                </Upload>
-                    <ColorPicker value={valueFooter?.logo?.colorLogo} onChange={onChangeColorLogo} />
-                    <ColorPicker value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
-                </> :
-                valueFooter?.logo?.value.length > 0 &&
-                // <img style={{ fill: valueFooter?.logo?.colorLogo }} className="uriit-logo" src={valueFooter?.logo?.value[0].url} />
-                // <img id="logo" style={{ fill: valueFooter?.logo?.colorLogo }} src={valueFooter?.logo?.value[0].url} />
-                <Image preview={false} style={{ fill: valueFooter?.logo?.colorLogo }} className="uriit-logo" src={valueFooter?.logo?.value[0].url} />
+                (<Space direction="vertical">
+                    <Space direction="vertical" style={{ display: "flex" }}>
+                        <Upload {...props} accept=".svg">
+                            <Button
+                                size="small"
+                                className="icon-button"
+                                title={gettext("Select File")}
+                            >{gettext("Select File")}</Button>
+                        </Upload>
+                        {valueFooter?.logo?.value?.length === 1 && <img className="uriit-logo-mini" src={valueFooter?.logo?.value[0].url} />}
+                        {valueFooter?.logo?.value?.length === 1 &&
+                            valueFooter.logo.value.map((file, index) => (
+                                <div key={index}>
+                                    <Button
+                                        size="small"
+                                        title={gettext("Remove file") + " - " + file.name}
+                                        onClick={() => {
+                                            setValueFooter((prev) => ({
+                                                ...prev,
+                                                logo: {
+                                                    ...prev.logo,
+                                                    value: prev.logo.value.filter((item) => item.uid !== file.uid),
+                                                },
+                                            }));
+                                        }}
+                                        className="icon-button"
+                                    >{gettext("Remove file")}</Button>
+                                </div>
+                            ))}
+                    </Space>
+                    <Space style={{ display: "flex", marginTop: 5 }} >
+                        <ColorPicker allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
+                        <span>Color background</span>
+                    </Space>
+                </Space>) :
+                valueFooter?.logo?.value?.length > 0 &&
+                (<span className="uriit-logo">
+                    <img src={valueFooter.logo.value[0].url} />
+                </span>)
             }
-        </>
+        </div>
     );
 };
 
@@ -164,20 +174,6 @@ export const Footer = observer(({ store, config }) => {
         setValueFooter,
     } = store;
 
-    useEffect(() => {
-        route("pyramid.csettings")
-            .get({
-                query: { pyramid: ["home_page_footer"] },
-            })
-            .then((data) => {
-                if (data.pyramid) {
-                    if (Object.keys(data.pyramid.home_page_footer).length > 0) {
-                        setValueFooter(data.pyramid.home_page_footer);
-                    }
-                }
-            });
-    }, []);
-
     const save = async () => {
         const payload = Object.fromEntries(
             Object.entries(valueFooter || {}).filter(([, v]) => v)
@@ -189,10 +185,10 @@ export const Footer = observer(({ store, config }) => {
     };
 
     return (
-        <div className="footer-home-page" style={{ backgroundColor: store.valueFooter.logo.colorBackground }}>
+        <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground }}>
             <div className="control-button">
                 {config.isAdministrator === true && (<Button
-                    size="small"
+                    className={edit ? "icon-pensil" : "icon-edit"}
                     shape="square"
                     title={edit ? gettext("Edit footer") : gettext("Save footer")}
                     type="default"
@@ -204,7 +200,7 @@ export const Footer = observer(({ store, config }) => {
                 />)}
                 {!edit && (
                     <Button
-                        size="small"
+                        className="icon-edit"
                         shape="square"
                         title={gettext("Add urls")}
                         type="default"
@@ -231,7 +227,7 @@ export const Footer = observer(({ store, config }) => {
                 )}
                 {!edit && (
                     <Button
-                        size="small"
+                        className="icon-edit"
                         shape="square"
                         title={gettext("Add contacts")}
                         type="default"
@@ -341,17 +337,16 @@ export const Footer = observer(({ store, config }) => {
                                                     }));
                                                 }}
                                             />
-                                            <span
+                                            <Button
+                                                title={gettext("Delete urls")}
                                                 onClick={() => {
                                                     const state = { ...valueFooter };
                                                     delete state.services.list[item[0]];
                                                     setValueFooter(state);
                                                 }}
                                                 className="icon-edit"
-                                                title={gettext("Delete urls")}
-                                            >
-                                                <DeleteOffOutline />
-                                            </span>
+                                                icon={<DeleteOffOutline />}
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -436,17 +431,16 @@ export const Footer = observer(({ store, config }) => {
                                                             }));
                                                         }}
                                                     />
-                                                    <span
+                                                    <Button
+                                                        title={gettext("Delete contacts")}
                                                         onClick={() => {
                                                             const state = { ...valueFooter };
                                                             delete state.address.phone[item[0]];
                                                             setValueFooter(state);
                                                         }}
                                                         className="icon-edit"
-                                                        title={gettext("Delete contacts")}
-                                                    >
-                                                        <DeleteOffOutline />
-                                                    </span>
+                                                        icon={<DeleteOffOutline />}
+                                                    />
                                                 </div>
                                             )}
                                         </div>

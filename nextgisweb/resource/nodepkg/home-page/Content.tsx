@@ -66,7 +66,6 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             },
             logo: {
                 value: [],
-                colorLogo: "#FFFFFF",
                 colorBackground: "#212020",
             },
         },
@@ -106,6 +105,20 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             }
         }
     );
+
+    useEffect(() => {
+        route("pyramid.csettings")
+            .get({
+                query: { pyramid: ["home_page_footer"] },
+            })
+            .then((data) => {
+                if (data.pyramid) {
+                    if (Object.keys(data.pyramid.home_page_footer).length > 0) {
+                        store.setValueFooter(data.pyramid.home_page_footer);
+                    }
+                }
+            });
+    }, []);
 
     useEffect(() => {
         if (makeQuery) {

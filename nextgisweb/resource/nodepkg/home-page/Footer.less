@@ -13,124 +13,156 @@
 		min-height: 190px;
 		margin: 10px 0 10px 0;
 		display: flex;
-	}
 
-	.uriit-logo {
-		height: 40px;
-		display: flex;
-		flex-direction: column;
-		font-size: 128px;
-		margin: 0 50px 0 0;
-	}
+		.logo-block {
+			min-width: 170px;
 
-	.block-info {
-		width: calc(100% - 50px);
-
-		.footer-content {
-
-			.ant-input[disabled] {
-				cursor: auto !important;
-				margin: 5px;
+			.uriit-logo {
+				height: 40px;
+				display: flex;
+				margin: 0 50px;
 			}
 
-			.item-edit {
-				display: flex;
-				align-items: center;
+			.uriit-logo-mini {
+				height: 14px;
 			}
+		}
 
-			.services-url {
-				padding: 0 0 0 5px;
-				display: flex;
-				flex-direction: column;
-				text-decoration: none;
+		.block-info {
+			width: calc(100% - 150px);
 
-				.icon-url {
-					font-size: 12px;
+			.footer-content {
+
+				.ant-input[disabled] {
+					cursor: auto !important;
+					margin: 5px;
 				}
 
-				a {
+				.item-edit {
+					display: flex;
+					align-items: center;
+				}
+
+				.services-url {
+					padding: 0 0 0 5px;
+					display: flex;
+					flex-direction: column;
 					text-decoration: none;
-					color: #ffffff;
+
+					.icon-url {
+						font-size: 12px;
+					}
+
+					a {
+						text-decoration: none;
+						color: #ffffff;
+					}
 				}
-			}
 
-			.services-list {
-				width: 100%;
-				display: flex;
-				flex-direction: column-reverse;
-			}
-
-			.icon-edit {
-				font-size: 18px;
-				color: var(--danger);
-				width: 24px;
-				height: 24px;
-				display: flex;
-				justify-items: center;
-				justify-content: center;
-				align-items: center;
-				flex: 0 0 auto;
-				cursor: pointer;
-			}
-
-			.address-content {
-				display: flex;
-				justify-content: space-between;
-
-				.phone {
+				.services-list {
 					width: 100%;
+					display: flex;
+					flex-direction: column-reverse;
+				}
 
-					.phone-item {
-						display: flex;
+				.address-content {
+					display: flex;
+					justify-content: space-between;
+
+					.phone {
 						width: 100%;
-						justify-content: space-between;
-						align-items: center;
 
-						.name {
-							padding: 0 5px 0 0;
-						}
+						.phone-item {
+							display: flex;
+							width: 100%;
+							justify-content: space-between;
+							align-items: center;
 
-						.value {
-							padding: 0 5px 0 0;
-							text-align: right;
+							.name {
+								padding: 0 5px 0 0;
+							}
+
+							.value {
+								padding: 0 5px 0 0;
+								text-align: right;
+							}
 						}
 					}
 				}
-			}
 
-			.address-edit {
-				display: flex;
-				flex-wrap: wrap;
+				.address-edit {
+					display: flex;
+					flex-wrap: wrap;
 
-				.phone {
+					.phone {
+						width: 100%;
+
+						.item-edit {
+							display: flex;
+							flex-direction: row;
+							justify-content: space-between;
+						}
+					}
+				}
+
+				.address {
 					width: 100%;
+				}
 
-					.item-edit {
-						display: flex;
-						flex-direction: row;
-						justify-content: space-between;
-					}
+				.service {
+					text-transform: uppercase;
 				}
 			}
 
-			.address {
-				width: 100%;
+			.logo-uriit {
+				font-size: 64px;
 			}
 
-			.service {
-				text-transform: uppercase;
+			.ant-divider {
+				background-color: #fff;
+				padding: 0;
+				margin: 10px 0;
 			}
 		}
+	}
 
-		.logo-uriit {
-			font-size: 64px;
-		}
+	.icon-edit {
+		width: 24px;
+		height: 24px;
+		color: var(--text-base);
+		background-color: #fff;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+		margin: 4px;
+	}
 
-		.ant-divider {
-			background-color: #fff;
-			padding: 0;
-			margin: 10px 0;
-		}
+	.icon-button {
+		color: var(--text-base);
+		background-color: #fff;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+	}
+
+	.icon-pensil {
+		width: 24px;
+		height: 24px;
+		color: var(--primary);
+		background-color: #fff;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+		margin: 4px;
 	}
 
 	.uriit-footer-name {

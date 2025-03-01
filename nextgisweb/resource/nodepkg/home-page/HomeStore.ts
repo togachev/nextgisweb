@@ -55,7 +55,6 @@ export interface FooterNameProps {
 
 export interface FooterLogoProps {
     value: UploadFile[];
-    colorLogo: string;
     colorBackground: string;
 }
 

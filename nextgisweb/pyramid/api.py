@@ -722,7 +722,6 @@ class FooterName(Struct):
 
 class FooterLogo(Struct):
     value: List[Dict[str, Any]]
-    colorLogo: str
     colorBackground: str
 
 
