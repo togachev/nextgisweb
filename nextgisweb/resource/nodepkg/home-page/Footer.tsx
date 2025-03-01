@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Divider, Input, message, Upload } from "@nextgisweb/gui/antd";
+import { Button, ColorPicker, Divider, Input, message, Space, Upload } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
@@ -385,73 +385,73 @@ export const Footer = observer(({ store, config }) => {
                             </div>
                             <div className="phone">
                                 {valueFooter?.services?.list && getEntries(valueFooter.address.phone).map((item) => {
-                                    return (
-                                        <div key={item[0]}>
-                                            {editFooter ? (
-                                                <div key={item[0]} className="phone-item">
-                                                    <div className="name">{item[1]?.name}</div>
-                                                    <div className="value">{item[1]?.value}</div>
-                                                </div>
-                                            ) : (
-                                                <div key={item[0]} className="item-edit">
-                                                    <Input
-                                                        placeholder={gettext("Name contacts")}
-                                                        type="text"
-                                                        value={item[1]?.name}
-                                                        allowClear
-                                                        disabled={editFooter}
-                                                        onChange={(e) => {
-                                                            setValueFooter((prev) => ({
-                                                                ...prev,
-                                                                address: {
-                                                                    ...prev.address,
-                                                                    phone: {
-                                                                        ...prev.address.phone,
-                                                                        [item[0]]: {
-                                                                            ...prev.address.phone[item[0]],
-                                                                            name: e.target.value,
-                                                                        },
+                                    if (editFooter) {
+                                        return (
+                                            <Space key={item[0]} className="phone-item">
+                                                <div className="name">{item[1]?.name}</div>
+                                                <div className="value">{item[1]?.value}</div>
+                                            </Space>
+                                        )
+                                    } else {
+                                        return (
+                                            <div key={item[0]} className="item-edit">
+                                                <Input
+                                                    placeholder={gettext("Name contacts")}
+                                                    type="text"
+                                                    value={item[1]?.name}
+                                                    allowClear
+                                                    disabled={editFooter}
+                                                    onChange={(e) => {
+                                                        setValueFooter((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                phone: {
+                                                                    ...prev.address.phone,
+                                                                    [item[0]]: {
+                                                                        ...prev.address.phone[item[0]],
+                                                                        name: e.target.value,
                                                                     },
                                                                 },
-                                                            }));
-                                                        }}
-                                                    />
-                                                    <Input
-                                                        placeholder={gettext("Number phone")}
-                                                        type="text"
-                                                        value={item[1]?.value}
-                                                        allowClear
-                                                        disabled={editFooter}
-                                                        onChange={(e) => {
-                                                            setValueFooter((prev) => ({
-                                                                ...prev,
-                                                                address: {
-                                                                    ...prev.address,
-                                                                    phone: {
-                                                                        ...prev.address.phone,
-                                                                        [item[0]]: {
-                                                                            ...prev.address.phone[item[0]],
-                                                                            value: e.target.value,
-                                                                        },
+                                                            },
+                                                        }));
+                                                    }}
+                                                />
+                                                <Input
+                                                    placeholder={gettext("Number phone")}
+                                                    type="text"
+                                                    value={item[1]?.value}
+                                                    allowClear
+                                                    disabled={editFooter}
+                                                    onChange={(e) => {
+                                                        setValueFooter((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                phone: {
+                                                                    ...prev.address.phone,
+                                                                    [item[0]]: {
+                                                                        ...prev.address.phone[item[0]],
+                                                                        value: e.target.value,
                                                                     },
                                                                 },
-                                                            }));
-                                                        }}
-                                                    />
-                                                    <Button
-                                                        title={gettext("Delete contacts")}
-                                                        onClick={() => {
-                                                            const state = { ...valueFooter };
-                                                            delete state.address.phone[item[0]];
-                                                            setValueFooter(state);
-                                                        }}
-                                                        className="icon-edit"
-                                                        icon={<DeleteOffOutline />}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    )
+                                                            },
+                                                        }));
+                                                    }}
+                                                />
+                                                <Button
+                                                    title={gettext("Delete contacts")}
+                                                    onClick={() => {
+                                                        const state = { ...valueFooter };
+                                                        delete state.address.phone[item[0]];
+                                                        setValueFooter(state);
+                                                    }}
+                                                    className="icon-edit"
+                                                    icon={<DeleteOffOutline />}
+                                                />
+                                            </div>
+                                        )
+                                    }
                                 })}
                             </div>
                         </div>
