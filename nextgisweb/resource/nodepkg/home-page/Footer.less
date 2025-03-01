@@ -23,95 +23,127 @@
 				margin: 0 50px;
 			}
 
-			.uriit-logo-mini {
-				height: 14px;
+			.edit-logo {
+				margin: 0 10px 0px 0;
+
+				.upload-content {
+					display: flex;
+					flex-direction: column;
+
+					.upload-block {
+						display: flex;
+						justify-content: space-between;
+					}
+
+					.logo-icon-view {
+						padding: 5px;
+
+						.uriit-logo-mini {
+							height: 14px;
+						}
+					}
+				}
 			}
+		}
+
+		.color-block {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 		}
 
 		.block-info {
 			width: calc(100% - 150px);
 
-			.footer-content {
+			.footer-content-edit {
+				background-color: #fff;
+				border-radius: 3px;
+				padding: 5px;
+			}
 
-				.ant-input[disabled] {
-					cursor: auto !important;
-					margin: 5px;
+			.ant-input[disabled] {
+				cursor: auto !important;
+				margin: 5px;
+			}
+
+			.item-edit {
+				display: flex;
+				align-items: center;
+				background-color: #fff;
+				border-radius: 3px;
+				padding: 2px 0;
+			}
+
+			.services-url {
+				padding: 0 0 0 5px;
+				display: flex;
+				flex-direction: column;
+				text-decoration: none;
+
+				.icon-url {
+					font-size: 12px;
 				}
 
-				.item-edit {
-					display: flex;
-					align-items: center;
-				}
-
-				.services-url {
-					padding: 0 0 0 5px;
-					display: flex;
-					flex-direction: column;
+				a {
 					text-decoration: none;
-
-					.icon-url {
-						font-size: 12px;
-					}
-
-					a {
-						text-decoration: none;
-						color: #ffffff;
-					}
+					color: #ffffff;
 				}
+			}
 
-				.services-list {
+			.services-list {
+				width: 100%;
+				display: flex;
+				flex-direction: column-reverse;
+			}
+
+			.address-content {
+				display: flex;
+				justify-content: space-between;
+
+				.phone {
 					width: 100%;
-					display: flex;
-					flex-direction: column-reverse;
-				}
 
-				.address-content {
-					display: flex;
-					justify-content: space-between;
-
-					.phone {
+					.phone-item {
+						display: flex;
 						width: 100%;
+						justify-content: space-between;
+						align-items: center;
 
-						.phone-item {
-							display: flex;
-							width: 100%;
-							justify-content: space-between;
-							align-items: center;
+						.name {
+							padding: 0 5px 0 0;
+						}
 
-							.name {
-								padding: 0 5px 0 0;
-							}
-
-							.value {
-								padding: 0 5px 0 0;
-								text-align: right;
-							}
+						.value {
+							padding: 0 5px 0 0;
+							text-align: right;
 						}
 					}
 				}
+			}
 
-				.address-edit {
-					display: flex;
-					flex-wrap: wrap;
+			.address-edit {
+				display: flex;
+				flex-wrap: wrap;
 
-					.phone {
-						width: 100%;
+				.phone {
+					width: 100%;
 
-						.item-edit {
-							display: flex;
-							flex-direction: row;
-							justify-content: space-between;
-						}
+					.item-edit {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
 					}
 				}
+			}
 
-				.address {
-					width: 100%;
-				}
+			.address {
+				width: 100%;
+				padding: 2px 0;
+			}
 
-				.service {
-					text-transform: uppercase;
-				}
+			.service {
+				text-transform: uppercase;
+				padding: 2px 0;
 			}
 
 			.logo-uriit {
@@ -122,6 +154,7 @@
 				background-color: #fff;
 				padding: 0;
 				margin: 10px 0;
+				border-block-start: 1px solid rgb(5 5 5 / 29%);
 			}
 		}
 	}
@@ -154,7 +187,7 @@
 	.icon-pensil {
 		width: 24px;
 		height: 24px;
-		color: var(--primary);
+		color: var(--text-base);
 		background-color: #fff;
 		display: flex;
 		justify-items: center;

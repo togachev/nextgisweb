@@ -65,14 +65,35 @@ export interface FooterProps {
     logo: FooterLogoProps;
 }
 
+export interface UrlMenuProps {
+    name: string;
+    value: string;
+}
+
+export interface HeaderNamesProps {
+    first_name: string;
+    last_name: string;
+}
+
+export interface HeaderMenuProps {
+    menu: UrlMenuProps[];
+}
+
+export interface HeaderProps {
+    names: HeaderNamesProps;
+    menus: HeaderMenuProps;
+}
+
 export class HomeStore {
-    edit = true;
+    editFooter = true;
+    editHeader = true;
     sourceMaps = false;
     sourceGroup = false;
     listMaps: ListMapProps[] = [];
     groupMapsGrid: GroupMapsGridProps[] = [];
     itemsMapsGroup: ListMapProps[] = [];
     valueFooter: FooterProps | null = null;
+    valueHeader: HeaderProps | null = null;
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -86,8 +107,16 @@ export class HomeStore {
         makeAutoObservable(this, {});
     }
 
-    setEdit = (edit: boolean) => {
-        this.edit = edit;
+    setEditFooter = (editFooter: boolean) => {
+        this.editFooter = editFooter;
+    };
+
+    setEditHeader = (editHeader: boolean) => {
+        this.editHeader = editHeader;
+    };
+
+    setValueHeader = (valueHeader: SetValue<HeaderProps | null>) => {
+        this.setValue("valueHeader", valueHeader);
     };
 
     setValueFooter = (valueFooter: SetValue<FooterProps | null>) => {

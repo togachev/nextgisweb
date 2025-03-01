@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Divider, Input, message, Space, Upload } from "@nextgisweb/gui/antd";
+import { Button, ColorPicker, Divider, Input, message, Upload } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
@@ -18,7 +18,7 @@ import "./Footer.less";
 
 const LogoUriitComp = ({ store }) => {
     const {
-        edit,
+        editFooter,
         valueFooter,
         setValueFooter,
     } = store;
@@ -120,42 +120,49 @@ const LogoUriitComp = ({ store }) => {
 
     return (
         <div className="logo-block">
-            {!edit ?
-                (<Space direction="vertical">
-                    <Space direction="vertical" style={{ display: "flex" }}>
-                        <Upload {...props} accept=".svg">
-                            <Button
-                                size="small"
-                                className="icon-button"
-                                title={gettext("Select File")}
-                            >{gettext("Select File")}</Button>
-                        </Upload>
-                        {valueFooter?.logo?.value?.length === 1 && <img className="uriit-logo-mini" src={valueFooter?.logo?.value[0].url} />}
+            {!editFooter ?
+                (<div className="edit-logo">
+                    <div className="upload-content">
+                        <div className="upload-block">
+                            <Upload {...props} accept=".svg">
+                                <Button
+                                    size="small"
+                                    className="icon-button"
+                                    title={gettext("Select File")}
+                                >{gettext("Select File")}</Button>
+                            </Upload>
+                            {valueFooter?.logo?.value?.length === 1 &&
+                                valueFooter.logo.value.map((file, index) => (
+                                    <div key={index}>
+                                        <Button
+                                            size="small"
+                                            title={gettext("Remove file") + " - " + file.name}
+                                            onClick={() => {
+                                                setValueFooter((prev) => ({
+                                                    ...prev,
+                                                    logo: {
+                                                        ...prev.logo,
+                                                        value: prev.logo.value.filter((item) => item.uid !== file.uid),
+                                                    },
+                                                }));
+                                            }}
+                                            className="icon-button"
+                                            icon={<DeleteOffOutline />}
+                                        />
+                                    </div>
+                                ))}
+                        </div>
                         {valueFooter?.logo?.value?.length === 1 &&
-                            valueFooter.logo.value.map((file, index) => (
-                                <div key={index}>
-                                    <Button
-                                        size="small"
-                                        title={gettext("Remove file") + " - " + file.name}
-                                        onClick={() => {
-                                            setValueFooter((prev) => ({
-                                                ...prev,
-                                                logo: {
-                                                    ...prev.logo,
-                                                    value: prev.logo.value.filter((item) => item.uid !== file.uid),
-                                                },
-                                            }));
-                                        }}
-                                        className="icon-button"
-                                    >{gettext("Remove file")}</Button>
-                                </div>
-                            ))}
-                    </Space>
-                    <Space style={{ display: "flex", marginTop: 5 }} >
+                            <div className="logo-icon-view">
+                                <img className="uriit-logo-mini" src={valueFooter?.logo?.value[0].url} />
+                            </div>
+                        }
+                    </div>
+                    <div className="color-block" >
                         <ColorPicker allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
                         <span>Color background</span>
-                    </Space>
-                </Space>) :
+                    </div>
+                </div>) :
                 valueFooter?.logo?.value?.length > 0 &&
                 (<span className="uriit-logo">
                     <img src={valueFooter.logo.value[0].url} />
@@ -168,8 +175,8 @@ const LogoUriitComp = ({ store }) => {
 export const Footer = observer(({ store, config }) => {
 
     const {
-        edit,
-        setEdit,
+        editFooter,
+        setEditFooter,
         valueFooter,
         setValueFooter,
     } = store;
@@ -188,17 +195,17 @@ export const Footer = observer(({ store, config }) => {
         <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground }}>
             <div className="control-button">
                 {config.isAdministrator === true && (<Button
-                    className={edit ? "icon-pensil" : "icon-edit"}
+                    className={editFooter ? "icon-pensil" : "icon-edit"}
                     shape="square"
-                    title={edit ? gettext("Edit footer") : gettext("Save footer")}
+                    title={editFooter ? gettext("Edit footer") : gettext("Save footer")}
                     type="default"
-                    icon={edit ? <Edit /> : <Save />}
+                    icon={editFooter ? <Edit /> : <Save />}
                     onClick={() => {
-                        setEdit(!edit);
+                        setEditFooter(!editFooter);
                         save()
                     }}
                 />)}
-                {!edit && (
+                {!editFooter && (
                     <Button
                         className="icon-edit"
                         shape="square"
@@ -225,7 +232,7 @@ export const Footer = observer(({ store, config }) => {
                         icon={<LinkEdit />}
                     />
                 )}
-                {!edit && (
+                {!editFooter && (
                     <Button
                         className="icon-edit"
                         shape="square"
@@ -256,33 +263,33 @@ export const Footer = observer(({ store, config }) => {
             <div className="footer-info">
                 <LogoUriitComp store={store} />
                 <div className="block-info">
-                    <div className="footer-content">
+                    <div className={editFooter ? "footer-content" : "footer-content-edit"}>
                         <div className="service">
-                            {edit ? (
-                                <Space align="baseline">{valueFooter?.services?.value}</Space>
-                            ) : (
-                                <Input
-                                    placeholder={gettext("Name company")}
-                                    disabled={edit}
-                                    type="text"
-                                    value={valueFooter?.services?.value}
-                                    allowClear
-                                    onChange={(e) => {
-                                        setValueFooter((prev) => ({
-                                            ...prev,
-                                            services: {
-                                                ...prev.services,
-                                                value: e.target.value,
-                                            },
-                                        }));
-                                    }}
-                                />
-                            )}
+                            {editFooter ?
+                                valueFooter?.services?.value
+                                : (
+                                    <Input
+                                        placeholder={gettext("Name company")}
+                                        disabled={editFooter}
+                                        type="text"
+                                        value={valueFooter?.services?.value}
+                                        allowClear
+                                        onChange={(e) => {
+                                            setValueFooter((prev) => ({
+                                                ...prev,
+                                                services: {
+                                                    ...prev.services,
+                                                    value: e.target.value,
+                                                },
+                                            }));
+                                        }}
+                                    />
+                                )}
                         </div>
                         {valueFooter?.services?.list && getEntries(valueFooter.services.list).map((item) => {
                             return (
                                 <div key={item[0]} className="services-list">
-                                    {edit ? (
+                                    {editFooter ? (
                                         <span className="services-url">
                                             <a href={item[1]?.value} target="_blank">
                                                 <span className="icon-link">
@@ -298,7 +305,7 @@ export const Footer = observer(({ store, config }) => {
                                                 type="text"
                                                 value={item[1]?.name}
                                                 allowClear
-                                                disabled={edit}
+                                                disabled={editFooter}
                                                 onChange={(e) => {
                                                     setValueFooter((prev) => ({
                                                         ...prev,
@@ -320,7 +327,7 @@ export const Footer = observer(({ store, config }) => {
                                                 type="text"
                                                 value={item[1]?.value}
                                                 allowClear
-                                                disabled={edit}
+                                                disabled={editFooter}
                                                 onChange={(e) => {
                                                     setValueFooter((prev) => ({
                                                         ...prev,
@@ -353,14 +360,14 @@ export const Footer = observer(({ store, config }) => {
                             )
                         })}
                         <Divider />
-                        <div className={!edit ? "address-edit" : "address-content"}>
+                        <div className={!editFooter ? "address-edit" : "address-content"}>
                             <div className="address">
-                                {edit ? (
-                                    <Space align="baseline">{valueFooter?.address?.value}</Space>
+                                {editFooter ? (
+                                    <div>{valueFooter?.address?.value}</div>
                                 ) : (
                                     <Input
                                         placeholder={gettext("Full address")}
-                                        disabled={edit}
+                                        disabled={editFooter}
                                         type="text"
                                         value={valueFooter?.address?.value}
                                         allowClear
@@ -380,7 +387,7 @@ export const Footer = observer(({ store, config }) => {
                                 {valueFooter?.services?.list && getEntries(valueFooter.address.phone).map((item) => {
                                     return (
                                         <div key={item[0]}>
-                                            {edit ? (
+                                            {editFooter ? (
                                                 <div key={item[0]} className="phone-item">
                                                     <div className="name">{item[1]?.name}</div>
                                                     <div className="value">{item[1]?.value}</div>
@@ -392,7 +399,7 @@ export const Footer = observer(({ store, config }) => {
                                                         type="text"
                                                         value={item[1]?.name}
                                                         allowClear
-                                                        disabled={edit}
+                                                        disabled={editFooter}
                                                         onChange={(e) => {
                                                             setValueFooter((prev) => ({
                                                                 ...prev,
@@ -414,7 +421,7 @@ export const Footer = observer(({ store, config }) => {
                                                         type="text"
                                                         value={item[1]?.value}
                                                         allowClear
-                                                        disabled={edit}
+                                                        disabled={editFooter}
                                                         onChange={(e) => {
                                                             setValueFooter((prev) => ({
                                                                 ...prev,
@@ -448,19 +455,18 @@ export const Footer = observer(({ store, config }) => {
                                 })}
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
             <div className="uriit-footer-name">
-                {edit ? (
-                    <Space.Compact block>© {valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {valueFooter?.footer_name?.name}</Space.Compact>
+                {editFooter ? (
+                    <div>© {valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {valueFooter?.footer_name?.name}</div>
                 ) : (
-                    <Space.Compact style={{ width: "100%" }}>
+                    <div style={{ width: "100%" }}>
                         <Input
                             style={{ width: "20%" }}
                             placeholder={gettext("Footer base year")}
-                            disabled={edit}
+                            disabled={editFooter}
                             type="text"
                             value={valueFooter?.footer_name?.base_year}
                             allowClear
@@ -477,7 +483,7 @@ export const Footer = observer(({ store, config }) => {
                         <Input
                             style={{ width: "80%" }}
                             placeholder={gettext("Footer name")}
-                            disabled={edit}
+                            disabled={editFooter}
                             type="text"
                             value={valueFooter?.footer_name?.name}
                             allowClear
@@ -491,7 +497,7 @@ export const Footer = observer(({ store, config }) => {
                                 }));
                             }}
                         />
-                    </Space.Compact>
+                    </div>
                 )}
             </div>
         </div>

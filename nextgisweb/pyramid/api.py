@@ -725,16 +725,30 @@ class FooterLogo(Struct):
     colorBackground: str
 
 
+class Names(Struct):
+    first_name: str
+    last_name: str
+
+
+class Menus(Struct):
+    menu: Dict[str, Any]
+
+
+class HomePageHeaders(Struct):
+    names: Union[Names, UnsetType] = UNSET
+    menus: Union[Menus, UnsetType] = UNSET
+
+
 class HomePageFooters(Struct):
     services: Union[Services, UnsetType] = UNSET
     address: Union[Address, UnsetType] = UNSET
     footer_name: Union[FooterName, UnsetType] = UNSET
     logo: Union[FooterLogo, UnsetType] = UNSET
 
-
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))
 csetting("home_path", Optional[str])
 csetting("metrics", Metrics, default={})
+csetting("home_page_header", HomePageHeaders, default={})
 csetting("home_page_footer", HomePageFooters, default={})
 
 def setup_pyramid(comp, config):

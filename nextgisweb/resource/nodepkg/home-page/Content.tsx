@@ -51,6 +51,15 @@ const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore({
+        valueHeader: {
+            names: {
+                first_name: "",
+                last_name: "",
+            },
+            menus: {
+                menu: {},
+            },
+        },
         valueFooter: {
             services: {
                 value: "",
@@ -115,6 +124,17 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_footer).length > 0) {
                         store.setValueFooter(data.pyramid.home_page_footer);
+                    }
+                }
+            });
+        route("pyramid.csettings")
+            .get({
+                query: { pyramid: ["home_page_header"] },
+            })
+            .then((data) => {
+                if (data.pyramid) {
+                    if (Object.keys(data.pyramid.home_page_header).length > 0) {
+                        store.setValueHeader(data.pyramid.home_page_header);
                     }
                 }
             });
@@ -199,7 +219,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     },
                 }}
             >
-                <Header />
+                <Header store={store} config={config} />
                 <div className="main">
                     <div className="content">
                         <div className="search-block">
