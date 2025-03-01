@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, ConfigProvider, Empty, Modal, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import Cog from "@nextgisweb/icon/mdi/cog";
+import Cogs from "@nextgisweb/icon/mdi/cogs";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { useSource } from "./hook/useSource";
@@ -114,7 +114,7 @@ export const MapTile = (props) => {
                                 </Link>
                                 {perm && perm.resource.update === true && (
                                     <Link className="settings-a" href={urlWebmapSettings} target="_blank">
-                                        <span title={settingsTitle} className="icon-info-map"><Cog /></span>
+                                        <span title={settingsTitle} className="icon-info-map"><Cogs /></span>
                                     </Link>
                                 )}
                                 {description_status === true && (

@@ -82,11 +82,14 @@ const LogoUriitComp = ({ store }) => {
             const extension = fileName.slice(fileName.lastIndexOf("."));
 
             const isValidType = TYPE_FILE.some((e) => e.extension === extension);
+            if (!isValidType) {
+                message.error("Only SVG format is supported");
+            }
             const isMaxCount = info.length <= 1;
 
             const isLimitVolume = file.size / 1024 < 2;
             if (!isLimitVolume) {
-                message.error("Exceeding the volume of 2mb");
+                message.error("Exceeding the volume of 2kb");
             }
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
