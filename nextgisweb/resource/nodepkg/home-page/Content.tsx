@@ -75,7 +75,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             },
             logo: {
                 value: [],
-                colorBackground: "#212020",
+                colorBackground: "#212529",
             },
         },
     }));
