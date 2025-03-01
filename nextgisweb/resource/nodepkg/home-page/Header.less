@@ -2,14 +2,7 @@
 	height: 200px;
 	padding: 0 10% 0 10%;
 
-	.control-button {
-		position: absolute;
-		left: 0;
 
-		button {
-			background-color: #fff;
-		}
-	}
 
 	.edit-panel {
 		display: flex;
@@ -37,8 +30,7 @@
 			display: flex;
 			text-transform: uppercase;
 			align-items: center;
-			background-color: #00000040;
-			box-shadow: 0px 0px 7px 3px #00000040;
+			background-color: #00000020;
 			border-radius: 4px;
 
 			.button-link {
@@ -77,28 +69,17 @@
 			}
 
 			.res-link {
-				margin: 0 0 0 12px;
+				margin: 0 12px 0 12px;
 
 				svg {
 					color: #ffffff;
+
+					&:hover {
+						color: rgb(175, 180, 253) !important;
+					}
 				}
 			}
 		}
-	}
-
-	.icon-edit {
-		width: 24px;
-		height: 24px;
-		color: var(--text-base);
-		background-color: #fff;
-		display: flex;
-		justify-items: center;
-		justify-content: center;
-		align-items: center;
-		flex: 0 0 auto;
-		cursor: pointer;
-		margin: 4px;
-		z-index: 1000;
 	}
 
 	.icon-button {
@@ -126,58 +107,6 @@
 		cursor: pointer;
 		margin: 4px;
 		z-index: 1000;
-	}
-
-	.menu-button {
-		height: 40px;
-		width: 100%;
-		display: flex;
-		justify-content: flex-end;
-
-		.menu-component {
-			display: flex;
-			text-transform: uppercase;
-
-			.button-link {
-				button {
-					font-weight: 400;
-					color: #fff;
-					display: flex;
-					flex-direction: row-reverse;
-					align-items: center;
-					font-size: 12px;
-					text-transform: capitalize;
-
-					&:hover {
-						color: #fff;
-					}
-
-				}
-
-				a:hover {
-					color: #ffffff !important;
-				}
-
-				a {
-					color: #ffffff;
-					font-weight: 500;
-				}
-
-				.ant-divider-vertical {
-					position: relative;
-					margin: 0;
-					border-inline-start: 1px solid #fff;
-				}
-
-				.res-link {
-					margin: 0 0 0 20px;
-
-					svg {
-						color: #ffffff;
-					}
-				}
-			}
-		}
 	}
 
 	.name-site {
@@ -230,6 +159,10 @@
 	height: 20px;
 	border: 1px solid white;
 	margin: 0 10px;
+
+	&:hover {
+		border-color: rgb(175, 180, 253) !important;
+	}
 
 	>a {
 		font-size: 14px;

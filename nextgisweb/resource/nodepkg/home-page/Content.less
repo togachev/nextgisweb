@@ -2,6 +2,44 @@
 	min-height: 100vh;
 	display: grid;
 	grid-template-rows: auto 1fr auto;
+	letter-spacing: .05rem;
+
+	.control-button {
+		position: absolute;
+		left: 0;
+		margin: 5px 0 0 0;
+
+		button {
+			background-color: #ffffff80;
+			border-color: #ffffff80;
+			color: #ffffff;
+		}
+	}
+	.icon-button {
+		color: #ffffff;
+		background-color: #ffffff80;
+		border-color: #ffffff80;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+	}
+	.icon-edit {
+		width: 24px;
+		height: 24px;
+		background-color: #ffffff80;
+		border-color: #b1b1b180;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+		margin: 4px;
+		z-index: 1000;
+	}
 
 	.ant-typography {
 		word-break: break-word;
