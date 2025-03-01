@@ -565,7 +565,7 @@ def setup_pyramid_csettings(comp, config):
                     if not is_administrator:
                         if "home_page_header" in attrs:
                             sf[cid] = cgetters["home_page_header"]()
-                        if "home_page_footer" in attrs:
+                        elif "home_page_footer" in attrs:
                             sf[cid] = cgetters["home_page_footer"]()
                         else:
                             request.require_administrator()
