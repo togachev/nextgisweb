@@ -96,7 +96,7 @@ def subscriber(event):
             "/static/",
             "/uacompat",
             "/favicon.ico",
-            "/header_image.png",
+            "/header_image.webp",
         )
     ):
         return

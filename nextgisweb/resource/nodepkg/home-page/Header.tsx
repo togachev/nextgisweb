@@ -9,7 +9,6 @@ import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
-import Folder from "@nextgisweb/icon/mdi/folder-eye-outline";
 import LoginVariant from "@nextgisweb/icon/mdi/login-variant";
 
 import "./Header.less";
@@ -220,6 +219,12 @@ export const Header = observer(({ store, config }) => {
                             </div>
                         }
                     </div>
+                    {authenticated ?
+                        <>
+                            <Button type="link" href={url}>{gettext("Resources")}</Button>
+                            {editHeader && <DividerMenu />}
+                        </>
+                        : null}
                     <div
                         className={
                             "menu-avatar" +
@@ -230,7 +235,7 @@ export const Header = observer(({ store, config }) => {
                         {authenticated ? (
                             <Popover
                                 placement="bottom"
-                                trigger="click"
+                                trigger={["hover", "click"]}
                                 title={userDisplayName}
                                 content={content}
                                 overlayClassName="menu-avatar-popover"
@@ -251,13 +256,6 @@ export const Header = observer(({ store, config }) => {
                             <a href={ngwConfig.logoutUrl}>{signInText}</a>
                         )}
                     </div>
-                    {authenticated ?
-                        <a title={gettext("Resources")} className="link-resource" href={url}>
-                            <span className="res-link">
-                                <Folder />
-                            </span>
-                        </a>
-                        : null}
                 </div>
             </div>
             <div className="name-site">
