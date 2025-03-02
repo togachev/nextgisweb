@@ -9,7 +9,7 @@ import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
-import Folder from "@nextgisweb/icon/mdi/folder";
+import Folder from "@nextgisweb/icon/mdi/folder-eye-outline";
 import LoginVariant from "@nextgisweb/icon/mdi/login-variant";
 
 import "./Header.less";
