@@ -274,7 +274,7 @@ export const Footer = observer(({ store, config }) => {
                     />
                 )}
             </div>
-            <div className="footer-info">
+            <div className="footer-info" style={editFooter ? { margin: "40px 0" } : { margin: 9 }}>
                 <LogoUriitComp store={store} />
                 <div className="block-info">
                     <div className={editFooter ? "footer-content" : "footer-content-edit"}>
