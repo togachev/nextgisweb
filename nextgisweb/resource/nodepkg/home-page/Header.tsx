@@ -5,12 +5,12 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
-import { LoginOutlined } from "@ant-design/icons";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
-import ResourceGroup from "./icons/resource_group.svg";
+import Folder from "@nextgisweb/icon/mdi/folder";
+import LoginVariant from "@nextgisweb/icon/mdi/login-variant";
 
 import "./Header.less";
 
@@ -245,7 +245,7 @@ export const Header = observer(({ store, config }) => {
                             </Popover>
                         ) : authStore.showLoginModal ? (
                             <Button onClick={showLoginModal}
-                                icon={<LoginOutlined />}
+                                icon={<LoginVariant />}
                                 type="link">{signInText}</Button>
                         ) : (
                             <a href={ngwConfig.logoutUrl}>{signInText}</a>
@@ -254,7 +254,7 @@ export const Header = observer(({ store, config }) => {
                     {authenticated ?
                         <a title={gettext("Resources")} className="link-resource" href={url}>
                             <span className="res-link">
-                                <ResourceGroup />
+                                <Folder />
                             </span>
                         </a>
                         : null}

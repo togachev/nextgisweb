@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { SearchOutlined } from "@ant-design/icons";
+import DeleteOffOutline from "@nextgisweb/icon/mdi/magnify";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -232,7 +232,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                                 {...rest}
                             >
                                 <Input
-                                    prefix={<SearchOutlined />}
+                                    prefix={<DeleteOffOutline />}
                                     size="middle"
                                     placeholder={gettext("Enter card name")}
                                     value={search}
