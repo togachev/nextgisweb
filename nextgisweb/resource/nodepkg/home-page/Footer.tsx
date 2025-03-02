@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Divider, Input, message, Space, Upload } from "@nextgisweb/gui/antd";
+import { Button, ColorPicker, Divider, Input, message, Space, Tooltip, Upload } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
@@ -121,6 +121,11 @@ const LogoUriitComp = ({ store }) => {
         }));
     }
 
+    const msgInfo = [
+        gettext("Supported file format SVG."),
+        gettext("Maximum file size 2KB."),
+    ];
+
     return (
         <div className="logo-block">
             {!editFooter ?
@@ -128,11 +133,16 @@ const LogoUriitComp = ({ store }) => {
                     <div className="upload-content">
                         <div className="upload-block">
                             <Upload {...props} accept=".svg">
-                                <Button
-                                    size="small"
-                                    className="icon-button"
-                                    title={gettext("Select File")}
-                                >{gettext("Select File")}</Button>
+                                <Tooltip
+                                    title={msgInfo.join(" ")}
+                                    trigger={["click", "hover"]}
+                                >
+                                    <Button
+                                        size="small"
+                                        className="icon-button"
+                                        title={gettext("Select File")}
+                                    >{gettext("Select File")}</Button>
+                                </Tooltip>
                             </Upload>
                             {valueFooter?.logo?.value?.length === 1 &&
                                 valueFooter.logo.value.map((file, index) => (
