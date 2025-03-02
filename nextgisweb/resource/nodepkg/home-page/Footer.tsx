@@ -162,7 +162,18 @@ const LogoUriitComp = ({ store }) => {
                         }
                     </div>
                     <div className="color-block" >
-                        <ColorPicker allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
+                        <ColorPicker
+                            presets={[
+                                {
+                                    label: gettext("Default color"),
+                                    colors: ["#212529"],
+                                },
+                                {
+                                    label: gettext("Primary colors"),
+                                    colors: ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#FFFFFF", "#000000", "#106A90"],
+                                },
+                            ]}
+                            allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
                         <span>Color background</span>
                     </div>
                 </div>) :
