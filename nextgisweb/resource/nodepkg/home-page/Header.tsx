@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Divider, Input, Popover, Typography } from "@nextgisweb/gui/antd";
@@ -11,7 +11,7 @@ import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import LoginVariant from "@nextgisweb/icon/mdi/login-variant";
-
+import { useSource } from "./hook/useSource";
 import "./Header.less";
 
 const { Title } = Typography;
@@ -19,21 +19,17 @@ const signInText = gettext("Sign in");
 
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-    const [widthMenu, setWidthMenu] = useState({
-        width: 0,
-    });
-    const [widthMenuChild, setWidthMenuChild] = useState({
-        width: 0,
-    });
+
+    const ref = useRef(null);
+
+    const { collapse } = useSource(ref);
+
     const {
         editHeader,
         setEditHeader,
         valueHeader,
         setValueHeader,
     } = store;
-
-    const menuRef = useRef(null);
-    const menuChildRef = useRef(null);
 
     const save = async () => {
         const payload = Object.fromEntries(
@@ -44,24 +40,6 @@ export const Header = observer(({ store, config }) => {
             json: { pyramid: { home_page_header: payload } },
         });
     };
-
-    useEffect(() => {
-        const updateSize = () => {
-            setWidthMenu({
-                width: menuRef.current.offsetWidth,
-            });
-            setWidthMenuChild({
-                width: menuChildRef.current.offsetWidth,
-            })
-        }
-
-        window.addEventListener("resize", updateSize)
-        updateSize()
-
-        return () => window.removeEventListener("resize", updateSize)
-    }, [menuRef.current])
-
-    console.log(widthMenu, widthMenuChild);
 
     const content = (
         <>
@@ -135,8 +113,8 @@ export const Header = observer(({ store, config }) => {
                     />
                 )}
             </div>
-            <div className="menus" ref={menuRef}>
-                <div className="menu-component" ref={menuChildRef}>
+            <div className="menus">
+                <div className="menu-component" ref={ref}>
                     <div className={editHeader ? "button-link" : "button-link edit-panel"}>
                         {valueHeader?.menus?.menu && getEntries(valueHeader.menus.menu).map((item) => {
                             return (
