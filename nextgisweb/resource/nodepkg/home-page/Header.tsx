@@ -1,3 +1,4 @@
+import { useEffect, useState, useMemo, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Divider, Input, Popover, Typography } from "@nextgisweb/gui/antd";
@@ -18,13 +19,21 @@ const signInText = gettext("Sign in");
 
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-
+    const [widthMenu, setWidthMenu] = useState({
+        width: 0,
+    });
+    const [widthMenuChild, setWidthMenuChild] = useState({
+        width: 0,
+    });
     const {
         editHeader,
         setEditHeader,
         valueHeader,
         setValueHeader,
     } = store;
+
+    const menuRef = useRef(null);
+    const menuChildRef = useRef(null);
 
     const save = async () => {
         const payload = Object.fromEntries(
@@ -35,6 +44,24 @@ export const Header = observer(({ store, config }) => {
             json: { pyramid: { home_page_header: payload } },
         });
     };
+
+    useEffect(() => {
+        const updateSize = () => {
+            setWidthMenu({
+                width: menuRef.current.offsetWidth,
+            });
+            setWidthMenuChild({
+                width: menuChildRef.current.offsetWidth,
+            })
+        }
+
+        window.addEventListener("resize", updateSize)
+        updateSize()
+
+        return () => window.removeEventListener("resize", updateSize)
+    }, [menuRef.current])
+
+    console.log(widthMenu, widthMenuChild);
 
     const content = (
         <>
@@ -108,15 +135,13 @@ export const Header = observer(({ store, config }) => {
                     />
                 )}
             </div>
-            <div className="menus">
-                <div className="menu-component">
+            <div className="menus" ref={menuRef}>
+                <div className="menu-component" ref={menuChildRef}>
                     <div className={editHeader ? "button-link" : "button-link edit-panel"}>
                         {valueHeader?.menus?.menu && getEntries(valueHeader.menus.menu).map((item) => {
                             return (
                                 <div key={item[0]} className="menu-link">
-                                    {editHeader ? (
-                                        <Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>
-                                    ) : (
+                                    {!editHeader && (
                                         <div className="item-edit">
                                             <Input
                                                 placeholder={gettext("Name url")}
@@ -174,6 +199,13 @@ export const Header = observer(({ store, config }) => {
                                             />
                                         </div>
                                     )}
+                                </div>
+                            )
+                        })}
+                        {editHeader && valueHeader?.menus?.menu && getEntries(valueHeader.menus.menu).map((item) => {
+                            return (
+                                <div key={item[0]} className="menu-link">
+                                    <Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>
                                     {editHeader && <DividerMenu />}
                                 </div>
                             )
@@ -260,8 +292,8 @@ export const Header = observer(({ store, config }) => {
             </div>
             <div className="name-site">
                 <div className="title">
-                    <Title ellipsis={{ suffix: "" }} className="name-site-a" level={1} >{valueHeader?.names?.first_name}</Title>
-                    <Title ellipsis={{ suffix: "" }} className="name-site-b" level={5} >{valueHeader?.names?.last_name}</Title>
+                    <Title className="name-site-a" level={1} >{valueHeader?.names?.first_name}</Title>
+                    <Title className="name-site-b" level={5} >{valueHeader?.names?.last_name}</Title>
                 </div>
             </div>
         </div >

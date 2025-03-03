@@ -1,5 +1,5 @@
 .header {
-	height: 200px;
+	height: 210px;
 	padding: 0 10% 0 10%;
 
 	.edit-panel {
@@ -110,18 +110,25 @@
 	}
 
 	.name-site {
-		top: 20px;
+		top: 0;
 		width: 100%;
+		height: calc(100% - 40px);
 		position: relative;
 		display: flex;
 		letter-spacing: normal;
 		text-align: center;
 		user-select: none;
+		align-items: center;
 
 		.ant-typography {
 			color: #fff;
 			display: flex;
 			justify-content: center;
+		}
+
+		.ant-typography {
+			word-break: break-word;
+			line-height: 1.57142857;
 		}
 
 		.name-site-a {
@@ -144,6 +151,10 @@
 
 		.title {
 			width: 100%;
+			color: #fff;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-evenly;
 		}
 
 
