@@ -1,8 +1,8 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Divider, Dropdown, Input, Popover, Space, Typography } from "@nextgisweb/gui/antd";
-import type { MenuProps } from '@nextgisweb/gui/antd';
+import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -73,10 +73,14 @@ export const Header = observer(({ store, config }) => {
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
-    const items: MenuProps['items'] = getEntries(valueHeader.menus.menu).map((item) => ({
-        label: (<Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>),
-        key: item[0],
-    }))
+    const items: MenuProps["items"] = useMemo(() => {
+        return getEntries(valueHeader.menus.menu).map((item) => ({
+            label: (<Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>),
+            name: item[1]?.name,
+            value: item[1]?.value,
+            key: item[0],
+        }))
+    })
 
 
     const MenuContainer = ({ collapse }) => {
@@ -92,15 +96,15 @@ export const Header = observer(({ store, config }) => {
             )
         } else {
             console.log(items);
-            
-            // items.map((item) => {
-            //     return (
-            //         <div key={item.key} className="menu-link">
-            //             {item.label}
-            //             {editHeader && <DividerMenu />}
-            //         </div>
-            //     )
-            // })
+
+            items.map((item) => {
+                return (
+                    <div key={item.key} className="menu-link">
+                        {item.label}
+                        {editHeader && <DividerMenu />}
+                    </div>
+                )
+            })
         }
     }
 
@@ -149,14 +153,14 @@ export const Header = observer(({ store, config }) => {
             <div className="menus">
                 <div className="menu-component" ref={ref}>
                     <div className={editHeader ? "button-link" : "button-link edit-panel"}>
-                        {!editHeader ? valueHeader?.menus?.menu && getEntries(valueHeader.menus.menu).map((item) => {
+                        {!editHeader ? items.map((item) => {
                             return (
-                                <div key={item[0]} className="menu-link">
+                                <div key={item.key} className="menu-link">
                                     <div className="item-edit">
                                         <Input
                                             placeholder={gettext("Name url")}
                                             type="text"
-                                            value={item[1]?.name}
+                                            value={item?.name}
                                             allowClear
                                             disabled={editHeader}
                                             onChange={(e) => {
@@ -166,8 +170,8 @@ export const Header = observer(({ store, config }) => {
                                                         ...prev.menus,
                                                         menu: {
                                                             ...prev.menus.menu,
-                                                            [item[0]]: {
-                                                                ...prev.menus.menu[item[0]],
+                                                            [item.key]: {
+                                                                ...prev.menus.menu[item.key],
                                                                 name: e.target.value,
                                                             },
                                                         },
@@ -178,7 +182,7 @@ export const Header = observer(({ store, config }) => {
                                         <Input
                                             placeholder={gettext("Url")}
                                             type="text"
-                                            value={item[1]?.value}
+                                            value={item?.value}
                                             allowClear
                                             disabled={editHeader}
                                             onChange={(e) => {
@@ -188,8 +192,8 @@ export const Header = observer(({ store, config }) => {
                                                         ...prev.menus,
                                                         menu: {
                                                             ...prev.menus.menu,
-                                                            [item[0]]: {
-                                                                ...prev.menus.menu[item[0]],
+                                                            [item.key]: {
+                                                                ...prev.menus.menu[item.key],
                                                                 value: e.target.value,
                                                             },
                                                         },
@@ -201,7 +205,7 @@ export const Header = observer(({ store, config }) => {
                                             title={gettext("Delete urls")}
                                             onClick={() => {
                                                 const state = { ...valueHeader };
-                                                delete state.menus.menu[item[0]];
+                                                delete state.menus.menu[item.key];
                                                 setValueHeader(state);
                                             }}
                                             className="icon-edit"
@@ -210,8 +214,8 @@ export const Header = observer(({ store, config }) => {
                                     </div>
                                 </div>
                             )
-                        }) : (<MenuContainer collapse={collapse} />)
-                        }
+                        }) :
+                            (<MenuContainer collapse={collapse} />)}
                         {!editHeader &&
                             <div className="edit-title">
                                 <div className="title-item">
