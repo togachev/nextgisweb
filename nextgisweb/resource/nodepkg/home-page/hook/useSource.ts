@@ -1,45 +1,41 @@
 import { route } from "@nextgisweb/pyramid/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { debounce } from "lodash-es";
 
-export const useSource = (ref) => {
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [containerWidth, setContainerWidth] = useState(0);
-    const [collapse, setCollapse] = useState(false);
+export const useSource = (refMenu, refMenus) => {
+    const [collapse, setCollapse] = useState(refMenus?.current?.offsetWidth >= refMenu?.current?.offsetWidth ? false : true);
+
+    const [size, setSize] = useState({
+        widthContainer: 0,
+        widthChildContainer: 0,
+    })
+
+    useEffect(() => {
+
+        const observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                console.log(entry);
+
+                // setSize({ widthContainer: entry.contentRect.width, widthChildContainer: entry.contentRect.width })
+            }
+        });
+        if (refMenu?.current) {
+            observer.observe(refMenu.current);
+        }
+        if (refMenus?.current) {
+            observer.observe(refMenus.current);
+        }
+        // Cleanup function
+        return () => {
+            observer.disconnect();
+        };
+    }, [])
 
     const getListMap = async () => {
         const maplist = await route("resource.maplist").get(); // список карт
         const maplist_action_map = maplist.result.filter(item => item.action_map === true);
         return maplist_action_map;
     }
-
-    useEffect(() => {
-        const cb = () => {
-            setWindowWidth(window.innerWidth - window.innerWidth / 100 * 20);
-        };
-        window.addEventListener("resize", cb);
-
-        const observer = new ResizeObserver((entries) => {
-            setContainerWidth(entries[0].contentRect.width);
-        });
-
-        if (ref?.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => {
-            ref.current && observer.unobserve(ref.current);
-            window.removeEventListener("resize", cb);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (windowWidth >= containerWidth) {
-            setCollapse(false)
-        } else {
-            setCollapse(true)
-        }
-    }, [windowWidth, containerWidth]);
-
 
     const getGroupMap = async () => {
         const groupMaps = await route("resource.mapgroup").get(); // список групп
@@ -52,5 +48,5 @@ export const useSource = (ref) => {
         return value;
     }
 
-    return { getListMap, getGroupMap, getPermission, collapse };
+    return { getListMap, getGroupMap, getPermission, collapse, size };
 };

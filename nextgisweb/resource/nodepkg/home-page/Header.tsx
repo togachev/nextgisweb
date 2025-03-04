@@ -22,9 +22,10 @@ const signInText = gettext("Sign in");
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
 
-    const ref = useRef(null);
+    const refMenu = useRef(null);
+    const refMenus = useRef(null);
 
-    const { collapse } = useSource(ref);
+    const { collapse, size } = useSource(refMenu, refMenus);
 
     const {
         editHeader,
@@ -73,39 +74,38 @@ export const Header = observer(({ store, config }) => {
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
-    const items: MenuProps["items"] = useMemo(() => {
-        return getEntries(valueHeader.menus.menu).map((item) => ({
-            label: (<Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>),
-            name: item[1]?.name,
-            value: item[1]?.value,
-            key: item[0],
-        }))
-    })
-
+    const items: MenuProps["items"] = valueHeader?.menus.menu && getEntries(valueHeader?.menus?.menu).map(item => ({
+        key: item[0],
+        label: (<Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>),
+        name: item[1]?.name,
+        value: item[1]?.value,
+    }));
 
     const MenuContainer = ({ collapse }) => {
-        if (collapse) {
-            return (
-                <Dropdown menu={{ items }}>
-                    <a onClick={(e) => e.preventDefault()}>
-                        <Space>
-                            <Menu />
-                        </Space>
-                    </a>
-                </Dropdown>
-            )
-        } else {
-            console.log(items);
-
-            items.map((item) => {
-                return (
-                    <div key={item.key} className="menu-link">
-                        {item.label}
-                        {editHeader && <DividerMenu />}
-                    </div>
-                )
-            })
-        }
+        // console.log(size);
+        
+        // if (size.widthChildContainer >= size.widthContainer) {
+        //     return (
+        //         <Dropdown menu={{ items }}>
+        //             <a onClick={(e) => e.preventDefault()}>
+        //                 <Space>
+        //                     <Menu />
+        //                 </Space>
+        //             </a>
+        //         </Dropdown>
+        //     )
+        // } else {
+            return (<>
+                {items?.map((item) => {
+                    return (
+                        <div key={item.key} className="menu-link">
+                            {item.label}
+                            {editHeader && <DividerMenu />}
+                        </div>
+                    )
+                })}
+            </>)
+        // }
     }
 
     return (
@@ -150,8 +150,8 @@ export const Header = observer(({ store, config }) => {
                     />
                 )}
             </div>
-            <div className="menus">
-                <div className="menu-component" ref={ref}>
+            <div className="menus" ref={refMenus}>
+                <div className="menu-component" ref={refMenu}>
                     <div className={editHeader ? "button-link" : "button-link edit-panel"}>
                         {!editHeader ? items.map((item) => {
                             return (

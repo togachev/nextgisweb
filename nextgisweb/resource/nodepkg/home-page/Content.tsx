@@ -80,7 +80,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         },
     }));
 
-    const { getListMap, getGroupMap } = useSource();
+    const { getListMap, getGroupMap } = useSource(null, null);
 
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
