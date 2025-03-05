@@ -114,7 +114,6 @@ export const Header = observer(({ store, config }) => {
                 items={items}
                 theme="light"
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
-                style={{ minWidth: 0, flex: "auto" }}
             />)
     }
 

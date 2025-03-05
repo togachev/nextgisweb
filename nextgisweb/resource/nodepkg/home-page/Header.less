@@ -31,7 +31,6 @@
 			display: flex;
 			text-transform: uppercase;
 			align-items: center;
-			background-color: #21252933;
 			border-radius: 4px;
 			justify-content: flex-end;
 
@@ -41,7 +40,9 @@
 				.menu-indicator {
 					font-size: 24px;
 				}
-
+				.ant-menu-horizontal, .ant-menu-item::after, .ant-menu-submenu::after {
+					border: none !important;
+				}
 				.ant-menu {
 					color: rgba(0, 0, 0, 0.88);
 					background: #ffffff00;
