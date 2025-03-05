@@ -86,6 +86,7 @@ export interface HeaderProps {
 
 export class HomeStore {
     editFooter = true;
+    widthMenu: number | string | null = null;
     editHeader = true;
     sourceMaps = false;
     sourceGroup = false;
@@ -109,6 +110,10 @@ export class HomeStore {
 
     setEditFooter = (editFooter: boolean) => {
         this.editFooter = editFooter;
+    };    
+    
+    setWidthMenu = (widthMenu: number | string) => {
+        this.widthMenu = widthMenu;
     };
 
     setEditHeader = (editHeader: boolean) => {

@@ -1,4 +1,5 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
+import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
@@ -28,7 +29,7 @@ const SortableMenu = (props) => {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        width: 290,
+        width: store.widthMenu,
         height: 40,
         zIndex: isDragging ? "100" : "auto",
         opacity: isDragging ? 0.3 : 1,
@@ -59,9 +60,8 @@ const SortableMenu = (props) => {
 export const ContainerMenu = (props) => {
     const { store, config } = props;
     const [disable, setDisable] = useState(true);
-
     const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
-    
+
     const [radioValue, setRadioValue] = useState(itemIds[0]);
 
     const updatePosition = async (id, id_pos) => {

@@ -92,7 +92,7 @@ export const Header = observer(({ store, config }) => {
                     key: gettext("Settings"),
                 },
                 {
-                    label: (<span onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</span>),
+                    label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
                     icon: <span className="menu-icon"><Logout /></span>,
                     key: gettext("Sign out"),
                 },
