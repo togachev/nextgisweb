@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Input, Menu, Typography } from "@nextgisweb/gui/antd";
@@ -12,6 +11,11 @@ import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
+import Login from "@nextgisweb/icon/mdi/login";
+import Logout from "@nextgisweb/icon/mdi/logout";
+import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
+import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
+import Cog from "@nextgisweb/icon/mdi/cog";
 
 import "./Header.less";
 
@@ -54,56 +58,45 @@ export const Header = observer(({ store, config }) => {
 
     const items: MenuItem[] = valueHeader?.menus.menu && getEntries(valueHeader?.menus?.menu).map(item => ({
         key: item[0],
-        label: (
-            <a href={item[1]?.value} target="_blank" rel="noopener noreferrer">
-                {item[1]?.name}
-            </a>),
+        label: (<a href={item[1]?.value} target="_blank" rel="noopener noreferrer">{item[1]?.name}</a>),
         name: item[1]?.name,
         value: item[1]?.value,
     }));
 
-    if (authenticated) {
-        items.push({
-            key: "resources",
-            label: (<a href={url} target="_blank" rel="noopener noreferrer">
-                {gettext("Resources")}
-            </a>),
-        })
-    }
-
     items.push({
         key: "auth",
-        label: <span className="auth-login">{userDisplayName}</span>,
+        label: authenticated ?
+            (<span className="auth-login">{userDisplayName}</span>) :
+            authStore.showLoginModal ?
+                (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
+                (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
         children:
-            authenticated ? [
+            authenticated && [
+                {
+                    key: "resources",
+                    label: (<a href={url} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
+                    icon: <span className="menu-icon"><FolderOutline /></span>,
+                },
+                config.isAdministrator === true && {
+                    key: "control-panel",
+                    icon: <span className="menu-icon"><Cog /></span>,
+                    label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
+                },
                 invitationSession && {
-                    label: (<div className="warning">
-                        {gettext("Invitation session")}
-                    </div>),
-                    key: gettext("Invitation session")
+                    label: (<div className="warning">{gettext("Invitation session")}</div>),
+                    key: gettext("Invitation session"),
                 },
                 {
-                    label: (<a href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    key: gettext("Settings")
+                    label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
+                    icon: <span className="menu-icon"><AccountCogOutline /></span>,
+                    key: gettext("Settings"),
                 },
                 {
-                    label: (<a href="#" onClick={() => authStore.logout()}>{gettext("Sign out")}</a>),
-                    key: gettext("Sign out")
-                }
-            ] :
-                authStore.showLoginModal ?
-                    [
-                        {
-                            label: (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText}</a>),
-                            key: "signInText"
-                        }
-                    ] :
-                    [
-                        {
-                            label: (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
-                            key: signInText
-                        }
-                    ],
+                    label: (<span onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</span>),
+                    icon: <span className="menu-icon"><Logout /></span>,
+                    key: gettext("Sign out"),
+                },
+            ]
     })
 
     const MenuContainer = () => {
