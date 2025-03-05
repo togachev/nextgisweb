@@ -25,14 +25,41 @@
 		align-items: center;
 
 		.menu-component {
+			position: absolute;
+			left: 0;
+			right: 10%;
 			display: flex;
 			text-transform: uppercase;
 			align-items: center;
 			background-color: #21252933;
 			border-radius: 4px;
+			justify-content: flex-end;
 
 			.button-link {
-				display: flex;
+				width: 100%;
+
+				.menu-indicator {
+					font-size: 24px;
+				}
+
+				.ant-menu {
+					color: rgba(0, 0, 0, 0.88);
+					background: #ffffff00;
+					display: flex;
+					justify-content: flex-end;
+				}
+
+				.auth-login {
+					font-weight: 500;
+					border: 1px solid white;
+					padding: 0 5px;
+					border-radius: 3px;
+				}
+
+				.ant-menu-submenu-title {
+					text-transform: uppercase;
+					color: rgba(255, 255, 255, 0.88);
+				}
 
 				.menu-link {
 					display: flex;
@@ -156,59 +183,18 @@
 			flex-direction: column;
 			justify-content: space-evenly;
 		}
-
-
 	}
 }
 
-.menu-avatar {
-	width: 100%;
+.content-auth {
 	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 4px;
-	height: 20px;
-	border: 1px solid white;
-	margin: 0 10px;
+	flex-direction: column;
+}
 
-	&:hover {
-		border-color: rgb(175, 180, 253) !important;
-	}
-
-	>a {
-		font-size: 14px;
-		text-decoration: none;
-		color: white;
-	}
-
-	&-label {
-		display: flex;
-		vertical-align: middle;
-		height: 22px;
-		line-height: 22px;
-		border-radius: 2px;
-		color: #fff;
-		font-size: 12px;
-		text-align: center;
-		cursor: pointer;
-		justify-content: center;
-		font-weight: 500;
-		padding: 0 10px;
-
-		&:hover {
-			color: rgb(175, 180, 253) !important;
-		}
-	}
-
-	.ant-btn-variant-link {
-		color: #fff;
-		box-shadow: none;
-		font-weight: 500;
-
-		&:hover {
-			color: rgb(175, 180, 253) !important;
-		}
-	}
+.menu-avatar-label {
+	border-radius: 2px;
+	color: #fff;
+	font-weight: 500;
 }
 
 .menu-avatar-authenticated {

@@ -1,7 +1,7 @@
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
-import { Button, Divider, Dropdown, Input, Popover, Space, Typography } from "@nextgisweb/gui/antd";
+import { Button, Input, Menu, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
@@ -11,21 +11,17 @@ import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
-import Menu from "@nextgisweb/icon/mdi/menu";
-import LoginVariant from "@nextgisweb/icon/mdi/login-variant";
-import { useSource } from "./hook/useSource";
+import MenuIcon from "@nextgisweb/icon/mdi/menu";
+
 import "./Header.less";
+
+type MenuItem = Required<MenuProps>["items"][number];
 
 const { Title } = Typography;
 const signInText = gettext("Sign in");
 
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-
-    const refMenu = useRef(null);
-    const refMenus = useRef(null);
-
-    const { collapse, size } = useSource(refMenu, refMenus);
 
     const {
         editHeader,
@@ -44,20 +40,6 @@ export const Header = observer(({ store, config }) => {
         });
     };
 
-    const content = (
-        <>
-            {invitationSession && (
-                <div className="warning">
-                    {gettext("Invitation session")}
-                </div>
-            )}
-            <a href={routeURL("auth.settings")}>{gettext("Settings")}</a>
-            <a href="#" onClick={() => authStore.logout()}>
-                {gettext("Sign out")}
-            </a>
-        </>
-    );
-
     const showLoginModal = () => {
         if (oauth.enabled && oauth.default) {
             const qs = new URLSearchParams([["next", window.location.href]]);
@@ -67,45 +49,73 @@ export const Header = observer(({ store, config }) => {
         }
     };
 
-    const DividerMenu = () => (
-        <Divider type="vertical" style={{ height: "24px", borderColor: "#fff" }} />
-    )
-
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
-    const items: MenuProps["items"] = valueHeader?.menus.menu && getEntries(valueHeader?.menus?.menu).map(item => ({
+    const items: MenuItem[] = valueHeader?.menus.menu && getEntries(valueHeader?.menus?.menu).map(item => ({
         key: item[0],
-        label: (<Button type="link" href={item[1]?.value}>{item[1]?.name}</Button>),
+        label: (
+            <a href={item[1]?.value} target="_blank" rel="noopener noreferrer">
+                {item[1]?.name}
+            </a>),
         name: item[1]?.name,
         value: item[1]?.value,
     }));
 
-    const MenuContainer = ({ collapse }) => {
-        // console.log(size);
-        
-        // if (size.widthChildContainer >= size.widthContainer) {
-        //     return (
-        //         <Dropdown menu={{ items }}>
-        //             <a onClick={(e) => e.preventDefault()}>
-        //                 <Space>
-        //                     <Menu />
-        //                 </Space>
-        //             </a>
-        //         </Dropdown>
-        //     )
-        // } else {
-            return (<>
-                {items?.map((item) => {
-                    return (
-                        <div key={item.key} className="menu-link">
-                            {item.label}
-                            {editHeader && <DividerMenu />}
-                        </div>
-                    )
-                })}
-            </>)
-        // }
+    if (authenticated) {
+        items.push({
+            key: "resources",
+            label: (<a href={url} target="_blank" rel="noopener noreferrer">
+                {gettext("Resources")}
+            </a>),
+        })
+    }
+
+    items.push({
+        key: "auth",
+        label: <span className="auth-login">{userDisplayName}</span>,
+        children:
+            authenticated ? [
+                invitationSession && {
+                    label: (<div className="warning">
+                        {gettext("Invitation session")}
+                    </div>),
+                    key: gettext("Invitation session")
+                },
+                {
+                    label: (<a href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
+                    key: gettext("Settings")
+                },
+                {
+                    label: (<a href="#" onClick={() => authStore.logout()}>{gettext("Sign out")}</a>),
+                    key: gettext("Sign out")
+                }
+            ] :
+                authStore.showLoginModal ?
+                    [
+                        {
+                            label: (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText}</a>),
+                            key: "signInText"
+                        }
+                    ] :
+                    [
+                        {
+                            label: (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
+                            key: signInText
+                        }
+                    ],
+    })
+
+    const MenuContainer = () => {
+        return (
+            <Menu
+                selectable={false}
+                mode="horizontal"
+                items={items}
+                theme="light"
+                overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
+                style={{ minWidth: 0, flex: "auto" }}
+            />)
     }
 
     return (
@@ -150,72 +160,74 @@ export const Header = observer(({ store, config }) => {
                     />
                 )}
             </div>
-            <div className="menus" ref={refMenus}>
-                <div className="menu-component" ref={refMenu}>
+            <div className="menus">
+                <div className="menu-component">
                     <div className={editHeader ? "button-link" : "button-link edit-panel"}>
                         {!editHeader ? items.map((item) => {
-                            return (
-                                <div key={item.key} className="menu-link">
-                                    <div className="item-edit">
-                                        <Input
-                                            placeholder={gettext("Name url")}
-                                            type="text"
-                                            value={item?.name}
-                                            allowClear
-                                            disabled={editHeader}
-                                            onChange={(e) => {
-                                                setValueHeader((prev) => ({
-                                                    ...prev,
-                                                    menus: {
-                                                        ...prev.menus,
-                                                        menu: {
-                                                            ...prev.menus.menu,
-                                                            [item.key]: {
-                                                                ...prev.menus.menu[item.key],
-                                                                name: e.target.value,
+                            if (!["auth", "resources"].includes(item.key)) {
+                                return (
+                                    <div key={item.key} className="menu-link">
+                                        <div className="item-edit">
+                                            <Input
+                                                placeholder={gettext("Name url")}
+                                                type="text"
+                                                value={item?.name}
+                                                allowClear
+                                                disabled={editHeader}
+                                                onChange={(e) => {
+                                                    setValueHeader((prev) => ({
+                                                        ...prev,
+                                                        menus: {
+                                                            ...prev.menus,
+                                                            menu: {
+                                                                ...prev.menus.menu,
+                                                                [item.key]: {
+                                                                    ...prev.menus.menu[item.key],
+                                                                    name: e.target.value,
+                                                                },
                                                             },
                                                         },
-                                                    },
-                                                }));
-                                            }}
-                                        />
-                                        <Input
-                                            placeholder={gettext("Url")}
-                                            type="text"
-                                            value={item?.value}
-                                            allowClear
-                                            disabled={editHeader}
-                                            onChange={(e) => {
-                                                setValueHeader((prev) => ({
-                                                    ...prev,
-                                                    menus: {
-                                                        ...prev.menus,
-                                                        menu: {
-                                                            ...prev.menus.menu,
-                                                            [item.key]: {
-                                                                ...prev.menus.menu[item.key],
-                                                                value: e.target.value,
+                                                    }));
+                                                }}
+                                            />
+                                            <Input
+                                                placeholder={gettext("Url")}
+                                                type="text"
+                                                value={item?.value}
+                                                allowClear
+                                                disabled={editHeader}
+                                                onChange={(e) => {
+                                                    setValueHeader((prev) => ({
+                                                        ...prev,
+                                                        menus: {
+                                                            ...prev.menus,
+                                                            menu: {
+                                                                ...prev.menus.menu,
+                                                                [item.key]: {
+                                                                    ...prev.menus.menu[item.key],
+                                                                    value: e.target.value,
+                                                                },
                                                             },
                                                         },
-                                                    },
-                                                }));
-                                            }}
-                                        />
-                                        <Button
-                                            title={gettext("Delete urls")}
-                                            onClick={() => {
-                                                const state = { ...valueHeader };
-                                                delete state.menus.menu[item.key];
-                                                setValueHeader(state);
-                                            }}
-                                            className="icon-edit"
-                                            icon={<DeleteOffOutline />}
-                                        />
+                                                    }));
+                                                }}
+                                            />
+                                            <Button
+                                                title={gettext("Delete urls")}
+                                                onClick={() => {
+                                                    const state = { ...valueHeader };
+                                                    delete state.menus.menu[item.key];
+                                                    setValueHeader(state);
+                                                }}
+                                                className="icon-edit"
+                                                icon={<DeleteOffOutline />}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            )
+                                )
+                            }
                         }) :
-                            (<MenuContainer collapse={collapse} />)}
+                            (<MenuContainer />)}
                         {!editHeader &&
                             <div className="edit-title">
                                 <div className="title-item">
@@ -256,43 +268,6 @@ export const Header = observer(({ store, config }) => {
                                 </div>
                             </div>
                         }
-                    </div>
-                    {authenticated ?
-                        <>
-                            <Button type="link" href={url}>{gettext("Resources")}</Button>
-                            {editHeader && <DividerMenu />}
-                        </>
-                        : null}
-                    <div
-                        className={
-                            "menu-avatar" +
-                            (authenticated ? " menu-avatar-authenticated" : "") +
-                            (invitationSession ? " menu-avatar-danger" : "")
-                        }
-                    >
-                        {authenticated ? (
-                            <Popover
-                                placement="bottom"
-                                trigger={["hover", "click"]}
-                                title={userDisplayName}
-                                content={content}
-                                overlayClassName="menu-avatar-popover"
-                                arrow={{ pointAtCenter: true }}
-                            >
-                                <div className="menu-avatar-label">
-                                    {userDisplayName
-                                        // .replace(/(.)[^\s]+(?: (.).*)?/, "$1$2")
-                                        // .toLowerCase()
-                                    }
-                                </div>
-                            </Popover>
-                        ) : authStore.showLoginModal ? (
-                            <Button onClick={showLoginModal}
-                                icon={<LoginVariant />}
-                                type="link">{signInText}</Button>
-                        ) : (
-                            <a href={ngwConfig.logoutUrl}>{signInText}</a>
-                        )}
                     </div>
                 </div>
             </div>

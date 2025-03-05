@@ -1,35 +1,6 @@
 import { route } from "@nextgisweb/pyramid/api";
-import { useEffect, useState, useRef } from "react";
-import { debounce } from "lodash-es";
 
-export const useSource = (refMenu, refMenus) => {
-    const [collapse, setCollapse] = useState(refMenus?.current?.offsetWidth >= refMenu?.current?.offsetWidth ? false : true);
-
-    const [size, setSize] = useState({
-        widthContainer: 0,
-        widthChildContainer: 0,
-    })
-
-    useEffect(() => {
-
-        const observer = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                console.log(entry);
-
-                // setSize({ widthContainer: entry.contentRect.width, widthChildContainer: entry.contentRect.width })
-            }
-        });
-        if (refMenu?.current) {
-            observer.observe(refMenu.current);
-        }
-        if (refMenus?.current) {
-            observer.observe(refMenus.current);
-        }
-        // Cleanup function
-        return () => {
-            observer.disconnect();
-        };
-    }, [])
+export const useSource = () => {
 
     const getListMap = async () => {
         const maplist = await route("resource.maplist").get(); // список карт
@@ -48,5 +19,5 @@ export const useSource = (refMenu, refMenus) => {
         return value;
     }
 
-    return { getListMap, getGroupMap, getPermission, collapse, size };
+    return { getListMap, getGroupMap, getPermission };
 };
