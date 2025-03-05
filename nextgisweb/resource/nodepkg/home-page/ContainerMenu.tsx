@@ -1,5 +1,4 @@
-import { useMemo, useEffect, useRef, useState } from "react";
-import { observer } from "mobx-react-lite";
+import { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";

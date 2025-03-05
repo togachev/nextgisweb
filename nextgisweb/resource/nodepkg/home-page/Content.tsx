@@ -54,7 +54,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     const refMainContent = useRef(null);
 
     const [store] = useState(() => new HomeStore({
-        widthMenu: "100%",
+        widthMenu: window.innerWidth < 775 ? "100%" : 300,
         valueHeader: {
             names: {
                 first_name: "",
@@ -127,7 +127,6 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             store.setWidthMenu(300);
         }
     });
-    console.log(store.widthMenu);
 
     useEffect(() => {
         route("pyramid.csettings")
