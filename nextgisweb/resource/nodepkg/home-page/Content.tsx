@@ -51,10 +51,8 @@ const resourcesToOptions = (resourcesInfo) => {
 const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
-    const refMainContent = useRef(null);
-
     const [store] = useState(() => new HomeStore({
-        widthMenu: window.innerWidth < 775 ? "100%" : 300,
+        widthMenu: window.innerWidth < 785 ? "100%" : 300,
         valueHeader: {
             names: {
                 first_name: "",
@@ -121,12 +119,15 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
 
 
     useOnWindowResize(() => {
-        if (refMainContent.current.clientWidth < 612) {
+        if (window.innerWidth < 785) {
             store.setWidthMenu("100%");
+            console.log(window.innerWidth);
+            
         } else {
             store.setWidthMenu(300);
         }
     });
+    console.log(store.widthMenu);
 
     useEffect(() => {
         route("pyramid.csettings")
@@ -234,7 +235,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             >
                 <Header store={store} config={config} />
                 <div className="main">
-                    <div className="content" ref={refMainContent}>
+                    <div className="content">
                         <div className="search-block">
                             <AutoComplete
                                 popupClassName="home-page-map-filter-dropdown"
@@ -256,7 +257,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                         </div>
                         <div className="menu-maps">
                             <div className="menu-list">
-                                {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} refMainContent={refMainContent} />}
+                                {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} />}
                             </div>
                             <div className="content-maps-grid">
                                 {store.itemsMapsGroup.length > 0 && <ContainerMaps config={config} size={size} store={store} />}
