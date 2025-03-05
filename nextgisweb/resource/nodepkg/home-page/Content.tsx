@@ -121,13 +121,10 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     useOnWindowResize(() => {
         if (window.innerWidth < 785) {
             store.setWidthMenu("100%");
-            console.log(window.innerWidth);
-            
         } else {
             store.setWidthMenu(300);
         }
     });
-    console.log(store.widthMenu);
 
     useEffect(() => {
         route("pyramid.csettings")
