@@ -125,6 +125,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             store.setWidthMenu(300);
         }
     });
+    console.log(store.widthMenu);
 
     useEffect(() => {
         route("pyramid.csettings")
