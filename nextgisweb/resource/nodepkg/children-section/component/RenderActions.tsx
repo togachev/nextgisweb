@@ -49,7 +49,7 @@ export function RenderActions({
         const icon = key[0] == "webmap" ? "material-info" : icon_;
         const href = key[0] == "webmap" ? "/resource/" + id : href_;
         const title = key[0] == "webmap" ? gettext("Description") : title_;
-        const target = key[0] == "webmap" ? target_ : target_;
+        const target = key[0] == "webmap" ? "_self" : target_;
 
         const createActionBtn = (props_: SvgIconLinkProps) => (
             <Tooltip key={title} title={title}>
