@@ -119,9 +119,9 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     useMemo(() => {
         const handleResize = () => {
             if (window.innerWidth < 785) {
-                store.setWidthMenu("100%");
+                store.setWidthMenu(window.innerWidth - window.innerWidth / 100 * 20 - 328);
             } else {
-                store.setWidthMenu(300);
+                console.log(window.innerWidth - window.innerWidth / 100 * 20);
             }
         };
 
@@ -131,7 +131,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             window.removeEventListener("resize", handleResize);
         };
     }, [store.widthMenu]);
-    
+
     useMemo(() => {
         route("pyramid.csettings")
             .get({
