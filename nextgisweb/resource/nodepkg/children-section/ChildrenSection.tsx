@@ -52,15 +52,15 @@ export function ChildrenSection({
     const rowSelection = useMemo<TableProps["rowSelection"] | undefined>(() => {
         return allowBatch
             ? {
-                  type: "checkbox",
-                  getCheckboxProps: () => ({
-                      disabled: batchDeletingInProgress,
-                  }),
-                  selectedRowKeys: selected,
-                  onChange: (selectedRowKeys) => {
-                      setSelected(selectedRowKeys.map(Number));
-                  },
-              }
+                type: "checkbox",
+                getCheckboxProps: () => ({
+                    disabled: batchDeletingInProgress,
+                }),
+                selectedRowKeys: selected,
+                onChange: (selectedRowKeys) => {
+                    setSelected(selectedRowKeys.map(Number));
+                },
+            }
             : undefined;
     }, [allowBatch, selected, batchDeletingInProgress]);
 
@@ -78,13 +78,24 @@ export function ChildrenSection({
                     dataIndex="displayName"
                     sorter={sorterFactory("displayName")}
                     render={(value, record: Resource) => (
-                        <SvgIconLink
-                            href={record.link}
-                            icon={`rescls-${record.cls}`}
-                        >
-                            <span className="name-style">{value}</span>
-                        </SvgIconLink>
-                    )}
+                            <SvgIconLink
+                                href={
+                                    record.cls === "webmap" ?
+                                        record.link + "/display" :
+                                        record.link
+                                }
+                                target={
+                                    record.cls === "webmap" ?
+                                        "_blank" :
+                                        "_self"
+                                }
+                                title={record.displayName}
+                                icon={`rescls-${record.cls}`}
+                            >
+                                <span className="name-style">{value}</span>
+                            </SvgIconLink>
+                        )
+                    }
                 />
                 <Column
                     title={gettext("Type")}
