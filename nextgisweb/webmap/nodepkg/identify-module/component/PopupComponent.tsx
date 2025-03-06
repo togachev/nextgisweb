@@ -1,4 +1,4 @@
-import { forwardRef, RefObject, useMemo, useState, useEffect } from "react";
+import { forwardRef, RefObject, useCallback, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
@@ -13,7 +13,7 @@ import { IdentifyStore } from "../IdentifyStore";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import showModal from "@nextgisweb/gui/showModal";
-
+import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
@@ -104,32 +104,28 @@ export default observer(
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
 
-            const LinkToGeometry = (value: DataProps) => {
-                const styles: number[] = [];
-                display.getVisibleItems()
-                    .then((items) => {
-                        items.map(i => {
-                            styles.push(i.styleId[0]);
-                        });
-                    })
-                setLinkToGeometry(value.layerId + ":" + value.id + ":" + styles);
-            }
-
+            const LinkToGeometry = useCallback((value: DataProps) => {
+                setLinkToGeometry(value.layerId + ":" + value.id + ":" + value.styleId);
+            }, [selected]);
+            
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val, key);
                 setExtensions(res.feature.extensions);
-                
+
                 res?.dataSource?.then(i => {
                     setAttribute(i);
-                })
+                });
+    
+                const highlights = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
+                
+                highlights === true ?
+                    topic.publish("feature.highlight", {
+                        geom: res.feature.geom,
+                        featureId: res.feature.id,
+                        layerId: res.resourceId,
+                    }) :
+                    topic.publish("feature.unhighlight")
 
-                topic.publish("feature.highlight", {
-                    geom: res.feature.geom,
-                    featureId: res.feature.id,
-                    layerId: res.resourceId,
-                })
-
-                LinkToGeometry(res)
                 setContextUrl(generateUrl({ res: val, st: response.data, pn: fixPanel }));
 
                 if (key === true) {
@@ -190,7 +186,8 @@ export default observer(
 
             const linkToGeometryFeature = useMemo(() => {
                 if (count > 0 && selected) {
-                    const item = Object.values(display.webmapStore._layers).find((itm) => itm.itemConfig.styleId === selected.styleId);
+                    const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === selected.styleId)?.[1];
+
                     if (count > 0 && selected) {
                         if (!imodule._isEditEnabled(display, item)) { return false; }
                         return (
@@ -201,7 +198,8 @@ export default observer(
                                     const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
                                     copyValue(linkToGeometryString, gettext("HTML code copied"));
                                 }}
-                            ><Identifier />
+                            >
+                                <Identifier />
                             </span>
                         )
                     }
@@ -211,8 +209,8 @@ export default observer(
             const editFeature = useMemo(() => {
                 if (count > 0 && selected) {
                     const { id, layerId, styleId } = selected;
-                    const item = Object.values(display.webmapStore._layers).find((itm) => itm.itemConfig.styleId === styleId);
-                    
+                    const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
+
                     if (display.isTinyMode() && !display.isTinyModePlugin("@nextgisweb/webmap/plugin/feature-layer")) {
                         return false;
                     } else if (!imodule._isEditEnabled(display, item)) {

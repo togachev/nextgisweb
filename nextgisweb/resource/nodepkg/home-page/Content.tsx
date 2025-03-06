@@ -121,7 +121,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             if (window.innerWidth < 785) {
                 store.setWidthMenu(window.innerWidth - window.innerWidth / 100 * 20 - 328);
             } else {
-                console.log(window.innerWidth - window.innerWidth / 100 * 20);
+                store.setWidthMenu(300);
             }
         };
 
