@@ -12,7 +12,6 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { HomeStore } from "./HomeStore";
 import "./Content.less";
 import { useSource } from "./hook/useSource";
-import { useOnWindowResize } from "./hook/useOnWindowResize";
 
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
@@ -117,17 +116,23 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         }
     );
 
+    useMemo(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 785) {
+                store.setWidthMenu("100%");
+            } else {
+                store.setWidthMenu(300);
+            }
+        };
 
-    useOnWindowResize(() => {
-        if (window.innerWidth < 785) {
-            store.setWidthMenu("100%");
-        } else {
-            store.setWidthMenu(300);
-        }
-    });
-    console.log(store.widthMenu);
+        window.addEventListener("resize", handleResize);
 
-    useEffect(() => {
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, [store.widthMenu]);
+    
+    useMemo(() => {
         route("pyramid.csettings")
             .get({
                 query: { pyramid: ["home_page_footer"] },

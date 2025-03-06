@@ -13,6 +13,7 @@ import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
 import Login from "@nextgisweb/icon/mdi/login";
 import Logout from "@nextgisweb/icon/mdi/logout";
+import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
@@ -66,12 +67,17 @@ export const Header = observer(({ store, config }) => {
     items.push({
         key: "auth",
         label: authenticated ?
-            (<span className="auth-login">{userDisplayName}</span>) :
+            (<span className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
                 (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
                 (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
         children:
             authenticated && [
+                {
+                    key: "user-name",
+                    label: userDisplayName,
+                    type: "group",
+                },
                 {
                     key: "resources",
                     label: (<a href={url} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
