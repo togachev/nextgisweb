@@ -6,6 +6,7 @@ import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceFavoriteAvatar } from "@nextgisweb/resource/favorite/Avatar";
+import Account from "@nextgisweb/icon/mdi/account";
 
 import "./Avatar.less";
 
@@ -53,11 +54,9 @@ export const Avatar = observer(() => {
                     overlayClassName="ngw-pyramid-avatar-popover"
                     arrow={{ pointAtCenter: true }}
                 >
-                    <div className="ngw-pyramid-avatar-label">
-                        {userDisplayName
-                            .replace(/(.)[^\s]+(?: (.).*)?/, "$1$2")
-                            .toUpperCase()}
-                    </div>
+                    <span className="ngw-pyramid-menu-icon">
+                        <Account />
+                    </span>
                 </Popover>
             ) : authStore.showLoginModal ? (
                 <a onClick={showLoginModal}>{msgSignIn}</a>

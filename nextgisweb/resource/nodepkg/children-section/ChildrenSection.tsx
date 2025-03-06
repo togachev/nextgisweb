@@ -82,7 +82,7 @@ export function ChildrenSection({
                             href={record.link}
                             icon={`rescls-${record.cls}`}
                         >
-                            {value}
+                            <span className="name-style">{value}</span>
                         </SvgIconLink>
                     )}
                 />

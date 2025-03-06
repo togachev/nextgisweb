@@ -81,11 +81,11 @@ export const Header = observer(({ store, config }) => {
                 {
                     key: "resources",
                     label: (<a href={url} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
-                    icon: <span className="menu-icon"><FolderOutline /></span>,
+                    extra: <span className="menu-icon"><FolderOutline /></span>,
                 },
                 config.isAdministrator === true && {
                     key: "control-panel",
-                    icon: <span className="menu-icon"><Cog /></span>,
+                    extra: <span className="menu-icon"><Cog /></span>,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
@@ -94,15 +94,15 @@ export const Header = observer(({ store, config }) => {
                 },
                 {
                     label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    icon: <span className="menu-icon"><AccountCogOutline /></span>,
+                    extra: <span className="menu-icon"><AccountCogOutline /></span>,
                     key: gettext("Settings"),
                 },
                 {
                     label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
-                    icon: <span className="menu-icon"><Logout /></span>,
+                    extra: <span className="menu-icon"><Logout /></span>,
                     key: gettext("Sign out"),
                 },
-            ]
+            ],
     })
 
     const MenuContainer = () => {
@@ -113,6 +113,7 @@ export const Header = observer(({ store, config }) => {
                 items={items}
                 theme="light"
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
+                triggerSubMenuAction="click"
             />)
     }
 

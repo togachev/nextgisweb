@@ -8,7 +8,7 @@
             width: 100%;
             text-align: left !important;
 
-            & > a {
+            &>a {
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -20,10 +20,17 @@
                     color: var(--primary);
                 }
 
-                & > svg.icon {
+                &>svg.icon {
                     flex-shrink: 0;
                     width: 24px;
                     height: 24px;
+                }
+
+                .name-style {
+                    overflow: hidden;
+                    -webkit-line-clamp: 3;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
                 }
             }
         }
