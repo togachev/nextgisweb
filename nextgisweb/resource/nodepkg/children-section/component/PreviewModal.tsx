@@ -30,6 +30,8 @@ export function PreviewModal({
     return (
         <Modal
             className="map-preview-modal"
+                                transitionName=""
+                    maskTransitionName=""
             open={open}
             {...props}
             onCancel={close}
