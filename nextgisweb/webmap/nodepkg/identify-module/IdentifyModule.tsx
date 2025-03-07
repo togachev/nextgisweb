@@ -174,8 +174,6 @@ export class IdentifyModule extends Component {
                     body: JSON.stringify(this.params.request),
                 })
                 .then(item => {
-                    console.log(item);
-                    
                     return { data: item.data, featureCount: item.featureCount };
                 });
             count = this.response.featureCount;

@@ -1,5 +1,4 @@
 import parse, { attributesToProps, Element, domToReact } from "html-react-parser";
-import { PanelHeader } from "@nextgisweb/webmap/panel/header";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Divider } from "@nextgisweb/gui/antd";
 
@@ -10,7 +9,6 @@ import { ImageView } from "@nextgisweb/gui/image-view";
 
 import "./DescComponent.less";
 
-const title = gettext("Description");
 const msgLayer = gettext("Layer description");
 const msgStyle = gettext("Style description");
 
@@ -51,7 +49,7 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 }
 
 export const DescComponent = (props) => {
-    const { display, content, type, close } = props;
+    const { display, content, type } = props;
 
     const DescComp = ({ content }) => {
         return (
@@ -121,7 +119,6 @@ export const DescComponent = (props) => {
 
     return (
         <div className="desc-component">
-            {type === "map" && (<PanelHeader {...{ title, close }} />)}
             <div className="ck-content">{data_}</div>
         </div>
     )

@@ -69,9 +69,12 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
 
         return (
             <PanelContainer
-                className="ngw-webmap-panel-description"
-                close={() => {}}
-                components={{ title: () => undefined }}
+                title={store.title}
+                close={store.close}
+                components={{
+                    content: PanelContainer.Unpadded,
+                    epilog: PanelContainer.Unpadded,
+                }}
             >
                 {contentDiv}
             </PanelContainer>
