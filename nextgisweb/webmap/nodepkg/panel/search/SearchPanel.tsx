@@ -546,13 +546,14 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                     }
                 },
             }}
-        >        <SearchPanelContext.Provider
-            value={{
-                searchText,
-                searchChange,
-                clearSearchText,
-            }}
         >
+            <SearchPanelContext.Provider
+                value={{
+                    searchText,
+                    searchChange,
+                    clearSearchText,
+                }}
+            >
                 <PanelContainer
                     className="ngw-webmap-panel-search"
                     close={store.close}
@@ -563,7 +564,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                         content: PanelContainer.Unpadded,
                     }}
                 >
-                    <div className="results">
+                    <div className="result">
                         {
                             results ? results :
                                 <Alert
