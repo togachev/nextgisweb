@@ -89,9 +89,12 @@ export default function CreateResourceModal({
         "color-primary": "colorPrimary",
         "color-primary-bg": "colorPrimaryBg",
     });
-
+    console.log(1);
+    
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             classNames={{ content: "ngw-resource-create-resource-modal" }}
             style={{ ...themeVariables, ...(style ? style : {}) }}
             title={
