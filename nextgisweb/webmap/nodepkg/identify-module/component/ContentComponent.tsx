@@ -14,11 +14,38 @@ import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table
 import { observer } from "mobx-react-lite";
 import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
+import Identifier from "@nextgisweb/icon/mdi/identifier";
+import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 
 const { Link } = Typography;
 const settings = webmapSettings;
 
-export const ContentComponent: FC = observer(({ store: storeProp, display, linkToGeometry }) => {
+const LinkToGeometryFeature = ({ store, display }) => {
+    const { selected, linkToGeometry } = store;
+    const imodule = display.identify_module;
+    const { copyValue, contextHolder } = useCopy();
+
+    if (selected) {
+        const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === selected.styleId)?.[1];
+
+        if (!imodule._isEditEnabled(display, item)) { return false; }
+        return (
+            <span
+                title={gettext("HTML code of the geometry link, for insertion into the description")}
+                className="link-button"
+                onClick={() => {
+                    const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
+                    copyValue(linkToGeometryString, gettext("HTML code copied"));
+                }}
+            >
+                {contextHolder}
+                <Identifier />
+            </span>
+        )
+    }
+};
+
+export const ContentComponent: FC = observer(({ store: storeProp, display }) => {
     const [store] = useState(() => storeProp);
     const { attribute, data, extensions, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, setCurrentUrlParams, valueRnd } = store;
     const { id, layerId } = selected;
@@ -212,7 +239,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display, linkT
                             </Dropdown>
                         </div>)
                 }
-                {linkToGeometry}
+                <LinkToGeometryFeature store={store} display={display} />
             </div>
             <div className="content-item">{fixContentItem?.children}</div>
         </ConfigProvider>

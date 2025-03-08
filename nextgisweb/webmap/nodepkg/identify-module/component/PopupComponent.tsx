@@ -1,10 +1,9 @@
-import { forwardRef, RefObject, useCallback, useMemo, useState, useEffect } from "react";
+import { forwardRef, RefObject, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
-import Identifier from "@nextgisweb/icon/mdi/identifier";
 import Pin from "@nextgisweb/icon/mdi/pin";
 import PinOff from "@nextgisweb/icon/mdi/pin-off";
 import { Rnd } from "react-rnd";
@@ -18,7 +17,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
-import { useCopy } from "@nextgisweb/webmap/useCopy";
 
 import type { DataProps, Params } from "./type";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -51,7 +49,6 @@ export default observer(
             const { params, visible, display } = props;
             const { op, position, response, selectedValue } = params;
             const { getAttribute, generateUrl } = useSource(display);
-            const { copyValue, contextHolder } = useCopy();
             const imodule = display.identify_module;
 
             const count = response.featureCount;
@@ -76,7 +73,6 @@ export default observer(
                 fixPopup,
                 fixPos,
                 fullscreen,
-                linkToGeometry,
                 selected,
                 setAttribute,
                 setContextUrl,
@@ -147,8 +143,6 @@ export default observer(
                     setData(response.data);
                     getContent(selectVal, false);
                     LinkToGeometry(selectVal)
-                    console.log(selectVal);
-                    
                 } else {
                     setContextUrl(generateUrl({ res: null, st: null, pn: null }));
                     setSelected(null);
@@ -190,30 +184,6 @@ export default observer(
                     (option?.desc ?? "").toLowerCase().includes(input.toLowerCase()))
                     return true
             }
-
-            const linkToGeometryFeature = useMemo(() => {
-                if (count > 0 && selected) {
-                    const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === selected.styleId)?.[1];
-
-                    if (count > 0 && selected) {
-                        if (!imodule._isEditEnabled(display, item)) { return false; }
-                        return (
-                            <span
-                                title={gettext("HTML code of the geometry link, for insertion into the description")}
-                                className="link-button"
-                                onClick={() => {
-                                    console.log(count, selected, linkToGeometry);
-
-                                    const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
-                                    copyValue(linkToGeometryString, gettext("HTML code copied"));
-                                }}
-                            >
-                                <Identifier />
-                            </span>
-                        )
-                    }
-                }
-            }, [count, selected])
 
             const editFeature = useMemo(() => {
                 if (count > 0 && selected) {
@@ -302,7 +272,7 @@ export default observer(
                             }
                         }}
                     >
-                        {contextHolder}
+                        
                         <Rnd
                             style={{ zIndex: 10 }}
                             resizeHandleClasses={{
@@ -427,7 +397,9 @@ export default observer(
                                 )}
                                 {selected && selected.permission !== "Forbidden" && (
                                     <div className="content">
-                                        <ContentComponent linkToGeometry={linkToGeometryFeature} store={store} display={display} />
+                                        <ContentComponent 
+                                        // linkToGeometryFeature={linkToGeometryFeature} 
+                                        store={store} display={display} />
                                     </div>
                                 )}
                                 {op === "popup" && (<div className="footer-popup">

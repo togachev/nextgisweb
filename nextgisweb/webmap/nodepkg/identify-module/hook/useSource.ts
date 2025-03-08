@@ -4,40 +4,10 @@ import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel
 import type { StoreItem } from "@nextgisweb/webmap/type";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps } from "./type";
-import dayjs from "dayjs";
-import type {
-    NgwDate,
-    NgwDateTime,
-    NgwTime,
-} from "@nextgisweb/feature-layer/type";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
 export const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
-
-export const valDT = (val, field) => {
-    const msgNA = gettext("N/A");
-    if (val) {
-        if (field?.datatype === "DATE") {
-            const { year, month, day } = val as NgwDate;
-            const dt = new Date(year, month - 1, day);
-            val = dayjs(dt).format("YYYY-MM-DD");
-        } else if (val && field?.datatype === "TIME") {
-            const { hour, minute, second } = val as NgwTime;
-            const dt = new Date(0, 0, 0, hour, minute, second);
-            val = dayjs(dt).format("HH:mm:ss");
-        } else if (val && field?.datatype === "DATETIME") {
-            const { year, month, day, hour, minute, second } = val as NgwDateTime;
-            const dt = new Date(year, month - 1, day, hour, minute, second);
-            val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
-        }
-        return val;
-    }
-    else if (val === null || val === "" || val === undefined) {
-        return msgNA;
-    }
-}
 
 export const useSource = (display: Display) => {
     const generateUrl = ({ res, st, pn }) => {

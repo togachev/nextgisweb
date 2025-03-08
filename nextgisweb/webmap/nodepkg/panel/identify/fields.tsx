@@ -9,7 +9,7 @@ import type {
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+// import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { load, lookup } from "./lookup";
 
@@ -113,9 +113,10 @@ export async function fieldValuesToDataSource(
                 }
                 dataItem.value = val as string;
             }
-        } else {
-            dataItem.value = gettext("N/A");
         }
+        // else {
+        //     dataItem.value = gettext("N/A");
+        // }
 
         dataSource.push(dataItem);
     }
