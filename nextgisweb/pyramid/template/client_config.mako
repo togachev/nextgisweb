@@ -66,23 +66,8 @@
 
     if request.env.ngupdate_url:
         ngwConfig['ngupdateUrl'] = request.env.ngupdate_url
-
-    dojoConfig = {
-        "async": True,
-        "isDebug": True,
-        "packages": [
-            {"name": "@nextgisweb", "location": request.static_url('main/@nextgisweb')}
-        ],
-        "baseUrl": request.static_url('dojo'),
-        "locale": request.locale_name,
-        "aliases": [
-            ['mocha', 'mocha/mocha'],
-            ['openlayers/ol', 'external-ol/ol'],
-        ],
-    }
 %>
 
 <script type="text/javascript">
     var ngwConfig = ${json_js(ngwConfig)};
-    var dojoConfig = ${json_js(dojoConfig)};
 </script>

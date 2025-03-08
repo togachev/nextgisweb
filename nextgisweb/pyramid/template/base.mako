@@ -4,6 +4,7 @@
     from types import SimpleNamespace
     from msgspec import NODEFAULT
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
+    from nextgisweb.pyramid.view import ICON_JSENTRY
 %>
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
@@ -44,9 +45,7 @@
     <link href="${custom_css_url}" rel="stylesheet" type="text/css"/>
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
-
-    <script src="${request.static_url('dojo/dojo.js')}"></script>
-    <script src="${request.static_url('main/chunk/runtime.js')}"></script>
+    <script src="${request.static_url('main/ngwEntry.js')}"></script>
     
     %if hasattr(self, 'assets'):
         ${self.assets()}
@@ -61,10 +60,7 @@
     %endfor
 
     <script type="text/javascript">
-        require([
-            "@nextgisweb/jsrealm/locale-loader!",
-            "@nextgisweb/pyramid/icon",
-        ]);
+        ngwEntry(${json_js(ICON_JSENTRY)});
     </script>
 
     <%include file="nextgisweb:pyramid/template/metrics.mako"/>
@@ -77,7 +73,7 @@
     ${include_head | n}
 </head>
 
-<body class="claro nextgis <%block name='body_class'/>">
+<body class="<%block name='body_class'/>">
     %if not custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]

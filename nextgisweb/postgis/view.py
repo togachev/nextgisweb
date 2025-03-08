@@ -1,7 +1,8 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
 
 from .model import PostgisConnection, PostgisLayer
@@ -10,13 +11,13 @@ from .model import PostgisConnection, PostgisLayer
 class PostgisConnectionWidget(Widget):
     resource = PostgisConnection
     operation = ("create", "update")
-    amdmod = "@nextgisweb/postgis/connection-widget"
+    amdmod = jsentry("@nextgisweb/postgis/connection-widget")
 
 
 class PostgisLayerWidget(Widget):
     resource = PostgisLayer
     operation = ("create", "update")
-    amdmod = "@nextgisweb/postgis/layer-widget"
+    amdmod = jsentry("@nextgisweb/postgis/layer-widget")
 
 
 def setup_pyramid(comp, config):
@@ -28,6 +29,8 @@ def setup_pyramid(comp, config):
         diagnostics_page, context=PostgisLayer
     )
 
+    icon_diagnostics = icon("material/flaky")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if (
@@ -38,12 +41,14 @@ def setup_pyramid(comp, config):
                 "extra/postgis-diagnostics",
                 gettext("Diagnostics"),
                 lambda args: args.request.route_url("postgis.diagnostics_page", id=args.obj.id),
-                icon="material-flaky",
+                icon=icon_diagnostics,
             )
 
 
-@viewargs(renderer="react")
-def diagnostics_page(context, request):
+@react_renderer("@nextgisweb/postgis/diagnostics-widget")
+def diagnostics_page(request):
+    context = request.context
+
     if isinstance(context, PostgisConnection):
         request.resource_permission(ConnectionScope.connect)
         data = dict(connection=dict(id=context.id))
@@ -54,7 +59,6 @@ def diagnostics_page(context, request):
         raise ValueError
 
     return dict(
-        entrypoint="@nextgisweb/postgis/diagnostics-widget",
         props=dict(data=data),
         title=gettext("PostGIS diagnostics"),
         obj=request.context,

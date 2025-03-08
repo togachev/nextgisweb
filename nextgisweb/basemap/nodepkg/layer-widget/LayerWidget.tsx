@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
+import settings from "@nextgisweb/basemap/client-settings";
 import { InputValue, Slider } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!basemap";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -23,9 +23,7 @@ const msgPickQmsHelpMainPart = gettext("Search for geoservices provided by ");
 const msgPickQmsHelpTodoPart = gettext("You can search by name or ID");
 
 // eslint-disable-next-line prettier/prettier
-const msgDisabled = gettext(
-    "If a service from QMS is selected, this field cannot be edited."
-);
+const msgDisabled = gettext("If a service from QMS is selected, this field cannot be edited.");
 
 export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
     observer(({ store }) => {

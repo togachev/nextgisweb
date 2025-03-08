@@ -2,7 +2,7 @@
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 
 panelRegistry(COMP_ID, {

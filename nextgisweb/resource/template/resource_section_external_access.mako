@@ -1,3 +1,8 @@
+<%!
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.resource.view import EXTERNAL_ACCESS_JSENTRY
+%>
+
 <%page args="section, links"/>
 <%
     section.title = gettext("External access")
@@ -16,14 +21,11 @@
 <div id="externalAccessSection"></div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/resource/external-access",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
-        reactApp.default(
-            comp.default, 
-            {links: ${json_js(links)}},
-            document.getElementById('externalAccessSection')
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
+        reactBoot(
+            ${json_js(EXTERNAL_ACCESS_JSENTRY)},
+            { links: ${json_js(links)} },
+            "externalAccessSection"
         );
     });
 </script>

@@ -4,11 +4,12 @@ from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.feature_layer import IFeatureLayer
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon
 from nextgisweb.resource import DataScope, Resource, resource_factory
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-attachment/attachment-form")
 def attachment(request):
     request.resource_permission(DataScope.read)
 
@@ -19,7 +20,6 @@ def attachment(request):
         obj=request.context,
         title=gettext("Manage attachments"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/feature-attachment/attachment-form",
         maxheight=True,
     )
 
@@ -30,6 +30,8 @@ def setup_pyramid(comp, config):
         r"/resource/{id:uint}/attachments",
         factory=resource_factory,
     ).add_view(attachment, context=IFeatureLayer)
+
+    icon_manage_attachments = icon("material/attach_file")
 
     # Layer menu extension
     @Resource.__dynmenu__.add
@@ -43,5 +45,5 @@ def setup_pyramid(comp, config):
                     "feature_layer/feature_attachment",
                     gettext("Manage attachments"),
                     lambda args: args.request.route_url("feature_attachment.page", id=args.obj.id),
-                    icon="material-attach_file",
+                    icon=icon_manage_attachments,
                 )

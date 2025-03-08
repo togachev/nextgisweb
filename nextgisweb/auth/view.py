@@ -13,6 +13,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import dynmenu as dm
 
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import SessionStore, WebSession, viewargs
 
 from . import permission
@@ -22,19 +24,22 @@ from .oauth import AuthorizationException, InvalidTokenException
 from .policy import AuthProvider, AuthState, OnUserLogin
 from .util import reset_slg_cookie, sync_ulg_cookie
 
+STORE_JSENTRY = jsentry("@nextgisweb/auth/store")
+
 
 @viewargs(renderer="mako")
 def login(request):
     next_url = request.params.get("next", request.application_url)
     return dict(
-        custom_layout=True,
-        next_url=next_url,
+        entrypoint=STORE_JSENTRY,
         props=dict(reloadAfterLogin=False),
         title=gettext("Sign in to Web GIS"),
+        custom_layout=True,
+        next_url=next_url,
     )
 
 
-@viewargs(renderer="mako")
+@react_renderer("@nextgisweb/auth/session-invite")
 def session_invite(request):
     next_url = request.params.get("next", request.application_url)
 
@@ -43,7 +48,12 @@ def session_invite(request):
             raise HTTPNotFound()
 
         return dict(
-            session_id=request.GET["sid"], expires=request.GET["expires"], next_url=next_url
+            title=gettext("Invitation session"),
+            props=dict(
+                sid=request.GET["sid"],
+                expires=request.GET["expires"],
+                next=next_url,
+            ),
         )
 
     elif request.method == "POST":
@@ -60,8 +70,7 @@ def session_invite(request):
         exp = datetime.fromtimestamp(state.exp)
         if expires != exp or state.ref != 0:
             raise InvalidCredentialsException(message=gettext("Invalid 'expires' parameter."))
-        now = datetime.utcnow()
-        if exp <= now:
+        if exp <= datetime.utcnow():
             raise InvalidCredentialsException(message=gettext("Session expired."))
 
         cookie_settings = WebSession.cookie_settings(request)
@@ -269,8 +278,9 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
             response = render_to_response(
                 "nextgisweb:auth/template/login.mako",
                 dict(
-                    custom_layout=True,
+                    entrypoint=STORE_JSENTRY,
                     props=dict(reloadAfterLogin=True),
+                    custom_layout=True,
                 ),
                 request=request,
             )
@@ -278,31 +288,27 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
             return response
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/auth/settings-form")
 def settings(request):
     if request.user.keyname == "guest":
         return HTTPUnauthorized()
 
-    return dict(title=gettext("User settings"), entrypoint="@nextgisweb/auth/settings-form")
+    return dict(title=gettext("User settings"))
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/auth/user-browse")
 def user_browse(request):
     request.user.require_permission(any, *permission.auth)
     return dict(
         title=gettext("Users"),
-        entrypoint="@nextgisweb/auth/user-browse",
         props=dict(readonly=not request.user.has_permission(permission.manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/auth/user-widget")
 def user_create_or_edit(request):
-    result = dict(
-        entrypoint="@nextgisweb/auth/user-widget",
-        dynmenu=request.env.pyramid.control_panel,
-    )
+    result = dict(dynmenu=request.env.pyramid.control_panel)
 
     if "id" not in request.matchdict:
         request.user.require_permission(permission.manage)
@@ -320,23 +326,19 @@ def user_create_or_edit(request):
     return result
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/auth/group-browse")
 def group_browse(request):
     request.user.require_permission(any, *permission.auth)
     return dict(
         title=gettext("Groups"),
-        entrypoint="@nextgisweb/auth/group-browse",
         props=dict(readonly=not request.user.has_permission(permission.manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/auth/group-widget")
 def group_create_or_edit(request):
-    result = dict(
-        entrypoint="@nextgisweb/auth/group-widget",
-        dynmenu=request.env.pyramid.control_panel,
-    )
+    result = dict(dynmenu=request.env.pyramid.control_panel)
 
     if "id" not in request.matchdict:
         request.user.require_permission(permission.manage)

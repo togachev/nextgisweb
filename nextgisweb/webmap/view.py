@@ -5,6 +5,8 @@ from pyramid.renderers import render_to_response
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import viewargs
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
@@ -18,13 +20,13 @@ from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
 class ItemWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
-    amdmod = "@nextgisweb/webmap/items-widget"
+    amdmod = jsentry("@nextgisweb/webmap/items-widget")
 
 
 class SettingsWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
-    amdmod = "@nextgisweb/webmap/settings-widget"
+    amdmod = jsentry("@nextgisweb/webmap/settings-widget")
 
 
 def check_origin(request):
@@ -61,8 +63,7 @@ def check_origin(request):
     return True
 
 
-@viewargs(renderer="mako")
-def display(obj, request):
+def display_view(obj, request, *, entrypoint):
     is_valid_or_error = check_origin(request)
     if is_valid_or_error is not True:
         return is_valid_or_error
@@ -70,19 +71,39 @@ def display(obj, request):
     request.resource_permission(ResourceScope.read)
 
     title = obj.display_name if obj.title is None else obj.title
-    return dict(obj=obj, id=obj.id, title=title, custom_layout=True)
+    return dict(
+        entrypoint=entrypoint,
+        obj=obj,
+        id=obj.id,
+        title=title,
+        custom_layout=True,
+    )
+
+
+DISPLAY_JSENTRY = jsentry("@nextgisweb/webmap/display/DisplayWidget")
+DISPLAY_TINY_JSENTRY = jsentry("@nextgisweb/webmap/display-tiny")
+
+
+@viewargs(renderer="mako")
+def display(obj, request):
+    return display_view(
+        *(obj, request),
+        entrypoint=DISPLAY_JSENTRY,
+    )
 
 
 @viewargs(renderer="mako")
 def display_tiny(obj, request):
-    return display(obj, request)
+    return display_view(
+        *(obj, request),
+        entrypoint=DISPLAY_TINY_JSENTRY,
+    )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/webmap/clone-webmap")
 def clone(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/webmap/clone-webmap",
         props=dict(id=request.context.id),
         obj=request.context,
         title=gettext("Clone web map"),
@@ -103,11 +124,10 @@ def preview_embedded(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/webmap/settings")
 def settings(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/webmap/settings",
         title=gettext("Web map settings"),
         dynmenu=request.env.pyramid.control_panel,
     )
@@ -185,6 +205,9 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).add_view(wmg_settings, context=WebMap)
 
+    icon_display = icon("display")
+    icon_clone = icon("material/content_copy")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if not isinstance(args.obj, WebMap):
@@ -199,7 +222,7 @@ def setup_pyramid(comp, config):
                 lambda args: args.request.route_url("webmap.display", id=args.obj.id),
                 important=True,
                 target="_blank",
-                icon="webmap-display",
+                icon=icon_display,
             )
 
         if args.obj.has_permission(ResourceScope.read, args.request.user):
@@ -209,7 +232,7 @@ def setup_pyramid(comp, config):
                 lambda args: args.request.route_url("webmap.clone", id=args.obj.id),
                 important=False,
                 target="_self",
-                icon="material-content_copy",
+                icon=icon_clone,
             )
         if args.obj.has_permission(ResourceScope.update, args.request.user):
             yield Link(

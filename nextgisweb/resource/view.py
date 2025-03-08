@@ -15,6 +15,8 @@ from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from nextgisweb.pyramid.psection import PageSections
@@ -26,6 +28,13 @@ from .interface import IResourceBase
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
+
+MAIN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/main-section")
+CHILDREN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/children-section")
+EXTERNAL_ACCESS_JSENTRY = jsentry("@nextgisweb/resource/external-access")
+RESOURCE_ENTRY_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
+HOME_PAGE_JSENTRY = jsentry("@nextgisweb/resource/home-page")
+DESCRIPTION_RESOURCE_JSENTRY = jsentry("@nextgisweb/resource/description")
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
@@ -107,11 +116,10 @@ def root(request):
     return HTTPFound(request.route_url("resource.show", id=0))
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/json-view")
 def json_view(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/resource/json-view",
         props=dict(id=request.context.id),
         title=gettext("JSON view"),
         obj=request.context,
@@ -119,11 +127,10 @@ def json_view(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/effective-permissions")
 def effective_permisssions(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/resource/effective-permissions",
         props=dict(resourceId=request.context.id),
         title=gettext("User permissions"),
         obj=request.context,
@@ -163,37 +170,34 @@ class OnResourceCreateView:
     parent: Resource
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/composite")
 def create(request):
     request.resource_permission(ResourceScope.manage_children)
     cls = request.GET.get("cls")
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     return dict(
         obj=request.context,
-        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Create resource"),
         maxheight=True,
         props=dict(operation="create", cls=cls, parent=request.context.id),
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/composite")
 def update(request):
     request.resource_permission(ResourceScope.update)
     return dict(
         obj=request.context,
-        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Update resource"),
         maxheight=True,
         props=dict(operation="update", id=request.context.id),
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/delete-page")
 def delete(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/resource/delete-page",
         # Delete page is universal for multiple resources deletion which is why resources is an array
         props=dict(resources=[request.context.id], navigateToId=request.context.parent.id),
         title=gettext("Delete resource"),
@@ -202,11 +206,10 @@ def delete(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/export-settings")
 def resource_export(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/resource/export-settings",
         title=gettext("Resource export"),
         dynmenu=request.env.pyramid.control_panel,
     )
@@ -364,6 +367,11 @@ def setup_pyramid(comp, config):
         Label("extra", gettext("Extra")),
     )
 
+    icon_edit = icon("material/edit")
+    icon_delete = icon("material/delete")
+    icon_json = icon("material/data_object")
+    icon_effective_permissions = icon("material/key")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         permissions = args.obj.permissions(args.request.user)
@@ -374,7 +382,7 @@ def setup_pyramid(comp, config):
                 gettext("Update"),
                 lambda args: args.request.route_url("resource.update", id=args.obj.id),
                 important=True,
-                icon="material-edit",
+                icon=icon_edit,
             )
 
         if args.obj.cls in ["mapserver_style", "qgis_vector_style", "qgis_raster_style", "wmsclient_layer", "tmsclient_layer"]:
@@ -401,7 +409,7 @@ def setup_pyramid(comp, config):
                 gettext("Delete"),
                 lambda args: args.request.route_url("resource.delete", id=args.obj.id),
                 important=True,
-                icon="material-delete",
+                icon=icon_delete,
             )
 
         if ResourceScope.read in permissions:
@@ -409,7 +417,7 @@ def setup_pyramid(comp, config):
                 "extra/json",
                 gettext("JSON view"),
                 lambda args: args.request.route_url("resource.json", id=args.obj.id),
-                icon="material-data_object",
+                icon=icon_json,
             )
 
             yield Link(
@@ -419,7 +427,7 @@ def setup_pyramid(comp, config):
                     "resource.effective_permissions",
                     id=args.obj.id,
                 ),
-                icon="material-key",
+                icon=icon_effective_permissions,
             )
 
     @comp.env.pyramid.control_panel.add

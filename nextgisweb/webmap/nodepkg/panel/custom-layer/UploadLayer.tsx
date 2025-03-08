@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 import "./UploadLayer.less";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import topic from "@nextgisweb/webmap/compat/topic";

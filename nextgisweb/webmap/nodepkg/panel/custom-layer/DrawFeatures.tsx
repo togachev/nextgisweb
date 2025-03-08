@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Checkbox, Radio, ConfigProvider, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import LineIcon from "@nextgisweb/icon/material/show_chart/outline";
 import CircleIcon from "@nextgisweb/icon/material/scatter_plot/outline";

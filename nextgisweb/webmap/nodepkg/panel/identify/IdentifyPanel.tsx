@@ -10,7 +10,7 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
@@ -32,6 +32,8 @@ import "./IdentifyPanel.less";
 const msgTipIdent = gettext("To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off.");
 const msgLoad = gettext("Retrieving object information...");
 const msgNotFound = gettext("No objects were found at the click location.");
+
+const measurementSridSetting = webmapSettings.measurement_srid;
 
 const loadFeatureItem = async (
     display: Display,
@@ -130,6 +132,31 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             );
         }
 
+        let featureInfoSection;
+        if (featureItem && featureInfo) {
+            const measurementSrid =
+                display.config.measureSrsId || measurementSridSetting;
+
+            featureInfoSection = (
+                <FeatureInfoSection
+                    showGeometryInfo={webmapSettings.show_geometry_info}
+                    measurementSrid={measurementSrid}
+                    showAttributes={webmapSettings.identify_attributes}
+                    resourceId={featureInfo.layerId}
+                    featureItem={featureItem}
+                    attributePanelAction={
+                        <FeatureEditButton
+                            display={display}
+                            resourceId={featureInfo.layerId}
+                            featureId={featureItem.id}
+                            onUpdate={() => updateFeatureItem(featureInfo)}
+                        />
+                    }
+                    highlights={highlights}
+                />
+            );
+        }
+
         return (
             <PanelContainer
                 className="ngw-webmap-panel-identify"
@@ -176,24 +203,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 }}
             >
                 {loadElement}
-                {featureItem && featureInfo && (
-                    <FeatureInfoSection
-                        showGeometryInfo={webmapSettings.show_geometry_info}
-                        measurementSrid={webmapSettings.measurement_srid}
-                        showAttributes={webmapSettings.identify_attributes}
-                        resourceId={featureInfo?.layerId}
-                        featureItem={featureItem}
-                        attributePanelAction={
-                            <FeatureEditButton
-                                display={display}
-                                resourceId={featureInfo.layerId}
-                                featureId={featureItem.id}
-                                onUpdate={() => updateFeatureItem(featureInfo)}
-                            />
-                        }
-                        highlights={highlights}
-                    />
-                )}
+                {featureInfoSection}
             </PanelContainer>
         );
     }

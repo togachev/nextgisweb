@@ -89,7 +89,6 @@ export default function CreateResourceModal({
         "color-primary": "colorPrimary",
         "color-primary-bg": "colorPrimaryBg",
     });
-    console.log(1);
     
     return (
         <Modal

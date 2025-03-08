@@ -1,5 +1,6 @@
 from collections import defaultdict
 from itertools import chain, count
+from json import dumps as json_dumps
 from textwrap import dedent
 from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
 
@@ -137,7 +138,6 @@ def api_type_module(config) -> str:
             "prettier/prettier",
             "import/newline-after-import",
             "import/order",
-            "@typescript-eslint/no-explicit-any",
         )
     )
 
@@ -166,5 +166,17 @@ def api_load_module(config) -> str:
                 name=iroute.name,
             )
         )
+
+    return "\n".join(code)
+
+
+def route(comp) -> str:
+    data = json_dumps(comp.route_meta, ensure_ascii=False, indent=4)
+
+    code = [
+        *eslint_disable(("prettier/prettier",)),
+        "const data: Record<string, string[]> = {};".format(data),
+        "export default data;\n",
+    ]
 
     return "\n".join(code)

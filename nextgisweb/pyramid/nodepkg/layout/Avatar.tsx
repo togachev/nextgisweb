@@ -66,3 +66,5 @@ export const Avatar = observer(() => {
         </div>
     );
 });
+
+Avatar.displayName = "Avatar";

@@ -30,6 +30,7 @@ requires = [
     "humanize==4.6.0",
     'importlib-metadata==4.6; python_version<"3.10"',
     "lxml==4.9.3",
+    "nh3==0.2.20",
     "msgspec==0.17.0",
     "numpy<2",
     "networkx",
@@ -75,7 +76,7 @@ extras_require = dict(
         "pytest-flake8",
         "pytest-watch",
         "pytest==7.3.*",
-        "ruff",
+        "ruff>=0.9.0",
         "sqlglot",
         "webtest",
     ]

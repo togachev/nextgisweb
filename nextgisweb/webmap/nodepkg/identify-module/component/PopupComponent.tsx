@@ -104,10 +104,15 @@ export default observer(
             const W = window.innerWidth - offHP - offset * 2;
             const H = window.innerHeight - offHP - offset * 2;
 
-            const LinkToGeometry = useCallback((value: DataProps) => {
-                setLinkToGeometry(value.layerId + ":" + value.id + ":" + value.styleId);
-            }, [selected]);
-            
+            const LinkToGeometry = async (value: DataProps) => {
+                const styles: number[] = [];
+                const items = await display.getVisibleItems();
+                items.map(i => {
+                    styles.push(i.styleId);
+                });
+                setLinkToGeometry(value.layerId + ":" + value.id + ":" + styles);
+            }
+
             const getContent = async (val: DataProps, key: boolean) => {
                 const res = await getAttribute(val, key);
                 setExtensions(res.feature.extensions);
@@ -115,9 +120,9 @@ export default observer(
                 res?.dataSource?.then(i => {
                     setAttribute(i);
                 });
-    
+
                 const highlights = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
-                
+
                 highlights === true ?
                     topic.publish("feature.highlight", {
                         geom: res.feature.geom,
@@ -142,6 +147,8 @@ export default observer(
                     setData(response.data);
                     getContent(selectVal, false);
                     LinkToGeometry(selectVal)
+                    console.log(selectVal);
+                    
                 } else {
                     setContextUrl(generateUrl({ res: null, st: null, pn: null }));
                     setSelected(null);
@@ -195,6 +202,8 @@ export default observer(
                                 title={gettext("HTML code of the geometry link, for insertion into the description")}
                                 className="link-button"
                                 onClick={() => {
+                                    console.log(count, selected, linkToGeometry);
+
                                     const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
                                     copyValue(linkToGeometryString, gettext("HTML code copied"));
                                 }}

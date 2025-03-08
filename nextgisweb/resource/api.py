@@ -1177,7 +1177,6 @@ def setup_pyramid(comp, config):
     config.add_route(
         "resource.blueprint",
         "/api/component/resource/blueprint",
-        load_types=True,
         get=blueprint,
     )
 

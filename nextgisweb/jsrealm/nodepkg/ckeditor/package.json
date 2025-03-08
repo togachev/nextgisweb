@@ -42,9 +42,6 @@
     "nextgisweb": {
         "webpackConfigs": {
             "ckeditor": "webpack.cjs"
-        },
-        "externals": [
-            "ckeditor"
-        ]
+        }
     }
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { Empty, Tag } from "@nextgisweb/gui/antd";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { LineChartOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import { Scatter } from "react-chartjs-2";

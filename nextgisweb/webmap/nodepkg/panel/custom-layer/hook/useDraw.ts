@@ -12,7 +12,7 @@ import { selectStyle, TYPE_FILE, style, styleDraw } from "../constant";
 import type { ItemType, ParamsFormat } from "../type";
 import type { Options as SnapOptions } from "ol/interaction/Snap";
 import { getUid } from 'ol/util';
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 
 type SnapProps = {
     key: number;

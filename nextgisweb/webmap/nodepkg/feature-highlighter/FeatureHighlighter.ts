@@ -7,7 +7,7 @@ import { Circle, Fill, Stroke, Style } from "ol/style";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 
 import type { MapStore } from "../ol/MapStore";
 

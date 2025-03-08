@@ -14,7 +14,7 @@ msgstr "Диапазон %s не может быть прочитан."
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: model.py:69 nodepkg/editor-widget/EditorWidget.tsx:47 view.py:58
+#: model.py:69 nodepkg/editor-widget/EditorWidget.tsx:47 view.py:61
 msgid "Raster layer"
 msgstr "Растровый слой"
 
@@ -86,27 +86,27 @@ msgstr "Файл должен быть в формате GeoTIFF."
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: nodepkg/export-form/ExportForm.tsx:55
+#: nodepkg/export-form/ExportForm.tsx:59
 msgid "Band"
 msgstr "Канал"
 
-#: nodepkg/export-form/ExportForm.tsx:79
+#: nodepkg/export-form/ExportForm.tsx:83
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:91
+#: nodepkg/export-form/ExportForm.tsx:95
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:96
+#: nodepkg/export-form/ExportForm.tsx:100
 msgid "Bands"
 msgstr "Каналы"
 
-#: nodepkg/export-form/ExportForm.tsx:129
+#: nodepkg/export-form/ExportForm.tsx:133
 msgid "Save"
 msgstr "Сохранить"
 
-#: view.py:25 view.py:63
+#: view.py:26 view.py:66
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -127,7 +127,7 @@ msgstr ""
 "обращаться в HTTP запросах только к нужным частям растра, без необходимости "
 "загружать его в клиентское приложение целиком."
 
-#: view.py:69
+#: view.py:72
 msgid "Download"
 msgstr "Скачать"
 

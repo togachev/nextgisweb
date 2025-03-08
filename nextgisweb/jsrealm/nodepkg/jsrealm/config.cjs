@@ -1,26 +1,26 @@
 const fs = require("fs");
 const path = require("path");
 
-const packageJson = JSON.parse(fs.readFileSync(`package.json`));
+const packageJson = JSON.parse(fs.readFileSync(`package.json`), "utf8");
 const section = packageJson.nextgisweb;
 
 const components = [];
 const packages = [];
-const externals = [];
 
 for (const [cId, cPath] of Object.entries(section.env.components)) {
     components.push({ name: cId, path: path.resolve(cPath) });
 }
 
 for (const wsPath of packageJson.workspaces) {
-    const packageJson = JSON.parse(fs.readFileSync(`${wsPath}/package.json`));
+    const packageJson = JSON.parse(
+        fs.readFileSync(`${wsPath}/package.json`, "utf8")
+    );
     const packageName = packageJson.name;
     packages.push({
         name: packageName,
         path: path.resolve(wsPath),
         json: packageJson,
     });
-    externals.push(...(packageJson?.nextgisweb?.externals || []));
 }
 
 const debug = section.core.debug;
@@ -50,7 +50,6 @@ module.exports = {
     debug,
     distPath,
     packages,
-    externals,
     pathToComponent,
     pathToModule,
     ...section,

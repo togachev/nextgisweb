@@ -5,7 +5,7 @@ import type { Vector as OlVectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
 import { customStyle, clickStyle } from "../constant";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { SourceType } from "../type";
 

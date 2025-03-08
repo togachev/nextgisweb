@@ -1,10 +1,9 @@
-from inspect import findsource, getfile, signature
+from inspect import signature
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, List, Literal, Optional, Set, Union, cast
-from warnings import warn_explicit
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -14,6 +13,7 @@ from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
@@ -60,7 +60,9 @@ def annotation_from_dict(obj, data):
     for k in ("description", "style", "geom", "public"):
         if k in data:
             v = data[k]
-            if k == "geom":
+            if k == "description":
+                v = sanitize(v)
+            elif k == "geom":
                 v = "SRID=3857;" + v
             setattr(obj, k, v)
 
@@ -378,8 +380,6 @@ AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("AddressGeo
 csetting("identify_radius", float, default=3)
 csetting("identify_attributes", bool, default=True)
 csetting("show_geometry_info", bool, default=False)
-csetting("popup_width", int, default=300)
-csetting("popup_height", int, default=200)
 csetting("address_search_enabled", bool, default=True)
 csetting("address_search_extent", bool, default=False)
 csetting("address_geocoder", AddressGeocoder, default="nominatim")
@@ -394,6 +394,8 @@ csetting("hide_nav_menu", bool, default=False)
 csetting("max_count_file_upload", float, default=10)
 csetting("identify_module", bool, default=False)
 csetting("offset_point", int, default=10)
+csetting("popup_width", int, default=350)
+csetting("popup_height", int, default=350)
 
 AnnotationVisibleMode = Literal["no", "yes", "messages"]
 LegendVisibleMode = Literal["collapse", "expand"]
@@ -423,7 +425,6 @@ class AnnotationsConfig(Struct, kw_only=True):
 
 class MidConfig(Struct, kw_only=True):
     adapter: Set[str]
-    basemap: Set[str]
     plugin: Set[str]
 
 
@@ -496,26 +497,12 @@ def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
     return ExtentWSEN(*parts) if None not in parts else None
 
 
-def _amd_free(iterable):
-    for item in iterable:
-        if getattr(item, "amd_free", False):
-            yield item
-        else:
-            warn_explicit(
-                f"Unsupported plugin {item.__name__} ignored!",
-                category=DeprecationWarning,
-                filename=getfile(item),
-                lineno=findsource(item)[1] + 1,
-                module=item.__module__,
-            )
-
-
 def display_config(obj, request) -> DisplayConfig:
     request.resource_permission(ResourceScope.read)
 
     # Map level plugins
     plugin = dict()
-    for p_cls in _amd_free(WebmapPlugin.registry):
+    for p_cls in WebmapPlugin.registry:
         if p_mid_data := p_cls.is_supported(obj):
             p_mid, p_payload = p_mid_data
             plugin[p_mid] = p_payload
@@ -530,7 +517,7 @@ def display_config(obj, request) -> DisplayConfig:
 
         return result
 
-    mid = MidConfig(adapter=set(), basemap=set(), plugin=set())
+    mid = MidConfig(adapter=set(), plugin=set())
     checked_items: Set[int] = set()
     expanded_items: Set[int] = set()
 
@@ -594,7 +581,7 @@ def display_config(obj, request) -> DisplayConfig:
             # Layer level plugins
             plugin = dict()
             plugin_base_kwargs = dict(layer=layer, webmap=obj)
-            for pcls in _amd_free(WebmapLayerPlugin.registry):
+            for pcls in WebmapLayerPlugin.registry:
                 fn = pcls.is_layer_supported
                 plugin_kwargs = (
                     dict(plugin_base_kwargs, style=style)

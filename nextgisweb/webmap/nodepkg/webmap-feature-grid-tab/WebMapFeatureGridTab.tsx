@@ -2,7 +2,7 @@ import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
+import { FeatureGrid } from "@nextgisweb/feature-layer/feature-grid/FeatureGrid";
 import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
 import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
@@ -19,6 +19,8 @@ import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 import type topic from "../compat/topic";
 import type { Display } from "../display";
 import type { PluginBase } from "../plugin/PluginBase";
+
+import GoToIcon from "@nextgisweb/icon/material/center_focus_weak";
 
 const msgGoto = gettext("Go to");
 
@@ -117,7 +119,7 @@ export function WebMapFeatureGridTab({
                 actions: [
                     {
                         title: msgGoto,
-                        icon: "material-center_focus_weak",
+                        icon: <GoToIcon />,
                         disabled: (params) => !params?.selectedIds?.length,
                         action: () => {
                             const fid = store.selectedIds[0];

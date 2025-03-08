@@ -6,7 +6,7 @@ import QueryStats from "@nextgisweb/icon/material/query_stats";
 import Attachment from "@nextgisweb/icon/material/attachment";
 import TableRows from "@nextgisweb/icon/material/table_rows";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";

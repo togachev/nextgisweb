@@ -1,5 +1,3 @@
-/** @entrypoint */
-
 import showModal from "../showModal";
 
 import { ErrorModal } from "./ErrorModal";
@@ -13,8 +11,8 @@ function errorModal(error: unknown, props?: Partial<ErrorModalProps>) {
 }
 
 export {
-    ErrorPage,
     errorModal,
+    ErrorPage,
     extractError,
     isAbortError,
     isApiError,

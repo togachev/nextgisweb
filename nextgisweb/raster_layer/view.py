@@ -3,7 +3,8 @@ from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
@@ -13,10 +14,10 @@ from .model import RasterLayer
 class RasterLayerWidget(Widget):
     resource = RasterLayer
     operation = ("create", "update")
-    amdmod = "@nextgisweb/raster-layer/editor-widget"
+    amdmod = jsentry("@nextgisweb/raster-layer/editor-widget")
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/raster-layer/export-form")
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
@@ -24,7 +25,6 @@ def export(request):
         obj=request.context,
         title=gettext("Save as"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/raster-layer/export-form",
         maxheight=True,
     )
 
@@ -50,6 +50,9 @@ def setup_pyramid(comp, config):
         context=RasterLayer,
     )
 
+    icon_export = icon("material/download")
+    icon_download = icon("material/download_for_offline")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if not isinstance(args.obj, RasterLayer):
@@ -62,11 +65,11 @@ def setup_pyramid(comp, config):
                 "raster_layer/export",
                 gettext("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
-                icon="material-download",
+                icon=icon_export,
             )
             yield dm.Link(
                 "raster_layer/download",
                 gettext("Download"),
                 lambda args: args.request.route_url("raster_layer.download", id=args.obj.id),
-                icon="material-download_for_offline",
+                icon=icon_download,
             )

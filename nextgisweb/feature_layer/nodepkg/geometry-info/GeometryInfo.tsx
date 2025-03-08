@@ -4,7 +4,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { GeometryInfoPreview } from "./component/GeometryInfoPreview";
 import { GeometryInfoTable } from "./component/GeometryInfoTable";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 
 import "./GeometryInfo.less";
 
@@ -62,7 +62,7 @@ export function GeometryInfo({
     return (
         <>
             <GeometryInfoTable geometryInfo={geometryInfo} isLoading={isLoading} error={error} resourceId={resourceId} featureId={featureId} />
-            {! webmapSettings.identify_module && geometryInfo && showPreview && (
+            {!webmapSettings.identify_module && geometryInfo && showPreview && (
                 <GeometryInfoPreview
                     geometryInfo={geometryInfo}
                     resourceId={resourceId}

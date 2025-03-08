@@ -1,7 +1,7 @@
+<%! from nextgisweb.pyramid.view import UPDATE_JSENTRY %>
+
 %if request.env.ngupdate_url:
     <script type="text/javascript">
-        require(["@nextgisweb/pyramid/update"], function (update) {
-            update.init();
-        });
+        ngwEntry(${json_js(UPDATE_JSENTRY)}).then(({ init }) => init());
     </script>
 %endif

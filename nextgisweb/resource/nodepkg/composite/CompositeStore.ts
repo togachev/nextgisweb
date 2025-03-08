@@ -1,7 +1,13 @@
 import { get, set } from "lodash-es";
-import { action, computed, observable, reaction, runInAction } from "mobx";
+import {
+    action,
+    computed,
+    isObservableProp,
+    observable,
+    reaction,
+    runInAction,
+} from "mobx";
 
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import {
     LunkwillParam,
     request,
@@ -132,6 +138,17 @@ export class CompositeStore {
     }
 
     @computed
+    get dirty(): boolean {
+        if (!this.members) {
+            return false;
+        } else {
+            return this.members.some(({ store }) =>
+                store.dirty !== undefined ? store.dirty : false
+            );
+        }
+    }
+
+    @computed
     get isValid(): boolean {
         if (!this.validate) return true;
         return this.members?.every((member) => member.store.isValid) ?? true;
@@ -162,7 +179,7 @@ export class CompositeStore {
                 const result = await member.store.dump({ lunkwill });
                 if (result !== undefined) {
                     const current = get(data, identity);
-                    if (current !== undefined) Object.assign(result, current);
+                    if (current !== undefined) Object.assign(current, result);
                     set(data, identity, result);
                 }
             }
@@ -207,13 +224,19 @@ export class CompositeStore {
     private async loadMembers(config: ResourceWidget["config"]) {
         const members = await Promise.all(
             Object.entries(config).map(async ([moduleName, params]) => {
-                const member = await entrypoint<WidgetEntrypoint>(moduleName);
+                const member = await ngwEntry<WidgetEntrypoint>(moduleName);
 
                 const widgetStore = new member.store({
                     composite: this,
                     operation: this.operation,
                     ...params,
                 });
+
+                if (!isObservableProp(widgetStore, "dirty")) {
+                    console.warn(
+                        `Missing 'dirty' observable in '${moduleName}' store!`
+                    );
+                }
 
                 return { ...member, key: moduleName, store: widgetStore };
             })

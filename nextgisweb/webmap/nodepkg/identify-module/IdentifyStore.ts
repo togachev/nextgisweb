@@ -98,8 +98,8 @@ export class IdentifyStore {
         this.setValue("fixContentItem", fixContentItem);
     };
 
-    setLinkToGeometry = (linkToGeometry: SetValue<string | null>) => {
-        this.setValue("linkToGeometry", linkToGeometry);
+    setLinkToGeometry = (linkToGeometry: string) => {
+        this.linkToGeometry = linkToGeometry;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {

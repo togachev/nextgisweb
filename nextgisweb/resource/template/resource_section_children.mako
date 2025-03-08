@@ -1,7 +1,9 @@
 <%!
     from types import SimpleNamespace
     from nextgisweb.lib import dynmenu as dm
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.resource import ResourceScope
+    from nextgisweb.resource.view import CHILDREN_SECTION_JSENTRY
 %>
 
 <%page args="section" />
@@ -32,16 +34,15 @@
 %>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/resource/children-section",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
-        reactApp.default(
-            comp.default, {
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
+        reactBoot(
+            ${json_js(CHILDREN_SECTION_JSENTRY)},
+            {
                 storageEnabled: ${json_js(request.env.core.options['storage.enabled'])},
                 data: ${json_js(data)},
                 resourceId: ${obj.id},
-            }, document.getElementById('childrenSection')
+            },
+            "childrenSection"
         );
     });
 </script>

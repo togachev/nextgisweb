@@ -1,14 +1,16 @@
+<%!
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.render.view import LEGEND_SYMBOLS_WIDGET_JSENTRY
+%>
+
 <div id="legendSymbols"></div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/render/legend-symbols-widget",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
-        reactApp.default(
-            comp.default, {
-                resourceId: ${obj.id},
-            }, document.getElementById('legendSymbols')
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
+        reactBoot(
+            ${json_js(LEGEND_SYMBOLS_WIDGET_JSENTRY)},
+            { resourceId: ${obj.id} },
+            "legendSymbols"
         );
     });
 </script>

@@ -28,6 +28,8 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ForbiddenError, UserException
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 
 from . import exception, permission, renderer
 from .component import PyramidComponent
@@ -38,6 +40,10 @@ from .tomb.response import StaticFileResponse
 from .uacompat import FAMILIES
 from .uacompat import parse_header as ua_parse_header
 from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
+
+ICON_JSENTRY = jsentry("@nextgisweb/pyramid/icon")
+UPDATE_JSENTRY = jsentry("@nextgisweb/pyramid/update")
+LAYOUT_JSENTRY = jsentry("@nextgisweb/pyramid/layout")
 
 
 def asset(request):
@@ -164,11 +170,10 @@ def openapi_json_test(request) -> JSONType:
     return openapi(config.registry.introspector, prefix="/")
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/swagger-ui")
 def swagger(request):
     return dict(
         title=gettext("HTTP API documentation"),
-        entrypoint="@nextgisweb/pyramid/swagger-ui",
         props=dict(url=request.route_url("pyramid.openapi_json")),
     )
 
@@ -196,7 +201,7 @@ def locale(request):
     return HTTPFound(location=request.GET.get("next", request.application_url))
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/system-info")
 def sysinfo(request):
     request.require_administrator()
     tr = request.translate
@@ -234,33 +239,30 @@ def sysinfo(request):
 
     return dict(
         title=gettext("System information"),
-        entrypoint="@nextgisweb/pyramid/system-info",
         props=dict(packages=packages, platform=platform, browser=browser),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/fonts")
 def fonts(request):
     request.require_administrator()
     return dict(
         title=gettext("Font management"),
-        entrypoint="@nextgisweb/pyramid/fonts",
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/storage-summary")
 def storage(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/pyramid/storage-summary",
         title=gettext("Storage"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/backup-browse")
 def backup_browse(request):
     if not request.env.pyramid.options["backup.download"]:
         raise HTTPNotFound()
@@ -271,7 +273,6 @@ def backup_browse(request):
     return dict(
         title=gettext("Backups"),
         dynmenu=request.env.pyramid.control_panel,
-        entrypoint="@nextgisweb/pyramid/backup-browse",
         props=dict(items=items),
     )
 
@@ -284,62 +285,56 @@ def backup_download(request):
     return FileResponse(fn)
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/cors-settings")
 def cors(request):
     request.user.require_permission(any, *permission.cors)
     return dict(
         title=gettext("Cross-origin resource sharing (CORS)"),
-        entrypoint="@nextgisweb/pyramid/cors-settings",
         props=dict(readonly=not request.user.has_permission(permission.cors_manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/custom-css-form")
 def custom_css(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/pyramid/custom-css-form",
         title=gettext("Custom CSS"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/logo-form")
 def cp_logo(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/pyramid/logo-form",
         title=gettext("Custom logo"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/system-name-form")
 def system_name(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/pyramid/system-name-form",
         title=gettext("Web GIS name"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/home-path")
 def home_path(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/pyramid/home-path",
         title=gettext("Home path"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/pyramid/metrics")
 def metrics(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/pyramid/metrics",
         title=gettext("Metrics and analytics"),
         dynmenu=request.env.pyramid.control_panel,
     )

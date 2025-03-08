@@ -1,6 +1,8 @@
 <%!
     from pathlib import Path
     import nextgisweb.pyramid as m
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.pyramid.view import LAYOUT_JSENTRY
     svglogo = None
 %>
 
@@ -57,36 +59,26 @@
     </div>
 </div>
 
-<script>
-    require([
-        "@nextgisweb/gui/react-app",
-        "@nextgisweb/pyramid/layout",
-        "@nextgisweb/resource/resources-filter",
-    ], function (reactApp, layout, resourcesFilter) {
-        reactApp.default(layout.Avatar, {}, document.getElementById("avatar"));
-        reactApp.default(layout.Menu, {}, document.getElementById("menu"));
-
-        %if not hide_resource_filter:
-        reactApp.default(resourcesFilter.default, {
-            onChange: function(v, opt) {
-                window.location.href = opt.url
-            }
-        }, document.getElementById("resourcesFilter"));
-        %endif
-    });
-</script>
-
 <script type="text/javascript">
-    require([
-        "@nextgisweb/pyramid/link-resource",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
+    Promise.all([
+        ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
+        ngwEntry(${json_js(LAYOUT_JSENTRY)}),
+    ]).then(([reactBoot, {Avatar, Menu, LinkResource}]) => {
+        reactBoot(Avatar, {}, document.getElementById("avatar"));
+        reactBoot(Menu, {}, document.getElementById("menu"));
+        
+        %if not hide_resource_filter:
+            ngwEntry("@nextgisweb/resource/resources-filter").then(
+                ({default: ResourcesFilter}) => reactBoot(
+                    ResourcesFilter,
+                    { onChange(v, opt) { window.location.href = opt.url } },
+                    document.getElementById("resourcesFilter"),
+                )
+            );
+        %endif
+
         %if not is_guest:
-        reactApp.default(
-            comp.default,
-            {},
-            document.getElementById('link-resource')
-        );
+            reactBoot(LinkResource, {}, document.getElementById("link-resource"));
         %endif
     });
 </script>

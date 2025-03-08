@@ -16,12 +16,6 @@
 @import "blocks/_tables.less";
 @import "blocks/_typography.less";
 
-// Antd 5 doesn't set box-sizing: border-box as Antd 4, but we rely on it.
-div.dijitTabPane,
-table.dijitSelect {
-    box-sizing: border-box;
-}
-
 /* -- BASE STYLES -- */
 
 body,
@@ -358,44 +352,6 @@ a[class*=" icon-"]:hover:before {
     }
 }
 
-/*-- Key-value definition list --*/
-
-dl.ngw-pyramid-kv {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 8px 4px;
-
-    >dt,
-    >dd {
-        margin: 0;
-        padding: 0;
-    }
-
-    >dt {
-        display: flex;
-        gap: 4px;
-        min-width: 15ch;
-        color: var(--text-secondary);
-
-        &:after {
-            display: inline-block;
-            flex-grow: 1;
-            background-image: radial-gradient(circle,
-                    currentcolor 0.75px,
-                    transparent 0.75px);
-            background-position: left 0 top 10px;
-            background-size: 6px 10px;
-            background-repeat: repeat-x;
-            min-width: 2em;
-            content: "";
-        }
-    }
-}
-
-.padding-block {
-    padding: 8px;
-}
-
 .overlay {
     display: none;
     position: fixed;
@@ -460,19 +416,3 @@ div.descClass img {
     margin-top: 1px !important;
     padding: 4px 3px;
 }
-
-// .ant-image-preview-close {
-//     background-color: var(--primary) !important;
-// }
-
-// .ant-image-preview-operations {
-//     background-color: var(--primary) !important;
-// }
-
-// .ant-image-preview-mask {
-//     pointer-events: auto !important;
-// }
-
-// .ant-image-preview {
-//     pointer-events: auto !important;
-// }

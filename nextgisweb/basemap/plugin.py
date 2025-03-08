@@ -1,8 +1,9 @@
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.webmap.plugin import WebmapPlugin
 
 
 class BasemapPlugin(WebmapPlugin):
-    amd_free = True
+    entrypoint = jsentry("@nextgisweb/basemap/plugin/base-map")
 
     @classmethod
     def is_supported(cls, webmap):
@@ -13,11 +14,8 @@ class BasemapPlugin(WebmapPlugin):
                 qms=bm.resource.qms,
                 copyright_text=bm.resource.copyright_text,
                 copyright_url=bm.resource.copyright_url,
-                **bm.to_dict()
+                **bm.to_dict(),
             )
             for bm in webmap.basemaps
         ]
-        return (
-            "@nextgisweb/basemap/plugin/base-map",
-            dict(basemaps=basemaps),
-        )
+        return (cls.entrypoint, dict(basemaps=basemaps))

@@ -1,12 +1,13 @@
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.layer import IBboxLayer
 
 from .base import WebmapLayerPlugin
 
 
 class ZoomToLayerPlugin(WebmapLayerPlugin):
-    amd_free = True
+    entry = jsentry("@nextgisweb/webmap/plugin/zoom-to-layer")
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IBboxLayer.providedBy(layer):
-            return ("@nextgisweb/webmap/plugin/zoom-to-layer", dict())
+            return (cls.entry, dict())

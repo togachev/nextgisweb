@@ -1,13 +1,14 @@
 from pyramid.threadlocal import get_current_request
 
 from nextgisweb.feature_layer import IFeatureLayer, IWritableFeatureLayer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import DataScope
 
 from .base import WebmapLayerPlugin
 
 
 class LayerEditorPlugin(WebmapLayerPlugin):
-    amd_free = True
+    entry = jsentry("@nextgisweb/webmap/plugin/layer-editor")
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
@@ -17,7 +18,7 @@ class LayerEditorPlugin(WebmapLayerPlugin):
             if not write_permission:
                 return False
             return (
-                "@nextgisweb/webmap/plugin/layer-editor",
+                cls.entry,
                 dict(
                     writable=IWritableFeatureLayer.providedBy(layer),
                     geometry_type=layer.geometry_type,

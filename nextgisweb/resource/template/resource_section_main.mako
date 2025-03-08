@@ -1,5 +1,8 @@
-<%! from nextgisweb.resource.view import creatable_resources %>
-<%! from nextgisweb.pyramid.api import csetting %>
+<%!
+    from nextgisweb.pyramid.api import csetting
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.resource.view import creatable_resources, MAIN_SECTION_JSENTRY
+%>
 
 <%page args="section" />
 <% section.content_box = False %>
@@ -33,14 +36,11 @@
 <div id="resourceMainSection" class="ngw-resource-section"></div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/resource/main-section",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
-        reactApp.default(
-            comp.default,
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
+        reactBoot(
+            ${json_js(MAIN_SECTION_JSENTRY)},
             ${json_js(props)},
-            document.getElementById('resourceMainSection')
+            "resourceMainSection"
         );
     });
 </script>

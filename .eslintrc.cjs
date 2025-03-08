@@ -18,8 +18,9 @@ const config = {
         "plugin:prettier/recommended",
     ],
     globals: {
-        dojoConfig: "readonly",
         ngwConfig: "readonly",
+        ngwEntry: "readonly",
+        ngwExternal: "readonly",
     },
     rules: {
         "eqeqeq": "error",
@@ -56,6 +57,14 @@ const config = {
                         ],
                         "message": "Use '@nextgisweb/*' namespace instead.",
                     },
+                    {
+                        "group": ["./../*"],
+                        "message": "Remove useless './' prefix.",
+                    },
+                    {
+                        "group": ["../../../*"],
+                        "message": "Too many levels up, use absolute name.",
+                    },
                 ],
             },
         ],
@@ -79,6 +88,7 @@ const config = {
                 "pathGroups": [
                     { pattern: "glob", group: "builtin" },
                     { pattern: "@nextgisweb/icon/**", group: "index" },
+                    { pattern: "@nextgisweb/*/icon/**", group: "index" },
                     { pattern: "@ant-design/icons", group: "index" },
                 ],
                 "alphabetize": { order: "asc", orderImportKind: "desc" },
@@ -140,7 +150,7 @@ const config = {
                 "react/prop-types": "off", // Use TypeScript instead
                 "react/jsx-no-target-blank": "off", // Unsupported browsers
                 "react/display-name": "warn",
-                "@typescript-eslint/no-explicit-any": "warn",
+                "@typescript-eslint/no-explicit-any": "off",
                 "@typescript-eslint/no-use-before-define": "warn",
                 "@typescript-eslint/no-unused-vars": [
                     "error",
@@ -160,21 +170,11 @@ const config = {
                 babelOptions: { configFile: babelConfigPath },
             },
         },
-        {
-            files: expcomp("amd/**/*.js"),
-            plugins: ["requirejs"],
-            extends: ["eslint:recommended", "plugin:requirejs/recommended"],
-            env: { browser: true, amd: true, es2015: true },
-            rules: {
-                "eqeqeq": "warn",
-                "no-useless-escape": "warn",
-            },
-        },
     ],
     settings: {
         "react": { version: "18" },
         "componentWrapperFunctions": ["observer"],
-        "import/internal-regex": "^(@nextgisweb/|ngw-)",
+        "import/internal-regex": "^@nextgisweb/",
     },
 };
 

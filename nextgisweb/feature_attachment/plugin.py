@@ -1,9 +1,10 @@
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.webmap.plugin import WebmapPlugin
 
 
 class BundleAttachmentPlugin(WebmapPlugin):
-    amd_free = True
+    entry = jsentry("@nextgisweb/feature-attachment/attachment-bundle/plugin")
 
     @classmethod
     def is_supported(cls, webmap):
-        return ("@nextgisweb/feature-attachment/attachment-bundle/plugin", dict())
+        return (cls.entry, dict())

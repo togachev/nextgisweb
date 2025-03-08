@@ -1,8 +1,8 @@
 import React, { Component, createRef, RefObject } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
-import { Map, MapBrowserEvent, Overlay } from "ol";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { Interaction } from "ol/interaction";
 import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
@@ -11,7 +11,6 @@ import { route } from "@nextgisweb/pyramid/api";
 import { Point } from "ol/geom";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
-import spatialRefSysList from "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/";
 import { positionContext } from "./positionContext"
 import OlGeomPoint from "ol/geom/Point";
 
@@ -22,13 +21,6 @@ import "./IdentifyModule.less";
 
 const settings = webmapSettings;
 const wkt = new WKT();
-
-const srsCoordinates = {};
-if (spatialRefSysList) {
-    spatialRefSysList.forEach((srsInfo) => {
-        srsCoordinates[srsInfo.id] = srsInfo;
-    });
-}
 
 const Control = function (options) {
     this.tool = options.tool;
@@ -62,7 +54,7 @@ export class IdentifyModule extends Component {
     private displaySrid: number;
     private lonlat: number[];
     private offHP: number;
-    private olmap: Map;
+    private olmap: olMap;
     private params: EventProps;
     private selected: string | undefined;
     private response: Response;
@@ -152,11 +144,13 @@ export class IdentifyModule extends Component {
     isNumeric = (string) => Number.isFinite(+string);
 
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
+        const srsInfo = await route("spatial_ref_sys.collection").get();
+        const srsMap = new Map(srsInfo.map((s) => [s.id, s]));
         this.lonlat = await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
                     srs_from: this.displaySrid,
-                    srs_to: Object.keys(srsCoordinates).map(Number),
+                    srs_to: Array.from(srsMap.keys()),
                     geom: wkt.writeGeometry(new Point(this.params.point)),
                 },
             })
@@ -326,11 +320,13 @@ export class IdentifyModule extends Component {
     };
 
     _responseContext = async (val: UrlParamsProps) => {
+        const srsInfo = await route("spatial_ref_sys.collection").get();
+        const srsMap = new Map(srsInfo.map((s) => [s.id, s]));
         await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
                     srs_from: 4326,
-                    srs_to: Object.keys(srsCoordinates).map(Number),
+                    srs_to: Array.from(srsMap.keys()),
                     geom: wkt.writeGeometry(new OlGeomPoint([val.lon, val.lat])),
                 },
             })

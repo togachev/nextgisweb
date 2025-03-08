@@ -1,8 +1,10 @@
+from nextgisweb.jsrealm import jsentry
+
 from .base import WebmapLayerPlugin
 
 
 class LayerInfoPlugin(WebmapLayerPlugin):
-    amd_free = True
+    entry = jsentry("@nextgisweb/webmap/plugin/layer-info")
 
     @classmethod
     def is_layer_supported(cls, *, style, layer, webmap):
@@ -16,4 +18,4 @@ class LayerInfoPlugin(WebmapLayerPlugin):
             payload["description_style"] = style.description
             payload["description_layer"] = layer.description
 
-        return ("@nextgisweb/webmap/plugin/layer-info", payload)
+        return (cls.entry, payload)
