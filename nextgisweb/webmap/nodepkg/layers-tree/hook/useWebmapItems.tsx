@@ -5,6 +5,9 @@ import { EditIcon } from "@nextgisweb/gui/icon";
 import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
+import FolderClosedIcon from "../icons/folder.svg";
+import FolderOpenIcon from "../icons/folder_open.svg";
+
 export function useWebmapItems({
     webmapItems,
 }: {
@@ -14,7 +17,12 @@ export function useWebmapItems({
         (webMapItem: TreeItemConfig): TreeWebmapItem => {
             const { key, title } = webMapItem;
             const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-            if (item.treeItem.type === "layer") {
+
+            if (item.treeItem.type === "root" || item.treeItem.type === "group") {
+                item.icon = ({ expanded }) =>
+                    expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
+
+            } else if (item.treeItem.type === "layer") {
                 item.isLeaf = true;
 
                 if ("legendInfo" in item.treeItem) {
