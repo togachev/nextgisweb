@@ -2,6 +2,7 @@ import { theme } from "antd";
 
 import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
@@ -41,8 +42,6 @@ export function Legend({ nodeData, store, checkable, display }: LegendProps) {
             }
             getData()
                 .then(extent => {
-                    console.log(extent, display.map.zoomToNgwExtent, display.displayProjection);
-
                     display.map.zoomToNgwExtent(extent, {
                         displayProjection: display.displayProjection,
                     })
@@ -109,7 +108,7 @@ export function Legend({ nodeData, store, checkable, display }: LegendProps) {
                                 height={20}
                                 src={"data:image/png;base64," + s.icon.data}
                             />
-                            <div className="legend-title">{s.display_name}</div>
+                            <div className="legend-title">{s.display_name ? s.display_name : gettext("All value")}</div>
                         </div>
                     );
                 })}
