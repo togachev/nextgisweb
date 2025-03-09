@@ -1,57 +1,52 @@
 .ngw-webmap-panel-search {
-    > .ngw-webmap-panel-title {
+    >.ngw-webmap-panel-title {
         padding-inline-start: 0;
         padding-block: 1px;
     }
 
-    > .ngw-webmap-panel-prolog > .ant-alert {
+    >.ngw-webmap-panel-prolog>.ant-alert {
         border: none;
         border-radius: none;
     }
 
-    > .ngw-webmap-panel-content {
-        .result {
-            cursor: pointer;
-            padding-inline: 10px;
-            padding-block: 6px;
+    >.ngw-webmap-panel-content {
+        .results {
+            .result {
+                cursor: pointer;
+                padding-inline: 10px;
+                padding-block: 6px;
 
-            svg {
-                padding-left: 2px;
-                color: gray;
+                svg {
+                    padding-left: 2px;
+                    color: gray;
+                }
+
+                &:first-child {
+                    padding-top: 7px;
+                }
+
+                &.selected {
+                    cursor: auto;
+                    background-color: #eae9e9;
+                }
+
             }
 
-            &:first-child {
-                padding-top: 7px;
+            .loading {
+                margin-top: 20px;
+                color: #076dbf;
+                text-align: center;
             }
 
-            &:hover {
-                background-color: #eae9e9;
+            .ant-descriptions.ant-descriptions-bordered>.ant-descriptions-view {
+                border: none;
             }
 
-            &.selected {
-                cursor: auto;
-                background-color: #eae9e9;
+            .alert-desc {
+                background: none;
+                border: none;
+                padding: 6px;
             }
-
-        }
-
-        .loading {
-            margin-top: 20px;
-            color: #076dbf;
-            text-align: center;
-        }
-
-        .ant-descriptions.ant-descriptions-bordered>.ant-descriptions-view {
-            border: none;
-        }
-
-        .alert-desc {
-            background: none;
-            border: none;
-            display: flex;
-            align-items: flex-end;
-            border-radius: 0px;
-            padding: 0;
         }
     }
 }

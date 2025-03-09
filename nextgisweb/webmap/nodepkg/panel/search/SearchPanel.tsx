@@ -564,7 +564,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                         content: PanelContainer.Unpadded,
                     }}
                 >
-                    <div className="result">
+                    <div className="results">
                         {
                             results ? results :
                                 <Alert
