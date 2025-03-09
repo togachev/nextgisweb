@@ -11,6 +11,11 @@ interface Adapters {
     image: { display_name: string };
 }
 
+interface PopupSize {
+    width: number;
+    height: number;
+}
+
 export interface WebmapSettings {
     editing: boolean;
     annotation: boolean;
@@ -32,8 +37,7 @@ export interface WebmapSettings {
     hide_nav_menu: boolean;
     offset_point: number;
     identify_module: boolean;
-    popup_width: boolean;
-    popup_height: boolean;
+    popup_size: PopupSize;
 }
 
 export default await fetchSettings<WebmapSettings>(COMP_ID);

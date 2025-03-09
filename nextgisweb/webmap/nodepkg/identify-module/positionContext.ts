@@ -8,8 +8,8 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
     
     const context_height = 24 + context_item * length;
     const context_width = 180;
-    const popup_height = settings.popup_height;
-    const popup_width = settings.popup_width;
+    const popup_height = settings.popup_size.height;
+    const popup_width = settings.popup_size.width;
     const coords_not_count_w = 250;
     const coords_not_count_h = 51;
 

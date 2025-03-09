@@ -175,8 +175,8 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             { height: valueRnd?.height - 76 }
 
         const styleGtaph = hideLegend ?
-            { height: webmapSettings.popup_height } :
-            { height: webmapSettings.popup_height * 1.5 };
+            { height: webmapSettings.popup_size.height } :
+            { height: webmapSettings.popup_size.height * 1.5 };
 
         return (
             <div style={!store ? styleGtaph : undefined}>

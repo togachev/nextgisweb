@@ -376,6 +376,7 @@ AreaUnits = Annotated[
 ]
 DegreeFormat = Annotated[Literal["dd", "ddm", "dms"], TSExport("DegreeFormat")]
 AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("AddressGeocoder")]
+PopupSize = Dict[str, Any]
 
 csetting("identify_radius", float, default=3)
 csetting("identify_attributes", bool, default=True)
@@ -394,8 +395,7 @@ csetting("hide_nav_menu", bool, default=False)
 csetting("max_count_file_upload", float, default=10)
 csetting("identify_module", bool, default=False)
 csetting("offset_point", int, default=10)
-csetting("popup_width", int, default=350)
-csetting("popup_height", int, default=350)
+csetting("popup_size", PopupSize, default=dict(width=350, height=350))
 
 AnnotationVisibleMode = Literal["no", "yes", "messages"]
 LegendVisibleMode = Literal["collapse", "expand"]

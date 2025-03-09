@@ -28,8 +28,10 @@ export function Legend({ nodeData, store, checkable, display }: LegendProps) {
     }
 
     const asyncFunc = async (id, name) => {
-        if (name) {
-            const query = { ilike: name }
+        // if (name) {
+            console.log(name);
+            
+            const query = name ? { ilike: name } : { not_ilike: "" }
             const getData = async () => {
                 const layer_extent = await route("layer.extent", id).get();
                 const extent = await route("feature_layer.feature.extent", id).get({ query });
@@ -47,7 +49,7 @@ export function Legend({ nodeData, store, checkable, display }: LegendProps) {
                     })
                 })
                 .catch(console.error);
-        }
+        // }
     };
 
     const blockClassName = checkable ? "checkable" : "uncheckable";
@@ -70,7 +72,7 @@ export function Legend({ nodeData, store, checkable, display }: LegendProps) {
                     const layerCls = nodeData.layerCls;
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;
-                    const title = s.display_name ? s.display_name : nodeData.title;
+                    const title = s.display_name && s.display_name;
                     let checkbox;
                     if (checkable) {
                         checkbox =
@@ -108,7 +110,7 @@ export function Legend({ nodeData, store, checkable, display }: LegendProps) {
                                 height={20}
                                 src={"data:image/png;base64," + s.icon.data}
                             />
-                            <div className="legend-title">{s.display_name ? s.display_name : gettext("All value")}</div>
+                            <div className="legend-title">{s.display_name ? s.display_name : gettext("All other values")}</div>
                         </div>
                     );
                 })}

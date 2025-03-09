@@ -63,7 +63,8 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             setGeocoder(allValues.address_geocoder);
         }
     };
-
+    console.log(initialValues);
+    
     return (
         <Form
             name="webmap_settings"
@@ -188,7 +189,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                 </Col>
                 <Col span={8}>
                     <Form.Item
-                        name="popup_width"
+                        name={["popup_size", "width"]}
                         label={gettext("Width, px")}
                         rules={[
                             {
@@ -201,7 +202,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                 </Col>
                 <Col span={8}>
                     <Form.Item
-                        name="popup_height"
+                        name={["popup_size", "height"]}
                         label={gettext("Height, px")}
                         rules={[
                             {
