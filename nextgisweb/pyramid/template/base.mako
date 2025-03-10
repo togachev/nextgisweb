@@ -5,6 +5,9 @@
     from msgspec import NODEFAULT
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.view import ICON_JSENTRY
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.pyramid.view import LAYOUT_BCRUMB_JSENTRY
+    import json
 %>
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
@@ -102,6 +105,7 @@
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
+                        <div id="layout-bcrumb"></div>
                         %if len(bcpath) > 0:
                             <div class="ngw-pyramid-layout-bcrumb">
                                 %for idx, bc in enumerate(bcpath):
@@ -156,3 +160,14 @@
     %endif
 </body>
 </html>
+
+
+<script type="text/javascript">
+    Promise.all([
+        ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
+        ngwEntry(${json_js(LAYOUT_BCRUMB_JSENTRY)}),
+    ]).then(([reactBoot, {LayoutBcrumb}]) => {
+        const test = ${json_js(str(dir(obj)))}
+        console.log(test)
+    });
+</script>
