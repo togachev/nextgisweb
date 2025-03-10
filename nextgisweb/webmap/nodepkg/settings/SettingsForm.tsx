@@ -63,7 +63,6 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             setGeocoder(allValues.address_geocoder);
         }
     };
-    console.log(initialValues);
     
     return (
         <Form

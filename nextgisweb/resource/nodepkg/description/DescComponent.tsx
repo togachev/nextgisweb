@@ -9,8 +9,9 @@ import { ImageView } from "@nextgisweb/gui/image-view";
 
 import "./DescComponent.less";
 
-const msgLayer = gettext("Layer description");
-const msgStyle = gettext("Style description");
+const msgWebmap = gettext("Webmap");
+const msgLayer = gettext("Layer");
+const msgStyle = gettext("Style");
 
 const zoomToFeature = (display, resourceId, featureId, result) => {
     display.featureHighlighter
@@ -50,12 +51,13 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 
 export const DescComponent = (props) => {
     const { display, content, type } = props;
-
+    console.log(type);
+    
     const DescComp = ({ content }) => {
         return (
             <>{
                 content?.map((item, index) => {
-                    const title = item.type === "layer" ? msgLayer : msgStyle;
+                    const title = item.type === "webmap_desc" ? msgWebmap : item.type === "layer" ? msgLayer : msgStyle;
                     return (
                         <div key={index}>
                             {content.length > 1 && (
@@ -110,8 +112,8 @@ export const DescComponent = (props) => {
     if (content === undefined && type === "map") {
         data_ = parse(display.config.webmapDescription, options)
     }
-    else if (content instanceof Array && type === "map") {
-        data_ = (<DescComp content={content} />)
+    else if (content.content instanceof Array && content.type === "map") {
+        data_ = (<DescComp content={content.content} />)
     }
     else {
         data_ = parse(content, options)

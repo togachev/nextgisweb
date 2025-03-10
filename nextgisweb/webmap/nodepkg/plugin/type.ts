@@ -4,6 +4,8 @@ export interface FeatureLayerWebMapPluginConfig {
 }
 export interface DescriptionWebMapPluginConfig {
     description: string | null;
+    description_style: string | null;
+    description_layer: string | null;
 }
 export interface LayerEditorWebMapPluginConfig {
     writable: boolean;

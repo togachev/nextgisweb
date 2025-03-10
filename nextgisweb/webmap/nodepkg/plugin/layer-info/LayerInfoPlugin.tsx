@@ -2,11 +2,15 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type DescriptionStore from "@nextgisweb/webmap/panel/description/DescriptionStore";
 import type { PluginState } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
-
 import { PluginBase } from "../PluginBase";
 import type { DescriptionWebMapPluginConfig } from "../type";
 
 import DescriptioIcon from "@nextgisweb/icon/material/article";
+
+interface DescriptionContentProps {
+    description: string;
+    type: string;
+}
 
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
@@ -17,38 +21,58 @@ export class LayerInfoPlugin extends PluginBase {
         ] as DescriptionWebMapPluginConfig;
         return {
             ...state,
-            enabled: !!(state.enabled && data.description),
+            enabled: !!(state.enabled && data.description_layer && data.description_style),
         };
     }
 
-    async run() {
-        this.openLayerInfo();
+    async run(nodeData) {
+        this.openLayerInfo(nodeData);
         return undefined;
     }
 
-    getMenuItem() {
+    getMenuItem(nodeData) {
         return {
             icon: <DescriptioIcon />,
             title: gettext("Description"),
             onClick: () => {
-                return this.run();
+                return this.run(nodeData);
             },
         };
     }
 
-    private async openLayerInfo() {
+    private async openLayerInfo(nodeData) {
         const pm = this.display.panelManager;
         const pkey = "info";
         const data = this.display.itemConfig?.plugin[
             this.identity
         ] as DescriptionWebMapPluginConfig;
-        if (data !== undefined) {
+
+        const content: DescriptionContentProps[] = [];
+        const vectorType = ["postgis_layer", "vector_layer"];
+
+        if (Object.values(data).length > 0) {
+
+            vectorType.includes(nodeData.layerCls) && data.description_layer && content.push({
+                description: data.description_layer,
+                type: "layer",
+            });
+
+            data.description_style && content.push({
+                description: data.description_style,
+                type: "style",
+            });
+
+            content.push({
+                description: this.display.config.webmapDescription,
+                type: "webmap_desc",
+            });
+            
             let panel = pm.getPanel<DescriptionStore>(pkey);
             if (!panel) {
                 panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
             }
             if (panel) {
-                panel.setContent(data.description);
+                panel.setContent({ content: content, type: "map" });
             }
             pm.activatePanel(pkey);
         }
