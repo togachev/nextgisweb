@@ -53,10 +53,10 @@
         ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
         ngwEntry(${json_js(LAYOUT_JSENTRY)}),
         ngwEntry(${json_js(RESOURCE_TITLE_JSENTRY)}),
-    ]).then(([reactBoot, {Avatar, Menu}, {WebMapTitle}]) => {
+    ]).then(([reactBoot, {Avatar, Menu}, {ResourceTitle}]) => {
         reactBoot(Avatar, {}, document.getElementById("avatar"));
         reactBoot(Menu, {}, document.getElementById("menu"));
-        reactBoot(WebMapTitle, { title: ${json_js(title)} }, document.getElementById("resource-title"));
+        reactBoot(ResourceTitle, { title: ${json_js(title)} }, document.getElementById("resource-title"));
 
         %if not hide_resource_filter:
             ngwEntry("@nextgisweb/resource/resources-filter").then(

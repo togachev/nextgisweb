@@ -1,10 +1,10 @@
-import "./WebMapTitle.less";
+import "./ResourceTitle.less";
 
-interface WebMapTitleProps {
+interface ResourceTitleProps {
     title?: string;
 }
 
-export const WebMapTitle = ({ title }: WebMapTitleProps) => {
+export const ResourceTitle = ({ title }: ResourceTitleProps) => {
     return (
         <div className="title-resource-component">
             <div className="title-resource" title={title} >{title}</div>
@@ -12,4 +12,4 @@ export const WebMapTitle = ({ title }: WebMapTitleProps) => {
     );
 };
 
-WebMapTitle.displayName = "WebMapTitle";
+ResourceTitle.displayName = "ResourceTitle";

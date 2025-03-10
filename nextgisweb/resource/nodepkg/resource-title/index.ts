@@ -1,1 +1,1 @@
-export { WebMapTitle } from "./WebMapTitle";
+export { ResourceTitle } from "./ResourceTitle";
