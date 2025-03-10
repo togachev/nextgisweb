@@ -17,3 +17,8 @@ class WebMapFragmentFavorite(ResourceFavorite):
     def url(cls, instance, *, request):
         base = request.route_url("webmap.display", id=instance.resource_id)
         return base + "?" + instance.data["query_string"]
+
+class WebMapResourceFavorite(ResourceFavorite):
+    kind = "resource_webmap"
+    label = gettext("Resource webmap")
+    icon = icon("material/info")

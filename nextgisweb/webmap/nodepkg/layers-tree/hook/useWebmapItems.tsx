@@ -20,7 +20,9 @@ export function useWebmapItems({
 
             if (item.treeItem.type === "root" || item.treeItem.type === "group") {
                 item.icon = ({ expanded }) =>
-                    expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
+                (<span className="legend">
+                    {expanded ? <FolderOpenIcon /> : <FolderClosedIcon />}
+                </span>)
 
             } else if (item.treeItem.type === "layer") {
                 item.isLeaf = true;

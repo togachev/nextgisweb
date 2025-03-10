@@ -6,4 +6,4 @@
 
 DELETE FROM setting 
 WHERE component = 'webmap' 
-    AND name IN ('identify_panel');
+    AND name IN ('identify_panel','popup_width','popup_height');

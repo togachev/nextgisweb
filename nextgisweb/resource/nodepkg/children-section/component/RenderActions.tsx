@@ -46,6 +46,7 @@ export function RenderActions({
 
     return actions.map((action) => {
         const { target: target_, href: href_, icon: icon_, title: title_, key } = action;
+        
         const icon = key[0] === "webmap" ? "material-info" : icon_;
         const href = key[0] === "webmap" ? "/resource/" + id : href_;
         const title = key[0] === "webmap" ? gettext("Description") : title_;

@@ -51,8 +51,6 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 
 export const DescComponent = (props) => {
     const { display, content, type } = props;
-    console.log(type);
-    
     const DescComp = ({ content }) => {
         return (
             <>{
