@@ -19,7 +19,7 @@
         effective_title = new_title if (new_title is not None) else effective_title
 
     bcpath = list()
-    if obj is not UNDEFINED:
+    if obj is not None:
         bcpath = breadcrumb_path(obj, request)
         if len(bcpath) > 0 and effective_title is None:
             effective_title = bcpath[-1].label
@@ -167,7 +167,16 @@
         ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
         ngwEntry(${json_js(LAYOUT_BCRUMB_JSENTRY)}),
     ]).then(([reactBoot, {LayoutBcrumb}]) => {
-        const test = ${json_js(str(dir(obj)))}
-        console.log(test)
+        const bcpath = ${json_js([
+            dict(
+                title=x.label,
+                href=x.link,
+                icon=x.icon
+            ) for x in bcpath if len(bcpath) > 0])};
+        reactBoot(
+            LayoutBcrumb,
+            {bcpath},
+            document.getElementById("layout-bcrumb")
+        );
     });
 </script>
