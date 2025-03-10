@@ -35,6 +35,7 @@ EXTERNAL_ACCESS_JSENTRY = jsentry("@nextgisweb/resource/external-access")
 RESOURCE_ENTRY_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
 HOME_PAGE_JSENTRY = jsentry("@nextgisweb/resource/home-page")
 DESCRIPTION_RESOURCE_JSENTRY = jsentry("@nextgisweb/resource/description")
+RESOURCE_TITLE_JSENTRY = jsentry("@nextgisweb/resource/resource-title")
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
