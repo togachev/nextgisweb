@@ -14,7 +14,7 @@ interface BreadcrumbProps {
 
 interface BreadcrumbComponentProps {
     bcpath?: BreadcrumbProps[];
-    current_id?: number;
+    current_id?: number | undefined;
 }
 
 export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentProps) => {
