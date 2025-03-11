@@ -6,7 +6,7 @@
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.view import ICON_JSENTRY
     from nextgisweb.gui.view import REACT_BOOT_JSENTRY
-    from nextgisweb.pyramid.view import LAYOUT_BCRUMB_JSENTRY
+    from nextgisweb.pyramid.view import BREADCRUMB_JSENTRY
     import json
 %>
 
@@ -105,7 +105,7 @@
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-                        <div id="layout-bcrumb"></div>
+                        <div id="breadcrumb"></div>
                         %if len(bcpath) > 0:
                             <div class="ngw-pyramid-layout-bcrumb">
                                 %for idx, bc in enumerate(bcpath):
@@ -165,22 +165,21 @@
 <script type="text/javascript">
     Promise.all([
         ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
-        ngwEntry(${json_js(LAYOUT_BCRUMB_JSENTRY)}),
-    ]).then(([reactBoot, {LayoutBcrumb}]) => {
+        ngwEntry(${json_js(BREADCRUMB_JSENTRY)}),
+    ]).then(([reactBoot, {BreadcrumbComponent}]) => {
         const bcpath = ${json_js([
             dict(
                 title=x.label,
                 href=x.link,
-                icon=x.icon
+                icon=x.icon,
+                id=x.parent["id"],
             ) for x in bcpath if len(bcpath) > 0])};
-        const effective_title = ${json_js(effective_title)}
         reactBoot(
-            LayoutBcrumb,
+            BreadcrumbComponent,
             {
                 bcpath,
-                effective_title,
             },
-            document.getElementById("layout-bcrumb")
+            document.getElementById("breadcrumb")
         );
     });
 </script>

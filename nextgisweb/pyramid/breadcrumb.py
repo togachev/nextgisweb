@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional, Dict
 
+Parent = Dict[Optional[str], int]
 
 @dataclass
 class Breadcrumb:
     label: Optional[str]
     link: str
     icon: Optional[str] = None
-    parent: Optional[Any] = None
+    parent: Parent = None
 
 
 _adapters = list()
@@ -25,7 +26,7 @@ def breadcrumb_path(obj, request):
             if brcr is not None:
                 assert isinstance(brcr, Breadcrumb)
                 result.insert(0, brcr)
-                obj = brcr.parent
+                obj = brcr.parent["parent"]
                 break
         else:
             break

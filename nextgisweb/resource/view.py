@@ -103,7 +103,7 @@ def resource_breadcrumb(obj, request):
             label=obj.display_name,
             link=request.route_url("resource.show", id=obj.id),
             icon=f"rescls-{obj.cls}",
-            parent=obj.parent,
+            parent=dict(parent=obj.parent, id=obj.id),
         )
 
 
