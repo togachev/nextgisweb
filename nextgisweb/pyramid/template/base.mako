@@ -106,6 +106,7 @@
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
                         <div id="breadcrumb"></div>
+                        <!--
                         %if len(bcpath) > 0:
                             <div class="ngw-pyramid-layout-bcrumb">
                                 %for idx, bc in enumerate(bcpath):
@@ -122,6 +123,7 @@
                                 %endfor
                             </div>
                         %endif
+                        --!>
 
                         <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
