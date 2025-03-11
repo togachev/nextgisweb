@@ -173,9 +173,13 @@
                 href=x.link,
                 icon=x.icon
             ) for x in bcpath if len(bcpath) > 0])};
+        const effective_title = ${json_js(effective_title)}
         reactBoot(
             LayoutBcrumb,
-            {bcpath},
+            {
+                bcpath,
+                effective_title,
+            },
             document.getElementById("layout-bcrumb")
         );
     });

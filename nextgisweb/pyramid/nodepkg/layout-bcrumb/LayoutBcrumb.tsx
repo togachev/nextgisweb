@@ -2,10 +2,11 @@ import "./LayoutBcrumb.less";
 
 interface LayoutBcrumbProps {
     bcpath?: string;
+    effective_title?: string;
 }
 
-export const LayoutBcrumb = ({ bcpath }: LayoutBcrumbProps) => {
-    console.log(bcpath);
+export const LayoutBcrumb = ({ bcpath, effective_title }: LayoutBcrumbProps) => {
+    console.log(bcpath, effective_title);
     
 //     %if len(bcpath) > 0:
 //     <div class="ngw-pyramid-layout-bcrumb">
