@@ -180,6 +180,7 @@
             BreadcrumbComponent,
             {
                 bcpath,
+                current_id: ${json_js(obj.id)},
             },
             document.getElementById("breadcrumb")
         );

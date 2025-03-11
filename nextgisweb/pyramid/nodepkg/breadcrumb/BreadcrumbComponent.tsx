@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Breadcrumb } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 
 import "./BreadcrumbComponent.less";
 
@@ -14,70 +14,60 @@ interface BreadcrumbProps {
 
 interface BreadcrumbComponentProps {
     bcpath?: BreadcrumbProps[];
+    current_id?: number;
 }
 
-// const menuItems = [
-//     {
-//         key: '1',
-//         label: (
-//             <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">
-//                 General
-//             </a>
-//         ),
-//     },
-//     {
-//         key: '2',
-//         label: (
-//             <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">
-//                 Layout
-//             </a>
-//         ),
-//     },
-//     {
-//         key: '3',
-//         label: (
-//             <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">
-//                 Navigation
-//             </a>
-//         ),
-//     },
-// ];
+export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentProps) => {
+    const [value, setValue] = useState([]);
 
-export const BreadcrumbComponent = ({ bcpath }: BreadcrumbComponentProps) => {
-
-    const getCollection = async (parentId) => {
+    const getCollection = async ({ id, href, icon, title }: BreadcrumbProps) => {
         return await route("resource.collection").get({
-            query: { parent: parentId },
+            query: { parent: id },
+            cache: true,
         })
             .then(item => item.filter(item => item.resource.cls === "resource_group" || item.resource.cls === "file_bucket"))
-            .then(item => item.map(item => ({ key: item.resource.id, label: item.resource.display_name })))
+            .then(item => item.map(item => ({
+                key: item.resource.id,
+                label: (
+                    <a target="_self" rel="noopener noreferrer" href={routeURL("resource.show", item.resource.id)}>
+                        {item.resource.display_name}
+                    </a>
+                ),
+
+            })))
+            .then(itm => {
+                const obj = {
+                    href: href,
+                    title: (
+                        <span className="title-item">
+                            <SvgIcon icon={icon} />
+                            <span className="title">{title}</span>
+                        </span>
+                    ),
+                }
+                itm.length > 1 && Object.assign(obj, {
+                    menu: {
+                        className: "dropdown-items",
+
+                        items: itm.filter(i => i.key !== current_id)
+                    },
+                });
+                setValue(prev => ({
+                    ...prev,
+                    [String(id)]: obj
+                }))
+            })
     }
-    // { key: item.resource.id, label: item.resource.display_name }
-    const items: BreadcrumbProps[] = useMemo(() => {
-        const value = bcpath?.map(item => {
-            return getCollection(item.id)
-                .then(itm => {
-                    return {
-                        href: item.href,
-                        title: (
-                            <span className="title-item">
-                                <SvgIcon icon={item.icon} />
-                                <span className="title">{item.title}</span>
-                            </span>
-                        ),
-                        menu: { items: itm },
-                    }
-                })
-                
+
+    useMemo(() => {
+        bcpath?.map(item => {
+            return getCollection(item)
         })
-        console.log(value);
-
-    }, [bcpath]);
-
+    }, []);
 
     return (
         <div className="ngw-breabcrumb-panel ">
-            <Breadcrumb separator=">" items={items} />
+            <Breadcrumb items={Object.values(value)} />
         </div>
     )
 };
