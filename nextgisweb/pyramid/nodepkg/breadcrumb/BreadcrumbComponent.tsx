@@ -34,12 +34,15 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
             .then(item => item.map(item => ({
                 key: item.resource.id,
                 label: (
-                    <a target="_self" rel="noopener noreferrer" href={routeURL("resource.show", item.resource.id)}>
-                        {item.resource.display_name}
+                    <a title={item.resource.display_name} target="_self" rel="noopener noreferrer" href={routeURL("resource.show", item.resource.id)}>
+                        <span className="menu-link-resource">{item.resource.display_name}</span>
                     </a>
                 ),
+                icon: (<span className="icon-home"><SvgIcon icon={`rescls-${item.resource.cls}`} /></span>)
             })))
             .then(itm => {
+                console.log(itm);
+                
                 const obj = {
                     href: href,
                     icon: icon,
@@ -67,7 +70,7 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
                         <MenuIcon />
                     </span>
                 }
-                
+                overlayStyle={{maxWidth: "50%", width: "max-content"}}
                 trigger="click"
                 size="small"
                 type={type}
@@ -86,7 +89,7 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
                 href={href}
                 type={type}
             >
-                <span className="title-bc">{title}</span>
+                <span title={title} className="title-bc">{title}</span>
             </Button>
         )
     }
