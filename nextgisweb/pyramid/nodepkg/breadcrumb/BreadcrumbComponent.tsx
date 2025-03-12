@@ -94,7 +94,7 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
             {bcItems.map(([_, itm], index) => {
                 itm.iconHome = (
                     <span className="icon-home">
-                        {index == 0 ? <ResourceHome /> : <SvgIcon icon={itm.icon} />}
+                        {index === 0 ? <ResourceHome /> : <SvgIcon icon={itm.icon} />}
                     </span>
                 );
                 return (
