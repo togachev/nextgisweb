@@ -1,7 +1,11 @@
 import { useMemo, useState } from "react";
-import { Breadcrumb } from "@nextgisweb/gui/antd";
+import { Button, Dropdown } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import MenuIcon from "@nextgisweb/icon/mdi/menu";
+import SlashForward from "@nextgisweb/icon/mdi/slash-forward";
+import ResourceHome from "./icons/resource_home.svg";
 
 import "./BreadcrumbComponent.less";
 
@@ -19,13 +23,13 @@ interface BreadcrumbComponentProps {
 
 export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentProps) => {
     const [value, setValue] = useState([]);
+    const bcItems = getEntries(value);
 
     const getCollection = async ({ id, href, icon, title }: BreadcrumbProps) => {
-        return await route("resource.collection").get({
-            query: { parent: id },
+        return await route("resource.collection_bc").get({
+            query: { cls: ["resource_group", "file_bucket"], parent: id },
             cache: true,
         })
-            .then(item => item.filter(item => item.resource.cls === "resource_group" || item.resource.cls === "file_bucket"))
             .then(item => item.map(item => ({
                 key: item.resource.id,
                 label: (
@@ -33,24 +37,16 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
                         {item.resource.display_name}
                     </a>
                 ),
-
             })))
             .then(itm => {
                 const obj = {
                     href: href,
-                    title: (
-                        <span className="title-item">
-                            <SvgIcon icon={icon} />
-                            <span className="title">{title}</span>
-                        </span>
-                    ),
+                    icon: icon,
+                    title: title,
+                    type: "link",
                 }
                 itm.length > 1 && Object.assign(obj, {
-                    menu: {
-                        className: "dropdown-items",
-
-                        items: itm.filter(i => i.key !== current_id)
-                    },
+                    items: itm.filter(i => i.key !== current_id)
                 });
                 setValue(prev => ({
                     ...prev,
@@ -59,15 +55,61 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
             })
     }
 
-    useMemo(() => {
-        bcpath?.map(item => {
-            return getCollection(item)
-        })
-    }, []);
+    useMemo(() => bcpath?.map(item => getCollection(item)), []);
+
+    const DropDownComponent = (itm) => {
+        const { items, type } = itm;
+        return (
+            <Dropdown.Button
+                icon={
+                    <span className="icon-menu">
+                        <MenuIcon />
+                    </span>
+                }
+                trigger="click"
+                size="small"
+                type={type}
+                menu={{ items }}
+            >
+                <TitleBc {...itm} />
+            </Dropdown.Button>)
+    }
+
+    const TitleBc = (itm) => {
+        const { iconHome, title, href, type } = itm;
+        return (
+            <Button
+                size="small"
+                icon={iconHome}
+                href={href}
+                type={type}
+            >
+                <span className="title-bc">{title}</span>
+            </Button>
+        )
+    }
 
     return (
         <div className="ngw-breabcrumb-panel ">
-            <Breadcrumb items={Object.values(value)} />
+            {bcItems.map(([_, itm], index) => {
+                itm.iconHome = (
+                    <span className="icon-home">
+                        {index == 0 ? <ResourceHome /> : <SvgIcon icon={itm.icon} />}
+                    </span>
+                );
+                return (
+                    <div className="item-bc" key={itm.href}>
+                        {
+                            itm.items ?
+                                <DropDownComponent {...itm} /> :
+                                <TitleBc {...itm} />
+                        }
+                        {index + 1 !== bcItems.length ? (
+                            <span className="icon-separator"><SlashForward /></span>
+                        ) : <></>}
+                    </div>
+                )
+            })}
         </div>
     )
 };

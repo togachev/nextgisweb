@@ -208,6 +208,32 @@ def collection_get(
     resources.sort(key=lambda res: (res.cls_order, res.display_name))
     return [serializer.serialize(res, CompositeRead) for res in resources]
 
+def collection_bc_get(
+    request,
+    *,
+    parent: Union[int, None] = None,
+    cls: List[ResourceCls],
+) -> AsJSON[List[CompositeRead]]:
+    """Read children resources"""
+    query = (
+        Resource.query()
+        .filter_by(parent_id=parent)
+        .filter(Resource.cls.in_(cls))
+        .order_by(Resource.display_name)
+        .options(orm.subqueryload(Resource.acl))
+    )
+
+    serializer = CompositeSerializer(user=request.user)
+    result = list()
+    for resource in query:
+        if resource.has_permission(ResourceScope.read, request.user):
+            result.append(serializer.serialize(resource, CompositeRead))
+
+    serializer = CompositeSerializer(user=request.user)
+    check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
+    resources = [res for res in query if check_perm(res)]
+    resources.sort(key=lambda res: (res.cls_order, res.display_name))
+    return [serializer.serialize(res, CompositeRead) for res in resources]
 
 def collection_post(
     request, body: CompositeCreate
@@ -1194,6 +1220,12 @@ def setup_pyramid(comp, config):
         "/api/resource/",
         get=collection_get,
         post=collection_post,
+    )
+    # get collection filtered cls for breadcrumb  
+    config.add_route(
+        "resource.collection_bc",
+        "/api/resource_bc/",
+        get=collection_bc_get,
     )
 
     config.add_route(
