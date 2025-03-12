@@ -6,6 +6,7 @@ import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
 import SlashForward from "@nextgisweb/icon/mdi/slash-forward";
 import ResourceHome from "./icons/resource_home.svg";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./BreadcrumbComponent.less";
 
@@ -62,10 +63,11 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
         return (
             <Dropdown.Button
                 icon={
-                    <span className="icon-menu">
+                    <span className="icon-menu" title={gettext("Вложенные ресурсы")}>
                         <MenuIcon />
                     </span>
                 }
+                
                 trigger="click"
                 size="small"
                 type={type}
