@@ -8,6 +8,91 @@
 	flex-direction: column;
 	line-height: 2;
 
+	.footer-info-edit {
+		margin: 5px 0 5px 0;
+	}
+
+	.footer-content-edit {
+		background-color: #fff;
+		border-radius: 3px;
+		padding: 5px;
+	}
+
+	.edit-logo {
+		padding: 0px 5px 5px 0px;
+		display: block;
+
+		.upload-content {
+			display: flex;
+			flex-direction: column;
+
+			.upload-block {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			.logo-icon-view {
+				padding: 5px;
+
+				.uriit-logo-mini {
+					height: 14px;
+				}
+			}
+		}
+	}
+
+	.item-edit {
+		display: flex;
+		align-items: center;
+		border-radius: 3px;
+		padding: 2px 0;
+	}
+
+	.address {
+		margin: 0;
+		width: 100%;
+	}
+
+	.address-edit {
+		display: flex;
+		flex-wrap: wrap;
+
+		.phone {
+			width: 100%;
+
+			.item-edit {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+			}
+		}
+	}
+
+	.logo-col {
+		display: flex;
+		justify-content: center;
+		padding: 0 0 16px 0
+	}
+
+	.color-block {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		>span {
+			padding: 0 5px;
+			line-height: 1.2;
+		}
+	}
+	
+	.logo-block {
+		.uriit-logo {
+			height: 40px;
+			display: flex;
+			justify-content: flex-start;
+		}
+	}
+
 	.footer-info {
 		padding: 0;
 		min-height: 190px;
@@ -15,70 +100,12 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: flex-start;
-
-		.logo-block {
-			width: 165px;
-
-			.uriit-logo {
-				height: 40px;
-				display: flex;
-				justify-content: flex-start;
-			}
-
-			.edit-logo {
-				margin: 0 10px 0px 0;
-
-				.upload-content {
-					display: flex;
-					flex-direction: column;
-
-					.upload-block {
-						display: flex;
-						justify-content: space-between;
-					}
-
-					.logo-icon-view {
-						padding: 5px;
-
-						.uriit-logo-mini {
-							height: 14px;
-						}
-					}
-				}
-			}
-		}
-
-		.color-block {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-
-			>span {
-				padding: 0 5px;
-				line-height: 1.2;
-			}
-		}
+		justify-content: space-around;
 
 		.block-info {
-			width: calc(100% - 165px);
-
-			.footer-content-edit {
-				background-color: #fff;
-				border-radius: 3px;
-				padding: 5px;
-			}
-
 			.ant-input[disabled] {
 				cursor: auto !important;
 				margin: 5px;
-			}
-
-			.item-edit {
-				display: flex;
-				align-items: center;
-				background-color: #fff;
-				border-radius: 3px;
-				padding: 2px 0;
 			}
 
 			.services-url {
@@ -113,25 +140,6 @@
 				}
 			}
 
-			.address-edit {
-				display: flex;
-				flex-wrap: wrap;
-
-				.phone {
-					width: 100%;
-
-					.item-edit {
-						display: flex;
-						flex-direction: row;
-						justify-content: space-between;
-					}
-				}
-			}
-
-			.address {
-				margin: 0;
-			}
-
 			.service {
 				text-transform: uppercase;
 				padding: 2px 0;
@@ -140,14 +148,14 @@
 			.logo-uriit {
 				font-size: 64px;
 			}
-
-			.ant-divider {
-				background-color: #fff;
-				padding: 0;
-				margin: 10px 0;
-				border-block-start: 1px solid rgb(5 5 5 / 29%);
-			}
 		}
+	}
+
+	.ant-divider {
+		background-color: #fff;
+		padding: 0;
+		margin: 10px 0;
+		border-block-start: 1px solid rgb(5 5 5 / 29%);
 	}
 
 	.icon-pensil {
@@ -166,22 +174,7 @@
 
 	.uriit-footer-name {
 		display: flex;
-		height: 50px;
 		align-items: center;
-
-		.year-name-block {
-			display: flex;
-		}
-	}
-
-	.control-button {
-		position: absolute;
-		left: 0;
-		display: flex;
-		flex-direction: column;
-
-		button {
-			background-color: #fff;
-		}
+		margin: 0px 0 5px 0;
 	}
 }
