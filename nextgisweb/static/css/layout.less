@@ -126,10 +126,11 @@ a[class*=" icon-"]:hover:before {
                 h1.ngw-pyramid-layout-title {
                     align-items: center;
                     display: flex;
+                    flex-wrap: wrap;
                     gap: 8px;
+                    justify-content: flex-end;
                     margin: 0 0 12px;
                     min-height: 40px;
-                    justify-content: space-between;
 
                     .title-class {
                         overflow-wrap: anywhere;
@@ -137,6 +138,7 @@ a[class*=" icon-"]:hover:before {
                         -webkit-line-clamp: 2;
                         display: -webkit-box;
                         -webkit-box-orient: vertical;
+                        font-size: 21px;
                     }
 
                     &.pull-right>*:first-child {
