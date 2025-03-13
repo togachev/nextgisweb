@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import { Button, Dropdown } from "@nextgisweb/gui/antd";
+import { Dropdown } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
-import SlashForward from "@nextgisweb/icon/mdi/slash-forward";
 import ResourceHome from "./icons/resource_home.svg";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -38,16 +37,13 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
                         <span className="menu-link-resource">{item.resource.display_name}</span>
                     </a>
                 ),
-                icon: (<span className="icon-home"><SvgIcon icon={`rescls-${item.resource.cls}`} /></span>)
+                icon: (<span className="icon-menu"><SvgIcon icon={`rescls-${item.resource.cls}`} /></span>)
             })))
             .then(itm => {
-                console.log(itm);
-                
                 const obj = {
                     href: href,
                     icon: icon,
                     title: title,
-                    type: "link",
                 }
                 itm.length > 1 && Object.assign(obj, {
                     items: itm.filter(i => i.key !== current_id)
@@ -61,58 +57,42 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
 
     useMemo(() => bcpath?.map(item => getCollection(item)), []);
 
-    const DropDownComponent = (itm) => {
-        const { items, type } = itm;
-        return (
-            <Dropdown.Button
-                icon={
-                    <span className="icon-menu" title={gettext("Вложенные ресурсы")}>
-                        <MenuIcon />
-                    </span>
-                }
-                overlayStyle={{maxWidth: "50%", width: "max-content"}}
-                trigger="click"
-                size="small"
-                type={type}
-                menu={{ items }}
-            >
-                <TitleBc {...itm} />
-            </Dropdown.Button>)
-    }
-
     const TitleBc = (itm) => {
-        const { iconHome, title, href, type } = itm;
+        const { iconHome, title, href, sep, items } = itm;
         return (
-            <Button
-                size="small"
-                icon={iconHome}
-                href={href}
-                type={type}
-            >
-                <span title={title} className="title-bc">{title}</span>
-            </Button>
+            <>
+                <a href={href}>
+                    <span className="icon-title">{iconHome}</span>
+                    <span>{title}</span>
+
+                </a>
+                {items &&
+                    <Dropdown
+                        className="menu-dropdown"
+                        overlayStyle={{ maxWidth: "50%", width: "max-content" }}
+                        trigger="click"
+                        size="small"
+                        menu={{ items }}
+                    >
+                        <span title={gettext("Вложенные ресурсы")}>
+                            <MenuIcon />
+                        </span>
+                    </Dropdown>
+                }
+                {sep}
+            </>
         )
     }
 
     return (
         <div className="ngw-breabcrumb-panel ">
             {bcItems.map(([_, itm], index) => {
-                itm.iconHome = (
-                    <span className="icon-home">
-                        {index === 0 ? <ResourceHome /> : <SvgIcon icon={itm.icon} />}
-                    </span>
-                );
+                itm.iconHome = index === 0 ? <ResourceHome /> : <SvgIcon icon={itm.icon} />
+                itm.sep = index + 1 !== bcItems.length ? <span className="separator"></span> : <></>
                 return (
-                    <div className="item-bc" key={itm.href}>
-                        {
-                            itm.items ?
-                                <DropDownComponent {...itm} /> :
-                                <TitleBc {...itm} />
-                        }
-                        {index + 1 !== bcItems.length ? (
-                            <span className="icon-separator"><SlashForward /></span>
-                        ) : <></>}
-                    </div>
+                    <span key={itm.href} className="item-bc">
+                        <TitleBc {...itm} />
+                    </span>
                 )
             })}
         </div>
