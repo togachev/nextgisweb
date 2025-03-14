@@ -10,17 +10,13 @@ export function ResourceIcon({
     identity,
     ...props
 }: SVGProps<SVGSVGElement> & { identity?: ResourceCls }) {
-    console.log(props);
     return <SvgIcon icon={"rescls-" + identity} {...props} />;
 }
 
 export function AllowIcon(props: SVGProps<SVGSVGElement>) {
-    console.log(props);
-
     return <MAllowIcon style={{ color: "var(--success)" }} {...props} />;
 }
 
 export function DenyIcon(props: SVGProps<SVGSVGElement>) {
-    console.log(props);
     return <MDenyIcon style={{ color: "var(--danger)" }} {...props} />;
 }
