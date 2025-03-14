@@ -26,9 +26,11 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
     const bcItems = getEntries(value);
 
     const getCollection = async ({ id, href, icon, title }: BreadcrumbProps) => {
-        return await route("resource.collection_bc").get({
-            query: { cls: ["resource_group", "file_bucket"], parent: id },
-            cache: true,
+        return await route("resource.collection").get({
+            query: {
+                cls: ["resource_group", "file_bucket"],
+                parent: id,
+            },
         })
             .then(item => item.map(item => ({
                 key: item.resource.id,
