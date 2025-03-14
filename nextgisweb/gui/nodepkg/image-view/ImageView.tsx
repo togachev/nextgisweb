@@ -29,6 +29,8 @@ export function ImageView(props) {
     return (
         <Image
             src={attribs.src}
+            width={attribs.width}
+            height={attribs.height}
             preview={{
                 src: attribs.src,
                 mask: <span className="icon-preview"><ImagePreview /></span>,

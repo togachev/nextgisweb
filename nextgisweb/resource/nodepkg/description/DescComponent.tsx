@@ -74,7 +74,7 @@ export const DescComponent = (props) => {
             const props = attributesToProps(item.attribs);
             const types = ["map", undefined, "home_page"];
 
-            if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_width && type === "feature") {
+            if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_size.width && type === "feature") {
                 return (<ImageView {...item} />);
             }
 
