@@ -3,17 +3,11 @@
 	padding: 0 10% 0 10%;
 
 	.edit-panel {
-		display: flex;
-		flex-direction: column;
-		position: absolute;
-		left: 38px;
-		top: 5px;
+		position: relative;
 		background: #fff;
-		box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
 		z-index: 1000;
-		width: 100%;
-		max-width: 680px;
-		padding: 5px;
+		margin-top: 5px;
+		padding-top: 5px;
 		border-radius: 3px;
 	}
 
@@ -53,8 +47,8 @@
 
 				.auth-login {
 					vertical-align: middle;
-				
-					> svg.icon {
+
+					>svg.icon {
 						color: inherit;
 						font-size: 24px;
 					}
@@ -69,13 +63,6 @@
 					display: flex;
 					text-transform: uppercase;
 					align-items: center;
-
-					.item-edit {
-						display: flex;
-						align-items: center;
-						width: 100%;
-						padding: 2px 0;
-					}
 
 					.ant-divider-vertical {
 						position: relative;
@@ -122,21 +109,6 @@
 		align-items: center;
 		flex: 0 0 auto;
 		cursor: pointer;
-		z-index: 1000;
-	}
-
-	.icon-pensil {
-		width: 24px;
-		height: 24px;
-		color: var(--text-base);
-		background-color: #fff;
-		display: flex;
-		justify-items: center;
-		justify-content: center;
-		align-items: center;
-		flex: 0 0 auto;
-		cursor: pointer;
-		margin: 4px;
 		z-index: 1000;
 	}
 

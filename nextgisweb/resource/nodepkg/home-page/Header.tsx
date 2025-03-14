@@ -32,6 +32,7 @@ export const Header = observer(({ store, config }) => {
         editHeader,
         setEditHeader,
         valueHeader,
+        valueFooter,
         setValueHeader,
     } = store;
 
@@ -54,12 +55,14 @@ export const Header = observer(({ store, config }) => {
         }
     };
 
+    const colorText = { color: valueFooter?.logo?.colorText }
+
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
     const items: MenuItem[] = valueHeader?.menus.menu && getEntries(valueHeader?.menus?.menu).map(item => ({
         key: item[0],
-        label: (<a href={item[1]?.value} target="_blank" rel="noopener noreferrer">{item[1]?.name}</a>),
+        label: (<a href={item[1]?.value} target="_blank" rel="noopener noreferrer" style={colorText}>{item[1]?.name}</a>),
         name: item[1]?.name,
         value: item[1]?.value,
     }));
@@ -121,7 +124,7 @@ export const Header = observer(({ store, config }) => {
         <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="control-button">
                 {config.isAdministrator === true && (<Button
-                    className={editHeader ? "icon-pensil" : "icon-edit"}
+                    className={editHeader ? "icon-pensil" : "icon-edit-control"}
                     shape="square"
                     title={editHeader ? gettext("Edit menu") : gettext("Save menu")}
                     type="default"
@@ -133,7 +136,7 @@ export const Header = observer(({ store, config }) => {
                 />)}
                 {!editHeader && (
                     <Button
-                        className="icon-edit"
+                        className="icon-edit-control"
                         shape="square"
                         title={gettext("Add urls")}
                         type="default"
@@ -160,68 +163,67 @@ export const Header = observer(({ store, config }) => {
                 )}
             </div>
             <div className="menus">
-                <div className="menu-component">
+                <div className={editHeader ? "menu-component" : ""}>
                     <div className={editHeader ? "button-link" : "button-link edit-panel"}>
                         {!editHeader ? items.map((item) => {
                             if (!["auth", "resources"].includes(item.key)) {
                                 return (
-                                    <div key={item.key} className="menu-link">
-                                        <div className="item-edit">
-                                            <Input
-                                                placeholder={gettext("Name url")}
-                                                type="text"
-                                                value={item?.name}
-                                                allowClear
-                                                disabled={editHeader}
-                                                onChange={(e) => {
-                                                    setValueHeader((prev) => ({
-                                                        ...prev,
-                                                        menus: {
-                                                            ...prev.menus,
-                                                            menu: {
-                                                                ...prev.menus.menu,
-                                                                [item.key]: {
-                                                                    ...prev.menus.menu[item.key],
-                                                                    name: e.target.value,
-                                                                },
+                                    <div key={item.key} className="item-edit">
+                                        <Input
+                                            placeholder={gettext("Name url")}
+                                            type="text"
+                                            value={item?.name}
+                                            allowClear
+                                            disabled={editHeader}
+                                            onChange={(e) => {
+                                                setValueHeader((prev) => ({
+                                                    ...prev,
+                                                    menus: {
+                                                        ...prev.menus,
+                                                        menu: {
+                                                            ...prev.menus.menu,
+                                                            [item.key]: {
+                                                                ...prev.menus.menu[item.key],
+                                                                name: e.target.value,
                                                             },
                                                         },
-                                                    }));
-                                                }}
-                                            />
-                                            <Input
-                                                placeholder={gettext("Url")}
-                                                type="text"
-                                                value={item?.value}
-                                                allowClear
-                                                disabled={editHeader}
-                                                onChange={(e) => {
-                                                    setValueHeader((prev) => ({
-                                                        ...prev,
-                                                        menus: {
-                                                            ...prev.menus,
-                                                            menu: {
-                                                                ...prev.menus.menu,
-                                                                [item.key]: {
-                                                                    ...prev.menus.menu[item.key],
-                                                                    value: e.target.value,
-                                                                },
+                                                    },
+                                                }));
+                                            }}
+                                        />
+                                        <Input
+                                            className="first-input"
+                                            placeholder={gettext("Url")}
+                                            type="text"
+                                            value={item?.value}
+                                            allowClear
+                                            disabled={editHeader}
+                                            onChange={(e) => {
+                                                setValueHeader((prev) => ({
+                                                    ...prev,
+                                                    menus: {
+                                                        ...prev.menus,
+                                                        menu: {
+                                                            ...prev.menus.menu,
+                                                            [item.key]: {
+                                                                ...prev.menus.menu[item.key],
+                                                                value: e.target.value,
                                                             },
                                                         },
-                                                    }));
-                                                }}
-                                            />
-                                            <Button
-                                                title={gettext("Delete urls")}
-                                                onClick={() => {
-                                                    const state = { ...valueHeader };
-                                                    delete state.menus.menu[item.key];
-                                                    setValueHeader(state);
-                                                }}
-                                                className="icon-edit"
-                                                icon={<DeleteOffOutline />}
-                                            />
-                                        </div>
+                                                    },
+                                                }));
+                                            }}
+                                        />
+                                        <Button
+                                            title={gettext("Delete urls")}
+                                            onClick={() => {
+                                                const state = { ...valueHeader };
+                                                delete state.menus.menu[item.key];
+                                                setValueHeader(state);
+                                            }}
+                                            className="icon-edit"
+                                            icon={<DeleteOffOutline />}
+                                        />
                                     </div>
                                 )
                             }
@@ -229,7 +231,7 @@ export const Header = observer(({ store, config }) => {
                             (<MenuContainer />)}
                         {!editHeader &&
                             <div className="edit-title">
-                                <div className="title-item">
+                                <div className="item-edit">
                                     <Input
                                         placeholder={gettext("Title")}
                                         type="text"
@@ -247,7 +249,7 @@ export const Header = observer(({ store, config }) => {
                                         }}
                                     />
                                 </div>
-                                <div className="title-item">
+                                <div className="item-edit">
                                     <Input
                                         placeholder={gettext("Title description")}
                                         type="text"
@@ -272,8 +274,8 @@ export const Header = observer(({ store, config }) => {
             </div>
             <div className="name-site">
                 <div className="title">
-                    <Title className="name-site-a" level={1} >{valueHeader?.names?.first_name}</Title>
-                    <Title className="name-site-b" level={5} >{valueHeader?.names?.last_name}</Title>
+                    <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.names?.first_name}</Title>
+                    <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.names?.last_name}</Title>
                 </div>
             </div>
         </div >

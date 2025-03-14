@@ -10,17 +10,19 @@
 
 	.footer-info-edit {
 		margin: 5px 0 5px 0;
+		background-color: #fff;
+		border-radius: 3px;
 	}
 
 	.footer-content-edit {
-		background-color: #fff;
 		border-radius: 3px;
-		padding: 5px;
+		padding-top: 5px;
 	}
 
 	.edit-logo {
-		padding: 0px 5px 5px 0px;
 		display: block;
+		border-radius: 3px;
+		color: var(--text-base);
 
 		.upload-content {
 			display: flex;
@@ -29,41 +31,21 @@
 			.upload-block {
 				display: flex;
 				justify-content: space-between;
+				padding: 0 5px 5px 5px;
 			}
 
 			.logo-icon-view {
+				margin: 0px 5px;
 				padding: 5px;
+				background: var(--icon-color);
+				border-radius: 3px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 
 				.uriit-logo-mini {
-					height: 14px;
+					height: 32px;
 				}
-			}
-		}
-	}
-
-	.item-edit {
-		display: flex;
-		align-items: center;
-		border-radius: 3px;
-		padding: 2px 0;
-	}
-
-	.address {
-		margin: 0;
-		width: 100%;
-	}
-
-	.address-edit {
-		display: flex;
-		flex-wrap: wrap;
-
-		.phone {
-			width: 100%;
-
-			.item-edit {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
 			}
 		}
 	}
@@ -71,26 +53,38 @@
 	.logo-col {
 		display: flex;
 		justify-content: center;
-		padding: 0 0 30px 0;
+		padding: 5px 5px 32px 0;
+	}
+
+	.logo-col-edit {
+		display: flex;
+		justify-content: center;
+		padding-top: 5px;
 	}
 
 	.color-block {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		margin: 5px 0px 0px 5px;
 
 		>span {
 			padding: 0 5px;
 			line-height: 1.2;
 		}
 	}
-	
+
 	.logo-block {
 		.uriit-logo {
 			height: 40px;
 			display: flex;
 			justify-content: flex-start;
 		}
+	}
+
+	.name-center {
+		text-transform: uppercase;
+		padding: 2px 0;
 	}
 
 	.footer-info {
@@ -140,10 +134,7 @@
 				}
 			}
 
-			.service {
-				text-transform: uppercase;
-				padding: 2px 0;
-			}
+
 
 			.logo-uriit {
 				font-size: 64px;
@@ -156,20 +147,6 @@
 		padding: 0;
 		margin: 10px 0;
 		border-block-start: 1px solid rgb(5 5 5 / 29%);
-	}
-
-	.icon-pensil {
-		width: 24px;
-		height: 24px;
-		color: var(--text-base);
-		background-color: #fff;
-		display: flex;
-		justify-items: center;
-		justify-content: center;
-		align-items: center;
-		flex: 0 0 auto;
-		cursor: pointer;
-		margin: 4px;
 	}
 
 	.uriit-footer-name {

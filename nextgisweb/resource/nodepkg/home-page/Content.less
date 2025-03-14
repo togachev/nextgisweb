@@ -1,5 +1,11 @@
 body {
-    min-width: auto;
+	min-width: auto;
+}
+
+input {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .wrapper-home-page {
@@ -11,37 +17,62 @@ body {
 	.control-button {
 		position: absolute;
 		left: 0;
+	}
 
-		button {
-			background-color: #ffffff80;
-			border-color: #ffffff80;
-			color: #ffffff;
-		}
-	}
-	.icon-button {
-		color: #ffffff;
-		background-color: #ffffff80;
-		border-color: #ffffff80;
-		display: flex;
-		justify-items: center;
-		justify-content: center;
-		align-items: center;
-		flex: 0 0 auto;
-		cursor: pointer;
-	}
-	.icon-edit {
+	.icon-pensil {
 		width: 24px;
 		height: 24px;
-		background-color: #ffffff80;
-		border-color: #b1b1b180;
+		color: var(--text-base);
+		background-color: #fff;
 		display: flex;
 		justify-items: center;
 		justify-content: center;
 		align-items: center;
 		flex: 0 0 auto;
 		cursor: pointer;
-		margin: 5px;
+		margin: 5px 0 0 5px;
 		z-index: 1000;
+		border-color: var(--icon-color);
+	}
+
+	.icon-edit-control {
+		width: 32px;
+		height: 32px;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+		z-index: 1000;
+		margin: 5px;
+		background-color: #fff;
+		font-size: 18px;
+		color: var(--text-base);
+	}
+
+	.icon-edit {
+		width: 32px;
+		height: 32px;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+		z-index: 1000;
+		color: var(--text-base);
+	}
+
+	.item-edit {
+		display: flex;
+		align-items: center;
+		border-radius: 3px;
+		padding: 0 5px 5px 5px;
+	}
+
+	.first-input {
+		margin: 0 5px;
 	}
 
 	a {
