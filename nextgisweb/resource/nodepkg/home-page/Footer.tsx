@@ -236,7 +236,7 @@ export const Footer = observer(({ store, config }) => {
     };
 
     return (
-        <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground, color: valueFooter?.logo?.colorText }}>
+        <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground, color: valueFooter?.logo?.colorText, fontWeight: 500 }}>
             <div className="control-button">
                 {config.isAdministrator === true && (<Button
                     className={editFooter ? "icon-pensil" : "icon-edit-control"}
