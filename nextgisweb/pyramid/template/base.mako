@@ -151,21 +151,23 @@
             ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
             ngwEntry(${json_js(BREADCRUMB_JSENTRY)}),
         ]).then(([reactBoot, {BreadcrumbComponent}]) => {
-            const bcpath = ${json_js([
-                dict(
-                    title=x.label,
-                    href=x.link,
-                    icon=x.icon,
-                    id=x.parent["id"],
-                ) for x in bcpath if len(bcpath) > 0])};
-            reactBoot(
-                BreadcrumbComponent,
-                {
-                    bcpath,
-                    current_id: ${json_js(obj.id)},
-                },
-                document.getElementById("breadcrumb")
-            );
+            if(ngwConfig.resourceFavorite.identity === "resource.show"){
+                const bcpath = ${json_js([
+                    dict(
+                        title=x.label,
+                        href=x.link,
+                        icon=x.icon,
+                        id=x.parent["id"],
+                    ) for x in bcpath if len(bcpath) > 0])};
+
+                reactBoot(
+                    BreadcrumbComponent,
+                    {
+                        bcpath,
+                        current_id: ${json_js(obj.id)},
+                    },
+                    document.getElementById("breadcrumb")
+            );}
         });
     </script>
 %endif
