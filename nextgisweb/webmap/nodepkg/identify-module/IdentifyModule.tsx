@@ -22,32 +22,67 @@ import "./IdentifyModule.less";
 const settings = webmapSettings;
 const wkt = new WKT();
 
-const Control = function (options) {
-    this.tool = options.tool;
-    Interaction.call(this, {
-        handleEvent: Control.prototype.handleClickEvent,
-    });
-};
+interface ControlOptions {
+    tool: IdentifyModule;
+}
 
-Control.prototype = Object.create(Interaction.prototype);
-Control.prototype.constructor = Control;
+class Control extends Interaction {
+    private tool: IdentifyModule;
 
-Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
-    if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-        this.tool.selected = undefined;
-        this.tool._overlayInfo(e, "popup", false);
-        e.preventDefault();
+    constructor(options: ControlOptions) {
+        super({
+            handleEvent: (e) => this.handleClickEvent(e),
+        });
+        this.tool = options.tool;
     }
-    else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
-        this.tool._popupMultiple(e, "multi", false);
-        e.preventDefault();
+
+    handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
+        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+            // this.tool.selected = undefined;
+            this.tool._overlayInfo(e, "popup", false);
+            e.preventDefault();
+        }
+        else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
+            this.tool._popupMultiple(e, "multi", false);
+            e.preventDefault();
+        }
+        else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+            this.tool._overlayInfo(e, "context", false);
+            e.preventDefault();
+        }
+        return true;
     }
-    else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-        this.tool._overlayInfo(e, "context", false);
-        e.preventDefault();
-    }
-    return true;
-};
+}
+
+
+
+
+// const Control = function (options) {
+//     this.tool = options.tool;
+//     Interaction.call(this, {
+//         handleEvent: Control.prototype.handleClickEvent,
+//     });
+// };
+
+// Control.prototype = Object.create(Interaction.prototype);
+// Control.prototype.constructor = Control;
+
+// Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
+//     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+//         this.tool.selected = undefined;
+//         this.tool._overlayInfo(e, "popup", false);
+//         e.preventDefault();
+//     }
+//     else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
+//         this.tool._popupMultiple(e, "multi", false);
+//         e.preventDefault();
+//     }
+//     else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+//         this.tool._overlayInfo(e, "context", false);
+//         e.preventDefault();
+//     }
+//     return true;
+// };
 
 export class IdentifyModule extends Component {
     private display: Display;

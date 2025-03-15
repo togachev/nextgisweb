@@ -5,10 +5,7 @@ import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
 import settings from "@nextgisweb/webmap/client-settings";
 import type { WebMapRead } from "@nextgisweb/webmap/type/api";
@@ -57,117 +54,121 @@ const activePanelOptions: { value: ActivePanelType; label: string }[] = [
     { value: "share", label: gettext("Share") },
     { value: "annotation", label: gettext("Annotations") }
 ];
-
-export const SettingsWidget: EditorWidgetComponent<
-    EditorWidgetProps<SettingStore>
-> = observer(({ store }) => {
-    return (
-        <Area pad cols={["1fr", "1fr"]}>
-            <Lot row label={msgInitExtent} help={msgInitExtentHelp}>
-                <ExtentRow
-                    pickerOptions={{
-                        parentId: store.composite.parent || undefined,
-                    }}
-                    value={store.extent}
-                    onChange={(value) => {
-                        store.setExtent(value);
-                    }}
-                />
-            </Lot>
-            <Lot row label={msgConstrExtent} help={msgConstrExtentHelp}>
-                <ExtentRow
-                    pickerOptions={{
-                        parentId: store.composite.parent ?? undefined,
-                    }}
-                    value={store.extentConst}
-                    onChange={(value) => {
-                        store.setConstrainedExtent(value);
-                    }}
-                />
-            </Lot>
-            <Lot row label={msgTitle}>
-                <InputValue
-                    value={store.title || ""}
-                    onChange={(v) => store.update({ title: v })}
-                />
-            </Lot>
-            <Lot label={msgLegend}>
-                <SelectLegendSymbols
-                    value={store.legendSymbols}
-                    onChange={(v) => {
-                        store.update({ legendSymbols: v });
-                    }}
-                    style={{ width: "100%" }}
-                    allowClear
-                />
-            </Lot>
-            <Lot label={msgAnnotations}>
-                <Select<AnnotationType>
-                    disabled={!annotation}
-                    value={
-                        store.annotationEnabled ? store.annotationDefault : null
-                    }
-                    onChange={(annotationDefault) => {
-                        store.update(
-                            annotationDefault
-                                ? { annotationEnabled: true, annotationDefault }
-                                : { annotationEnabled: false }
-                        );
-                    }}
-                    options={annotationOptions}
-                    placeholder={msgAnnotationsPlaceholder}
-                    style={{ width: "100%" }}
-                    allowClear
-                />
-            </Lot>
-            <Lot row label={msgBookmarks}>
-                <ResourceSelectRef
-                    pickerOptions={{
-                        initParentId: store.composite.parent,
-                        requireInterface: "IFeatureLayer",
-                    }}
-                    value={store.bookmarkResource}
-                    allowClear
-                    placeholder={msgBookmarksPlaceholder}
-                    style={{ width: "100%" }}
-                    onChange={(bookmarkResource) =>
-                        store.update({ bookmarkResource: bookmarkResource })
-                    }
-                />
-            </Lot>
-            <Lot row label={msgMeasurementSrs}>
-                <SrsSelect
-                    value={store.measureSrs}
-                    onChange={(v: number) => {
-                        store.update({ measureSrs: v });
-                    }}
-                    placeholder={msgDefault}
-                    style={{ width: "100%" }}
-                />
-            </Lot>
-            <Lot label={msgLayersEditing}>
-                <Checkbox
-                    disabled={!editing}
-                    checked={store.editable}
-                    onChange={(e) => {
-                        store.update({ editable: e.target.checked });
-                    }}
-                />
-            </Lot>
-            <Lot row label={msgActivePanel}>
-                <Select<ActivePanelType>
-                    style={{ width: "100%" }}
-                    value={store.activePanel}
-                    onChange={(activePanel) => {
-                        store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
-                    }}
-                    options={activePanelOptions}
-                    allowClear
-                />
-            </Lot>
-        </Area>
-    );
-});
+export const SettingsWidget: EditorWidget<SettingStore> = observer(
+    ({ store }) => {
+        return (
+            <Area pad cols={["1fr", "1fr"]}>
+                <Lot row label={msgInitExtent} help={msgInitExtentHelp}>
+                    <ExtentRow
+                        pickerOptions={{
+                            parentId: store.composite.parent || undefined,
+                        }}
+                        value={store.extent}
+                        onChange={(value) => {
+                            store.setExtent(value);
+                        }}
+                    />
+                </Lot>
+                <Lot row label={msgConstrExtent} help={msgConstrExtentHelp}>
+                    <ExtentRow
+                        pickerOptions={{
+                            parentId: store.composite.parent ?? undefined,
+                        }}
+                        value={store.extentConst}
+                        onChange={(value) => {
+                            store.setConstrainedExtent(value);
+                        }}
+                    />
+                </Lot>
+                <Lot row label={msgTitle}>
+                    <InputValue
+                        value={store.title || ""}
+                        onChange={(v) => store.update({ title: v })}
+                    />
+                </Lot>
+                <Lot label={msgLegend}>
+                    <SelectLegendSymbols
+                        value={store.legendSymbols}
+                        onChange={(v) => {
+                            store.update({ legendSymbols: v });
+                        }}
+                        style={{ width: "100%" }}
+                        allowClear
+                    />
+                </Lot>
+                <Lot label={msgAnnotations}>
+                    <Select<AnnotationType>
+                        disabled={!annotation}
+                        value={
+                            store.annotationEnabled
+                                ? store.annotationDefault
+                                : null
+                        }
+                        onChange={(annotationDefault) => {
+                            store.update(
+                                annotationDefault
+                                    ? {
+                                          annotationEnabled: true,
+                                          annotationDefault,
+                                      }
+                                    : { annotationEnabled: false }
+                            );
+                        }}
+                        options={annotationOptions}
+                        placeholder={msgAnnotationsPlaceholder}
+                        style={{ width: "100%" }}
+                        allowClear
+                    />
+                </Lot>
+                <Lot row label={msgBookmarks}>
+                    <ResourceSelectRef
+                        pickerOptions={{
+                            initParentId: store.composite.parent,
+                            requireInterface: "IFeatureLayer",
+                        }}
+                        value={store.bookmarkResource}
+                        allowClear
+                        placeholder={msgBookmarksPlaceholder}
+                        style={{ width: "100%" }}
+                        onChange={(bookmarkResource) =>
+                            store.update({ bookmarkResource: bookmarkResource })
+                        }
+                    />
+                </Lot>
+                <Lot row label={msgMeasurementSrs}>
+                    <SrsSelect
+                        value={store.measureSrs}
+                        onChange={(v: number) => {
+                            store.update({ measureSrs: v });
+                        }}
+                        placeholder={msgDefault}
+                        style={{ width: "100%" }}
+                    />
+                </Lot>
+                <Lot label={msgLayersEditing}>
+                    <Checkbox
+                        disabled={!editing}
+                        checked={store.editable}
+                        onChange={(e) => {
+                            store.update({ editable: e.target.checked });
+                        }}
+                    />
+                </Lot>
+                <Lot row label={msgActivePanel}>
+                    <Select<ActivePanelType>
+                        style={{ width: "100%" }}
+                        value={store.activePanel}
+                        onChange={(activePanel) => {
+                            store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
+                        }}
+                        options={activePanelOptions}
+                        allowClear
+                    />
+                </Lot>
+            </Area>
+        );
+    }
+);
 
 SettingsWidget.displayName = "SettingsWidget";
 SettingsWidget.title = gettext("Settings");

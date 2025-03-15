@@ -21,7 +21,7 @@ export const style = [
                 color: "#000000",
             }),
             radius: 5,
-            fill: new Stroke({
+            fill: new Fill({
                 width: 4,
                 color: "#106a9020",
             }),
@@ -46,7 +46,7 @@ export const style = [
                 color: "#ffffff",
             }),
             radius: 2,
-            fill: new Stroke({
+            fill: new Fill({
                 width: 2,
                 color: "#fff",
             }),
@@ -55,7 +55,7 @@ export const style = [
     new Style({
         image: new Circle({
             radius: 1,
-            fill: new Stroke({
+            fill: new Fill({
                 width: 2,
                 color: "#000",
             }),
@@ -88,7 +88,7 @@ export const styleDraw = [
                 color: "#1400FF",
             }),
             radius: 2,
-            fill: new Stroke({
+            fill: new Fill({
                 width: 2,
                 color: "#fff",
             }),
@@ -110,7 +110,7 @@ export const customStyle = new Style({
             color: "#fff",
         }),
         radius: 5,
-        fill: new Stroke({
+        fill: new Fill({
             width: 2,
             color: "#106a90",
         }),
@@ -137,7 +137,7 @@ export const clickStyle = new Style({
             color: "#000000"
         }),
         radius: 6,
-        fill: new Stroke({
+        fill: new Fill({
             width: 1,
             color: "#FFE900"
         }),
@@ -162,7 +162,7 @@ export const selectStyle = new Style({
             color: "#000000"
         }),
         radius: 6,
-        fill: new Stroke({
+        fill: new Fill({
             width: 1,
             color: "#FFE900"
         }),

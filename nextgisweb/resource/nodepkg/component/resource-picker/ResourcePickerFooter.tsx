@@ -2,7 +2,7 @@ import type { InputRef } from "antd/lib/input/Input";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Checkbox, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
@@ -100,6 +100,8 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
 }: MoveControlProps<V>) {
     const {
         loading,
+        visibleResource,
+        setVisibleResource,
         selected,
         parentId,
         multiple,
@@ -170,6 +172,12 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
                     )}
             </Col>
             <Col>
+                <Checkbox
+                    title={visibleResource ? gettext("Show all resources") : ("Hide unused resources")}
+                    onChange={(e) => { setVisibleResource(e.target.checked); store.refresh(); }}
+                    checked={visibleResource}>
+                    {visibleResource ? gettext("Show all resources") : ("Hide unused resources")}
+                </Checkbox>
                 {selected.length ? (
                     <Space>
                         <Tooltip title={msgClearSelection}>

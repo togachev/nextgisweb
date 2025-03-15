@@ -12,8 +12,9 @@ from .serialize import CRUTypes, Serializer
 
 
 class CompositeSerializer:
-    def __init__(self, *, keys: Union[Tuple[str, ...], None] = None, user: User):
+    def __init__(self, *, keys: Union[Tuple[str, ...], None] = None, description: bool = True, user: User):
         self.user = user
+        self.description = description
         self.members: Tuple[Tuple[str, Type[Serializer]], ...] = tuple(
             (identity, srlzrcls)
             for identity, srlzrcls in Serializer.registry.items()
@@ -31,6 +32,8 @@ class CompositeSerializer:
                 except Exception as exc:
                     self.annotate_exception(exc, srlzr)
                     raise
+        if self.description == False:
+            result["resource"]["description"] = None
         return cls(**result)
 
     def deserialize(self, obj: Resource, value: Struct):

@@ -187,7 +187,19 @@ def collection_get(
     request,
     *,
     parent: Union[int, None] = None,
-    cls: Annotated[List[ResourceCls], Meta(description="List cls")] = []
+    serialization: Annotated[
+        Literal["resource", "full"],
+        Meta(
+            description="Resource serialization mode\n\n"
+            "If set to `full`, all resource keys are returned, but this is "
+            "significantly slower. Otherwise, only the `resource` key is serialized."
+        ),
+    ] = "full",
+    cls: Annotated[List[ResourceCls], Meta(description="List cls")] = [],
+    description: Annotated[
+        bool,
+        Meta(description="Description resources"),
+    ] = True,
 ) -> AsJSON[List[CompositeRead]]:
     """Read children resources"""
     if len(cls) == 0:
@@ -205,14 +217,15 @@ def collection_get(
             .order_by(Resource.display_name)
             .options(orm.subqueryload(Resource.acl))
         )
+    cs_keys = None if serialization == "full" else ("resource",)
 
-    serializer = CompositeSerializer(user=request.user)
+    serializer = CompositeSerializer(description=description, keys=cs_keys, user=request.user)
     result = list()
     for resource in query:
         if resource.has_permission(ResourceScope.read, request.user):
             result.append(serializer.serialize(resource, CompositeRead))
 
-    serializer = CompositeSerializer(user=request.user)
+
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
     resources = [res for res in query if check_perm(res)]
     resources.sort(key=lambda res: (res.cls_order, res.display_name))

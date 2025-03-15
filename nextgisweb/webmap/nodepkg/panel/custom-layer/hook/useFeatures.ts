@@ -1,4 +1,4 @@
-import type { Feature as OlFeature, FeatureLike } from "ol/Feature";
+import type { Feature as OlFeature, FeatureLike } from "ol";
 import Feature from "ol/Feature";
 import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
@@ -6,10 +6,10 @@ import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
 import { customStyle, clickStyle } from "../constant";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { SourceType } from "../type";
 
-export const useFeatures = (display: DojoDisplay) => {
+export const useFeatures = (display: Display) => {
     const olmap = display.map.olMap;
     const addLayerMap = ({ id, url, format, file, length }: SourceType) => {
         const customSource = new VectorSource({ url: url, format: format })

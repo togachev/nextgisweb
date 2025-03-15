@@ -70,6 +70,7 @@ export class ResourcePickerStore
     @observable accessor allowCreateResource = true;
     @observable.shallow accessor selected: number[] = [];
     @observable accessor multiple = false;
+    @observable accessor visibleResource = true;
     @observable accessor saveLastParentIdGlobal = false;
     @observable accessor getThisMsg = msgPickThis;
     @observable accessor getSelectedMsg = msgPickSelected;
@@ -199,6 +200,11 @@ export class ResourcePickerStore
     };
 
     @action
+    setVisibleResource = (visibleResource: boolean) => {
+        this.visibleResource = visibleResource;
+    };
+
+    @action
     setAllowSelection(status: boolean): void {
         this.allowSelection = status;
     }
@@ -292,7 +298,12 @@ export class ResourcePickerStore
         }
 
         const resp = await route("resource.collection").get({
-            query: { parent: parent, cls: cls },
+            query: {
+                parent: parent,
+                cls: this.visibleResource ? cls : undefined,
+                serialization: "resource",
+                description: false
+            },
             signal: abort.signal,
         });
         this.setResources(
