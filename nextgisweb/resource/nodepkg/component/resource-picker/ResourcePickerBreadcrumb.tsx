@@ -44,10 +44,10 @@ export const ResourcePickerBreadcrumb = observer(
                     <span className="resource-breadcrumb-item">
                         {allowMoveInside ? (
                             <a
-                                onClick={() => onClick(resItem.resource.id)}
                                 className={cn({ "active": isActive })}
+                                onClick={() => onClick(resItem.resource.id)}
                             >
-                                {displayName}
+                                <span style={{ display: "block" }} >{displayName}</span>
                             </a>
                         ) : (
                             displayName

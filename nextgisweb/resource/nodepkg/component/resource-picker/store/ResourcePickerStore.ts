@@ -24,13 +24,31 @@ type Action = keyof Pick<
     | "getSelectedParent"
 >;
 
+const clsObject = {
+    IRenderableStyle:
+        ["resource_group", "vector_layer", "postgis_layer", "raster_layer", "raster_style", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+    basemap_layer:
+        ["resource_group", "basemap_layer"],
+    svg_marker_library:
+        ["resource_group", "svg_marker_library"],
+    postgis_connection:
+        ["resource_group", "postgis_connection"],
+    tablenogeom_connection:
+        ["resource_group", "tablenogeom_connection"],
+    tablenogeom_layer:
+        ["resource_group", "tablenogeom_layer"],
+    vector_layer:
+        ["resource_group", "vector_layer"],
+    tmsclient_connection:
+        ["resource_group", "tmsclient_connection"],
+};
+
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
 
 export class ResourcePickerStore
     implements
-        Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface">
-{
+    Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface"> {
     static GLOBAL_PARENT_ID?: number = undefined;
     static resetGlobalParentId = () => {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
@@ -95,13 +113,13 @@ export class ResourcePickerStore
         this.requireClass = Array.isArray(requireClass)
             ? requireClass
             : requireClass
-              ? [requireClass]
-              : [];
+                ? [requireClass]
+                : [];
         this.requireInterface = Array.isArray(requireInterface)
             ? requireInterface
             : requireInterface
-              ? [requireInterface]
-              : [];
+                ? [requireInterface]
+                : [];
         this.hideUnavailable = !!hideUnavailable;
         this.getSelectedMsg = getSelectedMsg ?? msgPickSelected;
         this.getThisMsg = getThisMsg ?? msgPickThis;
@@ -263,8 +281,18 @@ export class ResourcePickerStore
                 cache: true,
             })
         );
+
+        let cls;
+        if (this.requireClass.length) {
+            cls = clsObject[this.requireClass[0]]
+        } else if (this.requireInterface.length) {
+            cls = clsObject[this.requireInterface[0]]
+        } else {
+            cls = "resource_group"
+        }
+
         const resp = await route("resource.collection").get({
-            query: { parent: parent },
+            query: { parent: parent, cls: cls },
             signal: abort.signal,
         });
         this.setResources(
