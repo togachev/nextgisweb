@@ -1,6 +1,4 @@
-import { theme } from "antd";
-
-import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
+import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -17,9 +15,7 @@ interface LegendProps {
     display: Display;
 }
 
-const { useToken } = theme;
-
-export function Legend({ nodeData, store, checkable, display }: LegendProps) {
+export function Legend({ nodeData, store, checkable, display  }: LegendProps) {
     const { token } = useToken();
 
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
