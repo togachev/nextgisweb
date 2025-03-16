@@ -7,6 +7,7 @@
     from nextgisweb.pyramid.view import ICON_JSENTRY
     from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.pyramid.view import BREADCRUMB_JSENTRY
+    from nextgisweb.resource.favorite.view import config_value
     import json
 %>
 
@@ -27,6 +28,13 @@
 
     system_name = request.env.core.system_full_name()
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
+
+    if obj:
+        identity = config_value(request)["identity"]
+    else:
+        identity = False
+
+    
 %>
 <html>
 <head>
@@ -145,7 +153,7 @@
 </body>
 </html>
 
-%if obj:
+%if obj and identity != "webmap.display":
     <script type="text/javascript">
         Promise.all([
             ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
