@@ -24,7 +24,7 @@ interface BreadcrumbComponentProps {
 export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentProps) => {
     const [value, setValue] = useState([]);
     const bcItems = getEntries(value);
-    
+
     const getCollection = async ({ id, href, icon, title }: BreadcrumbProps) => {
         return await route("resource.collection").get({
             query: {
@@ -73,10 +73,14 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
                 {items &&
                     <Dropdown
                         className="menu-dropdown"
-                        overlayStyle={{ maxWidth: "50%", width: "max-content" }}
                         trigger="click"
                         size="small"
-                        menu={{ items }}
+                        menu={{
+                            items,
+                            style: {
+                                maxHeight: "250px",
+                            }
+                        }}
                     >
                         <span title={gettext("Вложенные ресурсы")}>
                             <MenuIcon />
