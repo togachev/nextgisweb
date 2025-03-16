@@ -24,12 +24,14 @@ interface BreadcrumbComponentProps {
 export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentProps) => {
     const [value, setValue] = useState([]);
     const bcItems = getEntries(value);
-
+    
     const getCollection = async ({ id, href, icon, title }: BreadcrumbProps) => {
         return await route("resource.collection").get({
             query: {
-                cls: ["resource_group", "file_bucket"],
+                cls: [],
                 parent: id,
+                serialization: "resource",
+                description: false,
             },
         })
             .then(item => item.map(item => ({

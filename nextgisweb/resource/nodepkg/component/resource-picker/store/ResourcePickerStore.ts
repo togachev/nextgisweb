@@ -294,9 +294,9 @@ export class ResourcePickerStore
         } else if (this.requireInterface.length) {
             cls = clsObject[this.requireInterface[0]]
         } else {
-            cls = "resource_group"
+            cls = []
         }
-
+        
         const resp = await route("resource.collection").get({
             query: {
                 parent: parent,
