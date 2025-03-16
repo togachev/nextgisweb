@@ -52,6 +52,10 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const { copyValue, contextHolder } = useCopy();
     const panelRef = useRef<HTMLDivElement>(null);
 
+    const opts = display.config.options;
+    const attrs = opts["webmap.identification_attributes"];
+    const geoms = opts["webmap.identification_geometry"];
+    
     const firstItem = data.find(i => i.id === id);
 
     const heightRadio = 135; /* ~ height and padding 2px */
@@ -112,8 +116,10 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             emptyValue;
     };
 
-    const options = [
-        {
+    const options: any[] = [];
+    
+    if (attrs) {
+        options.push({
             label: (<span className="icon-style"><TableRows /></span>),
             value: "attributes",
             key: "attributes",
@@ -121,32 +127,37 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             hidden: !settings.identify_attributes,
             children: attribute ? (<AttributeColumns attribute={attribute} />) :
                 emptyValue,
-        },
-        {
+        })
+    }
+
+    if (geoms) {
+        options.push({
             label: (<span className="icon-style"><QueryStats /></span>),
             value: "geom_info",
             key: "geom_info",
             title: gettext("Geometry info"),
             hidden: !settings.show_geometry_info,
             children: settings.show_geometry_info ? (<GeometryInfo showPreview resourceId={layerId} featureId={id} srid={4326} />) : emptyValue
-        },
-        {
-            label: (<span className="icon-style"><Info /></span>),
-            value: "description",
-            key: "description",
-            title: gettext("Description"),
-            hidden: false,
-            children: extensions !== null && extensions.description !== null ? (<DescComponent type="feature" display={display} content={extensions?.description} />) : emptyValue
-        },
-        {
-            label: (<span className="icon-style"><Attachment /></span>),
-            value: "attachment",
-            key: "attachment",
-            title: gettext("Attachments"),
-            hidden: false,
-            children: extensions !== null && extensions.attachment !== null ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
-        },
-    ];
+        })
+    }
+
+    options.push({
+        label: (<span className="icon-style"><Info /></span>),
+        value: "description",
+        key: "description",
+        title: gettext("Description"),
+        hidden: false,
+        children: extensions !== null && extensions.description !== null ? (<DescComponent type="feature" display={display} content={extensions?.description} />) : emptyValue
+    });
+
+    options.push({
+        label: (<span className="icon-style"><Attachment /></span>),
+        value: "attachment",
+        key: "attachment",
+        title: gettext("Attachments"),
+        hidden: false,
+        children: extensions !== null && extensions.attachment !== null ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
+    });
 
     if (firstItem.relation) {
         options.push({

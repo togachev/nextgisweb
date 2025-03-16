@@ -267,6 +267,8 @@ export class IdentifyModule extends Component {
     };
 
     _overlayInfo = (e: MapBrowserEvent, op: string, p) => {
+        const opts = this.display.config.options;
+        const attr = opts["webmap.identification_attributes"];
         let request;
         if (op === "popup" && p === false) {
             const styles: StylesRequest[] = [];
@@ -290,6 +292,7 @@ export class IdentifyModule extends Component {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
                 styles: styles,
+                status: attr,
             }
         }
 
@@ -312,6 +315,7 @@ export class IdentifyModule extends Component {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
                 styles: p.value.params,
+                status: attr,
             }
         }
 

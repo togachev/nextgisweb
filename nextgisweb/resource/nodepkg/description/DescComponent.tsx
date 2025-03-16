@@ -51,6 +51,9 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 
 export const DescComponent = (props) => {
     const { display, content, type } = props;
+    const identity = ngwConfig.resourceFavorite.identity;
+    console.log(type);
+    
     const DescComp = ({ content }) => {
         return (
             <>{
@@ -85,8 +88,9 @@ export const DescComponent = (props) => {
             if (item instanceof Element && item.attribs && item.name === "p") {
                 return <div {...props} >{domToReact(item.children, options)}</div>;
             }
-
-            if (display === undefined) {
+            console.log(display);
+            
+            if (identity === "resource.show") {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
                         const [resId] = item.attribs.href.split(":");
@@ -95,7 +99,7 @@ export const DescComponent = (props) => {
                 }
             }
 
-            if (display) {
+            if (identity === "webmap.display") {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
                         const [resId, fid, styles] = item.attribs.href.split(":");
@@ -111,6 +115,8 @@ export const DescComponent = (props) => {
         data_ = parse(display.config.webmapDescription, options)
     }
     else if (content.content instanceof Array && content.type === "map") {
+        console.log(type);
+        
         data_ = (<DescComp content={content.content} />)
     }
     else {

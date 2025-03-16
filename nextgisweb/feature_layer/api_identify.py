@@ -21,6 +21,7 @@ class IdentifyModuleBody(Struct, kw_only=True):
     geom: str
     srs: int
     styles: List[object]
+    status: bool
 
 def identify(request, *, body: IdentifyBody) -> JSONType:
     """Find features intersecting geometry"""
@@ -112,6 +113,26 @@ def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
                     )
             elif not IFeatureLayer.providedBy(layer):
                 options.append(dict(value="Not implemented"))
+            elif body.status == False:
+                query = layer.feature_query()
+                query.intersects(geom)
+                query.limit(100)
+
+                for f in query():
+                    options.append(
+                        dict(
+                            desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
+                            id=f.id,
+                            layerId=layer.id,
+                            styleId=style.id,
+                            dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
+                            label=f.label,
+                            permission="Read",
+                            value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
+                            fields=None,
+                            relation=None,
+                        )
+                    )
             else:
                 query = layer.feature_query()
                 query.intersects(geom)

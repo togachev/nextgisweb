@@ -10,6 +10,9 @@ type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 export const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 export const useSource = (display: Display) => {
+    const opts = display.config.options;
+    const attrs = opts["webmap.identification_attributes"];
+
     const generateUrl = ({ res, st, pn }) => {
         const imodule = display.identify_module;
         const lon = imodule.lonlat[0];
@@ -29,10 +32,10 @@ export const useSource = (display: Display) => {
         const result = [...new Set(st?.map(a => a.styleId))];
 
         const panel = display.panelManager.getActivePanelName();
-
+        
         const obj = res ?
-            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: display.baseLayer?.name } :
-            { attribute: false, lon, lat, zoom, styles: styles, base: display.baseLayer?.name };
+            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: display.map.baseLayer?.name } :
+            { attribute: false, lon, lat, zoom, styles: styles, base: display.map.baseLayer?.name };
 
         panel !== "share" && Object.assign(obj, { panel: panel });
 
@@ -51,8 +54,10 @@ export const useSource = (display: Display) => {
     const getAttribute = async (res: DataProps, key) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
+        const geom = item && item.itemConfig.layerHighligh === true ? true : false;
+        const query = { geom: geom };
 
-        const query = { geom: item && item.itemConfig.layerHighligh === true ? true : false };
+        attrs === false && Object.assign(query, { fields: attrs })
 
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: resourceId,

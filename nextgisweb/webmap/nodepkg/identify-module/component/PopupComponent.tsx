@@ -50,7 +50,9 @@ export default observer(
             const { op, position, response, selectedValue } = params;
             const { getAttribute, generateUrl } = useSource(display);
             const imodule = display.identify_module;
-
+            const opts = display.config.options;
+            const attrs = opts["webmap.identification_attributes"];
+            const geoms = opts["webmap.identification_geometry"];
             const count = response.featureCount;
             const urlParams = display.getUrlParams()
 
@@ -63,7 +65,10 @@ export default observer(
                         height: position.height,
                     },
                     fixPos: null,
-                    fixPanel: urlParams.pn ? urlParams.pn : "attributes",
+                    fixPanel: urlParams.pn ? urlParams.pn :
+                        attrs === true ? "attributes" :
+                            attrs === false && geoms === true ? "geom_info" :
+                                    (attrs === false && geoms === false) && "description",
                 }));
 
             const {
@@ -272,7 +277,7 @@ export default observer(
                             }
                         }}
                     >
-                        
+
                         <Rnd
                             style={{ zIndex: 10 }}
                             resizeHandleClasses={{
@@ -397,9 +402,9 @@ export default observer(
                                 )}
                                 {selected && selected.permission !== "Forbidden" && (
                                     <div className="content">
-                                        <ContentComponent 
-                                        // linkToGeometryFeature={linkToGeometryFeature} 
-                                        store={store} display={display} />
+                                        <ContentComponent
+                                            // linkToGeometryFeature={linkToGeometryFeature} 
+                                            store={store} display={display} />
                                     </div>
                                 )}
                                 {op === "popup" && (<div className="footer-popup">
