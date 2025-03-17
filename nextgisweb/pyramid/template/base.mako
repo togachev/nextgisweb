@@ -29,11 +29,17 @@
     system_name = request.env.core.system_full_name()
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
 
-    if obj:
-        identity = config_value(request)["identity"]
-    else:
-        identity = False
-
+    array = list()
+    if len(bcpath) > 0:
+        for idx, bc in enumerate(bcpath):
+            value = dict()
+            value["id"] = idx
+            value["href"] = bc.link
+            if bc.icon:
+                value["icon"] = bc.icon
+            if bc.label:
+                value["title"] = bc.label
+            array.append(value)
     
 %>
 <html>
@@ -153,20 +159,13 @@
 </body>
 </html>
 
-%if obj and identity != "webmap.display":
+%if obj and not custom_layout:
     <script type="text/javascript">
         Promise.all([
             ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
             ngwEntry(${json_js(BREADCRUMB_JSENTRY)}),
         ]).then(([reactBoot, {BreadcrumbComponent}]) => {
-            const bcpath = ${json_js([
-                dict(
-                    title=x.label,
-                    href=x.link,
-                    icon=x.icon,
-                    id=x.parent["id"],
-                ) for x in bcpath if len(bcpath) > 0])};
-
+            const bcpath = ${json_js(array)};
             reactBoot(
                 BreadcrumbComponent,
                 {

@@ -70,7 +70,7 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                                 height={20}
                                 src={"data:image/png;base64," + s.icon.data}
                             />
-                            <span className="title-icon">{s.display_name ? s.display_name : gettext("All other values")}</span>
+                            <span className="legend-title">{s.display_name ? s.display_name : gettext("All other values")}</span>
                         </div>
                     );
                 })}

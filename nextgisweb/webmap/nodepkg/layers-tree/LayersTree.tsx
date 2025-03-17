@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { EditIcon } from "@nextgisweb/gui/icon";
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { findNode } from "@nextgisweb/gui/util/tree";
@@ -202,8 +202,7 @@ export const LayersTree = observer(
                         <Row wrap={false}>
                             <Col flex="auto" className="tree-item-title">
                                 {legendAction}
-                                <div className="legend-title">{title}</div>
-                                {nodeData.treeItem?.editIcon && <div title={gettext("Edit mode")} className="edit-icon">{nodeData.treeItem.editIcon(nodeData.treeItem)}</div>}
+                                <TitleComponent title={title} item={nodeData.treeItem} />
                             </Col>
                             {actions}
                         </Row>
@@ -227,6 +226,16 @@ export const LayersTree = observer(
                 update,
             ]
         );
+
+        const TitleComponent = ({ title, item }) => {
+            const edit = item.type === "layer" && item.editable === true ? true : false;
+            return (
+                <Row className="item-title">
+                    <Col className={edit ? "legend-title edit-title" : "legend-title"}>{title}</Col>
+                    {edit && (<Col className="edit-icon"><EditIcon /></Col>)}
+                </Row>
+            )
+        }
 
         const checkedKeys = useMemo(() => {
             const ch = checked.filter((id) =>

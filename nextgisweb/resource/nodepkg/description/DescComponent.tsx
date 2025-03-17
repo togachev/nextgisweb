@@ -52,7 +52,6 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 export const DescComponent = (props) => {
     const { display, content, type } = props;
     const identity = ngwConfig.resourceFavorite.identity;
-    console.log(type);
     
     const DescComp = ({ content }) => {
         return (
@@ -88,7 +87,6 @@ export const DescComponent = (props) => {
             if (item instanceof Element && item.attribs && item.name === "p") {
                 return <div {...props} >{domToReact(item.children, options)}</div>;
             }
-            console.log(display);
             
             if (identity === "resource.show") {
                 if (item instanceof Element && item.name === "a") {
