@@ -50,15 +50,17 @@ export function useWebmapItems({
 
                 item.icon = (item_) => {
                     const item = item_ as TreeWebmapItem;
+                    if (item.legendIcon) {
+                        return item.legendIcon;
+                    }
+                };
+
+                item.treeItem.editIcon = () => {
                     if (
                         item.treeItem.type === "layer" &&
                         item.treeItem.editable === true
                     ) {
                         return <EditIcon />;
-                    } else {
-                        if (item.legendIcon) {
-                            return item.legendIcon;
-                        }
                     }
                 };
             }

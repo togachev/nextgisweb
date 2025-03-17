@@ -3,15 +3,12 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
-import type { Display } from "@nextgisweb/webmap/display";
-
 import "./Legend.less";
 
 interface LegendProps {
     nodeData: TreeItemConfig;
     store: WebmapStore;
     checkable: boolean;
-    display: Display;
 }
 
 export function Legend({ nodeData, store, checkable }: LegendProps) {
@@ -45,7 +42,7 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                         checkbox =
                             s.render !== null ? (
                                 <Checkbox
-                                    className="checkbox-label"
+                                style={{ width: "16px" }}
                                     defaultChecked={render}
                                     onChange={(e) => {
                                         store.setLayerLegendSymbol(
@@ -55,14 +52,7 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                                         );
                                     }}
                                     onClick={(evt) => evt.stopPropagation()}
-                                >
-                                    <img
-                                        width={20}
-                                        height={20}
-                                        src={"data:image/png;base64," + s.icon.data}
-                                    />
-                                    <span className="title-icon">{s.display_name ? s.display_name : gettext("All other values")}</span>
-                                </Checkbox>
+                                />
                             ) : (
                                 <div style={{ flex: "0 0 16px" }} />
                             );
@@ -75,6 +65,12 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                             title={s.display_name}
                         >
                             {checkbox}
+                            <img
+                                width={20}
+                                height={20}
+                                src={"data:image/png;base64," + s.icon.data}
+                            />
+                            <span className="title-icon">{s.display_name ? s.display_name : gettext("All other values")}</span>
                         </div>
                     );
                 })}
