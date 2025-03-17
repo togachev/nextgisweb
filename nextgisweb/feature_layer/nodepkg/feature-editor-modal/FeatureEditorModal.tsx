@@ -73,6 +73,8 @@ export function FeatureEditorModal({
     return (
         <>
             <Modal
+                transitionName=""
+                maskTransitionName=""
                 className="ngw-feature-layer-feature-editor-modal"
                 width="" // Do not set the default (520px) width
                 centered={true}

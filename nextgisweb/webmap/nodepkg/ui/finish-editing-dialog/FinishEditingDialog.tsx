@@ -18,6 +18,8 @@ export function FinishEditingModal({
 }: FinishEditingModalProps) {
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             title={gettext("Stopping editing")}
             width={400}
             open={true}
