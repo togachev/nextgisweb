@@ -18,22 +18,11 @@
         min-height: 20px;
         font-size: 13px;
         line-height: 20px;
+        margin: 3px 0;
 
         >.ant-checkbox-wrapper {
             align-self: start;
-        }
-
-        >.legend-title {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding: 0 4px;
-
-            &:hover {
-                background: var(--divider-color);
-                border-radius: 3px;
-                color: #000000;
-            }
+            width: 100%;
         }
 
         .ant-checkbox-checked .ant-checkbox-inner {
@@ -44,6 +33,32 @@
         .ant-checkbox .ant-checkbox-inner {
             border-color: #d9d9d9;
             border: dotted #d9d9d9 0.005em;
+        }
+
+        .title-icon {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 6px;
+
+            &:hover {
+                background: rgba(0,0,0,.02);
+                border-radius: 3px;
+                color: #000000;
+            }
+        }
+
+        .ant-checkbox-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+
+
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
         }
     }
 }

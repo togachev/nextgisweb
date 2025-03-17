@@ -69,7 +69,6 @@ export const LayersTree = observer(
         draggable = true,
         selectable = true,
         showLine = true,
-        display,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
@@ -210,7 +209,6 @@ export const LayersTree = observer(
                         {showLegend && (
                             <Legend
                                 checkable={checkable}
-                                display={display}
                                 nodeData={nodeData.treeItem}
                                 store={store}
                             />
@@ -247,8 +245,8 @@ export const LayersTree = observer(
                 motion={false}
                 checkable={checkable}
                 selectable={selectable}
-                showIcon
-                showLine={shouldShowLine}
+                showIcon={true}
+                showLine={true}
                 onExpand={onExpand}
                 expandedKeys={store.expanded}
                 autoExpandParent={false}
