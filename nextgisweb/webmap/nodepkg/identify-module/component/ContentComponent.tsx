@@ -137,7 +137,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             key: "geom_info",
             title: gettext("Geometry info"),
             hidden: !settings.show_geometry_info,
-            children: settings.show_geometry_info ? (<GeometryInfo showPreview resourceId={layerId} featureId={id} srid={4326} />) : emptyValue
+            children: settings.show_geometry_info ? (<GeometryInfo showInfo resourceId={layerId} featureId={id} srid={4326} />) : emptyValue
         })
     }
 
