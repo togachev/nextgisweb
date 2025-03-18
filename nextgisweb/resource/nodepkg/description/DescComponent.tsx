@@ -1,11 +1,8 @@
 import parse, { attributesToProps, Element, domToReact } from "html-react-parser";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Divider } from "@nextgisweb/gui/antd";
+import { Image, Divider } from "@nextgisweb/gui/antd";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
-
-import { ImageView } from "@nextgisweb/gui/image-view";
 
 import "./DescComponent.less";
 
@@ -31,7 +28,6 @@ const zoomToFeature = (display, resourceId, featureId, result) => {
         });
 };
 
-
 const GetData = ({ item, options, resourceId, fid, result, display }) => {
     const { data: data } = useRouteGet("resource.permission", { id: resourceId }, { cache: true });
     if (fid) {
@@ -51,19 +47,19 @@ const GetData = ({ item, options, resourceId, fid, result, display }) => {
 
 export const DescComponent = (props) => {
     const { display, content, type } = props;
-    
+
     const DescComp = ({ content }) => {
         return (
             <>{
                 content?.map((item, index) => {
                     const title = item.type === "webmap_desc" ? msgWebmap : item.type === "layer" ? msgLayer : msgStyle;
                     return (
-                        <div key={index}>
+                        <span key={index}>
                             {content.length > 1 && (
                                 <Divider style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
                             )}
                             {parse(item.description, options)}
-                        </div >
+                        </span >
                     )
                 })
             }</>
@@ -73,20 +69,20 @@ export const DescComponent = (props) => {
     const options = {
         replace: item => {
             const props = attributesToProps(item.attribs);
-            const types = ["map", undefined, "home_page"];
-
-            if (item instanceof Element && item.attribs && item.name === "img" && props.width > webmapSettings.popup_size.width && type === "feature") {
-                return (<ImageView {...item} />);
-            }
-
-            if (item instanceof Element && item.attribs && item.name === "img" && props.width > 350 && types.includes(type)) {
-                return (<ImageView {...item} />);
+            if (item instanceof Element && item.attribs && item.name === "img") {
+                return (<Image
+                    preview={Number(props.width) < 350 ? false : {
+                        transitionName: "",
+                        maskTransitionName: "",
+                    }}
+                    {...props}
+                />);
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {
-                return <div {...props} >{domToReact(item.children, options)}</div>;
+                return <span {...props} >{domToReact(item.children, options)}</span>;
             }
-            
+
             if (display === undefined) {
                 if (item instanceof Element && item.name === "a") {
                     if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
@@ -113,7 +109,7 @@ export const DescComponent = (props) => {
     }
     else if (content.content instanceof Array && content.type === "map") {
         console.log(type);
-        
+
         data_ = (<DescComp content={content.content} />)
     }
     else {
