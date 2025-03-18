@@ -61,8 +61,8 @@ export function GeometryInfo({
 
     return (
         <>
-            <GeometryInfoTable geometryInfo={geometryInfo} isLoading={isLoading} error={error} resourceId={resourceId} featureId={featureId} />
-            {!webmapSettings.identify_module && geometryInfo && showPreview && (
+            {showInfo && <GeometryInfoTable geometryInfo={geometryInfo} />}
+            {geometryInfo && showPreview && (
                 <GeometryInfoPreview
                     geometryInfo={geometryInfo}
                     resourceId={resourceId}
@@ -70,7 +70,6 @@ export function GeometryInfo({
                     srid={srid}
                 />
             )}
-            {showInfo && <GeometryInfoTable geometryInfo={geometryInfo} />}
         </>
     );
 }

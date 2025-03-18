@@ -26,7 +26,10 @@ const TableConfigModal = observer(({ store }: { store: FeatureGridStore }) => {
     );
 
     return (
-        <Modal open={settingsOpen} onOk={close} onCancel={close} footer={null}>
+        <Modal
+            transitionName=""
+            maskTransitionName=""
+            open={settingsOpen} onOk={close} onCancel={close} footer={null}>
             {fields.map((f) => {
                 return (
                     <div key={f.id}>
