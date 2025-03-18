@@ -331,7 +331,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
             <PanelSection flex>
                 <CodeArea value={mapLink} />
                 {favorites.contextHolder}
-                <Space.Compact>
+                <Space.Compact aling="baseline">
                     <CopyToClipboardButton
                         getTextToCopy={() => mapLink}
                         messageInfo={gettext(
@@ -340,12 +340,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                     >
                         {gettext("Copy link")}
                     </CopyToClipboardButton>
-                    <UpdateMapUrl
-                        mapLink={mapLink}
-                        display={display}
-                        setUrl={() => window.history.pushState({}, "", mapLink)}
-                        resetUrl={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
-                    />
+
                     {!ngwConfig.isGuest && (
                         <Tooltip title={msgAddFragmentToFavorites}>
                             <Button
@@ -354,6 +349,12 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                             />
                         </Tooltip>
                     )}
+                    <UpdateMapUrl
+                        mapLink={mapLink}
+                        display={display}
+                        setUrl={() => window.history.pushState({}, "", mapLink)}
+                        resetUrl={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
+                    />
                 </Space.Compact>
                 {!ngwConfig.isGuest && (
                     <Modal

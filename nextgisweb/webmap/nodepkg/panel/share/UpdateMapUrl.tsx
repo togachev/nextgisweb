@@ -7,7 +7,7 @@ import type { Display } from "@nextgisweb/webmap/display";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 
 import UpdateIcon from "@nextgisweb/icon/material/update";
-import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
+import LinkOff from "@nextgisweb/icon/mdi/link-off";
 
 interface UpdateMapUrlProps extends ButtonProps {
     setUrl: () => any;
@@ -20,8 +20,6 @@ const msgOriginalAddress = gettext("Click to return to original map address");
 const msgUpdateAddress = gettext("Click to update current map address");
 const msgUpdateValue = gettext("The map link updated.")
 const msgResetValue = gettext("The map link reset.")
-const msgUpdateUrl = gettext("Update url");
-const msgClearUrl = gettext("Clear url");
 
 export const UpdateMapUrl = ({
     setUrl,
@@ -80,18 +78,14 @@ export const UpdateMapUrl = ({
                         color="primary"
                         variant="solid"
                         onClick={resetValue}
-                        icon={<DeleteForever />}
-                    >
-                        {msgClearUrl}
-                    </Button> :
+                        icon={<LinkOff />}
+                    /> :
                     <Button
                         color={currentUrl !== panelUrl && popupContext ? "orange" : "default"}
                         variant={currentUrl !== panelUrl && popupContext ? "solid" : "outlined"}
                         onClick={valueSet}
                         icon={<UpdateIcon />}
-                    >
-                        {msgUpdateUrl}
-                    </Button>
+                    />
                 }
             </Tooltip>
         </>
