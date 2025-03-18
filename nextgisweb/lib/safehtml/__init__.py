@@ -56,7 +56,7 @@ from lxml.html.clean import Cleaner
 
 _cleaner = Cleaner()
 
-attrs = ['align', 'alt', 'autocomplete', 'axis', 'background', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'char', 'class', 'cols', 'colspan', 'disabled', 'headers', 'height', 'href', 'src', 'id', 'leftmargin', 'marginheight', 'marginwidth', 'media', 'name', 'nowrap', 'rows', 'rowspan', 'scope', 'shape', 'size', 'style', 'title', 'topmargin', 'valign', 'width']
+attrs = ["align", "alt", "autocomplete", "axis", "background", "bgcolor", "border", "cellpadding", "cellspacing", "char", "class", "cols", "colspan", "disabled", "headers", "height", "href", "src", "id", "leftmargin", "marginheight", "marginwidth", "media", "name", "nowrap", "rows", "rowspan", "scope", "shape", "size", "style", "title", "topmargin", "valign", "width", "target"]
 
 def sanitize(text, *, validate=False):
     if text is None:

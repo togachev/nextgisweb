@@ -79,9 +79,9 @@ export const DescComponent = (props) => {
                 />);
             }
 
-            if (item instanceof Element && item.attribs && item.name === "p") {
-                return <span {...props} >{domToReact(item.children, options)}</span>;
-            }
+            // if (item instanceof Element && item.attribs && item.name === "p") {
+            //     return <span {...props} >{domToReact(item.children, options)}</span>;
+            // }
 
             if (display === undefined) {
                 if (item instanceof Element && item.name === "a") {
