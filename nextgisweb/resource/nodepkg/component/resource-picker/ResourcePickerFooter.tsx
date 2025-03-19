@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Button, Checkbox, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Badge, Button, Checkbox, Col, Input, Row, Space } from "@nextgisweb/gui/antd";
 import type { InputRef } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
@@ -140,6 +140,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
     };
 
     const OkBtn = ({ disabled }: { disabled?: boolean }) => {
+        const badgeCnt = multiple && selected.length > 1 ? selected.length : 0;
         return (
             <Button
                 type="primary"
@@ -151,9 +152,14 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
                 }}
             >
                 {getSelectedMsg}
+                {!!badgeCnt && (
+                    <Badge size="small" color="transparent" count={badgeCnt} />
+                )}
             </Button>
         );
     };
+
+    const titleVisibleResource = visibleResource ? gettext("Show all resources") : ("Hide unused resources")
 
     return (
         <Row justify="space-between">
@@ -161,33 +167,31 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
                 {allowCreateResource &&
                     possibleToCreate &&
                     !loading.createNewGroup && (
-                        <Tooltip title={msgCreateGroup}>
-                            <a
-                                style={{ fontSize: "1.5rem" }}
-                                onClick={onCreateClick}
-                            >
-                                <CreateNewFolder />
-                            </a>
-                        </Tooltip>
+                        <a
+                            style={{ fontSize: "1.5rem" }}
+                            onClick={onCreateClick}
+                            title={msgCreateGroup}
+                        >
+                            <CreateNewFolder />
+                        </a>
                     )}
             </Col>
             <Col>
                 <Checkbox
-                    title={visibleResource ? gettext("Show all resources") : ("Hide unused resources")}
+                    title={titleVisibleResource}
                     onChange={(e) => { setVisibleResource(e.target.checked); store.refresh(); }}
                     checked={visibleResource}>
-                    {visibleResource ? gettext("Show all resources") : ("Hide unused resources")}
+                    {titleVisibleResource}
                 </Checkbox>
                 {selected.length ? (
                     <Space>
-                        <Tooltip title={msgClearSelection}>
-                            <Button
-                                icon={<HighlightOff />}
-                                onClick={() => {
-                                    store.clearSelection();
-                                }}
-                            ></Button>
-                        </Tooltip>
+                        <Button
+                            icon={<HighlightOff />}
+                            title={msgClearSelection}
+                            onClick={() => {
+                                store.clearSelection();
+                            }}
+                        ></Button>
                         <OkBtn />
                     </Space>
                 ) : pickThisGroupAllowed ? (

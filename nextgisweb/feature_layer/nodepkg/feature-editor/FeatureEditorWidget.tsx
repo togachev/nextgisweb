@@ -13,17 +13,15 @@ import type {
     ActionToolbarAction,
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Button, Tabs } from "@nextgisweb/gui/antd";
+import { Button, Tabs, message } from "@nextgisweb/gui/antd";
+import type { TabsProps } from "@nextgisweb/gui/antd";
+import { TabsLabelBadge } from "@nextgisweb/gui/component";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
-import { ErrorModal } from "@nextgisweb/gui/error/ErrorModal";
-import type { ApiError } from "@nextgisweb/gui/error/type";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
-import showModal from "@nextgisweb/gui/showModal";
-import type { ParamOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
-import { TabLabel } from "./component/TabLabel";
 import { ATTRIBUTES_KEY } from "./constant";
 import { registry } from "./registry";
 import type { FeatureEditorPlugin } from "./registry";
@@ -32,7 +30,7 @@ import type { FeatureEditorWidgetProps } from "./type";
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";
 import "./FeatureEditorWidget.less";
 
-type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
+type TabItem = NonNullable<TabsProps["items"]>[number] & {
     order?: number;
 };
 
@@ -40,6 +38,9 @@ const msgLoading = gettext("Loading...");
 const msgSave = gettext("Save");
 const msgOk = gettext("OK");
 const msgReset = gettext("Reset");
+
+const msgSaved = gettext("Feature saved");
+const msgNoChanges = gettext("No changes to save");
 
 export const FeatureEditorWidget = observer(
     ({
@@ -52,6 +53,7 @@ export const FeatureEditorWidget = observer(
         onOk,
         onSave,
     }: FeatureEditorWidgetProps) => {
+        const [messageApi, contextHolder] = message.useMessage();
         const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
         const store = useState<FeatureEditorStore>(() => {
             if (storeProp) return storeProp;
@@ -62,7 +64,7 @@ export const FeatureEditorWidget = observer(
             );
         })[0];
 
-        const { dirty } = store;
+        const { dirty, saving } = store;
 
         const [items, setItems] = useState<TabItem[]>([]);
 
@@ -82,19 +84,21 @@ export const FeatureEditorWidget = observer(
 
                 const Widget = lazy(async () => await newEditorWidget.widget());
 
-                const ObserverTableLabel = observer(() => (
-                    <TabLabel
-                        counter={widgetStore.counter}
+                const TabsLabelObserver = observer(() => (
+                    <TabsLabelBadge
+                        counter={widgetStore.counter ?? undefined}
                         dirty={widgetStore.dirty}
-                        label={newEditorWidget.label}
-                    />
+                    >
+                        {newEditorWidget.label}
+                    </TabsLabelBadge>
                 ));
-                ObserverTableLabel.displayName = "ObserverTableLabel";
+
+                TabsLabelObserver.displayName = "TabsLabelObserver";
 
                 return {
                     key,
                     order: newEditorWidget.order,
-                    label: <ObserverTableLabel />,
+                    label: <TabsLabelObserver />,
                     children: (
                         <Suspense fallback={msgLoading}>
                             <Widget store={widgetStore}></Widget>
@@ -117,6 +121,28 @@ export const FeatureEditorWidget = observer(
             loadWidgets();
         }, [store, createEditorTab]);
 
+        const onSaveClick = useCallback(async () => {
+            if (mode === "save") {
+                try {
+                    if (!dirty) {
+                        messageApi.success({ content: msgNoChanges });
+                        return;
+                    }
+                    const res = await store.save();
+                    if (res) {
+                        messageApi.success({ content: msgSaved });
+                        if (onSave) {
+                            onSave(res);
+                        }
+                    }
+                } catch (error) {
+                    errorModal(error);
+                }
+            } else if (onOk) {
+                onOk(store.preparePayload());
+            }
+        }, [dirty, messageApi, mode, onOk, onSave, store]);
+
         useUnsavedChanges({ dirty });
 
         const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
@@ -124,23 +150,8 @@ export const FeatureEditorWidget = observer(
                 <SaveButton
                     disabled={!dirty}
                     key="save"
-                    loading={store.saving}
-                    onClick={async () => {
-                        if (mode === "save") {
-                            try {
-                                const res = await store.save();
-                                if (onSave) {
-                                    onSave(res);
-                                }
-                            } catch (error) {
-                                showModal(ErrorModal, {
-                                    error: error as ApiError,
-                                });
-                            }
-                        } else if (onOk) {
-                            onOk(store.preparePayload());
-                        }
-                    }}
+                    loading={saving}
+                    onClick={onSaveClick}
                 >
                     {mode === "save" ? msgSave : okBtnMsg}
                 </SaveButton>,
@@ -168,7 +179,7 @@ export const FeatureEditorWidget = observer(
                     ...(toolbar?.rightActions || []),
                 ],
             };
-        }, [mode, okBtnMsg, onOk, onSave, store, dirty, toolbar]);
+        }, [dirty, saving, onSaveClick, mode, okBtnMsg, toolbar, store]);
 
         return (
             <div className="ngw-feature-layer-editor">
@@ -181,6 +192,7 @@ export const FeatureEditorWidget = observer(
                     parentHeight
                 />
                 <ActionToolbar {...toolbarProps} />
+                {contextHolder}
             </div>
         );
     }

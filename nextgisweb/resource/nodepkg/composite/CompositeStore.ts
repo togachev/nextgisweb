@@ -117,7 +117,8 @@ export class CompositeStore {
     }
 
     /** Suggested resource display name from file name or other aspects */
-    @computed get sdnDynamic(): string | undefined {
+    @computed
+    get sdnDynamic(): string | undefined {
         const firstMemberWithSdn = this.members?.find(
             (member) => member.store.suggestedDisplayName
         );
@@ -174,8 +175,13 @@ export class CompositeStore {
                 const result = await member.store.dump({ lunkwill });
                 if (result !== undefined) {
                     const current = get(data, identity);
-                    if (current !== undefined) Object.assign(current, result);
-                    set(data, identity, result);
+                    set(
+                        data,
+                        identity,
+                        current !== undefined
+                            ? Object.assign(current, result)
+                            : result
+                    );
                 }
             }
         }
