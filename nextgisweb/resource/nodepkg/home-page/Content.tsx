@@ -213,6 +213,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     token: {
                         fontFamily: "Montserrat",
                         colorPrimaryBorder: "#106a90",
+
                     },
                     components: {
                         Menu: {
@@ -221,6 +222,12 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             colorPrimaryBorder: "#106a90",
                             lineType: "solid",
                             lineWidth: 1,
+                            darkItemColor: `${store.valueFooter?.logo?.colorText}`,
+                            darkPopupBg: `${store.valueFooter?.logo?.colorBackground}`,
+                            darkSubMenuItemBg: `${store.valueFooter?.logo?.colorBackground}`,
+                            darkItemHoverColor: "#afb4fd",
+                            horizontalItemHoverColor: "#afb4fd",
+
                         },
                         Tooltip: {
                             colorBgSpotlight: "#fff",

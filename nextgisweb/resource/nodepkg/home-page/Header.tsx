@@ -65,7 +65,10 @@ export const Header = observer(({ store, config }) => {
         label: (<a href={item[1]?.value} target="_blank" rel="noopener noreferrer" style={colorText}>{item[1]?.name}</a>),
         name: item[1]?.name,
         value: item[1]?.value,
+        className: "menu-label"
     }));
+
+    const styleMenu = { color: `${store.valueFooter?.logo?.colorText}` }
 
     items.push({
         key: "auth",
@@ -78,17 +81,17 @@ export const Header = observer(({ store, config }) => {
             authenticated && [
                 {
                     key: "user-name",
-                    label: userDisplayName,
+                    label: <span style={styleMenu} className="account-name">{userDisplayName}</span>,
                     type: "group",
                 },
                 {
                     key: "resources",
                     label: (<a href={url} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
-                    extra: <span className="menu-icon"><FolderOutline /></span>,
+                    extra: <span style={styleMenu}><FolderOutline /></span>,
                 },
                 config.isAdministrator === true && {
                     key: "control-panel",
-                    extra: <span className="menu-icon"><Cog /></span>,
+                    extra: <span style={styleMenu}><Cog /></span>,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
@@ -97,12 +100,12 @@ export const Header = observer(({ store, config }) => {
                 },
                 {
                     label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    extra: <span className="menu-icon"><AccountCogOutline /></span>,
+                    extra: <span style={styleMenu}><AccountCogOutline /></span>,
                     key: gettext("Settings"),
                 },
                 {
                     label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
-                    extra: <span className="menu-icon"><Logout /></span>,
+                    extra: <span style={styleMenu}><Logout /></span>,
                     key: gettext("Sign out"),
                 },
             ],
@@ -114,9 +117,9 @@ export const Header = observer(({ store, config }) => {
                 selectable={false}
                 mode="horizontal"
                 items={items}
-                theme="light"
+                theme="dark"
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
-                triggerSubMenuAction="click"
+                triggerSubMenuAction="hover"
             />)
     }
 

@@ -58,11 +58,6 @@
 					font-weight: 500;
 				}
 
-				.ant-menu-submenu-title {
-					text-transform: uppercase;
-					color: rgba(255, 255, 255, 0.88);
-				}
-
 				.menu-link {
 					display: flex;
 					text-transform: uppercase;
@@ -163,6 +158,11 @@
 			flex-direction: column;
 			justify-content: space-evenly;
 		}
+	}
+
+	.ant-menu::before {
+		background-color: #212529;
+		font-weight: 500;
 	}
 }
 
@@ -267,4 +267,17 @@
 .ant-modal .ant-modal-close {
 	top: 0px;
 	inset-inline-end: 0px;
+}
+
+.account-name {
+	font-weight: 500;
+}
+
+.menu-label {
+	text-transform: uppercase;
+	font-weight: 500;
+
+	a:hover {
+		color: #afb4fd !important;
+	}
 }
