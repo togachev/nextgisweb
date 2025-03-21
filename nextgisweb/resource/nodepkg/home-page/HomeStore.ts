@@ -1,4 +1,4 @@
-import { action, observable, runInAction } from "mobx";
+import { action, observable } from "mobx";
 import { route } from "@nextgisweb/pyramid/api";
 import { extractError } from "@nextgisweb/gui/error";
 
@@ -185,13 +185,13 @@ export class HomeStore {
     }
 
     @actionHandler
-    async saveHeader(value) {
+    async saveSetting(value, key) {
         const payload = Object.fromEntries(
             Object.entries(value || {}).filter(([, v]) => v)
         );
 
         return await route("pyramid.csettings").put({
-            json: { pyramid: { home_page_header: payload } },
+            json: { pyramid: { [key]: payload } },
         });
     }
 
@@ -247,7 +247,6 @@ export class HomeStore {
                         })
                 }
             });
-
     }
 }
 

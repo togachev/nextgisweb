@@ -11,7 +11,6 @@ import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
 import "./Content.less";
-import { useSource } from "./hook/useSource";
 
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
@@ -51,8 +50,6 @@ const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore());
-
-    const { getListMap, getGroupMap } = useSource();
 
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);

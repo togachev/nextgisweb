@@ -1,9 +1,9 @@
-import { useMemo, useEffect, useState } from "react";
+import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Input, Menu, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
@@ -37,7 +37,6 @@ export const Header = observer(({ store: storeProp, config }) => {
     const {
         valueHeader,
         valueFooter,
-        setValueHeader,
     } = store;
 
     const showLoginModal = () => {
@@ -50,7 +49,7 @@ export const Header = observer(({ store: storeProp, config }) => {
     };
 
     const colorText = { color: valueFooter?.logo?.colorText }
-    const styleMenu = { color: `${valueFooter?.logo?.colorText}` }
+    const styleMenu = { color: valueFooter?.logo?.colorText }
 
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
@@ -118,18 +117,6 @@ export const Header = observer(({ store: storeProp, config }) => {
             />)
     }
 
-    const saveHeader = () => {
-        setDisable(!disable);
-    };
-
-    // useEffect(() => {
-    //     if (disable === true) {
-    //         store.saveHeader(store.valueHeader)
-    //     }
-    // }, [disable]);
-    console.log(disable);
-    
-
     return (
         <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="control-button">
@@ -139,7 +126,11 @@ export const Header = observer(({ store: storeProp, config }) => {
                     title={disable ? gettext("Edit") : gettext("Save")}
                     type="default"
                     icon={disable ? <Edit /> : <Save />}
-                    onClick={saveHeader}
+                    onClick={() => {
+                        setDisable(!disable);
+                        store.setEditHeader(!store.editHeader);
+                        store.saveSetting(valueHeader, "home_page_header")
+                    }}
                 />)}
                 {!disable && (
                     <Button
