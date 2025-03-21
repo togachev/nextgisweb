@@ -11,9 +11,9 @@ import MapIcon from "@nextgisweb/icon/material/map";
 import "./MapTile.less";
 
 
-const openMap = gettext("открыть карту");
-const descTitle = gettext("Описание карты");
-const settingsTitle = gettext("Настройки карты");
+const openMap = gettext("Open map");
+const descTitle = gettext("Map description");
+const settingsTitle = gettext("Map settings");
 
 const { Meta } = Card;
 const { Text, Link } = Typography;

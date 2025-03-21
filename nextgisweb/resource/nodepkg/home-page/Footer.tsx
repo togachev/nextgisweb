@@ -241,7 +241,7 @@ export const Footer = observer(({ store, config }) => {
                 {config.isAdministrator === true && (<Button
                     className={editFooter ? "icon-pensil" : "icon-edit-control"}
                     shape="square"
-                    title={editFooter ? gettext("Edit footer") : gettext("Save footer")}
+                    title={editFooter ? gettext("Edit") : gettext("Save changes")}
                     type="default"
                     icon={editFooter ? <Edit /> : <Save />}
                     onClick={() => {
@@ -442,7 +442,7 @@ export const Footer = observer(({ store, config }) => {
                                         return (
                                             <span key={item[0]} className="item-edit">
                                                 <Input
-                                                    placeholder={gettext("Name contacts")}
+                                                    placeholder={gettext("Name")}
                                                     type="text"
                                                     value={item[1]?.name}
                                                     allowClear
@@ -465,7 +465,7 @@ export const Footer = observer(({ store, config }) => {
                                                 />
                                                 <Input
                                                     className="first-input"
-                                                    placeholder={gettext("Number phone")}
+                                                    placeholder={gettext("Value")}
                                                     type="text"
                                                     value={item[1]?.value}
                                                     allowClear
@@ -487,7 +487,7 @@ export const Footer = observer(({ store, config }) => {
                                                     }}
                                                 />
                                                 <Button
-                                                    title={gettext("Delete contacts")}
+                                                    title={gettext("Delete contact")}
                                                     onClick={() => {
                                                         const state = { ...valueFooter };
                                                         delete state.address.phone[item[0]];
@@ -524,7 +524,7 @@ export const Footer = observer(({ store, config }) => {
                                 </Col>
                                 <Col flex="auto" className="first-input">
                                     <Input
-                                        placeholder={gettext("Footer name")}
+                                        placeholder={gettext("Name footer page")}
                                         disabled={editFooter}
                                         type="text"
                                         value={valueFooter?.footer_name?.name}

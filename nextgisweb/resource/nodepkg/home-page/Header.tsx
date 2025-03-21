@@ -129,7 +129,7 @@ export const Header = observer(({ store, config }) => {
                 {config.isAdministrator === true && (<Button
                     className={editHeader ? "icon-pensil" : "icon-edit-control"}
                     shape="square"
-                    title={editHeader ? gettext("Edit menu") : gettext("Save menu")}
+                    title={editHeader ? gettext("Edit") : gettext("Save")}
                     type="default"
                     icon={editHeader ? <Edit /> : <Save />}
                     onClick={() => {
@@ -141,7 +141,7 @@ export const Header = observer(({ store, config }) => {
                     <Button
                         className="icon-edit-control"
                         shape="square"
-                        title={gettext("Add urls")}
+                        title={gettext("Add url")}
                         type="default"
                         onClick={() => {
                             setValueHeader((prev) => ({
@@ -218,7 +218,7 @@ export const Header = observer(({ store, config }) => {
                                             }}
                                         />
                                         <Button
-                                            title={gettext("Delete urls")}
+                                            title={gettext("Delete url")}
                                             onClick={() => {
                                                 const state = { ...valueHeader };
                                                 delete state.menus.menu[item.key];
@@ -236,7 +236,7 @@ export const Header = observer(({ store, config }) => {
                             <div className="edit-title">
                                 <div className="item-edit">
                                     <Input
-                                        placeholder={gettext("Title")}
+                                        placeholder={gettext("First name site")}
                                         type="text"
                                         value={valueHeader?.names?.first_name}
                                         allowClear
@@ -254,7 +254,7 @@ export const Header = observer(({ store, config }) => {
                                 </div>
                                 <div className="item-edit">
                                     <Input
-                                        placeholder={gettext("Title description")}
+                                        placeholder={gettext("Additional name")}
                                         type="text"
                                         value={valueHeader?.names?.last_name}
                                         allowClear
