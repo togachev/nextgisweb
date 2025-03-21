@@ -1,4 +1,3 @@
-import { useMemo, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Input, Menu, Typography } from "@nextgisweb/gui/antd";
@@ -18,7 +17,7 @@ import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
-import { HomeStore } from "./HomeStore";
+
 import "./Header.less";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -26,19 +25,26 @@ type MenuItem = Required<MenuProps>["items"][number];
 const { Title } = Typography;
 const signInText = gettext("Sign in");
 
-export const Header = observer(({ store: storeProp, config }) => {
+export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-    const [disable, setDisable] = useState(true);
-
-    const [store] = useState(
-        () => storeProp || new HomeStore()
-    );
 
     const {
+        editHeader,
+        setEditHeader,
         valueHeader,
         valueFooter,
         setValueHeader,
     } = store;
+
+    const save = async () => {
+        const payload = Object.fromEntries(
+            Object.entries(valueHeader || {}).filter(([, v]) => v)
+        );
+
+        await route("pyramid.csettings").put({
+            json: { pyramid: { home_page_header: payload } },
+        });
+    };
 
     const showLoginModal = () => {
         if (oauth.enabled && oauth.default) {
@@ -50,20 +56,19 @@ export const Header = observer(({ store: storeProp, config }) => {
     };
 
     const colorText = { color: valueFooter?.logo?.colorText }
-    const styleMenu = { color: `${valueFooter?.logo?.colorText}` }
 
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
-    const items: MenuItem[] = [];
-
-    valueHeader?.menus?.menu && getEntries(valueHeader?.menus?.menu).map(item => items.push({
+    const items: MenuItem[] = valueHeader?.menus.menu && getEntries(valueHeader?.menus?.menu).map(item => ({
         key: item[0],
         label: (<a href={item[1]?.value} target="_blank" rel="noopener noreferrer" style={colorText}>{item[1]?.name}</a>),
         name: item[1]?.name,
         value: item[1]?.value,
         className: "menu-label"
     }));
+
+    const styleMenu = { color: `${store.valueFooter?.logo?.colorText}` }
 
     items.push({
         key: "auth",
@@ -118,62 +123,52 @@ export const Header = observer(({ store: storeProp, config }) => {
             />)
     }
 
-    const saveHeader = () => {
-        setDisable(!disable);
-    };
-
-    // useEffect(() => {
-    //     if (disable === true) {
-    //         store.saveHeader(store.valueHeader)
-    //     }
-    // }, [disable]);
-    console.log(disable);
-    
-
     return (
         <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="control-button">
                 {config.isAdministrator === true && (<Button
-                    className={disable ? "icon-pensil" : "icon-edit-control"}
+                    className={editHeader ? "icon-pensil" : "icon-edit-control"}
                     shape="square"
-                    title={disable ? gettext("Edit") : gettext("Save")}
+                    title={editHeader ? gettext("Edit") : gettext("Save")}
                     type="default"
-                    icon={disable ? <Edit /> : <Save />}
-                    onClick={saveHeader}
+                    icon={editHeader ? <Edit /> : <Save />}
+                    onClick={() => {
+                        setEditHeader(!editHeader);
+                        save()
+                    }}
                 />)}
-                {!disable && (
+                {!editHeader && (
                     <Button
                         className="icon-edit-control"
                         shape="square"
                         title={gettext("Add url")}
                         type="default"
                         onClick={() => {
-                            const value = {
-                                ...valueHeader,
+                            setValueHeader((prev) => ({
+                                ...prev,
                                 menus: {
-                                    ...valueHeader.menus,
+                                    ...prev.menus,
                                     menu: {
-                                        ...valueHeader.menus.menu,
-                                        [String(Object.keys(valueHeader.menus.menu).length + 1)]: {
-                                            ...valueHeader.menus.menu[
-                                            String(Object.keys(valueHeader.menus.menu).length + 1)
+                                        ...prev.menus.menu,
+                                        [String(Object.keys(prev.menus.menu).length + 1)]: {
+                                            ...prev.menus.menu[
+                                            String(Object.keys(prev.menus.menu).length + 1)
                                             ],
                                             name: "",
                                             value: "",
                                         },
                                     },
                                 },
-                            }
-                            store.setValueHeader(value);
+                            }));
                         }}
                         icon={<LinkEdit />}
                     />
                 )}
             </div>
             <div className="menus">
-                <div className={disable ? "menu-component" : ""}>
-                    <div className={disable ? "button-link" : "button-link edit-panel"}>
-                        {!disable ? items.map((item) => {
+                <div className={editHeader ? "menu-component" : ""}>
+                    <div className={editHeader ? "button-link" : "button-link edit-panel"}>
+                        {!editHeader ? items.map((item) => {
                             if (!["auth", "resources"].includes(item.key)) {
                                 return (
                                     <div key={item.key} className="item-edit">
@@ -182,22 +177,21 @@ export const Header = observer(({ store: storeProp, config }) => {
                                             type="text"
                                             value={item?.name}
                                             allowClear
-                                            disabled={disable}
+                                            disabled={editHeader}
                                             onChange={(e) => {
-                                                const value = {
-                                                    ...valueHeader,
+                                                setValueHeader((prev) => ({
+                                                    ...prev,
                                                     menus: {
-                                                        ...valueHeader.menus,
+                                                        ...prev.menus,
                                                         menu: {
-                                                            ...valueHeader.menus.menu,
+                                                            ...prev.menus.menu,
                                                             [item.key]: {
-                                                                ...valueHeader.menus.menu[item.key],
+                                                                ...prev.menus.menu[item.key],
                                                                 name: e.target.value,
                                                             },
                                                         },
                                                     },
-                                                }
-                                                store.setValueHeader(value);
+                                                }));
                                             }}
                                         />
                                         <Input
@@ -206,22 +200,21 @@ export const Header = observer(({ store: storeProp, config }) => {
                                             type="text"
                                             value={item?.value}
                                             allowClear
-                                            disabled={disable}
+                                            disabled={editHeader}
                                             onChange={(e) => {
-                                                const value = {
-                                                    ...valueHeader,
+                                                setValueHeader((prev) => ({
+                                                    ...prev,
                                                     menus: {
-                                                        ...valueHeader.menus,
+                                                        ...prev.menus,
                                                         menu: {
-                                                            ...valueHeader.menus.menu,
+                                                            ...prev.menus.menu,
                                                             [item.key]: {
-                                                                ...valueHeader.menus.menu[item.key],
+                                                                ...prev.menus.menu[item.key],
                                                                 value: e.target.value,
                                                             },
                                                         },
                                                     },
-                                                }
-                                                store.setValueHeader(value);
+                                                }));
                                             }}
                                         />
                                         <Button
@@ -229,7 +222,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                             onClick={() => {
                                                 const state = { ...valueHeader };
                                                 delete state.menus.menu[item.key];
-                                                store.setValueHeader(state);
+                                                setValueHeader(state);
                                             }}
                                             className="icon-edit"
                                             icon={<DeleteOffOutline />}
@@ -239,7 +232,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                             }
                         }) :
                             (<MenuContainer />)}
-                        {!disable &&
+                        {!editHeader &&
                             <div className="edit-title">
                                 <div className="item-edit">
                                     <Input
@@ -247,16 +240,15 @@ export const Header = observer(({ store: storeProp, config }) => {
                                         type="text"
                                         value={valueHeader?.names?.first_name}
                                         allowClear
-                                        disabled={disable}
+                                        disabled={editHeader}
                                         onChange={(e) => {
-                                            const value = {
-                                                ...valueHeader,
+                                            setValueHeader((prev) => ({
+                                                ...prev,
                                                 names: {
-                                                    ...valueHeader.names,
+                                                    ...prev.names,
                                                     first_name: e.target.value,
                                                 },
-                                            }
-                                            store.setValueHeader(value);
+                                            }));
                                         }}
                                     />
                                 </div>
@@ -266,17 +258,15 @@ export const Header = observer(({ store: storeProp, config }) => {
                                         type="text"
                                         value={valueHeader?.names?.last_name}
                                         allowClear
-                                        disabled={disable}
+                                        disabled={editHeader}
                                         onChange={(e) => {
-                                            const value = {
-                                                ...valueHeader,
+                                            setValueHeader((prev) => ({
+                                                ...prev,
                                                 names: {
-                                                    ...valueHeader.names,
+                                                    ...prev.names,
                                                     last_name: e.target.value,
                                                 },
-                                            }
-                                            
-                                            store.setValueHeader(value);
+                                            }));
                                         }}
                                     />
                                 </div>

@@ -1,0 +1,283 @@
+.header {
+	height: 225px;
+	padding: 0 10% 0 10%;
+
+	.edit-panel {
+		position: relative;
+		background: #fff;
+		z-index: 1000;
+		margin-top: 5px;
+		padding-top: 5px;
+		border-radius: 3px;
+	}
+
+	.menus {
+		height: 46px;
+		width: 100%;
+
+		.menu-component {
+			position: absolute;
+			left: 0;
+			right: 10%;
+			display: flex;
+			text-transform: uppercase;
+			align-items: center;
+			border-radius: 4px;
+			justify-content: flex-end;
+
+			.button-link {
+				width: calc(100% - 24px);
+
+				.menu-indicator {
+					font-size: 24px;
+				}
+
+				.ant-menu-horizontal,
+				.ant-menu-item::after,
+				.ant-menu-submenu::after {
+					border: none !important;
+				}
+
+				.ant-menu {
+					color: rgba(0, 0, 0, 0.88);
+					background: #ffffff00;
+					display: flex;
+					justify-content: flex-end;
+				}
+
+				.auth-login {
+					vertical-align: middle;
+
+					>svg.icon {
+						color: inherit;
+						font-size: 24px;
+					}
+				}
+
+				.ant-menu-title-content{
+					font-weight: 500;
+				}
+
+				.menu-link {
+					display: flex;
+					text-transform: uppercase;
+					align-items: center;
+
+					.ant-divider-vertical {
+						position: relative;
+						margin: 5px;
+						border-inline-start: 1px solid #fff;
+					}
+				}
+
+				.edit-title {
+					width: 100%;
+
+					.title-item {
+						padding: 2px 0;
+					}
+				}
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			.res-link {
+				margin: 0 12px 0 0;
+				font-size: 24px;
+
+				svg {
+					color: #ffffff;
+
+					&:hover {
+						color: rgb(175, 180, 253) !important;
+					}
+				}
+			}
+		}
+	}
+
+	.icon-button {
+		color: var(--text-base);
+		background-color: #fff;
+		display: flex;
+		justify-items: center;
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 auto;
+		cursor: pointer;
+		z-index: 1000;
+	}
+
+	.name-site {
+		top: 0;
+		width: 100%;
+		position: relative;
+		display: flex;
+		letter-spacing: normal;
+		text-align: center;
+		user-select: none;
+		align-items: center;
+
+		.ant-typography {
+			color: #fff;
+			display: flex;
+			justify-content: center;
+		}
+
+		.ant-typography {
+			word-break: break-word;
+			line-height: 1.57142857;
+		}
+
+		.name-site-a {
+			font-family: Forum;
+		}
+
+		.name-site-b {
+			text-transform: uppercase;
+			font-weight: 500;
+		}
+
+		h1:first-child {
+			margin: 0;
+			line-height: 1.2;
+		}
+
+		h5 {
+			font-weight: 100;
+			margin: 0;
+		}
+
+		.title {
+			width: 100%;
+			height: 155px;
+			color: #fff;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-evenly;
+		}
+	}
+
+	.ant-menu::before {
+		background-color: #212529;
+		font-weight: 500;
+	}
+}
+
+.content-auth {
+	display: flex;
+	flex-direction: column;
+}
+
+.menu-avatar-label {
+	border-radius: 2px;
+	color: #fff;
+	font-weight: 500;
+}
+
+.menu-avatar-authenticated {
+	line-height: 1;
+	padding: 0 2px;
+	margin: 0 15px;
+}
+
+
+.menu-avatar-danger {
+	.menu-avatar-label {
+		color: var(--on-primary);
+		background-color: var(--surface-bg-danger);
+	}
+}
+
+.menu-avatar-popover {
+	.ant-popover-title {
+		padding: 0;
+		min-width: 0;
+		display: flex;
+		justify-content: center;
+	}
+
+	.ant-popover-inner-content {
+		padding: 0px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+
+		div.warning {
+			display: block;
+			padding: 6px 12px;
+			background-color: var(--surface-bg-danger);
+		}
+
+		a {
+			display: block;
+			padding: 6px 12px;
+			text-decoration: none;
+			color: var(--text-base);
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.04);
+			}
+		}
+	}
+}
+
+.menu-avatar-active {
+	.menu-avatar-icon {
+		transform: rotate(180deg);
+	}
+}
+
+.ant-btn-primary {
+	background-color: #2a388c !important;
+	font-family: "Montserrat";
+	font-weight: 500;
+	border-color: var(--text-secondary);
+
+	&:hover {
+		border-color: #2a388c !important;
+	}
+}
+
+.ngw-auth-login-form {
+
+	h1,
+	h2,
+	h3 {
+		letter-spacing: normal;
+		color: #2a388c;
+		font-family: "Montserrat";
+		font-weight: 500;
+		margin: -9px 0 9px 0;
+		font-size: 18px;
+	}
+
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	input:-webkit-autofill:active {
+		-webkit-background-clip: text;
+		transition: background-color 5000s ease-in-out 0s;
+		box-shadow: inset 0 0 20px 20px #ffffff00;
+	}
+}
+
+.ant-modal .ant-modal-close {
+	top: 0px;
+	inset-inline-end: 0px;
+}
+
+.account-name {
+	font-weight: 500;
+}
+
+.menu-label {
+	text-transform: uppercase;
+	font-weight: 500;
+
+	a:hover {
+		color: #afb4fd !important;
+	}
+}

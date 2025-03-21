@@ -50,7 +50,37 @@ const resourcesToOptions = (resourcesInfo) => {
 const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
-    const [store] = useState(() => new HomeStore());
+    const [store] = useState(() => new HomeStore({
+        widthMenu: window.innerWidth < 785 ? "100%" : 300,
+        valueHeader: {
+            names: {
+                first_name: "",
+                last_name: "",
+            },
+            menus: {
+                menu: {},
+            },
+        },
+        valueFooter: {
+            services: {
+                value: "",
+                list: {},
+            },
+            address: {
+                value: "",
+                phone: {},
+            },
+            footer_name: {
+                base_year: "",
+                name: ""
+            },
+            logo: {
+                value: [],
+                colorBackground: "#212529",
+                colorText: "#fff",
+            },
+        },
+    }));
 
     const { getListMap, getGroupMap } = useSource();
 
@@ -103,6 +133,31 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         };
     }, [store.widthMenu]);
 
+    useMemo(() => {
+        route("pyramid.csettings")
+            .get({
+                query: { pyramid: ["home_page_footer"] },
+            })
+            .then((data) => {
+                if (data.pyramid) {
+                    if (Object.keys(data.pyramid.home_page_footer).length > 0) {
+                        store.setValueFooter(data.pyramid.home_page_footer);
+                    }
+                }
+            });
+        route("pyramid.csettings")
+            .get({
+                query: { pyramid: ["home_page_header"] },
+            })
+            .then((data) => {
+                if (data.pyramid) {
+                    if (Object.keys(data.pyramid.home_page_header).length > 0) {
+                        store.setValueHeader(data.pyramid.home_page_header);
+                    }
+                }
+            });
+    }, []);
+
     useEffect(() => {
         if (makeQuery) {
             makeSearchRequest.current({ query: makeQuery });
@@ -116,17 +171,39 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             onChanges(v, opt);
         }
     };
-    
+
+    const updateGridPosition = (key) => {
+        if (key === "all") {
+            getListMap()
+                .then(maps => {
+                    store.setListMaps(maps);
+                    getGroupMap()
+                        .then(group => {
+                            const result = group.filter(({ id }) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
+                            store.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
+                            const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0]?.id
+                            store.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
+                        })
+                });
+        }
+        else {
+            getListMap()
+                .then(maps => {
+                    store.setListMaps(maps);
+                });
+        }
+    }
+
     useMemo(() => {
-        store.getMapValues("all")
+        updateGridPosition("all")
     }, [])
 
     useEffect(() => {
-        (store.sourceGroup === false) && store.getMapValues("all");
+        (store.sourceGroup === false) && updateGridPosition("all");
     }, [store.sourceGroup]);
 
     useEffect(() => {
-        (store.sourceMaps === false) && store.getMapValues("maps");
+        (store.sourceMaps === false) && updateGridPosition("maps");
     }, [store.sourceMaps]);
 
     return (

@@ -1,6 +1,9 @@
-import { makeAutoObservable } from "mobx";
+import { action, observable, runInAction } from "mobx";
+import { route } from "@nextgisweb/pyramid/api";
+import { extractError } from "@nextgisweb/gui/error";
+
 import type { UploadFile } from "@nextgisweb/gui/antd";
-export type SetValue<T> = ((prevValue: T) => T) | T;
+import type { ApiError } from "@nextgisweb/gui/error/type";
 
 export interface LayoutProps {
     i: string;
@@ -85,81 +88,189 @@ export interface HeaderProps {
     menus: HeaderMenuProps;
 }
 
+type Action = keyof Pick<HomeStore,
+    | "getWidthMenu"
+    | "getMapValues"
+    | "getValuesHF"
+>;
+
 export class HomeStore {
-    editFooter = true;
-    widthMenu: number | string | null = null;
-    editHeader = true;
-    sourceMaps = false;
-    sourceGroup = false;
-    listMaps: ListMapProps[] = [];
-    groupMapsGrid: GroupMapsGridProps[] = [];
-    itemsMapsGroup: ListMapProps[] = [];
-    valueFooter: FooterProps | null = null;
-    valueHeader: HeaderProps | null = null;
+    @observable accessor widthMenu: number | string | null = null;
+    @observable accessor sourceMaps = false;
+    @observable accessor sourceGroup = false;
+    @observable accessor editFooter = true;
+    @observable accessor editHeader = true;
 
-    constructor({ ...props }) {
-        for (const key in props) {
-            const k = key;
-            const prop = (props)[k];
-            if (prop !== undefined) {
-                Object.assign(this, { [k]: prop });
-            }
-        }
+    @observable.shallow accessor listMaps: ListMapProps[] = [];
+    @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
+    @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
 
-        makeAutoObservable(this, {});
+
+    @observable.shallow accessor valueFooter: FooterProps;
+    @observable.shallow accessor valueHeader: HeaderProps;
+
+    @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
+    @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
+
+    constructor() {
+        this.getWidthMenu();
+        this.getMapValues("all");
+        this.getValuesHF()
     }
 
-    setEditFooter = (editFooter: boolean) => {
-        this.editFooter = editFooter;
-    };    
-    
-    setWidthMenu = (widthMenu: number | string) => {
-        this.widthMenu = widthMenu;
+    @action
+    setWidthMenu(width: number | string) {
+        this.widthMenu = width;
     };
 
-    setEditHeader = (editHeader: boolean) => {
-        this.editHeader = editHeader;
-    };
-
-    setValueHeader = (valueHeader: SetValue<HeaderProps | null>) => {
-        this.setValue("valueHeader", valueHeader);
-    };
-
-    setValueFooter = (valueFooter: SetValue<FooterProps | null>) => {
-        this.setValue("valueFooter", valueFooter);
-    };
-
-    setSourceMaps = (sourceMaps: boolean) => {
+    @action
+    setSourceMaps(sourceMaps: boolean): void {
         this.sourceMaps = sourceMaps;
     };
 
-    setSourceGroup = (sourceGroup: boolean) => {
+    @action
+    setSourceGroup(sourceGroup: boolean): void {
         this.sourceGroup = sourceGroup;
     };
 
-    setListMaps = (listMaps: SetValue<string>) => {
-        this.setValue("listMaps", listMaps);
+    @action
+    setEditHeader(editHeader: boolean): void {
+        this.editHeader = editHeader;
     };
 
-    setGroupMapsGrid = (groupMapsGrid: SetValue<string>) => {
-        this.setValue("groupMapsGrid", groupMapsGrid);
+    @action
+    setEditFooter(editFooter: boolean): void {
+        this.editFooter = editFooter;
     };
 
-    setItemsMapsGroup = (itemsMapsGroup: SetValue<string>) => {
-        this.setValue("itemsMapsGroup", itemsMapsGroup);
+    @action
+    setListMaps(listMaps: ListMapProps[]) {
+        this.listMaps = listMaps
     };
 
-    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
-        const isUpdaterFunction = (
-            input: unknown
-        ): input is (prevValue: T) => T => {
-            return typeof input === "function";
-        };
+    @action
+    setGroupMapsGrid(groupMapsGrid: GroupMapsGridProps[]) {
+        this.groupMapsGrid = groupMapsGrid
+    };
 
-        const newValue = isUpdaterFunction(valueOrUpdater)
-            ? valueOrUpdater(this[property] as T)
-            : valueOrUpdater;
+    @action
+    setItemsMapsGroup(itemsMapsGroup: ListMapProps[]) {
+        this.itemsMapsGroup = itemsMapsGroup
+    };
 
-        Object.assign(this, { [property]: newValue });
+    @action
+    setLoading(operation: Action, status: boolean) {
+        this.loading = { ...this.loading, [operation]: status };
     }
+
+    @action
+    setError(operation: Action, msg?: string) {
+        this.errors[operation] = msg;
+    }
+
+    @action
+    setValueHeader(valueHeader: HeaderProps) {
+        this.valueHeader = valueHeader;
+    };
+
+    @action
+    setValueFooter(valueFooter: FooterProps) {
+        this.valueFooter = valueFooter;
+    };
+
+    @actionHandler
+    getWidthMenu() {
+        const width = window.innerWidth < 785 ? "100%" : 300;
+        this.setWidthMenu(width);
+    }
+
+    @actionHandler
+    async saveHeader(value) {
+        const payload = Object.fromEntries(
+            Object.entries(value || {}).filter(([, v]) => v)
+        );
+
+        return await route("pyramid.csettings").put({
+            json: { pyramid: { home_page_header: payload } },
+        });
+    }
+
+    private async maplist() {
+        const resp = await route("resource.maplist").get();
+        return resp.result;
+    }
+
+    private async groupMaps() {
+        const resp = await route("resource.mapgroup").get();
+        return resp;
+    }
+
+    private async getSetting(key) {
+        const resp = await route("pyramid.csettings").get({
+            query: { pyramid: [key] }
+        });
+        return resp;
+    }
+
+    @actionHandler
+    async getValuesHF() {
+        this.getSetting("home_page_header")
+            .then((data) => {
+                if (data.pyramid) {
+                    if (Object.keys(data.pyramid.home_page_header).length > 0) {
+                        this.setValueHeader(data.pyramid.home_page_header);
+                    }
+                }
+            })
+        this.getSetting("home_page_footer")
+            .then((data) => {
+                if (data.pyramid) {
+                    if (Object.keys(data.pyramid.home_page_footer).length > 0) {
+                        this.setValueFooter(data.pyramid.home_page_footer);
+                    }
+                }
+            })
+    }
+
+    @actionHandler
+    async getMapValues(key) {
+        this.maplist()
+            .then(maps => {
+                this.setListMaps(maps);
+                if (key === "all") {
+                    this.groupMaps()
+                        .then(group => {
+                            const result = group.filter(({ id }) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
+                            this.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
+                            const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0]?.id
+                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
+                        })
+                }
+            });
+
+    }
+}
+
+export function actionHandler(
+    originalMethod: any,
+    _context: ClassMethodDecoratorContext
+) {
+    return async function (
+        this: HomeStore,
+        ...args: any[]
+    ): Promise<any> {
+        const operationName = originalMethod.name || "operation";
+        this.setLoading(operationName, true);
+
+        try {
+            const result = await originalMethod.apply(this, args);
+            return result;
+        } catch (er) {
+            const { title } = extractError(er as ApiError);
+            this.setError(operationName, title);
+            throw er;
+        } finally {
+            this.setLoading(operationName, false);
+        }
+    };
 }

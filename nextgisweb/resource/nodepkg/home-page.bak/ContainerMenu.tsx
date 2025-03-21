@@ -70,11 +70,11 @@ export const ContainerMenu = (props) => {
     const handleDragEnd = (event) => {
         const { active, over } = event;
         if (active.id !== over.id) {
-            const items = store.groupMapsGrid
-            const oldIndex = items.findIndex((item) => item.id === active.id);
-            const newIndex = items.findIndex((item) => item.id === over.id);
-            const value = arrayMove(items, oldIndex, newIndex);
-            store.setGroupMapsGrid(value);
+            store.setGroupMapsGrid((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id);
+                const newIndex = items.findIndex((item) => item.id === over.id);
+                return arrayMove(items, oldIndex, newIndex);
+            });
         }
     };
 

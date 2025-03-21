@@ -1111,15 +1111,14 @@ def getWebmapGroup(request) -> JSONType:
     query = DBSession.query(ResourceWebMapGroup)
     result = list()
     for resource_wmg in query:
-        if resource_wmg.action_map:
-            result.append(
-                dict(
-                    id=resource_wmg.id,
-                    webmap_group_name=resource_wmg.webmap_group_name,
-                    action_map=resource_wmg.action_map,
-                    id_pos=resource_wmg.id_pos
-                )
+        result.append(
+            dict(
+                id=resource_wmg.id,
+                webmap_group_name=resource_wmg.webmap_group_name,
+                action_map=resource_wmg.action_map,
+                id_pos=resource_wmg.id_pos
             )
+        )
     return result
 
 

@@ -80,11 +80,11 @@ export const ContainerMaps = (props) => {
         const { active, over } = event;
 
         if (active.id !== over.id) {
-            const items = store.itemsMapsGroup
-            const oldIndex = items.findIndex((item) => item.idx === active.id);
-            const newIndex = items.findIndex((item) => item.idx === over.id);
-            const value = arrayMove(items, oldIndex, newIndex);
-            store.setItemsMapsGroup(value);
+            store.setItemsMapsGroup((items) => {
+                const oldIndex = items.findIndex((item) => item.idx === active.id);
+                const newIndex = items.findIndex((item) => item.idx === over.id);
+                return arrayMove(items, oldIndex, newIndex);
+            });
         }
     };
 
