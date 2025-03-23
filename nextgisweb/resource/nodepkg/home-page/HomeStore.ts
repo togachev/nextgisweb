@@ -74,24 +74,17 @@ export interface UrlMenuProps {
     value: string;
 }
 
-export interface HeaderNamesProps {
+export interface HeaderProps {
     first_name: string;
     last_name: string;
-}
-
-export interface HeaderMenuProps {
     menu: UrlMenuProps[];
-}
-
-export interface HeaderProps {
-    names: HeaderNamesProps;
-    menus: HeaderMenuProps;
 }
 
 type Action = keyof Pick<HomeStore,
     | "getWidthMenu"
     | "getMapValues"
     | "getValuesHF"
+    | "saveSetting"
 >;
 
 export class HomeStore {
@@ -190,7 +183,7 @@ export class HomeStore {
             Object.entries(value || {}).filter(([, v]) => v)
         );
 
-        return await route("pyramid.csettings").put({
+        await route("pyramid.csettings").put({
             json: { pyramid: { [key]: payload } },
         });
     }

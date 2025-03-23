@@ -726,18 +726,10 @@ class FooterLogo(Struct):
     colorText: str
 
 
-class Names(Struct):
-    first_name: str
-    last_name: str
-
-
-class Menus(Struct):
-    menu: Dict[str, Any]
-
-
 class HomePageHeaders(Struct):
-    names: Union[Names, UnsetType] = UNSET
-    menus: Union[Menus, UnsetType] = UNSET
+    first_name: str = UNSET
+    last_name: str = UNSET
+    menu: List[Dict[str, Any]] = UNSET
 
 
 class HomePageFooters(Struct):

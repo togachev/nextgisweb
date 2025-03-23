@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
-import { Button, Input, Menu, Typography } from "@nextgisweb/gui/antd";
+import { Button, Col, Form, Input, Menu, Row, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
@@ -29,7 +28,7 @@ const signInText = gettext("Sign in");
 export const Header = observer(({ store: storeProp, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
     const [disable, setDisable] = useState(true);
-
+    const [form] = Form.useForm();
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
@@ -56,11 +55,11 @@ export const Header = observer(({ store: storeProp, config }) => {
 
     const items: MenuItem[] = [];
 
-    valueHeader?.menus?.menu && getEntries(valueHeader?.menus?.menu).map(item => items.push({
-        key: item[0],
-        label: (<a href={item[1]?.value} target="_blank" rel="noopener noreferrer" style={colorText}>{item[1]?.name}</a>),
-        name: item[1]?.name,
-        value: item[1]?.value,
+    store.valueHeader?.menu?.map((item, index) => items.push({
+        key: index,
+        label: (<a href={item?.value} target="_blank" rel="noopener noreferrer" style={colorText}>{item?.name}</a>),
+        name: item?.name,
+        value: item?.value,
         className: "menu-label"
     }));
 
@@ -117,169 +116,125 @@ export const Header = observer(({ store: storeProp, config }) => {
             />)
     }
 
+    const onFinish = (value) => {
+        setDisable(!disable);
+        store.setValueHeader(value);
+        store.saveSetting(value, "home_page_header");
+    }
+
     return (
         <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="control-button">
-                {config.isAdministrator === true && (<Button
-                    className={disable ? "icon-pensil" : "icon-edit-control"}
+                {disable && config.isAdministrator === true && (<Button
+                    className="icon-pensil"
                     shape="square"
                     title={disable ? gettext("Edit") : gettext("Save")}
                     type="default"
                     icon={disable ? <Edit /> : <Save />}
                     onClick={() => {
                         setDisable(!disable);
-                        store.setEditHeader(!store.editHeader);
-                        store.saveSetting(valueHeader, "home_page_header")
                     }}
                 />)}
-                {!disable && (
-                    <Button
-                        className="icon-edit-control"
-                        shape="square"
-                        title={gettext("Add url")}
-                        type="default"
-                        onClick={() => {
-                            const value = {
-                                ...valueHeader,
-                                menus: {
-                                    ...valueHeader.menus,
-                                    menu: {
-                                        ...valueHeader.menus.menu,
-                                        [String(Object.keys(valueHeader.menus.menu).length + 1)]: {
-                                            ...valueHeader.menus.menu[
-                                            String(Object.keys(valueHeader.menus.menu).length + 1)
-                                            ],
-                                            name: "",
-                                            value: "",
-                                        },
-                                    },
-                                },
-                            }
-                            store.setValueHeader(value);
-                        }}
-                        icon={<LinkEdit />}
-                    />
-                )}
             </div>
             <div className="menus">
                 <div className={disable ? "menu-component" : ""}>
                     <div className={disable ? "button-link" : "button-link edit-panel"}>
-                        {!disable ? items.map((item) => {
-                            if (!["auth", "resources"].includes(item.key)) {
-                                return (
-                                    <div key={item.key} className="item-edit">
-                                        <Input
-                                            placeholder={gettext("Name url")}
-                                            type="text"
-                                            value={item?.name}
-                                            allowClear
-                                            disabled={disable}
-                                            onChange={(e) => {
-                                                const value = {
-                                                    ...valueHeader,
-                                                    menus: {
-                                                        ...valueHeader.menus,
-                                                        menu: {
-                                                            ...valueHeader.menus.menu,
-                                                            [item.key]: {
-                                                                ...valueHeader.menus.menu[item.key],
-                                                                name: e.target.value,
-                                                            },
-                                                        },
-                                                    },
-                                                }
-                                                store.setValueHeader(value);
-                                            }}
-                                        />
-                                        <Input
-                                            className="first-input"
-                                            placeholder={gettext("Url")}
-                                            type="text"
-                                            value={item?.value}
-                                            allowClear
-                                            disabled={disable}
-                                            onChange={(e) => {
-                                                const value = {
-                                                    ...valueHeader,
-                                                    menus: {
-                                                        ...valueHeader.menus,
-                                                        menu: {
-                                                            ...valueHeader.menus.menu,
-                                                            [item.key]: {
-                                                                ...valueHeader.menus.menu[item.key],
-                                                                value: e.target.value,
-                                                            },
-                                                        },
-                                                    },
-                                                }
-                                                store.setValueHeader(value);
-                                            }}
-                                        />
-                                        <Button
-                                            title={gettext("Delete url")}
-                                            onClick={() => {
-                                                const state = { ...valueHeader };
-                                                delete state.menus.menu[item.key];
-                                                store.setValueHeader(state);
-                                            }}
-                                            className="icon-edit"
-                                            icon={<DeleteOffOutline />}
-                                        />
-                                    </div>
-                                )
-                            }
-                        }) :
-                            (<MenuContainer />)}
-                        {!disable &&
-                            <div className="edit-title">
-                                <div className="item-edit">
-                                    <Input
-                                        placeholder={gettext("First name site")}
-                                        type="text"
-                                        value={valueHeader?.names?.first_name}
-                                        allowClear
-                                        disabled={disable}
-                                        onChange={(e) => {
-                                            const value = {
-                                                ...valueHeader,
-                                                names: {
-                                                    ...valueHeader.names,
-                                                    first_name: e.target.value,
-                                                },
-                                            }
-                                            store.setValueHeader(value);
-                                        }}
-                                    />
-                                </div>
-                                <div className="item-edit">
-                                    <Input
-                                        placeholder={gettext("Additional name")}
-                                        type="text"
-                                        value={valueHeader?.names?.last_name}
-                                        allowClear
-                                        disabled={disable}
-                                        onChange={(e) => {
-                                            const value = {
-                                                ...valueHeader,
-                                                names: {
-                                                    ...valueHeader.names,
-                                                    last_name: e.target.value,
-                                                },
-                                            }
-                                            
-                                            store.setValueHeader(value);
-                                        }}
-                                    />
-                                </div>
-                            </div>
+                        {!disable ?
+                            <Form
+                                form={form}
+                                name="dynamic_form_complex"
+                                autoComplete="off"
+                                initialValues={valueHeader}
+                                onFinish={onFinish}
+                            >
+                                <Form.List name="menu">
+                                    {(fields, { add, remove }) => (
+                                        <>
+                                            {fields.map((field, index) => (
+                                                <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
+                                                    <Col flex="auto">
+                                                        <Form.Item noStyle name={[field.name, "name"]}>
+                                                            <Input
+                                                                type="text"
+                                                                allowClear
+                                                                placeholder={gettext("Name url")}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col flex="auto">
+                                                        <Form.Item noStyle name={[field.name, "value"]}>
+                                                            <Input
+                                                                placeholder={gettext("Url")}
+                                                                className="first-input"
+                                                                allowClear
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col flex="none">
+                                                        <Button
+                                                            title={gettext("Delete url")}
+                                                            onClick={() => {
+                                                                remove(field.name);
+                                                            }} className="icon-edit"
+                                                            icon={<DeleteOffOutline />}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            ))}
+                                            <Button
+                                                style={{ position: "absolute", bottom: "5px" }}
+                                                onClick={() => add()}
+                                                icon={<LinkEdit />}
+                                            />
+                                        </>
+                                    )}
+                                </Form.List>
+                                <Row gutter={[5, 5]} className="item-edit">
+                                    <Col flex="auto">
+                                        <Form.Item noStyle name={"first_name"}>
+                                            <Input
+                                                placeholder={gettext("First name site")}
+                                                type="text"
+                                                allowClear
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row gutter={[5, 5]} className="item-edit">
+                                    <Col flex="auto">
+                                        <Form.Item noStyle name={"last_name"}>
+                                            <Input
+                                                placeholder={gettext("Additional name")}
+                                                type="text"
+                                                allowClear
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row justify="end">
+                                    <Col>
+                                        <Form.Item noStyle label={null}>
+                                            <Button
+                                                type="default"
+                                                htmlType="submit"
+                                                icon={<Save />}
+                                                title={gettext("Save")}
+                                            >
+                                                {gettext("Save")}
+                                            </Button>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Form> :
+                            (<MenuContainer />)
                         }
                     </div>
                 </div>
             </div>
             <div className="name-site">
                 <div className="title">
-                    <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.names?.first_name}</Title>
-                    <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.names?.last_name}</Title>
+                    <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.first_name}</Title>
+                    <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.last_name}</Title>
                 </div>
             </div>
         </div >
