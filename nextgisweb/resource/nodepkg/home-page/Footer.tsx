@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Col, Row, Button, ColorPicker, Divider, Input, message, Space, Tooltip, Upload } from "@nextgisweb/gui/antd";
+import { Col, ColorPicker, Row, Button, Form, Divider, Input, message, Space, Tooltip, Upload } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
@@ -17,9 +17,11 @@ type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 import "./Footer.less";
 
-const LogoUriitComp = ({ store, disable }) => {
+const LogoUriitComp = ({ store }) => {
     const {
+        editFooter,
         valueFooter,
+        setValueFooter,
     } = store;
 
     const colorsFooter = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#FFFFFF", "#000000", "#106A90"];
@@ -45,18 +47,17 @@ const LogoUriitComp = ({ store, disable }) => {
             const { onSuccess, onError, file } = options;
             try {
                 await getBase64(file as FileType, (url) => {
-                    const value = {
-                        ...valueFooter,
+                    setValueFooter((prev) => ({
+                        ...prev,
                         logo: {
-                            ...valueFooter.logo,
+                            ...prev.logo,
                             value: [{
                                 url: url,
                                 name: file.name,
                                 value: file.uid,
                             }],
                         },
-                    };
-                    store.setValueFooter(value);
+                    }));
                 });
                 if (onSuccess) {
                     onSuccess("Ok");
@@ -68,14 +69,13 @@ const LogoUriitComp = ({ store, disable }) => {
             }
         },
         onChange: ({ fileList }) => {
-            const value = {
-                ...valueFooter,
+            setValueFooter((prev) => ({
+                ...prev,
                 logo: {
-                    ...valueFooter.logo,
+                    ...prev.logo,
                     value: fileList,
                 },
-            };
-            store.setValueFooter(value);
+            }));
         },
         showUploadList: false,
         defaultFileList: valueFooter?.logo?.value,
@@ -100,37 +100,34 @@ const LogoUriitComp = ({ store, disable }) => {
         listType: "text",
         name: "file",
         onRemove: (file) => {
-            const value = {
-                ...valueFooter,
+            setValueFooter((prev) => ({
+                ...prev,
                 logo: {
-                    ...valueFooter.logo,
-                    value: valueFooter.logo.value.filter((item) => item.uid !== file.uid),
+                    ...prev.logo,
+                    value: prev.logo.value.filter((item) => item.uid !== file.uid),
                 },
-            };
-            store.setValueFooter(value);
+            }));
         }
     };
 
     const onChangeColorBackground = (c) => {
-        const value = {
-            ...valueFooter,
+        setValueFooter((prev) => ({
+            ...prev,
             logo: {
-                ...valueFooter.logo,
+                ...prev.logo,
                 colorBackground: c.toHexString(),
             },
-        };
-        store.setValueFooter(value);
+        }));
     }
 
     const onChangeColorText = (c) => {
-        const value = {
-            ...valueFooter,
+        setValueFooter((prev) => ({
+            ...prev,
             logo: {
-                ...valueFooter.logo,
+                ...prev.logo,
                 colorText: c.toHexString(),
             },
-        };
-        store.setValueFooter(value);
+        }));
     }
 
     const msgInfo = [
@@ -140,97 +137,124 @@ const LogoUriitComp = ({ store, disable }) => {
 
     return (
         <span className="logo-block">
-            {!disable ?
-                (<span className="edit-logo">
-                    <span className="upload-content">
+            <span className="edit-logo">
+                <Row gutter={[5, 5]}>
+                    <Col flex="auto">
                         <span className="upload-block">
-                            <Upload {...props} accept=".svg">
-                                <Tooltip
-                                    title={msgInfo.join(" ")}
-                                    trigger={["click", "hover"]}
-                                >
-                                    <Button
-                                        className="icon-button"
-                                        title={gettext("Select File")}
-                                    >{gettext("Select File")}</Button>
-                                </Tooltip>
-                            </Upload>
-                            {valueFooter?.logo?.value?.length === 1 &&
-                                valueFooter.logo.value.map((file, index) => (
-                                    <span key={index}>
+                            <Form.Item noStyle valuePropName="fileList" getValueFromEvent={valueFooter?.logo?.value[0]}>
+                                <Upload {...props} accept=".svg">
+                                    <Tooltip
+                                        title={msgInfo.join(" ")}
+                                        trigger={["click", "hover"]}
+                                    >
                                         <Button
-                                            title={gettext("Remove file") + " - " + file.name}
-                                            onClick={() => {
-                                                const value = {
-                                                    ...valueFooter,
-                                                    logo: {
-                                                        ...valueFooter.logo,
-                                                        value: valueFooter.logo.value.filter((item) => item.uid !== file.uid),
-                                                    },
-                                                };
-                                                store.setValueFooter(value);
-                                            }}
-                                            icon={<span className="icon-edit">
-                                                <DeleteOffOutline />
-                                            </span>}
-                                        />
-                                    </span>
-                                ))}
+                                            className="icon-button"
+                                            title={gettext("Select File")}
+                                        >{gettext("Select File")}</Button>
+                                    </Tooltip>
+                                </Upload>
+                            </Form.Item>
+                            <Form.Item noStyle>
+                                {valueFooter.logo.value.length > 0 && (
+                                    <Button
+                                        title={gettext("Remove file") + " - " + valueFooter?.logo?.value?.name}
+                                        onClick={() => {
+                                            setValueFooter((prev) => ({
+                                                ...prev,
+                                                logo: {
+                                                    ...prev.logo,
+                                                    value: prev.logo.value.filter((item) => item.uid !== valueFooter?.logo?.value?.uid),
+                                                },
+                                            }));
+                                        }}
+                                        icon={<span className="icon-edit">
+                                            <DeleteOffOutline />
+                                        </span>}
+                                    />
+                                )}
+                            </Form.Item>
                         </span>
                         {valueFooter?.logo?.value?.length === 1 &&
                             <span className="logo-icon-view">
                                 <img className="uriit-logo-mini" src={valueFooter?.logo?.value[0].url} />
                             </span>
                         }
-                    </span>
-                    <span className="color-block" >
-                        <ColorPicker
-                            presets={[
-                                {
-                                    label: gettext("Default color"),
-                                    colors: ["#212529"],
-                                },
-                                {
-                                    label: gettext("Primary colors"),
-                                    colors: colorsFooter,
-                                },
-                            ]}
-                            allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
-                        <span>{gettext("Color background")}</span>
-                        <ColorPicker
-                            presets={[
-                                {
-                                    label: gettext("Default color text"),
-                                    colors: ["#fff"],
-                                },
-                                {
-                                    label: gettext("Primary colors"),
-                                    colors: colorsFooter,
-                                },
-                            ]}
-                            allowClear value={valueFooter?.logo?.colorText} onChange={onChangeColorText} />
-                        <span>{gettext("Color text")}</span>
-                    </span>
-                </span>) :
-                valueFooter?.logo?.value?.length > 0 && (
-                    <span className="uriit-logo">
-                        <img src={valueFooter.logo.value[0].url} />
-                    </span>
-                )
-            }
+                    </Col>
+                </Row>
+                <Row gutter={[5, 5]}>
+                    <Col flex="auto">
+                        <Form.Item noStyle label={gettext("Color background")} name={["logo", "colorBackground"]}>
+                            <ColorPicker
+                                presets={[
+                                    {
+                                        label: gettext("Default color"),
+                                        colors: ["#212529"],
+                                    },
+                                    {
+                                        label: gettext("Primary colors"),
+                                        colors: colorsFooter,
+                                    },
+                                ]}
+                                allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={[5, 5]}>
+                    <Col flex="auto">
+                        <Form.Item noStyle label={gettext("Color text")} name={["logo", "colorText"]}>
+                            <ColorPicker
+                                presets={[
+                                    {
+                                        label: gettext("Default color text"),
+                                        colors: ["#fff"],
+                                    },
+                                    {
+                                        label: gettext("Primary colors"),
+                                        colors: colorsFooter,
+                                    },
+                                ]}
+                                allowClear value={valueFooter?.logo?.colorText} onChange={onChangeColorText} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </span>
         </span>
     );
 };
 
 export const Footer = observer(({ store: storeProp, config }) => {
     const [disable, setDisable] = useState(true);
-
+    const [form] = Form.useForm();
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
     const {
         valueFooter,
     } = store;
+
+    const initialValues = {
+        services: {
+            services_value: "",
+            list: [{}],
+        },
+        address: {
+            address_value: "",
+            phone: [{}],
+        },
+        logo: {
+            value: {
+                url: "",
+                name: "",
+                value: "",
+            },
+            colorText: "",
+            colorBackground: "",
+        },
+        footer_name: {
+            name: "",
+            base_year: "",
+        },
+    }
 
     return (
         <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground, color: valueFooter?.logo?.colorText, fontWeight: 500 }}>
@@ -248,321 +272,227 @@ export const Footer = observer(({ store: storeProp, config }) => {
                             store.saveSetting(valueFooter, "home_page_footer")
                         }}
                     />)}
-                {!disable && (
-                    <Button
-                        className="icon-edit-control"
-                        shape="square"
-                        title={gettext("Add urls")}
-                        type="default"
-                        onClick={() => {
-                            const value = {
-                                ...valueFooter,
-                                services: {
-                                    ...valueFooter.services,
-                                    list: {
-                                        ...valueFooter.services.list,
-                                        [String(Object.keys(valueFooter.services.list).length + 1)]: {
-                                            ...valueFooter.services.list[
-                                            String(Object.keys(valueFooter.services.list).length + 1)
-                                            ],
-                                            name: "",
-                                            value: "",
-                                        },
-                                    },
-                                },
-                            };
-                            store.setValueFooter(value);
-                        }}
-                        icon={<LinkEdit />}
-                    />
-                )}
-                {!disable && (
-                    <Button
-                        className="icon-edit-control"
-                        shape="square"
-                        title={gettext("Add contacts")}
-                        type="default"
-                        onClick={() => {
-                            const value = {
-                                ...valueFooter,
-                                address: {
-                                    ...valueFooter.address,
-                                    phone: {
-                                        ...valueFooter.address.phone,
-                                        [String(Object.keys(valueFooter.address.phone).length + 1)]: {
-                                            ...valueFooter.address.phone[
-                                            String(Object.keys(valueFooter.address.phone).length + 1)
-                                            ],
-                                            name: "",
-                                            value: "",
-                                        },
-                                    },
-                                },
-                            };
-                            store.setValueFooter(value);
-                        }}
-                        icon={<CardAccountPhone />}
-                    />
-                )}
             </div>
-            <Row className={disable ? "footer-info" : "footer-info-edit"}>
-                <Col className={disable ? "logo-col" : "logo-col-edit"} flex={disable && 1}>
-                    <LogoUriitComp store={store} disable={disable} />
-                </Col>
-                <Col flex={4} className={disable ? "" : "footer-content-edit"}>
-                    <span className="block-info">
-                        {disable ?
-                            (<span className="name-center">{valueFooter?.services?.value}</span>) :
-                            (
-                                <span className="item-edit">
-                                    <Input
-                                        placeholder={gettext("Name company")}
-                                        disabled={disable}
-                                        type="text"
-                                        value={valueFooter?.services?.value}
-                                        allowClear
-                                        onChange={(e) => {
-                                            const value = {
-                                                ...valueFooter,
-                                                services: {
-                                                    ...valueFooter.services,
-                                                    value: e.target.value,
-                                                },
-                                            };
-                                            store.setValueFooter(value);
-                                        }}
-                                    />
-                                </span>
-                            )
-                        }
-                        {valueFooter?.services?.list && getEntries(valueFooter.services.list).map((item) => {
-                            return (
-                                <span key={item[0]} className={disable ? "services-list" : "item-edit"}>
-                                    {disable ? (
+            {disable ? (<>
+                <Row className="footer-info">
+                    <Col className="logo-col" flex={1}>
+                        <span className="logo-block">
+                            <span className="uriit-logo">
+                                <img src={valueFooter?.logo?.value[0]?.url} />
+                            </span>
+                        </span>
+                    </Col>
+                    <Col flex={4} >
+                        <span className="block-info">
+                            <span className="name-center">{valueFooter?.services?.value}</span>
+                            {valueFooter?.services?.list.map((item, index) => {
+                                return (
+                                    <span key={index} className="services-list">
                                         <span className="services-url">
-                                            <a href={item[1]?.value} target="_blank" style={{ color: valueFooter?.logo?.colorText }}>
+                                            <a href={item?.value} target="_blank" style={{ color: valueFooter?.logo?.colorText }}>
                                                 <span className="icon-link">
                                                     <ChevronRight />
                                                 </span>
-                                                {item[1]?.name}
+                                                {item?.name}
                                             </a>
                                         </span>
-                                    ) : (<>
-                                        <Input
-                                            placeholder={gettext("Name url")}
-                                            type="text"
-                                            value={item[1]?.name}
-                                            allowClear
-                                            disabled={disable}
-                                            onChange={(e) => {
-                                                const value = {
-                                                    ...valueFooter,
-                                                    services: {
-                                                        ...valueFooter.services,
-                                                        list: {
-                                                            ...valueFooter.services.list,
-                                                            [item[0]]: {
-                                                                ...valueFooter.services.list[item[0]],
-                                                                name: e.target.value,
-                                                            },
-                                                        },
-                                                    },
-                                                };
-                                                store.setValueFooter(value);
-                                            }}
-                                        />
-                                        <Input
-                                            className="first-input"
-                                            placeholder={gettext("Url")}
-                                            type="text"
-                                            value={item[1]?.value}
-                                            allowClear
-                                            disabled={disable}
-                                            onChange={(e) => {
-                                                const value = {
-                                                    ...valueFooter,
-                                                    services: {
-                                                        ...valueFooter.services,
-                                                        list: {
-                                                            ...valueFooter.services.list,
-                                                            [item[0]]: {
-                                                                ...valueFooter.services.list[item[0]],
-                                                                value: e.target.value,
-                                                            },
-                                                        },
-                                                    },
-                                                };
-                                                store.setValueFooter(value);
-                                            }}
-                                        />
-                                        <Button
-                                            title={gettext("Delete urls")}
-                                            onClick={() => {
-                                                const value = { ...valueFooter };
-                                                delete value.services.list[item[0]];
-                                                store.setValueFooter(value);
-                                            }}
-                                            className="icon-edit"
-                                            icon={<DeleteOffOutline />}
-                                        />
-                                    </>)}
-                                </span>
-                            )
-                        })}
-                        {disable && (<Divider />)}
-                        <span className="address-content">
-                            <span className={disable ? "address" : "item-edit"}>
-                                {disable ? (
+                                    </span>
+                                )
+                            })}
+                            <Divider />
+                            <span className="address-content">
+                                <span className="address">
                                     <span>{valueFooter?.address?.value}</span>
-                                ) : (
-                                    <Input
-                                        placeholder={gettext("Full address")}
-                                        disabled={disable}
-                                        type="text"
-                                        value={valueFooter?.address?.value}
-                                        allowClear
-                                        onChange={(e) => {
-                                            const value = {
-                                                ...valueFooter,
-                                                address: {
-                                                    ...valueFooter.address,
-                                                    value: e.target.value,
-                                                },
-                                            };
-                                            store.setValueFooter(value);
-                                        }}
-                                    />
-                                )}
-                            </span>
-                            <span className="phone">
-                                {valueFooter?.services?.list && getEntries(valueFooter.address.phone).map((item) => {
-                                    if (disable) {
+                                </span>
+                                <span className="phone">
+                                    {valueFooter?.address?.phone.map((item, index) => {
                                         return (
-                                            <Space key={item[0]} className="phone-item">
-                                                <span className="name">{item[1]?.name}</span>
-                                                <span className="value">{item[1]?.value}</span>
+                                            <Space key={index} className="phone-item">
+                                                <span className="name">{item?.name}</span>
+                                                <span className="value">{item?.value}</span>
                                             </Space>
                                         )
-                                    } else {
-                                        return (
-                                            <span key={item[0]} className="item-edit">
-                                                <Input
-                                                    placeholder={gettext("Name")}
-                                                    type="text"
-                                                    value={item[1]?.name}
-                                                    allowClear
-                                                    disabled={disable}
-                                                    onChange={(e) => {
-                                                        const value = {
-                                                            ...valueFooter,
-                                                            address: {
-                                                                ...valueFooter.address,
-                                                                phone: {
-                                                                    ...valueFooter.address.phone,
-                                                                    [item[0]]: {
-                                                                        ...valueFooter.address.phone[item[0]],
-                                                                        name: e.target.value,
-                                                                    },
-                                                                },
-                                                            },
-                                                        };
-                                                        store.setValueFooter(value);
-                                                    }}
-                                                />
-                                                <Input
-                                                    className="first-input"
-                                                    placeholder={gettext("Value")}
-                                                    type="text"
-                                                    value={item[1]?.value}
-                                                    allowClear
-                                                    disabled={disable}
-                                                    onChange={(e) => {
-                                                        const value = {
-                                                            ...valueFooter,
-                                                            address: {
-                                                                ...valueFooter.address,
-                                                                phone: {
-                                                                    ...valueFooter.address.phone,
-                                                                    [item[0]]: {
-                                                                        ...valueFooter.address.phone[item[0]],
-                                                                        value: e.target.value,
-                                                                    },
-                                                                },
-                                                            },
-                                                        };
-                                                        store.setValueFooter(value);
-                                                    }}
-                                                />
-                                                <Button
-                                                    title={gettext("Delete contact")}
-                                                    onClick={() => {
-                                                        const value = { ...valueFooter };
-                                                        delete value.address.phone[item[0]];
-                                                        store.setValueFooter(value);
-                                                    }}
-                                                    className="icon-edit"
-                                                    icon={<DeleteOffOutline />}
-                                                />
-                                            </span>
-                                        )
-                                    }
-                                })}
+                                    })}
+                                </span>
                             </span>
                         </span>
-                        {!disable && (
-                            <Row className="item-edit">
-                                <Col flex="96px">
-                                    <Input
-                                        placeholder={gettext("Footer base year")}
-                                        disabled={disable}
-                                        type="text"
-                                        value={valueFooter?.footer_name?.base_year}
-                                        allowClear
-                                        onChange={(e) => {
-                                            const value = {
-                                                ...valueFooter,
-                                                footer_name: {
-                                                    ...valueFooter.footer_name,
-                                                    base_year: e.target.value,
-                                                },
-                                            };
-                                            store.setValueFooter(value);
-                                        }}
-                                    />
-                                </Col>
-                                <Col flex="auto" className="first-input">
-                                    <Input
-                                        placeholder={gettext("Name footer page")}
-                                        disabled={disable}
-                                        type="text"
-                                        value={valueFooter?.footer_name?.name}
-                                        allowClear
-                                        onChange={(e) => {
-                                            const value = {
-                                                ...valueFooter,
-                                                footer_name: {
-                                                    ...valueFooter.footer_name,
-                                                    name: e.target.value,
-                                                },
-                                            };
-                                            store.setValueFooter(value);
-                                        }}
-                                    />
-                                </Col>
-                            </Row>
-                        )}
-                    </span>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    {disable && (
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
                         <div className="uriit-footer-name">
                             © {valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {valueFooter?.footer_name?.name}
                         </div>
-                    )}
-                </Col>
-            </Row>
+                    </Col>
+                </Row>
+            </>) : (
+                <Form
+                    form={form}
+                    name="dynamic_form_complex"
+                    autoComplete="off"
+                    initialValues={valueFooter}
+                >
+                    <Row gutter={[5, 5]} className="footer-info-edit">
+                        <Col flex="auto">
+                            <Row gutter={[5, 5]}>
+                                <Col flex="auto">
+                                    <LogoUriitComp store={store} />
+                                    {/* <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Form.Item noStyle name={["logo", "value", "url"]}>
+                                                <Input placeholder="name" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Form.Item noStyle name={["logo", "value", "name"]}>
+                                                <Input placeholder="name" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Form.Item noStyle name={["logo", "value", "value"]}>
+                                                <Input placeholder="name" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Form.Item noStyle name={["logo", "colorText"]}>
+                                                <Input placeholder="name" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Form.Item noStyle name={["logo", "colorBackground"]}>
+                                                <Input placeholder="name" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row> */}
+                                </Col>
+                                <Col flex={6}>
+                                    <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Row gutter={[5, 5]}>
+                                                <Col flex="auto">
+                                                    <Form.Item noStyle name={["services", "value"]}>
+                                                        <Input placeholder="name" />
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                            <Row gutter={[5, 5]}>
+                                                <Col flex="auto">
+                                                    <Form.List name={["services", "list"]}>
+                                                        {(fields, { add, remove }) => (
+                                                            <>
+                                                                <Row gutter={[5, 5]}>
+                                                                    <Col flex="none">
+                                                                        <Button onClick={() => add()} icon={<LinkEdit />} />
+                                                                    </Col>
+                                                                    <Col flex="auto">
+                                                                        {fields.map((field, index) => (
+                                                                            <Row key={index} gutter={[5, 5]} wrap={false}>
+                                                                                <Col flex="auto">
+                                                                                    <Form.Item noStyle name={[field.name, "name"]}>
+                                                                                        <Input />
+                                                                                    </Form.Item>
+                                                                                </Col>
+                                                                                <Col flex="auto">
+                                                                                    <Form.Item noStyle name={[field.name, "value"]}>
+                                                                                        <Input />
+                                                                                    </Form.Item>
+                                                                                </Col>
+                                                                                <Col flex="none">
+                                                                                    <Button
+                                                                                        onClick={() => {
+                                                                                            remove(field.name);
+                                                                                        }}
+                                                                                        icon={<DeleteOffOutline />}
+                                                                                    />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        ))}
+                                                                    </Col>
+                                                                </Row>
+                                                            </>
+                                                        )}
+                                                    </Form.List>
+                                                </Col>
+                                            </Row>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={[5, 5]}>
+                                        <Col flex="auto">
+                                            <Row gutter={[5, 5]}>
+                                                <Col flex="auto">
+                                                    <Form.Item noStyle name={["address", "value"]}>
+                                                        <Input placeholder="value" />
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                            <Row gutter={[5, 5]}>
+                                                <Col flex="auto">
+                                                    <Form.List name={["address", "phone"]}>
+                                                        {(fields, { add, remove }) => (
+                                                            <>
+                                                                <Row gutter={[5, 5]}>
+                                                                    <Col flex="none">
+                                                                        <Button onClick={() => add()} icon={<LinkEdit />} />
+                                                                    </Col>
+                                                                    <Col flex="auto">
+                                                                        {fields.map((field, index) => (
+                                                                            <Row key={index} gutter={[5, 5]} wrap={false}>
+                                                                                <Col flex="auto">
+                                                                                    <Form.Item noStyle name={[field.name, "name"]}>
+                                                                                        <Input />
+                                                                                    </Form.Item>
+                                                                                </Col>
+                                                                                <Col flex="auto">
+                                                                                    <Form.Item noStyle name={[field.name, "value"]}>
+                                                                                        <Input />
+                                                                                    </Form.Item>
+                                                                                </Col>
+                                                                                <Col flex="none">
+                                                                                    <Button
+                                                                                        onClick={() => {
+                                                                                            remove(field.name);
+                                                                                        }}
+                                                                                        icon={<DeleteOffOutline />}
+                                                                                    />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        ))}
+                                                                    </Col>
+                                                                </Row>
+                                                            </>
+                                                        )}
+                                                    </Form.List>
+                                                </Col>
+                                            </Row>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row gutter={[5, 5]}>
+                                <Col flex="auto">
+                                    <Form.Item noStyle name={["footer_name", "base_year"]}>
+                                        <Input placeholder="base_year" />
+                                    </Form.Item>
+                                </Col>
+                                <Col flex="auto">
+                                    <Form.Item noStyle name={["footer_name", "name"]}>
+                                        <Input placeholder="name" />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+
+                </Form>
+            )}
         </div >
     );
 })

@@ -14,6 +14,15 @@
 		border-radius: 3px;
 	}
 
+	.footer-info-edit {
+		right: 10%;
+		display: flex;
+		text-transform: uppercase;
+		align-items: center;
+		border-radius: 4px;
+		justify-content: flex-end;
+	}
+
 	.footer-content-edit {
 		border-radius: 3px;
 		padding-top: 5px;
@@ -24,28 +33,24 @@
 		border-radius: 3px;
 		color: var(--text-base);
 
-		.upload-content {
+
+		.upload-block {
 			display: flex;
-			flex-direction: column;
+			justify-content: space-between;
+			padding: 0 5px 5px 5px;
+		}
 
-			.upload-block {
-				display: flex;
-				justify-content: space-between;
-				padding: 0 5px 5px 5px;
-			}
+		.logo-icon-view {
+			margin: 0px 5px;
+			padding: 5px;
+			background: var(--icon-color);
+			border-radius: 3px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 
-			.logo-icon-view {
-				margin: 0px 5px;
-				padding: 5px;
-				background: var(--icon-color);
-				border-radius: 3px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-
-				.uriit-logo-mini {
-					height: 32px;
-				}
+			.uriit-logo-mini {
+				height: 32px;
 			}
 		}
 	}

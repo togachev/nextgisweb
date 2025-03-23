@@ -15,6 +15,7 @@ import Login from "@nextgisweb/icon/mdi/login";
 import Logout from "@nextgisweb/icon/mdi/logout";
 import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
+import Cancel from "@nextgisweb/icon/mdi/cancel";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import { HomeStore } from "./HomeStore";
@@ -122,6 +123,19 @@ export const Header = observer(({ store: storeProp, config }) => {
         store.saveSetting(value, "home_page_header");
     }
 
+    const initialValues = {
+        "services_value": "",
+        "list": [
+          {}
+        ],
+        "address_value": "",
+        "phone": [
+          {}
+        ],
+        "footer_name": "",
+        "base_year": ""
+      }
+
     return (
         <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="control-button">
@@ -185,7 +199,10 @@ export const Header = observer(({ store: storeProp, config }) => {
                                                 style={{ position: "absolute", bottom: "5px" }}
                                                 onClick={() => add()}
                                                 icon={<LinkEdit />}
-                                            />
+                                                title={gettext("Add url")}
+                                            >
+                                                {gettext("Add url")}
+                                            </Button>
                                         </>
                                     )}
                                 </Form.List>
@@ -211,7 +228,23 @@ export const Header = observer(({ store: storeProp, config }) => {
                                         </Form.Item>
                                     </Col>
                                 </Row>
-                                <Row justify="end">
+                                <Row gutter={[5, 5]} justify="end">
+                                    <Col>
+                                        <Form.Item noStyle label={null}>
+                                            {!disable && (
+                                                <Button
+                                                    title={gettext("Cancel")}
+                                                    type="default"
+                                                    icon={<Cancel />}
+                                                    onClick={() => {
+                                                        setDisable(!disable);
+                                                    }}
+                                                >
+                                                    {gettext("Cancel")}
+                                                </Button>
+                                            )}
+                                        </Form.Item>
+                                    </Col>
                                     <Col>
                                         <Form.Item noStyle label={null}>
                                             <Button
@@ -231,12 +264,14 @@ export const Header = observer(({ store: storeProp, config }) => {
                     </div>
                 </div>
             </div>
-            <div className="name-site">
-                <div className="title">
-                    <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.first_name}</Title>
-                    <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.last_name}</Title>
+            {disable && (
+                <div className="name-site">
+                    <div className="title">
+                        <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.first_name}</Title>
+                        <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.last_name}</Title>
+                    </div>
                 </div>
-            </div>
+            )}
         </div >
     );
 });

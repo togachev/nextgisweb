@@ -58,57 +58,12 @@
 				.ant-menu-title-content{
 					font-weight: 500;
 				}
-
-				.menu-link {
-					display: flex;
-					text-transform: uppercase;
-					align-items: center;
-
-					.ant-divider-vertical {
-						position: relative;
-						margin: 5px;
-						border-inline-start: 1px solid #fff;
-					}
-				}
-
-				.edit-title {
-					width: 100%;
-
-					.title-item {
-						padding: 2px 0;
-					}
-				}
 			}
 
 			a {
 				color: #ffffff;
 			}
-
-			.res-link {
-				margin: 0 12px 0 0;
-				font-size: 24px;
-
-				svg {
-					color: #ffffff;
-
-					&:hover {
-						color: rgb(175, 180, 253) !important;
-					}
-				}
-			}
 		}
-	}
-
-	.icon-button {
-		color: var(--text-base);
-		background-color: #fff;
-		display: flex;
-		justify-items: center;
-		justify-content: center;
-		align-items: center;
-		flex: 0 0 auto;
-		cursor: pointer;
-		z-index: 1000;
 	}
 
 	.name-site {
@@ -167,11 +122,6 @@
 	}
 }
 
-.content-auth {
-	display: flex;
-	flex-direction: column;
-}
-
 .menu-avatar-label {
 	border-radius: 2px;
 	color: #fff;
@@ -189,45 +139,6 @@
 	.menu-avatar-label {
 		color: var(--on-primary);
 		background-color: var(--surface-bg-danger);
-	}
-}
-
-.menu-avatar-popover {
-	.ant-popover-title {
-		padding: 0;
-		min-width: 0;
-		display: flex;
-		justify-content: center;
-	}
-
-	.ant-popover-inner-content {
-		padding: 0px;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-
-		div.warning {
-			display: block;
-			padding: 6px 12px;
-			background-color: var(--surface-bg-danger);
-		}
-
-		a {
-			display: block;
-			padding: 6px 12px;
-			text-decoration: none;
-			color: var(--text-base);
-
-			&:hover {
-				background-color: rgba(0, 0, 0, 0.04);
-			}
-		}
-	}
-}
-
-.menu-avatar-active {
-	.menu-avatar-icon {
-		transform: rotate(180deg);
 	}
 }
 

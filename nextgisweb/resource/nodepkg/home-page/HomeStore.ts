@@ -92,7 +92,6 @@ export class HomeStore {
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
     @observable accessor editFooter = true;
-    @observable accessor editHeader = true;
 
     @observable.shallow accessor listMaps: ListMapProps[] = [];
     @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
@@ -124,11 +123,6 @@ export class HomeStore {
     @action
     setSourceGroup(sourceGroup: boolean): void {
         this.sourceGroup = sourceGroup;
-    };
-
-    @action
-    setEditHeader(editHeader: boolean): void {
-        this.editHeader = editHeader;
     };
 
     @action

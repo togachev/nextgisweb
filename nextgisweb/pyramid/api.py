@@ -707,12 +707,12 @@ class Metrics(Struct):
 
 class Services(Struct):
     value: str
-    list: Dict[str, Any]
+    list: List[Dict[str, Any]]
 
 
 class Address(Struct):
     value: str
-    phone: Dict[str, Any]
+    phone: List[Dict[str, Any]]
 
 
 class FooterName(Struct):

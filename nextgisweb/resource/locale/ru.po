@@ -646,7 +646,7 @@ msgstr "Изменить"
 
 #: nodepkg/home-page/Header.tsx:132
 msgid "Save"
-msgstr "Save"
+msgstr "Сохранить"
 
 #: nodepkg/home-page/Header.tsx:144
 msgid "Add"
@@ -657,7 +657,7 @@ msgid "Delete"
 msgstr "Удалить"
 
 #: nodepkg/home-page/Header.tsx:239
-msgid "First name site "
+msgid "First name site"
 msgstr "Имя сайта"
 
 #: nodepkg/home-page/Header.tsx:257
