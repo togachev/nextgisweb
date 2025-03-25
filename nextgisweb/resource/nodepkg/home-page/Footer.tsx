@@ -6,6 +6,7 @@ import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
+import Cancel from "@nextgisweb/icon/mdi/cancel";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -35,50 +36,9 @@ const LogoUriitComp = ({ store }) => {
             disabled: false,
         },
     ];
-
-    const getBase64 = async (file: FileType, callback: (url: string) => void) => {
-        const reader = new FileReader();
-        reader.addEventListener("load", () => callback(reader.result as string));
-        reader.readAsDataURL(file as Blob);
-    };
+    console.log(valueFooter?.logo?.value?.length > 0 && valueFooter?.logo?.value[0]);
 
     const props: UploadProps = {
-        customRequest: async (options) => {
-            const { onSuccess, onError, file } = options;
-            try {
-                await getBase64(file as FileType, (url) => {
-                    setValueFooter((prev) => ({
-                        ...prev,
-                        logo: {
-                            ...prev.logo,
-                            value: [{
-                                url: url,
-                                name: file.name,
-                                value: file.uid,
-                            }],
-                        },
-                    }));
-                });
-                if (onSuccess) {
-                    onSuccess("Ok");
-                }
-            } catch (err) {
-                if (onError) {
-                    onError(new Error("Exception download"));
-                }
-            }
-        },
-        onChange: ({ fileList }) => {
-            setValueFooter((prev) => ({
-                ...prev,
-                logo: {
-                    ...prev.logo,
-                    value: fileList,
-                },
-            }));
-        },
-        showUploadList: false,
-        defaultFileList: valueFooter?.logo?.value,
         multiple: false,
         beforeUpload: (file, info) => {
             const fileName = file.name;
@@ -97,43 +57,19 @@ const LogoUriitComp = ({ store }) => {
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
         maxCount: 1,
-        listType: "text",
-        name: "file",
-        onRemove: (file) => {
-            setValueFooter((prev) => ({
-                ...prev,
-                logo: {
-                    ...prev.logo,
-                    value: prev.logo.value.filter((item) => item.uid !== file.uid),
-                },
-            }));
-        }
     };
-
-    const onChangeColorBackground = (c) => {
-        setValueFooter((prev) => ({
-            ...prev,
-            logo: {
-                ...prev.logo,
-                colorBackground: c.toHexString(),
-            },
-        }));
-    }
-
-    const onChangeColorText = (c) => {
-        setValueFooter((prev) => ({
-            ...prev,
-            logo: {
-                ...prev.logo,
-                colorText: c.toHexString(),
-            },
-        }));
-    }
 
     const msgInfo = [
         gettext("Supported file format SVG."),
         gettext("Maximum file size 2KB."),
     ];
+
+    const normalizingFileUpload = (event) => {
+        if (Array.isArray(event)) {
+            return event;
+        }
+        return event && event.fileList;
+    };
 
     return (
         <span className="logo-block">
@@ -141,8 +77,13 @@ const LogoUriitComp = ({ store }) => {
                 <Row gutter={[5, 5]}>
                     <Col flex="auto">
                         <span className="upload-block">
-                            <Form.Item noStyle valuePropName="fileList" getValueFromEvent={valueFooter?.logo?.value[0]}>
-                                <Upload {...props} accept=".svg">
+                            <Form.Item
+                                noStyle
+                                name={["logo", "value"]}
+                                valuePropName="file"
+                                getValueFromEvent={normalizingFileUpload}
+                            >
+                                <Upload {...props} name="logo" listType="file" accept=".svg">
                                     <Tooltip
                                         title={msgInfo.join(" ")}
                                         trigger={["click", "hover"]}
@@ -154,36 +95,25 @@ const LogoUriitComp = ({ store }) => {
                                     </Tooltip>
                                 </Upload>
                             </Form.Item>
-                            <Form.Item noStyle>
-                                {valueFooter.logo.value.length > 0 && (
-                                    <Button
-                                        title={gettext("Remove file") + " - " + valueFooter?.logo?.value?.name}
-                                        onClick={() => {
-                                            setValueFooter((prev) => ({
-                                                ...prev,
-                                                logo: {
-                                                    ...prev.logo,
-                                                    value: prev.logo.value.filter((item) => item.uid !== valueFooter?.logo?.value?.uid),
-                                                },
-                                            }));
-                                        }}
-                                        icon={<span className="icon-edit">
-                                            <DeleteOffOutline />
-                                        </span>}
-                                    />
-                                )}
-                            </Form.Item>
                         </span>
-                        {valueFooter?.logo?.value?.length === 1 &&
+                        {valueFooter?.logo?.value?.length > 0 &&
                             <span className="logo-icon-view">
-                                <img className="uriit-logo-mini" src={valueFooter?.logo?.value[0].url} />
+                                <img className="uriit-logo-mini" src={valueFooter?.logo?.value[0].thumbUrl
+                                } />
                             </span>
                         }
                     </Col>
                 </Row>
                 <Row gutter={[5, 5]}>
                     <Col flex="auto">
-                        <Form.Item noStyle label={gettext("Color background")} name={["logo", "colorBackground"]}>
+                        <Form.Item
+                            noStyle
+                            label={gettext("Color background")}
+                            name={["logo", "colorText"]}
+                            getValueFromEvent={(color) => {
+                                return "#" + color.toHex();
+                            }}
+                        >
                             <ColorPicker
                                 presets={[
                                     {
@@ -195,13 +125,20 @@ const LogoUriitComp = ({ store }) => {
                                         colors: colorsFooter,
                                     },
                                 ]}
-                                allowClear value={valueFooter?.logo?.colorBackground} onChange={onChangeColorBackground} />
+                                allowClear value={valueFooter?.logo?.colorText} />
                         </Form.Item>
                     </Col>
                 </Row>
                 <Row gutter={[5, 5]}>
                     <Col flex="auto">
-                        <Form.Item noStyle label={gettext("Color text")} name={["logo", "colorText"]}>
+                        <Form.Item
+                            noStyle
+                            label={gettext("Color text")}
+                            name={["logo", "colorBackground"]}
+                            getValueFromEvent={(color) => {
+                                return "#" + color.toHex();
+                            }}
+                        >
                             <ColorPicker
                                 presets={[
                                     {
@@ -213,7 +150,7 @@ const LogoUriitComp = ({ store }) => {
                                         colors: colorsFooter,
                                     },
                                 ]}
-                                allowClear value={valueFooter?.logo?.colorText} onChange={onChangeColorText} />
+                                allowClear value={valueFooter?.logo?.colorText} />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -255,7 +192,13 @@ export const Footer = observer(({ store: storeProp, config }) => {
             base_year: "",
         },
     }
-
+    const onFinish = (value) => {
+        console.log(value);
+        
+        setDisable(!disable);
+        store.setValueFooter(value);
+        store.saveSetting(value, "home_page_footer");
+    }
     return (
         <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground, color: valueFooter?.logo?.colorText, fontWeight: 500 }}>
             <div className="control-button">
@@ -276,10 +219,8 @@ export const Footer = observer(({ store: storeProp, config }) => {
             {disable ? (<>
                 <Row className="footer-info">
                     <Col className="logo-col" flex={1}>
-                        <span className="logo-block">
-                            <span className="uriit-logo">
-                                <img src={valueFooter?.logo?.value[0]?.url} />
-                            </span>
+                        <span className="uriit-logo">
+                            <img src={valueFooter?.logo?.value[0]?.thumbUrl} />
                         </span>
                     </Col>
                     <Col flex={4} >
@@ -331,47 +272,13 @@ export const Footer = observer(({ store: storeProp, config }) => {
                     name="dynamic_form_complex"
                     autoComplete="off"
                     initialValues={valueFooter}
+                    onFinish={onFinish}
                 >
                     <Row gutter={[5, 5]} className="footer-info-edit">
                         <Col flex="auto">
                             <Row gutter={[5, 5]}>
                                 <Col flex="auto">
                                     <LogoUriitComp store={store} />
-                                    {/* <Row gutter={[5, 5]}>
-                                        <Col flex="auto">
-                                            <Form.Item noStyle name={["logo", "value", "url"]}>
-                                                <Input placeholder="name" />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                    <Row gutter={[5, 5]}>
-                                        <Col flex="auto">
-                                            <Form.Item noStyle name={["logo", "value", "name"]}>
-                                                <Input placeholder="name" />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                    <Row gutter={[5, 5]}>
-                                        <Col flex="auto">
-                                            <Form.Item noStyle name={["logo", "value", "value"]}>
-                                                <Input placeholder="name" />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                    <Row gutter={[5, 5]}>
-                                        <Col flex="auto">
-                                            <Form.Item noStyle name={["logo", "colorText"]}>
-                                                <Input placeholder="name" />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                    <Row gutter={[5, 5]}>
-                                        <Col flex="auto">
-                                            <Form.Item noStyle name={["logo", "colorBackground"]}>
-                                                <Input placeholder="name" />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row> */}
                                 </Col>
                                 <Col flex={6}>
                                     <Row gutter={[5, 5]}>
@@ -485,6 +392,36 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                 <Col flex="auto">
                                     <Form.Item noStyle name={["footer_name", "name"]}>
                                         <Input placeholder="name" />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Row gutter={[5, 5]} justify="end">
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        {!disable && (
+                                            <Button
+                                                title={gettext("Cancel")}
+                                                type="default"
+                                                icon={<Cancel />}
+                                                onClick={() => {
+                                                    setDisable(!disable);
+                                                }}
+                                            >
+                                                {gettext("Cancel")}
+                                            </Button>
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        <Button
+                                            type="default"
+                                            htmlType="submit"
+                                            icon={<Save />}
+                                            title={gettext("Save")}
+                                        >
+                                            {gettext("Save")}
+                                        </Button>
                                     </Form.Item>
                                 </Col>
                             </Row>
