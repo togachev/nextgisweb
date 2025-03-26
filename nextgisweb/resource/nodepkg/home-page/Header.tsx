@@ -143,7 +143,6 @@ export const Header = observer(({ store: storeProp, config }) => {
                     className="icon-pensil"
                     shape="square"
                     title={disable ? gettext("Edit") : gettext("Save")}
-                    type="default"
                     icon={disable ? <Edit /> : <Save />}
                     onClick={() => {
                         setDisable(!disable);
@@ -189,8 +188,9 @@ export const Header = observer(({ store: storeProp, config }) => {
                                                             title={gettext("Delete url")}
                                                             onClick={() => {
                                                                 remove(field.name);
-                                                            }} className="icon-edit"
+                                                            }}
                                                             icon={<DeleteOffOutline />}
+                                                            type="link" size="small"
                                                         />
                                                     </Col>
                                                 </Row>
@@ -200,6 +200,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                                 onClick={() => add()}
                                                 icon={<LinkEdit />}
                                                 title={gettext("Add url")}
+                                                type="link" size="small"
                                             >
                                                 {gettext("Add url")}
                                             </Button>
@@ -234,7 +235,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                             {!disable && (
                                                 <Button
                                                     title={gettext("Cancel")}
-                                                    type="default"
+                                                    type="link" size="small"
                                                     icon={<Cancel />}
                                                     onClick={() => {
                                                         setDisable(!disable);
@@ -248,7 +249,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                     <Col>
                                         <Form.Item noStyle label={null}>
                                             <Button
-                                                type="default"
+                                                type="link" size="small"
                                                 htmlType="submit"
                                                 icon={<Save />}
                                                 title={gettext("Save")}

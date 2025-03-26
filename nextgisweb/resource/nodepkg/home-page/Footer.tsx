@@ -8,7 +8,6 @@ import Edit from "@nextgisweb/icon/material/edit";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import Cancel from "@nextgisweb/icon/mdi/cancel";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { HomeStore } from "./HomeStore";
 
@@ -50,8 +49,18 @@ const LogoUriitComp = ({ store }) => {
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
         itemRender: (originNode, file) => {
-            console.log(originNode, file);
-            return originNode
+            console.log(originNode, file, file.thumbUrl);
+            const children = originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))
+            return (
+                <Space>
+                    <span className="custom-image">
+                        <img src={file.thumbUrl} />
+                    </span>
+                    {children.map(item => (
+                        <span key={item.key}>{item}</span>
+                    ))}
+                </Space>
+            )
         },
         maxCount: 1,
     };
@@ -71,7 +80,7 @@ const LogoUriitComp = ({ store }) => {
     return (
         <span className="logo-block">
             <span className="edit-logo">
-                <Row gutter={[5, 5]}>
+                <Row gutter={[5, 5]} className="item-edit">
                     <Col flex="auto">
                         <span className="upload-block">
                             <Form.Item
@@ -84,10 +93,12 @@ const LogoUriitComp = ({ store }) => {
                                     <Tooltip
                                         title={msgInfo.join(" ")}
                                         trigger={["click", "hover"]}
+                                        style={{ lineHeight: 2 }}
                                     >
                                         <Button
-                                            className="icon-button"
+                                            className="upload-button"
                                             title={gettext("Select File")}
+                                            type="link" size="small"
                                         >{gettext("Select File")}</Button>
                                     </Tooltip>
                                 </Upload>
@@ -95,10 +106,11 @@ const LogoUriitComp = ({ store }) => {
                         </span>
                     </Col>
                 </Row>
-                <Row gutter={[5, 5]} justify="start">
+                <Row gutter={[5, 5]} className="item-edit">
+                    <Col flex="auto">{gettext("Color background")}</Col>
                     <Col>
                         <Form.Item
-                            label={gettext("Color background")}
+                            noStyle
                             name={["logo", "colorBackground"]}
                             getValueFromEvent={(color) => {
                                 return "#" + color.toHex();
@@ -115,14 +127,16 @@ const LogoUriitComp = ({ store }) => {
                                         colors: colorsFooter,
                                     },
                                 ]}
-                                allowClear value={store.valueFooter?.logo?.colorText} />
+                                allowClear value={store.valueFooter?.logo?.colorText}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row gutter={[5, 5]} justify="start">
+                <Row gutter={[5, 5]} className="item-edit">
+                    <Col flex="auto">{gettext("Color text")}</Col>
                     <Col>
                         <Form.Item
-                            label={gettext("Color text")}
+                            noStyle
                             name={["logo", "colorText"]}
                             getValueFromEvent={(color) => {
                                 return "#" + color.toHex();
@@ -231,7 +245,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                     initialValues={store.valueFooter}
                     onFinish={onFinish}
                 >
-                    <Row gutter={[5, 5]} className="footer-info-edit">
+                    <Row className="footer-info-edit form-footer">
                         <Col flex="auto">
                             <Row gutter={[5, 5]}>
                                 <Col flex="auto">
@@ -240,7 +254,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                 <Col flex={6}>
                                     <Row gutter={[5, 5]}>
                                         <Col flex="auto">
-                                            <Row gutter={[5, 5]}>
+                                            <Row gutter={[5, 5]} className="item-edit">
                                                 <Col flex="auto">
                                                     <Form.Item noStyle name={["services", "value"]}>
                                                         <Input placeholder="name" />
@@ -252,35 +266,47 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                     <Form.List name={["services", "list"]}>
                                                         {(fields, { add, remove }) => (
                                                             <>
-                                                                <Row gutter={[5, 5]}>
-                                                                    <Col flex="none">
-                                                                        <Button onClick={() => add()} icon={<LinkEdit />} />
-                                                                    </Col>
-                                                                    <Col flex="auto">
-                                                                        {fields.map((field, index) => (
-                                                                            <Row key={index} gutter={[5, 5]} wrap={false}>
-                                                                                <Col flex="auto">
-                                                                                    <Form.Item noStyle name={[field.name, "name"]}>
-                                                                                        <Input />
-                                                                                    </Form.Item>
-                                                                                </Col>
-                                                                                <Col flex="auto">
-                                                                                    <Form.Item noStyle name={[field.name, "value"]}>
-                                                                                        <Input />
-                                                                                    </Form.Item>
-                                                                                </Col>
-                                                                                <Col flex="none">
-                                                                                    <Button
-                                                                                        onClick={() => {
-                                                                                            remove(field.name);
-                                                                                        }}
-                                                                                        icon={<DeleteOffOutline />}
-                                                                                    />
-                                                                                </Col>
-                                                                            </Row>
-                                                                        ))}
+                                                                <Row gutter={[5, 5]} justify="end">
+                                                                    <Col>
+                                                                        <Button
+                                                                            className="item-edit"
+                                                                            onClick={() => add()}
+                                                                            icon={<LinkEdit />}
+                                                                            title={gettext("Add url menu")}
+                                                                            type="link" size="small"
+                                                                        >
+                                                                            {gettext("Add url menu")}
+                                                                        </Button>
                                                                     </Col>
                                                                 </Row>
+                                                                {fields.map((field, index) => (
+                                                                    <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
+                                                                        <Col flex="auto">
+                                                                            <Form.Item noStyle name={[field.name, "name"]}>
+                                                                                <Input type="text"
+                                                                                    allowClear
+                                                                                    placeholder={gettext("Name url")} />
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col flex="auto">
+                                                                            <Form.Item noStyle name={[field.name, "value"]}>
+                                                                                <Input type="text"
+                                                                                    allowClear
+                                                                                    placeholder={gettext("Url")} />
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col flex="none">
+                                                                            <Button
+                                                                                onClick={() => {
+                                                                                    remove(field.name);
+                                                                                }}
+                                                                                icon={<DeleteOffOutline />}
+                                                                                type="link" size="small"
+                                                                                title={gettext("Remove url menu")}
+                                                                            />
+                                                                        </Col>
+                                                                    </Row>
+                                                                ))}
                                                             </>
                                                         )}
                                                     </Form.List>
@@ -290,7 +316,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                     </Row>
                                     <Row gutter={[5, 5]}>
                                         <Col flex="auto">
-                                            <Row gutter={[5, 5]}>
+                                            <Row gutter={[5, 5]} className="item-edit">
                                                 <Col flex="auto">
                                                     <Form.Item noStyle name={["address", "value"]}>
                                                         <Input placeholder="value" />
@@ -302,35 +328,45 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                     <Form.List name={["address", "phone"]}>
                                                         {(fields, { add, remove }) => (
                                                             <>
-                                                                <Row gutter={[5, 5]}>
-                                                                    <Col flex="none">
-                                                                        <Button onClick={() => add()} icon={<LinkEdit />} />
-                                                                    </Col>
-                                                                    <Col flex="auto">
-                                                                        {fields.map((field, index) => (
-                                                                            <Row key={index} gutter={[5, 5]} wrap={false}>
-                                                                                <Col flex="auto">
-                                                                                    <Form.Item noStyle name={[field.name, "name"]}>
-                                                                                        <Input />
-                                                                                    </Form.Item>
-                                                                                </Col>
-                                                                                <Col flex="auto">
-                                                                                    <Form.Item noStyle name={[field.name, "value"]}>
-                                                                                        <Input />
-                                                                                    </Form.Item>
-                                                                                </Col>
-                                                                                <Col flex="none">
-                                                                                    <Button
-                                                                                        onClick={() => {
-                                                                                            remove(field.name);
-                                                                                        }}
-                                                                                        icon={<DeleteOffOutline />}
-                                                                                    />
-                                                                                </Col>
-                                                                            </Row>
-                                                                        ))}
+                                                                <Row gutter={[5, 5]} justify="end">
+                                                                    <Col>
+                                                                        <Button
+
+                                                                            className="item-edit"
+                                                                            onClick={() => add()}
+                                                                            icon={<LinkEdit />}
+                                                                            title={gettext("Add contact")}
+                                                                            type="link" size="small"
+                                                                        >
+                                                                            {gettext("Add contact")}
+                                                                        </Button>
                                                                     </Col>
                                                                 </Row>
+                                                                {fields.map((field, index) => (
+                                                                    <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
+                                                                        <Col flex="auto">
+                                                                            <Form.Item noStyle name={[field.name, "name"]}>
+                                                                                <Input />
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col flex="auto">
+                                                                            <Form.Item noStyle name={[field.name, "value"]}>
+                                                                                <Input />
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col flex="none">
+                                                                            <Button
+                                                                                onClick={() => {
+                                                                                    remove(field.name);
+                                                                                }}
+                                                                                icon={<DeleteOffOutline />}
+                                                                                type="link" size="small"
+                                                                                title={gettext("Remove contact")}
+                                                                            />
+                                                                        </Col>
+                                                                    </Row>
+                                                                ))}
+
                                                             </>
                                                         )}
                                                     </Form.List>
@@ -340,8 +376,8 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                     </Row>
                                 </Col>
                             </Row>
-                            <Row gutter={[5, 5]}>
-                                <Col flex="auto">
+                            <Row gutter={[5, 5]} className="item-edit">
+                                <Col flex="72px">
                                     <Form.Item noStyle name={["footer_name", "base_year"]}>
                                         <Input placeholder="base_year" />
                                     </Form.Item>
@@ -358,7 +394,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                         {!disable && (
                                             <Button
                                                 title={gettext("Cancel")}
-                                                type="default"
+                                                type="link" size="small"
                                                 icon={<Cancel />}
                                                 onClick={() => {
                                                     setDisable(!disable);
@@ -372,7 +408,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                 <Col>
                                     <Form.Item noStyle label={null}>
                                         <Button
-                                            type="default"
+                                            type="link" size="small"
                                             htmlType="submit"
                                             icon={<Save />}
                                             title={gettext("Save")}
