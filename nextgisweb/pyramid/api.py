@@ -721,7 +721,7 @@ class FooterName(Struct):
 
 
 class FooterLogo(Struct):
-    value: Dict[str, Any]
+    file: Dict[str, Any]
     colorBackground: str
     colorText: str
 
