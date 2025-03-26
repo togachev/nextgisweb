@@ -48,18 +48,22 @@ const LogoUriitComp = ({ store }) => {
             }
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
+        showUploadList: {
+            extra: ({ size }) => (
+                <span style={{ color: '#cccccc' }}>({(size / 1024).toFixed(2)}MB)</span>
+            ),
+            showDownloadIcon: false,
+            showRemoveIcon: true,
+            removeIcon: <DeleteOffOutline />,
+        },
         itemRender: (originNode, file) => {
-            console.log(originNode, file, file.thumbUrl);
-            const children = originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))
             return (
-                <Space>
-                    <span className="custom-image">
-                        <img src={file.thumbUrl} />
-                    </span>
-                    {children.map(item => (
-                        <span key={item.key}>{item}</span>
-                    ))}
-                </Space>
+                <Row gutter={[5, 5]} wrap={false}>
+                    <Col flex="auto" span={24} className="upload-item">
+                        <img className="custom-image" src={file.thumbUrl} />
+                        {originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))}
+                    </Col>
+                </Row>
             )
         },
         maxCount: 1,
@@ -82,28 +86,25 @@ const LogoUriitComp = ({ store }) => {
             <span className="edit-logo">
                 <Row gutter={[5, 5]} className="item-edit">
                     <Col flex="auto">
-                        <span className="upload-block">
-                            <Form.Item
-                                noStyle
-                                name={["logo", "file"]}
-                                valuePropName="file"
-                                getValueFromEvent={normalizingFileUpload}
-                            >
-                                <Upload {...props} name="logo" listType="picture" accept=".svg">
-                                    <Tooltip
-                                        title={msgInfo.join(" ")}
-                                        trigger={["click", "hover"]}
-                                        style={{ lineHeight: 2 }}
-                                    >
-                                        <Button
-                                            className="upload-button"
-                                            title={gettext("Select File")}
-                                            type="link" size="small"
-                                        >{gettext("Select File")}</Button>
-                                    </Tooltip>
-                                </Upload>
-                            </Form.Item>
-                        </span>
+                        <Form.Item
+                            noStyle
+                            name={["logo", "file"]}
+                            valuePropName="file"
+                            getValueFromEvent={normalizingFileUpload}
+                        >
+                            <Upload {...props} listType="picture" accept=".svg">
+                                <Tooltip
+                                    title={msgInfo.join(" ")}
+                                    trigger={["click", "hover"]}
+                                >
+                                    <Button
+                                        className="upload-button"
+                                        title={gettext("Select File")}
+                                        type="default"
+                                    >{gettext("Select File")}</Button>
+                                </Tooltip>
+                            </Upload>
+                        </Form.Item>
                     </Col>
                 </Row>
                 <Row gutter={[5, 5]} className="item-edit">
@@ -190,11 +191,13 @@ export const Footer = observer(({ store: storeProp, config }) => {
             </div>
             {disable ? (<>
                 <Row className="footer-info">
-                    {store.valueFooter?.logo?.file?.status === "done" && <Col className="logo-col" flex={1}>
-                        <span className="uriit-logo">
-                            <img src={store.valueFooter?.logo?.file?.thumbUrl} />
-                        </span>
-                    </Col>}
+                    {store.valueFooter?.logo?.file?.status === "done" &&
+                        <Col className="logo-col" flex={1}>
+                            <span className="uriit-logo">
+                                <img src={store.valueFooter?.logo?.file?.thumbUrl} />
+                            </span>
+                        </Col>
+                    }
                     <Col flex={4} >
                         <span className="block-info">
                             <span className="name-center">{store.valueFooter?.services?.value}</span>
@@ -257,7 +260,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                             <Row gutter={[5, 5]} className="item-edit">
                                                 <Col flex="auto">
                                                     <Form.Item noStyle name={["services", "value"]}>
-                                                        <Input placeholder="name" />
+                                                        <Input allowClear placeholder="name" />
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
@@ -273,7 +276,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                             onClick={() => add()}
                                                                             icon={<LinkEdit />}
                                                                             title={gettext("Add url menu")}
-                                                                            type="link" size="small"
+                                                                            type="default"
                                                                         >
                                                                             {gettext("Add url menu")}
                                                                         </Button>
@@ -283,16 +286,12 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                     <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
                                                                         <Col flex="auto">
                                                                             <Form.Item noStyle name={[field.name, "name"]}>
-                                                                                <Input type="text"
-                                                                                    allowClear
-                                                                                    placeholder={gettext("Name url")} />
+                                                                                <Input type="text" allowClear placeholder={gettext("Name url")} />
                                                                             </Form.Item>
                                                                         </Col>
                                                                         <Col flex="auto">
                                                                             <Form.Item noStyle name={[field.name, "value"]}>
-                                                                                <Input type="text"
-                                                                                    allowClear
-                                                                                    placeholder={gettext("Url")} />
+                                                                                <Input type="text" allowClear placeholder={gettext("Url")} />
                                                                             </Form.Item>
                                                                         </Col>
                                                                         <Col flex="none">
@@ -301,7 +300,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                                     remove(field.name);
                                                                                 }}
                                                                                 icon={<DeleteOffOutline />}
-                                                                                type="link" size="small"
+                                                                                type="default"
                                                                                 title={gettext("Remove url menu")}
                                                                             />
                                                                         </Col>
@@ -319,7 +318,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                             <Row gutter={[5, 5]} className="item-edit">
                                                 <Col flex="auto">
                                                     <Form.Item noStyle name={["address", "value"]}>
-                                                        <Input placeholder="value" />
+                                                        <Input allowClear placeholder="value" />
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
@@ -336,7 +335,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                             onClick={() => add()}
                                                                             icon={<LinkEdit />}
                                                                             title={gettext("Add contact")}
-                                                                            type="link" size="small"
+                                                                            type="default"
                                                                         >
                                                                             {gettext("Add contact")}
                                                                         </Button>
@@ -346,12 +345,12 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                     <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
                                                                         <Col flex="auto">
                                                                             <Form.Item noStyle name={[field.name, "name"]}>
-                                                                                <Input />
+                                                                                <Input allowClear />
                                                                             </Form.Item>
                                                                         </Col>
                                                                         <Col flex="auto">
                                                                             <Form.Item noStyle name={[field.name, "value"]}>
-                                                                                <Input />
+                                                                                <Input allowClear />
                                                                             </Form.Item>
                                                                         </Col>
                                                                         <Col flex="none">
@@ -360,7 +359,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                                     remove(field.name);
                                                                                 }}
                                                                                 icon={<DeleteOffOutline />}
-                                                                                type="link" size="small"
+                                                                                type="default"
                                                                                 title={gettext("Remove contact")}
                                                                             />
                                                                         </Col>
@@ -377,14 +376,14 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                 </Col>
                             </Row>
                             <Row gutter={[5, 5]} className="item-edit">
-                                <Col flex="72px">
+                                <Col flex="96px">
                                     <Form.Item noStyle name={["footer_name", "base_year"]}>
-                                        <Input placeholder="base_year" />
+                                        <Input allowClear placeholder="base_year" />
                                     </Form.Item>
                                 </Col>
                                 <Col flex="auto">
                                     <Form.Item noStyle name={["footer_name", "name"]}>
-                                        <Input placeholder="name" />
+                                        <Input allowClear placeholder="name" />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -394,7 +393,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                         {!disable && (
                                             <Button
                                                 title={gettext("Cancel")}
-                                                type="link" size="small"
+                                                type="default"
                                                 icon={<Cancel />}
                                                 onClick={() => {
                                                     setDisable(!disable);
@@ -408,7 +407,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                 <Col>
                                     <Form.Item noStyle label={null}>
                                         <Button
-                                            type="link" size="small"
+                                            type="default"
                                             htmlType="submit"
                                             icon={<Save />}
                                             title={gettext("Save")}

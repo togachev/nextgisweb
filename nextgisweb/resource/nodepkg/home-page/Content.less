@@ -8,6 +8,10 @@ input {
 	white-space: nowrap;
 }
 
+:root {
+	--primary: #2a388c;
+}
+
 .wrapper-home-page {
 	min-height: 100vh;
 	display: grid;
@@ -17,6 +21,15 @@ input {
 	.control-button {
 		position: absolute;
 		left: 0;
+	}
+
+	.ant-btn-color-link.ant-btn-variant-link {
+		border: 1px dotted black;
+
+		&:hover {
+			background-color: #00000007 !important;
+			color: var(--text-base) !important;
+		}
 	}
 
 	.icon-pensil {
