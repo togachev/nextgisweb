@@ -12,13 +12,11 @@ import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { HomeStore } from "./HomeStore";
 
-import type { GetProp, UploadProps } from "@nextgisweb/gui/antd";
-
-type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+import type { UploadProps } from "@nextgisweb/gui/antd";
 
 import "./Footer.less";
 
-const LogoUriitComp = ({ store, form }) => {
+const LogoUriitComp = ({ store }) => {
 
     const colorsFooter = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#FFFFFF", "#000000", "#106A90"];
 
@@ -32,38 +30,8 @@ const LogoUriitComp = ({ store, form }) => {
         },
     ];
 
-    // const getBase64 = async (file: FileType, callback: (url: string) => void) => {
-    //     const reader = new FileReader();
-    //     reader.addEventListener("load", () => callback(reader.result as string));
-    //     reader.readAsDataURL(file as Blob);
-    // };
-
     const props: UploadProps = {
-        // customRequest: async (options) => {
-        //     const { onSuccess, onError, file } = options;
-        //     try {
-        //         await getBase64(file as FileType, (url) => {
-        //             console.log(file);
-                    
-        //             const value = {
-        //                 ...store.valueFooter,
-        //                 logo: {
-        //                     ...store.valueFooter.logo,
-        //                     value: file,
-        //                 },
-        //             }
-        //             store.setValueFooter(value);
-        //         });
-        //         if (onSuccess) {
-        //             onSuccess("Ok");
-        //         }
-        //     } catch (err) {
-        //         if (onError) {
-        //             onError(new Error("Exception download"));
-        //         }
-        //     }
-        // },
-        defaultFileList: [store.valueFooter?.logo?.file],
+        defaultFileList: store.valueFooter?.logo?.file?.status === "done" && [store.valueFooter?.logo?.file],
         multiple: false,
         beforeUpload: (file, info) => {
             const fileName = file.name;
@@ -81,10 +49,11 @@ const LogoUriitComp = ({ store, form }) => {
             }
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
-        maxCount: 1,
-        onRemove: (file) => {
-            console.log(file, form.getFieldValue("logo"));
+        itemRender: (originNode, file) => {
+            console.log(originNode, file);
+            return originNode
         },
+        maxCount: 1,
     };
 
     const msgInfo = [
@@ -181,23 +150,17 @@ const LogoUriitComp = ({ store, form }) => {
 
 export const Footer = observer(({ store: storeProp, config }) => {
     const [disable, setDisable] = useState(true);
-    const [form] = Form.useForm();
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
-    const {
-        valueFooter,
-    } = store;
 
     const onFinish = (value) => {
-        console.log(value);
-        
         setDisable(!disable);
         store.setValueFooter(value);
         store.saveSetting(value, "home_page_footer");
     }
     return (
-        <div className="footer-home-page" style={{ backgroundColor: valueFooter?.logo?.colorBackground, color: valueFooter?.logo?.colorText, fontWeight: 500 }}>
+        <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.logo?.colorBackground, color: store.valueFooter?.logo?.colorText, fontWeight: 500 }}>
             <div className="control-button">
                 {config.isAdministrator === true && disable && (
                     <Button
@@ -213,19 +176,19 @@ export const Footer = observer(({ store: storeProp, config }) => {
             </div>
             {disable ? (<>
                 <Row className="footer-info">
-                    <Col className="logo-col" flex={1}>
+                    {store.valueFooter?.logo?.file?.status === "done" && <Col className="logo-col" flex={1}>
                         <span className="uriit-logo">
-                            <img src={valueFooter?.logo?.file?.thumbUrl} />
+                            <img src={store.valueFooter?.logo?.file?.thumbUrl} />
                         </span>
-                    </Col>
+                    </Col>}
                     <Col flex={4} >
                         <span className="block-info">
-                            <span className="name-center">{valueFooter?.services?.value}</span>
-                            {valueFooter?.services?.list.map((item, index) => {
+                            <span className="name-center">{store.valueFooter?.services?.value}</span>
+                            {store.valueFooter?.services?.list.map((item, index) => {
                                 return (
                                     <span key={index} className="services-list">
                                         <span className="services-url">
-                                            <a href={item?.value} target="_blank" style={{ color: valueFooter?.logo?.colorText }}>
+                                            <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.logo?.colorText }}>
                                                 <span className="icon-link">
                                                     <ChevronRight />
                                                 </span>
@@ -238,10 +201,10 @@ export const Footer = observer(({ store: storeProp, config }) => {
                             <Divider />
                             <span className="address-content">
                                 <span className="address">
-                                    <span>{valueFooter?.address?.value}</span>
+                                    <span>{store.valueFooter?.address?.value}</span>
                                 </span>
                                 <span className="phone">
-                                    {valueFooter?.address?.phone.map((item, index) => {
+                                    {store.valueFooter?.address?.phone.map((item, index) => {
                                         return (
                                             <Space key={index} className="phone-item">
                                                 <span className="name">{item?.name}</span>
@@ -257,23 +220,22 @@ export const Footer = observer(({ store: storeProp, config }) => {
                 <Row>
                     <Col>
                         <div className="uriit-footer-name">
-                            © {valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {valueFooter?.footer_name?.name}
+                            © {store.valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {store.valueFooter?.footer_name?.name}
                         </div>
                     </Col>
                 </Row>
             </>) : (
                 <Form
-                    form={form}
                     name="dynamic_form_complex"
                     autoComplete="off"
-                    initialValues={valueFooter}
+                    initialValues={store.valueFooter}
                     onFinish={onFinish}
                 >
                     <Row gutter={[5, 5]} className="footer-info-edit">
                         <Col flex="auto">
                             <Row gutter={[5, 5]}>
                                 <Col flex="auto">
-                                    <LogoUriitComp store={store} form={form} />
+                                    <LogoUriitComp store={store} />
                                 </Col>
                                 <Col flex={6}>
                                     <Row gutter={[5, 5]}>
