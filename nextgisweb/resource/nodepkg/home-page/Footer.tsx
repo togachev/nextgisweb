@@ -43,6 +43,8 @@ const LogoUriitComp = ({ store }) => {
             const { onSuccess, onError, file } = options;
             try {
                 await getBase64(file as FileType, (url) => {
+                    console.log(file);
+                    
                     const value = {
                         ...store.valueFooter,
                         logo: {
@@ -121,10 +123,9 @@ const LogoUriitComp = ({ store }) => {
                         </span>
                     </Col>
                 </Row>
-                <Row gutter={[5, 5]}>
-                    <Col flex="auto">
+                <Row gutter={[5, 5]} justify="start">
+                    <Col>
                         <Form.Item
-                            noStyle
                             label={gettext("Color background")}
                             name={["logo", "colorBackground"]}
                             getValueFromEvent={(color) => {
@@ -146,10 +147,9 @@ const LogoUriitComp = ({ store }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row gutter={[5, 5]}>
-                    <Col flex="auto">
+                <Row gutter={[5, 5]} justify="start">
+                    <Col>
                         <Form.Item
-                            noStyle
                             label={gettext("Color text")}
                             name={["logo", "colorText"]}
                             getValueFromEvent={(color) => {
