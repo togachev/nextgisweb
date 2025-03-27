@@ -98,6 +98,9 @@ export class HomeStore {
     @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
 
 
+    @observable.shallow accessor initialFooter: FooterProps;
+    @observable.shallow accessor initialHeader: HeaderProps;
+
     @observable.shallow accessor valueFooter: FooterProps;
     @observable.shallow accessor valueHeader: HeaderProps;
 
@@ -107,8 +110,8 @@ export class HomeStore {
     constructor() {
         this.getWidthMenu();
         this.getMapValues("all");
-        this.getValuesHeader();
-        this.getValuesFooter();
+        this.getValuesHeader("loading");
+        this.getValuesFooter("loading");
     }
 
     @action
@@ -161,6 +164,16 @@ export class HomeStore {
         this.valueFooter = valueFooter;
     };
 
+    @action
+    setInitialHeader(initialHeader: HeaderProps) {
+        this.initialHeader = initialHeader;
+    };
+
+    @action
+    setInitialFooter(initialFooter: FooterProps) {
+        this.initialFooter = initialFooter;
+    };
+
     @actionHandler
     getWidthMenu() {
         const width = window.innerWidth < 785 ? "100%" : 300;
@@ -196,24 +209,26 @@ export class HomeStore {
     }
 
     @actionHandler
-    async getValuesHeader() {
+    async getValuesHeader(status: string) {
         this.getSetting("home_page_header")
             .then((data) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_header).length > 0) {
                         this.setValueHeader(data.pyramid.home_page_header);
+                        status === "loading" && this.setInitialHeader(data.pyramid.home_page_header);
                     }
                 }
             })
     }
 
     @actionHandler
-    async getValuesFooter() {
+    async getValuesFooter(status: string) {
         this.getSetting("home_page_footer")
             .then((data) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_footer).length > 0) {
                         this.setValueFooter(data.pyramid.home_page_footer);
+                        status === "loading" && this.setInitialFooter(data.pyramid.home_page_footer);
                     }
                 }
             })

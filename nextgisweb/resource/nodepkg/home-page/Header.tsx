@@ -28,29 +28,12 @@ const signInText = gettext("Sign in");
 
 export const Header = observer(({ store: storeProp, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-    const [initialValue, setInitialValue] = useState();
+
     const [disable, setDisable] = useState(true);
-    const [status] = useState<string | null>("loading");
     const [form] = Form.useForm();
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
-
-    useEffect(() => {
-        if (status === "loading") {
-            store.getSetting("home_page_header")
-                .then((data) => {
-                    if (data.pyramid) {
-                        setInitialValue(data.pyramid.home_page_header)
-                    }
-                });
-        }
-    }, []);
-
-    const {
-        valueHeader,
-        valueFooter,
-    } = store;
 
     const showLoginModal = () => {
         if (oauth.enabled && oauth.default) {
@@ -61,8 +44,8 @@ export const Header = observer(({ store: storeProp, config }) => {
         }
     };
 
-    const colorText = { color: valueFooter?.logo?.colorText }
-    const styleMenu = { color: valueFooter?.logo?.colorText }
+    const colorText = { color: store.valueFooter?.logo?.colorText }
+    const styleMenu = { color: store.valueFooter?.logo?.colorText }
 
     const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
@@ -174,8 +157,8 @@ export const Header = observer(({ store: storeProp, config }) => {
             </div>
             <div className="name-site">
                 <div className="title">
-                    <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.first_name}</Title>
-                    <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.last_name}</Title>
+                    <Title className="name-site-a" style={colorText} level={1} >{store.valueHeader?.first_name}</Title>
+                    <Title className="name-site-b" style={colorText} level={5} >{store.valueHeader?.last_name}</Title>
                 </div>
             </div>
             {!disable && (
@@ -183,7 +166,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                     form={form}
                     name="ngw_home_page_header"
                     autoComplete="off"
-                    initialValues={initialValue}
+                    initialValues={store.initialHeader}
                     onFinish={onFinish}
                     clearOnDestroy={true}
                 >

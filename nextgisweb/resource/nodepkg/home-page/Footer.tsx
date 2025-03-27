@@ -196,24 +196,12 @@ const LogoUriitComp = observer(({ store }) => {
 });
 
 export const Footer = observer(({ store: storeProp, config }) => {
-    const [initialValue, setInitialValue] = useState();
     const [form] = Form.useForm();
     const [disable, setDisable] = useState(true);
-    const [status] = useState<string | null>("loading");
+
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
-
-    useEffect(() => {
-        if (status === "loading") {
-            store.getSetting("home_page_footer")
-                .then((data) => {
-                    if (data.pyramid) {
-                        setInitialValue(data.pyramid.home_page_footer)
-                    }
-                });
-        }
-    }, []);
 
     const onFinish = (value) => {
         setDisable(!disable);
@@ -256,7 +244,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                     form={form}
                     name="ngw_home_page_footer"
                     autoComplete="off"
-                    initialValues={initialValue}
+                    initialValues={store.initialFooter}
                     onFinish={onFinish}
                     clearOnDestroy={true}
                 >
