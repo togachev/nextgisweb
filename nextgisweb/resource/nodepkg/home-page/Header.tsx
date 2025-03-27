@@ -142,7 +142,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                         {!disable ?
                             <Form
                                 form={form}
-                                name="dynamic_form_complex"
+                                name="ngw_home_page_header"
                                 autoComplete="off"
                                 initialValues={valueHeader}
                                 onFinish={onFinish}

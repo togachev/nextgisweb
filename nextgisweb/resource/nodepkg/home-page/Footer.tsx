@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Col, ColorPicker, Row, Button, Form, Divider, Input, message, Space, Tooltip, Upload } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
@@ -10,12 +10,11 @@ import Cancel from "@nextgisweb/icon/mdi/cancel";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { HomeStore } from "./HomeStore";
-
 import type { UploadProps } from "@nextgisweb/gui/antd";
 
 import "./Footer.less";
 
-const LogoUriitComp = ({ store }) => {
+const LogoUriitComp = observer(({ store }) => {
 
     const colorsFooter = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#FFFFFF", "#000000", "#106A90"];
 
@@ -29,7 +28,7 @@ const LogoUriitComp = ({ store }) => {
         },
     ];
 
-    const props: UploadProps = {
+    const props: UploadProps = useMemo(() => ({
         defaultFileList: store.valueFooter?.logo?.file?.status === "done" && [store.valueFooter?.logo?.file],
         multiple: false,
         beforeUpload: (file, info) => {
@@ -50,7 +49,7 @@ const LogoUriitComp = ({ store }) => {
         },
         showUploadList: {
             extra: ({ size }) => (
-                <span style={{ color: '#cccccc' }}>({(size / 1024).toFixed(2)}MB)</span>
+                <span style={{ color: "var(--icon-color)" }}>({(size / 1024).toFixed(2)}KB)</span>
             ),
             showDownloadIcon: false,
             showRemoveIcon: true,
@@ -67,7 +66,7 @@ const LogoUriitComp = ({ store }) => {
             )
         },
         maxCount: 1,
-    };
+    }), [store]);
 
     const msgInfo = [
         gettext("Supported file format SVG."),
@@ -161,98 +160,68 @@ const LogoUriitComp = ({ store }) => {
             </span>
         </span>
     );
-};
+});
 
 export const Footer = observer(({ store: storeProp, config }) => {
+    const [initialValue, setInitialValue] = useState();
+    const [form] = Form.useForm();
     const [disable, setDisable] = useState(true);
+    const [status] = useState<string | null>("loading");
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
+
+    useEffect(() => {
+        if (status === "loading") {
+            store.getSetting("home_page_footer")
+                .then((data) => {
+                    if (data.pyramid) {
+                        setInitialValue(data.pyramid.home_page_footer)
+                    }
+                });
+        }
+    }, []);
 
     const onFinish = (value) => {
         setDisable(!disable);
         store.setValueFooter(value);
         store.saveSetting(value, "home_page_footer");
+    };
+
+    const cancelForm = () => {
+        setDisable(!disable);
+        store.getValuesHF();
+    };
+
+    const resetForm = () => {
+        store.getValuesHF();
+        form.resetFields()
+    };
+
+    const applyForm = () => {
+        store.setValueFooter(form.getFieldsValue());
+    };
+
+    const openForm = () => {
+        setDisable(!disable);
     }
+
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.logo?.colorBackground, color: store.valueFooter?.logo?.colorText, fontWeight: 500 }}>
-            <div className="control-button">
-                {config.isAdministrator === true && disable && (
-                    <Button
-                        className="icon-pensil"
-                        shape="square"
-                        title={gettext("Edit")}
-                        type="default"
-                        icon={<Edit />}
-                        onClick={() => {
-                            setDisable(!disable);
-                        }}
-                    />)}
-            </div>
-            {disable ? (<>
-                <Row className="footer-info">
-                    {store.valueFooter?.logo?.file?.status === "done" &&
-                        <Col className="logo-col" flex={1}>
-                            <span className="uriit-logo">
-                                <img src={store.valueFooter?.logo?.file?.thumbUrl} />
-                            </span>
-                        </Col>
-                    }
-                    <Col flex={4} >
-                        <span className="block-info">
-                            <span className="name-center">{store.valueFooter?.services?.value}</span>
-                            {store.valueFooter?.services?.list.map((item, index) => {
-                                return (
-                                    <span key={index} className="services-list">
-                                        <span className="services-url">
-                                            <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.logo?.colorText }}>
-                                                <span className="icon-link">
-                                                    <ChevronRight />
-                                                </span>
-                                                {item?.name}
-                                            </a>
-                                        </span>
-                                    </span>
-                                )
-                            })}
-                            <Divider />
-                            <span className="address-content">
-                                <span className="address">
-                                    <span>{store.valueFooter?.address?.value}</span>
-                                </span>
-                                <span className="phone">
-                                    {store.valueFooter?.address?.phone.map((item, index) => {
-                                        return (
-                                            <Space key={index} className="phone-item">
-                                                <span className="name">{item?.name}</span>
-                                                <span className="value">{item?.value}</span>
-                                            </Space>
-                                        )
-                                    })}
-                                </span>
-                            </span>
-                        </span>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <div className="uriit-footer-name">
-                            © {store.valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {store.valueFooter?.footer_name?.name}
-                        </div>
-                    </Col>
-                </Row>
-            </>) : (
+            {!disable && (
                 <Form
-                    name="dynamic_form_complex"
+                    clearOnDestroy={true}
+                    form={form}
+                    name="ngw_home_page_footer"
                     autoComplete="off"
-                    initialValues={store.valueFooter}
+                    initialValues={initialValue}
                     onFinish={onFinish}
                 >
                     <Row className="footer-info-edit form-footer">
                         <Col flex="auto">
                             <Row gutter={[5, 5]}>
                                 <Col flex="auto">
-                                    <LogoUriitComp store={store} />
+                                    <LogoUriitComp store={store} status={status} />
                                 </Col>
                                 <Col flex={6}>
                                     <Row gutter={[5, 5]}>
@@ -330,10 +299,9 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                 <Row gutter={[5, 5]} justify="end">
                                                                     <Col>
                                                                         <Button
-
                                                                             className="item-edit"
                                                                             onClick={() => add()}
-                                                                            icon={<LinkEdit />}
+                                                                            icon={<CardAccountPhone />}
                                                                             title={gettext("Add contact")}
                                                                             type="default"
                                                                         >
@@ -395,13 +363,37 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                 title={gettext("Cancel")}
                                                 type="default"
                                                 icon={<Cancel />}
-                                                onClick={() => {
-                                                    setDisable(!disable);
-                                                }}
+                                                onClick={cancelForm}
                                             >
                                                 {gettext("Cancel")}
                                             </Button>
                                         )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        {!disable && (
+                                            <Button
+                                                title={gettext("Reset")}
+                                                type="default"
+                                                icon={<Cancel />}
+                                                onClick={resetForm}
+                                            >
+                                                {gettext("Reset")}
+                                            </Button>
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        <Button
+                                            type="default"
+                                            onClick={applyForm}
+                                            icon={<Save />}
+                                            title={gettext("Apply")}
+                                        >
+                                            {gettext("Apply")}
+                                        </Button>
                                     </Form.Item>
                                 </Col>
                                 <Col>
@@ -422,6 +414,66 @@ export const Footer = observer(({ store: storeProp, config }) => {
 
                 </Form>
             )}
+            <div className="control-button">
+                {config.isAdministrator === true && disable && (
+                    <Button
+                        className="icon-pensil"
+                        shape="square"
+                        title={gettext("Edit")}
+                        type="default"
+                        icon={<Edit />}
+                        onClick={openForm}
+                    />)}
+            </div>
+            <Row className="footer-info">
+                {store.valueFooter?.logo?.file?.status === "done" && (<Col className="logo-col" flex={1}>
+                    <span className="uriit-logo">
+                        <img src={store.valueFooter?.logo?.file?.thumbUrl} />
+                    </span>
+                </Col>)}
+                <Col flex={4} >
+                    <span className="block-info">
+                        <span className="name-center">{store.valueFooter?.services?.value}</span>
+                        {store.valueFooter?.services?.list.map((item, index) => {
+                            return (
+                                <span key={index} className="services-list">
+                                    <span className="services-url">
+                                        <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.logo?.colorText }}>
+                                            <span className="icon-link">
+                                                <ChevronRight />
+                                            </span>
+                                            {item?.name}
+                                        </a>
+                                    </span>
+                                </span>
+                            )
+                        })}
+                        <Divider />
+                        <span className="address-content">
+                            <span className="address">
+                                <span>{store.valueFooter?.address?.value}</span>
+                            </span>
+                            <span className="phone">
+                                {store.valueFooter?.address?.phone.map((item, index) => {
+                                    return (
+                                        <Space key={index} className="phone-item">
+                                            <span className="name">{item?.name}</span>
+                                            <span className="value">{item?.value}</span>
+                                        </Space>
+                                    )
+                                })}
+                            </span>
+                        </span>
+                    </span>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <div className="uriit-footer-name">
+                        © {store.valueFooter?.footer_name?.base_year}-{new Date().getFullYear()} {store.valueFooter?.footer_name?.name}
+                    </div>
+                </Col>
+            </Row>
         </div >
     );
 })
