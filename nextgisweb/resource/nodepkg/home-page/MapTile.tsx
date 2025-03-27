@@ -5,11 +5,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
-import { useSource } from "./hook/useSource";
 
 import MapIcon from "@nextgisweb/icon/material/map";
 import "./MapTile.less";
-
 
 const openMap = gettext("Open map");
 const descTitle = gettext("Map description");
@@ -24,26 +22,14 @@ export const MapTile = (props) => {
     const [perm, setPerm] = useState();
     const { id, display_name, preview_fileobj_id, description_status } = props.item;
     const { upath_info } = props.config;
-    const { getPermission } = useSource();
+    const { store } = props;
+
     const preview = routeURL("resource.preview", id);
     const urlWebmap = routeURL("webmap.display", id);
     const descRef = useRef<HTMLDivElement>(null);
 
-    const loadData = async (id) => {
-        const value = await route("resource.item", {
-            id: id,
-        }).get({
-            cache: true,
-        });
-        return value;
-    }
-
     useEffect(() => {
-        loadData(id)
-            .then(val => {
-                setDescValue(val.resource.description)
-            })
-        getPermission(id)
+        store.getPermission(id)
             .then(value => {
                 setPerm(value);
             })

@@ -17,7 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 
 const SortableMaps = (props) => {
-    const { item, disable, config, size } = props;
+    const { item, disable, config, size, store } = props;
 
     const {
         attributes,
@@ -43,7 +43,7 @@ const SortableMaps = (props) => {
                 title={item.display_name}
                 style={style}
             >
-                {disable ? (<MapTile config={config} item={item} />) :
+                {disable ? (<MapTile config={config} item={item} store={store} />) :
                     (<div className="drag-item"><div className="content-drag">
                         {item?.display_name}
                     </div>
