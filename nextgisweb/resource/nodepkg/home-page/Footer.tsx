@@ -10,7 +10,9 @@ import Cancel from "@nextgisweb/icon/mdi/cancel";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { HomeStore } from "./HomeStore";
-import type { UploadProps } from "@nextgisweb/gui/antd";
+import type { GetProp, UploadProps } from "@nextgisweb/gui/antd";
+
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 import "./Footer.less";
 
@@ -28,9 +30,40 @@ const LogoUriitComp = observer(({ store }) => {
         },
     ];
 
+    const getBase64 = (file: FileType): Promise<string> =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file as Blob);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+        });
+
     const props: UploadProps = useMemo(() => ({
         defaultFileList: store.valueFooter?.logo?.file?.status === "done" && [store.valueFooter?.logo?.file],
         multiple: false,
+        customRequest: async (options) => {
+            const { onSuccess, onError, file } = options;
+            try {
+                if (!file.url && !file.preview) {
+                    file.preview = await getBase64(file);
+                    const value = {
+                        ...store.valueFooter,
+                        logo: {
+                            ...store.valueFooter.logo,
+                            file: file,
+                        },
+                    }
+                    store.setValueFooter(value);
+                }
+                if (onSuccess) {
+                    onSuccess("Ok");
+                }
+            } catch (err) {
+                if (onError) {
+                    onError(new Error("Exception download"));
+                }
+            }
+        },
         beforeUpload: (file, info) => {
             const fileName = file.name;
             const extension = fileName.slice(fileName.lastIndexOf("."));
@@ -426,11 +459,13 @@ export const Footer = observer(({ store: storeProp, config }) => {
                     />)}
             </div>
             <Row className="footer-info">
-                {store.valueFooter?.logo?.file?.status === "done" && (<Col className="logo-col" flex={1}>
-                    <span className="uriit-logo">
-                        <img src={store.valueFooter?.logo?.file?.thumbUrl} />
-                    </span>
-                </Col>)}
+                {store.valueFooter?.logo?.file?.status === "done" && (
+                    <Col className="logo-col" flex={1}>
+                        <span className="uriit-logo">
+                            <img src={store.valueFooter?.logo?.file?.preview} />
+                        </span>
+                    </Col>
+                )}
                 <Col flex={4} >
                     <span className="block-info">
                         <span className="name-center">{store.valueFooter?.services?.value}</span>
