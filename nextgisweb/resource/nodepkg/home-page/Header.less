@@ -1,24 +1,27 @@
-.header {
-	height: 225px;
+.header-home-page {
 	padding: 0 10% 0 10%;
 
-	.edit-panel {
-		position: relative;
-		background: #fff;
-		z-index: 1000;
-		margin-top: 5px;
-		padding: 5px;
+	.header-info-edit {
+		margin-bottom: 5px;
+		background-color: #fbfbfb;
 		border-radius: 3px;
-		box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		font-weight: var(--ngw-text-font-weight-normal);
+		z-index: 1000;
+		position: relative;
 
 		.ant-input-outlined {
 			box-shadow: inset 0 1px 2px 0px var(--divider-color);
+			border-radius: 3px;
 		}
 	}
 
 	.menus {
 		height: 46px;
 		width: 100%;
+		user-select: none;
 
 		.menu-component {
 			position: absolute;
@@ -59,7 +62,7 @@
 					}
 				}
 
-				.ant-menu-title-content{
+				.ant-menu-title-content {
 					font-weight: 500;
 				}
 			}
@@ -147,13 +150,13 @@
 }
 
 .ant-btn-primary {
-	background-color: #2a388c !important;
+	background-color: var(--primary) !important;
 	font-family: "Montserrat";
 	font-weight: 500;
 	border-color: var(--text-secondary);
 
 	&:hover {
-		border-color: #2a388c !important;
+		border-color: var(--primary) !important;
 	}
 }
 
@@ -163,7 +166,7 @@
 	h2,
 	h3 {
 		letter-spacing: normal;
-		color: #2a388c;
+		color: var(--primary);
 		font-family: "Montserrat";
 		font-weight: 500;
 		margin: -9px 0 9px 0;

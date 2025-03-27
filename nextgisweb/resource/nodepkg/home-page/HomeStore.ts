@@ -83,7 +83,8 @@ export interface HeaderProps {
 type Action = keyof Pick<HomeStore,
     | "getWidthMenu"
     | "getMapValues"
-    | "getValuesHF"
+    | "getValuesHeader"
+    | "getValuesFooter"
     | "saveSetting"
 >;
 
@@ -91,7 +92,6 @@ export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
-    @observable accessor editFooter = true;
 
     @observable.shallow accessor listMaps: ListMapProps[] = [];
     @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
@@ -107,7 +107,8 @@ export class HomeStore {
     constructor() {
         this.getWidthMenu();
         this.getMapValues("all");
-        this.getValuesHF()
+        this.getValuesHeader();
+        this.getValuesFooter();
     }
 
     @action
@@ -123,11 +124,6 @@ export class HomeStore {
     @action
     setSourceGroup(sourceGroup: boolean): void {
         this.sourceGroup = sourceGroup;
-    };
-
-    @action
-    setEditFooter(editFooter: boolean): void {
-        this.editFooter = editFooter;
     };
 
     @action
@@ -200,7 +196,7 @@ export class HomeStore {
     }
 
     @actionHandler
-    async getValuesHF() {
+    async getValuesHeader() {
         this.getSetting("home_page_header")
             .then((data) => {
                 if (data.pyramid) {
@@ -209,6 +205,10 @@ export class HomeStore {
                     }
                 }
             })
+    }
+
+    @actionHandler
+    async getValuesFooter() {
         this.getSetting("home_page_footer")
             .then((data) => {
                 if (data.pyramid) {
@@ -227,10 +227,11 @@ export class HomeStore {
                 if (key === "all") {
                     this.groupMaps()
                         .then(group => {
-                            const result = group.filter(({ id }) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
+                            const maps_filter = maps.filter(item => item.action_map === true);
+                            const result = group.filter(({ id }) => [...new Set(maps_filter.map(g => g.webmap_group_id))].includes(id));
                             this.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
                             const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0]?.id
-                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
+                            this.setItemsMapsGroup(maps_filter.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
                         })
                 }
             });

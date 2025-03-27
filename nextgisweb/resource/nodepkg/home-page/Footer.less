@@ -8,23 +8,20 @@
 	flex-direction: column;
 	line-height: 2;
 
-
-
-	.form-footer {
-		padding: 5px;
-	}
-
 	.footer-info-edit {
 		margin: 5px 0 5px 0;
-		background-color: #fff;
+		background-color: #fbfbfb;
 		border-radius: 3px;
-		right: 10%;
 		display: flex;
 		align-items: center;
 		border-radius: 4px;
 		justify-content: flex-end;
 		font-weight: normal;
-		box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+
+		.ant-input-outlined {
+			box-shadow: inset 0 1px 2px 0px var(--divider-color);
+			border-radius: 3px;
+		}
 	}
 
 	.footer-content-edit {
@@ -44,6 +41,8 @@
 	.logo-col {
 		display: flex;
 		justify-content: center;
+		user-select: none;
+		pointer-events: none;
 	}
 
 	.ant-upload-list-item-actions {

@@ -1130,7 +1130,6 @@ def getMaplist(request) -> JSONType:
 
     result = list()
     for res, res_wmg, wmg, res_social in query:
-        action_map = res_wmg.action_map
         if res_wmg.id != 0:
             if res.has_permission(ResourceScope.read, request.user):
                 result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
@@ -1157,7 +1156,6 @@ def webmap_group_item(request) -> JSONType:
 
     result = list()
     for wmg, res, res_wmg, res_social in query:
-        action_map = res_wmg.action_map
         if res.has_permission(ResourceScope.read, request.user):
             result.append(dict(wmg_id=wmg.webmap_group_id,
             webmap_group_name=res_wmg.webmap_group_name, action_map=res_wmg.action_map,

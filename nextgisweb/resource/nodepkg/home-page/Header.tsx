@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Col, Form, Input, Menu, Row, Typography } from "@nextgisweb/gui/antd";
@@ -28,11 +28,24 @@ const signInText = gettext("Sign in");
 
 export const Header = observer(({ store: storeProp, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
+    const [initialValue, setInitialValue] = useState();
     const [disable, setDisable] = useState(true);
+    const [status] = useState<string | null>("loading");
     const [form] = Form.useForm();
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
+
+    useEffect(() => {
+        if (status === "loading") {
+            store.getSetting("home_page_header")
+                .then((data) => {
+                    if (data.pyramid) {
+                        setInitialValue(data.pyramid.home_page_header)
+                    }
+                });
+        }
+    }, []);
 
     const {
         valueHeader,
@@ -123,142 +136,193 @@ export const Header = observer(({ store: storeProp, config }) => {
         store.saveSetting(value, "home_page_header");
     }
 
+    const cancelForm = () => {
+        setDisable(!disable);
+        store.getValuesHeader();
+    };
+
+    const resetForm = () => {
+        store.getValuesHeader();
+        form.resetFields()
+    };
+
+    const applyForm = () => {
+        store.setValueHeader(form.getFieldsValue());
+    };
+
+    const openForm = () => {
+        setDisable(!disable);
+    }
+
     return (
-        <div className="header" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
+        <div className="header-home-page" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
             <div className="control-button">
-                {disable && config.isAdministrator === true && (<Button
+                {config.isAdministrator === true && disable && (<Button
                     className="icon-pensil"
-                    shape="square"
-                    title={disable ? gettext("Edit") : gettext("Save")}
-                    icon={disable ? <Edit /> : <Save />}
-                    onClick={() => {
-                        setDisable(!disable);
-                    }}
+                    title={gettext("Edit")}
+                    type="default"
+                    icon={<Edit />}
+                    onClick={openForm}
                 />)}
             </div>
             <div className="menus">
-                <div className={disable ? "menu-component" : ""}>
-                    <div className={disable ? "button-link" : "button-link edit-panel"}>
-                        {!disable ?
-                            <Form
-                                form={form}
-                                name="ngw_home_page_header"
-                                autoComplete="off"
-                                initialValues={valueHeader}
-                                onFinish={onFinish}
-                            >
-                                <Form.List name="menu">
-                                    {(fields, { add, remove }) => (
-                                        <>
-                                            {fields.map((field, index) => (
-                                                <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
-                                                    <Col flex="auto">
-                                                        <Form.Item noStyle name={[field.name, "name"]}>
-                                                            <Input
-                                                                type="text"
-                                                                allowClear
-                                                                placeholder={gettext("Name url")}
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col flex="auto">
-                                                        <Form.Item noStyle name={[field.name, "value"]}>
-                                                            <Input
-                                                                placeholder={gettext("Url")}
-                                                                className="first-input"
-                                                                allowClear
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col flex="none">
-                                                        <Button
-                                                            title={gettext("Delete url")}
-                                                            onClick={() => {
-                                                                remove(field.name);
-                                                            }}
-                                                            icon={<DeleteOffOutline />}
-                                                            type="default" 
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            ))}
-                                            <Button
-                                                style={{ position: "absolute", bottom: "5px" }}
-                                                onClick={() => add()}
-                                                icon={<LinkEdit />}
-                                                title={gettext("Add url")}
-                                                type="default" 
-                                            >
-                                                {gettext("Add url")}
-                                            </Button>
-                                        </>
-                                    )}
-                                </Form.List>
-                                <Row gutter={[5, 5]} className="item-edit">
-                                    <Col flex="auto">
-                                        <Form.Item noStyle name={"first_name"}>
-                                            <Input
-                                                placeholder={gettext("First name site")}
-                                                type="text"
-                                                allowClear
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                                <Row gutter={[5, 5]} className="item-edit">
-                                    <Col flex="auto">
-                                        <Form.Item noStyle name={"last_name"}>
-                                            <Input
-                                                placeholder={gettext("Additional name")}
-                                                type="text"
-                                                allowClear
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                                <Row gutter={[5, 5]} justify="end">
-                                    <Col>
-                                        <Form.Item noStyle label={null}>
-                                            {!disable && (
-                                                <Button
-                                                    title={gettext("Cancel")}
-                                                    type="default" 
-                                                    icon={<Cancel />}
-                                                    onClick={() => {
-                                                        setDisable(!disable);
-                                                    }}
-                                                >
-                                                    {gettext("Cancel")}
-                                                </Button>
-                                            )}
-                                        </Form.Item>
-                                    </Col>
-                                    <Col>
-                                        <Form.Item noStyle label={null}>
-                                            <Button
-                                                type="default" 
-                                                htmlType="submit"
-                                                icon={<Save />}
-                                                title={gettext("Save")}
-                                            >
-                                                {gettext("Save")}
-                                            </Button>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                            </Form> :
-                            (<MenuContainer />)
-                        }
+                <div className="menu-component">
+                    <div className="button-link">
+                        <MenuContainer />
                     </div>
                 </div>
             </div>
-            {disable && (
-                <div className="name-site">
-                    <div className="title">
-                        <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.first_name}</Title>
-                        <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.last_name}</Title>
-                    </div>
+            <div className="name-site">
+                <div className="title">
+                    <Title className="name-site-a" style={colorText} level={1} >{valueHeader?.first_name}</Title>
+                    <Title className="name-site-b" style={colorText} level={5} >{valueHeader?.last_name}</Title>
                 </div>
+            </div>
+            {!disable && (
+                <Form
+                    form={form}
+                    name="ngw_home_page_header"
+                    autoComplete="off"
+                    initialValues={initialValue}
+                    onFinish={onFinish}
+                    clearOnDestroy={true}
+                >
+                    <Row className="header-info-edit form-padding">
+                        <Col flex="auto">
+                            <Row gutter={[16, 16]} className="item-edit">
+                                <Col flex="auto">
+                                    <Form.List name="menu">
+                                        {(fields, { add, remove }) => (
+                                            <>
+                                                <Row gutter={[16, 16]} justify="end">
+                                                    <Col>
+                                                        <Button
+                                                            className="item-edit"
+                                                            onClick={() => add()}
+                                                            icon={<LinkEdit />}
+                                                            title={gettext("Add url")}
+                                                            type="default"
+                                                        >
+                                                            {gettext("Add url")}
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                                {fields.map((field, index) => (
+                                                    <Row key={index} gutter={[16, 16]} wrap={false} className="item-edit">
+                                                        <Col flex="auto">
+                                                            <Form.Item noStyle name={[field.name, "name"]}>
+                                                                <Input
+                                                                    type="text"
+                                                                    allowClear
+                                                                    placeholder={gettext("Name url")}
+                                                                />
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col flex="auto">
+                                                            <Form.Item noStyle name={[field.name, "value"]}>
+                                                                <Input
+                                                                    placeholder={gettext("Url")}
+                                                                    className="first-input"
+                                                                    allowClear
+                                                                />
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col flex="none">
+                                                            <Button
+                                                                title={gettext("Delete url")}
+                                                                onClick={() => {
+                                                                    remove(field.name);
+                                                                }}
+                                                                icon={<DeleteOffOutline />}
+                                                                type="default"
+                                                            />
+                                                        </Col>
+                                                    </Row>
+                                                ))}
+                                            </>
+                                        )}
+                                    </Form.List>
+                                </Col>
+                            </Row>
+                            <Row gutter={[16, 16]} className="item-edit">
+                                <Col flex="auto">
+                                    <Form.Item noStyle name={"first_name"}>
+                                        <Input
+                                            placeholder={gettext("First name site")}
+                                            type="text"
+                                            allowClear
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Row gutter={[16, 16]} className="item-edit">
+                                <Col flex="auto">
+                                    <Form.Item noStyle name={"last_name"}>
+                                        <Input
+                                            placeholder={gettext("Additional name")}
+                                            type="text"
+                                            allowClear
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Row gutter={[16, 16]} justify="end">
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        {!disable && (
+                                            <Button
+                                                title={gettext("Cancel")}
+                                                type="default"
+                                                icon={<Cancel />}
+                                                onClick={cancelForm}
+                                            >
+                                                {gettext("Cancel")}
+                                            </Button>
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        {!disable && (
+                                            <Button
+                                                title={gettext("Reset")}
+                                                type="default"
+                                                icon={<Cancel />}
+                                                onClick={resetForm}
+                                            >
+                                                {gettext("Reset")}
+                                            </Button>
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        <Button
+                                            type="default"
+                                            onClick={applyForm}
+                                            icon={<Save />}
+                                            title={gettext("Apply")}
+                                        >
+                                            {gettext("Apply")}
+                                        </Button>
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item noStyle label={null}>
+                                        <Button
+                                            type="default"
+                                            htmlType="submit"
+                                            icon={<Save />}
+                                            title={gettext("Save")}
+                                        >
+                                            {gettext("Save")}
+                                        </Button>
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                </Form>
             )}
         </div >
     );

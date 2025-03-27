@@ -18,6 +18,14 @@ input {
 	grid-template-rows: auto 1fr auto;
 	letter-spacing: .05rem;
 
+	button {
+		background-color: #fff;
+	}
+
+	.form-padding {
+		padding: 16px;
+	}
+
 	.control-button {
 		position: absolute;
 		left: 0;
@@ -146,7 +154,7 @@ input {
 				}
 
 				.ant-input-affix-wrapper {
-					border-image: linear-gradient(0.25turn, #2a388c, #2a388c, #2a388c00);
+					border-image: linear-gradient(0.25turn, var(--primary), var(--primary), #2a388c00);
 					border-image-slice: 1;
 					border-bottom-style: solid !important;
 					border-style: none;
@@ -167,7 +175,7 @@ input {
 					border-right-color: #ffffff00 !important;
 					border-left-color: #ffffff00 !important;
 					border-top-color: #ffffff00 !important;
-					border-bottom-color: #2a388c !important;
+					border-bottom-color: var(--primary) !important;
 				}
 
 
@@ -176,7 +184,7 @@ input {
 					border-right-color: #ffffff00 !important;
 					border-left-color: #ffffff00 !important;
 					border-top-color: #ffffff00 !important;
-					border-bottom-color: #2a388c !important;
+					border-bottom-color: var(--primary) !important;
 					box-shadow: 0 0 0 0 #ffffff00;
 					outline: 0;
 				}
@@ -238,7 +246,8 @@ input {
 										border-radius: 3px;
 										padding: 5px;
 										font-weight: 500;
-										color: #2a388c;
+										color: var(--primary);
+										user-select: none;
 									}
 								}
 							}
@@ -400,7 +409,7 @@ input {
 
 											.icon-open-map {
 												margin: 0 0 0 10px;
-												color: #2a388c;
+												color: var(--primary);
 												padding: 0;
 												border-radius: 2px;
 												line-height: 1;
@@ -417,7 +426,7 @@ input {
 												cursor: pointer;
 
 												svg.icon {
-													fill: #2a388c;
+													fill: var(--primary);
 												}
 
 												svg.icon:hover {
@@ -426,7 +435,7 @@ input {
 											}
 
 											a {
-												color: #2a388c;
+												color: var(--primary);
 												display: flex;
 												align-items: center;
 												font-size: 24px;
@@ -434,14 +443,14 @@ input {
 											}
 
 											.open-map {
-												color: #2a388c;
+												color: var(--primary);
 												text-transform: uppercase;
 												text-decoration: none;
 												font-weight: 500;
 											}
 
 											svg.icon {
-												fill: #2a388c;
+												fill: var(--primary);
 											}
 
 											svg.icon:hover {
@@ -476,7 +485,7 @@ textarea::-webkit-input-placeholder {
 
 	.ant-modal-title {
 		margin: auto;
-		color: #2a388c;
+		color: var(--primary);
 		overflow: hidden;
 		-webkit-line-clamp: 2;
 		display: -webkit-box;

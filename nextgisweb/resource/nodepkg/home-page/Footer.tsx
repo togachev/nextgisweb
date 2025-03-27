@@ -90,7 +90,7 @@ const LogoUriitComp = observer(({ store }) => {
         },
         itemRender: (originNode, file) => {
             return (
-                <Row gutter={[5, 5]} wrap={false}>
+                <Row gutter={[16, 16]} wrap={false}>
                     <Col flex="auto" span={24} className="upload-item">
                         <img className="custom-image" src={file.thumbUrl} />
                         {originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))}
@@ -116,7 +116,7 @@ const LogoUriitComp = observer(({ store }) => {
     return (
         <span className="logo-block">
             <span className="edit-logo">
-                <Row gutter={[5, 5]} className="item-edit">
+                <Row gutter={[16, 16]} className="item-edit">
                     <Col flex="auto">
                         <Form.Item
                             noStyle
@@ -139,7 +139,7 @@ const LogoUriitComp = observer(({ store }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row gutter={[5, 5]} className="item-edit">
+                <Row gutter={[16, 16]} className="item-edit">
                     <Col flex="auto">{gettext("Color background")}</Col>
                     <Col>
                         <Form.Item
@@ -165,7 +165,7 @@ const LogoUriitComp = observer(({ store }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row gutter={[5, 5]} className="item-edit">
+                <Row gutter={[16, 16]} className="item-edit">
                     <Col flex="auto">{gettext("Color text")}</Col>
                     <Col>
                         <Form.Item
@@ -223,11 +223,11 @@ export const Footer = observer(({ store: storeProp, config }) => {
 
     const cancelForm = () => {
         setDisable(!disable);
-        store.getValuesHF();
+        store.getValuesFooter();
     };
 
     const resetForm = () => {
-        store.getValuesHF();
+        store.getValuesFooter();
         form.resetFields()
     };
 
@@ -241,37 +241,47 @@ export const Footer = observer(({ store: storeProp, config }) => {
 
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.logo?.colorBackground, color: store.valueFooter?.logo?.colorText, fontWeight: 500 }}>
+            <div className="control-button">
+                {config.isAdministrator === true && disable && (
+                    <Button
+                        className="icon-pensil"
+                        title={gettext("Edit")}
+                        type="default"
+                        icon={<Edit />}
+                        onClick={openForm}
+                    />)}
+            </div>
             {!disable && (
                 <Form
-                    clearOnDestroy={true}
                     form={form}
                     name="ngw_home_page_footer"
                     autoComplete="off"
                     initialValues={initialValue}
                     onFinish={onFinish}
+                    clearOnDestroy={true}
                 >
-                    <Row className="footer-info-edit form-footer">
+                    <Row className="footer-info-edit form-padding">
                         <Col flex="auto">
-                            <Row gutter={[5, 5]}>
+                            <Row gutter={[16, 16]}>
                                 <Col flex="auto">
                                     <LogoUriitComp store={store} status={status} />
                                 </Col>
                                 <Col flex={6}>
-                                    <Row gutter={[5, 5]}>
+                                    <Row gutter={[16, 16]}>
                                         <Col flex="auto">
-                                            <Row gutter={[5, 5]} className="item-edit">
+                                            <Row gutter={[16, 16]} className="item-edit">
                                                 <Col flex="auto">
                                                     <Form.Item noStyle name={["services", "value"]}>
                                                         <Input allowClear placeholder="name" />
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-                                            <Row gutter={[5, 5]}>
+                                            <Row gutter={[16, 16]}>
                                                 <Col flex="auto">
                                                     <Form.List name={["services", "list"]}>
                                                         {(fields, { add, remove }) => (
                                                             <>
-                                                                <Row gutter={[5, 5]} justify="end">
+                                                                <Row gutter={[16, 16]} justify="end">
                                                                     <Col>
                                                                         <Button
                                                                             className="item-edit"
@@ -285,7 +295,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                     </Col>
                                                                 </Row>
                                                                 {fields.map((field, index) => (
-                                                                    <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
+                                                                    <Row key={index} gutter={[16, 16]} wrap={false} className="item-edit">
                                                                         <Col flex="auto">
                                                                             <Form.Item noStyle name={[field.name, "name"]}>
                                                                                 <Input type="text" allowClear placeholder={gettext("Name url")} />
@@ -315,21 +325,21 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                             </Row>
                                         </Col>
                                     </Row>
-                                    <Row gutter={[5, 5]}>
+                                    <Row gutter={[16, 16]}>
                                         <Col flex="auto">
-                                            <Row gutter={[5, 5]} className="item-edit">
+                                            <Row gutter={[16, 16]} className="item-edit">
                                                 <Col flex="auto">
                                                     <Form.Item noStyle name={["address", "value"]}>
                                                         <Input allowClear placeholder="value" />
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-                                            <Row gutter={[5, 5]}>
+                                            <Row gutter={[16, 16]}>
                                                 <Col flex="auto">
                                                     <Form.List name={["address", "phone"]}>
                                                         {(fields, { add, remove }) => (
                                                             <>
-                                                                <Row gutter={[5, 5]} justify="end">
+                                                                <Row gutter={[16, 16]} justify="end">
                                                                     <Col>
                                                                         <Button
                                                                             className="item-edit"
@@ -343,7 +353,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                                                     </Col>
                                                                 </Row>
                                                                 {fields.map((field, index) => (
-                                                                    <Row key={index} gutter={[5, 5]} wrap={false} className="item-edit">
+                                                                    <Row key={index} gutter={[16, 16]} wrap={false} className="item-edit">
                                                                         <Col flex="auto">
                                                                             <Form.Item noStyle name={[field.name, "name"]}>
                                                                                 <Input allowClear />
@@ -376,7 +386,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                     </Row>
                                 </Col>
                             </Row>
-                            <Row gutter={[5, 5]} className="item-edit">
+                            <Row gutter={[16, 16]} className="item-edit">
                                 <Col flex="96px">
                                     <Form.Item noStyle name={["footer_name", "base_year"]}>
                                         <Input allowClear placeholder="base_year" />
@@ -388,7 +398,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                     </Form.Item>
                                 </Col>
                             </Row>
-                            <Row gutter={[5, 5]} justify="end">
+                            <Row gutter={[16, 16]} justify="end">
                                 <Col>
                                     <Form.Item noStyle label={null}>
                                         {!disable && (
@@ -444,20 +454,8 @@ export const Footer = observer(({ store: storeProp, config }) => {
                             </Row>
                         </Col>
                     </Row>
-
                 </Form>
             )}
-            <div className="control-button">
-                {config.isAdministrator === true && disable && (
-                    <Button
-                        className="icon-pensil"
-                        shape="square"
-                        title={gettext("Edit")}
-                        type="default"
-                        icon={<Edit />}
-                        onClick={openForm}
-                    />)}
-            </div>
             <Row className="footer-info">
                 {store.valueFooter?.logo?.file?.status === "done" && (
                     <Col className="logo-col" flex={1}>
