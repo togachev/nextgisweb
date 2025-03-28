@@ -1,7 +1,9 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Col, ColorPicker, Row, Button, Form, Divider, Input, message, Space, Tooltip, Upload } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
+import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
+import InformationOutline from "@nextgisweb/icon/mdi/information-outline";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
@@ -82,7 +84,14 @@ const LogoUriitComp = observer(({ store }) => {
         },
         showUploadList: {
             extra: ({ size }) => (
-                <span style={{ color: "var(--icon-color)" }}>({(size / 1024).toFixed(2)}KB)</span>
+                <span className="info-file">
+                    <Tooltip
+                        title={(size / 1024).toFixed(2) + "KB"}
+                        trigger={["click", "hover"]}
+                    >
+                        <InformationOutline />
+                    </Tooltip >
+                </span>
             ),
             showDownloadIcon: false,
             showRemoveIcon: true,
@@ -90,12 +99,10 @@ const LogoUriitComp = observer(({ store }) => {
         },
         itemRender: (originNode, file) => {
             return (
-                <Row gutter={[16, 16]} wrap={false}>
-                    <Col flex="auto" span={24} className="upload-item">
-                        <img className="custom-image" src={file.thumbUrl} />
-                        {originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))}
-                    </Col>
-                </Row>
+                <Space direction="horizontal">
+                    <img className="custom-image" src={file.preview} />
+                    {originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))}
+                </Space>
             )
         },
         maxCount: 1,
@@ -124,16 +131,16 @@ const LogoUriitComp = observer(({ store }) => {
                             valuePropName="file"
                             getValueFromEvent={normalizingFileUpload}
                         >
-                            <Upload {...props} listType="picture" accept=".svg">
+                            <Upload {...props} listType="picture" accept=".svg" className="upload-item">
                                 <Tooltip
                                     title={msgInfo.join(" ")}
                                     trigger={["click", "hover"]}
                                 >
                                     <Button
-                                        className="upload-button"
-                                        title={gettext("Select File")}
+                                        icon={<FileArrowUpDownOutline />}
                                         type="default"
-                                    >{gettext("Select File")}</Button>
+                                        title={gettext("Select File")}
+                                    />
                                 </Tooltip>
                             </Upload>
                         </Form.Item>
@@ -252,7 +259,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                         <Col flex="auto">
                             <Row gutter={[16, 16]}>
                                 <Col flex="auto">
-                                    <LogoUriitComp store={store} status={status} />
+                                    <LogoUriitComp store={store} />
                                 </Col>
                                 <Col flex={6}>
                                     <Row gutter={[16, 16]}>

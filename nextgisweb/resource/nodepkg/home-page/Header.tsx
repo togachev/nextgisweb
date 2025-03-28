@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Col, Form, Input, Menu, Row, Typography } from "@nextgisweb/gui/antd";
