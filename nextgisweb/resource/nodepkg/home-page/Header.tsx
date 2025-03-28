@@ -16,6 +16,7 @@ import Logout from "@nextgisweb/icon/mdi/logout";
 import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import Cancel from "@nextgisweb/icon/mdi/cancel";
+import Restore from "@nextgisweb/icon/mdi/restore";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import { HomeStore } from "./HomeStore";
@@ -270,7 +271,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                             <Button
                                                 title={gettext("Reset")}
                                                 type="default"
-                                                icon={<Cancel />}
+                                                icon={<Restore />}
                                                 onClick={resetForm}
                                             >
                                                 {gettext("Reset")}

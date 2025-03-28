@@ -3,7 +3,7 @@ import { Col, ColorPicker, Row, Button, Form, Divider, Input, message, Space, To
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
-import InformationOutline from "@nextgisweb/icon/mdi/information-outline";
+import Restore from "@nextgisweb/icon/mdi/restore";
 import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
@@ -409,7 +409,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                             <Button
                                                 title={gettext("Reset")}
                                                 type="default"
-                                                icon={<Cancel />}
+                                                icon={<Restore />}
                                                 onClick={resetForm}
                                             >
                                                 {gettext("Reset")}
