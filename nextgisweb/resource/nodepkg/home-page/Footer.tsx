@@ -83,16 +83,6 @@ const LogoUriitComp = observer(({ store }) => {
             return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
         },
         showUploadList: {
-            extra: ({ size }) => (
-                <span className="info-file">
-                    <Tooltip
-                        title={(size / 1024).toFixed(2) + "KB"}
-                        trigger={["click", "hover"]}
-                    >
-                        <InformationOutline />
-                    </Tooltip >
-                </span>
-            ),
             showDownloadIcon: false,
             showRemoveIcon: true,
             removeIcon: <DeleteOffOutline />,
@@ -100,8 +90,13 @@ const LogoUriitComp = observer(({ store }) => {
         itemRender: (originNode, file) => {
             return (
                 <Space direction="horizontal">
-                    <img className="custom-image" src={file.preview} />
-                    {originNode.props.children.filter(item => ["view", "download-delete"].includes(item.key))}
+                    <Tooltip
+                        title={file.name + ", " + (file.size / 1024).toFixed(2) + "KB"}
+                        trigger={["click", "hover"]}
+                    >
+                        <img className="custom-image" src={file.preview} />
+                    </Tooltip >
+                    {originNode.props.children.filter(item => ["download-delete"].includes(item.key))}
                 </Space>
             )
         },
