@@ -354,6 +354,8 @@ class WFSConnection(Base, Resource):
             return None, count
 
         if propertyname is not None:
+            if add_box and layer.column_geom not in propertyname:
+                propertyname.append(layer.column_geom)
             for p in propertyname:
                 __p = etree.Element(etree.QName(NS_WFS, "PropertyName"))
                 __p.text = p
@@ -707,6 +709,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             params["offset"] = self._offset
         if self._srs is not None:
             params["srs"] = self._srs.id
+        else:
+            params["srs"] = self.layer.srs_id
         if self._box:
             params["add_box"] = True
         if self._intersects:

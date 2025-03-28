@@ -234,8 +234,7 @@ msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
 #: nodepkg/children-section/component/MenuDropdown.tsx:211
-#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/composite/CompositeWidget.tsx:49 view.py:410
+#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8 view.py:381
 msgid "Delete"
 msgstr "Удалить"
 
@@ -268,7 +267,7 @@ msgstr "Описание"
 msgid "Change"
 msgstr "Изменить"
 
-#: nodepkg/children-section/util/forEachSelected.ts:8
+#: nodepkg/children-section/util/forEachSelected.ts:7
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
@@ -295,11 +294,11 @@ msgstr[2] "Перемещено {} ресурсов"
 msgid "Select first eligible child resource"
 msgstr "Выбрать первый подходящий дочерний ресурс"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:31
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:30
 msgid "Create group"
 msgstr "Создать группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:32
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:31
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
@@ -328,44 +327,32 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/composite/CompositeStore.ts:259
-msgid "Validation error"
-msgstr "Ошибка валидации"
-
-#: nodepkg/composite/CompositeStore.ts:261
+#: nodepkg/composite/CompositeStore.ts:241
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: nodepkg/composite/CompositeStore.ts:277
-msgid "Unexpected error"
-msgstr "Внезапная ошибка"
+#: nodepkg/composite/CompositeStore.ts:242
+msgid "Validation error"
+msgstr "Ошибка валидации"
 
-#: nodepkg/composite/CompositeStore.ts:278
-msgid "Serialization failed"
-msgstr "Сериализация не удалась"
-
-#: nodepkg/composite/CompositeWidget.tsx:47
-msgid "Create"
-msgstr "Создать"
-
-#: nodepkg/composite/CompositeWidget.tsx:48
-#: nodepkg/export-settings/ExportSettings.tsx:80
-msgid "Save"
-msgstr "Сохранить"
-
-#: nodepkg/composite/CompositeWidget.tsx:50
-msgid "Read"
-msgstr "Прочитать"
-
-#: nodepkg/composite/CompositeWidget.tsx:54
+#: nodepkg/composite/CompositeWidget.tsx:27
 msgid "Please wait. Processing request..."
 msgstr "Подождите, пожалуйста, идет обработка запроса..."
 
-#: nodepkg/composite/CompositeWidget.tsx:178
+#: nodepkg/composite/CompositeWidget.tsx:34
+msgid "Create"
+msgstr "Создать"
+
+#: nodepkg/composite/CompositeWidget.tsx:35
+#: nodepkg/export-settings/ExportSettings.tsx:79
+msgid "Save"
+msgstr "Сохранить"
+
+#: nodepkg/composite/CompositeWidget.tsx:175
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
-#: nodepkg/delete-page/DeletePage.tsx:125
+#: nodepkg/delete-page/DeletePage.tsx:124
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -464,11 +451,11 @@ msgstr "Нет"
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/export-settings/ExportSettings.tsx:36
+#: nodepkg/export-settings/ExportSettings.tsx:35
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/export-settings/ExportSettings.tsx:57
+#: nodepkg/export-settings/ExportSettings.tsx:56
 msgid ""
 "Select the category of users who can use the \"Save as\" link to download "
 "resource data."
@@ -476,19 +463,19 @@ msgstr ""
 "Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
 "как\" для скачивания данных ресурса."
 
-#: nodepkg/export-settings/ExportSettings.tsx:67
+#: nodepkg/export-settings/ExportSettings.tsx:66
 msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
-#: nodepkg/export-settings/ExportSettings.tsx:70
+#: nodepkg/export-settings/ExportSettings.tsx:69
 msgid "Users with \"Data: Modify\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Изменение\""
 
-#: nodepkg/export-settings/ExportSettings.tsx:73
+#: nodepkg/export-settings/ExportSettings.tsx:72
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: nodepkg/export-settings/ExportSettings.tsx:88
+#: nodepkg/export-settings/ExportSettings.tsx:87
 msgid ""
 "* This will not affect REST API use which will continue to be governed by "
 "permissions."
@@ -677,7 +664,7 @@ msgid "Map settings"
 msgstr "Настройки карты"
 
 #: nodepkg/main-section/CreateResourceButton.tsx:8
-#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:181 view.py:366
+#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:180 view.py:350
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -701,7 +688,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:367
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:351
 msgid "Action"
 msgstr "Действие"
 
@@ -830,11 +817,11 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:125 view.py:419
+#: view.py:122 view.py:390
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:136 view.py:426
+#: view.py:133 view.py:397
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -842,11 +829,11 @@ msgstr "Права пользователя"
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:204
+#: view.py:203
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:214 view.py:439
+#: view.py:213 view.py:410
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -854,15 +841,15 @@ msgstr "Экспорт ресурсов"
 msgid "Groups of digital web maps"
 msgstr "Группы цифровых веб-карт"
 
-#: view.py:287
+#: view.py:277
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:368
+#: view.py:352
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:383
+#: view.py:367
 msgid "Update"
 msgstr "Изменить"
 

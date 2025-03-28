@@ -1,11 +1,12 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import type {
     WFSConnectionRead,
@@ -41,17 +42,17 @@ export class WfsClientConnectionStore
         EditorStore<WFSConnectionRead, WFSConnectionRead, WFSConnectionUpdate>
 {
     readonly identity = "wfsclient_connection";
+    readonly composite: CompositeStore;
 
-    path = path.init(null, this);
-    username = username.init(null, this);
-    password = password.init(null, this);
-    version = version.init("2.0.2", this);
+    readonly path = path.init(null, this);
+    readonly username = username.init(null, this);
+    readonly password = password.init(null, this);
+    readonly version = version.init("2.0.2", this);
 
-    readonly operation: Operation;
-    @observable accessor validate = false;
+    @observable.ref accessor validate = false;
 
-    constructor({ operation }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
     }
 
     @action
@@ -61,15 +62,14 @@ export class WfsClientConnectionStore
 
     @computed
     get dirty(): boolean {
-        return this.operation === "create" ? true : mapperDirty(this);
+        return this.composite.operation === "create" ? true : mapperDirty(this);
     }
 
     dump() {
         if (this.dirty) {
             const { path, ...rest } = mapperDump(this);
-            if (!path) {
-                throw new Error("Missing required parameters");
-            }
+            assert(path);
+
             const result: WFSConnectionRead | WFSConnectionUpdate = {
                 path,
                 ...rest,
@@ -85,9 +85,6 @@ export class WfsClientConnectionStore
 
     @computed
     get isValid() {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !this.error;
     }
 }

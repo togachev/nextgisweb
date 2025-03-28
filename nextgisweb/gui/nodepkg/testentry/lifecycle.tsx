@@ -10,9 +10,11 @@ import {
     useState,
 } from "react";
 
+import { assert } from "@nextgisweb/jsrealm/error";
 // import { useAbortController } from "@nextgisweb/pyramid/hook";
 
 import { Button, CheckboxValue } from "../antd";
+import { makeAbortError } from "../error/util";
 import reactApp from "../react-app";
 import { sleep } from "../util";
 
@@ -44,8 +46,7 @@ function useAbortController(): Omit<AbortHelper, "rotate"> {
 
     useEffect(() => {
         return () => {
-            const error = new DOMException("Component unmounted", "AbortError");
-            ref.current!.abort(error);
+            ref.current!.abort(makeAbortError("Component unmounted"));
             ref.current!.rotate();
         };
     }, []);
@@ -125,9 +126,7 @@ function eventsReducer(
         return state;
     } else if (action === "log") {
         return [...state, rest as Event];
-    } else {
-        throw Error();
-    }
+    } else assert(false);
 }
 
 export default function LifecycleTestentry() {

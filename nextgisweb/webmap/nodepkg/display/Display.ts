@@ -6,6 +6,7 @@ import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -48,6 +49,7 @@ import type {
 } from "../type";
 import type { TreeItemConfig } from "../type/TreeItems";
 import { getURLParams, setURLParam } from "../utils/URL";
+import { normalizeExtent } from "../utils/normalizeExtent";
 
 export class Display {
     private readonly modeURLParam: keyof MapURLParams = "panel";
@@ -129,19 +131,24 @@ export class Display {
         this.tabsManager = new WebMapTabsStore();
         this.mapStates = MapStatesObserver.getInstance();
 
+        this.config.initialExtent = normalizeExtent(this.config.initialExtent);
         this._extent = transformExtent(
             this.config.initialExtent,
             this.lonlatProjection,
             this.displayProjection
         );
 
-        this._extentConst =
-            this.config.constrainingExtent &&
-            transformExtent(
+        this._extentConst = null;
+        if (this.config.constrainingExtent) {
+            this.config.constrainingExtent = normalizeExtent(
+                this.config.constrainingExtent
+            );
+            this._extentConst = transformExtent(
                 this.config.constrainingExtent,
                 this.lonlatProjection,
                 this.displayProjection
             );
+        }
 
         this.map = new MapStore({
             logo: false,
@@ -187,17 +194,10 @@ export class Display {
             this._itemStorePrepare();
         });
 
-        if (this.config.initialExtent[3] > 82) {
-            this.config.initialExtent[3] = 82;
-        }
-        if (this.config.initialExtent[1] < -82) {
-            this.config.initialExtent[1] = -82;
-        }
-
-        // // Layers panel
+        // Layers panel
         this._layersPanelSetup();
 
-        // // Map and plugins
+        // Map and plugins
         Promise.all([
             this._midDeferred.webmapPlugin,
             this._startupDeferred,
@@ -206,7 +206,7 @@ export class Display {
             this._mapSetup();
         });
 
-        // // Setup layers
+        // Setup layers
         Promise.all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
             () => {
                 this._layersSetup();
@@ -249,9 +249,7 @@ export class Display {
 
     @action
     _mapSetup() {
-        if (!this.mapNode) {
-            throw new Error("Display is not started yet!");
-        }
+        assert(this.mapNode);
 
         this.mapToolbar = new MapToolbar({
             display: this,

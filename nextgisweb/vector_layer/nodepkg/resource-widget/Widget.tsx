@@ -1,18 +1,17 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
-import type {
-    FileMeta,
-    UploaderMeta,
-} from "@nextgisweb/file-upload/file-uploader";
-import { Checkbox, Collapse, Input, Radio, Select } from "@nextgisweb/gui/antd";
-import type {
-    CheckboxProps,
-    RadioGroupProps,
-    SelectProps,
+import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
+import {
+    CheckboxValue,
+    Collapse,
+    Input,
+    Radio,
+    Select,
 } from "@nextgisweb/gui/antd";
+import type { RadioGroupProps, SelectProps } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -86,12 +85,12 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
         };
     };
 
-    const bcb = (key: string): CheckboxProps => {
+    const bcb = (key: string) => {
         const a = key as keyof typeof so;
         return {
-            checked: !!so[a],
-            onChange: (e) => {
-                store.updateSourceOptions({ [a]: e.target.checked });
+            value: !!so[a],
+            onChange: (value: boolean) => {
+                store.updateSourceOptions({ [a]: value });
             },
         };
     };
@@ -101,9 +100,9 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
             <label>{gettext("Fix errors")}</label>
             <div className="group">
                 <RadioGroup options={optsFixErrors} {...brg("fix_errors")} />
-                <Checkbox {...bcb("skip_errors")}>
+                <CheckboxValue {...bcb("skip_errors")}>
                     <>{gettext("Skip features with unfixable errors")}</>
-                </Checkbox>
+                </CheckboxValue>
             </div>
 
             <label>{gettext("Geometry type")}</label>
@@ -112,13 +111,13 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
                     options={optsGType}
                     {...brg("cast_geometry_type")}
                 />
-                <Checkbox
+                <CheckboxValue
                     {...bcb("skip_other_geometry_types")}
                     disabled={store.sourceOptions.cast_geometry_type === null}
                 >
                     {/* prettier-ignore */}
                     <>{gettext("Skip features with other geometry types")}</>
-                </Checkbox>
+                </CheckboxValue>
             </div>
 
             <label>{gettext("Multi-geometry")}</label>
@@ -148,14 +147,8 @@ SourceOptions.displayName = "SourceOptions";
 export const Widget: EditorWidget<Store> = observer(({ store }) => {
     const [layerOpts, setLayerOpts] = useState<Option[]>();
 
-    const {
-        operation,
-        mode,
-        update,
-        geometryTypeInitial,
-        confirmMsg,
-        confirm,
-    } = store;
+    const { mode, update, geometryTypeInitial, confirmMsg, confirm } = store;
+    const operation = store.composite.operation;
 
     const modeOpts = useMemo(() => {
         const result: Option<Mode>[] = [];
@@ -200,9 +193,19 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         add("MULTIPOINTZ", gettext("Multipoint Z"));
         add("MULTILINESTRINGZ", gettext("Multiline Z"));
         add("MULTIPOLYGONZ", gettext("Multipolygon Z"));
-        update({ geometryType: gti ? gti : result[0].value });
         return result;
-    }, [mode, update, geometryTypeInitial]);
+    }, [geometryTypeInitial, mode]);
+
+    useEffect(() => {
+        update({
+            geometryType:
+                mode === "gtype"
+                    ? geometryTypeInitial
+                    : mode === "empty"
+                      ? "POINT"
+                      : null,
+        });
+    }, [geometryTypeInitial, mode, update]);
 
     const inspectUpload = useCallback(
         async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
@@ -228,11 +231,11 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                 if (!isAbortError(err)) {
                     errorModal(err);
                 }
-                update({ source: null });
+                store.setSource(null);
                 throw err;
             }
         },
-        [update]
+        [update, store]
     );
 
     const bval = useCallback(
@@ -245,25 +248,6 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         [store, update]
     );
 
-    const onFileChange = useCallback(
-        (value?: UploaderMeta) =>
-            update({
-                source: value
-                    ? Array.isArray(value)
-                        ? value[0]
-                        : value
-                    : null,
-            }),
-        [update]
-    );
-
-    const onUploading = useCallback(
-        (value: boolean) => {
-            store.update({ uploading: value });
-        },
-        [store]
-    );
-
     return (
         <div className="ngw-vector-layer-resource-widget">
             <Select className="mode" options={modeOpts} {...bval("mode")} />
@@ -271,8 +255,8 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                 <>
                     <FileUploader
                         fileMeta={store.source ?? undefined}
-                        onChange={onFileChange}
-                        onUploading={onUploading}
+                        onChange={store.setSource}
+                        onUploading={store.setUploading}
                         afterUpload={[
                             {
                                 message: msgInspect,
@@ -307,14 +291,14 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                 </>
             )}
             {confirmMsg && (
-                <Checkbox
-                    checked={confirm}
-                    onChange={({ target: { checked } }) => {
-                        update({ confirm: checked });
+                <CheckboxValue
+                    value={confirm}
+                    onChange={(value) => {
+                        update({ confirm: value });
                     }}
                 >
                     {confirmMsg}
-                </Checkbox>
+                </CheckboxValue>
             )}
             {mode === "file" && (
                 <Collapse

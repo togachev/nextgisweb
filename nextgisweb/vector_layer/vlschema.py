@@ -390,9 +390,10 @@ class VLSchema(MetaData):
         for idx, (k, v) in enumerate(ct.fields.items(), start=1):
             if fields is None or k in fields:
                 bmap[k] = bpn = f"fld_{idx}"
-                cht.append(bindparam(bpn).label(v.name))
+                bp = bindparam(bpn).label(v.name)
             else:
-                cht.append(literal_column(v.name))
+                bp = literal_column(v.name)
+            cht.append(sql_cast(bp, v.type))
 
         sht = select(ht.c.fid, ht.c.nid, ht.c.nop, *cht)
         hir = func.int4range(ht.c.vid, ht.c.nid)
@@ -545,7 +546,8 @@ def _lc_changes_fields(count):
 def _lc_changes_bits(count):
     cols = ["dif_geom", *(f"dif_{i}" for i in range(1, count + 1))]
     cols = [f"CASE WHEN {c} THEN '1' ELSE '0' END" for c in cols]
-    return literal_column(f"CONCAT({', '.join(cols)})").label("bits")
+    # NOTE: CONCAT fails here if len(cols) > 100
+    return literal_column(" || ".join(cols)).label("bits")
 
 
 @lru_cache

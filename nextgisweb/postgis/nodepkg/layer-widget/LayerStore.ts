@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -6,7 +6,6 @@ import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
@@ -64,29 +63,26 @@ fields.validate((v, s) => {
 
 export class LayerStore implements EditorStore<Value> {
     readonly identity = "postgis_layer";
-    readonly operation: Operation;
-
-    @observable accessor dirty = false;
-    @observable accessor validate = false;
-
-    connection = connection.init(null, this);
-    connection_relation = connection_relation.init(null, this);
-    schema = schema.init("", this);
-    table = table.init("", this);
-    columnId = columnId.init("", this);
-
-    resourceFieldName = resourceFieldName.init("", this);
-    externalFieldName = externalFieldName.init("", this);
-
-    columnGeom = columnGeom.init("", this);
-    geometryType = geometryType.init(null, this);
-    geometrySrid = geometrySrid.init(null, this);
-    fields = fields.init("update", this);
-
     readonly composite: CompositeStore;
 
-    constructor({ operation, composite }: EditorStoreOptions) {
-        this.operation = operation;
+    readonly connection = connection.init(null, this);
+    readonly connection_relation = connection_relation.init(null, this);
+    readonly schema = schema.init("", this);
+    readonly table = table.init("", this);
+    readonly columnId = columnId.init("", this);
+
+    readonly resourceFieldName = resourceFieldName.init("", this);
+    readonly externalFieldName = externalFieldName.init("", this);
+
+    readonly columnGeom = columnGeom.init("", this);
+    readonly geometryType = geometryType.init(null, this);
+    readonly geometrySrid = geometrySrid.init(null, this);
+    readonly fields = fields.init("update", this);
+
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
+
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
     }
 
@@ -113,7 +109,7 @@ export class LayerStore implements EditorStore<Value> {
             ...this.geometryType.jsonPart(),
             ...this.geometrySrid.jsonPart(),
             ...this.fields.jsonPart(),
-            ...(this.operation === "create"
+            ...(this.composite.operation === "create"
                 ? { srs: srsSettings.default }
                 : {}),
         };
@@ -126,11 +122,6 @@ export class LayerStore implements EditorStore<Value> {
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            runInAction(() => {
-                this.validate = true;
-            });
-        });
         return error(this) === false;
     }
 }

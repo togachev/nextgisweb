@@ -15,7 +15,7 @@ import PrintMapExport from "./PrintMapExport";
 import { PrintElementsSettings } from "./component/PrintElementsSettings";
 import { PrintPaperSettings } from "./component/PrintPaperSettings";
 import { PrintScaleSettings } from "./component/PrintScaleSettings";
-import { usePrintMap } from "./hook/usePrintMap";
+import { usePrintMapLayout } from "./hook/usePrintMapLayout";
 import {
     defaultPanelMapSettings,
     getPrintMapLink,
@@ -26,13 +26,30 @@ import { ShareAltOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
 
+let isCenterFromUrlRead = false;
+const getCenterUrlSettings = (): Coordinate | null => {
+    if (isCenterFromUrlRead) return null;
+
+    const urlSettings = getPrintUrlSettings();
+    isCenterFromUrlRead = true;
+
+    return urlSettings.center || null;
+};
+
 const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const mapInit = useRef(false);
 
     const { close, title, visible } = store;
 
+    const [zoom, setZoom] = useState<number>();
     const [center, setCenter] = useState<Coordinate>();
     const [printMapScale, setPrintMapScale] = useState<number>();
+
+    const mapPositionRef = useRef({ center, zoom });
+
+    useEffect(() => {
+        mapPositionRef.current = { center, zoom };
+    }, [center, zoom]);
 
     const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(() =>
         defaultPanelMapSettings(display.config.webmapTitle)
@@ -49,16 +66,16 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         if (mapInit.current) {
             return null;
         }
-        const urlSettings = getPrintUrlSettings();
-        return urlSettings.center || null;
+        return getCenterUrlSettings();
     }, []);
 
-    const { createPrintMapComp, printMapEl, destroy } = usePrintMap({
+    const { createPrintMapComp, printMapEl, destroy } = usePrintMapLayout({
         settings: mapSettings,
         display,
-        getCenterFromUrl,
+        onZoomChange: setZoom,
         onScaleChange: setPrintMapScale,
         onCenterChange: setCenter,
+        getCenterFromUrl,
     });
 
     const show = useCallback(() => {
@@ -72,9 +89,17 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const hide = useCallback(() => {
         if (mapInit.current) {
             destroy();
+
+            // Sync the main map's view with last print preview position before closing
+            const mainMapView = display.map.olMap.getView();
+            mainMapView.setCenter(mapPositionRef.current.center);
+            if (mapPositionRef.current.zoom) {
+                mainMapView.setZoom(mapPositionRef.current.zoom);
+            }
+
             mapInit.current = false;
         }
-    }, [destroy]);
+    }, [destroy, display]);
 
     const getTextToCopy = useCallback(() => {
         return getPrintMapLink(mapSettings);

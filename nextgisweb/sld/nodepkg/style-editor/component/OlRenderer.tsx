@@ -63,6 +63,8 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
     const layer = useRef<OlLayerVector<OlSourceVector>>();
     const [mapId] = useState(_uniqueId("map_"));
 
+    const target = useRef<HTMLDivElement>(null);
+
     const getSampleGeomFromSymbolizer = useCallback(() => {
         const kind: SymbolizerKind | undefined =
             symbolizerKind || _get(symbolizers, "[0].kind");
@@ -100,19 +102,19 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
                 Name: "Sample Feature",
             });
             source.addFeature(sampleFeature);
-            // zoom to feature extent
+
+            // Zoom to feature extent with padding
             const extent = source.getExtent();
             if (map.current) {
                 map.current.getView().fit(extent, {
                     maxZoom: 20,
+                    padding: Array(4).fill(10),
                 });
             }
         }
     }, [getSampleGeomFromSymbolizer]);
 
     useEffect(() => {
-        // cons;
-
         layer.current = new OlLayerVector({
             source: new OlSourceVector(),
         });
@@ -120,7 +122,7 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
             layers: [layer.current],
             controls: [],
             interactions: [],
-            target: mapId,
+            target: target.current ?? undefined,
             view: new OlView({
                 projection: "EPSG:4326",
             }),
@@ -172,6 +174,7 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
                     stroke.setLineCap(outlineCap);
                 }
             }
+
             layer.current.setStyle(olStyles);
             return olStyles;
         }
@@ -191,6 +194,7 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
             className="gs-symbolizer-olrenderer"
             role="presentation"
             id={mapId}
+            ref={target}
         />
     );
 };

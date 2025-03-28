@@ -21,9 +21,6 @@ interface ResourcesFilterProps extends Omit<AutoProps, "onChange"> {
 const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
-        if (!resource) {
-            throw new Error("No `resource` item in response");
-        }
         const resourceUrl = routeURL("resource.show", {
             id: resource.id,
         });
@@ -93,7 +90,7 @@ export function ResourcesFilter({
                 const options = resourcesToOptions(resources);
                 setOptions(options);
                 setAcSatus("");
-            } catch (er) {
+            } catch (err) {
                 setAcSatus("error");
             } finally {
                 setLoading(false);

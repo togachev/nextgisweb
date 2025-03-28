@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction, toJS } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { getChildrenDeep, traverseTree } from "@nextgisweb/gui/util/tree";
 import { route } from "@nextgisweb/pyramid/api";
@@ -82,8 +82,9 @@ export class WebmapStore {
         return [...this._expanded];
     }
 
+    /** @deprecated Use {@link webmapItems} instead */
     getWebmapItems(): TreeItemConfig[] {
-        return toJS(this._webmapItems);
+        return this.webmapItems;
     }
 
     @action
@@ -398,10 +399,10 @@ export class WebmapStore {
                 legends.items.forEach(({ resource, legend_symbols }) => {
                     this.updateLayerLegendInfo(resource.id, legend_symbols);
                 });
-            } catch (error) {
+            } catch (err) {
                 console.error(
                     "Error fetching render.resource_legend_symbols:",
-                    error
+                    err
                 );
             } finally {
                 newResources.forEach((id) =>

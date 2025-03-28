@@ -1,4 +1,5 @@
-import { action, computed, observable, toJS } from "mobx";
+import { isEmpty } from "lodash-es";
+import { action, computed, observable } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -7,7 +8,6 @@ import type {
     DumpParams,
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/vector-layer/type/api";
@@ -37,11 +37,12 @@ export class Store
             apitype.VectorLayerCreate
         >
 {
-    identity = "vector_layer";
+    readonly identity = "vector_layer";
+    readonly composite: CompositeStore;
 
-    @observable accessor mode: Mode | null = "file";
+    @observable.ref accessor mode: Mode | null = "file";
     @observable.shallow accessor source: FileMeta | null = null;
-    @observable accessor sourceLayer: string | null = null;
+    @observable.ref accessor sourceLayer: string | null = null;
     @observable.shallow accessor sourceOptions: SourceOptions = {
         fix_errors: "LOSSY",
         skip_errors: true,
@@ -53,22 +54,17 @@ export class Store
         skip_other_geometry_types: false,
     };
 
-    @observable accessor geometryType: GeometryType | null = null;
-    @observable accessor geometryTypeInitial: GeometryType | null = null;
+    @observable.ref accessor geometryType: GeometryType | null = null;
+    @observable.ref accessor geometryTypeInitial: GeometryType | null = null;
 
-    @observable accessor confirm = false;
-    @observable accessor uploading = false;
+    @observable.ref accessor confirm = false;
+    @observable.ref accessor uploading = false;
 
-    @observable accessor dirty = false;
+    @observable.ref accessor dirty = false;
 
-    @observable accessor operation: Operation;
-    @observable.shallow accessor composite: CompositeStore;
-
-    constructor({ composite, operation }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-
-        this.mode = operation === "create" ? "file" : "keep";
+        this.mode = this.composite.operation === "create" ? "file" : "keep";
     }
 
     @action
@@ -88,9 +84,11 @@ export class Store
             result.source_layer = this.sourceLayer!;
             result.srs = srsSettings.default;
 
-            const so = toJS<Record<keyof SourceOptions, unknown>>(
-                this.sourceOptions
-            );
+            const so = { ...this.sourceOptions } as Record<
+                keyof SourceOptions,
+                unknown
+            >;
+
             const onull = (k: keyof SourceOptions) => {
                 if (so[k] === "NONE") {
                     so[k] = null;
@@ -123,7 +121,7 @@ export class Store
             result.delete_all_features = true;
         }
 
-        return toJS(result);
+        return result;
     }
 
     @action.bound
@@ -133,17 +131,6 @@ export class Store
             (so as Record<string, unknown>)[key] = value;
         });
         this.sourceOptions = so;
-    }
-
-    @action.bound
-    update(props: Partial<this>) {
-        Object.assign(this, props);
-
-        if (!("confirm" in props)) {
-            this.confirm = false;
-        }
-
-        this.dirty = true;
     }
 
     @computed
@@ -164,9 +151,40 @@ export class Store
         return base ? base.replace(/\.[a-z0-9]+$/i, "") : undefined;
     }
 
+    @action.bound
+    update(values: Partial<Omit<this, "source" | "uploading">>) {
+        for (const [k, v] of Object.entries(values)) {
+            if (this[k as keyof typeof values] === v) {
+                delete values[k as keyof typeof values];
+            }
+        }
+
+        if (isEmpty(values)) return;
+        Object.assign(this, values);
+
+        if (!("confirm" in values)) {
+            this.confirm = false;
+        }
+
+        this.dirty = true;
+    }
+
+    @action.bound
+    setSource(value: this["source"] | undefined) {
+        value = value ?? null;
+        if (this.source === value) return;
+        this.source = value;
+        this.dirty = true;
+    }
+
+    @action.bound
+    setUploading(value: this["uploading"]) {
+        this.uploading = value;
+    }
+
     @computed
     get confirmMsg() {
-        if (this.operation === "create") return undefined;
+        if (this.composite.operation === "create") return undefined;
         const mode = this.mode;
 
         if (

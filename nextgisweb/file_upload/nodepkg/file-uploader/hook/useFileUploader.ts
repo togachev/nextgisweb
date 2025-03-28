@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import type { UploadFile } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 
@@ -43,10 +44,7 @@ export function useFileUploader<M extends boolean = false>({
         if (setInitMeta) {
             setInitMeta(meta);
         }
-        if (onChange) {
-            onChange(meta);
-        }
-    }, [meta, onChange, setInitMeta]);
+    }, [meta, setInitMeta]);
 
     useEffect(() => {
         setProgressText(
@@ -69,6 +67,11 @@ export function useFileUploader<M extends boolean = false>({
         }
     }, []);
 
+    const clearMeta = useCallback(() => {
+        setMeta(undefined);
+        onChange?.(undefined);
+    }, [onChange]);
+
     const fileUploaderWrapper = useCallback(
         async (options: FileUploaderOptions) => {
             abort();
@@ -82,7 +85,7 @@ export function useFileUploader<M extends boolean = false>({
                 setProgressText(message);
                 try {
                     await loader(uploadedFiles, { signal });
-                } catch (error) {
+                } catch {
                     return [];
                 }
             }
@@ -106,21 +109,27 @@ export function useFileUploader<M extends boolean = false>({
                     f._file = files[i];
                 });
                 if (multiple) {
-                    setMeta(uploadedFiles.filter(Boolean) as UploaderMeta<M>);
+                    const metaToSet = uploadedFiles.filter(
+                        Boolean
+                    ) as UploaderMeta<M>;
+                    setMeta(metaToSet);
+                    onChange?.(metaToSet);
                 } else {
                     const uploadedFile = uploadedFiles && uploadedFiles[0];
                     if (uploadedFile) {
-                        setMeta(uploadedFile as UploaderMeta<M>);
+                        const metaToSet = uploadedFile as UploaderMeta<M>;
+                        setMeta(metaToSet);
+                        onChange?.(metaToSet);
                     }
                 }
-            } catch (er) {
-                console.log(er);
+            } catch (err) {
+                errorModal(err);
             } finally {
                 setProgress(undefined);
                 setUploading(false);
             }
         },
-        [fileUploaderWrapper, onProgress, multiple]
+        [fileUploaderWrapper, onProgress, multiple, onChange]
     );
 
     const { onChange: inputPropsOnChange, ...restInputProps } = inputProps;
@@ -171,7 +180,7 @@ export function useFileUploader<M extends boolean = false>({
         abort,
         props,
         upload,
-        setMeta,
+        clearMeta,
         uploading,
         onProgress,
         progressText,

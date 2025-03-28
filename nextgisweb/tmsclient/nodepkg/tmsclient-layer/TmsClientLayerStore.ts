@@ -1,12 +1,12 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
@@ -54,7 +54,6 @@ export class TmsClientLayerStore
     implements EditorStore<LayerRead, LayerCreate, LayerUpdate>
 {
     readonly identity = "tmsclient_layer";
-    readonly operation: Operation;
     readonly composite: CompositeStore;
 
     readonly connection = connection.init(null, this);
@@ -65,10 +64,9 @@ export class TmsClientLayerStore
     readonly maxzoom = maxzoom.init(14, this);
     readonly extent = extent.init(null, this);
 
-    @observable accessor validate = false;
+    @observable.ref accessor validate = false;
 
-    constructor({ operation, composite }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
     }
 
@@ -88,15 +86,14 @@ export class TmsClientLayerStore
 
     @computed
     get dirty(): boolean {
-        return this.operation === "create" ? true : mapperDirty(this);
+        return this.composite.operation === "create" ? true : mapperDirty(this);
     }
 
     dump() {
         if (this.dirty) {
             const { extent, tilesize, minzoom, maxzoom, connection, ...rest } =
                 mapperDump(this);
-
-            if (!connection) throw new Error("Connection is required");
+            assert(connection);
 
             const result: LayerCreate | LayerUpdate = {
                 connection,
@@ -107,7 +104,7 @@ export class TmsClientLayerStore
                 ...(typeof minzoom === "number" && { minzoom }),
                 ...(typeof maxzoom === "number" && { maxzoom }),
                 ...(typeof tilesize === "number" && { tilesize }),
-                ...(this.operation === "create"
+                ...(this.composite.operation === "create"
                     ? { srs: srsSettings.default }
                     : {}),
                 ...rest,
@@ -124,9 +121,6 @@ export class TmsClientLayerStore
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !this.error;
     }
 }

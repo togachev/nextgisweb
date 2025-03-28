@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 import type { IObservableArray } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
@@ -32,15 +32,15 @@ export class ItemsStore
         FocusTableStore<ItemObject>
 {
     readonly identity = "webmap";
-    @observable.ref accessor dirty = false;
-    @observable.ref accessor validate = false;
+    readonly composite: CompositeStore;
 
     readonly drawOrderEnabled = drawOrderEnabled.init(false, this);
     readonly items = observableChildren<ItemObject>(null, "parent", () => {
         this.markDirty();
     });
 
-    composite: CompositeStore;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
     private _loaded = false;
 
@@ -62,7 +62,7 @@ export class ItemsStore
     }
 
     dump(): PickMy<WebMapUpdate> | undefined {
-        if (!this.dirty) return;
+        if (!this.dirty) return undefined;
         return {
             ...this.drawOrderEnabled.jsonPart(),
             root_item: {
@@ -74,16 +74,18 @@ export class ItemsStore
 
     @action
     markDirty() {
-        if (this._loaded) {
-            this.dirty = true;
+        /**
+         * Calling mapperLoad(this, value) in {@link load} action triggers the mapper’s onChange callback, which calls this {@link markDirty}.
+         * So this condition prevents the dirty flag from being set during data initialization in update mode.
+         */
+        if (!this._loaded && this.composite.operation === "update") {
+            return;
         }
+        this.dirty = true;
     }
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.items.every((i) => {
             return i.error === false;
         });
