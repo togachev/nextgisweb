@@ -9,18 +9,18 @@
   transition: all 0.3s;
 
   a {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      height: 100%;
-      width: 100%;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+    width: 100%;
   }
+
   &:hover {
     background-color: #F5F5F5;
     border-radius: 3px;
   }
 }
-
 
 .fileTitle {
   display: flex;
@@ -34,7 +34,7 @@
   align-items: center;
   flex-direction: row;
   flex-wrap: nowrap;
-  color: rgba(0,0,0,.45);
+  color: rgba(0, 0, 0, .45);
 }
 
 .fileName {
@@ -42,6 +42,24 @@
   text-overflow: ellipsis;
   display: block;
   white-space: nowrap;
+  color: var(--primary);
+}
+
+.dowload-file-icon {
+  font-size: 18px;
+  width: 21px;
+  height: 21px;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  position: relative;
+
+  &:hover {
+    border-radius: 3px;
+    color: var(--primary);
+  }
 }
 
 .colFile {
@@ -53,6 +71,7 @@
   justify-items: center;
   justify-content: center;
   align-items: center;
+
   &:hover {
     background: #106a90;
     border-radius: 3px;
@@ -65,13 +84,17 @@
   max-height: 350px;
   overflow: overlay;
   box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+
   .ant-dropdown-menu-title-content {
     flex: auto;
     max-width: 350px;
   }
-  .ant-dropdown-menu-item, .ant-dropdown-menu-submenu-title {
+
+  .ant-dropdown-menu-item,
+  .ant-dropdown-menu-submenu-title {
     padding: 2px 6px;
   }
+
   .ant-dropdown-menu {
     padding: 0;
   }

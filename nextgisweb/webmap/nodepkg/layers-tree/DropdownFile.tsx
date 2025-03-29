@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Dropdown } from "@nextgisweb/gui/antd";
+import { Dropdown, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import Paperclip from "@nextgisweb/icon/mdi/paperclip";
+import Download from "@nextgisweb/icon/mdi/download";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import "./DropdownFile.less";
 
@@ -29,6 +30,7 @@ interface FileProps {
 interface DropdownFileProps {
     nodeData: TreeItemConfig | RootItemConfig;
 }
+const { Link } = Typography;
 
 export function DropdownFile({ nodeData }: DropdownFileProps) {
     const [open, setOpen] = useState(false);
@@ -52,13 +54,12 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
             items.push({
                 key: i.id,
                 label: (
-                    <div className="linkFile" title={i.name}>
-                        <a className="a-linkFile" target="_blank" href={i.link} download>
-                            <span className="fileTitle">{i.res_name}</span>
-                            <span className="fileName">{i.name}</span>
-                        </a>
-                    </div>
-                )
+                    <Link title={i.name} className="linkFile" target="_blank" href={i.link}>
+                        <span className="fileTitle">{i.res_name}</span>
+                        <span className="fileName">{i.name}</span>
+                    </Link>
+                ),
+                extra: <Link title={gettext("Download")} className="dowload-file-icon" target="_blank" href={i.link} download><Download /></Link>
             })
         })
     })

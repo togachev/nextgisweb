@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
 import Restore from "@nextgisweb/icon/mdi/restore";
-import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
