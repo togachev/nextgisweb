@@ -114,8 +114,6 @@ export const CoordinatesSwitcher = ({
         const loadSrs = async () => {
             const srsInfo = await route("spatial_ref_sys.collection").get();
             setSrsMap(new Map(srsInfo.map((s) => [s.id, s])));
-            console.log(new Map(srsInfo.map((s) => [s.id, s])));
-            
         };
         loadSrs();
     }, []);
