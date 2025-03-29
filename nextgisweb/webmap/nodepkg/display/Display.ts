@@ -755,7 +755,15 @@ export class Display {
     }
 
     private _buildPanelManager() {
-        const activePanelKey = this.urlParams[this.modeURLParam];
+        let activePanelKey;
+        if (!this.urlParams[this.modeURLParam]) {
+            activePanelKey = this.config.active_panel
+        } else if (this.urlParams[this.modeURLParam] !== this.config.active_panel) {
+            activePanelKey = this.urlParams[this.modeURLParam]
+        } else {
+            activePanelKey = this.config.active_panel
+        }
+
         const onChangePanel = (panel?: PanelStore) => {
             if (panel) {
                 setURLParam(this.modeURLParam, panel.name);
