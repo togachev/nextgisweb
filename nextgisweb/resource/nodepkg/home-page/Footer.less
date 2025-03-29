@@ -40,7 +40,7 @@
 
 	.logo-col {
 		display: flex;
-		justify-content: center;
+		justify-content: flex-start;
 		user-select: none;
 		pointer-events: none;
 	}
@@ -66,7 +66,7 @@
 	}
 
 	.uriit-logo {
-		height: 40px;
+		height: 55px;
 		display: flex;
 		justify-content: flex-start;
 		margin: 9px 9px 35px 9px;
@@ -75,6 +75,7 @@
 	.name-center {
 		text-transform: uppercase;
 		padding: 2px 0;
+		font-weight: 600;
 	}
 
 	.footer-info {
@@ -111,6 +112,10 @@
 				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 				gap: 10px 20px;
 
+				.address {
+					padding: 0;
+				}
+
 				.phone {
 					padding: 0;
 
@@ -118,8 +123,17 @@
 						display: flex;
 						width: 100%;
 						justify-content: space-between;
-						flex-wrap: wrap;
-						align-items: center;
+						align-items: flex-start;
+
+						.name {
+							padding: 0 16px 0 0;
+						}
+
+						.value {
+							padding: 0 0 0 16px;
+							text-align: right;
+							word-break: break-word;
+						}
 					}
 				}
 			}
@@ -128,8 +142,6 @@
 
 	.ant-divider {
 		background-color: #fff;
-		padding: 0;
-		margin: 10px 0;
 		border-block-start: 1px solid rgb(5 5 5 / 29%);
 	}
 

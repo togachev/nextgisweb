@@ -456,37 +456,36 @@ export const Footer = observer(({ store: storeProp, config }) => {
                 )}
                 <Col flex={4} >
                     <span className="block-info">
-                        <span className="name-center">{store.valueFooter?.services?.value}</span>
+                        <Row className="name-center">
+                            <Col className="address">{store.valueFooter?.services?.value}</Col>
+                        </Row>
                         {store.valueFooter?.services?.list.map((item, index) => {
                             return (
-                                <span key={index} className="services-list">
-                                    <span className="services-url">
+                                <Row key={index} className="services-list">
+                                    <Col className="services-url">
                                         <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.logo?.colorText }}>
-                                            <span className="icon-link">
-                                                <ChevronRight />
-                                            </span>
                                             {item?.name}
                                         </a>
-                                    </span>
-                                </span>
+                                    </Col>
+                                </Row>
                             )
                         })}
                         <Divider />
-                        <span className="address-content">
-                            <span className="address">
-                                <span>{store.valueFooter?.address?.value}</span>
-                            </span>
-                            <span className="phone">
+                        <Row className="address-content" justify="space-between">
+                            <Col className="address">
+                                {store.valueFooter?.address?.value}
+                            </Col>
+                            <Col className="phone">
                                 {store.valueFooter?.address?.phone.map((item, index) => {
                                     return (
-                                        <Space key={index} className="phone-item">
-                                            <span className="name">{item?.name}</span>
-                                            <span className="value">{item?.value}</span>
-                                        </Space>
+                                        <Row key={index} className="phone-item" wrap={false} >
+                                            <Col className="name">{item?.name}</Col>
+                                            <Col className="value">{item?.value}</Col>
+                                        </Row>
                                     )
                                 })}
-                            </span>
-                        </span>
+                            </Col>
+                        </Row>
                     </span>
                 </Col>
             </Row>
