@@ -5,8 +5,8 @@ import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gu
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { ContainerMenu } from "./ContainerMenu";
-import { ContainerMaps } from "./ContainerMaps";
+import { ContainerMenu } from "./component/ContainerMenu";
+import { ContainerMaps } from "./component/ContainerMaps";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
@@ -142,9 +142,9 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             colorPrimaryBorder: "#106a90",
                             lineType: "solid",
                             lineWidth: 1,
-                            darkItemColor: `${store.valueFooter?.logo?.colorText}`,
-                            darkPopupBg: `${store.valueFooter?.logo?.colorBackground}`,
-                            darkSubMenuItemBg: `${store.valueFooter?.logo?.colorBackground}`,
+                            darkItemColor: `${store.valueFooter?.colorText}`,
+                            darkPopupBg: `${store.valueFooter?.colorBackground}`,
+                            darkSubMenuItemBg: `${store.valueFooter?.colorBackground}`,
                             darkItemHoverColor: "#afb4fd",
                             horizontalItemHoverColor: "#afb4fd",
 

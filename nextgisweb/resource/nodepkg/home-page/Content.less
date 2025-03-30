@@ -18,6 +18,13 @@ input {
 	grid-template-rows: auto 1fr auto;
 	letter-spacing: .05rem;
 
+	.custom-image {
+		background-color: var(--icon-color);
+		height: 24px;
+		padding: 3px;
+		border-radius: 3px;
+	}
+
 	button {
 		background-color: #fff;
 	}
@@ -82,6 +89,14 @@ input {
 		cursor: pointer;
 		z-index: 1000;
 		color: var(--text-base);
+	}
+
+	.item-edit-top {
+		display: flex;
+		border-radius: 3px;
+		margin-bottom: 12px;
+		justify-content: space-between;
+		align-items: flex-start;
 	}
 
 	.item-edit {

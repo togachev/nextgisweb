@@ -720,23 +720,20 @@ class FooterName(Struct):
     name: str
 
 
-class FooterLogo(Struct):
-    file: Dict[str, Any]
-    colorBackground: str
-    colorText: str
-
-
 class HomePageHeaders(Struct):
     first_name: str = UNSET
     last_name: str = UNSET
     menu: List[Dict[str, Any]] = UNSET
+    picture: Dict[str, Any] = UNSET
 
 
 class HomePageFooters(Struct):
     services: Union[Services, UnsetType] = UNSET
     address: Union[Address, UnsetType] = UNSET
     footer_name: Union[FooterName, UnsetType] = UNSET
-    logo: Union[FooterLogo, UnsetType] = UNSET
+    logo: Dict[str, Any] = UNSET
+    colorBackground: str = UNSET
+    colorText: str = UNSET
 
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))
 csetting("home_path", Optional[str])

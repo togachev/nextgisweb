@@ -20,6 +20,8 @@ import Restore from "@nextgisweb/icon/mdi/restore";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import { HomeStore } from "./HomeStore";
+import { UploadComponent } from "./component/UploadComponent";
+
 import "./Header.less";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -36,6 +38,20 @@ export const Header = observer(({ store: storeProp, config }) => {
         () => storeProp || new HomeStore()
     );
 
+    const paramsFileHeader = {
+        size: 100, /* KB */
+        extension: ".webp",
+        type: "image/webp",
+        formatName: "WEBP",
+        className: "upload-header",
+        styleImage: {
+            margin: "0 0 0 16px",
+        },
+        file: "picture",
+        values: "valueHeader",
+        setValues: "setValueHeader",
+    }
+
     const showLoginModal = () => {
         if (oauth.enabled && oauth.default) {
             const qs = new URLSearchParams([["next", window.location.href]]);
@@ -45,10 +61,8 @@ export const Header = observer(({ store: storeProp, config }) => {
         }
     };
 
-    const colorText = { color: store.valueFooter?.logo?.colorText }
-    const styleMenu = { color: store.valueFooter?.logo?.colorText }
+    const colorText = { color: store.valueFooter?.colorText }
 
-    const header_image = routeURL("pyramid.asset.header_image")
     const url = routeURL("resource.show", 0);
 
     const items: MenuItem[] = [];
@@ -72,17 +86,17 @@ export const Header = observer(({ store: storeProp, config }) => {
             authenticated && [
                 {
                     key: "user-name",
-                    label: <span style={styleMenu} className="account-name">{userDisplayName}</span>,
+                    label: <span style={colorText} className="account-name">{userDisplayName}</span>,
                     type: "group",
                 },
                 {
                     key: "resources",
                     label: (<a href={url} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
-                    extra: <span style={styleMenu}><FolderOutline /></span>,
+                    extra: <span style={colorText}><FolderOutline /></span>,
                 },
                 config.isAdministrator === true && {
                     key: "control-panel",
-                    extra: <span style={styleMenu}><Cog /></span>,
+                    extra: <span style={colorText}><Cog /></span>,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
@@ -91,12 +105,12 @@ export const Header = observer(({ store: storeProp, config }) => {
                 },
                 {
                     label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    extra: <span style={styleMenu}><AccountCogOutline /></span>,
+                    extra: <span style={colorText}><AccountCogOutline /></span>,
                     key: gettext("Settings"),
                 },
                 {
                     label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
-                    extra: <span style={styleMenu}><Logout /></span>,
+                    extra: <span style={colorText}><Logout /></span>,
                     key: gettext("Sign out"),
                 },
             ],
@@ -117,17 +131,17 @@ export const Header = observer(({ store: storeProp, config }) => {
     const onFinish = (value) => {
         setDisable(!disable);
         store.setValueHeader(value);
+        store.setInitialHeader(value);
         store.saveSetting(value, "home_page_header");
     }
 
     const cancelForm = () => {
         setDisable(!disable);
-        store.getValuesHeader();
     };
 
     const resetForm = () => {
-        store.getValuesHeader();
-        form.resetFields()
+        form.resetFields();
+        store.getValuesHeader("loading");
     };
 
     const applyForm = () => {
@@ -138,8 +152,10 @@ export const Header = observer(({ store: storeProp, config }) => {
         setDisable(!disable);
     }
 
+    const urlPicture = store.valueHeader?.picture?.status === "done" ? store.valueHeader?.picture?.preview : undefined
+
     return (
-        <div className="header-home-page" style={{ backgroundImage: "linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(" + header_image + ")" }}>
+        <div className="header-home-page" style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}>
             <div className="control-button">
                 {config.isAdministrator === true && disable && (<Button
                     className="icon-pensil"
@@ -171,14 +187,20 @@ export const Header = observer(({ store: storeProp, config }) => {
                     onFinish={onFinish}
                     clearOnDestroy={true}
                 >
+
                     <Row className="header-info-edit form-padding">
                         <Col flex="auto">
+                            <Row gutter={[16, 16]} className="item-edit" justify="end">
+                                <Col flex="none">
+                                    <UploadComponent store={store} params={paramsFileHeader} />
+                                </Col>
+                            </Row>
                             <Row gutter={[16, 16]} className="item-edit">
                                 <Col flex="auto">
                                     <Form.List name="menu">
                                         {(fields, { add, remove }) => (
                                             <>
-                                                <Row gutter={[16, 16]} justify="end">
+                                                <Row gutter={[16, 16]} >
                                                     <Col>
                                                         <Button
                                                             className="item-edit"

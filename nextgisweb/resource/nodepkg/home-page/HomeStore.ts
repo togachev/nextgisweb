@@ -56,17 +56,13 @@ export interface FooterNameProps {
     name: string;
 }
 
-export interface FooterLogoProps {
-    file: UploadFile[];
-    colorBackground: string;
-    colorText: string;
-}
-
 export interface FooterProps {
     services: ServicesProps;
     address: AddressProps;
     footer_name: FooterNameProps;
-    logo: FooterLogoProps;
+    logo: UploadFile[];
+    colorBackground: string;
+    colorText: string;
 }
 
 export interface UrlMenuProps {
@@ -78,6 +74,7 @@ export interface HeaderProps {
     first_name: string;
     last_name: string;
     menu: UrlMenuProps[];
+    picture: UploadFile[];
 }
 
 type Action = keyof Pick<HomeStore,
