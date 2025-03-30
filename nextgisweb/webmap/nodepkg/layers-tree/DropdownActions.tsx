@@ -55,7 +55,7 @@ export function DropdownActions({
         const pluginInfo = plugin.getPluginState(nodeData);
         if (pluginInfo.enabled) {
             if (plugin.getMenuItem) {
-                const { icon, title, onClick } = plugin.getMenuItem(nodeData);
+                const { icon, title, onClick, extra } = plugin.getMenuItem(nodeData);
                 const onClick_ = async () => {
                     if (plugin) {
                         if (onClick) {
@@ -84,6 +84,16 @@ export function DropdownActions({
                             icon
                         ),
                     label: title,
+                    extra:
+                        typeof icon === "string" ? (
+                            <SvgIcon
+                                className="icon"
+                                icon={extra}
+                                fill="currentColor"
+                            />
+                        ) : (
+                            extra
+                        ),
                 });
             } else if (render) {
                 const RenderedPlugin = () => render.call(plugin, pluginInfo);

@@ -6,6 +6,7 @@ import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import { PluginBase } from "../PluginBase";
 
 import ImageEdit from "@nextgisweb/icon/mdi/image-edit";
+import EyeOoutline from "@nextgisweb/icon/mdi/eye-outline";
 
 export class StyleSettingsPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
@@ -24,6 +25,16 @@ export class StyleSettingsPlugin extends PluginBase {
             onClick: () => {
                 window.open(routeURL("resource.update", { id: nodeData.styleId }), "_blank");
             },
+            extra:
+                <span
+                className="show-resource"
+                title={gettext("Style show")}
+                    onClick={() => {
+                        window.open(routeURL("resource.show", { id: nodeData.layerId }), "_blank");
+                    }}
+                >
+                    <EyeOoutline />
+                </span >,
         };
     }
 }

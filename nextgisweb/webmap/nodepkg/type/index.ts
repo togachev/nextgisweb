@@ -87,6 +87,7 @@ export type MapPlugin = new (val: PluginParams) => PluginBase;
 
 export interface PluginMenuItem {
     icon: React.ReactNode;
+    extra?: React.ReactNode;
     title: string;
     onClick: () => void;
 }
