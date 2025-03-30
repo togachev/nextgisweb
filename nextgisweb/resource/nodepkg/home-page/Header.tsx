@@ -47,7 +47,7 @@ export const Header = observer(({ store: storeProp, config }) => {
         styleImage: {
             margin: "0 0 0 16px",
         },
-        file: "picture",
+        key: "picture",
         values: "valueHeader",
         setValues: "setValueHeader",
     }
@@ -63,7 +63,7 @@ export const Header = observer(({ store: storeProp, config }) => {
 
     const colorText = { color: store.valueFooter?.colorText }
 
-    const url = routeURL("resource.show", 0);
+    const urlResShow = routeURL("resource.show", 0);
 
     const items: MenuItem[] = [];
 
@@ -91,7 +91,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                 },
                 {
                     key: "resources",
-                    label: (<a href={url} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
+                    label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
                     extra: <span style={colorText}><FolderOutline /></span>,
                 },
                 config.isAdministrator === true && {

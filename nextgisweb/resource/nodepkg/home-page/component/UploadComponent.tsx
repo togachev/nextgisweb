@@ -14,8 +14,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
-    const [fileUpload, setFileUpload] = useState()
-    const { size, extension, file, type, formatName, className, styleImage, values, setValues } = params;
+    const { size, extension, key, type, formatName, className, styleImage, values, setValues } = params;
 
     const TYPE_FILE = [
         {
@@ -36,16 +35,16 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         });
 
     const props: UploadProps = useMemo(() => ({
-        defaultFileList: store[values]?.[file]?.status === "done" && [store[values]?.[file]],
+        defaultFileList: store[values]?.[key]?.status === "done" && [store[values]?.[key]],
         multiple: false,
         customRequest: async (options) => {
             const { onSuccess, onError, file } = options;
             try {
-                if (!file.url && !file.preview) {
+                if (!file.preview) {
                     file.preview = await getBase64(file);
                     const value = {
                         ...store[values],
-                        [file]: file,
+                        [key]: file,
                     };
 
                     store[setValues](value);
@@ -112,7 +111,18 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         if (Array.isArray(event)) {
             return;
         }
-        return event && event.file;
+        return event && {
+            preview: event.file.preview,
+            name: event.file.name,
+            uid: event.file.uid,
+            type: event.file.type,
+            status: event.file.status,
+            size: event.file.size,
+            response: event.file.response,
+            lastModified: event.file.lastModified,
+            lastModifiedDate: event.file.lastModifiedDate,
+            percent: event.file.percent,
+        };
     };
 
     return (
@@ -120,8 +130,8 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
             <Col flex="auto">
                 <Form.Item
                     noStyle
-                    name={file}
-                    valuePropName={file}
+                    name={key}
+                    valuePropName="file"
                     getValueFromEvent={normalizingFileUpload}
                 >
                     <Upload {...props} listType="picture" accept={extension} className={className}>

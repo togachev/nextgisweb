@@ -96,7 +96,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
         styleImage: {
             margin: "0 0 0 16px",
         },
-        file: "logo",
+        key: "logo",
         values: "valueFooter",
         setValues: "setValueFooter",
     }
