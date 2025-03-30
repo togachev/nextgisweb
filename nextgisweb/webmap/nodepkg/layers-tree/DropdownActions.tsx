@@ -84,16 +84,7 @@ export function DropdownActions({
                             icon
                         ),
                     label: title,
-                    extra:
-                        typeof icon === "string" ? (
-                            <SvgIcon
-                                className="icon"
-                                icon={extra}
-                                fill="currentColor"
-                            />
-                        ) : (
-                            extra
-                        ),
+                    extra: extra,
                 });
             } else if (render) {
                 const RenderedPlugin = () => render.call(plugin, pluginInfo);
