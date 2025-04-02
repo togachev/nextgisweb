@@ -49,6 +49,7 @@ export const Header = observer(({ store: storeProp, config }) => {
         },
         key: "picture",
         values: "valueHeader",
+        valuesInitial: "initialHeader",
         setValues: "setValueHeader",
     }
 
@@ -129,10 +130,12 @@ export const Header = observer(({ store: storeProp, config }) => {
     }
 
     const onFinish = (value) => {
+        console.log(value);
+        
         setDisable(!disable);
         store.setValueHeader(value);
-        store.setInitialHeader(value);
-        store.saveSetting(value, "home_page_header");
+        store.setInitialHeader(store.valueHeader);
+        store.saveSetting(store.valueHeader, "home_page_header");
     }
 
     const cancelForm = () => {
@@ -152,10 +155,12 @@ export const Header = observer(({ store: storeProp, config }) => {
         setDisable(!disable);
     }
 
-    const urlPicture = store.valueHeader?.picture?.status === "done" ? store.valueHeader?.picture?.preview : undefined
+    const urlPicture = store.valueHeader?.picture && store.valueHeader?.picture[0]?.status === "done" ? store.valueHeader?.picture[0]?.url : ""
 
     return (
-        <div className="header-home-page" style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}>
+        <div className="header-home-page"
+        style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}
+        >
             <div className="control-button">
                 {config.isAdministrator === true && disable && (<Button
                     className="icon-pensil"
@@ -183,7 +188,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                     form={form}
                     name="ngw_home_page_header"
                     autoComplete="off"
-                    initialValues={store.initialHeader}
+                    initialValues={store.valueHeader}
                     onFinish={onFinish}
                     clearOnDestroy={true}
                 >
@@ -200,7 +205,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                     <Form.List name="menu">
                                         {(fields, { add, remove }) => (
                                             <>
-                                                <Row gutter={[16, 16]} >
+                                                <Row gutter={[16, 16]} justify="end">
                                                     <Col>
                                                         <Button
                                                             className="item-edit"

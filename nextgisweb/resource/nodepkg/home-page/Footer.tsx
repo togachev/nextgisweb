@@ -98,13 +98,15 @@ export const Footer = observer(({ store: storeProp, config }) => {
         },
         key: "logo",
         values: "valueFooter",
+        valuesInitial: "initialFooter",
         setValues: "setValueFooter",
     }
 
     const onFinish = (value) => {
         setDisable(!disable);
         store.setValueFooter(value);
-        store.saveSetting(value, "home_page_footer");
+        store.setInitialFooter(store.valueFooter);
+        store.saveSetting(store.valueFooter, "home_page_footer");
     };
 
     const cancelForm = () => {
@@ -124,6 +126,10 @@ export const Footer = observer(({ store: storeProp, config }) => {
     const openForm = () => {
         setDisable(!disable);
     }
+
+    console.log(store.valueFooter?.logo);
+
+    const urlLogo = store.valueFooter?.logo && store.valueFooter?.logo[0]?.status === "done" ? store.valueFooter?.logo[0]?.url : undefined
 
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground, color: store.valueFooter?.colorText, fontWeight: 500 }}>
@@ -348,13 +354,11 @@ export const Footer = observer(({ store: storeProp, config }) => {
                 </Form>
             )}
             <Row className="footer-info">
-                {store.valueFooter?.logo?.status === "done" && (
-                    <Col className="logo-col" flex={1}>
-                        <span className="uriit-logo">
-                            <img src={store.valueFooter?.logo?.preview} />
-                        </span>
-                    </Col>
-                )}
+                <Col className="logo-col" flex={1}>
+                    <span className="uriit-logo">
+                        <img src={urlLogo} />
+                    </span>
+                </Col>
                 <Col flex={4} >
                     <span className="block-info">
                         <Row className="name-center">

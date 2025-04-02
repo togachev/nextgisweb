@@ -724,14 +724,14 @@ class HomePageHeaders(Struct):
     first_name: str = UNSET
     last_name: str = UNSET
     menu: List[Dict[str, Any]] = UNSET
-    picture: Dict[str, Any] = UNSET
+    picture: List[Dict[str, Any]] = UNSET
 
 
 class HomePageFooters(Struct):
     services: Union[Services, UnsetType] = UNSET
     address: Union[Address, UnsetType] = UNSET
     footer_name: Union[FooterName, UnsetType] = UNSET
-    logo: Dict[str, Any] = UNSET
+    logo: List[Dict[str, Any]] = UNSET
     colorBackground: str = UNSET
     colorText: str = UNSET
 
