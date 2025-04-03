@@ -9,8 +9,8 @@ import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import Cancel from "@nextgisweb/icon/mdi/cancel";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { HomeStore } from "./HomeStore";
-import { UploadComponent } from "./component/UploadComponent";
+import { HomeStore } from "../HomeStore";
+import { UploadComponent } from "./UploadComponent";
 
 import "./Footer.less";
 
@@ -153,7 +153,6 @@ export const Footer = observer(({ store: storeProp, config }) => {
                 transitionName=""
                 maskTransitionName=""
                 style={{ maxWidth: "75%", minWidth: "340px" }}
-                styles={{ mask: { backgroundColor: "transparent" } }}
                 width="max-content"
                 centered
                 footer={null}
@@ -330,6 +329,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
                                         <Button
                                             title={gettext("Reset")}
                                             type="default"
+                                            htmlType="reset"
                                             icon={<Restore />}
                                             onClick={resetForm}
                                         >

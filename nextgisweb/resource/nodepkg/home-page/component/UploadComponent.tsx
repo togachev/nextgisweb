@@ -178,6 +178,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
             {previewImage && (
                 <Col>
                     <Image
+                        styles={{ mask: { backgroundColor: "transparent" } }}
                         wrapperStyle={{ display: "none" }}
                         preview={{
                             visible: previewOpen,

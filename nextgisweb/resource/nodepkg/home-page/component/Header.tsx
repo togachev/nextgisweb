@@ -7,7 +7,6 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
-import Save from "@nextgisweb/icon/material/save";
 import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
@@ -15,12 +14,10 @@ import Login from "@nextgisweb/icon/mdi/login";
 import Logout from "@nextgisweb/icon/mdi/logout";
 import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
-import Cancel from "@nextgisweb/icon/mdi/cancel";
-import Restore from "@nextgisweb/icon/mdi/restore";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
-import { HomeStore } from "./HomeStore";
-import { UploadComponent } from "./component/UploadComponent";
+import { HomeStore } from "../HomeStore";
+import { ControlForm, UploadComponent } from ".";
 
 import "./Header.less";
 
@@ -195,7 +192,6 @@ export const Header = observer(({ store: storeProp, config }) => {
                 transitionName=""
                 maskTransitionName=""
                 style={{ maxWidth: "75%", minWidth: "340px" }}
-                styles={{ mask: { backgroundColor: "transparent" } }}
                 width="max-content"
                 centered
                 footer={null}
@@ -296,45 +292,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                                     </Form.Item>
                                 </Col>
                             </Row>
-                            <Row gutter={[16, 16]} justify="end">
-                                <Col>
-                                    <Form.Item noStyle label={null}>
-                                        <Button
-                                            title={gettext("Cancel")}
-                                            type="default"
-                                            icon={<Cancel />}
-                                            onClick={handleCancel}
-                                        >
-                                            {gettext("Cancel")}
-                                        </Button>
-                                    </Form.Item>
-                                </Col>
-                                <Col>
-                                    <Form.Item noStyle label={null}>
-                                        <Button
-                                            title={gettext("Reset")}
-                                            type="default"
-                                            htmlType="reset"
-                                            icon={<Restore />}
-                                            onClick={resetForm}
-                                        >
-                                            {gettext("Reset")}
-                                        </Button>
-                                    </Form.Item>
-                                </Col>
-                                <Col>
-                                    <Form.Item noStyle label={null}>
-                                        <Button
-                                            type="default"
-                                            htmlType="submit"
-                                            icon={<Save />}
-                                            title={gettext("Save")}
-                                        >
-                                            {gettext("Save")}
-                                        </Button>
-                                    </Form.Item>
-                                </Col>
-                            </Row>
+                            <ControlForm handleCancel={handleCancel} resetForm={resetForm} />
                         </Col>
                     </Row>
                 </Form>
