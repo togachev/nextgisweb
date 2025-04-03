@@ -38,7 +38,7 @@ const SortableMenu = (props) => {
 
     const onClickGroupMapsGrid = (id) => {
         store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.id_pos - b.id_pos));
-    }
+    };
 
     return (
         <div className="menu-item" {...listeners} {...attributes} ref={setNodeRef}>

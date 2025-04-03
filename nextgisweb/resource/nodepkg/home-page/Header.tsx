@@ -45,14 +45,11 @@ export const Header = observer(({ store: storeProp, config }) => {
         type: "image/webp",
         formatName: "WEBP",
         className: "upload-header",
-        styleImage: {
-            margin: "0 0 0 16px",
-        },
         key: "picture",
         values: "valueHeader",
         valuesInitial: "initialHeader",
         setValues: "setValueHeader",
-    }
+    };
 
     const showLoginModal = () => {
         if (oauth.enabled && oauth.default) {
@@ -63,7 +60,7 @@ export const Header = observer(({ store: storeProp, config }) => {
         }
     };
 
-    const colorText = { color: store.valueFooter?.colorText }
+    const colorText = { color: store.valueFooter?.colorText };
 
     const urlResShow = routeURL("resource.show", 0);
 
@@ -128,32 +125,30 @@ export const Header = observer(({ store: storeProp, config }) => {
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
                 triggerSubMenuAction="hover"
             />)
-    }
+    };
 
     const onFinish = (value) => {
         setIsModalOpen(false);
         store.setValueHeader(value);
         store.setInitialHeader(value);
         store.saveSetting(value, "home_page_header");
-    }
+    };
 
     const onValuesChange = (value) => {
-        console.log(value);
-        
         store.setValueHeader(form.getFieldsValue())
-    }
-
+    };
 
     useEffect(() => {
         try {
             if (status === true) {
                 form.resetFields();
+                store.setValueHeader(store.initialHeader);
                 store.updateStatusFile("done", "picture", "initialHeader", "valueHeader", "setValueHeader")
             }
         } finally {
             setStatus(false);
         }
-    }, [status])
+    }, [status]);
 
     const resetForm = () => {
         setStatus(true);
@@ -161,7 +156,7 @@ export const Header = observer(({ store: storeProp, config }) => {
 
     const openForm = () => {
         setIsModalOpen(true);
-    }
+    };
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -199,7 +194,8 @@ export const Header = observer(({ store: storeProp, config }) => {
             <Modal
                 transitionName=""
                 maskTransitionName=""
-                style={{ maxWidth: "75%", backgroundColor: "transparent" }}
+                style={{ maxWidth: "75%", minWidth: "340px" }}
+                styles={{ mask: { backgroundColor: "transparent" } }}
                 width="max-content"
                 centered
                 footer={null}

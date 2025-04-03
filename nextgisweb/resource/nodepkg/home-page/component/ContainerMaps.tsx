@@ -36,7 +36,8 @@ const SortableMaps = (props) => {
         zIndex: isDragging ? "100" : "auto",
         cursor: disable ? "pointer" : "move",
     };
-    const preview = routeURL("resource.preview", item.id)
+    const preview = routeURL("resource.preview", item.id);
+
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
             <div

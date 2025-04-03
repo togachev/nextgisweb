@@ -27,34 +27,34 @@ export interface ListMapProps {
     value: number;
     webmap_group_id: number;
     webmap_group_name: string;
-}
+};
 
 export interface GroupMapsGridProps {
     id: number;
     webmap_group_name: string;
     action_map: boolean;
     position_group: LayoutProps;
-}
+};
 
 export interface UrlPhoneProps {
     name: string;
     value: string;
-}
+};
 
 export interface ServicesProps {
     value: string;
     list: UrlPhoneProps[];
-}
+};
 
 export interface AddressProps {
     value: string;
     phone: UrlPhoneProps[];
-}
+};
 
 export interface FooterNameProps {
     base_year: string;
     name: string;
-}
+};
 
 export interface FooterProps {
     services: ServicesProps;
@@ -63,19 +63,19 @@ export interface FooterProps {
     logo: UploadFile[];
     colorBackground: string;
     colorText: string;
-}
+};
 
 export interface UrlMenuProps {
     name: string;
     value: string;
-}
+};
 
 export interface HeaderProps {
     first_name: string;
     last_name: string;
     menu: UrlMenuProps[];
     picture: UploadFile[];
-}
+};
 
 type Action = keyof Pick<HomeStore,
     | "getWidthMenu"
@@ -109,7 +109,7 @@ export class HomeStore {
         this.getMapValues("all");
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
-    }
+    };
 
     @action
     setWidthMenu(width: number | string) {
@@ -144,12 +144,12 @@ export class HomeStore {
     @action
     setLoading(operation: Action, status: boolean) {
         this.loading = { ...this.loading, [operation]: status };
-    }
+    };
 
     @action
     setError(operation: Action, msg?: string) {
         this.errors[operation] = msg;
-    }
+    };
 
     @action
     setValueHeader(valueHeader: HeaderProps) {
@@ -175,13 +175,13 @@ export class HomeStore {
     getWidthMenu() {
         const width = window.innerWidth < 785 ? "100%" : 300;
         this.setWidthMenu(width);
-    }
+    };
 
     @actionHandler
     updateStatusFile(status, nameArray, stateInitial, state, setState) {
         if (this[stateInitial]?.[nameArray]?.length > 0) {
             const val = [...this[stateInitial][nameArray]]
-            val[0].status = status
+            val.map(item => item.status = status)
             const value = {
                 ...this[state],
                 [nameArray]: val,
@@ -194,7 +194,7 @@ export class HomeStore {
             };
             this[setState](value);
         }
-    }
+    };
 
     @actionHandler
     async saveSetting(value, key) {
@@ -205,24 +205,24 @@ export class HomeStore {
         await route("pyramid.csettings").put({
             json: { pyramid: { [key]: payload } },
         });
-    }
+    };
 
     private async getPermission(id: number) {
         const resp = await route("resource.permission", id).get({
             cache: true,
         });
         return resp;
-    }
+    };
 
     private async maplist() {
         const resp = await route("resource.maplist").get();
         return resp.result;
-    }
+    };
 
     private async groupMaps() {
         const resp = await route("resource.mapgroup").get();
         return resp;
-    }
+    };
 
     private async getSetting(key) {
         const resp = await route("pyramid.csettings").get({
@@ -230,7 +230,7 @@ export class HomeStore {
             cache: true,
         });
         return resp;
-    }
+    };
 
     @actionHandler
     async getValuesHeader(status: string) {
@@ -242,8 +242,8 @@ export class HomeStore {
                         status === "loading" && this.setInitialHeader(data.pyramid.home_page_header);
                     }
                 }
-            })
-    }
+            });
+    };
 
     @actionHandler
     async getValuesFooter(status: string) {
@@ -255,8 +255,8 @@ export class HomeStore {
                         status === "loading" && this.setInitialFooter(data.pyramid.home_page_footer);
                     }
                 }
-            })
-    }
+            });
+    };
 
     @actionHandler
     async getMapValues(key) {
@@ -274,8 +274,8 @@ export class HomeStore {
                         })
                 }
             });
-    }
-}
+    };
+};
 
 export function actionHandler(
     originalMethod: any,
@@ -299,4 +299,4 @@ export function actionHandler(
             this.setLoading(operationName, false);
         }
     };
-}
+};

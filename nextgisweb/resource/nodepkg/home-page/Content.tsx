@@ -15,7 +15,7 @@ import "./Content.less";
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
-        const resourceUrl = routeURL("webmap.display", resource.id)
+        const resourceUrl = routeURL("webmap.display", resource.id);
         return {
             key: `${resource.id}`,
             label: (
@@ -46,7 +46,7 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 }
+const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 };
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore());
@@ -113,10 +113,10 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
             onChanges(v, opt);
         }
     };
-    
+
     useMemo(() => {
         store.getMapValues("all")
-    }, [])
+    }, []);
 
     useEffect(() => {
         (store.sourceGroup === false) && store.getMapValues("all");

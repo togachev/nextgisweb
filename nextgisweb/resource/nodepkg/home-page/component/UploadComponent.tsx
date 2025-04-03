@@ -4,7 +4,7 @@ import { Button, Col, Form, message, Row, Upload, Image, Space } from "@nextgisw
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
-import DownloadOutline from "@nextgisweb/icon/mdi/download-outline";
+import Eye from "@nextgisweb/icon/mdi/eye";
 import { HomeStore } from "../HomeStore";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 
@@ -14,7 +14,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
-    const { size, extension, key, type, formatName, className, styleImage, values } = params;
+    const { size, extension, key, type, formatName, className, values } = params;
 
     const TYPE_FILE = [
         {
@@ -32,7 +32,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
 
     useEffect(() => {
         setFiles(store[values]?.[key])
-    }, [store[values]?.[key]])
+    }, [store[values]?.[key]]);
 
     const getBase64 = (file: FileType | Blob): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -102,36 +102,35 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         accept: extension,
         action: "/upload",
         className: className,
+        style: { width: "100%" },
         itemRender: (originNode, file, fileList, actions) => {
             return (
-                <Space className="item-upload">
-                    <Space>
-                        <span className="title-file" style={{ width: "100%" }}>
-                            <span className="ellipsis" title={file.name}>
-                                {file.name}
-                            </span>
+                <Space className="file-list">
+                    <Button
+                        className="icon-file"
+                        icon={<Eye />}
+                        type="default"
+                        onClick={actions.preview}
+                        title={gettext("Preview file")}
+                    />
+                    <Button
+                        className="icon-file"
+                        icon={<DeleteOffOutline />}
+                        type="default"
+                        onClick={actions.remove}
+                        title={gettext("Delete file")}
+                    />
+                    <span className="file-name" title={file.name}>
+                        <span className="ellipsis" title={file.name}>
+                            {file.name}
                         </span>
-                        <span className="file-size" title={gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"} style={{ width: "100%" }}>
-                            <span className="ellipsis">
-                                {gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}
-                            </span>
-                        </span>
-                        <Button
-                            icon={<DownloadOutline />}
-                            type="default"
-                            onClick={actions.preview}
-                            title={gettext("Download file")}
-                        />
-                        <Button
-                            icon={<DeleteOffOutline />}
-                            type="default"
-                            onClick={actions.remove}
-                            title={gettext("Delete file")}
-                        />
-                    </Space>
+                    </span>
+                    <span className="file-size" title={gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}>
+                        {gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}
+                    </span>
                 </Space>
             );
-        }
+        },
     };
 
     const msgInfo = [
@@ -154,6 +153,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
             }];
         }
     };
+
     return (
         <Row gutter={[16, 16]}>
             <Col flex="auto">
