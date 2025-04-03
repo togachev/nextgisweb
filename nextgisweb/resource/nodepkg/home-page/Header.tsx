@@ -148,13 +148,6 @@ export const Header = observer(({ store: storeProp, config }) => {
         try {
             if (status === true) {
                 form.resetFields();
-                // const val = [...store.initialHeader.picture]
-                // val[0].status = "done"
-                // const value = {
-                //     ...store.valueHeader,
-                //     picture: val,
-                // };
-                // store.setValueHeader(value);
                 store.updateStatusFile("done", "picture", "initialHeader", "valueHeader", "setValueHeader")
             }
         } finally {

@@ -178,14 +178,22 @@ export class HomeStore {
     }
 
     @actionHandler
-    updateStatusFile(status, key, stateInitial, state, setState) {
-        const val = [...this[stateInitial][key]]
-        val[0].status = status
-        const value = {
-            ...this[state],
-            [key]: val,
-        };
-        this[setState](value);
+    updateStatusFile(status, nameArray, stateInitial, state, setState) {
+        if (this[stateInitial]?.[nameArray]?.length > 0) {
+            const val = [...this[stateInitial][nameArray]]
+            val[0].status = status
+            const value = {
+                ...this[state],
+                [nameArray]: val,
+            };
+            this[setState](value);
+        } else {
+            const value = {
+                ...this[state],
+                [nameArray]: [],
+            };
+            this[setState](value);
+        }
     }
 
     @actionHandler
