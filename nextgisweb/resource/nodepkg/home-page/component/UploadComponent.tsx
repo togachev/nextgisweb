@@ -1,17 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Button, Col, Form, message, Row, Upload, Image, Space, Tooltip, Typography } from "@nextgisweb/gui/antd";
+import { Button, Col, Form, message, Row, Upload, Image, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
-import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";
-import InformationOutline from "@nextgisweb/icon/mdi/information-outline";
+import DownloadOutline from "@nextgisweb/icon/mdi/download-outline";
 import { HomeStore } from "../HomeStore";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
-
-const { Text, Link } = Typography;
 
 export const UploadComponent = observer(({ store: storeProp, params }) => {
     const [store] = useState(
@@ -31,7 +28,11 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState(store[values]?.[key]?.url);
-    const [files, setFiles] = useState<UploadFile[]>(store[values]?.[key])
+    const [files, setFiles] = useState<UploadFile[]>(store[values]?.[key]);
+
+    useEffect(() => {
+        setFiles(store[values]?.[key])
+    }, [store[values]?.[key]])
 
     const getBase64 = (file: FileType | Blob): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -102,33 +103,39 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         action: "/upload",
         className: className,
         itemRender: (originNode, file, fileList, actions) => {
-            console.log(actions)
             return (
-                // <ImagePreview key={file.uid} title={file.name} size={file.size} type={file.type} imageUrl={file.url} deleteButton={actions.remove} />
-                <Row gutter={[16, 16]} wrap={false}>
-                    {/* <Col flex="auto"> */}
-                        <Text ellipsis={{ suffix: "" }}>{file.name}</Text>
-                        <Text ellipsis={{ tooltip: gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB" }}>{gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}</Text>
+                <Space className="item-upload">
+                    <Space>
+                        <span className="title-file" style={{ width: "100%" }}>
+                            <span className="ellipsis" title={file.name}>
+                                {file.name}
+                            </span>
+                        </span>
+                        <span className="file-size" title={gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"} style={{ width: "100%" }}>
+                            <span className="ellipsis">
+                                {gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}
+                            </span>
+                        </span>
                         <Button
-                            icon={<EyeOutline />}
+                            icon={<DownloadOutline />}
                             type="default"
-                            title={gettext("Download file")}
                             onClick={actions.preview}
+                            title={gettext("Download file")}
                         />
                         <Button
                             icon={<DeleteOffOutline />}
                             type="default"
-                            title={gettext("Delete file")}
                             onClick={actions.remove}
+                            title={gettext("Delete file")}
                         />
-                    {/* </Col> */}
-                </Row>
-
+                    </Space>
+                </Space>
             );
         }
     };
 
     const msgInfo = [
+        gettext("Select File"),
         gettext(`Supported file format ${formatName}.`),
         gettext(`Maximum file size ${size}KB.`),
     ];
@@ -150,29 +157,26 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     return (
         <Row gutter={[16, 16]}>
             <Col flex="auto">
-
                 <Form.Item
                     noStyle
                     name={key}
                     valuePropName="picture"
                     getValueFromEvent={normFile}
                 >
-                    <Upload {...props} >
+                    <Upload {...props} style={{ width: "100%" }}>
                         {files?.length > 1 ? null : (
-                            <Tooltip title={msgInfo.join(" ")} trigger={["click", "hover"]} >
-                                <Button
-                                    icon={<FileArrowUpDownOutline />}
-                                    type="default"
-                                    title={gettext("Select File")}
-                                />
-                            </Tooltip>
+                            <Button
+                                style={{ margin: "0 10px 0 0" }}
+                                icon={<FileArrowUpDownOutline />}
+                                type="default"
+                                title={msgInfo.join(" \n")}
+                            />
                         )}
                     </Upload>
-
                 </Form.Item>
             </Col>
-            <Col>
-                {previewImage && (
+            {previewImage && (
+                <Col>
                     <Image
                         wrapperStyle={{ display: "none" }}
                         preview={{
@@ -184,8 +188,8 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                         }}
                         src={previewImage}
                     />
-                )}
-            </Col>
+                </Col>
+            )}
         </Row >
     );
 });

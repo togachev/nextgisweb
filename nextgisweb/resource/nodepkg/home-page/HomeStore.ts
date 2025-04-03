@@ -178,6 +178,17 @@ export class HomeStore {
     }
 
     @actionHandler
+    updateStatusFile(status, key, stateInitial, state, setState) {
+        const val = [...this[stateInitial][key]]
+        val[0].status = status
+        const value = {
+            ...this[state],
+            [key]: val,
+        };
+        this[setState](value);
+    }
+
+    @actionHandler
     async saveSetting(value, key) {
         const payload = Object.fromEntries(
             Object.entries(value || {}).filter(([, v]) => v)
@@ -207,7 +218,8 @@ export class HomeStore {
 
     private async getSetting(key) {
         const resp = await route("pyramid.csettings").get({
-            query: { pyramid: [key] }
+            query: { pyramid: [key] },
+            cache: true,
         });
         return resp;
     }

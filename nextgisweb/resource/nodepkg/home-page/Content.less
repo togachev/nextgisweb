@@ -18,13 +18,6 @@ input {
 	grid-template-rows: auto 1fr auto;
 	letter-spacing: .05rem;
 
-	.custom-image {
-		background-color: var(--icon-color);
-		height: 24px;
-		padding: 3px;
-		border-radius: 3px;
-	}
-
 	button {
 		background-color: #fff;
 	}
@@ -91,26 +84,7 @@ input {
 		color: var(--text-base);
 	}
 
-	.item-edit-top {
-		display: flex;
-		border-radius: 3px;
-		margin-bottom: 12px;
-		justify-content: space-between;
-		align-items: flex-start;
-	}
 
-	.item-edit {
-		display: flex;
-		border-radius: 3px;
-		margin-bottom: 12px;
-		justify-content: space-between;
-		align-items: center;
-
-		.first-item,
-		.last-item {
-			width: 100%;
-		}
-	}
 
 	.list-edit {
 		background-color: #e9e9e91a;
@@ -510,4 +484,54 @@ textarea::-webkit-input-placeholder {
 		max-width: 500px;
 		text-align: center;
 	}
+}
+
+.item-edit-top {
+	display: flex;
+	margin-bottom: 12px;
+	flex-direction: column;
+}
+
+.item-edit {
+	display: flex;
+	border-radius: 3px;
+	margin-bottom: 12px;
+	justify-content: space-between;
+	align-items: center;
+
+	.first-item,
+	.last-item {
+		width: 100%;
+	}
+}
+
+.item-upload {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+
+	.title-file {
+		width: 100%;
+		display: inline-grid;
+
+		.ellipsis {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+}
+
+.upload-footer {
+	display: flex;
+	justify-content: space-between;
+}
+
+
+.upload-header {
+	float: left;
+	margin: 0;
+	display: flex;
+	width: 100%;
+	justify-content: space-between;
 }

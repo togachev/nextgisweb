@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
-import { Button, Col, Form, Input, Menu, Row, Typography } from "@nextgisweb/gui/antd";
+import { Button, Col, Form, Input, Menu, Modal, Row, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -32,7 +32,8 @@ const signInText = gettext("Sign in");
 export const Header = observer(({ store: storeProp, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
 
-    const [disable, setDisable] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [status, setStatus] = useState(false);
     const [form] = Form.useForm();
     const [store] = useState(
         () => storeProp || new HomeStore()
@@ -130,39 +131,58 @@ export const Header = observer(({ store: storeProp, config }) => {
     }
 
     const onFinish = (value) => {
-        console.log(value);
-        
-        setDisable(!disable);
+        setIsModalOpen(false);
         store.setValueHeader(value);
-        store.setInitialHeader(store.valueHeader);
-        store.saveSetting(store.valueHeader, "home_page_header");
+        store.setInitialHeader(value);
+        store.saveSetting(value, "home_page_header");
     }
 
-    const cancelForm = () => {
-        setDisable(!disable);
-    };
+    const onValuesChange = (value) => {
+        console.log(value);
+        
+        store.setValueHeader(form.getFieldsValue())
+    }
+
+
+    useEffect(() => {
+        try {
+            if (status === true) {
+                form.resetFields();
+                // const val = [...store.initialHeader.picture]
+                // val[0].status = "done"
+                // const value = {
+                //     ...store.valueHeader,
+                //     picture: val,
+                // };
+                // store.setValueHeader(value);
+                store.updateStatusFile("done", "picture", "initialHeader", "valueHeader", "setValueHeader")
+            }
+        } finally {
+            setStatus(false);
+        }
+    }, [status])
 
     const resetForm = () => {
-        form.resetFields();
-        store.getValuesHeader("loading");
-    };
-
-    const applyForm = () => {
-        store.setValueHeader(form.getFieldsValue());
+        setStatus(true);
     };
 
     const openForm = () => {
-        setDisable(!disable);
+        setIsModalOpen(true);
     }
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        setStatus(true)
+    };
 
     const urlPicture = store.valueHeader?.picture && store.valueHeader?.picture[0]?.status === "done" ? store.valueHeader?.picture[0]?.url : ""
 
     return (
         <div className="header-home-page"
-        style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}
+            style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}
         >
             <div className="control-button">
-                {config.isAdministrator === true && disable && (<Button
+                {config.isAdministrator === true && !isModalOpen && (<Button
                     className="icon-pensil"
                     title={gettext("Edit")}
                     type="default"
@@ -183,20 +203,30 @@ export const Header = observer(({ store: storeProp, config }) => {
                     <Title className="name-site-b" style={colorText} level={5} >{store.valueHeader?.last_name}</Title>
                 </div>
             </div>
-            {!disable && (
+            <Modal
+                transitionName=""
+                maskTransitionName=""
+                style={{ maxWidth: "75%", backgroundColor: "transparent" }}
+                width="max-content"
+                centered
+                footer={null}
+                open={isModalOpen}
+                title={gettext("Header title")}
+                onCancel={handleCancel}>
                 <Form
                     form={form}
                     name="ngw_home_page_header"
                     autoComplete="off"
-                    initialValues={store.valueHeader}
+                    initialValues={store.initialHeader}
                     onFinish={onFinish}
+                    onValuesChange={onValuesChange}
                     clearOnDestroy={true}
                 >
 
                     <Row className="header-info-edit form-padding">
                         <Col flex="auto">
                             <Row gutter={[16, 16]} className="item-edit" justify="end">
-                                <Col flex="none">
+                                <Col flex="none" style={{ width: "100%" }}>
                                     <UploadComponent store={store} params={paramsFileHeader} />
                                 </Col>
                             </Row>
@@ -280,41 +310,26 @@ export const Header = observer(({ store: storeProp, config }) => {
                             <Row gutter={[16, 16]} justify="end">
                                 <Col>
                                     <Form.Item noStyle label={null}>
-                                        {!disable && (
-                                            <Button
-                                                title={gettext("Cancel")}
-                                                type="default"
-                                                icon={<Cancel />}
-                                                onClick={cancelForm}
-                                            >
-                                                {gettext("Cancel")}
-                                            </Button>
-                                        )}
-                                    </Form.Item>
-                                </Col>
-                                <Col>
-                                    <Form.Item noStyle label={null}>
-                                        {!disable && (
-                                            <Button
-                                                title={gettext("Reset")}
-                                                type="default"
-                                                icon={<Restore />}
-                                                onClick={resetForm}
-                                            >
-                                                {gettext("Reset")}
-                                            </Button>
-                                        )}
+                                        <Button
+                                            title={gettext("Cancel")}
+                                            type="default"
+                                            icon={<Cancel />}
+                                            onClick={handleCancel}
+                                        >
+                                            {gettext("Cancel")}
+                                        </Button>
                                     </Form.Item>
                                 </Col>
                                 <Col>
                                     <Form.Item noStyle label={null}>
                                         <Button
+                                            title={gettext("Reset")}
                                             type="default"
-                                            onClick={applyForm}
-                                            icon={<Save />}
-                                            title={gettext("Apply")}
+                                            htmlType="reset"
+                                            icon={<Restore />}
+                                            onClick={resetForm}
                                         >
-                                            {gettext("Apply")}
+                                            {gettext("Reset")}
                                         </Button>
                                     </Form.Item>
                                 </Col>
@@ -334,7 +349,7 @@ export const Header = observer(({ store: storeProp, config }) => {
                         </Col>
                     </Row>
                 </Form>
-            )}
+            </Modal>
         </div >
     );
 });
