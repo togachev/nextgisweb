@@ -1,19 +1,33 @@
-import { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Button, Col, Form, message, Row, Upload, Image, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Col, Form, message, Row, Upload, Image, Space, Tooltip, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
+import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";
+import InformationOutline from "@nextgisweb/icon/mdi/information-outline";
 import { HomeStore } from "../HomeStore";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+
+const { Text, Link } = Typography;
 
 export const UploadComponent = observer(({ store: storeProp, params }) => {
     const [store] = useState(
         () => storeProp || new HomeStore()
     );
     const { size, extension, key, type, formatName, className, styleImage, values } = params;
+
+    const TYPE_FILE = [
+        {
+            label: formatName,
+            title: formatName,
+            value: type,
+            extension: extension,
+            disabled: false,
+        },
+    ];
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState(store[values]?.[key]?.url);
@@ -23,19 +37,18 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result as string);
-
             if (reader.readAsDataURL && file instanceof Blob) {
                 reader.readAsDataURL(file);
             }
-
             reader.onerror = reject;
         });
 
-    const handleChange: UploadProps["onChange"] = async ({ file, fileList: newFileList }) => {
+    const handleChange: UploadProps["onChange"] = async ({ file, fileList }) => {
         if (!file.url) {
             file.url = await getBase64(file as FileType);
         }
-        setFiles([file]);
+
+        setFiles(fileList);
     };
 
     const handlePreview = async (file: UploadFile) => {
@@ -46,8 +59,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         setPreviewImage(file.url);
         setPreviewOpen(true);
     };
-    console.log(files);
-    
+
     const customRequest = async options => {
         const { onSuccess, onError, file } = options;
         try {
@@ -60,28 +72,67 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         }
     };
 
+    const beforeUpload = (file, info) => {
+        const fileName = file.name;
+        const extension = fileName.slice(fileName.lastIndexOf("."));
+
+        const isValidType = TYPE_FILE.some((e) => e.extension === extension);
+        if (!isValidType) {
+            message.error(`Only ${formatName} format is supported`);
+        }
+        const isMaxCount = info.length <= 1;
+
+        const isLimitVolume = file.size / 1024 < size;
+        if (!isLimitVolume) {
+            message.error(`Exceeding the volume of ${size}kb`);
+        }
+        return (isValidType && isMaxCount && isLimitVolume) || Upload.LIST_IGNORE;
+    };
+
     const props = {
         defaultFileList: files,
         multiple: false,
         onPreview: handlePreview,
         customRequest: customRequest,
+        beforeUpload: beforeUpload,
         onChange: handleChange,
         maxCount: 1,
-        listType: "picture-circle",
+        listType: "picture",
         accept: extension,
-        action: "/",
+        action: "/upload",
+        className: className,
+        itemRender: (originNode, file, fileList, actions) => {
+            console.log(actions)
+            return (
+                // <ImagePreview key={file.uid} title={file.name} size={file.size} type={file.type} imageUrl={file.url} deleteButton={actions.remove} />
+                <Row gutter={[16, 16]} wrap={false}>
+                    {/* <Col flex="auto"> */}
+                        <Text ellipsis={{ suffix: "" }}>{file.name}</Text>
+                        <Text ellipsis={{ tooltip: gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB" }}>{gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}</Text>
+                        <Button
+                            icon={<EyeOutline />}
+                            type="default"
+                            title={gettext("Download file")}
+                            onClick={actions.preview}
+                        />
+                        <Button
+                            icon={<DeleteOffOutline />}
+                            type="default"
+                            title={gettext("Delete file")}
+                            onClick={actions.remove}
+                        />
+                    {/* </Col> */}
+                </Row>
+
+            );
+        }
     };
 
     const msgInfo = [
         gettext(`Supported file format ${formatName}.`),
         gettext(`Maximum file size ${size}KB.`),
     ];
-    const uploadButton = (
-        <button style={{ border: 0, background: "none" }} type="button">
-            <FileArrowUpDownOutline />
-            <div style={{ marginTop: 8 }}>Upload</div>
-        </button>
-    );
+
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -91,6 +142,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                 uid: e.file.uid,
                 name: e.file.name,
                 url: e.file.url,
+                size: e.file.size,
                 status: e.file.status,
             }];
         }
@@ -98,6 +150,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     return (
         <Row gutter={[16, 16]}>
             <Col flex="auto">
+
                 <Form.Item
                     noStyle
                     name={key}
@@ -105,9 +158,20 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                     getValueFromEvent={normFile}
                 >
                     <Upload {...props} >
-                        {files?.length > 1 ? null : uploadButton}
+                        {files?.length > 1 ? null : (
+                            <Tooltip title={msgInfo.join(" ")} trigger={["click", "hover"]} >
+                                <Button
+                                    icon={<FileArrowUpDownOutline />}
+                                    type="default"
+                                    title={gettext("Select File")}
+                                />
+                            </Tooltip>
+                        )}
                     </Upload>
+
                 </Form.Item>
+            </Col>
+            <Col>
                 {previewImage && (
                     <Image
                         wrapperStyle={{ display: "none" }}
