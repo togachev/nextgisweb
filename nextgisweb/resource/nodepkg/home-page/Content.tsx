@@ -134,7 +134,10 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     },
                     components: {
                         Modal: {
-                            colorBgMask: "transparent",
+                            colorBgMask: "var(--divider-color)",
+                        },
+                        Image: {
+                            colorBgMask: "var(--divider-color)",
                         },
                         Menu: {
                             activeBarBorderWidth: 0,
