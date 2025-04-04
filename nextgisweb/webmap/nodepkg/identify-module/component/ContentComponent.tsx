@@ -55,7 +55,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const opts = display.config.options;
     const attrs = opts["webmap.identification_attributes"];
     const geoms = opts["webmap.identification_geometry"];
-    
+
     const firstItem = data.find(i => i.id === id);
 
     const heightRadio = 135; /* ~ height and padding 2px */
@@ -65,16 +65,20 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
     const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-    const RenderValue = ({ value }) => {
-        const val = value;
-        if (urlRegex.test(val)) {
-            return (<Link title={val} href={val} target="_blank">{val}</Link>)
-        } else if (emailRegex.test(val)) {
-            return (<div className="value-email" title={val} onClick={() => {
-                copyValue(val, gettext("Email address copied"));
-            }} >{val}</div>)
-        } else {
-            return val
+    const RenderValue = ({ attribute }) => {
+        const { datatype, value } = attribute;
+        if (urlRegex.test(value)) {
+            return (<Link title={value} href={value} target="_blank">{value}</Link>)
+        } else if (emailRegex.test(value)) {
+            return (<div className="value-email" title={value} onClick={() => {
+                copyValue(value, gettext("Email address copied"));
+            }} >{value}</div>)
+        }
+        else if (datatype === "REAL") {
+            return new Intl.NumberFormat("ru-RU", { style: "decimal" }).format(value)
+        }
+        else {
+            return value
         }
     };
 
@@ -87,7 +91,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
                         items.push({
                             key: item.key,
                             label: item.attr,
-                            children: (<RenderValue value={item.value} />),
+                            children: (<RenderValue attribute={item} />),
                         })
                     }
                 })
@@ -97,7 +101,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
                         items.push({
                             key: item.key,
                             label: item.attr,
-                            children: (<RenderValue value={attribute.value} />),
+                            children: (<RenderValue attribute={attribute} />),
                         })
                     }
                 })
@@ -117,7 +121,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     };
 
     const options: any[] = [];
-    
+
     if (attrs) {
         options.push({
             label: (<span className="icon-style"><TableRows /></span>),

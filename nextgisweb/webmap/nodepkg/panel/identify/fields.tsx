@@ -44,6 +44,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export interface FieldDataItem {
     key: number | string;
     attr?: string;
+    datatype?: string;
     value: string | React.ReactElement;
 }
 
@@ -79,6 +80,7 @@ export async function fieldValuesToDataSource(
             key: key++,
             attr: field.display_name,
             value: val as string,
+            datatype: field.datatype,
         };
 
         if (val !== null) {
