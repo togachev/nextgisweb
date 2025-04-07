@@ -4,14 +4,14 @@ import { useCallback } from "react";
 import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
-import { Area } from "@nextgisweb/gui/mayout";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import { DatatypeSelect } from "./DatatypeSelect";
-import { FormattedDecimalForm } from "./component/FormattedDecimalForm";
-import { Field } from "./FieldsStore";
+import { FormattedDecimalForm } from "./FormattedDecimalForm";
+import { Field, FormatNumberFieldData } from "./FieldsStore";
 import type { FieldsStore } from "./FieldsStore";
 
 import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
@@ -32,70 +32,72 @@ const msgLookupTableNotUsed = gettext("Not used");
 const FieldWidget = observer<{
     item: Field;
 }>(function GroupComponentBase({ item }) {
-    console.log(item.formatField.cprops());
-    
     return (
-        <Area pad>
-            <LotMV
-                label={msgDisplayName}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <LotMV
-                label={msgKeyname}
-                value={item.keyname}
-                component={InputValue}
-            />
-            <LotMV
-                label={msgDatatype}
-                value={item.datatype}
-                component={DatatypeSelect}
-                props={{
-                    placeholder: msgDatatypePlaceholder,
-                    disabled: !!item.id.value,
-                    style: { width: "100%" },
-                }}
-            />
-            <LotMV
-                label={msgLookupTable}
-                visible={item.loookupTableAvailable}
-                value={item.lookupTable}
-                component={ResourceSelectRef}
-                props={{
-                    pickerOptions: {
-                        requireClass: "lookup_table",
-                        initParentId: item.store.composite.parent,
-                    },
-                    placeholder: msgLookupTableNotUsed,
-                    style: { width: "100%" },
-                    allowClear: true,
-                }}
-            />
-            <LotMV
-                label={false}
-                value={item.gridVisibility}
-                component={CheckboxValue}
-                props={{ children: msgGridVisibility }}
-            />
-            <LotMV
-                label={false}
-                value={item.textSearch}
-                component={CheckboxValue}
-                props={{ children: msgTextSearch }}
-            />
-            <LotMV
-                label={false}
-                value={item.labelField}
-                component={CheckboxValue}
-                props={{ children: msgLabelField }}
-            />
-            {item.numberFormat &&
+        <>
+            <Area pad>
+                <LotMV
+                    label={msgDisplayName}
+                    value={item.displayName}
+                    component={InputValue}
+                />
+                <LotMV
+                    label={msgKeyname}
+                    value={item.keyname}
+                    component={InputValue}
+                />
+                <LotMV
+                    label={msgDatatype}
+                    value={item.datatype}
+                    component={DatatypeSelect}
+                    props={{
+                        placeholder: msgDatatypePlaceholder,
+                        disabled: !!item.id.value,
+                        style: { width: "100%" },
+                    }}
+                />
+                <LotMV
+                    label={msgLookupTable}
+                    visible={item.loookupTableAvailable}
+                    value={item.lookupTable}
+                    component={ResourceSelectRef}
+                    props={{
+                        pickerOptions: {
+                            requireClass: "lookup_table",
+                            initParentId: item.store.composite.parent,
+                        },
+                        placeholder: msgLookupTableNotUsed,
+                        style: { width: "100%" },
+                        allowClear: true,
+                    }}
+                />
+                <LotMV
+                    label={false}
+                    value={item.gridVisibility}
+                    component={CheckboxValue}
+                    props={{ children: msgGridVisibility }}
+                />
+                <LotMV
+                    label={false}
+                    value={item.textSearch}
+                    component={CheckboxValue}
+                    props={{ children: msgTextSearch }}
+                />
+                <LotMV
+                    label={false}
+                    value={item.labelField}
+                    component={CheckboxValue}
+                    props={{ children: msgLabelField }}
+                />
+
+            </Area>
+            {
+                item.numberFormat &&
                 <FormattedDecimalForm
                     value={item.formatField}
                     {...item.formatField.cprops()}
                 />
             }
-        </Area>
+        </>
     );
 });
 

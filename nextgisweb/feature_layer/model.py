@@ -3,7 +3,8 @@ from typing import Any, List, Union
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
-from msgspec import UNSET, Struct, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType
+from typing_extensions import Annotated
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
@@ -26,9 +27,9 @@ from .interface import (
 )
 
 class FormatNumberFieldData(Struct):
-    checked: bool
-    round: int
-    prefix: str
+    checked: Annotated[bool, Meta(description="Enable format number visible")] = False
+    round: Union[int, None] = None
+    prefix: Union[str, None] = None
 
 Base.depends_on("resource", "lookup_table")
 

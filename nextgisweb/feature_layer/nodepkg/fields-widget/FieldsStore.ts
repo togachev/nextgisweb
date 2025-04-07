@@ -11,10 +11,10 @@ import type {
 } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
-interface FormatNumberFieldData {
+export interface FormatNumberFieldData {
     checked: boolean;
-    round: number;
-    prefix: string;
+    round: number | null;
+    prefix: string | null;
 }
 
 interface FieldData {
@@ -26,7 +26,7 @@ interface FieldData {
     label_field: boolean;
     grid_visibility: boolean;
     text_search: boolean;
-    format_field: FormatNumberFieldData;
+    format_field: FormatNumberFieldData | undefined;
 }
 
 const {
