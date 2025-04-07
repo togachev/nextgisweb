@@ -1,6 +1,7 @@
 from typing import Any, List, Union
 
 import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
@@ -24,6 +25,11 @@ from .interface import (
     IVersionableFeatureLayer,
 )
 
+class FormatNumberFieldData(Struct):
+    checked: bool
+    round: int
+    prefix: str
+
 Base.depends_on("resource", "lookup_table")
 
 FIELD_FORBIDDEN_NAME = ("geom",)
@@ -44,6 +50,7 @@ class LayerField(Base):
     display_name = sa.Column(sa.Unicode, nullable=False)
     grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
     text_search = sa.Column(sa.Boolean, nullable=False, default=True)
+    format_field = sa.Column(sa_pg.JSONB, nullable=False, default=dict)
     lookup_table_id = sa.Column(sa.ForeignKey(LookupTable.id))
 
     identity = __tablename__
@@ -123,6 +130,7 @@ class FeatureLayerFieldRead(Struct, kw_only=True):
     label_field: bool
     grid_visibility: bool
     text_search: bool
+    format_field: FormatNumberFieldData
     lookup_table: Union[ResourceRef, None]
 
 
@@ -136,6 +144,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     label_field: Union[bool, UnsetType] = UNSET
     grid_visibility: Union[bool, UnsetType] = UNSET
     text_search: Union[bool, UnsetType] = UNSET
+    format_field: Union[FormatNumberFieldData, UnsetType] = UNSET
     lookup_table: Union[ResourceRef, None, UnsetType] = UNSET
 
 
@@ -151,6 +160,7 @@ class FieldsAttr(SAttribute):
                 label_field=(f == srlzr.obj.feature_label_field),
                 grid_visibility=f.grid_visibility,
                 text_search=f.text_search,
+                format_field=f.format_field,
                 lookup_table=ResourceRef(id=f.lookup_table.id) if f.lookup_table else None,
             )
             for f in srlzr.obj.fields
@@ -196,6 +206,9 @@ class FieldsAttr(SAttribute):
 
             if fld.text_search is not UNSET:
                 mfld.text_search = fld.text_search
+
+            if fld.format_field is not UNSET:
+                mfld.format_field = fld.format_field
 
             if fld.lookup_table is None:
                 mfld.lookup_table = fld.lookup_table

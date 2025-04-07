@@ -11,6 +11,12 @@ import type {
 } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
+interface FormatNumberFieldData {
+    checked: boolean;
+    round: number;
+    prefix: string;
+}
+
 interface FieldData {
     id: number | undefined;
     display_name: string;
@@ -20,6 +26,7 @@ interface FieldData {
     label_field: boolean;
     grid_visibility: boolean;
     text_search: boolean;
+    format_field: FormatNumberFieldData;
 }
 
 const {
@@ -31,6 +38,7 @@ const {
     label_field: fieldLabelField,
     grid_visibility: fieldGridVisibility,
     text_search: fieldTextSearch,
+    format_field: fieldFormatField,
     $load: fieldLoad,
     $error: fieldError,
 } = mapper<Field, FieldData>({
@@ -61,6 +69,7 @@ export class Field {
     readonly labelField = fieldLabelField.init(false, this);
     readonly gridVisibility = fieldGridVisibility.init(true, this);
     readonly textSearch = fieldTextSearch.init(true, this);
+    readonly formatField = fieldFormatField.init("", this);
 
     constructor(store: FieldsStore, data: FieldData) {
         this.store = store;
@@ -87,6 +96,7 @@ export class Field {
             ...this.labelField.jsonPart(),
             ...this.gridVisibility.jsonPart(),
             ...this.textSearch.jsonPart(),
+            ...(this.numberFormat && this.formatField.jsonPart()),
         };
     }
 
@@ -98,6 +108,11 @@ export class Field {
     get loookupTableAvailable() {
         const dt = this.datatype.value;
         return dt ? ["INTEGER", "BIGINT", "STRING"].includes(dt) : false;
+    }
+
+    get numberFormat() {
+        const dt = this.datatype.value;
+        return dt && ["INTEGER", "BIGINT", "REAL"].includes(dt);
     }
 }
 

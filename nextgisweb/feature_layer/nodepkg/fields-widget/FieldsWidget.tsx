@@ -10,6 +10,7 @@ import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import { DatatypeSelect } from "./DatatypeSelect";
+import { FormattedDecimalForm } from "./component/FormattedDecimalForm";
 import { Field } from "./FieldsStore";
 import type { FieldsStore } from "./FieldsStore";
 
@@ -31,6 +32,8 @@ const msgLookupTableNotUsed = gettext("Not used");
 const FieldWidget = observer<{
     item: Field;
 }>(function GroupComponentBase({ item }) {
+    console.log(item.formatField.cprops());
+    
     return (
         <Area pad>
             <LotMV
@@ -86,6 +89,12 @@ const FieldWidget = observer<{
                 component={CheckboxValue}
                 props={{ children: msgLabelField }}
             />
+            {item.numberFormat &&
+                <FormattedDecimalForm
+                    value={item.formatField}
+                    {...item.formatField.cprops()}
+                />
+            }
         </Area>
     );
 });
@@ -117,12 +126,13 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
             label_field: false,
             lookup_table: null,
             text_search: true,
+            format_field: "",
         });
     }, [store]);
 
     // TODO: Use interfaces and capabilities to get available actions
     const isVectorLayer = store.composite.cls === "vector_layer";
-
+    console.log(store);
     return (
         <FocusTable<Field>
             store={store}
