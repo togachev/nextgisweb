@@ -126,7 +126,7 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
             label_field: false,
             lookup_table: null,
             text_search: true,
-            format_field: "",
+            format_field: undefined,
         });
     }, [store]);
 
