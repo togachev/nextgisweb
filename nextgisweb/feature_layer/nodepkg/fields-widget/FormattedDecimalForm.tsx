@@ -1,6 +1,9 @@
-import { Checkbox, Form, Input, InputNumber, Space } from "@nextgisweb/gui/antd";
+import { Checkbox, Form, Input, InputNumber, Space, Row, Col } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { FormatNumberFieldData } from "./FieldsStore";
+import type { FormatNumberFieldData } from "./FieldsStore";
+
+import "./FormattedDecimalForm.less";
+
 export const FormattedDecimalForm = ({ value, onChange }) => {
     const [form] = Form.useForm<FormatNumberFieldData>();
 
@@ -14,24 +17,36 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
             form={form}
             initialValues={value}
             onValuesChange={onValuesChange}
-            style={{ padding: "1em" }}
+            style={{ padding: "0 1em 1em 1em" }}
         >
-            <Space direction="vertical" size="middle">
-                <Form.Item noStyle name="checked" valuePropName="checked">
-                    <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
-                </Form.Item>
-                <Space>
-                    {gettext("Rounding off a number")}
-                    <Form.Item noStyle name="round">
-                        <InputNumber value={value?.round} disabled={!value?.checked} max={12} min={0} />
-                    </Form.Item>
-                </Space>
-                <Space>
-                    {gettext("Value prefix")}
-                    <Form.Item noStyle name="prefix">
-                        <Input value={value?.prefix} disabled={!value?.checked} />
-                    </Form.Item>
-                </Space>
+            <Space style={{ width: "100%" }} direction={'vertical'} size="middle">
+                <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
+                    <Col className="format-item">
+                        <Form.Item noStyle name="checked" valuePropName="checked">
+                            <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
+                    <Col className="format-item">
+                        {gettext("Rounding off a number")}
+                    </Col>
+                    <Col className="format-item">
+                        <Form.Item noStyle name="round">
+                            <InputNumber value={value?.round} disabled={!value?.checked} max={12} min={0} style={{ width: "100%" }} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
+                    <Col className="format-item">
+                        {gettext("Value prefix")}
+                    </Col>
+                    <Col className="format-item">
+                        <Form.Item noStyle name="prefix">
+                            <Input value={value?.prefix} disabled={!value?.checked} style={{ width: "100%" }} />
+                        </Form.Item>
+                    </Col>
+                </Row>
             </Space>
         </Form>
     );

@@ -7,6 +7,7 @@ import type {
     NgwTime,
 } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
@@ -45,6 +46,7 @@ export interface FieldDataItem {
     key: number | string;
     attr?: string;
     datatype?: string;
+    format_field?: FormatNumberFieldData;
     value: string | React.ReactElement;
 }
 
@@ -81,6 +83,7 @@ export async function fieldValuesToDataSource(
             attr: field.display_name,
             value: val as string,
             datatype: field.datatype,
+            format_field: field.format_field,
         };
 
         if (val !== null) {

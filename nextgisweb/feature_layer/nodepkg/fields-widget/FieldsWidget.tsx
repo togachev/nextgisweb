@@ -11,7 +11,7 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import { DatatypeSelect } from "./DatatypeSelect";
 import { FormattedDecimalForm } from "./FormattedDecimalForm";
-import { Field, FormatNumberFieldData } from "./FieldsStore";
+import { Field } from "./FieldsStore";
 import type { FieldsStore } from "./FieldsStore";
 
 import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
@@ -134,7 +134,6 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
 
     // TODO: Use interfaces and capabilities to get available actions
     const isVectorLayer = store.composite.cls === "vector_layer";
-    console.log(store);
     return (
         <FocusTable<Field>
             store={store}

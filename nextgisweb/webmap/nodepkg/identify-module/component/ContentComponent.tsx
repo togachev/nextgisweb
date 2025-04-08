@@ -66,7 +66,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
     const RenderValue = ({ attribute }) => {
-        const { datatype, value } = attribute;
+        const { datatype, value, format_field } = attribute;
         if (urlRegex.test(value)) {
             return (<Link title={value} href={value} target="_blank">{value}</Link>)
         } else if (emailRegex.test(value)) {
@@ -75,7 +75,11 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             }} >{value}</div>)
         }
         else if (datatype === "REAL") {
-            return new Intl.NumberFormat("ru-RU", { style: "decimal" }).format(value)
+            return format_field?.checked === true
+                ? new Intl.NumberFormat(navigator.languages[0], {
+                    maximumFractionDigits: format_field?.round,
+                }).format(value) + " " + format_field?.prefix
+                : value;
         }
         else {
             return value
@@ -110,7 +114,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
 
         return items.length > 0 ?
             (<Descriptions
-                styles={{ label: { wordBreak: "break-all", width: "calc(50%)" } }}
+                styles={{ label: { wordBreak: "break-word", width: "calc(50%)" } }}
                 bordered
                 size="small"
                 column={1}
