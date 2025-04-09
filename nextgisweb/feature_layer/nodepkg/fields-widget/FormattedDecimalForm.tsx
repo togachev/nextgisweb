@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, InputNumber, Space, Row, Col } from "@nextgisweb/gui/antd";
+import { Checkbox, Divider, Form, Input, InputNumber, Space, Row, Col } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { FormatNumberFieldData } from "./FieldsStore";
 
@@ -19,6 +19,7 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
             onValuesChange={onValuesChange}
             style={{ padding: "0 1em 1em 1em" }}
         >
+            <Divider orientation="left">{gettext("Setting up value formatting")}</Divider>
             <Space style={{ width: "100%" }} direction={'vertical'} size="middle">
                 <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
                     <Col className="format-item">
@@ -26,12 +27,10 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
                             <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
                         </Form.Item>
                     </Col>
-                </Row>
-                <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
                     <Col className="format-item">
                         {gettext("Rounding off a number")}
                     </Col>
-                    <Col className="format-item">
+                    <Col flex="auto" className="format-item">
                         <Form.Item noStyle name="round">
                             <InputNumber value={value?.round} disabled={!value?.checked} max={12} min={0} style={{ width: "100%" }} />
                         </Form.Item>
@@ -41,7 +40,7 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
                     <Col className="format-item">
                         {gettext("Value prefix")}
                     </Col>
-                    <Col className="format-item">
+                    <Col flex="auto" className="format-item">
                         <Form.Item noStyle name="prefix">
                             <Input value={value?.prefix} disabled={!value?.checked} style={{ width: "100%" }} />
                         </Form.Item>
