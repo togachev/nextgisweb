@@ -1,14 +1,13 @@
-import { Checkbox, Divider, Form, Input, InputNumber, Space, Row, Col } from "@nextgisweb/gui/antd";
+import { Checkbox, Form, Input, InputNumber, Space, Row, Col } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { FormatNumberFieldData } from "./FieldsStore";
 
-import "./FormattedDecimalForm.less";
-
 export const FormattedDecimalForm = ({ value, onChange }) => {
     const [form] = Form.useForm<FormatNumberFieldData>();
-
-    const onValuesChange = (_, value) => {
-        onChange(value);
+    console.log(value);
+    
+    const onValuesChange = (changedValues: any, values: any) => {
+        onChange(values);
     };
 
     return (
@@ -19,15 +18,14 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
             onValuesChange={onValuesChange}
             className="format-component"
         >
-            <Divider orientation="left" plain>{gettext("Setting up value formatting")}</Divider>
-            <Space style={{ width: "100%" }} direction={'vertical'} size="middle">
+            <Space className="title-formatting" direction="horizontal" size="middle">
+                <span>{gettext("Setting up value formatting")}</span>
+                <Form.Item noStyle name="checked" valuePropName="checked">
+                    <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
+                </Form.Item>
+            </Space>
+            {value?.checked && (<Space style={{ width: "100%" }} direction="vertical" size="middle">
                 <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
-                    <Col>
-                        <Form.Item noStyle name="checked" valuePropName="checked">
-                            <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
-                        </Form.Item>
-                    </Col>
-                    <Divider type="vertical" />
                     <Col >
                         {gettext("Rounding off a number")}
                     </Col>
@@ -47,7 +45,7 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-            </Space>
+            </Space>)}
         </Form>
     );
 };

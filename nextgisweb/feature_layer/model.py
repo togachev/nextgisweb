@@ -28,8 +28,9 @@ from .interface import (
 
 class FormatNumberFieldData(Struct):
     checked: Annotated[bool, Meta(description="Enable format number visible")] = False
-    round: Union[int, None] = None
-    prefix: Union[str, None] = None
+    round: Union[int, None] = 5
+    prefix: Union[str, None] = "None"
+
 
 Base.depends_on("resource", "lookup_table")
 
@@ -145,7 +146,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     label_field: Union[bool, UnsetType] = UNSET
     grid_visibility: Union[bool, UnsetType] = UNSET
     text_search: Union[bool, UnsetType] = UNSET
-    format_field: Union[FormatNumberFieldData, UnsetType] = UNSET
+    format_field: Union[FormatNumberFieldData, None, UnsetType] = UNSET
     lookup_table: Union[ResourceRef, None, UnsetType] = UNSET
 
 

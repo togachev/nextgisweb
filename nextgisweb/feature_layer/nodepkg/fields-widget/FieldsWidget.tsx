@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
-import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
-import { Area, Lot } from "@nextgisweb/gui/mayout";
+import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
@@ -17,6 +17,9 @@ import type { FieldsStore } from "./FieldsStore";
 import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
 import TextSearchIcon from "@nextgisweb/icon/material/manage_search";
 import GridVisibilityIcon from "@nextgisweb/icon/material/table_chart/outline";
+import FormatText from "@nextgisweb/icon/mdi/format-text";
+
+import "./FieldsWidget.less";
 
 const msgDisplayName = gettext("Display name");
 const msgKeyname = gettext("Keyname");
@@ -134,10 +137,26 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
 
     // TODO: Use interfaces and capabilities to get available actions
     const isVectorLayer = store.composite.cls === "vector_layer";
+
+    const DisplayName = ({ item }) => {
+        if (item.numberFormat && item.formatField.value.checked === true) {
+            return (
+                <Space>
+                    {item.displayName.value}
+                    <span title={gettext("Formatted value")} className="formatted-icon">
+                        <FormatText />
+                    </span>
+                </Space>
+            )
+        } else {
+            return item.displayName.value
+        }
+    }
+
     return (
         <FocusTable<Field>
             store={store}
-            title={(item) => item.displayName.value}
+            title={(item) => <DisplayName item={item} />}
             columns={[
                 {
                     render: (item) => item.keyname.value,

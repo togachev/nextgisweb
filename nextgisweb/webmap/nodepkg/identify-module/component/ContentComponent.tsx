@@ -75,11 +75,11 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             }} >{value}</div>)
         }
         else if (datatype === "REAL") {
-            return format_field?.checked === true
-                ? new Intl.NumberFormat(navigator.languages[0], {
-                    maximumFractionDigits: format_field?.round,
-                }).format(value) + " " + format_field?.prefix
-                : value;
+            const round = format_field?.round !== null ? { maximumFractionDigits: format_field?.round } : {};
+            const prefix = format_field?.prefix !== null ? format_field?.prefix : "";
+            return format_field?.checked === true ?
+                new Intl.NumberFormat(navigator.languages[0], { ...round }).format(value) + " " + prefix :
+                value;
         }
         else {
             return value

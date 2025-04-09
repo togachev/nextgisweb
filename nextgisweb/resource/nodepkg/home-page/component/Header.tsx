@@ -131,8 +131,8 @@ export const Header = observer(({ store: storeProp, config }) => {
         store.saveSetting(value, "home_page_header");
     };
 
-    const onValuesChange = (value) => {
-        store.setValueHeader(form.getFieldsValue())
+    const onValuesChange = (changedValues: any, values: any) => {
+        store.setValueHeader(values)
     };
 
     useEffect(() => {
