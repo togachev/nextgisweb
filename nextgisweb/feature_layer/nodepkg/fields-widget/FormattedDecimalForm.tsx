@@ -17,30 +17,31 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
             form={form}
             initialValues={value}
             onValuesChange={onValuesChange}
-            style={{ padding: "0 1em 1em 1em" }}
+            className="format-component"
         >
-            <Divider orientation="left">{gettext("Setting up value formatting")}</Divider>
+            <Divider orientation="left" plain>{gettext("Setting up value formatting")}</Divider>
             <Space style={{ width: "100%" }} direction={'vertical'} size="middle">
                 <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
-                    <Col className="format-item">
+                    <Col>
                         <Form.Item noStyle name="checked" valuePropName="checked">
                             <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
                         </Form.Item>
                     </Col>
-                    <Col className="format-item">
+                    <Divider type="vertical" />
+                    <Col >
                         {gettext("Rounding off a number")}
                     </Col>
-                    <Col flex="auto" className="format-item">
+                    <Col flex="auto" >
                         <Form.Item noStyle name="round">
                             <InputNumber value={value?.round} disabled={!value?.checked} max={12} min={0} style={{ width: "100%" }} />
                         </Form.Item>
                     </Col>
                 </Row>
                 <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
-                    <Col className="format-item">
+                    <Col>
                         {gettext("Value prefix")}
                     </Col>
-                    <Col flex="auto" className="format-item">
+                    <Col flex="auto" >
                         <Form.Item noStyle name="prefix">
                             <Input value={value?.prefix} disabled={!value?.checked} style={{ width: "100%" }} />
                         </Form.Item>
