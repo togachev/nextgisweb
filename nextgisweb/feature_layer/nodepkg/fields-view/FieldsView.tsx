@@ -1,6 +1,6 @@
 import React from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { Table } from "@nextgisweb/gui/antd";
+import { Space, Table } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { sorterFactory } from "@nextgisweb/gui/util";
@@ -17,6 +17,7 @@ interface DataType {
     table: string;
     lookup_table: string | null;
     format_field: FormattedDecimalForm | null;
+    additional_props: any[]
 }
 
 const columns: TableColumnsType<DataType>["columns"] = [
@@ -31,36 +32,44 @@ const columns: TableColumnsType<DataType>["columns"] = [
         dataIndex: "keyname",
         sorter: sorterFactory("keyname"),
         ellipsis: true,
-        responsive:["sm"],
+        responsive: ["sm"],
     },
     {
         title: gettext("Type"),
         dataIndex: "datatype",
         sorter: sorterFactory("datatype"),
         ellipsis: true,
-        responsive:["md"],
+        responsive: ["md"],
     },
     {
         title: gettext("Visibility in the table"),
         dataIndex: "table",
         sorter: sorterFactory("table"),
         align: "center",
-        responsive:["lg"],
+        responsive: ["lg"],
     },
     {
-        title: gettext("Lookup table"),
-        dataIndex: "lookup_table",
-        render: (text) => text && <a href={text}>{gettext("Yes")}</a>,
+        title: gettext("Additional properties"),
+        dataIndex: "additional_props",
+        render: (text) => text,
         align: "center",
-        responsive:["xl"],
-    },
-    {
-        title: gettext("Formatted value"),
-        dataIndex: "format_field",
-        align: "center",
-        responsive: ['xl'],
+        responsive: ["xl"],
     },
 ];
+
+const AdditionalProps = ({ item }) => {
+    const items: any = []
+    item.lookup_table !== null &&
+        items.push(<a href={routeURL("resource.show", { id: item?.lookup_table?.id })}>{gettext("Reference book added")}</a>);
+        item.format_field !== null && item.format_field.checked &&
+        items.push(<span title={gettext("Formatted value")} className="formatted-icon">{gettext("Formatted value")}</span>);
+
+    return (
+        <Space>{items.map((i, index) => {
+            return (<span key={index}>{i}</span>)
+        })}</Space>
+    )
+}
 
 export const FieldsView = (props) => {
     const fields = getEntries(props);
@@ -71,15 +80,12 @@ export const FieldsView = (props) => {
         datatype: itm.datatype,
         display_name: itm.display_name,
         table: itm.grid_visibility ? gettext("Yes") : gettext("No"),
-        lookup_table: itm.lookup_table !== null ? routeURL("resource.show", { id: itm.lookup_table.id }) : undefined,
-        format_field: itm.format_field !== null ?
-            <span title={gettext("Formatted value")} className="formatted-icon">F</span> :
-            undefined,
+        additional_props: <AdditionalProps item={itm} />,
     }))
 
     return (
         <Table<DataType>
-        bordered
+            bordered
             columns={columns}
             dataSource={dataSource}
             showSorterTooltip={{ target: "sorter-icon" }}

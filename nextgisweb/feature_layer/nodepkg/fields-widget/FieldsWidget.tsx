@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
-import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
@@ -138,11 +138,21 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
     const isVectorLayer = store.composite.cls === "vector_layer";
 
     const DisplayName = ({ item }) => {
-        if (item.numberFormat && item.formatField.value.checked === true) {
+        if (item.numberFormat &&
+            item.formatField.value.checked === true ||
+            item.lookupTable !== null) {
+            const formated = item.formatField.value?.checked;
+            const lookup = item.lookupTable.value
             return (
-                <span title={gettext("Formatted value")} className="formatted-icon">
-                    {item.datatype.value}
-                </span>
+                <>
+                    <span title={item.displayName.value}>{item.displayName.value}</span>
+                    {formated &&
+                        <span title={gettext("Formatted value")} className="formatted-value">{gettext("Formatted value")}</span>
+                    }
+                    {lookup &&
+                        <span title={gettext("Reference book added")} className="lookup-value">{gettext("Reference book added")}</span>
+                    }
+                </>
             )
         } else {
             return item.datatype.value
@@ -152,13 +162,15 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
     return (
         <FocusTable<Field>
             store={store}
-            title={(item) => item.displayName.value}
+            title={(item) => <DisplayName item={item} />}
+            // title={(item) => item.displayName.value}
             columns={[
                 {
                     render: (item) => item.keyname.value,
                     width: ["20%", "30%"],
                 },
-                { render: (item) => <DisplayName item={item} /> },
+                { render: (item) => item.datatype.value },
+                // { render: (item) => <DisplayName item={item} /> },
                 {
                     render: (item) => (
                         <>
