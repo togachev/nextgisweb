@@ -69,7 +69,6 @@ export function ChildrenSection({
             <Table
                 dataSource={items}
                 rowKey="id"
-                size="middle"
                 rowSelection={rowSelection}
             >
                 <Column

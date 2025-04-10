@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
-import { CheckboxValue, InputValue, Space } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
