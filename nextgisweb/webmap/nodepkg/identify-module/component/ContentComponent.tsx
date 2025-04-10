@@ -76,7 +76,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
         }
         else if (["INTEGER", "BIGINT", "REAL"].includes(datatype)) {
             const round = format_field?.round !== null ? { maximumFractionDigits: format_field?.round } : {};
-            const prefix = format_field?.prefix !== null ? format_field?.prefix : "";
+            const prefix = format_field?.prefix ? format_field?.prefix : "";
             return format_field?.checked === true ?
                 new Intl.NumberFormat(navigator.languages[0], { ...round }).format(value) + " " + prefix :
                 value;
