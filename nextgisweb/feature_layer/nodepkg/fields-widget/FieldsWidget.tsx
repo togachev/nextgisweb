@@ -139,7 +139,7 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
 
     const DisplayName = ({ item }) => {
         if (item.numberFormat &&
-            item.formatField.value.checked === true ||
+            item.formatField.value?.checked === true ||
             item.lookupTable !== null) {
             const formated = item.formatField.value?.checked;
             const lookup = item.lookupTable.value
