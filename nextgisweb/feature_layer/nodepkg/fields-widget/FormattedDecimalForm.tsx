@@ -1,15 +1,11 @@
-import { Checkbox, Form, Input, InputNumber, Space, Row, Col } from "@nextgisweb/gui/antd";
+import { Form, Input, InputNumber, Space, Switch, Row, Col } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { FormatNumberFieldData } from "./FieldsStore";
-
 export const FormattedDecimalForm = ({ value, onChange }) => {
     const [form] = Form.useForm<FormatNumberFieldData>();
-    console.log(value);
-    
     const onValuesChange = (changedValues: any, values: any) => {
         onChange(values);
     };
-
     return (
         <Form
             size="middle"
@@ -21,10 +17,10 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
             <Space className="title-formatting" direction="horizontal" size="middle">
                 <span>{gettext("Setting up value formatting")}</span>
                 <Form.Item noStyle name="checked" valuePropName="checked">
-                    <Checkbox checked={value?.checked}>{gettext("Enable formatting")}</Checkbox>
+                    <Switch checkedChildren={gettext("Disable")} unCheckedChildren={gettext("Enable")} checked={value?.checked} />
                 </Form.Item>
             </Space>
-            {value?.checked && (<Space style={{ width: "100%" }} direction="vertical" size="middle">
+            <Space style={{ width: "100%", color: !value?.checked && "var(--icon-color)" }} direction="vertical" size="middle">
                 <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
                     <Col >
                         {gettext("Rounding off a number")}
@@ -45,7 +41,7 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-            </Space>)}
+            </Space>
         </Form>
     );
 };

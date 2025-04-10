@@ -74,8 +74,6 @@ export class Field {
     constructor(store: FieldsStore, data: FieldData) {
         this.store = store;
         fieldLoad(this, data);
-        console.log(data);
-        
         observe(this.labelField, "value", () => {
             if (this.labelField.value) {
                 this.store.fields.forEach((i) => {

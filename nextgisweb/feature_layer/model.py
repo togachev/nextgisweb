@@ -26,12 +26,6 @@ from .interface import (
     IVersionableFeatureLayer,
 )
 
-class FormatNumberFieldData(Struct):
-    checked: Annotated[bool, Meta(description="Enable format number visible")] = False
-    round: Union[int, None] = 5
-    prefix: Union[str, None] = "None"
-
-
 Base.depends_on("resource", "lookup_table")
 
 FIELD_FORBIDDEN_NAME = ("geom",)
@@ -132,7 +126,7 @@ class FeatureLayerFieldRead(Struct, kw_only=True):
     label_field: bool
     grid_visibility: bool
     text_search: bool
-    format_field: FormatNumberFieldData
+    format_field: Any
     lookup_table: Union[ResourceRef, None]
 
 
@@ -146,7 +140,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     label_field: Union[bool, UnsetType] = UNSET
     grid_visibility: Union[bool, UnsetType] = UNSET
     text_search: Union[bool, UnsetType] = UNSET
-    format_field: Union[FormatNumberFieldData, None, UnsetType] = UNSET
+    format_field: Union[Any, UnsetType] = UNSET
     lookup_table: Union[ResourceRef, None, UnsetType] = UNSET
 
 
