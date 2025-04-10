@@ -17,7 +17,6 @@ import type { FieldsStore } from "./FieldsStore";
 import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
 import TextSearchIcon from "@nextgisweb/icon/material/manage_search";
 import GridVisibilityIcon from "@nextgisweb/icon/material/table_chart/outline";
-import FormatText from "@nextgisweb/icon/mdi/format-text";
 
 import "./FieldsWidget.less";
 
@@ -141,28 +140,25 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
     const DisplayName = ({ item }) => {
         if (item.numberFormat && item.formatField.value.checked === true) {
             return (
-                <Space>
-                    {item.displayName.value}
-                    <span title={gettext("Formatted value")} className="formatted-icon">
-                        <FormatText />
-                    </span>
-                </Space>
+                <span title={gettext("Formatted value")} className="formatted-icon">
+                    {item.datatype.value}
+                </span>
             )
         } else {
-            return item.displayName.value
+            return item.datatype.value
         }
     }
 
     return (
         <FocusTable<Field>
             store={store}
-            title={(item) => <DisplayName item={item} />}
+            title={(item) => item.displayName.value}
             columns={[
                 {
                     render: (item) => item.keyname.value,
                     width: ["20%", "30%"],
                 },
-                { render: (item) => item.datatype.value },
+                { render: (item) => <DisplayName item={item} /> },
                 {
                     render: (item) => (
                         <>
