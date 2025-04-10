@@ -14,6 +14,9 @@ from .interface import IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
+FIELDS_RESOURCE_JSENTRY = jsentry("@nextgisweb/feature-layer/fields-view")
+
+
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ("update",)
