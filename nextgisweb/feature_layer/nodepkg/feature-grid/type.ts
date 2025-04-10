@@ -7,6 +7,7 @@ import type { NgwAttributeType } from "../type";
 
 import type { $FID, $VID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
+import { FormattedDecimalForm } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
 
 export type FeatureAttrs = Record<string, NgwAttributeType> & {
     [$FID]: number;
@@ -24,6 +25,7 @@ export interface FeatureLayerFieldCol
     extends Pick<FeatureLayerFieldRead, "id" | "display_name" | "datatype"> {
     keyname?: string;
     flex?: string;
+    format_field?: FormattedDecimalForm;
 }
 
 export type EffectiveWidths = Record<string, number>;

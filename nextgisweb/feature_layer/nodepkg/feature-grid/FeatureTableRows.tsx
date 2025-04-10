@@ -101,7 +101,13 @@ export function FeatureTableRows({
                                 ? renderFeatureFieldValue(f, val)
                                 : loadingCol();
                     }
-
+                    if (f.datatype === "REAL") {
+                        const round = f.format_field?.round !== null ? { maximumFractionDigits: f.format_field?.round } : {};
+                        const prefix = f.format_field?.prefix !== null ? f.format_field?.prefix : "";
+                        renderValue = f.format_field?.checked === true && renderValue ?
+                            new Intl.NumberFormat(navigator.languages[0], { ...round }).format(renderValue) + " " + prefix :
+                            renderValue;
+                    }
                     return (
                         <div
                             key={f.id}
