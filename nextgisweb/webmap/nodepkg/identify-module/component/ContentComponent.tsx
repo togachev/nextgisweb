@@ -74,10 +74,10 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
                 copyValue(value, gettext("Email address copied"));
             }} >{value}</div>)
         }
-        else if (datatype === "REAL") {
+        else if (["INTEGER", "BIGINT", "REAL"].includes(datatype)) {
             const round = format_field?.round !== null ? { maximumFractionDigits: format_field?.round } : {};
             const prefix = format_field?.prefix !== null ? format_field?.prefix : "";
-            return format_field?.checked === true && value ?
+            return format_field?.checked === true ?
                 new Intl.NumberFormat(navigator.languages[0], { ...round }).format(value) + " " + prefix :
                 value;
         }
@@ -105,7 +105,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
                         items.push({
                             key: item.key,
                             label: item.attr,
-                            children: (<RenderValue attribute={attribute} />),
+                            children: (<RenderValue attribute={item} />),
                         })
                     }
                 })
