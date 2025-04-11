@@ -16,6 +16,8 @@ import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPa
 import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
+
 
 const { Link } = Typography;
 const settings = webmapSettings;
@@ -50,6 +52,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const { attribute, data, extensions, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, setCurrentUrlParams, valueRnd } = store;
     const { id, layerId } = selected;
     const { copyValue, contextHolder } = useCopy();
+    const { getNumberValue } = formattedFields();
     const panelRef = useRef<HTMLDivElement>(null);
 
     const opts = display.config.options;
@@ -66,23 +69,16 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
     const RenderValue = ({ attribute }) => {
-        const { datatype, value, format_field } = attribute;
+        const { value } = attribute;
+
         if (urlRegex.test(value)) {
             return (<Link title={value} href={value} target="_blank">{value}</Link>)
         } else if (emailRegex.test(value)) {
             return (<div className="value-email" title={value} onClick={() => {
                 copyValue(value, gettext("Email address copied"));
             }} >{value}</div>)
-        }
-        else if (["INTEGER", "BIGINT", "REAL"].includes(datatype)) {
-            const round = format_field?.round !== null ? { maximumFractionDigits: format_field?.round } : {};
-            const prefix = format_field?.prefix ? format_field?.prefix : "";
-            return format_field?.checked === true ?
-                new Intl.NumberFormat(navigator.languages[0], { ...round }).format(value) + " " + prefix :
-                value;
-        }
-        else {
-            return value
+        } else {
+            return getNumberValue(attribute);
         }
     };
 

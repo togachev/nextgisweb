@@ -25,17 +25,43 @@
                 cursor: pointer;
                 border-right-color: var(--color-border);
                 min-width: 3em;
+                align-items: center;
 
                 &:hover {
                     background-color: var(--color-secondary);
                 }
 
-                .label {
-                    flex-grow: 1;
-                    min-width: 0;
-                    overflow: hidden;
-                    font-weight: bold;
-                    text-overflow: ellipsis;
+                @media (pointer: fine), (pointer: none) {
+                    .label {
+                        flex-grow: 1;
+                        min-width: 0;
+                        overflow: hidden;
+                        -webkit-line-clamp: 2;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        font-weight: bold;
+                        text-overflow: ellipsis;
+                        word-break: break-word;
+                    }
+    
+                }
+
+                @media (pointer: coarse)  {
+                    .label {
+                        flex-grow: 1;
+                        min-width: 0;
+                        overflow: hidden;
+                        font-weight: bold;
+                    }
+                }
+
+                @media (pointer: fine) and (any-pointer: coarse) {
+                    .label {
+                        flex-grow: 1;
+                        min-width: 0;
+                        overflow: hidden;
+                        font-weight: bold;
+                    }
                 }
 
                 .suffix {

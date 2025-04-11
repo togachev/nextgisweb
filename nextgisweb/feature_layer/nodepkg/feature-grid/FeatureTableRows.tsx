@@ -14,6 +14,7 @@ import type {
     SetValue,
 } from "./type";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
+import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 
 interface VersionProps {
     resourceId: number;
@@ -71,6 +72,8 @@ export function FeatureTableRows({
 }: RowsProps) {
     const firstVirtual = virtualItems[0];
 
+    const { getNumberValue } = formattedFields();
+
     if (!firstVirtual) {
         return null;
     }
@@ -79,6 +82,7 @@ export function FeatureTableRows({
         return (
             <>
                 {columns.map((f) => {
+
                     let renderValue: ReactNode;
                     let cellClassName;
                     if (!row) {
@@ -101,13 +105,7 @@ export function FeatureTableRows({
                                 ? renderFeatureFieldValue(f, val)
                                 : loadingCol();
                     }
-                    if (["INTEGER", "BIGINT", "REAL"].includes(f.datatype)) {
-                        const round = f.format_field?.round !== null ? { maximumFractionDigits: f.format_field?.round } : {};
-                        const prefix = f.format_field?.prefix ? f.format_field?.prefix : "";
-                        renderValue = f.format_field?.checked === true && renderValue ?
-                            new Intl.NumberFormat(navigator.languages[0], { ...round }).format(renderValue) + " " + prefix :
-                            renderValue;
-                    }
+
                     return (
                         <div
                             key={f.id}
@@ -116,7 +114,7 @@ export function FeatureTableRows({
                                 width: `${effectiveWidths[f.id]}px`,
                             }}
                         >
-                            {renderValue}
+                            {getNumberValue(f, renderValue)}
                         </div>
                     );
                 })}

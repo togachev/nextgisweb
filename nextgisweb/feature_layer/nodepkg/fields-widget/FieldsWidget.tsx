@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
-import { CheckboxValue, InputValue, Space } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
@@ -163,14 +163,12 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
         <FocusTable<Field>
             store={store}
             title={(item) => <DisplayName item={item} />}
-            // title={(item) => item.displayName.value}
             columns={[
                 {
                     render: (item) => item.keyname.value,
                     width: ["20%", "30%"],
                 },
                 { render: (item) => item.datatype.value },
-                // { render: (item) => <DisplayName item={item} /> },
                 {
                     render: (item) => (
                         <>

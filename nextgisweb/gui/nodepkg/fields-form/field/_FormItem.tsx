@@ -1,7 +1,7 @@
 import { isValidElement, useCallback, useMemo } from "react";
 import type { ComponentType, ReactElement } from "react";
 
-import { Form, Space } from "@nextgisweb/gui/antd";
+import { Form, Space, Row, Col } from "@nextgisweb/gui/antd";
 
 import type { ChildProps, FormItemProps } from "../type";
 
@@ -41,12 +41,24 @@ export function FormItem({
     );
 
     return (
-        <Form.Item label={label}>
-            {wrapWithSpaceIfNeeded(
-                <Form.Item {...props} noStyle={noStyle}>
-                    {memoizedInputComponent}
+        <Row gutter={[16, 16]} wrap={false} style={{ alignItems: "center" }}>
+            {label && (<Col xs={2} sm={4} md={6} lg={8} xl={10} style={{
+                overflow: "hidden",
+                letterSpacing: "normal",
+                webkitLineClamp: "2",
+                display: "-webkit-box",
+                webkitBoxOrient: "vertical",
+                marginBottom: "24px",
+            }} title={label}>{label}</Col>)}
+            <Col flex="auto">
+                <Form.Item>
+                    {wrapWithSpaceIfNeeded(
+                        <Form.Item {...props} noStyle={noStyle} >
+                            {memoizedInputComponent}
+                        </Form.Item >
+                    )}
                 </Form.Item>
-            )}
-        </Form.Item>
+            </Col>
+        </Row >
     );
 }

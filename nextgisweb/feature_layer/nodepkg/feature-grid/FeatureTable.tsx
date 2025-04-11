@@ -252,7 +252,7 @@ const FeatureTable = observer(
                                     style={style}
                                     onClick={onClick}
                                 >
-                                    <div className="label">{label}</div>
+                                    <div title={label} className="label">{label}</div>
                                     {colSort && (
                                         <div className="suffix">
                                             <SortIcon dir={colSort} />
