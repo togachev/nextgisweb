@@ -29,6 +29,7 @@
             %endif
         </a>
     </div>
+    <div class="text">${title}</div>
     <div class="container">
         %if not hide_resource_filter:
             <div class="header-resources-filter" id="resourcesFilter"></div>
