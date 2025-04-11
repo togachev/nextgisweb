@@ -45,9 +45,9 @@ export function FormItem({
             {label && (<Col xs={2} sm={4} md={6} lg={8} xl={10} style={{
                 overflow: "hidden",
                 letterSpacing: "normal",
-                webkitLineClamp: "2",
+                WebkitLineClamp: "2",
                 display: "-webkit-box",
-                webkitBoxOrient: "vertical",
+                WebkitBoxOrient: "vertical",
                 marginBottom: "24px",
             }} title={label}>{label}</Col>)}
             <Col flex="auto">
