@@ -18,6 +18,11 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
 
+    const msgUpdate = [
+        gettext("Update web map url."),
+        gettext("Double click will return the original page address."),
+    ];
+
     return (
         <div className="footer-coordinate-component">
             {contextHolder}
@@ -34,7 +39,7 @@ export const CoordinateComponent: FC = observer(({ store: storeProp, display, co
             {!display.tinyConfig && op === "popup" && contextUrl !== null && (
                 <div className="link-block">
                     <span className="link-button"
-                        title={gettext("Update web map url")}
+                        title={msgUpdate.join("\n")}
                         onClick={(e) => {
                             if (e.detail === 2) {
                                 window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))
