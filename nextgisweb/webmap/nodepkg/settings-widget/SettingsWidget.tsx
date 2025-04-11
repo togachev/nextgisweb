@@ -193,6 +193,8 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                     </Lot>
                 </Area>
                 <Modal
+                    transitionName=""
+                    maskTransitionName=""
                     title={msgAdditionalOptions}
                     open={optionsModal}
                     footer={null}
