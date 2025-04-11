@@ -3,7 +3,7 @@
     import nextgisweb.pyramid as m
     from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.pyramid.view import LAYOUT_JSENTRY
-    from nextgisweb.resource.view import RESOURCE_TITLE_JSENTRY
+    from nextgisweb.resource.view import RESOURCE_FILTER_JSENTRY
     svglogo = None
 %>
 
@@ -28,7 +28,6 @@
                 ${svglogo}
             %endif
         </a>
-        <div id="resource-title"></div>
     </div>
     <div class="container">
         %if not hide_resource_filter:
@@ -52,14 +51,12 @@
     Promise.all([
         ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
         ngwEntry(${json_js(LAYOUT_JSENTRY)}),
-        ngwEntry(${json_js(RESOURCE_TITLE_JSENTRY)}),
-    ]).then(([reactBoot, {Avatar, Menu}, {ResourceTitle}]) => {
+    ]).then(([reactBoot, {Avatar, Menu}]) => {
         reactBoot(Avatar, {}, document.getElementById("avatar"));
         reactBoot(Menu, {}, document.getElementById("menu"));
-        reactBoot(ResourceTitle, { title: ${json_js(title)} }, document.getElementById("resource-title"));
 
         %if not hide_resource_filter:
-            ngwEntry("@nextgisweb/resource/resources-filter").then(
+            ngwEntry(${json_js(RESOURCE_FILTER_JSENTRY)}).then(
                 ({default: ResourcesFilter}) => reactBoot(
                     ResourcesFilter,
                     { onChange(v, opt) { window.location.href = opt.url } },

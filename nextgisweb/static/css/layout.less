@@ -13,7 +13,6 @@
 @import "blocks/_icons.less";
 @import "blocks/_links.less";
 @import "blocks/_list.less";
-@import "blocks/_tables.less";
 @import "blocks/_typography.less";
 
 /* -- BASE STYLES -- */
@@ -240,39 +239,6 @@ a[class*=" icon-"]:hover:before {
         padding: 0 12px 0 0;
         min-height: 24px;
     }
-}
-
-/* -- CONTENT STYLES -- */
-
-.ngw-card {
-    border: 1px solid #f0f0f0;
-    border-radius: var(--border-radius-root);
-    background: white;
-}
-
-.ngw-resource-section {
-    margin-bottom: 32px;
-}
-
-.content-box {
-    position: relative;
-    margin-bottom: 32px;
-    border: 1px solid #f0f0f0;
-    border-radius: var(--border-radius-root);
-    background: white;
-    padding: 12px;
-
-    &>p:first-child,
-    &>p:last-child,
-    &>div>p:first-child,
-    &>div>p:last-child {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-}
-
-.content-box img {
-    max-width: 100%;
 }
 
 /* Sidebar */

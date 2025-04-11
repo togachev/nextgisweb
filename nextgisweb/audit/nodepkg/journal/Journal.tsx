@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import type { Dayjs } from "dayjs";
 import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
 import type { ValueDate } from "rc-picker/lib/interface";
@@ -54,7 +55,7 @@ const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
 const fld = (rec: AuditFields, name: string): string => {
     const val = rec[FIELD_INDEX[name]];
-    return val ? String(val) : "";
+    return val !== undefined && val !== null ? String(val) : "";
 };
 
 export function isAuditArrayLogEntry(
@@ -120,7 +121,7 @@ function Detail({ data }: { data: AuditObject | boolean }) {
             {entries.map(([k, v], idx) => {
                 const last = idx === entries.length - 1;
                 return (
-                    <tr key={k} className={"detail" + (last ? " last" : "")}>
+                    <tr key={k} className={classNames("detail", { last })}>
                         <td className="c-detail-key">{k}</td>
                         <td className="c-detail-val" colSpan={COLUMNS.length}>
                             {JSON.stringify(v, null, " ")}
@@ -148,7 +149,7 @@ function Record({ tstamp, fields }: { tstamp: string; fields: AuditFields }) {
     return (
         <>
             <tr
-                className={"summary" + (expanded ? " expanded" : "")}
+                className={classNames("summary", { expanded })}
                 onClick={() => toggle()}
             >
                 <td className="c-timestamp">{format_tstamp(tstamp)}</td>

@@ -1,9 +1,31 @@
 import * as Sentry from "@sentry/browser";
 import type { Integration } from "@sentry/core";
 
+import { isAbortError } from "@nextgisweb/gui/error";
 import { BaseAPIError } from "@nextgisweb/pyramid/api";
 
 export function init(opts: { dsn: string; routeName: string }) {
+    // Check if the environment supports ES2020 features using `eval` to avoid
+    // transpilation. This includes optional chaining, nullish coalescing, and
+    // other features.
+
+    let es2020 = false;
+    try {
+        es2020 = eval(
+            "((undefined?.() ?? Number.MAX_SAFE_INTEGER) === 9007199254740991) " +
+                "&& !!Promise.allSettled && !!String.prototype.matchAll " +
+                "&& ((...rest) => rest[0])(true)"
+        );
+    } catch {
+        // Assume ES2020 is unsupported
+    }
+
+    // Skip Sentry initialization if ES2020 features are not supported
+    if (!es2020) {
+        console.warn("Sentry initialization skipped: ES2020 not supported.");
+        return;
+    }
+
     const { routeName, ...sentryOpts } = opts;
 
     const integrations: Integration[] = [
@@ -22,6 +44,11 @@ export function init(opts: { dsn: string; routeName: string }) {
 
         beforeSend(event, hint) {
             const error = hint.originalException;
+
+            // Too many abort errors captured, ignore them
+            if (isAbortError(error)) {
+                return null;
+            }
 
             // The server has its own logic for reporting API errors, so skip
             // client-side reporting.

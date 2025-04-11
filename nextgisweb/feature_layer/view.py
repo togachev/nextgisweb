@@ -14,9 +14,6 @@ from .interface import IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
-FIELDS_RESOURCE_JSENTRY = jsentry("@nextgisweb/feature-layer/fields-view")
-
-
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ("update",)
@@ -134,6 +131,11 @@ class MVTLink(ExternalAccessLink):
         )
 
 
+@resource_sections("@nextgisweb/feature-layer/resource-section")
+def resource_section_fields(obj, **kwargs):
+    return IFeatureLayer.providedBy(obj)
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.export_multiple",
@@ -200,7 +202,3 @@ def setup_pyramid(comp, config):
                     lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
                     icon=icon_export,
                 )
-
-    @resource_sections(title=gettext("Attributes"))
-    def resource_section_fields(obj):
-        return IFeatureLayer.providedBy(obj)

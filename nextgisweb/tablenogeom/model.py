@@ -22,7 +22,6 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
-    FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     Feature,
     FeatureQueryIntersectsMixin,
@@ -232,10 +231,6 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
                             gettext("To use column as ID it should have integer type!")
                         )
                     colfound_id = True
-
-                elif column["name"] in FIELD_FORBIDDEN_NAME:
-                    # TODO: Currently id fields break vector layer. We should fix it!
-                    pass
 
                 else:
                     if isinstance(column["type"], sa.BigInteger):

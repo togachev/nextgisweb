@@ -44,7 +44,7 @@ class Control extends Interaction {
         this.tool = options.tool;
     }
 
-    handleClickEvent(evt: MapBrowserEvent<UIEvent>): boolean {
+    handleClickEvent(evt: MapBrowserEvent): boolean {
         if (evt.type === "singleclick") {
             if (this.tool.display.panelManager.getActivePanelName() !== "custom-layer") {
                 this.tool.execute(evt.pixel);
