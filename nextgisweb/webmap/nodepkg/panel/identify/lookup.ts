@@ -1,11 +1,12 @@
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export async function load(
     resourceId: number,
     requestOptions?: GetRequestOptions
 ): Promise<Record<string, string>> {
-    const resourceItem = await route("resource.item", resourceId).get({
+    const resourceItem = await route("resource_lookup.item", resourceId).get({
         cache: true,
         ...requestOptions,
     });
@@ -24,9 +25,14 @@ export async function lookup(
     requestOptions?: GetRequestOptions
 ) {
     const data = await load(resourceId, requestOptions);
-    const value = data[key];
+
+    const value = data["value"] === "Forbidden" ?
+        gettext("The data is not available for reading") :
+        data[key];
+
     if (value === undefined) {
         return null;
     }
+
     return value;
 }

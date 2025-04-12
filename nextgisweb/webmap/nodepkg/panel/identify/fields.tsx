@@ -105,11 +105,13 @@ export async function fieldValuesToDataSource(
                 dataItem.value = <a href={href}>{val as string}</a>;
             } else {
                 if (field.lookup_table) {
+                    
                     const lval = await lookup(
                         field.lookup_table.id,
                         val as string,
                         reuestOptions
                     );
+
                     if (lval !== null) {
                         val = `[${val}] ${lval}`;
                     }

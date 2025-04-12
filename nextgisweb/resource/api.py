@@ -148,6 +148,14 @@ def item_get(context, request) -> CompositeRead:
     return serializer.serialize(context, CompositeRead)
 
 
+def item_get_lookup(context, request) -> CompositeRead:
+    """Read resource"""
+    if context.has_permission(ResourceScope.read, request.user):
+        serializer = CompositeSerializer(user=request.user)
+        return serializer.serialize(context, CompositeRead)
+    else:
+        return dict(lookup_table=dict(items=dict(value="Forbidden")))
+
 def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
     """Update resource"""
     request.resource_permission(ResourceScope.read)
@@ -1214,6 +1222,13 @@ def setup_pyramid(comp, config):
         get=item_get,
         put=item_put,
         delete=item_delete,
+    )
+
+    config.add_route(
+        "resource_lookup.item",
+        "/api/resource_lookup/{id}",
+        factory=resource_factory,
+        get=item_get_lookup,
     )
 
     config.add_route(
