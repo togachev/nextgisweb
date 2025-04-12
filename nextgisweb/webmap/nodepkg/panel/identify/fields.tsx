@@ -12,7 +12,7 @@ import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 // import { gettext } from "@nextgisweb/pyramid/i18n";
-
+import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 import { load, lookup } from "./lookup";
 
 export const getFieldsInfo = async (resourceId: number) => {
@@ -57,6 +57,7 @@ export async function fieldValuesToDataSource(
 ): Promise<FieldDataItem[]> {
     let key = 0;
     const dataSource = [];
+    const { getNumberValue } = formattedFields();
 
     for (const k in fields) {
         let val = fields[k];
@@ -117,12 +118,14 @@ export async function fieldValuesToDataSource(
                     }
                 }
                 dataItem.value = val as string;
+                dataItem.value = getNumberValue(dataItem) as string;
             }
         }
+        
         // else {
         //     dataItem.value = gettext("N/A");
         // }
-
+        
         dataSource.push(dataItem);
     }
     return dataSource;

@@ -1,12 +1,12 @@
 from enum import Enum
-from typing import Dict, List, Literal, Type, Union
+from typing import Any, Dict, List, Literal, Type, Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
-from msgspec import Meta, Struct
+from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import text
 from sqlalchemy.ext.orderinglist import ordering_list
@@ -176,6 +176,7 @@ class WebMapItem(Base):
     legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
     file_resource_visible = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
     layer_highligh = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", True))
+    setting_item = sa.Column(sa_pg.JSONB, nullable=False, default=dict)
 
     parent = orm.relationship(
         "WebMapItem",
@@ -232,6 +233,7 @@ class WebMapItem(Base):
                 style_parent_id=style_parent_id,
                 file_resource_visible=self.file_resource_visible,
                 layer_highligh=self.layer_highligh,
+                setting_item=self.setting_item,
             )
 
         return data
@@ -271,6 +273,7 @@ class WebMapItem(Base):
                     "legend_symbols",
                     "file_resource_visible",
                     "layer_highligh",
+                    "setting_item",
                 ):
                     _set(item, k, True)
 
@@ -334,6 +337,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
     layer_enabled: bool
     file_resource_visible: bool
     layer_highligh: bool
+    setting_item: Any
     layer_identifiable: bool
     layer_transparency: Union[float, None]
     layer_style_id: int
@@ -355,6 +359,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
             layer_enabled=bool(obj.layer_enabled),
             file_resource_visible=bool(obj.file_resource_visible),
             layer_highligh=bool(obj.layer_highligh),
+            setting_item=obj.setting_item,
             layer_identifiable=bool(obj.layer_identifiable),
             layer_transparency=obj.layer_transparency,
             layer_style_id=obj.layer_style_id,
@@ -372,6 +377,7 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
     layer_enabled: bool = False
     file_resource_visible: bool = False
     layer_highligh: bool = True
+    setting_item: Union[Any, UnsetType] = UNSET
     layer_identifiable: bool = True
     layer_transparency: Union[float, None] = None
     layer_style_id: int
