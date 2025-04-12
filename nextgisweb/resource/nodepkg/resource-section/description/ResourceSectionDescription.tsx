@@ -1,4 +1,4 @@
-import { ContentCard } from "@nextgisweb/gui/component";
+// import { ContentCard } from "@nextgisweb/gui/component";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { DescComponent } from "@nextgisweb/resource/description";
 import type { ResourceSection } from "../type";
