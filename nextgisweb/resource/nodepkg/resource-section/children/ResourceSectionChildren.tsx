@@ -81,10 +81,7 @@ export const ResourceSectionChildren = ({
                 className="displayName"
                 dataIndex="displayName"
                 sorter={sorterFactory("displayName")}
-                render={(value, record: Resource) => {
-                    console.log(record);
-                    
-                    return (
+                render={(value, record: Resource) => (
                     <SvgIconLink
                         href={record.cls === "webmap" ?
                             routeURL("resource.show", record.id) + "/display" :
@@ -99,7 +96,7 @@ export const ResourceSectionChildren = ({
                     >
                         {value}
                     </SvgIconLink>
-                )}}
+                )}
             />
             <Column
                 title={gettext("Type")}
