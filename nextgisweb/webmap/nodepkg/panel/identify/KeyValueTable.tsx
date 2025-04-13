@@ -7,6 +7,7 @@ import type { FieldDataItem } from "./fields";
 import "./KeyValueTable.less";
 
 export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
+    const filter = data.filter(item => item.value);
     const columns: TableColumnsType<FieldDataItem> = [
         {
             className: "attr-column",
@@ -24,7 +25,7 @@ export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
     return (
         <Table
             className="ngw-webmap-panel-identify-kv-table"
-            dataSource={data.map(({ key, value, attr }) => ({
+            dataSource={filter.map(({ key, value, attr }) => ({
                 key,
                 value,
                 attr: attr ?? (key ? String(key) : undefined),

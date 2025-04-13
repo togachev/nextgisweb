@@ -33,6 +33,7 @@ export function GeometryInfo({
             fid: featureId,
         },
         options: {
+            cache: true,
             query: {
                 srs: srid,
             },

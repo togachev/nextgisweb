@@ -99,6 +99,7 @@ export class LayerEditor extends PluginBase {
             enabled:
                 !this.disabled &&
                 nodeData.type === "layer" &&
+                nodeData.editGeom === true &&
                 (
                     nodeData.plugin[
                         this.identity
