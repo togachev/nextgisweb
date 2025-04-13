@@ -176,7 +176,7 @@ class WebMapItem(Base):
     legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
     file_resource_visible = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
     layer_highligh = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", True))
-    setting_item = sa.Column(sa_pg.JSONB, nullable=False, default=dict)
+    edit_geom = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", True))
 
     parent = orm.relationship(
         "WebMapItem",
@@ -233,7 +233,7 @@ class WebMapItem(Base):
                 style_parent_id=style_parent_id,
                 file_resource_visible=self.file_resource_visible,
                 layer_highligh=self.layer_highligh,
-                setting_item=self.setting_item,
+                edit_geom=self.edit_geom,
             )
 
         return data
@@ -273,7 +273,7 @@ class WebMapItem(Base):
                     "legend_symbols",
                     "file_resource_visible",
                     "layer_highligh",
-                    "setting_item",
+                    "edit_geom",
                 ):
                     _set(item, k, True)
 
@@ -337,7 +337,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
     layer_enabled: bool
     file_resource_visible: bool
     layer_highligh: bool
-    setting_item: Any
+    edit_geom: bool
     layer_identifiable: bool
     layer_transparency: Union[float, None]
     layer_style_id: int
@@ -359,7 +359,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
             layer_enabled=bool(obj.layer_enabled),
             file_resource_visible=bool(obj.file_resource_visible),
             layer_highligh=bool(obj.layer_highligh),
-            setting_item=obj.setting_item,
+            edit_geom=obj.edit_geom,
             layer_identifiable=bool(obj.layer_identifiable),
             layer_transparency=obj.layer_transparency,
             layer_style_id=obj.layer_style_id,
@@ -377,7 +377,7 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
     layer_enabled: bool = False
     file_resource_visible: bool = False
     layer_highligh: bool = True
-    setting_item: Union[Any, UnsetType] = UNSET
+    edit_geom: bool = True
     layer_identifiable: bool = True
     layer_transparency: Union[float, None] = None
     layer_style_id: int

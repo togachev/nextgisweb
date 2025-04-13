@@ -565,6 +565,7 @@ def display_config(obj, request) -> DisplayConfig:
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=legend_info,
                 layerHighligh=item.layer_highligh,
+                editGeom=item.edit_geom,
             )
 
             if item.file_resource_visible:

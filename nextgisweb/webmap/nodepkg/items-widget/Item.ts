@@ -13,8 +13,8 @@ import type { ItemsStore } from "./ItemsStore";
 
 type ItemPayload = {
     [P in keyof WebMapItemGroupWrite & keyof WebMapItemLayerWrite]:
-        | WebMapItemGroupWrite[P]
-        | WebMapItemLayerWrite[P];
+    | WebMapItemGroupWrite[P]
+    | WebMapItemLayerWrite[P];
 };
 type ItemType = ItemPayload["item_type"];
 type ItemData<D> = Partial<Omit<D, "item_type">>;
@@ -81,7 +81,7 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
                 item.item_type === "group"
                     ? new Group(this.store, item)
                     : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                      new Layer(this.store, item)
+                    new Layer(this.store, item)
             )
         );
     }
@@ -118,6 +118,7 @@ const {
     layer_transparency: layerTransparency,
     file_resource_visible: fileResourceVisible,
     layer_highligh: layerHighligh,
+    edit_geom: editGeom,
     layer_min_scale_denom: layerMinScaleDenom,
     layer_max_scale_denom: layerMaxScaleDenom,
     layer_adapter: layerAdapter,
@@ -136,6 +137,7 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
     readonly layerTransparency = layerTransparency.init(null, this);
     readonly fileResourceVisible = fileResourceVisible.init(false, this);
     readonly layerHighligh = layerHighligh.init(true, this);
+    readonly editGeom = editGeom.init(true, this);
     readonly layerMinScaleDenom = layerMinScaleDenom.init(null, this);
     readonly layerMaxScaleDenom = layerMaxScaleDenom.init(null, this);
     readonly layerAdapter = layerAdapter.init("image", this);
@@ -156,6 +158,7 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
             ...this.layerTransparency.jsonPart(),
             ...this.fileResourceVisible.jsonPart(),
             ...this.layerHighligh.jsonPart(),
+            ...this.editGeom.jsonPart(),
             ...this.layerMinScaleDenom.jsonPart(),
             ...this.layerMaxScaleDenom.jsonPart(),
             ...this.layerAdapter.jsonPart(),
