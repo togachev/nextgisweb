@@ -7,7 +7,6 @@
     from nextgisweb.pyramid.view import ICON_JSENTRY
     from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.pyramid.view import BREADCRUMB_JSENTRY
-    from nextgisweb.resource.favorite.view import config_value
     import json
 %>
 
@@ -33,7 +32,8 @@
     if len(bcpath) > 0:
         for idx, bc in enumerate(bcpath):
             value = dict()
-            value["id"] = idx
+            value["idx"] = idx
+            value["id"] = bc.id
             value["href"] = bc.link
             if bc.icon:
                 value["icon"] = bc.icon
@@ -44,7 +44,7 @@
 %>
 <html>
 <head>
-    <title>${head_title}qqq</title>
+    <title>${head_title}</title>
     <meta charset="utf-8">
     
     <%include
@@ -158,3 +158,22 @@
     %endif
 </body>
 </html>
+
+%if obj and not custom_layout:
+    <script type="text/javascript">
+        Promise.all([
+            ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
+            ngwEntry(${json_js(BREADCRUMB_JSENTRY)}),
+        ]).then(([reactBoot, {BreadcrumbComponent}]) => {
+            const bcpath = ${json_js(array)};
+            reactBoot(
+                BreadcrumbComponent,
+                {
+                    bcpath,
+                    current_id: ${json_js(obj.id)},
+                },
+                document.getElementById("breadcrumb")
+            );
+        });
+    </script>
+%endif
