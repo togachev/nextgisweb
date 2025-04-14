@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Dropdown } from "@nextgisweb/gui/antd";
+import { Dropdown, Typography } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
@@ -8,7 +8,7 @@ import ResourceHome from "./icons/resource_home.svg";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./BreadcrumbComponent.less";
-
+const { Text } = Typography;
 interface BreadcrumbProps {
     href?: string;
     icon?: string;
@@ -66,15 +66,15 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
 
     useMemo(() => bcpath?.map(item => getCollection(item)), []);
 
+
+
     const TitleBc = (itm) => {
         const { iconHome, title, href, sep, items } = itm;
         return (
             <>
-                <a href={href}>
-                    <span className="icon-title">{iconHome}</span>
-                    <span>{title}</span>
-
-                </a>
+                <Text style={{ maxWidth: 250 }} ellipsis={{ tooltip: title }}>
+                    <a href={href} target="_self"><span className="icon-title">{iconHome}</span>{title}</a>
+                </Text>
                 {items &&
                     <Dropdown
                         className="menu-dropdown"
