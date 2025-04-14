@@ -44,7 +44,7 @@
 %>
 <html>
 <head>
-    <title>${head_title}</title>
+    <title>${head_title}qqq</title>
     <meta charset="utf-8">
     
     <%include
@@ -158,22 +158,3 @@
     %endif
 </body>
 </html>
-
-%if obj and not custom_layout:
-    <script type="text/javascript">
-        Promise.all([
-            ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
-            ngwEntry(${json_js(BREADCRUMB_JSENTRY)}),
-        ]).then(([reactBoot, {BreadcrumbComponent}]) => {
-            const bcpath = ${json_js(array)};
-            reactBoot(
-                BreadcrumbComponent,
-                {
-                    bcpath,
-                    current_id: ${json_js(obj.id)},
-                },
-                document.getElementById("breadcrumb")
-            );
-        });
-    </script>
-%endif

@@ -19,7 +19,7 @@ from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
+from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter, breadcrumb_path
 
 from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
@@ -32,8 +32,6 @@ from .scope import ResourceScope
 
 RESOURCE_FILTER_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
 HOME_PAGE_JSENTRY = jsentry("@nextgisweb/resource/home-page")
-
-RESOURCE_TITLE_JSENTRY = jsentry("@nextgisweb/resource/resource-title")
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
@@ -99,6 +97,7 @@ def resource_breadcrumb(obj, request):
     if isinstance(obj, Resource):
         return Breadcrumb(
             label=obj.display_name,
+            id=obj.id,
             link=request.route_url("resource.show", id=obj.id),
             icon=f"rescls-{obj.cls}",
             parent=dict(parent=obj.parent, id=obj.id),
@@ -284,6 +283,30 @@ def creatable_resources(parent, *, user):
 
 resource_sections = PageSections("resource_section")
 
+@resource_sections("@nextgisweb/resource/resource-section/breadcrumb", order=-200)
+def resource_section_breadcrumb(obj, *, request, **kwargs):
+    bcpath = list()
+    if obj is not None:
+        bcpath = breadcrumb_path(obj, request)
+        if len(bcpath) > 0:
+            bcpath = bcpath[:-1]
+
+    array = list()
+    if len(bcpath) > 0:
+        for idx, bc in enumerate(bcpath):
+            value = dict()
+            value["idx"] = idx
+            value["id"] = bc.id
+            value["href"] = bc.link
+            if bc.icon:
+                value["icon"] = bc.icon
+            if bc.label:
+                value["title"] = bc.label
+            array.append(value)
+
+    return dict(bcpath=array, current_id=obj.id)
+
+
 @resource_sections("@nextgisweb/resource/resource-section/main", order=-100)
 def resource_section_main(obj, *, request, **kwargs):
     tr = request.localizer.translate
@@ -311,6 +334,9 @@ def resource_section_main(obj, *, request, **kwargs):
     result["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
     result["cls"] = obj.cls
     return result
+
+
+
 
 
 @resource_sections("@nextgisweb/resource/resource-section/children", order=-50)

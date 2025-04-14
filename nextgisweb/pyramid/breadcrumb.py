@@ -7,6 +7,7 @@ Parent = Dict[Optional[str], int]
 class Breadcrumb:
     label: Optional[str]
     link: str
+    id: int
     icon: Optional[str] = None
     parent: Parent = None
 

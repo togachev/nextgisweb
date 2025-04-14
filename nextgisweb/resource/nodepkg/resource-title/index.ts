@@ -1,1 +1,0 @@
-export { ResourceTitle } from "./ResourceTitle";
