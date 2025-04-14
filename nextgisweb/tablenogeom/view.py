@@ -1,7 +1,8 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
 
 from .model import TablenogeomConnection, TablenogeomLayer
@@ -10,13 +11,13 @@ from .model import TablenogeomConnection, TablenogeomLayer
 class TablenogeomConnectionWidget(Widget):
     resource = TablenogeomConnection
     operation = ("create", "update")
-    amdmod = "@nextgisweb/tablenogeom/connection-widget"
+    amdmod = jsentry("@nextgisweb/tablenogeom/connection-widget")
 
 
 class TablenogeomLayerWidget(Widget):
     resource = TablenogeomLayer
     operation = ("create", "update")
-    amdmod = "@nextgisweb/tablenogeom/layer-widget"
+    amdmod = jsentry("@nextgisweb/tablenogeom/layer-widget")
 
 
 def setup_pyramid(comp, config):
@@ -28,6 +29,8 @@ def setup_pyramid(comp, config):
         diagnostics_page, context=TablenogeomLayer
     )
 
+    icon_diagnostics = icon("material/flaky")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if (
@@ -38,12 +41,14 @@ def setup_pyramid(comp, config):
                 "extra/tablenogeom-diagnostics",
                 gettext("Diagnostics"),
                 lambda args: args.request.route_url("tablenogeom.diagnostics_page", id=args.obj.id),
-                icon="material-flaky",
+                icon=icon_diagnostics,
             )
 
 
-@viewargs(renderer="react")
-def diagnostics_page(context, request):
+@react_renderer("@nextgisweb/tablenogeom/diagnostics-widget")
+def diagnostics_page(request):
+    context = request.context
+
     if isinstance(context, TablenogeomConnection):
         request.resource_permission(ConnectionScope.connect)
         data = dict(connection=dict(id=context.id))
@@ -54,7 +59,6 @@ def diagnostics_page(context, request):
         raise ValueError
 
     return dict(
-        entrypoint="@nextgisweb/tablenogeom/diagnostics-widget",
         props=dict(data=data),
         title=gettext("Tablenogeom diagnostics"),
         obj=request.context,

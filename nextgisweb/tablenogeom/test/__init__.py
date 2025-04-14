@@ -18,7 +18,7 @@ from nextgisweb.feature_layer import GEOM_TYPE_OGR_2_GEOM_TYPE
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer.util import FIELD_TYPE_2_DB, FIELD_TYPE_2_ENUM
 
-from .. import PostgisConnection, PostgisLayer
+from .. import TablenogeomConnection, TablenogeomLayer
 
 
 @contextmanager
@@ -94,7 +94,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     with transaction.manager:
         res_common = dict(parent_id=parent_id, owner_user=User.by_keyname("administrator"))
 
-        connection = PostgisConnection(
+        connection = TablenogeomConnection(
             **res_common,
             display_name=token_hex(),
             hostname=opts_db["host"],
@@ -104,7 +104,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
             password=opts_db["password"],
         ).persist()
 
-        layer = PostgisLayer(
+        layer = TablenogeomLayer(
             **res_common,
             display_name=token_hex(),
             connection=connection,

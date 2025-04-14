@@ -6,7 +6,7 @@ from sqlalchemy.engine.url import make_url as make_engine_url
 
 from nextgisweb.env import DBSession
 
-from .. import PostgisConnection, PostgisLayer
+from .. import TablenogeomConnection, TablenogeomLayer
 from ..diagnostics import StatusEnum
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -38,7 +38,6 @@ def creds(ngw_env):
                 CREATE TABLE test_types
                 (
                     id bigserial PRIMARY KEY,
-                    geom geometry(Point,3857),
                     fld_varchar character varying, fld_character character(50), fld_text text, fld_uuid uuid,
                     fld_int integer, fld_bigint bigint,
                     fld_double double precision, fld_numeric numeric,
@@ -46,14 +45,12 @@ def creds(ngw_env):
                 );
 
                 INSERT INTO test_types (
-                    geom,
                     fld_varchar, fld_character, fld_text, fld_uuid,
                     fld_int, fld_bigint,
                     fld_double, fld_numeric,
                     fld_date, fld_time_without_tz, fld_ts_without_tz
                 )
                 VALUES (
-                    ST_SetSRID('POINT (0 0)'::geometry, 3857),
                     'varchar', 'character', 'text', md5(random()::text)::uuid,
                     -1, 9223372036854775807,
                     1.1, 1.2,
@@ -71,7 +68,7 @@ def creds(ngw_env):
 
 def test_types(creds, ngw_webtest_app):
     with transaction.manager:
-        connection = PostgisConnection(
+        connection = TablenogeomConnection(
             hostname=creds["host"],
             port=creds["port"],
             database=creds["database"],
@@ -79,12 +76,11 @@ def test_types(creds, ngw_webtest_app):
             password=creds["password"],
         ).persist()
 
-        layer = PostgisLayer(
+        layer = TablenogeomLayer(
             connection=connection,
             schema="public",
             table="test_types",
             column_id="id",
-            column_geom="geom",
         ).persist()
 
         layer.setup()
@@ -92,7 +88,7 @@ def test_types(creds, ngw_webtest_app):
         DBSession.flush()
 
     resp = ngw_webtest_app.post_json(
-        "/api/component/postgis/check",
+        "/api/component/tablenogeom/check",
         dict(layer=dict(id=layer.id)),
     )
     assert StatusEnum(resp.json["status"]) is StatusEnum.SUCCESS

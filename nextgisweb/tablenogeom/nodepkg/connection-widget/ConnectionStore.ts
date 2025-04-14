@@ -1,12 +1,13 @@
-import { makeObservable } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { TablenogeomConnectionRead } from "@nextgisweb/tablenogeom/type/api";
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { EditorStore } from "@nextgisweb/resource/type";
 
 const {
     hostname,
     port,
+    sslmode,
     username,
     password,
     database,
@@ -25,25 +26,17 @@ database.validate(validate.string({ minLength: 1 }));
 export class ConnectionStore implements EditorStore<TablenogeomConnectionRead> {
     readonly identity = "tablenogeom_connection";
 
-    dirty = false;
-    validate = false;
+    readonly hostname = hostname.init("", this);
+    readonly port = port.init(null, this);
+    readonly sslmode = sslmode.init(null, this);
+    readonly username = username.init("", this);
+    readonly password = password.init("", this);
+    readonly database = database.init("", this);
 
-    hostname = hostname.init("", this);
-    port = port.init(null, this);
-    username = username.init("", this);
-    password = password.init("", this);
-    database = database.init("", this);
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
-    constructor() {
-        makeObservable(this, {
-            dirty: true,
-            validate: true,
-            load: true,
-            markDirty: true,
-            isValid: true,
-        });
-    }
-
+    @action
     load(value: TablenogeomConnectionRead) {
         load(this, value);
         this.dirty = false;
@@ -54,18 +47,20 @@ export class ConnectionStore implements EditorStore<TablenogeomConnectionRead> {
         return {
             ...this.hostname.jsonPart(),
             ...this.port.jsonPart(),
+            ...this.sslmode.jsonPart(),
             ...this.username.jsonPart(),
             ...this.password.jsonPart(),
             ...this.database.jsonPart(),
         };
     }
 
+    @action
     markDirty() {
         this.dirty = true;
     }
 
+    @computed
     get isValid(): boolean {
-        this.validate = true;
         return error(this) === false;
     }
 }

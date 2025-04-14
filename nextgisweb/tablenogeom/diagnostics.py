@@ -6,7 +6,7 @@ from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine import URL as EngineURL
 from sqlalchemy.engine import Connection, create_engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
     BigInteger,
@@ -18,7 +18,7 @@ from sqlalchemy.types import (
     Time,
 )
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.feature_layer import FIELD_TYPE
@@ -110,13 +110,14 @@ class Check:
 class ConnectionCheck(Check):
     group = "connection"
 
-    def __init__(self, *, hostname, port, database, username, password):
+    def __init__(self, *, hostname, port, database, username, password, sslmode):
         super().__init__()
         self.hostname = hostname
         self.port = port
         self.database = database
         self.username = username
         self.password = password
+        self.sslmode = sslmode
 
 
 class LayerCheck(Check):
@@ -153,7 +154,7 @@ class PostgresCheck(ConnectionCheck):
         try:
             gethostbyname(self.hostname)
         except gaierror as exc:
-            self.error(gettext("Host name resolution failed: {}.").format(exc.strerror.lower()))
+            self.error(gettextf("Host name resolution failed: {}.")(exc.strerror.lower()))
             return
 
         url = EngineURL.create(
@@ -165,8 +166,11 @@ class PostgresCheck(ConnectionCheck):
             password=self.password,
         )
 
+        connect_args = dict(connect_timeout=5)
+        if self.sslmode is not None:
+            connect_args["sslmode"] = self.sslmode.value
         engine = create_engine(
-            url, client_encoding="utf-8", poolclass=NullPool, connect_args=dict(connect_timeout=5)
+            url, client_encoding="utf-8", poolclass=NullPool, connect_args=connect_args
         )
         try:
             conn = self._conn = engine.connect()
@@ -178,10 +182,15 @@ class PostgresCheck(ConnectionCheck):
         self.success(gettext("Connected to the database."))
 
         conn.execute(sql.text("SELECT 1"))
-        self.success(gettext("Executed {} query.").format("SELECT 1"))
+        self.success(gettextf("Executed {} query.")("SELECT 1"))
 
         ver = conn.execute(sql.text("SHOW server_version")).scalar().split(" ")[0]
-        self.success(gettext("PostgreSQL version {}.").format(ver))
+        self.success(gettextf("PostgreSQL version {}.")(ver))
+
+        ssl = conn.execute(
+            sql.text("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")
+        ).scalar()
+        self.say(gettext("SSL is used.") if ssl else gettext("SSL is not used."))
 
     def cleanup(self):
         if conn := getattr(self, "_conn", None):
@@ -233,7 +242,7 @@ class TableCheck(LayerCheck):
         except TableNotExists:
             self.error(gettext("Table not found."))
             return
-        self.success(gettext("Table found, table type is {}.").format(tins.table_type))
+        self.success(gettextf("Table found, table type is {}.")(tins.table_type))
 
         sql_has_privilege = """
             SELECT has_table_privilege(
@@ -251,14 +260,14 @@ class TableCheck(LayerCheck):
                 dict(schema=self.schema, table=self.table, privilege=priv),
             ).scalar()
             if has_privilege:
-                self.success(gettext("{} privilege is present.").format(priv))
+                self.success(gettextf("{} privilege is present.")(priv))
             elif not req:
-                self.warning(gettext("{} privilege is absent.").format(priv))
+                self.warning(gettextf("{} privilege is absent.")(priv))
             else:
-                self.error(gettext("{} privilege is absent.").format(priv))
+                self.error(gettextf("{} privilege is absent.")(priv))
 
         count = conn.execute(select(func.count("*")).select_from(self.sa_table)).scalar()
-        self.say(gettext("Number of records: {}.").format(count))
+        self.say(gettextf("Number of records: {}.")(count))
 
         if self.column_id is None:
             self.error(gettext("ID column isn't set."))
@@ -278,9 +287,9 @@ class IdColumnCheck(LayerCheck):
 
         ctype_repr = coltype_as_str(cinfo["type"])
         if not isinstance(cinfo["type"], Integer):
-            self.error(gettext("Column found, but has non-integer type - {}.").format(ctype_repr))
+            self.error(gettextf("Column found, but has non-integer type - {}.")(ctype_repr))
 
-        self.success(gettext("Column found, type is {}.").format(ctype_repr))
+        self.success(gettextf("Column found, type is {}.")(ctype_repr))
 
         is_table = tins.table_type == "BASE TABLE"
 
@@ -346,7 +355,7 @@ class ColumnsCheck(LayerCheck):
         for field in self.fields:
             cinfo = tins.columns.get(field.column_name)
             if cinfo is None:
-                self.error(gettext("Column of field '{}' not found.").format(field.keyname))
+                self.error(gettextf("Column of field '{}' not found.")(field.keyname))
                 return
 
             ctype = cinfo["type"]
@@ -355,15 +364,13 @@ class ColumnsCheck(LayerCheck):
             type_expected = _FIELD_TYPE_2_DB[field.datatype]
             if not isinstance(ctype, type_expected):
                 self.error(
-                    gettext(
-                        "Column of field '{}' found, but has an incompatible type - {}."
-                    ).format(field.keyname, ctype_repr)
+                    gettextf("Column of field '{}' found, but has an incompatible type - {}.")(
+                        field.keyname, ctype_repr
+                    )
                 )
             else:
                 self.success(
-                    gettext("Column of field '{}' found, type is {}.").format(
-                        field.keyname, ctype_repr
-                    )
+                    gettextf("Column of field '{}' found, type is {}.")(field.keyname, ctype_repr)
                 )
 
 
