@@ -44,7 +44,8 @@ export interface ResourcePickerTitleProps {
 
 export interface ResourcePickerStoreOptions {
     multiple?: boolean;
-    // visibleResource?: boolean;
+    visibleResource?: boolean;
+    cls?: ResourceCls;
     parentId?: number;
     initParentId?: number | null;
     saveLastParentIdGlobal?: boolean;

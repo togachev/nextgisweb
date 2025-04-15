@@ -39,7 +39,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                                     parent: typeof v === "number" ? v : null,
                                 })
                             }
-                            pickerOptions={{ initParentId: store.parent }}
+                            pickerOptions={{ initParentId: store.parent, cls: store.composite.cls }}
                             allowClear={false}
                             disabled={store.composite.operation === "create"}
                             style={{ width: "100%" }}

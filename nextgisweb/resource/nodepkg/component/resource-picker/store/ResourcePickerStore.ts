@@ -27,23 +27,27 @@ type Action = keyof Pick<
     | "getSelectedParent"
 >;
 
+const IRenderableStyle = ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"];
+
 const clsObject = {
-    IRenderableStyle:
-        ["resource_group", "vector_layer", "postgis_layer", "raster_layer", "raster_style", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
-    basemap_layer:
-        ["resource_group", "basemap_layer"],
-    svg_marker_library:
-        ["resource_group", "svg_marker_library"],
-    postgis_connection:
-        ["resource_group", "postgis_connection"],
-    tablenogeom_connection:
-        ["resource_group", "tablenogeom_connection"],
-    tablenogeom_layer:
-        ["resource_group", "tablenogeom_layer"],
-    vector_layer:
-        ["resource_group", "vector_layer"],
-    tmsclient_connection:
-        ["resource_group", "tmsclient_connection"],
+    layer_style: ["vector_layer", "postgis_layer"],
+    basemap_layer: ["resource_group"],
+    svg_marker_library: ["resource_group"],
+    postgis_connection: ["resource_group"],
+    tablenogeom_connection: ["resource_group"],
+    tablenogeom_layer: ["resource_group"],
+    vector_layer: ["resource_group"],
+    postgis_layer: ["resource_group"],
+    raster_layer: ["resource_group"],
+    wfsclient_layer: ["resource_group"],
+    wmsclient_layer: ["resource_group"],
+    tmsclient_layer: ["resource_group"],
+    tmsclient_connection: ["resource_group"],
+    webmap: ["resource_group"],
+    wfsserver_service: ["resource_group"],
+    file_bucket: ["resource_group"],
+    lookup_table: ["resource_group"],
+    resource_group: ["resource_group"],
 };
 
 const msgPickThis = gettext("Pick this group");
@@ -51,7 +55,7 @@ const msgPickSelected = gettext("Pick selected");
 
 export class ResourcePickerStore
     implements
-    Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface"> {
+    Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface" | "cls"> {
     static GLOBAL_PARENT_ID?: number = undefined;
     static resetGlobalParentId = () => {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
@@ -65,6 +69,8 @@ export class ResourcePickerStore
         number,
         CompositeRead
     > = new Map();
+    @observable accessor cls: ResourceCls | null = null;
+    @observable accessor clsResource: string[] = [];
     @observable.ref accessor parentId: number = 0;
     @observable.shallow accessor breadcrumbItems: CompositeRead[] = [];
     @observable.ref accessor hideUnavailable = false;
@@ -113,12 +119,13 @@ export class ResourcePickerStore
         requireInterface,
         disableResourceIds,
         saveLastParentIdGlobal,
+        cls
     }: ResourcePickerStoreOptions) {
         if (saveLastParentIdGlobal) {
             this.saveLastParentIdGlobal = saveLastParentIdGlobal;
             parentId = ResourcePickerStore.GLOBAL_PARENT_ID;
         }
-
+        this.cls = cls;
         this.parentId = parentId ?? initParentId ?? this.parentId;
         this.initParentId = initParentId ?? this.parentId;
 
@@ -142,6 +149,7 @@ export class ResourcePickerStore
         this.traverseClasses = traverseClasses ?? null;
 
         this.getSelectedParent({ selected, parentId });
+        this.getResourceParent();
     }
 
     @action
@@ -388,22 +396,23 @@ export class ResourcePickerStore
         this.setResources(childrenResources);
     }
 
+    @actionHandler
+    private getResourceParent() {
+        if (IRenderableStyle.includes(this.cls)) {
+            this.clsResource = clsObject.layer_style
+        } else {
+            this.clsResource = clsObject[this.cls]
+        }
+    }
+
     private async fetchChildrenResources(
         parent: number,
         { signal }: RequestOptions = {}
     ) {
-        let cls;
-        if (this.requireClass.length) {
-            cls = clsObject[this.requireClass[0]];
-        } else if (this.requireInterface.length) {
-            cls = clsObject[this.requireInterface[0]];
-        } else {
-            cls = [];
-        }
         const resp = await route("resource.collection").get({
             query: {
                 parent: parent,
-                cls: this.visibleResource ? cls : undefined,
+                cls: this.visibleResource ? this.clsResource : undefined,
                 serialization: "resource",
                 description: false
             },
