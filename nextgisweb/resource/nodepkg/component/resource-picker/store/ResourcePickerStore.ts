@@ -33,8 +33,6 @@ const clsObject = {
     layer_style: ["vector_layer", "postgis_layer"],
     basemap_layer: ["resource_group"],
     svg_marker_library: ["resource_group"],
-    postgis_connection: ["resource_group"],
-    tablenogeom_connection: ["resource_group"],
     tablenogeom_layer: ["resource_group"],
     vector_layer: ["resource_group"],
     postgis_layer: ["resource_group"],
@@ -42,12 +40,17 @@ const clsObject = {
     wfsclient_layer: ["resource_group"],
     wmsclient_layer: ["resource_group"],
     tmsclient_layer: ["resource_group"],
-    tmsclient_connection: ["resource_group"],
+    wmsserver_service: ["resource_group"],
     webmap: ["resource_group"],
     wfsserver_service: ["resource_group"],
     file_bucket: ["resource_group"],
     lookup_table: ["resource_group"],
     resource_group: ["resource_group"],
+    tmsclient_connection: ["resource_group"],
+    wfsclient_connection: ["resource_group"],
+    postgis_connection: ["resource_group"],
+    tablenogeom_connection: ["resource_group"],
+    wmsclient_connection: ["resource_group"],
 };
 
 const msgPickThis = gettext("Pick this group");
