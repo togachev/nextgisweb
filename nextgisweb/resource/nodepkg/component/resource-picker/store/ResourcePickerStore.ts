@@ -28,8 +28,10 @@ type Action = keyof Pick<
 >;
 
 const clsObject = {
-    layer: ["vector_layer", "postgis_layer"],
+    layer: ["resource_group", "vector_layer", "postgis_layer"],
+    basemap_layer: ["resource_group", "basemap_layer"],
     style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+    layer_webmap: ["resource_group", "vector_layer", "postgis_layer", "wfsclient_layer", "wmsclient_layer", "qgis_vector_style", "tmsclient_layer", "wmsclient_layer"],
 };
 
 const msgPickThis = gettext("Pick this group");
@@ -380,10 +382,20 @@ export class ResourcePickerStore
 
     @actionHandler
     private getResourceParent() {
-        const { layer, style } = clsObject;
-        if (style.includes(this.cls)) {
+        const { layer, style, layer_webmap, basemap_layer } = clsObject;
+        if (this.cls === undefined) {
+            this.clsResource = []
+        }
+        else if (style.includes(this.cls)) {
             this.clsResource = layer
-        } else {
+        }
+        else if (this.cls === "layer_webmap") {
+            this.clsResource = layer_webmap
+        }
+        else if (this.cls === "basemap_layer") {
+            this.clsResource = basemap_layer
+        }
+        else {
             this.clsResource = ["resource_group"]
         }
     }
@@ -392,6 +404,8 @@ export class ResourcePickerStore
         parent: number,
         { signal }: RequestOptions = {}
     ) {
+        console.log(this.cls);
+        
         const resp = await route("resource.collection").get({
             query: {
                 parent: parent,
