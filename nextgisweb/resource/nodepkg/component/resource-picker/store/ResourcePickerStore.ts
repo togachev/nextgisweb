@@ -27,30 +27,9 @@ type Action = keyof Pick<
     | "getSelectedParent"
 >;
 
-const IRenderableStyle = ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"];
-
 const clsObject = {
-    layer_style: ["vector_layer", "postgis_layer"],
-    basemap_layer: ["resource_group"],
-    svg_marker_library: ["resource_group"],
-    tablenogeom_layer: ["resource_group"],
-    vector_layer: ["resource_group"],
-    postgis_layer: ["resource_group"],
-    raster_layer: ["resource_group"],
-    wfsclient_layer: ["resource_group"],
-    wmsclient_layer: ["resource_group"],
-    tmsclient_layer: ["resource_group"],
-    wmsserver_service: ["resource_group"],
-    webmap: ["resource_group"],
-    wfsserver_service: ["resource_group"],
-    file_bucket: ["resource_group"],
-    lookup_table: ["resource_group"],
-    resource_group: ["resource_group"],
-    tmsclient_connection: ["resource_group"],
-    wfsclient_connection: ["resource_group"],
-    postgis_connection: ["resource_group"],
-    tablenogeom_connection: ["resource_group"],
-    wmsclient_connection: ["resource_group"],
+    layer: ["vector_layer", "postgis_layer"],
+    style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
 };
 
 const msgPickThis = gettext("Pick this group");
@@ -401,10 +380,11 @@ export class ResourcePickerStore
 
     @actionHandler
     private getResourceParent() {
-        if (IRenderableStyle.includes(this.cls)) {
-            this.clsResource = clsObject.layer_style
+        const { layer, style } = clsObject;
+        if (style.includes(this.cls)) {
+            this.clsResource = layer
         } else {
-            this.clsResource = clsObject[this.cls]
+            this.clsResource = ["resource_group"]
         }
     }
 

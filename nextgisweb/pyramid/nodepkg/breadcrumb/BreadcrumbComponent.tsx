@@ -83,8 +83,9 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
                         menu={{
                             items,
                             style: {
-                                maxWidth: "350px",
-                                maxHeight: "250px",
+                                maxWidth: 350,
+                                maxHeight: 250,
+                                scrollbarWidth: "thin",
                             }
                         }}
                     >
