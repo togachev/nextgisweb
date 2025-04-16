@@ -16,11 +16,13 @@ import {
     useCallback,
     useContext,
     useMemo,
+    useRef,
 } from "react";
 import type { CSSProperties, FC, HTMLAttributes } from "react";
 
 import { Button, Table } from "../antd";
-import type { TableColumnType, TableProps } from "../antd";
+import type { InputRef, TableColumnType, TableProps } from "../antd";
+import { useKeydownListener } from "../hook";
 
 import type { EdiTableStore } from "./EdiTableStore";
 import { RowActions, WELLKNOWN_ROW_ACTIONS } from "./RowAction";
@@ -33,7 +35,7 @@ import "./EdiTable.less";
 
 export interface EdiTableProps<
     S extends EdiTableStore,
-    R extends AnyObject = AnyObject,
+    R extends AnyObject,
     T = FunctionKeys<S>,
 > extends Omit<TableProps, "columns"> {
     rowActions?: T[] | RowActionConfig<T>[] | RowAction<R>[];
@@ -108,6 +110,8 @@ export const EdiTable = observer(
         rowKey = "key",
         ...tableProps
     }: EdiTableProps<EdiTableStore<R>, R>) => {
+        const { moveRow, placeholder } = store;
+
         const renderActs = useCallback(
             (row: R) => {
                 const actions: RowAction[] = [];
@@ -140,12 +144,22 @@ export const EdiTable = observer(
             [store, rowActions]
         );
 
+        const placeholderRef = useRef<InputRef | null>(null);
+
+        const handleKeyDown = useCallback(() => {
+            if (placeholderRef.current) {
+                placeholderRef.current.focus?.();
+            }
+        }, []);
+
+        useKeydownListener("Enter", handleKeyDown);
+
         const tableDataSource = [...store.rows];
 
         // There is no way to append a placeholder row by overriding components
         // property. It works in general, but looses focus on inputs. So we add
         // placeholders to rows and customize rendering via hooks.
-        store.placeholder && tableDataSource.push(store.placeholder);
+        placeholder && tableDataSource.push(placeholder);
 
         const onDragEnd = ({ active, over }: DragEndEvent) => {
             if (active && over && active.id !== over.id) {
@@ -155,18 +169,18 @@ export const EdiTable = observer(
                 const overIndex = store.rows.findIndex(
                     (record) => record[rowKey as string] === over.id
                 );
-                if (row && overIndex !== -1 && store.moveRow) {
-                    store.moveRow(row, overIndex);
+                if (row && overIndex !== -1 && moveRow) {
+                    moveRow(row, overIndex);
                 }
             }
         };
 
         const tableColumns: TableColumnType<R>[] = useMemo(() => {
-            const isPlaceholder = (row: R) => row === store.placeholder;
+            const isPlaceholder = (row: R) => row === placeholder;
             const actsCell = { className: "row-actions" };
             const hideCell = { colSpan: 0 };
             const placeholderCell = {
-                colSpan: columns.length + 1 + (store.moveRow ? 1 : 0),
+                colSpan: columns.length + 1 + (moveRow ? 1 : 0),
                 className: "placeholder",
             };
 
@@ -189,7 +203,7 @@ export const EdiTable = observer(
                             style.minWidth = shrink;
                         }
 
-                        const moveSpan = idx === 0 && store.moveRow;
+                        const moveSpan = idx === 0 && moveRow;
                         result.onHeaderCell = () => ({
                             className,
                             colSpan: moveSpan ? 2 : 1,
@@ -208,12 +222,18 @@ export const EdiTable = observer(
                         };
 
                         if (component) {
-                            result.render = (value, row) =>
-                                createElement(component, {
-                                    ...{ value, row },
-                                    placeholder:
-                                        idx === 0 && isPlaceholder(row),
+                            result.render = (value, row) => {
+                                const placeholder =
+                                    idx === 0 && isPlaceholder(row);
+                                return createElement(component, {
+                                    value,
+                                    row,
+                                    placeholder,
+                                    placeholderRef: placeholder
+                                        ? placeholderRef
+                                        : undefined,
                                 });
+                            };
                         }
 
                         return result;
@@ -229,7 +249,7 @@ export const EdiTable = observer(
                 },
             ];
 
-            if (store.moveRow) {
+            if (moveRow) {
                 resultColumns.unshift({
                     key: "sort",
                     onHeaderCell: () => hideCell,
@@ -242,7 +262,7 @@ export const EdiTable = observer(
             }
 
             return resultColumns;
-        }, [store, columns, renderActs]);
+        }, [placeholder, columns, renderActs, moveRow]);
 
         return (
             <DndContext

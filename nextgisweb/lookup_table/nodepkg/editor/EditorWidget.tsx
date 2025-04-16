@@ -2,19 +2,16 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Input, Modal, Upload } from "@nextgisweb/gui/antd";
-import type { InputProps } from "@nextgisweb/gui/antd";
-import { EdiTable } from "@nextgisweb/gui/edi-table";
-import type {
-    RecordItem,
-    RecordOption,
-} from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type {
-    ComponentProps,
-    EdiTableColumn,
-} from "@nextgisweb/gui/edi-table/type";
+import { Button, Modal, Select, Space, Upload } from "@nextgisweb/gui/antd";
+import {
+    EdiTable,
+    EdiTableKeyInput,
+    EdiTableValueInput,
+} from "@nextgisweb/gui/edi-table";
+import type { EdiTableColumn } from "@nextgisweb/gui/edi-table";
 import { ClearIcon, ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
 import { parseCsv } from "@nextgisweb/gui/util/parseCsv";
+import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
@@ -26,70 +23,46 @@ import {
     updateItems,
 } from "./util";
 
+import SortIcon from "@nextgisweb/icon/material/swap_vert";
+import ReorderIcon from "@nextgisweb/icon/material/sync";
+
 import "./EditorWidget.less";
 
-const msgTypeToAdd = gettext("Type here to add a new item...");
 const msgExport = gettext("Export");
 const msgImport = gettext("Import");
+const msgSort = gettext("Sort order");
+const msgResort = gettext("Resort rows");
 const msgClear = gettext("Clear");
 
 // prettier-ignore
 const msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
 
-const InputKey = observer(
-    ({ row, placeholder }: ComponentProps<RecordItem>) => {
-        return (
-            <Input
-                value={row.key}
-                onChange={(e) => {
-                    const props: Partial<RecordOption> = {
-                        key: e.target.value,
-                    };
-                    if (row.value === undefined) {
-                        props.value = "";
-                    }
-                    row.update(props);
-                }}
-                variant="borderless"
-                placeholder={placeholder ? msgTypeToAdd : undefined}
-            />
-        );
-    }
-);
+type RowType = EditorStore["items"][number];
 
-InputKey.displayName = "InputKey";
-
-const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
-    if (row.type === "string") {
-        return (
-            <Input
-                value={row.value as InputProps["value"]}
-                onChange={(e) => {
-                    row.update({ value: e.target.value });
-                }}
-                variant="borderless"
-            />
-        );
-    }
-
-    return <></>;
-});
-
-InputValue.displayName = "InputValue";
-
-const columns: EdiTableColumn<RecordItem>[] = [
+const columns: EdiTableColumn<RowType>[] = [
     {
         key: "key",
         title: gettext("Key"),
-        width: "50%",
-        component: InputKey,
+        width: "25%",
+        component: EdiTableKeyInput,
     },
     {
         key: "value",
         title: gettext("Value"),
-        width: "50%",
-        component: InputValue,
+        width: "75%",
+        component: EdiTableValueInput,
     },
+];
+
+const sortSelectOptions: {
+    value: LookupTableRead["sort"];
+    label: string;
+}[] = [
+    { value: "KEY_ASC", label: gettext("Key, ascending") },
+    { value: "KEY_DESC", label: gettext("Key, descending") },
+    { value: "VALUE_ASC", label: gettext("Value, ascending") },
+    { value: "VALUE_DESC", label: gettext("Value, descending") },
+    { value: "CUSTOM", label: gettext("Custom") },
 ];
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
@@ -115,6 +88,8 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                 store.setDirty(true);
             }
         };
+
+        const { sort, setSort, isSorted } = store;
 
         return (
             <div className="ngw-lookup-table-editor">
@@ -151,6 +126,25 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                             title: msgExport,
                             onClick: exportLookup,
                         },
+                        () => (
+                            <Space.Compact>
+                                <Select
+                                    prefix={<SortIcon />}
+                                    title={msgSort}
+                                    options={sortSelectOptions}
+                                    popupMatchSelectWidth={false}
+                                    value={sort}
+                                    onChange={setSort}
+                                />
+                                {!isSorted && (
+                                    <Button
+                                        icon={<ReorderIcon />}
+                                        title={msgResort}
+                                        onClick={() => setSort()}
+                                    />
+                                )}
+                            </Space.Compact>
+                        ),
                     ]}
                     rightActions={[
                         {
