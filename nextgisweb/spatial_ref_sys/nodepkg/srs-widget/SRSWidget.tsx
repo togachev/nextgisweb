@@ -117,6 +117,8 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
                 )}
             </ModelForm>
             <Modal
+                transitionName=""
+                maskTransitionName=""
                 title={<Title />}
                 open={isModalVisible}
                 onOk={handleOk}

@@ -124,6 +124,7 @@ export const TmsClientLayerWidget: EditorWidget<TmsClientLayerStore> = observer(
                         pickerOptions: {
                             requireClass: "tmsclient_connection",
                             initParentId: store.composite.parent,
+                            clsFilter: "tms_service",
                         },
                         style: { width: "100%" },
                         labelRender: ({ label }) => (

@@ -62,6 +62,8 @@ export function VendorParamsModal({
 
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             title={gettext("Vendor parameters")}
             closable={false}
             open={open}

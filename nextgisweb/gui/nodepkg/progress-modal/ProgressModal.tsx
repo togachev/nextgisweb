@@ -57,7 +57,10 @@ export const ProgressModal = ({
     };
 
     return (
-        <Modal {...modalOptions}>
+        <Modal
+            transitionName=""
+            maskTransitionName=""
+            {...modalOptions}>
             <Progress {...progressProps} />
         </Modal>
     );

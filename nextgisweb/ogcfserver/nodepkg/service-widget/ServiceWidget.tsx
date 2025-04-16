@@ -79,6 +79,7 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
                             pickerOptions: {
                                 requireInterface: "IFeatureLayer",
                                 multiple: true,
+                                clsFilter: "layer",
                             },
                         }
                     ),

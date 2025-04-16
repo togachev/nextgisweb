@@ -168,6 +168,7 @@ export const WfsClientLayerWidget: EditorWidget<WfsClientLayerStore> = observer(
                         pickerOptions: {
                             requireClass: "wfsclient_connection",
                             initParentId: store.composite.parent,
+                            clsFilter: "wfs_service",
                         },
                         style: { width: "100%" },
                     }}

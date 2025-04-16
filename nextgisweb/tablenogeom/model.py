@@ -27,7 +27,7 @@ from nextgisweb.feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
-    IFeatureLayer,
+    IFeatureLayerNoGeom,
     IFeatureQuery,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
@@ -193,7 +193,7 @@ class TablenogeomLayerField(Base, LayerField):
     column_name = sa.Column(sa.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(IFeatureLayerNoGeom, IWritableFeatureLayer, IBboxLayer)
 class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
     identity = "tablenogeom_layer"
     cls_display_name = gettext("Tablenogeom layer")
@@ -307,7 +307,7 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
                     gettext("Column '%(column)s' not found!") % dict(column=self.column_id)
                 )
 
-    # IFeatureLayer
+    # IFeatureLayerNoGeom
 
     @property
     def feature_query(self):

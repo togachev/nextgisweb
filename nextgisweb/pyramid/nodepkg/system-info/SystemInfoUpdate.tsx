@@ -68,6 +68,8 @@ export const SystemInfoUpdate = observer(() => {
                     {msgShowDetails}
                 </Button>
                 <Modal
+                    transitionName=""
+                    maskTransitionName=""
                     wrapClassName="ngw-pyramid-update-sysinfo-modal"
                     open={detailsVisible}
                     onCancel={hideDetails}

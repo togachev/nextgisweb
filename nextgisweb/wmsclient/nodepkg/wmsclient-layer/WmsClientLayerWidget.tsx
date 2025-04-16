@@ -87,6 +87,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
                         pickerOptions: {
                             requireClass: "wmsclient_connection",
                             initParentId: store.composite.parent,
+                            clsFilter: "wms_service",
                         },
                         style: { width: "100%" },
                     }}

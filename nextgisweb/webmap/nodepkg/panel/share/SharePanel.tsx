@@ -358,6 +358,8 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 </Space.Compact>
                 {!ngwConfig.isGuest && (
                     <Modal
+                        transitionName=""
+                        maskTransitionName=""
                         title={msgAddFragmentToFavorites}
                         closeIcon={false}
                         open={favLabelModalOpen}

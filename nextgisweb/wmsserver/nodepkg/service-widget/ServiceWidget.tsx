@@ -96,6 +96,7 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
                             pickerOptions: {
                                 requireInterface: "IRenderableStyle",
                                 multiple: true,
+                                clsFilter: "layer_webmap",
                             },
                         }
                     ),

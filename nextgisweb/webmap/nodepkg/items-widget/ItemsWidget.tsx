@@ -196,7 +196,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                         pickerOptions: {
                             requireInterface: "IRenderableStyle",
                             multiple: true,
-                            cls: "layer_webmap"
+                            clsFilter: "layer_webmap"
                         },
                     }
                 ),

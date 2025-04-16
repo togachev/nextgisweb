@@ -78,7 +78,7 @@ export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
                         pickerOptions: {
                             requireClass: "basemap_layer",
                             multiple: true,
-                            cls: "basemap_layer",
+                            clsFilter: "basemap_layer",
                         },
                     }
                 ),

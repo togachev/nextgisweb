@@ -12,6 +12,8 @@ export function DeleteConfirmModal({
 }: DeleteConfirmModalProps) {
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             footer={null}
             closable={false}
             destroyOnClose

@@ -73,6 +73,8 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
 
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             className="resource-picker-modal"
             open={open}
             destroyOnClose

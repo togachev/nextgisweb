@@ -79,6 +79,8 @@ export function AttachmentForm({ id }: { id: number }) {
         ...props
     }: ImportSuccessModalProps) => (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             okText={gettext("Back to resource")}
             onOk={backToResource}
             cancelText={gettext("Close")}

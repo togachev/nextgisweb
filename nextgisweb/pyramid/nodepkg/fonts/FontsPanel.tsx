@@ -32,6 +32,8 @@ const fontType = { custom: gettext("Custom"), system: gettext("System") };
 const LoadingModal = (props: ModalProps) => {
     return (
         <Modal
+            transitionName=""
+            maskTransitionName=""
             title={msgRestarting}
             styles={{ header: { textAlign: "center" } }}
             closable={false}
@@ -93,11 +95,11 @@ export function FontsPanel() {
     const filtered = showSystem
         ? { filtered: false }
         : {
-              filteredValue: ["custom"],
-              filtered: true,
-              onFilter: (value: React.Key | boolean, record: FontType) =>
-                  record.type.includes(value as string),
-          };
+            filteredValue: ["custom"],
+            filtered: true,
+            onFilter: (value: React.Key | boolean, record: FontType) =>
+                record.type.includes(value as string),
+        };
 
     const columns: TableColumnType<FontType>[] = [
         {

@@ -30,8 +30,11 @@ type Action = keyof Pick<
 const clsObject = {
     layer: ["resource_group", "vector_layer", "postgis_layer"],
     basemap_layer: ["resource_group", "basemap_layer"],
-    style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
-    layer_webmap: ["resource_group", "vector_layer", "postgis_layer", "wfsclient_layer", "wmsclient_layer", "qgis_vector_style", "tmsclient_layer", "wmsclient_layer"],
+    wms_service: ["resource_group", "wmsclient_connection"],
+    wfs_service: ["resource_group", "wfsclient_connection"],
+    tms_service: ["resource_group", "tmsclient_connection"],
+    style: ["resource_group", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+    layer_webmap: ["resource_group", "vector_layer", "postgis_layer", "raster_layer", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "wmsclient_layer", "tileset", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
 };
 
 const msgPickThis = gettext("Pick this group");
@@ -39,7 +42,7 @@ const msgPickSelected = gettext("Pick selected");
 
 export class ResourcePickerStore
     implements
-    Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface" | "cls"> {
+    Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface" | "clsFilter"> {
     static GLOBAL_PARENT_ID?: number = undefined;
     static resetGlobalParentId = () => {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
@@ -53,7 +56,7 @@ export class ResourcePickerStore
         number,
         CompositeRead
     > = new Map();
-    @observable accessor cls: ResourceCls | null = null;
+    @observable accessor clsFilter: ResourceCls | null = null;
     @observable accessor clsResource: string[] = [];
     @observable.ref accessor parentId: number = 0;
     @observable.shallow accessor breadcrumbItems: CompositeRead[] = [];
@@ -103,13 +106,13 @@ export class ResourcePickerStore
         requireInterface,
         disableResourceIds,
         saveLastParentIdGlobal,
-        cls
+        clsFilter
     }: ResourcePickerStoreOptions) {
         if (saveLastParentIdGlobal) {
             this.saveLastParentIdGlobal = saveLastParentIdGlobal;
             parentId = ResourcePickerStore.GLOBAL_PARENT_ID;
         }
-        this.cls = cls;
+        this.clsFilter = clsFilter;
         this.parentId = parentId ?? initParentId ?? this.parentId;
         this.initParentId = initParentId ?? this.parentId;
 
@@ -382,18 +385,15 @@ export class ResourcePickerStore
 
     @actionHandler
     private getResourceParent() {
-        const { layer, style, layer_webmap, basemap_layer } = clsObject;
-        if (this.cls === undefined) {
+        const { layer, style } = clsObject;
+        if (this.clsFilter === undefined) {
             this.clsResource = []
         }
-        else if (style.includes(this.cls)) {
+        else if (style.includes(this.clsFilter)) {
             this.clsResource = layer
         }
-        else if (this.cls === "layer_webmap") {
-            this.clsResource = layer_webmap
-        }
-        else if (this.cls === "basemap_layer") {
-            this.clsResource = basemap_layer
+        else if (clsObject[this.clsFilter]) {
+            this.clsResource = clsObject[this.clsFilter]
         }
         else {
             this.clsResource = ["resource_group"]
@@ -404,8 +404,6 @@ export class ResourcePickerStore
         parent: number,
         { signal }: RequestOptions = {}
     ) {
-        console.log(this.cls);
-        
         const resp = await route("resource.collection").get({
             query: {
                 parent: parent,

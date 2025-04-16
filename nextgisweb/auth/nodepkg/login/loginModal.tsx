@@ -6,7 +6,10 @@ import { LoginForm } from "./LoginForm";
 
 const LoginModal = (props: ShowModalOptions) => {
     return (
-        <Modal footer={null} width="350px" {...props}>
+        <Modal
+            transitionName=""
+            maskTransitionName=""
+            footer={null} width="350px" {...props}>
             <LoginForm reloadAfterLogin />
         </Modal>
     );

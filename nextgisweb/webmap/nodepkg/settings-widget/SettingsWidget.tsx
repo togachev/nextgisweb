@@ -138,6 +138,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             pickerOptions={{
                                 initParentId: store.composite.parent,
                                 requireInterface: "IFeatureLayer",
+                                clsFilter: "layer"
                             }}
                             value={store.bookmarkResource}
                             allowClear
