@@ -28,14 +28,16 @@ type Action = keyof Pick<
 >;
 
 const clsObject = {
-    layer: ["resource_group", "vector_layer", "postgis_layer"],
-    basemap_layer: ["resource_group", "basemap_layer"],
-    wms_service: ["resource_group", "wmsclient_connection"],
-    wfs_service: ["resource_group", "wfsclient_connection"],
-    tms_service: ["resource_group", "tmsclient_connection"],
-    style: ["resource_group", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
-    layer_webmap: ["resource_group", "vector_layer", "postgis_layer", "raster_layer", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "wmsclient_layer", "tileset", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+    layer: ["vector_layer", "postgis_layer"],
+    basemap_layer: ["basemap_layer"],
+    wms_service: ["wmsclient_connection"],
+    wfs_service: ["wfsclient_connection"],
+    tms_service: ["tmsclient_connection"],
+    style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+    layer_webmap: ["vector_layer", "postgis_layer", "raster_layer", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "wmsclient_layer", "tileset", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
 };
+
+Object.values(clsObject).map(i => i.push("resource_group"))
 
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
