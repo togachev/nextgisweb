@@ -17,6 +17,7 @@ import AutoMode from "@nextgisweb/icon/mdi/auto-mode";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { useDraw } from "./hook/useDraw";
 
+import { TYPE_FILE } from "./constant";
 import "./DrawFeatures.less";
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -99,22 +100,15 @@ export const DrawFeatures = observer(({ display }: Display) => {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const itemDefault = { key: 0, change: false, label: '', geomType: '', edge: false, vertex: false, allLayer: false, draw: false, modify: false };
 
-    const [store] = useState(() => new DrawStore({}));
+    const [store] = useState(() => new DrawStore({
+        options: TYPE_FILE.map(item => {
+            return { value: item.value, label: item.label, disabled: item.disabled }
+        })
+    }));
 
-    const {
-        options,
-        setOptions,
-        drawLayer,
-        setDrawLayer,
-        readonly,
-        setReadonly,
-        itemModal,
-        setItemModal,
-    } = store;
+    const [defaultOp, setDefaultOp] = useState(store.options[0]);
 
-    const [defaultOp, setDefaultOp] = useState(options[0]);
-
-    const currentMaxLayer = MaxCreated + " " + maxCount + "/" + drawLayer.length
+    const currentMaxLayer = MaxCreated + " " + maxCount + "/" + store.drawLayer.length
 
     const geomTypesOptions = geomTypesInfo.map(({ key, label }) => {
         if (key !== geomTypeDefault) {
@@ -128,46 +122,47 @@ export const DrawFeatures = observer(({ display }: Display) => {
     }
 
     const onChangeSelect = ({ item, value }) => {
-        const itemCurrent = !item ? drawLayer.find(item => item.key === value) : item;
+        const itemCurrent = !item ? store.drawLayer.find(item => item.key === value) : item;
         setEditableLayerKey(value)
-        setDrawLayer((items: ItemType[]) => {
-            return items.map((item: ItemType) => {
-                if (item.key === value) {
-                    return { ...item, change: false, modify: false }
-                }
-                else {
-                    return { ...item, change: true }
-                }
-            })
+
+        const val = store.drawLayer.map((item: ItemType) => {
+            if (item.key === value) {
+                return { ...item, change: false, modify: false }
+            }
+            else {
+                return { ...item, change: true }
+            }
         })
+        store.setDrawLayer(val)
 
         modifyInteraction(itemCurrent);
         drawInteraction(itemCurrent);
         snapInteraction(itemCurrent, false);
         topic.publish("webmap/tool/identify/off");
-        setReadonly(false);
+        store.setReadonly(false);
     };
 
     const deselectOnClick = ({ status, value }) => {
-        const itemCurrent = drawLayer.find(item => item.key === value);
+        const itemCurrent = store.drawLayer.find(item => item.key === value);
         if (value === editableLayerKey) {
             setEditableLayerKey(null);
-            setDrawLayer((prev: ItemType[]) => {
-                return prev.map((item: ItemType) => {
-                    if (status) {
-                        if (item.key !== itemCurrent.key) {
-                            return { ...item, change: false }
-                        }
-                        return item;
-                    } else {
+
+            const val = store.drawLayer.map((item: ItemType) => {
+                if (status) {
+                    if (item.key !== itemCurrent.key) {
                         return { ...item, change: false }
                     }
+                    return item;
+                } else {
+                    return { ...item, change: false }
+                }
 
-                })
-            })
+            });
+            store.setDrawLayer(val);
+
             interactionClear();
             topic.publish("webmap/tool/identify/on");
-            setReadonly(true)
+            store.setReadonly(true)
         }
     };
 
@@ -179,11 +174,11 @@ export const DrawFeatures = observer(({ display }: Display) => {
     }, [editableLayerKey])
 
     const addLayer = (geomType: string) => {
-        if (drawLayer.length < maxCount) {
+        if (store.drawLayer.length < maxCount) {
             const layer = addLayerMap(id);
             const item = typeComponentIcon.find(item => item.key === geomType);
             const currentItem = { key: layer.ol_uid, change: false, label: item?.label + " " + id++, geomType: geomType, edge: false, vertex: geomType === 'Point' ? false : true, allLayer: false, draw: true, modify: false };
-            setDrawLayer([...drawLayer, currentItem])
+            store.setDrawLayer([...store.drawLayer, currentItem])
 
             if (editableLayerKey) {
                 deselectOnClick({ status: false, value: editableLayerKey })
@@ -198,21 +193,20 @@ export const DrawFeatures = observer(({ display }: Display) => {
     }
 
     const onModify = (checked: boolean) => {
-        setDrawLayer((prev: ItemType[]) => {
-            return prev.map((item: ItemType) => {
-                if (item.key === editableLayerKey) {
-                    return { ...item, draw: !checked, modify: checked }
-                };
-                return item;
-            })
+        const val = store.drawLayer.map((item: ItemType) => {
+            if (item.key === editableLayerKey) {
+                return { ...item, draw: !checked, modify: checked }
+            };
+            return item;
         })
+        store.setDrawLayer(val);
     };
 
     const geomTypesMenuItems: MenuProps = {
         items: geomTypesOptions,
         onClick: (item) => {
             setGeomTypeDefault(item.key)
-            if (readonly && !editableLayerKey) {
+            if (store.readonly && !editableLayerKey) {
                 addLayer(item.key);
             } else if (startEdit && featureCount.includes(editableLayerKey)) {
                 addLayer(item.key);
@@ -222,7 +216,7 @@ export const DrawFeatures = observer(({ display }: Display) => {
 
     const onDefaultType = () => {
         const type = currentTypeGeom(geomTypeDefault) as string;
-        if (readonly && !editableLayerKey) {
+        if (store.readonly && !editableLayerKey) {
             addLayer(type);
         } else if (startEdit && featureCount.includes(editableLayerKey)) {
             addLayer(type);
@@ -252,11 +246,11 @@ export const DrawFeatures = observer(({ display }: Display) => {
         return (
             <div
                 title={AllDeleteItems}
-                className={readonly ? "icon-symbol" : "icon-symbol-disable"}
+                className={store.readonly ? "icon-symbol" : "icon-symbol-disable"}
                 onClick={() => {
-                    if (readonly) {
+                    if (store.readonly) {
                         removeItems();
-                        setDrawLayer([]);
+                        store.setDrawLayer([]);
                     }
                 }}
             >
@@ -266,42 +260,42 @@ export const DrawFeatures = observer(({ display }: Display) => {
     };
 
     const onDeleteLayer = (item: ItemType) => {
-        if (readonly) {
+        if (store.readonly) {
             removeItem(item.key);
-            setDrawLayer(drawLayer.filter((x) => x.key !== item.key));
+            store.setDrawLayer(store.drawLayer.filter((x) => x.key !== item.key));
         }
     }
 
     useEffect(() => {
-        itemModal?.geomType === "Polygon" ?
+        const val1 = store.options.map((item) => {
+            if (item.value === "application/gpx+xml") {
+                return { ...item, disabled: true }
+            } else {
+                return { ...item, disabled: false }
+            }
+        });
+
+        const val2 = store.options.map((item) => {
+            return { ...item, disabled: false }
+        });
+
+        store.itemModal?.geomType === "Polygon" ?
             (
-                setDefaultOp(options.find(item => item.value !== "application/gpx+xml")),
-                setOptions(options => {
-                    return options.map((item) => {
-                        if (item.value === "application/gpx+xml") {
-                            return { ...item, disabled: true }
-                        } else {
-                            return { ...item, disabled: false }
-                        }
-                    })
-                })
+                setDefaultOp(store.options.find(item => item.value !== "application/gpx+xml")),
+                store.setOptions(val1)
             ) :
             (
-                setDefaultOp(options[0]),
-                setOptions(options => {
-                    return options.map((item) => {
-                        return { ...item, disabled: false }
-                    })
-                })
+                setDefaultOp(store.options[0]),
+                store.setOptions(val2)
             )
-    }, [itemModal])
+    }, [store.itemModal])
 
     const showModal = () => {
         setOpen(true);
     };
 
     const handleOk = () => {
-        saveLayer(itemModal, defaultOp)
+        saveLayer(store.itemModal, defaultOp)
         setConfirmLoading(true);
         setTimeout(() => {
             setOpen(false);
@@ -318,39 +312,36 @@ export const DrawFeatures = observer(({ display }: Display) => {
     };
 
     useEffect(() => {
-        if (drawLayer) {
-            snapBuild(drawLayer.find((x) => x.key === editableLayerKey))
+        if (store.drawLayer) {
+            snapBuild(store.drawLayer.find((x) => x.key === editableLayerKey))
         }
-    }, [drawLayer]);
+    }, [store.drawLayer]);
 
     const toggleChecked = (key) => {
         if (key === "allLayer") {
-            setDrawLayer((prev: ItemType[]) => {
-                return prev.map((item: ItemType) => {
-                    if (item.key === editableLayerKey) {
-                        return { ...item, allLayer: !item.allLayer }
-                    };
-                    return item;
-                })
+            const val = store.drawLayer.map((item: ItemType) => {
+                if (item.key === editableLayerKey) {
+                    return { ...item, allLayer: !item.allLayer }
+                };
+                return item;
             })
+            store.setDrawLayer(val);
         } else if (key === "vertex") {
-            setDrawLayer((prev: ItemType[]) => {
-                return prev.map((item: ItemType) => {
-                    if (item.key === editableLayerKey) {
-                        return { ...item, vertex: !item.vertex }
-                    };
-                    return item;
-                })
+            const val = store.drawLayer.map((item: ItemType) => {
+                if (item.key === editableLayerKey) {
+                    return { ...item, vertex: !item.vertex }
+                };
+                return item;
             })
+            store.setDrawLayer(val);
         } else if (key === "edge") {
-            setDrawLayer((prev: ItemType[]) => {
-                return prev.map((item: ItemType) => {
-                    if (item.key === editableLayerKey) {
-                        return { ...item, edge: !item.edge }
-                    };
-                    return item;
-                })
+            const val = store.drawLayer.map((item: ItemType) => {
+                if (item.key === editableLayerKey) {
+                    return { ...item, edge: !item.edge }
+                };
+                return item;
             })
+            store.setDrawLayer(val);
         }
     };
 
@@ -384,12 +375,12 @@ export const DrawFeatures = observer(({ display }: Display) => {
                             <div
                                 key={index}
                                 className={
-                                    !readonly && !item.change ?
+                                    !store.readonly && !item.change ?
                                         "button-active" :
                                         "button-disable"
                                 }
                                 onClick={() => {
-                                    !readonly && !item.change ? toggleChecked(i.keyname) : undefined
+                                    !store.readonly && !item.change ? toggleChecked(i.keyname) : undefined
                                 }}>
                                 <div className={item[i.keyname] ? "icon-symbol-yes" : "icon-symbol-no"}
                                     title={i.keyname === "allLayer" ? titleEnable : i.title}>
@@ -431,14 +422,14 @@ export const DrawFeatures = observer(({ display }: Display) => {
                         value={defaultOp}
                         style={{ width: 120 }}
                         onChange={handleChange}
-                        options={options}
+                        options={store.options}
                     />
                 </div>
             </Modal>
             <div className="dropdown-button-draw">
                 <div className="info-file">
                     <Text title={currentMaxLayer} ellipsis={true} >{currentMaxLayer}</Text>
-                    {drawLayer.length > 1 && (<DeleteItems />)}
+                    {store.drawLayer.length > 1 && (<DeleteItems />)}
                 </div>
                 <div className="dropdown-button">
                     {DropdownType()}
@@ -449,12 +440,12 @@ export const DrawFeatures = observer(({ display }: Display) => {
                         </span>
                     </label>
                 </div>
-                {drawLayer.length > 0 ?
+                {store.drawLayer.length > 0 ?
                     editableLayerKey ?
-                        (<ControlSnap item={drawLayer.find((x) => x.key === editableLayerKey)} />) :
+                        (<ControlSnap item={store.drawLayer.find((x) => x.key === editableLayerKey)} />) :
                         (<ControlSnap item={itemDefault} />) : null}
                 <Radio.Group className="radio-custom" onChange={(e) => { onChangeSelect({ item: '', value: e.target.value }) }} value={editableLayerKey} >
-                    {drawLayer.map((item: ItemType, index: number) => {
+                    {store.drawLayer.map((item: ItemType, index: number) => {
                         const statusFeature = featureCount.includes(item.key)
                         return (
                             <div key={index} >
@@ -472,7 +463,7 @@ export const DrawFeatures = observer(({ display }: Display) => {
                                                 <span title={SaveAs} className={statusFeature ? "icon-symbol" : "icon-symbol-disable"} onClick={() => {
                                                     if (statusFeature) {
                                                         showModal()
-                                                        setItemModal(item)
+                                                        store.setItemModal(item)
                                                     }
                                                 }}>
                                                     <SaveAsIcon />
@@ -488,12 +479,12 @@ export const DrawFeatures = observer(({ display }: Display) => {
                                         )}
                                         <span
                                             title={DeleteLayer}
-                                            className={readonly ? "icon-symbol" : "icon-symbol-disable"}
+                                            className={store.readonly ? "icon-symbol" : "icon-symbol-disable"}
                                             onClick={() => { onDeleteLayer(item) }}>
                                             <DeleteForever />
                                         </span>
                                         {
-                                            !readonly && !item.change ? (
+                                            !store.readonly && !item.change ? (
                                                 <label className="icon-edit-margin">
                                                     <Input disabled={item.change} type="checkbox"
                                                         onChange={(e) => {
@@ -504,7 +495,7 @@ export const DrawFeatures = observer(({ display }: Display) => {
                                                         className="input-button-none" />
                                                     <span
                                                         title={ChangeGeometry}
-                                                        className={!readonly && item.modify ? "icon-edit icon-symbol" : !item.change && statusFeature ? "icon-symbol" : "icon-symbol-disable"}>
+                                                        className={!store.readonly && item.modify ? "icon-edit icon-symbol" : !item.change && statusFeature ? "icon-symbol" : "icon-symbol-disable"}>
                                                         <ModifyIcon />
                                                     </span>
                                                 </label>
