@@ -40,7 +40,6 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                                 })
                             }
                             pickerOptions={{
-                                requireClass: "resource_group",
                                 initParentId: store.parent,
                                 clsFilter: store.composite.cls,
                             }}

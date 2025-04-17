@@ -27,17 +27,7 @@ type Action = keyof Pick<
     | "getSelectedParent"
 >;
 
-const clsObject = {
-    layer: ["vector_layer", "postgis_layer"],
-    basemap_layer: ["basemap_layer"],
-    wms_service: ["wmsclient_connection"],
-    wfs_service: ["wfsclient_connection"],
-    tms_service: ["tmsclient_connection"],
-    style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
-    layer_webmap: ["vector_layer", "postgis_layer", "raster_layer", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "wmsclient_layer", "tileset", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
-};
 
-Object.values(clsObject).map(i => i.push("resource_group"))
 
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
@@ -387,18 +377,35 @@ export class ResourcePickerStore
 
     @actionHandler
     private getResourceParent() {
+
+        const clsObject = {
+            layer: ["vector_layer", "postgis_layer"],
+            basemap_layer: ["basemap_layer"],
+            wms_service: ["wmsclient_connection"],
+            wfs_service: ["wfsclient_connection"],
+            tms_service: ["tmsclient_connection"],
+            style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+            layer_webmap: ["vector_layer", "postgis_layer", "raster_layer", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "wmsclient_layer", "tileset", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
+        };
+
         const { layer, style } = clsObject;
         if (this.clsFilter === undefined) {
             this.clsResource = []
         }
         else if (style.includes(this.clsFilter)) {
+            clsObject.layer.push("resource_group");
             this.clsResource = layer
+            this.requireInterface = ["IFeatureLayer"];
+            console.log(this.clsResource);
         }
         else if (clsObject[this.clsFilter]) {
-            this.clsResource = clsObject[this.clsFilter]
+            clsObject[this.clsFilter].push("resource_group");
+            this.clsResource = clsObject[this.clsFilter];
+            console.log(this.clsResource);
         }
         else {
-            this.clsResource = ["resource_group"]
+            this.clsResource = ["resource_group"];
+            this.requireClass = ["resource_group"];
         }
     }
 
