@@ -390,18 +390,16 @@ export class ResourcePickerStore
 
         const { layer, style } = clsObject;
         if (this.clsFilter === undefined) {
-            this.clsResource = []
+            this.clsResource = [];
         }
         else if (style.includes(this.clsFilter)) {
             clsObject.layer.push("resource_group");
-            this.clsResource = layer
+            this.clsResource = layer;
             this.requireInterface = ["IFeatureLayer"];
-            console.log(this.clsResource);
         }
         else if (clsObject[this.clsFilter]) {
             clsObject[this.clsFilter].push("resource_group");
             this.clsResource = clsObject[this.clsFilter];
-            console.log(this.clsResource);
         }
         else {
             this.clsResource = ["resource_group"];
