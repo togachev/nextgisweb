@@ -94,6 +94,10 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                         <CheckboxValue {...item.layerIdentifiable.cprops()}>
                             {msgIdentifiable}
                         </CheckboxValue>
+                    </Space>
+                </Lot>
+                <Lot row>
+                    <Space size="middle">
                         <CheckboxValue {...item.layerHighligh.cprops()}>
                             {msgLayerHighligh}
                         </CheckboxValue>
