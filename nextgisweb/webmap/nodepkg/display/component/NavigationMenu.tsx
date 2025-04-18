@@ -2,13 +2,16 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Row, Col, Typography } from "@nextgisweb/gui/antd";
+import { Dropdown, Space, Row, Col, Typography } from "@nextgisweb/gui/antd";
 
+import type { MenuProps } from "@nextgisweb/gui/antd";
 import type { PanelManager } from "../../panel/PanelManager";
 import type { Display } from "../Display";
 
 import Information from "@nextgisweb/icon/mdi/information";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
+import Home from "@nextgisweb/icon/mdi/home-circle";
+import LinkIcon from "@nextgisweb/icon/mdi/link";
 
 import "./NavigationMenu.less";
 
@@ -27,6 +30,30 @@ export const NavigationMenu = observer(({ store, display }: { store: PanelManage
     );
 
     const infomap = display.config.infomap;
+
+    const items: MenuProps['items'] = [
+        {
+            key: '1',
+            label: (
+                <Link target="_blank" href={infomap.link}><span title={gettext("Map properties")} className="iconLinks">{gettext("Map properties")}</span></Link>
+            ),
+            icon: <Information />,
+        },
+        {
+            key: '2',
+            label: (
+                <Link target="_blank" href={infomap.update}><span title={gettext("Map settings")} className="iconLinks">{gettext("Map settings")}</span></Link>
+            ),
+            icon: <Cogs />,
+        },
+        {
+            key: '3',
+            label: (
+                <Link target="_blank" href={infomap.resource}><span title={gettext("Resources")} className="iconLinks">{gettext("Resources")}</span></Link>
+            ),
+            icon: <Home />,
+        },
+    ];
 
     const active = store.activePanel;
     return (
@@ -48,10 +75,13 @@ export const NavigationMenu = observer(({ store, display }: { store: PanelManage
             </Col>
             <Col>
                 {!display.tinyConfig && infomap.scope ? (
-                    <div className="infoblock">
-                        <Link target="_blank" href={infomap.link}><span title={gettext("Map properties")} className="iconLinks"><Information /></span></Link>
-                        <Link target="_blank" href={infomap.update}><span title={gettext("Map settings")} className="iconLinks"><Cogs /></span></Link>
-                    </div>
+                    <Dropdown menu={{ items }} trigger={["click", "hover"]}>
+                        <div className="infoblock" onClick={(e) => e.preventDefault()}>
+                            <span title={gettext("Map properties")} className="iconLinks">
+                                <LinkIcon />
+                            </span>
+                        </div>
+                    </Dropdown>
                 ) : null}
             </Col>
         </Row>

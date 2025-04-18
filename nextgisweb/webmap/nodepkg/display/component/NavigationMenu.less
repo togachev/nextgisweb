@@ -8,8 +8,8 @@
     color: var(--on-primary-text);
     scrollbar-width: thin;
     display: flex;
-    justify-content: space-between;
-    flex-direction: column;
+    justify-content: center;
+    align-content: space-between;
 
     .ngw-webmap-display-navigation-menu-item {
         cursor: pointer;
@@ -45,21 +45,16 @@
     justify-content: space-around;
 
     .iconLinks {
-        color: #87b4c7;
-        font-size: 24px;
+        opacity: 0.5;
+        cursor: pointer;
         height: 40px;
-        width: 40px;
-    }
+        user-select: none;
+        text-align: center;
+        font-size: 24px;
 
-    svg.icon {
-        fill: #87b4c7;
-    }
-
-    svg.icon:hover {
-        fill: rgb(255, 255, 255);
-    }
-
-    .iconLinks:hover {
-        color: rgb(255, 255, 255);
+        &:hover {
+            opacity: 1;
+            color: rgb(255, 255, 255);
+        }
     }
 }
