@@ -16,8 +16,8 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
     readonly _parentStore?: FeatureEditorStore;
     readonly _fields?: FeatureLayerFieldRead[];
 
-    @observable.shallow accessor value: NgwAttributeValue = {};
-    @observable.shallow private accessor _initValue: NgwAttributeValue = {};
+    @observable.shallow accessor value: NgwAttributeValue | null = null;
+    @observable.shallow private accessor _initValue: NgwAttributeValue | null = null;
 
     constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
         this._parentStore = parentStore;
@@ -90,8 +90,8 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
         }
     };
 
-    @action
-    setValues = (values: AppAttributes = {}) => {
+    @action.bound
+    setValues(values: AppAttributes) {
         this.value = this._formatAttributes(values);
     };
 

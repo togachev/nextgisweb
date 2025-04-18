@@ -1,4 +1,3 @@
-import re
 from contextlib import contextmanager
 from enum import Enum
 from typing import Literal, Union
@@ -6,11 +5,7 @@ from typing import Literal, Union
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
-from msgspec import UNSET
-from shapely.geometry import box
-from sqlalchemy import alias, bindparam, cast, func, select, sql, text
-from sqlalchemy import and_ as sql_and
-from sqlalchemy import or_ as sql_or
+from sqlalchemy import alias, cast, func, sql
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
@@ -25,21 +20,18 @@ from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
     Feature,
-    FeatureQueryIntersectsMixin,
     FeatureSet,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryIlike,
-    IFeatureQueryIntersects,
     IFeatureQueryLike,
     IFeatureQueryOrderBy,
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
 )
-from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
@@ -193,7 +185,7 @@ class TablenogeomLayerField(Base, LayerField):
     column_name = sa.Column(sa.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(IFeatureLayer, IWritableFeatureLayer)
 class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
     identity = "tablenogeom_layer"
     cls_display_name = gettext("Tablenogeom layer")
@@ -416,10 +408,9 @@ class TablenogeomLayerSerializer(Serializer, resource=TablenogeomLayer):
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
     IFeatureQueryIlike,
-    IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
 )
-class FeatureQueryBase(FeatureQueryIntersectsMixin):
+class FeatureQueryBase():
     def __init__(self):
         super().__init__()
 
