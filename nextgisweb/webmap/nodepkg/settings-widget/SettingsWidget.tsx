@@ -137,7 +137,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                         <ResourceSelectRef
                             pickerOptions={{
                                 initParentId: store.composite.parent,
-                                requireInterface: "IFeatureLayer",
+                                requireClass: ["vector_layer", "postgis_layer"],
                                 clsFilter: "layer"
                             }}
                             value={store.bookmarkResource}

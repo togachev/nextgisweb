@@ -25,21 +25,7 @@ from .interface import (
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
-from .interface_nogeom import (
-    FIELD_TYPE,
-    FIELD_TYPE_OGR,
-    FeatureLayerFieldDatatype,
-    IFeatureLayerNoGeom,
-    IFeatureQuery,
-    IFeatureQueryFilter,
-    IFeatureQueryFilterBy,
-    IFeatureQueryIlike,
-    IFeatureQueryLike,
-    IFeatureQueryOrderBy,
-    IFieldEditableFeatureLayer,
-    IVersionableFeatureLayer,
-    IWritableFeatureLayer,
-)
+
 from .model import FeatureQueryIntersectsMixin, LayerField, LayerFieldsMixin
 from .transaction import FeatureLayerTransaction
 from .versioning import FVersioningMeta, FVersioningObj
