@@ -157,7 +157,7 @@ class TablenogeomConnection(Base, Resource):
         try:
             yield conn
         except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
+            raise ValidationError(str(exc.orig))
         finally:
             conn.close()
 
