@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Dropdown, Space, Row, Col, Typography } from "@nextgisweb/gui/antd";
+import { Dropdown, Row, Col, Typography } from "@nextgisweb/gui/antd";
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import type { PanelManager } from "../../panel/PanelManager";
