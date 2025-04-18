@@ -205,21 +205,11 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
     table = sa.Column(sa.Unicode, nullable=False)
     column_id = sa.Column(sa.Unicode, nullable=False)
 
-    resource_field_name = sa.Column(sa.Unicode, nullable=True)
-    external_field_name = sa.Column(sa.Unicode, nullable=True)
-    external_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
-
     __field_class__ = TablenogeomLayerField
 
     connection = orm.relationship(
         Resource,
         foreign_keys=connection_id,
-        cascade="save-update, merge",
-    )
-
-    connection_relation = orm.relationship(
-        Resource,
-        foreign_keys=external_resource_id,
         cascade="save-update, merge",
     )
 
@@ -235,9 +225,6 @@ class TablenogeomLayer(Base, Resource, LayerFieldsMixin):
                 schema=self.schema,
                 table=self.table,
                 column_id=self.column_id,
-                resource_field_name=self.resource_field_name,
-                external_field_name=self.external_field_name,
-                external_resource_id=self.external_resource_id,
             )
         )
         return source_meta
@@ -416,13 +403,9 @@ class FieldsAttr(SAttribute):
 
 class TablenogeomLayerSerializer(Serializer, resource=TablenogeomLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
-    connection_relation = SResource(read=ResourceScope.read, write=ResourceScope.update)
     schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     table = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     column_id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    resource_field_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    external_field_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    external_resource_id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     fields = FieldsAttr(read=None, write=ResourceScope.update)
 

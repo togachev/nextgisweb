@@ -2,7 +2,7 @@ import { uniq } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import { Divider, Select } from "@nextgisweb/gui/antd";
+import { Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { AutoCompleteInput } from "@nextgisweb/gui/component";
 import { Area } from "@nextgisweb/gui/mayout";
@@ -18,16 +18,10 @@ const msgConnection = gettext("Connection");
 const msgSchema = gettext("Schema");
 const msgTable = gettext("Table");
 const msgColumnId = gettext("ID column");
-
-const msgResRelSettings = gettext("Resource relation settings");
-const msgFieldforConnectionWithExternalTable = gettext("Field for connection with external table");
-const msgExternalTableField = gettext("External table field");
-const msgTableForCommunication = gettext("Table for communication");
-
 const msgFields = gettext("Fields");
 
 async function inspConFetch([conId]: [number], opts: { signal: AbortSignal }) {
-    const data = await route("tablenogeom.connection.inspect", conId).get({
+    const data = await route("tablenogeom.connection.inspect_tablenogeom", conId).get({
         signal: opts.signal,
     });
     return data
@@ -55,20 +49,9 @@ async function inspTabFetch(
     return result;
 }
 
-async function relFieldFetch([extResId]: [number], opts: { signal: AbortSignal }) {
-    const fields = await route("feature_layer.fields", extResId).get({
-        signal: opts.signal,
-    });
-    const result = { fields: new Array<string>() };
-    fields.map(item => {
-        if (/^INTEGER|BIGINT$/i.test(item.datatype)) result.fields.push(item.keyname);
-    })
-    return result;
-}
-type FocusedField = "schema" | "table" | "columnId" | "resourceFieldName" | "externalFieldName" | null;
+type FocusedField = "schema" | "table" | "columnId" | null;
 const conFields: FocusedField[] = ["schema", "table"];
-const tabFields: FocusedField[] = ["columnId","resourceFieldName"];
-const relFields: FocusedField[] = ["externalFieldName"];
+const tabFields: FocusedField[] = ["columnId"];
 
 const SKIPPED = { status: "skipped" as const };
 type OrSkipped<V extends (...args: never[]) => unknown> =
@@ -85,12 +68,10 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
     const inspCon = useCache(inspConFetch);
     const inspTab = useCache(inspTabFetch);
-    const resFieldRel = useCache(relFieldFetch);
 
     const conId = store.connection.value?.id;
     const schema = store.schema.value;
     const table = store.table.value;
-    const extResId = store.connection_relation.value?.id;
 
     let conInfo: OrSkipped<typeof inspCon> = SKIPPED;
     if (conId) {
@@ -104,13 +85,6 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
         // Do not inspect table util id or geom column focused
         const cachedOnly = !tabFields.includes(focusedField!);
         tabInfo = inspTab([conId, schema, table], { cachedOnly });
-    }
-
-    let relFieldInfo: OrSkipped<typeof resFieldRel> = SKIPPED;
-    if (extResId) {
-        // Do not inspect connection util schema or table focused
-        const cachedOnly = !relFields.includes(focusedField!);
-        relFieldInfo = resFieldRel([extResId], { cachedOnly });
     }
 
     const schemaOpts = useMemo(() => {
@@ -132,16 +106,6 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
         return tabInfo.data.id.map((n) => ({ value: n, label: n }));
     }, [tabInfo]);
 
-    const resourceFieldNameOpts = useMemo(() => {
-        if (tabInfo?.status !== "ready") return undefined;
-        return tabInfo.data.id.map((n) => ({ value: n, label: n }));
-    }, [tabInfo]);
-
-    const externalFieldNameOpts = useMemo(() => {
-        if (relFieldInfo?.status !== "ready") return undefined;
-        return relFieldInfo.data.fields.map((n) => ({ value: n, label: n }));
-    }, [relFieldInfo]);
-
     const acProps = useCallback(
         (
             field: NonNullable<FocusedField>,
@@ -157,84 +121,50 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
         [focusedField]
     );
 
-    const resourceFieldNameProps = acProps("resourceFieldName", tabInfo, resourceFieldNameOpts);
-    Object.assign(resourceFieldNameProps, { allowClear: true, });
-
-    const externalFieldNameProps = acProps("externalFieldName", relFieldInfo, externalFieldNameOpts);
-    Object.assign(externalFieldNameProps, { allowClear: true, });
-
     return (
-        <>
-            <Area pad cols={["1fr", "1fr"]}>
-                <LotMV
-                    row
-                    label={msgConnection}
-                    value={store.connection}
-                    component={ResourceSelectRef}
-                    props={{
-                        pickerOptions: {
-                            requireClass: "tablenogeom_connection",
-                            initParentId: store.composite.parent,
-                        },
-                        style: { width: "100%" },
-                    }}
-                />
-                <LotMV
-                    label={msgSchema}
-                    value={store.schema}
-                    component={AutoCompleteInput}
-                    props={acProps("schema", conInfo, schemaOpts)}
-                />
-                <LotMV
-                    label={msgTable}
-                    value={store.table}
-                    component={AutoCompleteInput}
-                    props={acProps("table", conInfo, tableOpts)}
-                />
-                <LotMV
-                    label={msgColumnId}
-                    value={store.columnId}
-                    component={AutoCompleteInput}
-                    props={acProps("columnId", tabInfo, columnIdOpts)}
-                />
-                <LotMV
-                    row
-                    label={msgFields}
-                    value={store.fields}
-                    component={Select}
-                    props={{
-                        options: fieldsOptions,
-                        style: { width: "100%" },
-                    }}
-                />
-            </Area>
-            <Divider orientation="left" orientationMargin="16" plain>{msgResRelSettings}</Divider>
-            <Area pad cols={["1fr", "1fr"]}>
-                <LotMV
-                    row
-                    label={msgTableForCommunication}
-                    value={store.connection_relation}
-                    component={ResourceSelectRef}
-                    props={{
-                        pickerOptions: { requireClass: "tablenogeom_layer" },
-                        style: { width: "100%" },
-                        allowClear: true,
-                    }}
-                />
-                <LotMV
-                    label={msgFieldforConnectionWithExternalTable}
-                    value={store.resourceFieldName}
-                    component={AutoCompleteInput}
-                    props={resourceFieldNameProps}
-                />
-                <LotMV
-                    label={msgExternalTableField}
-                    value={store.externalFieldName}
-                    component={AutoCompleteInput}
-                    props={externalFieldNameProps}
-                />
-            </Area>
-        </>
+        <Area pad cols={["1fr", "1fr"]}>
+            <LotMV
+                row
+                label={msgConnection}
+                value={store.connection}
+                component={ResourceSelectRef}
+                props={{
+                    pickerOptions: {
+                        requireClass: "tablenogeom_connection",
+                        initParentId: store.composite.parent,
+                    },
+                    style: { width: "100%" },
+                }}
+            />
+            <LotMV
+                label={msgSchema}
+                value={store.schema}
+                component={AutoCompleteInput}
+                props={acProps("schema", conInfo, schemaOpts)}
+            />
+            <LotMV
+                label={msgTable}
+                value={store.table}
+                component={AutoCompleteInput}
+                props={acProps("table", conInfo, tableOpts)}
+            />
+            <LotMV
+                label={msgColumnId}
+                value={store.columnId}
+                component={AutoCompleteInput}
+                props={acProps("columnId", tabInfo, columnIdOpts)}
+            />
+            <LotMV
+                row
+                label={msgFields}
+                value={store.fields}
+                component={Select}
+                props={{
+                    options: fieldsOptions,
+                    style: { width: "100%" },
+                }}
+            />
+        </Area>
     );
 });
 
