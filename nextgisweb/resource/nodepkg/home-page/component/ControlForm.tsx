@@ -13,7 +13,7 @@ export const ControlForm = ({ handleCancel, resetForm }) => (
                 icon={<Cancel />}
                 onClick={handleCancel}
             >
-                {gettext("Cancel")}
+                {window.innerWidth >= 466 && window.innerHeight >= 466 && gettext("Cancel")}
             </Button>
         </Form.Item>
         <Form.Item noStyle label={null}>
@@ -24,7 +24,7 @@ export const ControlForm = ({ handleCancel, resetForm }) => (
                 icon={<Restore />}
                 onClick={resetForm}
             >
-                {gettext("Reset")}
+                {window.innerWidth >= 466 && window.innerHeight >= 466 && gettext("Reset")}
             </Button>
         </Form.Item>
         <Form.Item noStyle label={null}>
@@ -34,7 +34,7 @@ export const ControlForm = ({ handleCancel, resetForm }) => (
                 icon={<Save />}
                 title={gettext("Save")}
             >
-                {gettext("Save")}
+                {window.innerWidth >= 466 && window.innerHeight >= 466 && gettext("Save")}
             </Button>
         </Form.Item>
     </Space>

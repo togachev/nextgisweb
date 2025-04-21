@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useState } from "react";
+import { CSSProperties, useEffect, useLayoutEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { createPortal } from "react-dom";
 import { Rnd } from "react-rnd";
@@ -43,9 +43,9 @@ export interface Rnd {
 }
 const position: Rnd = {
     x: W > 466 ? W / 2 - width / 2 : 0,
-    y: H / 2 - height / 2,
+    y: H > 466 ? H / 2 - height / 2 : 0,
     width: W > 466 ? width : W,
-    height: "auto",
+    height: H > 466 ? height : H,
 };
 
 export const Header = observer(({ store, config }) => {
@@ -170,7 +170,6 @@ export const Header = observer(({ store, config }) => {
     const openForm = () => {
         store.setValueRnd(position);
         store.setOpen(true)
-        store.setValueRnd(position);
     };
 
     const handleCancel = () => {
@@ -185,6 +184,48 @@ export const Header = observer(({ store, config }) => {
         width: "calc(100%)",
         maxHeight: store.valueRnd?.height,
     };
+
+    useLayoutEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 466) {
+                const value = {
+                    ...store.valueRnd,
+                    x: window.innerWidth / 2 - (window.innerWidth * 0.65) / 2,
+                    width: window.innerWidth * 0.65,
+                };
+                store.setValueRnd(value);
+            } else {
+                const value = {
+                    ...store.valueRnd,
+                    x: 0,
+                    width: window.innerWidth,
+                };
+                store.setValueRnd(value);
+            }
+
+            if (window.innerHeight >= 466) {
+                const value = {
+                    ...store.valueRnd,
+                    y: window.innerHeight / 2 - (window.innerHeight * 0.65) / 2,
+                    height: window.innerHeight * 0.65,
+                };
+                store.setValueRnd(value);
+            } else {
+                const value = {
+                    ...store.valueRnd,
+                    y: 0,
+                    height: window.innerHeight,
+                };
+                store.setValueRnd(value);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, [window.innerWidth, window.innerHeight]);
 
     return (
         <>
@@ -218,8 +259,8 @@ export const Header = observer(({ store, config }) => {
             {store.open && createPortal(
                 <Rnd
                     className="rnd-style"
-                    minWidth={store.valueRnd.width === W ? W : position.width}
-                    minHeight={store.valueRnd.height === H ? H : position.height}
+                    // minWidth={store.valueRnd.width === W ? W : position.width}
+                    // minHeight={store.valueRnd.height === H ? H : position.height}
                     position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
                     size={{ width: store.valueRnd.width, height: store.valueRnd.height }}
                     onDragStop={(e, d) => {
