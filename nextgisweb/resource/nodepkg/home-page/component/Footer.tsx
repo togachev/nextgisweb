@@ -83,7 +83,7 @@ export const Footer = observer(({ store: storeProp, config }) => {
     const [status, setStatus] = useState(false);
     const [form] = Form.useForm();
     const [store] = useState(
-        () => storeProp || new HomeStore()
+        () => storeProp || new HomeStore({})
     );
 
     const paramsFileFooter = {

@@ -77,6 +77,13 @@ export interface HeaderProps {
     picture: UploadFile[];
 };
 
+export interface Rnd {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 type Action = keyof Pick<HomeStore,
     | "getWidthMenu"
     | "getMapValues"
@@ -89,11 +96,14 @@ export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
+    @observable accessor open = false;
 
     @observable.shallow accessor listMaps: ListMapProps[] = [];
     @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
     @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
 
+
+    @observable.shallow accessor valueRnd: Rnd;
 
     @observable.shallow accessor initialFooter: FooterProps;
     @observable.shallow accessor initialHeader: HeaderProps;
@@ -109,6 +119,16 @@ export class HomeStore {
         this.getMapValues("all");
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
+    };
+
+    @action
+    setValueRnd(valueRnd) {
+        this.valueRnd = valueRnd;
+    };
+
+    @action
+    setOpen(open: boolean): void {
+        this.open = open;
     };
 
     @action

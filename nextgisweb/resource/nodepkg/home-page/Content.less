@@ -491,9 +491,7 @@ textarea::-webkit-input-placeholder {
 .item-edit {
 	display: flex;
 	border-radius: 3px;
-	margin-bottom: 12px;
-	justify-content: space-between;
-	align-items: center;
+	flex-wrap: wrap;
 
 	.first-item,
 	.last-item {
@@ -503,25 +501,26 @@ textarea::-webkit-input-placeholder {
 
 
 .upload-footer {
-	display: inline-flex;
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .upload-header {
-	display: inline-flex;
+	display: flex;
 }
 
 .file-list {
 	font-weight: 500;
 
 	.file-name {
-		width: 100%;
-		display: inline-grid;
+		// width: 100%;
+		// display: inline-grid;
 
-		.ellipsis {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
+		// .ellipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		// }
 	}
 
 	.file-size {

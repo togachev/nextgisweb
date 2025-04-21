@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Button, Col, Form, message, Row, Upload, Image, Space } from "@nextgisweb/gui/antd";
+import { Button, Form, message, Upload, Image, Space, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
@@ -8,12 +8,12 @@ import Eye from "@nextgisweb/icon/mdi/eye";
 import { HomeStore } from "../HomeStore";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 
+const { Text } = Typography;
+
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 export const UploadComponent = observer(({ store: storeProp, params }) => {
-    const [store] = useState(
-        () => storeProp || new HomeStore()
-    );
+    const [store] = useState(() => storeProp || new HomeStore());
     const { size, extension, key, type, formatName, className, values } = params;
 
     const TYPE_FILE = [
@@ -105,7 +105,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         style: { width: "100%" },
         itemRender: (originNode, file, fileList, actions) => {
             return (
-                <Space className="file-list">
+                <Space wrap={true}>
                     <Button
                         className="icon-file"
                         icon={<Eye />}
@@ -120,14 +120,8 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                         onClick={actions.remove}
                         title={gettext("Delete file")}
                     />
-                    <span className="file-name" title={file.name}>
-                        <span className="ellipsis" title={file.name}>
-                            {file.name}
-                        </span>
-                    </span>
-                    <span className="file-size" title={gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}>
-                        {gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}
-                    </span>
+                    <Text ellipsis={{ suffix: "", tooltip: true }} >{file.name}</Text>
+                    <Text ellipsis={{ suffix: "", tooltip: true }} >{gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}</Text>
                 </Space>
             );
         },
@@ -155,42 +149,41 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     };
 
     return (
-        <Row gutter={[16, 16]}>
-            <Col flex="auto">
-                <Form.Item
-                    noStyle
-                    name={key}
-                    valuePropName="picture"
-                    getValueFromEvent={normFile}
-                >
-                    <Upload {...props} style={{ width: "100%" }}>
-                        {files?.length > 1 ? null : (
-                            <Button
-                                style={{ margin: "0 10px 0 0" }}
-                                icon={<FileArrowUpDownOutline />}
-                                type="default"
-                                title={msgInfo.join(" \n")}
-                            />
-                        )}
-                    </Upload>
-                </Form.Item>
-            </Col>
+
+        <Space wrap style={{
+            display: "flex"
+        }}>
+            <Form.Item
+                noStyle
+                name={key}
+                valuePropName="picture"
+                getValueFromEvent={normFile}
+            >
+                <Upload {...props} style={{ width: "100%" }}>
+                    {files?.length > 1 ? null : (
+                        <Button
+                            style={{ margin: "0 10px 0 0" }}
+                            icon={<FileArrowUpDownOutline />}
+                            type="default"
+                            title={msgInfo.join(" \n")}
+                        />
+                    )}
+                </Upload>
+            </Form.Item>
             {previewImage && (
-                <Col>
-                    <Image
-                        styles={{ mask: { backgroundColor: "transparent" } }}
-                        wrapperStyle={{ display: "none" }}
-                        preview={{
-                            visible: previewOpen,
-                            onVisibleChange: (visible) => setPreviewOpen(visible),
-                            afterOpenChange: (visible) => !visible && setPreviewImage(""),
-                            transitionName: "",
-                            maskTransitionName: "",
-                        }}
-                        src={previewImage}
-                    />
-                </Col>
+                <Image
+                    styles={{ mask: { backgroundColor: "transparent" } }}
+                    wrapperStyle={{ display: "none" }}
+                    preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) => !visible && setPreviewImage(""),
+                        transitionName: "",
+                        maskTransitionName: "",
+                    }}
+                    src={previewImage}
+                />
             )}
-        </Row >
+        </Space >
     );
 });
