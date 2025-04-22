@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useLayoutEffect, useState } from "react";
+import { CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { createPortal } from "react-dom";
 import { Rnd } from "react-rnd";
@@ -33,15 +33,34 @@ type MenuItem = Required<MenuProps>["items"][number];
 const { Title } = Typography;
 const signInText = gettext("Sign in");
 const minVal = 500;
+const p = 0.55;
 
+const getSize = (cssStyleDeclaration) => {
+    if (cssStyleDeclaration.boxSizing === "border-box") {
+        return {
+            h: parseInt(cssStyleDeclaration.height, 10),
+            w: parseInt(cssStyleDeclaration.width, 10),
+        };
+    }
+
+    return {
+        h:
+            parseInt(cssStyleDeclaration.height, 10) +
+            parseInt(cssStyleDeclaration.marginTop, 10) +
+            parseInt(cssStyleDeclaration.marginBottom, 10),
+        w:
+            parseInt(cssStyleDeclaration.width, 10) +
+            parseInt(cssStyleDeclaration.marginLeft, 10) +
+            parseInt(cssStyleDeclaration.marginRight, 10),
+    };
+};
 
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
     const [collapse, setCollapse] = useState(false);
     const [status, setStatus] = useState(false);
     const [form] = Form.useForm();
+    const refContainer = useRef(document.body);
 
     const paramsFileHeader = {
         size: 100, /* KB */
@@ -157,26 +176,27 @@ export const Header = observer(({ store, config }) => {
     };
 
     const openForm = () => {
+        const size = getSize(getComputedStyle(refContainer.current));
         const value = {
             ...store.valueRnd,
-            x: minVal < w ? w / 2 - (w * 0.55) / 2 : 0,
-            width: minVal < w ? w * 0.55 : w,
-            y: minVal < h ? h / 2 - (h * 0.55) / 2 : 0,
-            height: minVal < h ? h * 0.55 : h,
+            x: minVal < size.w ? size.w / 2 - (size.w * p) / 2 : 0,
+            width: minVal < size.w ? size.w * p : size.w,
+            y: minVal < size.h ? size.h / 2 - (size.h * p) / 2 : 0,
+            height: minVal < size.h ? size.h * p : size.h,
         };
         store.setValueRnd(value);
-
         store.setOpen(true)
     };
 
     const handleCollapse = () => {
         setCollapse(!collapse);
+        const size = getSize(getComputedStyle(refContainer.current));
         const value = {
             ...store.valueRnd,
-            x: collapse ? w / 2 - (w * 0.55) / 2 : 0,
-            width: collapse ? w * 0.55 : w,
-            y: collapse ? h / 2 - (h * 0.55) / 2 : 0,
-            height: collapse ? h * 0.55 : h,
+            x: collapse ? size.w / 2 - (size.w * p) / 2 : 0,
+            width: collapse ? size.w * p : size.w,
+            y: collapse ? size.h / 2 - (size.h * p) / 2 : 0,
+            height: collapse ? size.h * p : size.h,
         };
         store.setValueRnd(value);
     };
@@ -196,12 +216,13 @@ export const Header = observer(({ store, config }) => {
 
     useLayoutEffect(() => {
         const handleResize = () => {
+            const size = getSize(getComputedStyle(refContainer.current));
             const value = {
                 ...store.valueRnd,
-                x: minVal < w ? w / 2 - (w * 0.55) / 2 : 0,
-                width: minVal < w ? w * 0.55 : w,
-                y: minVal < h ? h / 2 - (h * 0.55) / 2 : 0,
-                height: minVal < h ? h * 0.55 : h,
+                x: minVal < size.w ? size.w / 2 - (size.w * p) / 2 : 0,
+                width: minVal < size.w ? size.w * p : size.w,
+                y: minVal < size.h ? size.h / 2 - (size.h * p) / 2 : 0,
+                height: minVal < size.h ? size.h * p : size.h,
             };
             store.setValueRnd(value);
         };
@@ -254,8 +275,12 @@ export const Header = observer(({ store, config }) => {
                             store.setValueRnd(value);
                         }
                     }}
-                    bounds="window"
-                    enableResizing={false}
+                    onResize={(e, direction, ref, delta, position) => {
+                        const value = { ...store.valueRnd, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y };
+                        store.setValueRnd(value);
+                    }}
+                    bounds={refContainer.current}
+                    enableResizing={true}
                     cancel=".contentStyle,.footerStyle"
                 >
                     <Form
