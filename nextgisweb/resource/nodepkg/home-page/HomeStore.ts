@@ -92,6 +92,8 @@ type Action = keyof Pick<HomeStore,
     | "saveSetting"
 >;
 
+const p = 0.55;
+
 export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
@@ -114,11 +116,14 @@ export class HomeStore {
     @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
     @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
 
+    private minVal: number;
+
     constructor() {
         this.getWidthMenu();
         this.getMapValues("all");
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
+        this.minVal = 500
     };
 
     @action
@@ -189,6 +194,51 @@ export class HomeStore {
     @action
     setInitialFooter(initialFooter: FooterProps) {
         this.initialFooter = initialFooter;
+    };
+
+    private getSize(cssDecl) {
+        if (cssDecl.boxSizing === "border-box") {
+            return {
+                h: parseInt(cssDecl.height, 10),
+                w: parseInt(cssDecl.width, 10),
+            };
+        }
+
+        return {
+            h:
+                parseInt(cssDecl.height, 10) +
+                parseInt(cssDecl.marginTop, 10) +
+                parseInt(cssDecl.marginBottom, 10),
+            w:
+                parseInt(cssDecl.width, 10) +
+                parseInt(cssDecl.marginLeft, 10) +
+                parseInt(cssDecl.marginRight, 10),
+        };
+    };
+
+    private handleResize(ref) {
+        const size = this.getSize(getComputedStyle(ref.current));
+        const value = {
+            ...this.valueRnd,
+            x: this.minVal < size.w ? size.w / 2 - (size.w * p) / 2 : 0,
+            width: this.minVal < size.w ? size.w * p : size.w,
+            y: this.minVal < size.h ? size.h / 2 - (size.h * p) / 2 : 0,
+            height: this.minVal < size.h ? size.h * p : size.h,
+        };
+        this.setValueRnd(value);
+    };
+
+    private openForm(ref) {
+        const size = this.getSize(getComputedStyle(ref.current));
+        const value = {
+            ...this.valueRnd,
+            x: this.minVal < size.w ? size.w / 2 - (size.w * p) / 2 : 0,
+            width: this.minVal < size.w ? size.w * p : size.w,
+            y: this.minVal < size.h ? size.h / 2 - (size.h * p) / 2 : 0,
+            height: this.minVal < size.h ? size.h * p : size.h,
+        };
+        this.setValueRnd(value);
+        this.setOpen(true)
     };
 
     @actionHandler
