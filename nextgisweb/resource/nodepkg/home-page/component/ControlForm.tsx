@@ -4,7 +4,7 @@ import Save from "@nextgisweb/icon/material/save";
 import Cancel from "@nextgisweb/icon/mdi/cancel";
 import Restore from "@nextgisweb/icon/mdi/restore";
 
-export const ControlForm = ({ handleCancel, resetForm }) => (
+export const ControlForm = ({ handleCancel, minVal, resetForm }) => (
     <Space wrap>
         <Form.Item noStyle label={null}>
             <Button
@@ -13,7 +13,7 @@ export const ControlForm = ({ handleCancel, resetForm }) => (
                 icon={<Cancel />}
                 onClick={handleCancel}
             >
-                {window.innerWidth >= 466 && window.innerHeight >= 466 && gettext("Cancel")}
+                {window.innerWidth > minVal && window.innerHeight > minVal && gettext("Cancel")}
             </Button>
         </Form.Item>
         <Form.Item noStyle label={null}>
@@ -24,7 +24,7 @@ export const ControlForm = ({ handleCancel, resetForm }) => (
                 icon={<Restore />}
                 onClick={resetForm}
             >
-                {window.innerWidth >= 466 && window.innerHeight >= 466 && gettext("Reset")}
+                {window.innerWidth > minVal && window.innerHeight > minVal && gettext("Reset")}
             </Button>
         </Form.Item>
         <Form.Item noStyle label={null}>
@@ -34,7 +34,7 @@ export const ControlForm = ({ handleCancel, resetForm }) => (
                 icon={<Save />}
                 title={gettext("Save")}
             >
-                {window.innerWidth >= 466 && window.innerHeight >= 466 && gettext("Save")}
+                {window.innerWidth > minVal && window.innerHeight > minVal && gettext("Save")}
             </Button>
         </Form.Item>
     </Space>

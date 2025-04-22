@@ -120,8 +120,8 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                         onClick={actions.remove}
                         title={gettext("Delete file")}
                     />
-                    <Text ellipsis={{ suffix: "", tooltip: true }} >{file.name}</Text>
                     <Text ellipsis={{ suffix: "", tooltip: true }} >{gettext("File size") + ": " + (file.size / 1024).toFixed(2) + "KB"}</Text>
+                    <Text ellipsis={{ suffix: "", tooltip: true }} >{file.name}</Text>
                 </Space>
             );
         },
@@ -151,7 +151,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     return (
 
         <Space wrap style={{
-            display: "flex"
+            display: "flex",
         }}>
             <Form.Item
                 noStyle
@@ -162,7 +162,6 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                 <Upload {...props} style={{ width: "100%" }}>
                     {files?.length > 1 ? null : (
                         <Button
-                            style={{ margin: "0 10px 0 0" }}
                             icon={<FileArrowUpDownOutline />}
                             type="default"
                             title={msgInfo.join(" \n")}

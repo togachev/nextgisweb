@@ -19,6 +19,9 @@ import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import Close from "@nextgisweb/icon/mdi/close";
+import Collapse from "@nextgisweb/icon/mdi/arrow-collapse";
+import Expand from "@nextgisweb/icon/mdi/arrow-expand";
+
 import { ControlForm, UploadComponent } from ".";
 
 import "./Header.less";
@@ -29,11 +32,14 @@ type MenuItem = Required<MenuProps>["items"][number];
 
 const { Title } = Typography;
 const signInText = gettext("Sign in");
-const minVal = 466;
+const minVal = 500;
+
 
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
-
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const [collapse, setCollapse] = useState(false);
     const [status, setStatus] = useState(false);
     const [form] = Form.useForm();
 
@@ -151,19 +157,28 @@ export const Header = observer(({ store, config }) => {
     };
 
     const openForm = () => {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-
         const value = {
             ...store.valueRnd,
-            x: minVal <= w ? w / 2 - (w * 0.65) / 2 : 0,
-            width: minVal <= w ? w * 0.65 : w,
-            y: minVal <= h ? h / 2 - (h * 0.65) / 2 : 0,
-            height: minVal <= h ? h * 0.65 : h,
+            x: minVal < w ? w / 2 - (w * 0.55) / 2 : 0,
+            width: minVal < w ? w * 0.55 : w,
+            y: minVal < h ? h / 2 - (h * 0.55) / 2 : 0,
+            height: minVal < h ? h * 0.55 : h,
         };
         store.setValueRnd(value);
 
         store.setOpen(true)
+    };
+
+    const handleCollapse = () => {
+        setCollapse(!collapse);
+        const value = {
+            ...store.valueRnd,
+            x: collapse ? w / 2 - (w * 0.55) / 2 : 0,
+            width: collapse ? w * 0.55 : w,
+            y: collapse ? h / 2 - (h * 0.55) / 2 : 0,
+            height: collapse ? h * 0.55 : h,
+        };
+        store.setValueRnd(value);
     };
 
     const handleCancel = () => {
@@ -181,15 +196,12 @@ export const Header = observer(({ store, config }) => {
 
     useLayoutEffect(() => {
         const handleResize = () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-
             const value = {
                 ...store.valueRnd,
-                x: minVal <= w ? w / 2 - (w * 0.65) / 2 : 0,
-                width: minVal <= w ? w * 0.65 : w,
-                y: minVal <= h ? h / 2 - (h * 0.65) / 2 : 0,
-                height: minVal <= h ? h * 0.65 : h,
+                x: minVal < w ? w / 2 - (w * 0.55) / 2 : 0,
+                width: minVal < w ? w * 0.55 : w,
+                y: minVal < h ? h / 2 - (h * 0.55) / 2 : 0,
+                height: minVal < h ? h * 0.55 : h,
             };
             store.setValueRnd(value);
         };
@@ -201,19 +213,11 @@ export const Header = observer(({ store, config }) => {
         };
     }, [store.open, window.innerWidth, window.innerHeight]);
 
-    // useEffect(() => {
-    //     const html = document.querySelector("html");
-    //     if (store.open) {
-    //         console.log(html?.style);
-            
-    //         // html.style.overflow = store.open ? "hidden" : "auto";
-    //     }
-    // }, [store.open]); // condition to watch to perform side effect
-
     return (
         <>
             <div
-                className="header-home-page"
+                className={store.open ?
+                    "header-home-page  disable-scroll" : "header-home-page"}
                 style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}
             >
                 <div className="control-button">
@@ -250,6 +254,7 @@ export const Header = observer(({ store, config }) => {
                             store.setValueRnd(value);
                         }
                     }}
+                    bounds="window"
                     enableResizing={false}
                     cancel=".contentStyle,.footerStyle"
                 >
@@ -265,13 +270,21 @@ export const Header = observer(({ store, config }) => {
                     >
                         <Layout style={layoutStyle}>
                             <LHeader className="headerStyle">
-                                <span className="title-rnd" >Header title</span>
-                                <Button
-                                    title={gettext("Close")}
-                                    type="text"
-                                    icon={<Close />}
-                                    onClick={handleCancel}
-                                />
+                                <span className="title-rnd">{gettext("Header setting")}</span>
+                                <span>
+                                    <Button
+                                        title={gettext("Collapse")}
+                                        type="text"
+                                        icon={collapse ? <Collapse /> : <Expand />}
+                                        onClick={handleCollapse}
+                                    />
+                                    <Button
+                                        title={gettext("Close")}
+                                        type="text"
+                                        icon={<Close />}
+                                        onClick={handleCancel}
+                                    />
+                                </span>
                             </LHeader>
                             <Layout>
                                 <LContent className="contentStyle">
@@ -338,7 +351,7 @@ export const Header = observer(({ store, config }) => {
                                 </LContent>
                             </Layout>
                             <LFooter className="footerStyle">
-                                <ControlForm handleCancel={handleCancel} resetForm={resetForm} />
+                                <ControlForm minVal={minVal} handleCancel={handleCancel} resetForm={resetForm} />
                             </LFooter>
                         </Layout>
                     </Form>
