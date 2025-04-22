@@ -1,9 +1,7 @@
-import { CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { createPortal } from "react-dom";
-import { Rnd } from "react-rnd";
 import { authStore } from "@nextgisweb/auth/store";
-import { Button, Form, Input, Menu, Space, Typography, Layout } from "@nextgisweb/gui/antd";
+import { Button, Form, Input, Menu, Space, Modal, Typography } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -18,46 +16,20 @@ import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
-import Close from "@nextgisweb/icon/mdi/close";
 
 import { ControlForm, UploadComponent } from ".";
 
 import "./Header.less";
 
-const { Header: LHeader, Footer: LFooter, Content: LContent } = Layout;
-
 type MenuItem = Required<MenuProps>["items"][number];
 
 const { Title } = Typography;
 const signInText = gettext("Sign in");
-const minVal = 500;
-const p = 0.55;
-
-const getSize = (cssStyleDeclaration) => {
-    if (cssStyleDeclaration.boxSizing === "border-box") {
-        return {
-            h: parseInt(cssStyleDeclaration.height, 10),
-            w: parseInt(cssStyleDeclaration.width, 10),
-        };
-    }
-
-    return {
-        h:
-            parseInt(cssStyleDeclaration.height, 10) +
-            parseInt(cssStyleDeclaration.marginTop, 10) +
-            parseInt(cssStyleDeclaration.marginBottom, 10),
-        w:
-            parseInt(cssStyleDeclaration.width, 10) +
-            parseInt(cssStyleDeclaration.marginLeft, 10) +
-            parseInt(cssStyleDeclaration.marginRight, 10),
-    };
-};
 
 export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
     const [status, setStatus] = useState(false);
     const [form] = Form.useForm();
-    const refContainer = useRef(document.body);
 
     const paramsFileHeader = {
         size: 100, /* KB */
@@ -146,7 +118,7 @@ export const Header = observer(({ store, config }) => {
     };
 
     const onFinish = (value) => {
-        store.setOpen(false)
+        store.setOpen(false);
         store.setValueHeader(value);
         store.setInitialHeader(value);
         store.saveSetting(value, "home_page_header");
@@ -173,15 +145,6 @@ export const Header = observer(({ store, config }) => {
     };
 
     const openForm = () => {
-        const size = getSize(getComputedStyle(refContainer.current));
-        const value = {
-            ...store.valueRnd,
-            x: minVal < size.w ? size.w / 2 - (size.w * p) / 2 : 0,
-            width: minVal < size.w ? size.w * p : size.w,
-            y: minVal < size.h ? size.h / 2 - (size.h * p) / 2 : 0,
-            height: minVal < size.h ? size.h * p : size.h,
-        };
-        store.setValueRnd(value);
         store.setOpen(true)
     };
 
@@ -191,32 +154,6 @@ export const Header = observer(({ store, config }) => {
     };
 
     const urlPicture = store.valueHeader?.picture && store.valueHeader?.picture[0]?.status === "done" ? store.valueHeader?.picture[0]?.url : "";
-
-    const layoutStyle: CSSProperties = {
-        overflow: "hidden",
-        width: "calc(100%)",
-        maxHeight: store.valueRnd?.height,
-    };
-
-    useLayoutEffect(() => {
-        const handleResize = () => {
-            const size = getSize(getComputedStyle(refContainer.current));
-            const value = {
-                ...store.valueRnd,
-                x: minVal < size.w ? size.w / 2 - (size.w * p) / 2 : 0,
-                width: minVal < size.w ? size.w * p : size.w,
-                y: minVal < size.h ? size.h / 2 - (size.h * p) / 2 : 0,
-                height: minVal < size.h ? size.h * p : size.h,
-            };
-            store.setValueRnd(value);
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, [store.open, window.innerWidth, window.innerHeight]);
 
     return (
         <>
@@ -248,117 +185,91 @@ export const Header = observer(({ store, config }) => {
                     </div>
                 </div>
             </div >
-            {store.open && createPortal(
-                <Rnd
-                    className="rnd-style"
-                    position={{ x: store.valueRnd.x, y: store.valueRnd.y }}
-                    size={{ width: store.valueRnd.width, height: store.valueRnd.height }}
-                    onDragStop={(e, d) => {
-                        if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
-                            const value = { ...store.valueRnd, x: d.x, y: d.y }
-                            store.setValueRnd(value);
-                        }
-                    }}
-                    onResize={(e, direction, ref, delta, position) => {
-                        const value = { ...store.valueRnd, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y };
-                        store.setValueRnd(value);
-                    }}
-                    bounds="window"
-                    enableResizing={true}
-                    cancel=".contentStyle,.footerStyle"
+            <Modal
+                transitionName=""
+                maskTransitionName=""
+                style={{ maxWidth: "75%", minWidth: "340px" }}
+                width="max-content"
+                centered
+                footer={null}
+                open={store.open}
+                title={gettext("Header title")}
+                onCancel={handleCancel}>
+                <Form
+                    form={form}
+                    name="ngw_home_page_header"
+                    autoComplete="off"
+                    initialValues={store.initialHeader}
+                    onFinish={onFinish}
+                    onValuesChange={onValuesChange}
+                    clearOnDestroy={true}
+                    style={{ height: "100%" }}
                 >
-                    <Form
-                        form={form}
-                        name="ngw_home_page_header"
-                        autoComplete="off"
-                        initialValues={store.initialHeader}
-                        onFinish={onFinish}
-                        onValuesChange={onValuesChange}
-                        clearOnDestroy={true}
-                        style={{ height: "100%" }}
-                    >
-                        <Layout style={layoutStyle}>
-                            <LHeader className="headerStyle">
-                                <span className="title-rnd">{gettext("Header setting")}</span>
-                                <Button
-                                    title={gettext("Close")}
-                                    type="text"
-                                    icon={<Close />}
-                                    onClick={handleCancel}
-                                />
-                            </LHeader>
-                            <Layout>
-                                <LContent className="contentStyle">
-                                    <Space className="content" direction="vertical">
-                                        <UploadComponent store={store} params={paramsFileHeader} />
-                                        <Form.List name="menu">
-                                            {(fields, { add, remove }) => (
-                                                <>
-                                                    <Space direction="vertical" style={{ width: "100%" }} wrap>
-                                                        <Button
-                                                            className="item-edit"
-                                                            onClick={() => add()}
-                                                            icon={<LinkEdit />}
-                                                            title={gettext("Add url")}
-                                                            type="default"
-                                                        >
-                                                            {gettext("Add url")}
-                                                        </Button>
-                                                        {fields.map((field, index) => (
-                                                            <Space.Compact block key={index} >
-                                                                <Form.Item noStyle name={[field.name, "name"]}>
-                                                                    <Input
-                                                                        type="text"
-                                                                        allowClear
-                                                                        placeholder={gettext("Name url")}
-                                                                    />
-                                                                </Form.Item>
-                                                                <Form.Item noStyle name={[field.name, "value"]}>
-                                                                    <Input
-                                                                        placeholder={gettext("Url")}
-                                                                        className="first-input"
-                                                                        allowClear
-                                                                    />
-                                                                </Form.Item>
-                                                                <Button
-                                                                    title={gettext("Delete url")}
-                                                                    onClick={() => {
-                                                                        remove(field.name);
-                                                                    }}
-                                                                    icon={<DeleteOffOutline />}
-                                                                    type="default"
-                                                                />
-                                                            </Space.Compact>
-                                                        ))}
-                                                    </Space>
-                                                </>
-                                            )}
-                                        </Form.List>
-                                        <Form.Item noStyle name={"first_name"}>
-                                            <Input
-                                                placeholder={gettext("First name site")}
-                                                type="text"
-                                                allowClear
-                                            />
-                                        </Form.Item>
-                                        <Form.Item noStyle name={"last_name"}>
-                                            <Input
-                                                placeholder={gettext("Additional name")}
-                                                type="text"
-                                                allowClear
-                                            />
-                                        </Form.Item>
+                    <Space className="content" direction="vertical">
+                        <UploadComponent store={store} params={paramsFileHeader} />
+                        <Form.List name="menu">
+                            {(fields, { add, remove }) => (
+                                <>
+                                    <Space direction="vertical" style={{ width: "100%" }} wrap>
+                                        <Button
+                                            className="item-edit"
+                                            onClick={() => add()}
+                                            icon={<LinkEdit />}
+                                            title={gettext("Add url")}
+                                            type="default"
+                                        >
+                                            {gettext("Add url")}
+                                        </Button>
+                                        {fields.map((field, index) => (
+                                            <Space.Compact block key={index} >
+                                                <Form.Item noStyle name={[field.name, "name"]}>
+                                                    <Input
+                                                        type="text"
+                                                        allowClear
+                                                        placeholder={gettext("Name url")}
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item noStyle name={[field.name, "value"]}>
+                                                    <Input
+                                                        placeholder={gettext("Url")}
+                                                        className="first-input"
+                                                        allowClear
+                                                    />
+                                                </Form.Item>
+                                                <Button
+                                                    title={gettext("Delete url")}
+                                                    onClick={() => {
+                                                        remove(field.name);
+                                                    }}
+                                                    icon={<DeleteOffOutline />}
+                                                    type="default"
+                                                />
+                                            </Space.Compact>
+                                        ))}
                                     </Space>
-                                </LContent>
-                            </Layout>
-                            <LFooter className="footerStyle">
-                                <ControlForm minVal={minVal} handleCancel={handleCancel} resetForm={resetForm} />
-                            </LFooter>
-                        </Layout>
-                    </Form>
-                </Rnd>,
-                document.body
-            )}
+                                </>
+                            )}
+                        </Form.List>
+                        <Form.Item noStyle name={"first_name"}>
+                            <Input
+                                placeholder={gettext("First name site")}
+                                type="text"
+                                allowClear
+                            />
+                        </Form.Item>
+                        <Form.Item noStyle name={"last_name"}>
+                            <Input
+                                placeholder={gettext("Additional name")}
+                                type="text"
+                                allowClear
+                            />
+                        </Form.Item>
+                        <span className="control-component">
+                            <ControlForm handleCancel={handleCancel} resetForm={resetForm} />
+                        </span>
+                    </Space>
+                </Form>
+            </Modal>
         </>
     );
 });

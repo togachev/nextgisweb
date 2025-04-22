@@ -2,78 +2,13 @@ body {
 	overflow-x: hidden;
 }
 
-.rnd-style {
-	border-radius: 3px;
-	box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-	background: #fff;
-	z-index: 1000;
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
-	min-height: 254px;
-	min-width: 275px;
-	letter-spacing: 0.05rem;
+.content {
+	width: 100%;
+}
 
-	.headerStyle {
-		display: flex;
-		height: 40px;
-		box-sizing: border-box;
-		padding: 5px 5px 5px 16px;
-		align-items: center;
-		font-weight: 600;
-		font-size: 16px;
-		justify-content: space-between;
-		border-bottom: 1px solid var(--divider-color);
-		background-color: #e9e9e91a;
-	}
-
-	.contentStyle {
-		text-align: center;
-		color: #000000;
-		height: calc(100% - 104px);
-		left: 0;
-		right: 0;
-		overflow-y: auto;
-		scrollbar-width: thin;
-		box-sizing: border-box;
-		background-color: #fff;
-		cursor: auto;
-		position: absolute;
-		min-height: 150px;
-	}
-
-	.content {
-		width: 100%;
-		padding: 16px;
-	}
-
-	.add-url {
-		display: flex;
-		justify-content: flex-end;
-		margin-bottom: 5px;
-	}
-
-	.item-url {
-		flex-wrap: wrap;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.footerStyle {
-		cursor: auto;
-		padding: 16px;
-		background: #ffffff;
-		bottom: 0;
-		position: absolute;
-		right: 0;
-		left: 0;
-		text-align: end;
-	}
-
-	.flex-end-space {
-		display: flex;
-		justify-content: space-around;
-	}
+.control-component {
+	justify-content: flex-end;
+	display: flex;
 }
 
 .header-home-page {
@@ -262,8 +197,3 @@ body {
 	}
 }
 
-// -------------------------------
-
-div:has(> .upload-header) { width: 100%; }
-
-div:has(> .disable-scroll) { overflow: hidden; position: fixed; width: 100%; height: 100%; }
