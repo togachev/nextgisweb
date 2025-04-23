@@ -23,12 +23,11 @@ const { Link } = Typography;
 const settings = webmapSettings;
 
 const LinkToGeometryFeature = ({ store, display }) => {
-    const { selected, linkToGeometry } = store;
     const imodule = display.identify_module;
     const { copyValue, contextHolder } = useCopy();
 
-    if (selected) {
-        const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === selected.styleId)?.[1];
+    if (store.selected) {
+        const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === store.selected.styleId)?.[1];
 
         if (!imodule._isEditEnabled(display, item)) { return false; }
         return (
@@ -36,7 +35,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
                 title={gettext("HTML code of the geometry link, for insertion into the description")}
                 className="link-button"
                 onClick={() => {
-                    const linkToGeometryString = `<a href="${linkToGeometry}">${selected.label}</a>`
+                    const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
                     copyValue(linkToGeometryString, gettext("HTML code copied"));
                 }}
             >
@@ -49,8 +48,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
 
 export const ContentComponent: FC = observer(({ store: storeProp, display }) => {
     const [store] = useState(() => storeProp);
-    const { attribute, data, extensions, fixContentItem, fixPanel, fixPos, setFixContentItem, setFixPanel, selected, setCurrentUrlParams, valueRnd } = store;
-    const { id, layerId } = selected;
+    const { id, layerId } = store.selected;
     const { copyValue, contextHolder } = useCopy();
     const { getNumberValue } = formattedFields();
     const panelRef = useRef<HTMLDivElement>(null);
@@ -59,7 +57,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     const attrs = opts["webmap.identification_attributes"];
     const geoms = opts["webmap.identification_geometry"];
 
-    const firstItem = data.find(i => i.id === id);
+    const firstItem = store.data.find(i => i.id === id);
 
     const heightRadio = 135; /* ~ height and padding 2px */
     const [heightPanel, setHeightPanel] = useState();
@@ -129,7 +127,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             key: "attributes",
             title: gettext("Attributes"),
             hidden: !settings.identify_attributes,
-            children: attribute ? (<AttributeColumns attribute={attribute} />) :
+            children: store.attribute ? (<AttributeColumns attribute={store.attribute} />) :
                 emptyValue,
         })
     }
@@ -151,7 +149,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
         key: "description",
         title: gettext("Description"),
         hidden: false,
-        children: extensions !== null && extensions.description !== null ? (<DescComponent type="feature" display={display} content={extensions?.description} />) : emptyValue
+        children: store.extensions !== null && store.extensions.description !== null ? (<DescComponent type="feature" display={display} content={store.extensions?.description} />) : emptyValue
     });
 
     options.push({
@@ -160,7 +158,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
         key: "attachment",
         title: gettext("Attachments"),
         hidden: false,
-        children: extensions !== null && extensions.attachment !== null ? (<AttachmentTable attachments={extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
+        children: store.extensions !== null && store.extensions.attachment !== null ? (<AttachmentTable attachments={store.extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
     });
 
     if (firstItem.relation) {
@@ -175,20 +173,20 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     }
 
     useEffect(() => {
-        setHeightPanel(valueRnd.height - 70);
-        if (fixPos !== null) {
-            const result = options.find(item => item.key === fixPanel);
-            result ? setFixContentItem(options.find(item => item.key === result.key)) : setFixContentItem(options.find(item => item.key === "attributes"));
+        setHeightPanel(store.valueRnd.height - 70);
+        if (store.fixPos !== null) {
+            const result = options.find(item => item.key === store.fixPanel);
+            result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.store.setFixContentItem(options.find(item => item.key === "attributes"));
         } else {
-            const result = options.find(item => item.key === fixPanel);
-            result ? setFixContentItem(options.find(item => item.key === result.key)) : setFixContentItem(options.find(item => item.key === "attributes"));
+            const result = options.find(item => item.key === store.fixPanel);
+            result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.store.setFixContentItem(options.find(item => item.key === "attributes"));
         }
-    }, [attribute]);
+    }, [store.attribute]);
 
     const onClick: MenuProps["onClick"] = ({ key }) => {
-        setFixContentItem(options.find(item => item.key === key));
-        setFixPanel(key);
-        setCurrentUrlParams(key);
+        store.setFixContentItem(options.find(item => item.key === key));
+        store.setFixPanel(key);
+        store.setCurrentUrlParams(key);
     };
 
     const items: MenuProps["items"] = useMemo(() => {
@@ -203,12 +201,12 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
         })
     }, []);
 
-    const valueDropdown = items.find(item => item?.key === fixContentItem?.value);
+    const valueDropdown = items.find(item => item?.key === store.fixContentItem?.value);
 
     const onValuesChange = (e) => {
-        setFixContentItem(options.find(item => item.key === e.target.value));
-        setFixPanel(e.target.value);
-        setCurrentUrlParams(e.target.value);
+        store.setFixContentItem(options.find(item => item.key === e.target.value));
+        store.setFixPanel(e.target.value);
+        store.setCurrentUrlParams(e.target.value);
     }
 
     return (
@@ -230,7 +228,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
                                 <Radio.Group
                                     buttonStyle="solid"
                                     onChange={onValuesChange}
-                                    value={fixContentItem?.value}
+                                    value={store.fixContentItem?.value}
                                     className="radio-component"
                                 >
                                     <Space direction="vertical" style={{ rowGap: 2, padding: 2 }} >
@@ -256,7 +254,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
                 }
                 <LinkToGeometryFeature store={store} display={display} />
             </div>
-            <div className="content-item">{fixContentItem?.children}</div>
+            <div className="content-item">{store.fixContentItem?.children}</div>
         </ConfigProvider>
     )
 });

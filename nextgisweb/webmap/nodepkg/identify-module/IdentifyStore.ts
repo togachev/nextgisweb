@@ -1,119 +1,119 @@
-import { makeAutoObservable } from "mobx";
+import { action, observable } from "mobx";
 
-export type SetValue<T> = ((prevValue: T) => T) | T;
 import type { DataProps, Rnd } from "./type";
 
 export class IdentifyStore {
-    layerName: string | null = null;
-    data: DataProps[] = [];
-    selected: DataProps | null = null;
-    attribute: object | null = null;
-    extensions: object | null = null;
-    currentUrlParams: string | null = null;
-    update = false;
-    fullscreen = false;
-    contextUrl: string | null = null;
-    fixContentItem: string | null = null;
-    linkToGeometry: string | null = null;
-    valueRnd: Rnd | null = null;
-    hideLegend = true;
-    fixPos: Rnd | null = null;
-    fixPanel: string | null = null;
-    fixPopup = false;
-    result: object | undefined = undefined;
+    @observable accessor layerName: string | null = null;
+    @observable accessor fixPopup = false;
+    @observable accessor hideLegend = true;
+    @observable accessor update = false;
+    @observable accessor fullscreen = false;
 
-    constructor({ ...props }) {
-        for (const key in props) {
-            const k = key;
-            const prop = (props)[k];
-            if (prop !== undefined) {
-                Object.assign(this, { [k]: prop });
-            }
-        }
+    @observable.ref accessor data: DataProps[] = [];
+    @observable.ref accessor selected: DataProps | null = null;
+    @observable.ref accessor attribute: object | null = null;
+    @observable.ref accessor extensions: object | null = null;
+    @observable.ref accessor currentUrlParams: string | null = null;
+    @observable.ref accessor contextUrl: string | null = null;
+    @observable.ref accessor fixContentItem: string | null = null;
+    @observable.ref accessor linkToGeometry: string | null = null;
+    @observable.ref accessor valueRnd: Rnd | null = null;
+    @observable.ref accessor fixPos: Rnd | null = null;
+    @observable.ref accessor fixPanel: string | null = null;
+    @observable.ref accessor result: object | undefined = undefined;
 
-        makeAutoObservable(this, {});
+    constructor({
+        valueRnd,
+        fixPos,
+        fixPanel
+    }) {
+        this.valueRnd = valueRnd;
+        this.fixPos = fixPos;
+        this.fixPanel = fixPanel;
     }
 
-    setValueRnd = (valueRnd: SetValue<Rnd | null>) => {
-        this.setValue("valueRnd", valueRnd);
+    @action
+    setValueRnd(valueRnd: Rnd) {
+        this.valueRnd = valueRnd;
     };
 
-    setResult = (result: SetValue<object | null>) => {
-        this.setValue("result", result);
+    @action
+    setResult(result: object) {
+        this.result = result;
     };
 
-    setHideLegend = (hideLegend: boolean) => {
+    @action
+    setHideLegend(hideLegend: boolean) {
         this.hideLegend = hideLegend;
     };
-    
-    setFixPos = (fixPos: SetValue<Rnd | null>) => {
-        this.setValue("fixPos", fixPos);
+
+    @action
+    setFixPos(fixPos: Rnd) {
+        this.fixPos = fixPos;
     };
 
-    setFixPanel = (fixPanel: SetValue<string | null>) => {
-        this.setValue("fixPanel", fixPanel);
+    @action
+    setFixPanel(fixPanel: string) {
+        this.fixPanel = fixPanel;
     };
 
-    setFixPopup = (fixPopup: boolean) => {
+    @action
+    setFixPopup(fixPopup: boolean) {
         this.fixPopup = fixPopup;
     };
 
-    setLayerName = (layerName: SetValue<string | null>) => {
-        this.setValue("layerName", layerName);
+    @action
+    setLayerName(layerName: string) {
+        this.layerName = layerName;
     };
 
-    setData = (data: DataProps[]) => {
+    @action
+    setData(data: DataProps[]) {
         this.data = data;
     };
 
-    setSelected = (selected: SetValue<DataProps | null>) => {
-        this.setValue("selected", selected);
+    @action
+    setSelected(selected: DataProps) {
+        this.selected = selected;
     };
 
-    setAttribute = (attribute: SetValue<object | null>) => {
-        this.setValue("attribute", attribute);
+    @action
+    setAttribute(attribute: object) {
+        this.attribute = attribute;
     };
 
-    setExtensions = (extensions: SetValue<object | null>) => {
-        this.setValue("extensions", extensions);
+    @action
+    setExtensions(extensions: object) {
+        this.extensions = extensions;
     };
 
-    setUpdate = (update: boolean) => {
+    @action
+    setUpdate(update: boolean) {
         this.update = update;
     };
 
-    setCurrentUrlParams = (currentUrlParams: SetValue<string | null>) => {
-        this.setValue("currentUrlParams", currentUrlParams);
+    @action
+    setCurrentUrlParams(currentUrlParams: string) {
+        this.currentUrlParams = currentUrlParams;
     };
 
-    setFullscreen = (fullscreen: boolean) => {
+    @action
+    setFullscreen(fullscreen: boolean) {
         this.fullscreen = fullscreen;
     };
 
-    setContextUrl = (contextUrl: SetValue<string | null>) => {
-        this.setValue("contextUrl", contextUrl);
+    @action
+    setContextUrl(contextUrl: string) {
+        this.contextUrl = contextUrl;
     };
 
-    setFixContentItem = (fixContentItem: SetValue<string | null>) => {
-        this.setValue("fixContentItem", fixContentItem);
+    @action
+    setFixContentItem(fixContentItem: string) {
+        this.fixContentItem = fixContentItem;
     };
 
-    setLinkToGeometry = (linkToGeometry: string) => {
+    @action
+    setLinkToGeometry(linkToGeometry: string) {
         this.linkToGeometry = linkToGeometry;
     };
-
-    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
-        const isUpdaterFunction = (
-            input: unknown
-        ): input is (prevValue: T) => T => {
-            return typeof input === "function";
-        };
-
-        const newValue = isUpdaterFunction(valueOrUpdater)
-            ? valueOrUpdater(this[property] as T)
-            : valueOrUpdater;
-
-        Object.assign(this, { [property]: newValue });
-    }
-
 }

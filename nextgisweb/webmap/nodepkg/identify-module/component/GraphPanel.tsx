@@ -21,14 +21,7 @@ import "./GraphPanel.less";
 
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-export const GraphPanel = observer(({ item, store: storeProp }) => {
-    const [store] = useState(() => storeProp);
-    const {
-        fixPos,
-        valueRnd,
-        fixPanel,
-    } = store ?? {};
-
+export const GraphPanel = observer(({ item, store }) => {
     const sizeFont = 16;
     const [hideLegend, setHideLegend] = useState(true);
     const [result, setResult] = useState();
@@ -91,7 +84,7 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
                 onChange={onChange}
                 className="legend-hide-button"
                 title={hideLegend ? msgShowLegend : msgHideLegend}
-                style={!fixPanel ? {} : { position: "absolute", right: 0 }}
+                style={!store.fixPanel ? {} : { position: "absolute", right: 0 }}
             >
                 {hideLegend ? <EyeOff /> : <Eye />}
             </Tag.CheckableTag>
@@ -170,9 +163,9 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
             }
         }
 
-        const styleResize = fixPos !== null ?
-            { height: fixPos?.height - 76 } :
-            { height: valueRnd?.height - 76 }
+        const styleResize = store.fixPos !== null ?
+            { height: store.fixPos?.height - 76 } :
+            { height: store.valueRnd?.height - 76 }
 
         const styleGtaph = hideLegend ?
             { height: webmapSettings.popup_size.height } :
@@ -200,13 +193,13 @@ export const GraphPanel = observer(({ item, store: storeProp }) => {
                         <LineChartOutlined />
                         {msgGraphs}
                     </h3>)}
-                    {result && !fixPanel && item?.relation && (<HideLegend />)}
+                    {result && !store.fixPanel && item?.relation && (<HideLegend />)}
                 </div>
             </div>
             <div className="panel-content-container">
                 <div className="fill">
                     <div className="relation-item">
-                        {result && fixPanel === "relation" && item?.relation && (<HideLegend />)}
+                        {result && store.fixPanel === "relation" && item?.relation && (<HideLegend />)}
                         {result ? (<GraphComponent value={result} />) : emptyValue}
                     </div>
                 </div>

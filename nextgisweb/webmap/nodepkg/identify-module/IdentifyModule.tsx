@@ -398,12 +398,14 @@ export class IdentifyModule extends Component {
                 const p = { value, coordinate: transformedCoord };
 
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
+                console.log(this.display.panelManager.getActivePanelName());
+                
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
                     target: "map",
                     pixel: [
-                        this.display.panelManager.getActivePanelName() ?
+                        this.display.panelManager.getActivePanelName() !== "none" ?
                             (pixel[0] + 340 + this.offHP) :
                             (pixel[0] + this.offHP), (pixel[1] + this.offHP)
                     ],
