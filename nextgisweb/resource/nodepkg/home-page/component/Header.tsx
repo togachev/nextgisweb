@@ -263,7 +263,7 @@ export const Header = observer(({ store, config }) => {
                     </div>
                 </div>
             </div >
-            <ModalComponent title={gettext("Header title")} form={formHeader} open={open} handleCancel={handleCancel} />
+            <ModalComponent title={gettext("Header setting")} form={formHeader} open={open} handleCancel={handleCancel} />
         </>
     );
 });

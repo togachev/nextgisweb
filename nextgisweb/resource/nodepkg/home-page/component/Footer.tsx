@@ -239,7 +239,7 @@ export const Footer = observer(({ store, config }) => {
                         onClick={openForm}
                     />)}
             </div>
-            <ModalComponent title={gettext("Footer title")} form={formFooter} open={open} handleCancel={handleCancel} />
+            <ModalComponent title={gettext("Footer setting")} form={formFooter} open={open} handleCancel={handleCancel} />
             <Row className="footer-info">
                 <Col className="logo-col" flex={1}>
                     <span className="uriit-logo">
