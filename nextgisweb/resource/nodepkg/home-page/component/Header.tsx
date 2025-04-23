@@ -236,8 +236,7 @@ export const Header = observer(({ store, config }) => {
     return (
         <>
             <div
-                className={open ?
-                    "header-home-page  disable-scroll" : "header-home-page"}
+                className="header-home-page"
                 style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}
             >
                 <div className="control-button">

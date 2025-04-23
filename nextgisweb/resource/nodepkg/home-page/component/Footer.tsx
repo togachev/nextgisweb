@@ -135,7 +135,7 @@ export const Footer = observer(({ store, config }) => {
             clearOnDestroy={true}
             className="form-component"
         >
-            <Space direction="vertical">
+            <Space className="content" direction="vertical">
                 <UploadComponent store={store} params={paramsFileFooter} />
                 <ColorComponent store={store} />
                 <Form.Item noStyle name={["services", "value"]}>
@@ -226,7 +226,7 @@ export const Footer = observer(({ store, config }) => {
             </Space>
         </Form>
     )
-
+    
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground, color: store.valueFooter?.colorText, fontWeight: 500 }}>
             <div className="control-button">

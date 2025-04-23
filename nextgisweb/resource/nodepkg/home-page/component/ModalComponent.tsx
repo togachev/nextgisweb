@@ -28,7 +28,7 @@ export const ModalComponent = ({ title, form, open, handleCancel }) => {
             maskTransitionName=""
             className="modal-component"
             styles={{ content: { padding: 0 }, body: { padding: 16 }}}
-            width="max-content"
+            width="50%"
             centered
             footer={null}
             open={open}
