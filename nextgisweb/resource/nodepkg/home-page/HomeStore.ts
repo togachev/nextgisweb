@@ -89,7 +89,6 @@ export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
-    @observable accessor open = false;
 
     @observable.shallow accessor listMaps: ListMapProps[] = [];
     @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
@@ -109,11 +108,6 @@ export class HomeStore {
         this.getMapValues("all");
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
-    };
-
-    @action
-    setOpen(open: boolean): void {
-        this.open = open;
     };
 
     @action

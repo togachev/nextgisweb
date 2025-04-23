@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, ConfigProvider, Empty, Modal, Typography } from "@nextgisweb/gui/antd";
+import { Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
-
+import { ModalComponent } from ".";
 import MapIcon from "@nextgisweb/icon/material/map";
 import "./MapTile.less";
 
@@ -48,6 +48,10 @@ export const MapTile = (props) => {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
+
+    const contentDesc = (
+        <DescComponent type="home_page" upath_info={upath_info} content={descValue} />
+    )
 
     return (
         <ConfigProvider
@@ -112,18 +116,7 @@ export const MapTile = (props) => {
                         }
                     />
                 </Card>
-                <Modal
-                    transitionName=""
-                    maskTransitionName=""
-                    width="max-content"
-                    className="modal-desc-home-page"
-                    centered
-                    title={display_name}
-                    footer={null}
-                    open={isModalOpen}
-                    onCancel={handleCancel}>
-                    <DescComponent type="home_page" upath_info={upath_info} content={descValue} />
-                </Modal>
+                <ModalComponent title={display_name} form={contentDesc} open={isModalOpen} handleCancel={handleCancel} />
             </div>
         </ConfigProvider>
     )

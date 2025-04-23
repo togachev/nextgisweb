@@ -459,29 +459,6 @@ textarea::-webkit-input-placeholder {
 	color: #2a398ca6 !important;
 }
 
-.modal-desc-home-page {
-	padding: 16px;
-
-	.ant-modal-close {
-		top: 0px;
-		right: 0px;
-		border-radius: 50%;
-	}
-
-	.ant-modal-title {
-		margin: auto;
-		color: var(--primary);
-		overflow: hidden;
-		-webkit-line-clamp: 2;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		text-transform: uppercase;
-		font-weight: 500;
-		max-width: 500px;
-		text-align: center;
-	}
-}
-
 .item-edit-top {
 	display: flex;
 	margin-bottom: 12px;
@@ -497,6 +474,11 @@ textarea::-webkit-input-placeholder {
 	.last-item {
 		width: 100%;
 	}
+}
+
+div:has(> .item-edit) {
+	display: flex;
+	justify-content: flex-end;
 }
 
 
@@ -520,4 +502,37 @@ div:has(> .disable-scroll) {
 	position: fixed;
 	width: 100%;
 	height: 100%;
+}
+
+// ---modal---
+
+.modal-component {
+	min-width: 340px;
+	max-width: 75%;
+
+	.ant-modal-close {
+		top: 5px;
+		inset-inline-end: 5px;
+	}
+
+	.modal-title {
+		cursor: move;
+		padding: 5px 32px 5px 16px;
+		margin-bottom: 16px;
+		background-color: #e9e9e91a;
+		overflow: hidden;
+		-webkit-line-clamp: 2;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		font-family: var(--ngw-head-font-family);
+		overflow-wrap: anywhere;
+	}
+}
+
+
+// ---form---
+
+.form-component {
+	height: 100%;
+	padding: 0 16px 16px 16px;
 }

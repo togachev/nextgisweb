@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Col, ColorPicker, Row, Button, Form, Divider, Input, Modal, Space } from "@nextgisweb/gui/antd";
+import { Col, ColorPicker, Row, Button, Form, Divider, Input, Space } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Edit from "@nextgisweb/icon/material/edit";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { UploadComponent } from "./UploadComponent";
-import { ControlForm } from "./ControlForm";
+
+import { UploadComponent, ControlForm, ModalComponent } from ".";
+
 import "./Footer.less";
 
 const ColorComponent = observer(({ store }) => {
@@ -69,6 +70,7 @@ const ColorComponent = observer(({ store }) => {
 
 export const Footer = observer(({ store, config }) => {
     const [status, setStatus] = useState(false);
+    const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
 
     const paramsFileFooter = {
@@ -84,7 +86,7 @@ export const Footer = observer(({ store, config }) => {
     }
 
     const onFinish = (value) => {
-        store.setOpen(false);
+        setOpen(false);
         store.setValueFooter(value);
         store.setInitialFooter(value);
         store.saveSetting(value, "home_page_footer");
@@ -112,20 +114,123 @@ export const Footer = observer(({ store, config }) => {
     };
 
     const openForm = () => {
-        store.setOpen(true)
+        setOpen(true)
     };
 
     const handleCancel = () => {
         setStatus(true);
-        store.setOpen(false)
+        setOpen(false)
     };
 
     const urlLogo = store.valueFooter?.logo && store.valueFooter?.logo[0]?.status === "done" ? store.valueFooter?.logo[0]?.url : undefined
 
+    const formFooter = (
+        <Form
+            form={form}
+            name="ngw_home_page_footer"
+            autoComplete="off"
+            initialValues={store.initialFooter}
+            onFinish={onFinish}
+            onValuesChange={onValuesChange}
+            clearOnDestroy={true}
+            className="form-component"
+        >
+            <Space direction="vertical">
+                <UploadComponent store={store} params={paramsFileFooter} />
+                <ColorComponent store={store} />
+                <Form.Item noStyle name={["services", "value"]}>
+                    <Input allowClear placeholder="name" />
+                </Form.Item>
+                <Form.List name={["services", "list"]}>
+                    {(fields, { add, remove }) => (
+                        <>
+                            <Space direction="vertical" style={{ width: "100%" }} wrap>
+                                <Button
+                                    className="item-edit"
+                                    onClick={() => add()}
+                                    icon={<LinkEdit />}
+                                    title={gettext("Add url menu")}
+                                    type="default"
+                                >
+                                    {gettext("Add url menu")}
+                                </Button>
+                                {fields.map((field, index) => (
+                                    <Space.Compact block key={index} >
+                                        <Form.Item noStyle name={[field.name, "name"]}>
+                                            <Input type="text" allowClear placeholder={gettext("Name url")} />
+                                        </Form.Item>
+                                        <Form.Item noStyle name={[field.name, "value"]}>
+                                            <Input type="text" allowClear placeholder={gettext("Url")} />
+                                        </Form.Item>
+                                        <Button
+                                            onClick={() => {
+                                                remove(field.name);
+                                            }}
+                                            icon={<DeleteOffOutline />}
+                                            type="default"
+                                            title={gettext("Remove url menu")}
+                                        />
+                                    </Space.Compact>
+                                ))}
+                            </Space>
+                        </>
+                    )}
+                </Form.List>
+                <Form.Item noStyle name={["address", "value"]}>
+                    <Input allowClear placeholder="value" />
+                </Form.Item>
+                <Form.List name={["address", "phone"]}>
+                    {(fields, { add, remove }) => (
+                        <Space direction="vertical" style={{ width: "100%" }} wrap>
+                            <Button
+                                className="item-edit"
+                                onClick={() => add()}
+                                icon={<CardAccountPhone />}
+                                title={gettext("Add contact")}
+                                type="default"
+                            >
+                                {gettext("Add contact")}
+                            </Button>
+                            {fields.map((field, index) => (
+                                <Space.Compact block key={index} >
+                                    <Form.Item noStyle name={[field.name, "name"]}>
+                                        <Input allowClear />
+                                    </Form.Item>
+                                    <Form.Item noStyle name={[field.name, "value"]}>
+                                        <Input allowClear />
+                                    </Form.Item>
+                                    <Button
+                                        onClick={() => {
+                                            remove(field.name);
+                                        }}
+                                        icon={<DeleteOffOutline />}
+                                        type="default"
+                                        title={gettext("Remove contact")}
+                                    />
+                                </Space.Compact>
+                            ))}
+
+                        </Space>
+                    )}
+                </Form.List>
+
+                <Form.Item noStyle name={["footer_name", "base_year"]}>
+                    <Input allowClear placeholder="base_year" />
+                </Form.Item>
+                <Form.Item noStyle name={["footer_name", "name"]}>
+                    <Input allowClear placeholder="name" />
+                </Form.Item>
+                <span className="control-component">
+                    <ControlForm handleCancel={handleCancel} resetForm={resetForm} />
+                </span>
+            </Space>
+        </Form>
+    )
+
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground, color: store.valueFooter?.colorText, fontWeight: 500 }}>
             <div className="control-button">
-                {config.isAdministrator === true && !store.open && (
+                {config.isAdministrator === true && !open && (
                     <Button
                         className="icon-pensil"
                         title={gettext("Edit")}
@@ -134,116 +239,7 @@ export const Footer = observer(({ store, config }) => {
                         onClick={openForm}
                     />)}
             </div>
-            <Modal
-                transitionName=""
-                maskTransitionName=""
-                style={{ maxWidth: "75%", minWidth: "340px" }}
-                width="max-content"
-                centered
-                footer={null}
-                open={store.open}
-                title={gettext("Footer title")}
-                onCancel={handleCancel}>
-                <Form
-                    form={form}
-                    name="ngw_home_page_footer"
-                    autoComplete="off"
-                    initialValues={store.initialFooter}
-                    onFinish={onFinish}
-                    onValuesChange={onValuesChange}
-                    clearOnDestroy={true}
-                >
-                    <Space direction="vertical">
-                        <UploadComponent store={store} params={paramsFileFooter} />
-                        <ColorComponent store={store} />
-                        <Form.Item noStyle name={["services", "value"]}>
-                            <Input allowClear placeholder="name" />
-                        </Form.Item>
-                        <Form.List name={["services", "list"]}>
-                            {(fields, { add, remove }) => (
-                                <>
-                                    <Space direction="vertical" style={{ width: "100%" }} wrap>
-                                        <Button
-                                            className="item-edit"
-                                            onClick={() => add()}
-                                            icon={<LinkEdit />}
-                                            title={gettext("Add url menu")}
-                                            type="default"
-                                        >
-                                            {gettext("Add url menu")}
-                                        </Button>
-                                        {fields.map((field, index) => (
-                                            <Space.Compact block key={index} >
-                                                <Form.Item noStyle name={[field.name, "name"]}>
-                                                    <Input type="text" allowClear placeholder={gettext("Name url")} />
-                                                </Form.Item>
-                                                <Form.Item noStyle name={[field.name, "value"]}>
-                                                    <Input type="text" allowClear placeholder={gettext("Url")} />
-                                                </Form.Item>
-                                                <Button
-                                                    onClick={() => {
-                                                        remove(field.name);
-                                                    }}
-                                                    icon={<DeleteOffOutline />}
-                                                    type="default"
-                                                    title={gettext("Remove url menu")}
-                                                />
-                                            </Space.Compact>
-                                        ))}
-                                    </Space>
-                                </>
-                            )}
-                        </Form.List>
-                        <Form.Item noStyle name={["address", "value"]}>
-                            <Input allowClear placeholder="value" />
-                        </Form.Item>
-                        <Form.List name={["address", "phone"]}>
-                            {(fields, { add, remove }) => (
-                                <Space direction="vertical" style={{ width: "100%" }} wrap>
-                                    <Button
-                                        className="item-edit"
-                                        onClick={() => add()}
-                                        icon={<CardAccountPhone />}
-                                        title={gettext("Add contact")}
-                                        type="default"
-                                    >
-                                        {gettext("Add contact")}
-                                    </Button>
-                                    {fields.map((field, index) => (
-                                        <Space.Compact block key={index} >
-                                            <Form.Item noStyle name={[field.name, "name"]}>
-                                                <Input allowClear />
-                                            </Form.Item>
-                                            <Form.Item noStyle name={[field.name, "value"]}>
-                                                <Input allowClear />
-                                            </Form.Item>
-                                            <Button
-                                                onClick={() => {
-                                                    remove(field.name);
-                                                }}
-                                                icon={<DeleteOffOutline />}
-                                                type="default"
-                                                title={gettext("Remove contact")}
-                                            />
-                                        </Space.Compact>
-                                    ))}
-
-                                </Space>
-                            )}
-                        </Form.List>
-
-                        <Form.Item noStyle name={["footer_name", "base_year"]}>
-                            <Input allowClear placeholder="base_year" />
-                        </Form.Item>
-                        <Form.Item noStyle name={["footer_name", "name"]}>
-                            <Input allowClear placeholder="name" />
-                        </Form.Item>
-                        <span className="control-component">
-                            <ControlForm handleCancel={handleCancel} resetForm={resetForm} />
-                        </span>
-                    </Space>
-                </Form>
-            </Modal>
+            <ModalComponent title={gettext("Footer title")} form={formFooter} open={open} handleCancel={handleCancel} />
             <Row className="footer-info">
                 <Col className="logo-col" flex={1}>
                     <span className="uriit-logo">

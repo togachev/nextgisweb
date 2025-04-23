@@ -5,3 +5,4 @@ export { MapTile } from "./MapTile";
 export { Header } from "./Header";
 export { Footer } from "./Footer";
 export { UploadComponent } from "./UploadComponent";
+export { ModalComponent } from "./ModalComponent";
