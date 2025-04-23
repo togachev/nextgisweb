@@ -38,7 +38,6 @@ class Control extends Interaction {
 
     handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
         if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-            // this.tool.selected = undefined;
             this.tool._overlayInfo(e, "popup", false);
             e.preventDefault();
         }
@@ -53,36 +52,6 @@ class Control extends Interaction {
         return true;
     }
 }
-
-
-
-
-// const Control = function (options) {
-//     this.tool = options.tool;
-//     Interaction.call(this, {
-//         handleEvent: Control.prototype.handleClickEvent,
-//     });
-// };
-
-// Control.prototype = Object.create(Interaction.prototype);
-// Control.prototype.constructor = Control;
-
-// Control.prototype.handleClickEvent = function (e: MapBrowserEvent) {
-//     if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-//         this.tool.selected = undefined;
-//         this.tool._overlayInfo(e, "popup", false);
-//         e.preventDefault();
-//     }
-//     else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
-//         this.tool._popupMultiple(e, "multi", false);
-//         e.preventDefault();
-//     }
-//     else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-//         this.tool._overlayInfo(e, "context", false);
-//         e.preventDefault();
-//     }
-//     return true;
-// };
 
 export class IdentifyModule extends Component {
     private display: Display;
@@ -386,7 +355,6 @@ export class IdentifyModule extends Component {
                 })
 
                 this.selected = val.slf;
-
                 const value = {
                     attribute: val.attribute,
                     pn: val.pn,
@@ -396,10 +364,7 @@ export class IdentifyModule extends Component {
                 }
 
                 const p = { value, coordinate: transformedCoord };
-
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
-                console.log(this.display.panelManager.getActivePanelName());
-                
                 const simulateEvent = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
