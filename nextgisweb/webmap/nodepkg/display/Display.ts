@@ -40,19 +40,20 @@ import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
+    DisplayURLParams,
     Entrypoint,
     MapPlugin,
     MapRefs,
-    MapURLParams,
     Mid,
     TinyConfig,
 } from "../type";
 import type { TreeItemConfig } from "../type/TreeItems";
-import { getURLParams, setURLParam } from "../utils/URL";
+import { setURLParam } from "../utils/URL";
 import { normalizeExtent } from "../utils/normalizeExtent";
 
+import { displayURLParams } from "./displayURLParams";
+
 export class Display {
-    private readonly modeURLParam: keyof MapURLParams = "panel";
     private readonly emptyModeURLValue = "none";
     readonly _itemConfigById: Record<string, TreeItemConfig> = {};
     displayProjection = "EPSG:3857";
@@ -87,7 +88,7 @@ export class Display {
         wmplugin: {},
     };
 
-    urlParams: Record<keyof MapURLParams, string>;
+    urlParams: DisplayURLParams;
 
     // Deferred Objects
 
@@ -120,7 +121,7 @@ export class Display {
     }) {
         this.config = config;
         this.tinyConfig = tinyConfig;
-        this.urlParams = getURLParams<MapURLParams>();
+        this.urlParams = displayURLParams.values();
 
         this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
         this.mapDeferred = new LoggedDeferred("_mapDeferred");
@@ -337,19 +338,14 @@ export class Display {
 
         const view = this.map.olMap.getView();
         if (urlParams.lon && urlParams.lat) {
-            view.setCenter(
-                fromLonLat([
-                    parseFloat(urlParams.lon),
-                    parseFloat(urlParams.lat),
-                ])
-            );
+            view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
         }
         if (urlParams.zoom !== undefined) {
-            view.setZoom(parseInt(urlParams.zoom));
+            view.setZoom(urlParams.zoom);
         }
 
         if ("angle" in urlParams && urlParams.angle !== undefined) {
-            view.setRotation(parseFloat(urlParams.angle));
+            view.setRotation(urlParams.angle);
         }
 
         return true;
@@ -447,7 +443,6 @@ export class Display {
 
     private _layersSetup() {
         const store = this.itemStore;
-        let visibleStyles: number[] | null = null;
 
         this._adaptersSetup();
 
@@ -460,12 +455,6 @@ export class Display {
                 return this.webmapStore._layers;
             },
         });
-
-        if (typeof this.urlParams.styles === "string") {
-            visibleStyles = this.urlParams.styles
-                .split(",")
-                .map((i) => parseInt(i, 10));
-        }
 
         // Layers initialization
         store.fetch({
@@ -483,15 +472,20 @@ export class Display {
 
                 // Turn on layers from permalink
                 let cond;
-                const layer = this.webmapStore.getLayer(
-                    store.getValue(item, "id")
-                );
-                if (visibleStyles) {
-                    cond =
-                        visibleStyles.indexOf(
-                            store.getValue(item, "styleId")
-                        ) !== -1;
-
+                const layerId = store.getValue(item, "id");
+                const layer = this.webmapStore.getLayer(layerId);
+                if (this.urlParams.styles) {
+                    const styleId = store.getValue(item, "styleId");
+                    cond = styleId in this.urlParams.styles;
+                    if (cond) {
+                        const symbols = this.urlParams.styles[styleId];
+                        if (symbols) {
+                            this.webmapStore.setItemSymbols(
+                                layerId,
+                                symbols === "-1" ? [] : symbols
+                            );
+                        }
+                    }
                     layer.olLayer.setVisible(cond);
                     layer.setVisibility(cond);
                     store.setValue(item, "checked", cond);
@@ -756,26 +750,25 @@ export class Display {
 
     private _buildPanelManager() {
         let activePanelKey;
-        if (!this.urlParams[this.modeURLParam]) {
+        if (!this.urlParams.panel) {
             activePanelKey = this.config.active_panel
-        } else if (this.urlParams[this.modeURLParam] !== this.config.active_panel) {
-            activePanelKey = this.urlParams[this.modeURLParam]
+        } else if (this.urlParams.panel !== this.config.active_panel) {
+            activePanelKey = this.urlParams.panel
         } else {
             activePanelKey = this.config.active_panel
         }
-
+        
         const onChangePanel = (panel?: PanelStore) => {
             if (panel) {
-                setURLParam(this.modeURLParam, panel.name);
+                setURLParam("panel", panel.name);
             } else {
-                setURLParam(this.modeURLParam, this.emptyModeURLValue);
+                setURLParam("panel", this.emptyModeURLValue);
             }
         };
 
         let allowPanels;
         if (this.isTinyMode()) {
-            const panels = this.urlParams.panels;
-            allowPanels = panels ? panels.split(",") : [];
+            allowPanels = this.urlParams.panels || [];
         }
 
         const panelManager = new PanelManager(

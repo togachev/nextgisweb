@@ -5,6 +5,7 @@ import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import type { LayerDisplayAdapterCtor } from "../DisplayLayerAdapter";
 import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
+import type { LayerSymbols } from "../compat/type";
 import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { MapStore } from "../ol/MapStore";
@@ -57,21 +58,21 @@ export interface MapRefs {
     rightBottomControlPane: HTMLElement;
 }
 
-export interface MapURLParams {
-    lon?: string;
-    lat?: string;
+export interface DisplayURLParams {
+    lon?: number;
+    lat?: number;
     base?: string;
-    zoom?: string;
-    angle?: string;
+    zoom?: number;
+    angle?: number;
     annot?: AnnotationVisibleMode;
     events?: "true";
     panel?: string;
-    panels?: string;
-    styles?: string;
+    panels?: string[];
+    styles?: Record<number, LayerSymbols>;
     hl_val?: string;
-    hl_lid?: string;
+    hl_lid?: number;
     hl_attr?: string;
-    controls?: string;
+    controls?: string[];
     linkMainMap?: "true";
     attribute: string | boolean;
     st?: string;

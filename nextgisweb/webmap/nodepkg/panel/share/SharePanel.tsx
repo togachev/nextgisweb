@@ -334,9 +334,10 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 <Space.Compact aling="baseline">
                     <CopyToClipboardButton
                         getTextToCopy={() => mapLink}
-                        messageInfo={gettext(
-                            "The map link copied to clipboard."
-                        )}
+                        messageInfo={
+                            // pretties-ignore
+                            gettext("The map link copied to clipboard.")
+                        }
                     >
                         {gettext("Copy link")}
                     </CopyToClipboardButton>

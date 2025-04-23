@@ -4,6 +4,7 @@ import { toLonLat } from "ol/proj";
 import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import type { Display } from "../display";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
+import type { DisplayURLParams } from "../type";
 
 export interface GetPermalinkOptions {
     display: Display;
@@ -26,15 +27,20 @@ export const getPermalink = ({
     origin,
     pathname,
 }: GetPermalinkOptions): string => {
-    const visibleStyles: number[] = [];
+    // { 1: ['0-5', '8-12'], 2: [], 3: '-1' } >>> 1[0-5|8-12],2,3[-1]
+    const visibleStyles: string[] = [];
     visibleItems.forEach((i) => {
         const item = display.itemStore.dumpItem(i);
         if ("styleId" in item) {
-            visibleStyles.push(item.styleId);
+            let styleStr = String(item.styleId);
+            if (item.symbols && item.symbols.length) {
+                styleStr += `[${Array.isArray(item.symbols) ? item.symbols.join("|") : item.symbols}]`;
+            }
+            visibleStyles.push(styleStr);
         }
     });
 
-    const params: Record<string, string> = {
+    const params: Partial<Record<keyof DisplayURLParams, string>> = {
         angle: String(display.map.olMap.getView().getRotation() || 0),
         zoom: String(display.map.olMap.getView().getZoom() || 0),
         styles: visibleStyles.join(","),
