@@ -56,7 +56,8 @@ const activePanelOptions: { value: ActivePanelType; label: string }[] = [
     { value: "bookmark", label: gettext("Bookmarks") },
     { value: "info", label: gettext("Description") },
     { value: "share", label: gettext("Share") },
-    { value: "annotation", label: gettext("Annotations") }
+    { value: "annotation", label: gettext("Annotations") },
+    { value: "none", label: gettext("Panel disabled") }
 ];
 
 

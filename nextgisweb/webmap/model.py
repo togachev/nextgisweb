@@ -40,7 +40,7 @@ from .option import WebMapOption
 
 Base.depends_on("resource")
 
-ACTIVE_PANEL_VALUES = ("layers", "search", "custom-layer", "print", "bookmark", "info", "share", "annotation")
+ACTIVE_PANEL_VALUES = ("layers", "search", "custom-layer", "print", "bookmark", "info", "share", "annotation", "none")
 ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
 
