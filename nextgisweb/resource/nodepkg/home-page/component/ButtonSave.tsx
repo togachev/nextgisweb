@@ -10,11 +10,12 @@ export const ButtonSave = (props) => {
     const { onClickSave, staticPosition } = props;
 
     return (
-        <span title={staticPosition ? editPosition : savePosition}>
+        <span title={staticPosition ? editPosition : savePosition} >
             <Button
+                className="button-edit-save"
                 icon={staticPosition ? <Edit /> : <Save />}
-                size="small"
                 onClick={onClickSave}
+                type="default"
             />
         </span>
     );

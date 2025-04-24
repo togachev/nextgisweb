@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
+import { Button, Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
-import ImageOffOutline from "@nextgisweb/icon/mdi/image-off-outline";
+import ImageOff from "@nextgisweb/icon/mdi/image-off";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
@@ -94,7 +94,7 @@ export const MapTile = (props) => {
                                 </div>
                             </Link> :
                             <Link title={display_name} className="link-map" href={urlWebmap} target="_blank">
-                                {size.min ? <TitleMap /> : <Empty description="" image={<ImageOffOutline />} />}
+                                {size.min ? <TitleMap /> : <Empty description="" image={<ImageOff />} />}
                             </Link>
                     }
                 >
@@ -110,20 +110,29 @@ export const MapTile = (props) => {
                         }
                         description={
                             <>
-                                <Link href={urlWebmap} target="_blank">
+                                <Button
+                                    href={urlWebmap}
+                                    target="_blank"
+                                    type="text"
+                                    icon={<MapIcon />}
+                                >
                                     {!size.min && <Text className="open-map">{openMap}</Text>}
-                                    <span className="icon-open-map"><MapIcon /></span>
-                                </Link>
+                                </Button>
                                 {perm && perm.resource.update === true && (
-                                    <Link className="settings-a" href={urlWebmapSettings} target="_blank">
-                                        <span title={settingsTitle} className="icon-info-map"><Cogs /></span>
-                                    </Link>
-                                )}
+                                    <Button
+                                        title={settingsTitle}
+                                        href={urlWebmapSettings}
+                                        target="_blank"
+                                        type="text"
+                                        icon={<Cogs />}
+                                    />)}
                                 {description_status === true && (
-                                    <span title={descTitle} className="icon-info-map" onClick={showDescription}>
-                                        <Info />
-                                    </span>
-                                )}
+                                    <Button
+                                        title={descTitle}
+                                        onClick={showDescription}
+                                        type="text"
+                                        icon={<Info />}
+                                    />)}
                             </>
                         }
                     />
