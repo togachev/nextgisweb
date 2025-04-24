@@ -1,12 +1,14 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/magnify";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gui/antd";
+import { Space, Segmented, Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContainerMenu, ContainerMaps, Footer, Header } from "./component";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
+import GridLarge from "@nextgisweb/icon/mdi/grid-large";
+import Grid from "@nextgisweb/icon/mdi/grid";
 import "./Content.less";
 
 const resourcesToOptions = (resourcesInfo) => {
@@ -43,10 +45,17 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-const size = { minW: 150, maxW: 300, minH: 150, maxH: 320 };
+const sizeTile = {
+    large: { minW: 150, maxW: 300, minH: 150, maxH: 320, cardCoverH: 204, cardBodyH: 116, min: false },
+    small: { minW: 150, maxW: 150, minH: 150, maxH: 170, cardCoverH: 121, cardBodyH: 50, min: true },
+}
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
     const [store] = useState(() => new HomeStore());
+    
+    const [minStatus, setMinStatus] = useState(window.innerWidth > 785 ? "large" : "small");
+
+    const [size, setSize] = useState(minStatus === "large" ? sizeTile.large : sizeTile.small);
 
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
@@ -95,7 +104,15 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         return () => {
             window.removeEventListener("resize", handleResize);
         };
-    }, [store.widthMenu]);
+    }, [store.widthMenu, window.innerWidth]);
+
+    useEffect(() => {
+        if (minStatus === "large") {
+            setSize(sizeTile.large)
+        } else {
+            setSize(sizeTile.small)
+        }
+    }, [minStatus]);
 
     useEffect(() => {
         if (makeQuery) {
@@ -152,6 +169,9 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             horizontalItemHoverColor: "#afb4fd",
 
                         },
+                        Segmented: {
+                            trackBg: "transparent",
+                        },
                         Tooltip: {
                             colorBgSpotlight: "#fff",
                             colorTextLightSolid: "#000",
@@ -171,23 +191,37 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                 <div className="main">
                     <div className="content">
                         <div className="search-block">
-                            <AutoComplete
-                                popupClassName="home-page-map-filter-dropdown"
-                                style={{ width: "100%" }}
-                                onSelect={onSelect}
-                                options={options}
-                                status={acStatus}
-                                {...rest}
-                            >
-                                <Input
-                                    prefix={<DeleteOffOutline />}
-                                    size="middle"
-                                    placeholder={gettext("Enter card name")}
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    allowClear
+                            <div className="search">
+                                <AutoComplete
+                                    popupClassName="home-page-map-filter-dropdown"
+                                    style={{ width: "100%" }}
+                                    onSelect={onSelect}
+                                    options={options}
+                                    status={acStatus}
+                                    {...rest}
+                                >
+                                    <Input
+                                        prefix={<DeleteOffOutline />}
+                                        size="middle"
+                                        placeholder={gettext("Enter card name")}
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        allowClear
+                                    />
+                                </AutoComplete>
+                            </div>
+                            <Space>
+                                <Segmented<string>
+                                    options={[
+                                        { value: "small", icon: <Grid />, title: gettext("Small tile") },
+                                        { value: "large", icon: <GridLarge />, title: gettext("Large tile") },
+                                    ]}
+                                    onChange={(value) => {
+                                        setMinStatus(value);
+                                    }}
+                                    value={minStatus}
                                 />
-                            </AutoComplete>
+                            </Space>
                         </div>
                         <div className="menu-maps">
                             <div className="menu-list">

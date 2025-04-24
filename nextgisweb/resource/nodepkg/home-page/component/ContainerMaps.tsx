@@ -44,7 +44,7 @@ const SortableMaps = (props) => {
                 title={item.display_name}
                 style={style}
             >
-                {disable ? (<MapTile config={config} item={item} store={store} />) :
+                {disable ? (<MapTile config={config} item={item} store={store} size={size} />) :
                     (<div className="drag-item"><div className="content-drag">
                         {item?.display_name}
                     </div>

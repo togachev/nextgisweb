@@ -40,6 +40,7 @@ export {
     Rate,
     Result,
     Row,
+    Segmented,
     Select,
     Skeleton,
     Slider,

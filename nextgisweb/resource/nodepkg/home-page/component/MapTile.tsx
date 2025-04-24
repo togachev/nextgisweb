@@ -3,6 +3,7 @@ import { Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
+import ImageOffOutline from "@nextgisweb/icon/mdi/image-off-outline";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
@@ -22,7 +23,7 @@ export const MapTile = (props) => {
     const [perm, setPerm] = useState();
     const { id, display_name, preview_fileobj_id, description_status } = props.item;
     const { upath_info } = props.config;
-    const { store } = props;
+    const { store, size } = props;
 
     const preview = routeURL("resource.preview", id);
     const urlWebmap = routeURL("webmap.display", id);
@@ -53,6 +54,12 @@ export const MapTile = (props) => {
         <DescComponent type="home_page" upath_info={upath_info} content={descValue} />
     )
 
+    const TitleMap = ({ className }) => (
+        <div title={display_name} className={className + " grid-card-meta-title grid-card-meta-title-min"} >
+            {display_name}
+        </div >
+    )
+
     return (
         <ConfigProvider
             theme={{
@@ -69,21 +76,26 @@ export const MapTile = (props) => {
         >
             <div ref={descRef}>
                 <Card
+                    styles={{ cover: { height: size.cardCoverH }, body: { height: size.cardBodyH } }}
                     hoverable
                     cover={
-                        <>
-                            <Link className="link-map" href={urlWebmap} target="_blank">
-                                {
-                                    preview_fileobj_id ?
-                                        (<div className="img_preview"
-                                            style={{
-                                                background: `url(${preview}) center center / cover no-repeat`,
-                                            }}
-                                        ></div>) :
-                                        (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
-                                }
+                        preview_fileobj_id ?
+                            <Link title={display_name} className="link-map" href={urlWebmap} target="_blank">
+                                <div className="img_preview"
+                                    style={
+                                        !size.min ?
+                                            { background: `url(${preview}) center center / cover no-repeat` } :
+                                            {
+                                                background: `linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${preview}) center center / cover no-repeat`
+                                            }
+                                    }
+                                >
+                                    {size.min && <TitleMap />}
+                                </div>
+                            </Link> :
+                            <Link title={display_name} className="link-map" href={urlWebmap} target="_blank">
+                                {size.min ? <TitleMap /> : <Empty description="" image={<ImageOffOutline />} />}
                             </Link>
-                        </>
                     }
                 >
                     <Meta
@@ -93,13 +105,13 @@ export const MapTile = (props) => {
                         }}
                         title={
                             <span title={display_name} className="grid-card-meta-title">
-                                {display_name}
+                                {!size.min && display_name}
                             </span>
                         }
                         description={
                             <>
                                 <Link href={urlWebmap} target="_blank">
-                                    <Text className="open-map">{openMap}</Text>
+                                    {!size.min && <Text className="open-map">{openMap}</Text>}
                                     <span className="icon-open-map"><MapIcon /></span>
                                 </Link>
                                 {perm && perm.resource.update === true && (
