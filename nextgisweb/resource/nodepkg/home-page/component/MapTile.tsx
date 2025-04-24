@@ -114,9 +114,11 @@ export const MapTile = (props) => {
                                     href={urlWebmap}
                                     target="_blank"
                                     type="text"
-                                    icon={<MapIcon />}
                                 >
-                                    {!size.min && <Text className="open-map">{openMap}</Text>}
+                                    <span className="open-map">
+                                        <MapIcon />
+                                        {!size.min && <Text >{openMap}</Text>}
+                                    </span>
                                 </Button>
                                 {perm && perm.resource.update === true && (
                                     <Button
