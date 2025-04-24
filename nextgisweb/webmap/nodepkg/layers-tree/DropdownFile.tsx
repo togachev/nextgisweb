@@ -35,13 +35,13 @@ const { Link } = Typography;
 export function DropdownFile({ nodeData }: DropdownFileProps) {
     const [open, setOpen] = useState(false);
 
-    const handleMenuClick: MenuProps['onClick'] = (e) => {
+    const handleMenuClick: MenuProps["onClick"] = (e) => {
         e.domEvent.stopPropagation();
         setOpen(false);
     };
 
-    const handleOpenChange: DropdownProps['onOpenChange'] = (nextOpen, info) => {
-        if (info.source === 'trigger' || nextOpen) {
+    const handleOpenChange: DropdownProps["onOpenChange"] = (nextOpen, info) => {
+        if (info.source === "trigger" || nextOpen) {
             setOpen(nextOpen);
         }
     };
