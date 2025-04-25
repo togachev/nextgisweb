@@ -94,7 +94,7 @@ export const ResourceSectionChildren = ({
                         }
                         icon={`rescls-${record.cls}`}
                     >
-                        {value}
+                        <span className="name-style">{value}</span>
                     </SvgIconLink>
                 )}
             />

@@ -200,6 +200,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                         pickerOptions: {
                             requireClass: "postgis_connection",
                             initParentId: store.composite.parent,
+                            clsFilter: "postgis_service",
                         },
                         style: { width: "100%" },
                     }}

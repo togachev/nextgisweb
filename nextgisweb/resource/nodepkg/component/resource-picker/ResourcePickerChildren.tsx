@@ -201,6 +201,11 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     renderResourceCls({ name: value, cls }),
             },
             {
+                title: msgDislpayName,
+                className: "cls",
+                dataIndex: "cls",
+            },
+            {
                 className: "actions",
                 dataIndex: "actions",
                 align: "right",
