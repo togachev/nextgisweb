@@ -287,7 +287,7 @@ input {
 								align-items: center;
 								box-sizing: border-box;
 								border: 1px solid #b3b9be78;
-								border-radius: 3px;
+								border-radius: 4px;
 
 								.ant-card {
 									height: 100%;
@@ -297,6 +297,8 @@ input {
 									border-radius: 3px;
 
 									.ant-card-cover {
+										margin: 0;
+										border-bottom: 1px solid #b3b9be78;
 
 										.link-map {
 											display: inline-grid;
@@ -333,7 +335,6 @@ input {
 									padding: 0;
 									border-top-right-radius: 3px;
 									border-top-left-radius: 3px;
-									border: 1px solid #b3b9be78;
 									box-sizing: border-box;
 									text-align: center;
 									display: grid;
@@ -371,7 +372,6 @@ input {
 
 											.title-map {
 												width: 100%;
-												background: #fffafa;
 												position: relative;
 												height: 100%;
 
@@ -379,7 +379,7 @@ input {
 													width: 100%;
 													position: absolute;
 													top: 0;
-													bottom: 32px;
+													bottom: 40px;
 													display: flex;
 													align-items: center;
 													justify-content: center;
@@ -433,7 +433,9 @@ input {
 												}
 
 												.button-min {
-													a, button {
+
+													a,
+													button {
 														font-size: 18px;
 													}
 												}
@@ -521,16 +523,16 @@ div:has(> .upload-footer) {
 
 .grid-card-meta-title {
 	font-weight: 600;
-    font-size: 16px;
-    overflow: hidden;
-    white-space: initial;
-    text-overflow: ellipsis;
-    line-height: 20.7px;
-    text-align: center;
-    letter-spacing: normal;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+	font-size: 16px;
+	overflow: hidden;
+	white-space: initial;
+	text-overflow: ellipsis;
+	line-height: 20.7px;
+	text-align: center;
+	letter-spacing: normal;
+	-webkit-line-clamp: 3;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
 	padding: 0 5px;
 }
 
