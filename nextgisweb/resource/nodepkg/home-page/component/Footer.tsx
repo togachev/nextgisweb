@@ -270,10 +270,10 @@ export const Footer = observer(({ store, config }) => {
                             <Col className="phone">
                                 {store.valueFooter?.address?.phone.map((item, index) => {
                                     return (
-                                        <Row key={index} className="phone-item" wrap={false} >
-                                            <Col className="name">{item?.name}</Col>
-                                            <Col className="value">{item?.value}</Col>
-                                        </Row>
+                                        <Space key={index} className="phone-item" wrap>
+                                            <div className="name">{item?.name}</div>
+                                            <div className="value">{item?.value}</div>
+                                        </Space>
                                     )
                                 })}
                             </Col>
