@@ -29,6 +29,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import "./ResourcePickerChildren.less";
 
 const msgDislpayName = gettext("Display name");
+const msgClsName = gettext("Cls name");
 const msgSelectFirst = gettext("Select first eligible child resource");
 
 function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
@@ -201,7 +202,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     renderResourceCls({ name: value, cls }),
             },
             {
-                title: msgDislpayName,
+                title: msgClsName,
                 className: "cls",
                 dataIndex: "cls",
             },
