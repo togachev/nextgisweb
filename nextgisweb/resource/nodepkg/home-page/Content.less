@@ -310,6 +310,10 @@ input {
 												opacity: 1;
 												font-size: 32px;
 											}
+
+											&:hover {
+												color: var(--text-base) !important;
+											}
 										}
 
 										a:hover {
@@ -335,10 +339,10 @@ input {
 									text-align: center;
 									display: grid;
 									place-items: center;
-								}
 
-								.img_preview_none {
-									height: 168px;
+									&:hover {
+										color: var(--text-base) !important;
+									}
 								}
 
 								.meta-card {
@@ -365,82 +369,75 @@ input {
 											justify-content: center;
 											width: 100%;
 											height: 100%;
-										}
 
-										.ant-card-meta-description {
-											padding: 0 10px 10px 10px;
-											display: flex;
-											cursor: text;
-											bottom: 1px;
-											align-items: center;
-											width: 100%;
-											height: 40px;
-											justify-content: space-between;
+											.title-map {
+												width: 100%;
+												background: #fffafa;
+												position: relative;
+												height: 100%;
 
-											.icon-open-map {
-												margin: 0;
-												color: var(--text-base);
-												padding: 0;
-												border-radius: 2px;
-												line-height: 1;
-											}
+												.title {
+													width: 100%;
+													position: absolute;
+													top: 0;
+													bottom: 32px;
+													display: flex;
+													align-items: center;
+													justify-content: center;
 
-											.settings-a {
-												padding: 0;
-											}
-
-											.icon-info-map {
-												line-height: 1;
-												font-size: 24px;
-												padding: 0;
-												cursor: pointer;
-
-												svg.icon {
-													fill: var(--text-base);
+													.content-title {
+														color: #000000;
+														font-size: 16px;
+														overflow: hidden;
+														white-space: initial;
+														text-overflow: ellipsis;
+														line-height: 20.7px;
+														text-align: left;
+														letter-spacing: normal;
+														-webkit-line-clamp: 3;
+														display: -webkit-box;
+														-webkit-box-orient: vertical;
+														padding: 0 10px;
+													}
 												}
 
-												svg.icon:hover {
-													fill: #2a398c79;
+												.control-button {
+													position: absolute;
+													bottom: 0;
+													display: flex;
+													justify-content: space-between;
+													width: 100%;
+													height: 40px;
+													align-items: center;
+
+													a,
+													button {
+														display: flex;
+														align-items: center;
+														font-size: 24px;
+														margin: 0px 10px;
+														padding: 0;
+
+														span {
+															display: flex;
+															align-items: center;
+															color: var(--primary);
+															text-transform: uppercase;
+															text-decoration: none;
+															font-weight: 500;
+														}
+
+														&:hover {
+															background-color: transparent;
+														}
+													}
 												}
-											}
 
-											a,
-											button {
-												color: var(--text-base);
-												display: flex;
-												align-items: center;
-												font-size: 24px;
-												padding: 0 5px;
-
-												&:hover {
-													background-color: transparent;
+												.button-min {
+													a, button {
+														font-size: 18px;
+													}
 												}
-											}
-
-											.open-map {
-												color: var(--primary);
-												text-transform: uppercase;
-												text-decoration: none;
-												font-weight: 500;
-												display: flex;
-												align-items: center;
-
-												&:hover {
-													opacity: .5;
-												}
-
-												span {
-													color: var(--primary);
-													margin-left: 5px;
-												}
-											}
-
-											svg.icon {
-												fill: var(--primary);
-											}
-
-											svg.icon:hover {
-												fill: #2a398c79;
 											}
 										}
 									}
@@ -524,32 +521,22 @@ div:has(> .upload-footer) {
 }
 
 .grid-card-meta-title {
-	margin: 5px 16px;
-	padding: 0;
-	color: #000000;
-	font-weight: 400;
-	font-size: 16px;
-	overflow: hidden;
-	white-space: initial;
-	text-overflow: ellipsis;
-	line-height: 20.7px;
-	text-align: left;
-	letter-spacing: normal;
-	-webkit-line-clamp: 3;
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
+	font-weight: 600;
+    font-size: 16px;
+    overflow: hidden;
+    white-space: initial;
+    text-overflow: ellipsis;
+    line-height: 20.7px;
+    text-align: center;
+    letter-spacing: normal;
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+	padding: 0 5px;
 }
 
 .grid-card-meta-title-min {
-	padding: 0;
-	text-align: center;
-	color: var(--text-base);
 	line-height: 2;
-}
-
-.title-map {
-	border-radius: 3px;
-	background-color: var(--divider-color);
 }
 
 .button-edit-save {

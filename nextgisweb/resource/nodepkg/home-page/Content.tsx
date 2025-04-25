@@ -47,7 +47,7 @@ const resourcesToOptions = (resourcesInfo) => {
 
 const sizeTile = {
     large: { minW: 150, maxW: 300, minH: 150, maxH: 320, cardCoverH: 204, cardBodyH: 116, min: false },
-    small: { minW: 150, maxW: 150, minH: 150, maxH: 170, cardCoverH: 121, cardBodyH: 50, min: true },
+    small: { minW: 150, maxW: 150, minH: 150, maxH: 160, cardCoverH: 120, cardBodyH: 40, min: true },
 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
@@ -167,7 +167,6 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             darkSubMenuItemBg: `${store.valueFooter?.colorBackground}`,
                             darkItemHoverColor: "#afb4fd",
                             horizontalItemHoverColor: "#afb4fd",
-
                         },
                         Segmented: {
                             trackBg: "transparent",

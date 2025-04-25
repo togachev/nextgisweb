@@ -86,7 +86,7 @@ export const MapTile = (props) => {
                                         !size.min ?
                                             { background: `url(${preview}) center center / cover no-repeat` } :
                                             {
-                                                background: `linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${preview}) center center / cover no-repeat`
+                                                background: `linear-gradient(to right, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url(${preview}) center center / cover no-repeat`
                                             }
                                     }
                                 >
@@ -104,39 +104,73 @@ export const MapTile = (props) => {
                             fontWeight: 500,
                         }}
                         title={
-                            <span title={display_name} className="grid-card-meta-title">
-                                {!size.min && display_name}
-                            </span>
-                        }
-                        description={
-                            <>
-                                <Button
-                                    href={urlWebmap}
-                                    target="_blank"
-                                    type="text"
-                                >
-                                    <span className="open-map">
-                                        <MapIcon />
-                                        {!size.min && <Text >{openMap}</Text>}
-                                    </span>
-                                </Button>
-                                {perm && perm.resource.update === true && (
+                            <div className="title-map">
+                                <span title={display_name} className="title">
+                                    <div className="content-title">
+                                        {!size.min && display_name}
+                                    </div>
+                                </span>
+                                <div className={size.min ? "button-min control-button" : "control-button"} >
                                     <Button
-                                        title={settingsTitle}
-                                        href={urlWebmapSettings}
+                                        href={urlWebmap}
                                         target="_blank"
                                         type="text"
-                                        icon={<Cogs />}
-                                    />)}
-                                {description_status === true && (
-                                    <Button
-                                        title={descTitle}
-                                        onClick={showDescription}
-                                        type="text"
-                                        icon={<Info />}
-                                    />)}
-                            </>
+                                        icon={<MapIcon />}
+                                    >
+                                        {!size.min && <Text >{openMap}</Text>}
+                                    </Button>
+                                    {perm && perm.resource.update === true && (
+                                        <Button
+                                            title={settingsTitle}
+                                            href={urlWebmapSettings}
+                                            target="_blank"
+                                            type="text"
+                                            icon={<Cogs />}
+                                        />)}
+                                    {description_status === true && (
+                                        <Button
+                                            title={descTitle}
+                                            onClick={showDescription}
+                                            type="text"
+                                            icon={<Info />}
+                                        />)}
+                                </div>
+                            </div>
                         }
+                    // title={
+                    //     <span title={display_name} className="grid-card-meta-title">
+                    //         {!size.min && display_name}
+                    //     </span>
+                    // }
+                    // description={
+                    //     <>
+                    //         <Button
+                    //             href={urlWebmap}
+                    //             target="_blank"
+                    //             type="text"
+                    //         >
+                    //             <span className="open-map">
+                    //                 <MapIcon />
+                    //                 {!size.min && <Text >{openMap}</Text>}
+                    //             </span>
+                    //         </Button>
+                    //         {perm && perm.resource.update === true && (
+                    //             <Button
+                    //                 title={settingsTitle}
+                    //                 href={urlWebmapSettings}
+                    //                 target="_blank"
+                    //                 type="text"
+                    //                 icon={<Cogs />}
+                    //             />)}
+                    //         {description_status === true && (
+                    //             <Button
+                    //                 title={descTitle}
+                    //                 onClick={showDescription}
+                    //                 type="text"
+                    //                 icon={<Info />}
+                    //             />)}
+                    //     </>
+                    // }
                     />
                 </Card>
                 <ModalComponent title={display_name} form={contentDesc} open={isModalOpen} handleCancel={handleCancel} />
