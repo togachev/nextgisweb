@@ -12,7 +12,8 @@ import type {
     ResourceInterface,
 } from "@nextgisweb/resource/type/api";
 
-import { renderResourceCls } from "../../util/renderResourceCls";
+// import { renderResourceCls } from "../../util/renderResourceCls";
+import { renderResourceClsDisplayName } from "../../util/renderResourceClsDisplayName";
 
 import usePickerCard from "./hook/usePickerCard";
 import type {
@@ -29,7 +30,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import "./ResourcePickerChildren.less";
 
 const msgDislpayName = gettext("Display name");
-const msgClsName = gettext("Cls name");
+// const msgClsName = gettext("Cls name");
 const msgSelectFirst = gettext("Select first eligible child resource");
 
 function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
@@ -196,15 +197,9 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             {
                 title: msgDislpayName,
                 className: "displayName",
-                dataIndex: "display_name",
                 sorter: sorterFactory("display_name"),
                 render: (value, { cls }: PickerResource) =>
-                    renderResourceCls({ name: value, cls }),
-            },
-            {
-                title: msgClsName,
-                className: "clsDisplayName",
-                dataIndex: "cls_display_name",
+                    renderResourceClsDisplayName({ name: value.display_name, cls, cls_display_name: value.cls_display_name }),
             },
             {
                 className: "actions",
