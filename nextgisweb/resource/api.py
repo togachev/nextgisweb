@@ -1,4 +1,15 @@
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Mapping, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    ClassVar,
+    Dict,
+    List,
+    Literal,
+    Mapping,
+    Union,
+    cast,
+)
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -14,7 +25,6 @@ from sqlalchemy.sql import exists
 from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op
 from sqlalchemy.sql.operators import ilike_op, in_op, like_op
-from typing_extensions import Annotated
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..postgis.exception import ExternalDatabaseError
 

@@ -1,8 +1,7 @@
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Annotated, Union
 
 from msgspec import Meta
-from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, JSONType, Query, StatusCode
 from nextgisweb.lib.apitype.test.test_param import EnumA, LiteralA, StructA
@@ -39,8 +38,8 @@ def query_primitive(
 def query_array(
     request,
     *,
-    str: Annotated[List[str], Meta(description="List with default")] = [],
-    int: Annotated[List[int], Meta(min_length=2, description="Two or more list")],
+    str: Annotated[list[str], Meta(description="list with default")] = [],
+    int: Annotated[list[int], Meta(min_length=2, description="Two or more list")],
 ):
     "Array query params"
 
@@ -50,7 +49,7 @@ def query_object(
     *,
     sto: Annotated[StructA, Meta(description="Struct")],
     sts: Annotated[StructA, Query(spread=True), Meta(description="Spreaded struct")],
-    dsi: Annotated[Dict[str, int], Meta(description="String to integer mapping")],
+    dsi: Annotated[dict[str, int], Meta(description="String to integer mapping")],
 ):
     "Object query params"
 

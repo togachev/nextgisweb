@@ -1,5 +1,7 @@
+from types import UnionType
 from typing import (
     TYPE_CHECKING,
+    Annotated,
     Any,
     Iterable,
     Optional,
@@ -7,6 +9,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     get_args,
     get_origin,
 )
@@ -16,7 +19,6 @@ from msgspec import _utils as ms_utils
 from msgspec.inspect import Metadata, type_info
 from msgspec.inspect import _is_enum as is_enum  # noqa: F401
 from msgspec.inspect import _is_struct as is_struct  # noqa: F401
-from typing_extensions import Annotated, _AnnotatedAlias
 
 get_class_annotations = ms_utils.get_class_annotations
 NoneType = type(None)
@@ -45,10 +47,9 @@ def disannotate(tdef: T, *, supertype: bool = False) -> Tuple[T, Tuple[Any, ...]
     if supertype and (sdef := getattr(tdef, "__supertype__", None)):
         tdef = sdef
 
-    if type(tdef) is _AnnotatedAlias:
-        result_type = get_args(tdef)[0]
-        result_extras = getattr(tdef, "__metadata__")
-
+    if get_origin(tdef) is Annotated:
+        result_type, *result_extras = get_args(tdef)
+        result_extras = tuple(result_extras)
         if supertype:
             result_type, supertype_extras = disannotate(result_type, supertype=True)
             result_extras = supertype_extras + result_extras
@@ -62,7 +63,7 @@ def decompose_union(tdef: Type, *, annotated: bool = True) -> Tuple[Type, ...]:
     if annotated:
         tdef = unannotate(tdef)
 
-    if get_origin(tdef) == Union:
+    if get_origin(tdef) in (UnionType, Union):
         return get_args(tdef)
     else:
         return (tdef,)
@@ -72,7 +73,7 @@ def is_optional(tdef: Type) -> Tuple[bool, Type]:
     """Determine if type definition is an optional type"""
 
     tdef = unannotate(tdef)
-    if get_origin(tdef) == Union:
+    if get_origin(tdef) in (UnionType, Union):
         result = (False,)
         args = []
         for a in get_args(tdef):
@@ -83,7 +84,7 @@ def is_optional(tdef: Type) -> Tuple[bool, Type]:
                 args.append(a)
         if result:
             ndef = args[0] if len(args) == 1 else Union[tuple(args)]  # type: ignore
-            return True, ndef
+            return True, cast(Type, ndef)
     return False, tdef
 
 
