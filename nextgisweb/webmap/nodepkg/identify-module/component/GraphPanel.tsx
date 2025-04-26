@@ -84,7 +84,7 @@ export const GraphPanel = observer(({ item, store }) => {
                 onChange={onChange}
                 className="legend-hide-button"
                 title={hideLegend ? msgShowLegend : msgHideLegend}
-                style={!store.fixPanel ? {} : { position: "absolute", right: 0 }}
+                style={!store?.fixPanel ? {} : { position: "absolute", right: 0 }}
             >
                 {hideLegend ? <EyeOff /> : <Eye />}
             </Tag.CheckableTag>
@@ -163,8 +163,8 @@ export const GraphPanel = observer(({ item, store }) => {
             }
         }
 
-        const styleResize = store.fixPos !== null ?
-            { height: store.fixPos?.height - 76 } :
+        const styleResize = store?.fixPos !== null ?
+            { height: store?.fixPos?.height - 76 } :
             { height: store.valueRnd?.height - 76 }
 
         const styleGtaph = hideLegend ?
@@ -193,13 +193,13 @@ export const GraphPanel = observer(({ item, store }) => {
                         <LineChartOutlined />
                         {msgGraphs}
                     </h3>)}
-                    {result && !store.fixPanel && item?.relation && (<HideLegend />)}
+                    {result && !store?.fixPanel && item?.relation && (<HideLegend />)}
                 </div>
             </div>
             <div className="panel-content-container">
                 <div className="fill">
                     <div className="relation-item">
-                        {result && store.fixPanel === "relation" && item?.relation && (<HideLegend />)}
+                        {result && store?.fixPanel === "relation" && item?.relation && (<HideLegend />)}
                         {result ? (<GraphComponent value={result} />) : emptyValue}
                     </div>
                 </div>

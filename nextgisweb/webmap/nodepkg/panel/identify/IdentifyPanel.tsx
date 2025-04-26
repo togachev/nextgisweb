@@ -11,6 +11,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
+import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -22,7 +23,7 @@ import { FeatureEditButton } from "./FeatureEditButton";
 import type IdentifyStore from "./IdentifyStore";
 import { FeatureInfoSection } from "./component/FeatureInfoSection";
 import { FeatureSelector } from "./component/FeatureSelector";
-import type { FeatureInfo, IdentifyInfo } from "./identification";
+import type { FeatureInfo, IdentifyInfo, FeatureIdentify } from "./identification";
 import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
 import "./IdentifyPanel.less";
@@ -56,12 +57,13 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
     ({ display, store }) => {
         const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
         const [featureItem, setFeatureItem] = useState<FeatureItem>();
+        const [relationInfo, setRelationInfo] = useState<FeatureIdentify>();
 
         const { trackPromise, isLoading } = useLoading();
         const { makeSignal, abort } = useAbortController();
 
         const identifyInfo = store.identifyInfo;
-        
+
         const highlights = featureInfo && getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureInfo.layerId)?.[1].itemConfig.layerHighligh;
         const isNotFound =
             identifyInfo && identifyInfo.response.featureCount === 0;
@@ -70,6 +72,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             if (isNotFound) {
                 setFeatureInfo(undefined);
                 setFeatureItem(undefined);
+                setRelationInfo(undefined);
             }
         }, [isNotFound]);
 
@@ -92,6 +95,10 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     );
 
                     setFeatureItem(featureItemLoaded);
+                    const layerResponse = identifyInfo.response[featureInfo?.layerId];
+                    const featureResponse = layerResponse?.features[featureInfo.idx];
+                    setRelationInfo(featureResponse);
+
                 } catch (err) {
                     if (!isAbortError(err)) {
                         errorModal(err);
@@ -157,6 +164,11 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             );
         }
 
+        let relationElement;
+        if (relationInfo?.relation) {
+            relationElement = (<GraphPanel item={relationInfo} />);
+        }
+
         return (
             <PanelContainer
                 className="ngw-webmap-panel-identify"
@@ -202,6 +214,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
+                {relationElement}
                 {loadElement}
                 {featureInfoSection}
             </PanelContainer>

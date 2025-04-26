@@ -8,6 +8,7 @@
         "html-react-parser": "^5.2.2",
         "react-chartjs-2": "^5.2.0",
         "chart.js": "^4.1.1",
-        "pako": "^2.1.0"
+        "pako": "^2.1.0",
+        "@ant-design/plots": "^2.3.3"
     }
 }
