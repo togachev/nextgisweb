@@ -203,8 +203,8 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             },
             {
                 title: msgClsName,
-                className: "cls",
-                dataIndex: "cls",
+                className: "clsDisplayName",
+                dataIndex: "cls_display_name",
             },
             {
                 className: "actions",

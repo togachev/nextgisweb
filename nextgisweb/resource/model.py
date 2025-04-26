@@ -618,6 +618,11 @@ class InterfacesAttr(SAttribute):
 class ScopesAttr(SAttribute):
     def get(self, srlzr) -> List[ResourceScopeIdentity]:
         return list(srlzr.obj.scope.keys())
+    
+
+class ClsDisplayNameAttr(SAttribute):
+    def get(self, srlzr) -> str:
+        return str(srlzr.obj.cls_display_name)
 
 
 class ResourceSerializer(Serializer, resource=Resource):
@@ -638,6 +643,8 @@ class ResourceSerializer(Serializer, resource=Resource):
     children = ChildrenAttr(read=ResourceScope.read, write=None)
     interfaces = InterfacesAttr(read=ResourceScope.read, write=None)
     scopes = ScopesAttr(read=ResourceScope.read, write=None)
+
+    cls_display_name = ClsDisplayNameAttr(read=ResourceScope.read, write=None)
 
     def deserialize(self, *args, **kwargs):
         # As the test for uniqueness within group is dependent on two attributes

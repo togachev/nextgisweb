@@ -237,6 +237,9 @@ def collection_get(
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
     resources = [res for res in query if check_perm(res)]
     resources.sort(key=lambda res: (res.cls_order, res.display_name))
+    tr = request.localizer.translate
+    for item in resources:
+        item.cls_display_name = tr(item.cls_display_name)
     return [serializer.serialize(res, CompositeRead) for res in resources]
 
 def collection_post(
