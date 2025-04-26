@@ -75,7 +75,7 @@ export const NavigationMenu = observer(({ store, display }: { store: PanelManage
             </Col>
             <Col>
                 {!display.tinyConfig && infomap.scope ? (
-                    <Dropdown menu={{ items }} trigger={["click", "hover"]}>
+                    <Dropdown menu={{ items }} trigger={["click"]}>
                         <div className="infoblock" onClick={(e) => e.preventDefault()}>
                             <span title={gettext("Map properties")} className="iconLinks">
                                 <LinkIcon />

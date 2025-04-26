@@ -14,7 +14,7 @@ export function renderResourceClsDisplayName({
         <div className="content">
             <div className="icon-cls"><SvgIcon icon={`rescls-${cls}`} /></div>
             <div className="name">
-                <div className="value">{name}</div>
+                <div title={name} className="value">{name}</div>
                 <div className="cls">{cls_display_name}</div>
             </div>
         </div>
