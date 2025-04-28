@@ -59,7 +59,7 @@ export const ResourceSectionDescription: ResourceSection = ({
                         {gettext("View resource description")}
                     </Button>
                 </div> :
-                <>
+                <div className="result-description">
                     <div className="result-title">
                         <div className="title">{gettext("Description")}</div>
                         <Button
@@ -69,7 +69,7 @@ export const ResourceSectionDescription: ResourceSection = ({
                         />
                     </div>
                     <DescComponent content={descValue} />
-                </>
+                </div>
             }
         </div>
     );
