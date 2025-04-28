@@ -33,14 +33,19 @@ input {
 	}
 
 	.icon-pensil {
-		color: var(--text-base);
+		color: var(--text-secondary);
 		display: flex;
 		align-items: center;
 		background-color: #fff;
 		margin: 5px 0 0 5px;
 		z-index: 1000;
-		width: 24px;
-		height: 24px;
+		width: 32px;
+		height: 32px;
+		font-size: 16px;
+
+		&:hover {
+			color: var(--primary) !important;
+		}
 	}
 
 	.icon-edit-control {
@@ -417,11 +422,11 @@ input {
 														font-size: 24px;
 														margin: 0px 10px;
 														padding: 0;
+														color: var(--text-secondary);
 
 														span {
 															display: flex;
 															align-items: center;
-															color: var(--primary);
 															text-transform: uppercase;
 															text-decoration: none;
 															font-weight: 500;
@@ -526,7 +531,7 @@ div:has(> .upload-footer) {
 }
 
 .grid-card-meta-title {
-	font-weight: 600;
+	font-weight: 500;
 	font-size: 16px;
 	overflow: hidden;
 	white-space: initial;
@@ -545,15 +550,22 @@ div:has(> .upload-footer) {
 }
 
 .button-edit-save {
-	color: var(--text-base);
+	color: var(--text-secondary);
 	display: flex;
 	align-items: center;
-	font-size: 18px;
+	font-size: 16px;
 	position: relative;
-    top: -32px;
+	top: -32px;
+	width: 32px !important;
+	height: 32px !important;
+
+	&:hover {
+		color: var(--primary) !important;
+	}
 }
 
-.edit-group-maps,.edit-grid-maps {
+.edit-group-maps,
+.edit-grid-maps {
 	position: absolute;
 }
 

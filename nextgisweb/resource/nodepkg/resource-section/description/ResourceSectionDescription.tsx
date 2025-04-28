@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import { Alert, Button, Spin } from "@nextgisweb/gui/antd";
+import { Button, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { LoadingOutlined } from "@ant-design/icons";
-
+import Close from "@nextgisweb/icon/mdi/close";
 import { DescComponent } from "@nextgisweb/resource/description";
 import type { ResourceSection } from "../type";
 import "./ResourceSectionDescription.less";
@@ -54,22 +54,28 @@ export const ResourceSectionDescription: ResourceSection = ({
                         iconPosition="end"
                         icon={<Spin indicator={<LoadingOutlined spin />} spinning={spinning} percent={percent} />}
                         onClick={showLoader}
+                        type="link"
                     >
-                        {gettext("Upload description")}
+                        {gettext("View resource description")}
                     </Button>
-                </div>}
-            {descValue &&
-                <>
-                <Alert
-                showIcon
-                    className="alert-info"
-                    message={gettext("Uploaded description")}
-                    type="success"
-                    onClose={handleClose}
-                    closable
-                />
-                <DescComponent content={descValue} /></>
+                </div>
             }
+            <div className="result-description">
+                {descValue &&
+                    <>
+                        <div className="result-title">
+                            <div className="title">{gettext("Description")}</div>
+                            <Button
+                                icon={<Close />}
+                                onClick={handleClose}
+                                type="link"
+                            />
+                        </div>
+
+                        <DescComponent content={descValue} />
+                    </>
+                }
+            </div>
         </div>
     );
 };
