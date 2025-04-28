@@ -48,7 +48,7 @@ export const ResourceSectionDescription: ResourceSection = ({
 
     return (
         <div className="description-panel">
-            {!descValue &&
+            {!descValue ?
                 <div className="button-upload">
                     <Button
                         iconPosition="end"
@@ -58,22 +58,19 @@ export const ResourceSectionDescription: ResourceSection = ({
                     >
                         {gettext("View resource description")}
                     </Button>
-                </div>
+                </div> :
+                <>
+                    <div className="result-title">
+                        <div className="title">{gettext("Description")}</div>
+                        <Button
+                            icon={<Close />}
+                            onClick={handleClose}
+                            type="link"
+                        />
+                    </div>
+                    <DescComponent content={descValue} />
+                </>
             }
-                {descValue &&
-                    <>
-                        <div className="result-title">
-                            <div className="title">{gettext("Description")}</div>
-                            <Button
-                                icon={<Close />}
-                                onClick={handleClose}
-                                type="link"
-                            />
-                        </div>
-
-                        <DescComponent content={descValue} />
-                    </>
-                }
         </div>
     );
 };
