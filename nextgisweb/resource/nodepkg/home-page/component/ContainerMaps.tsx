@@ -2,10 +2,11 @@ import { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
+import TableCog from "@nextgisweb/icon/mdi/table-cog";
 import { Empty } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MapTile } from "./MapTile";
-import { routeURL } from "@nextgisweb/pyramid/api";
 import {
     DndContext,
     closestCenter,
@@ -109,7 +110,7 @@ export const ContainerMaps = (props) => {
     return (
         <div className="dnd-container-maps">
             {config.isAdministrator === true &&
-                (<ButtonSave staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<TableCog />} text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="maps-group"

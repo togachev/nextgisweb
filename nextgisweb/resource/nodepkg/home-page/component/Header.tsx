@@ -7,7 +7,6 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
-import Edit from "@nextgisweb/icon/material/edit";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
 import Login from "@nextgisweb/icon/mdi/login";
@@ -242,9 +241,9 @@ export const Header = observer(({ store, config }) => {
                 <div className="control-button">
                     {config.isAdministrator === true && !open && (<Button
                         className="icon-pensil"
-                        title={gettext("Edit")}
+                        title={gettext("Setting header")}
                         type="default"
-                        icon={<Edit />}
+                        icon={<Cog />}
                         onClick={openForm}
                     />)}
                 </div>

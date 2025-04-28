@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Col, ColorPicker, Row, Button, Form, Divider, Input, Space } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
-import Edit from "@nextgisweb/icon/material/edit";
+import Cog from "@nextgisweb/icon/mdi/cog";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -233,9 +233,9 @@ export const Footer = observer(({ store, config }) => {
                 {config.isAdministrator === true && !open && (
                     <Button
                         className="icon-pensil"
-                        title={gettext("Edit")}
+                        title={gettext("Setting footer")}
                         type="default"
-                        icon={<Edit />}
+                        icon={<Cog />}
                         onClick={openForm}
                     />)}
             </div>
