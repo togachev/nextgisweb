@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import ListEdit from "@nextgisweb/icon/mdi/playlist-edit";
+import CogTransfer from "@nextgisweb/icon/mdi/cog-transfer";
 import { Radio } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -101,7 +101,7 @@ export const ContainerMenu = (props) => {
     return (
         <div className="dnd-container-menu">
             {config.isAdministrator === true &&
-                (<ButtonSave icon={<ListEdit />} text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<CogTransfer />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="menu-group"

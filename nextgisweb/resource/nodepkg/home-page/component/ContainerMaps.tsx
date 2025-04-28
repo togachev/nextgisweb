@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import TableCog from "@nextgisweb/icon/mdi/table-cog";
+import CogTransfer from "@nextgisweb/icon/mdi/cog-transfer";
 import { Empty } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -38,7 +38,7 @@ const SortableMaps = (props) => {
         cursor: disable ? "pointer" : "move",
     };
     const preview = routeURL("resource.preview", item.id);
-    
+
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
             <div
@@ -110,7 +110,7 @@ export const ContainerMaps = (props) => {
     return (
         <div className="dnd-container-maps">
             {config.isAdministrator === true &&
-                (<ButtonSave icon={<TableCog />} text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<CogTransfer />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="maps-group"

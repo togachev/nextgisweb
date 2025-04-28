@@ -5,10 +5,10 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 const savePosition = gettext("Save changes");
 
 export const ButtonSave = (props) => {
-    const { onClickSave, staticPosition, icon, text } = props;
+    const { onClickSave, staticPosition, icon, text, className } = props;
 
     return (
-        <span title={staticPosition ? text : savePosition} >
+        <span title={staticPosition ? text : savePosition} className={className}>
             <Button
                 className="button-edit-save"
                 icon={staticPosition ? icon : <Save />}
