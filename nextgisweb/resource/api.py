@@ -150,11 +150,27 @@ else:
     CompositeUpdate = composite.update
 
 
-def item_get(context, request) -> CompositeRead:
+def item_get(
+    context,
+    request,
+    *,
+    serialization: Annotated[
+        Literal["resource", "full"],
+        Meta(
+            description="Resource serialization mode\n\n"
+            "If set to `full`, all resource keys are returned, but this is "
+            "significantly slower. Otherwise, only the `resource` key is serialized."
+        ),
+    ] = "full",
+    description: Annotated[
+        bool,
+        Meta(description="Description resources"),
+    ] = True,
+) -> CompositeRead:
     """Read resource"""
     request.resource_permission(ResourceScope.read)
-
-    serializer = CompositeSerializer(user=request.user)
+    cs_keys = None if serialization == "full" else ("resource",)
+    serializer = CompositeSerializer(description=description, keys=cs_keys, user=request.user)
     return serializer.serialize(context, CompositeRead)
 
 

@@ -623,6 +623,12 @@ class ClsDisplayNameAttr(SAttribute):
     def get(self, srlzr) -> Any:
         return str(srlzr.obj.cls_display_name)
 
+class DescriptionStatusAttr(SAttribute):
+    def get(self, srlzr) -> bool:
+        if srlzr.obj.description:
+            return True
+        else:
+            return False
 
 class ResourceSerializer(Serializer, resource=Resource):
     id = SColumn(read=ResourceScope.read, write=None)
@@ -638,6 +644,7 @@ class ResourceSerializer(Serializer, resource=Resource):
     display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update, required=True)
 
     description = DescriptionAttr(read=ResourceScope.read, write=ResourceScope.update)
+    description_status = DescriptionStatusAttr(read=ResourceScope.read, write=None)
 
     children = ChildrenAttr(read=ResourceScope.read, write=None)
     interfaces = InterfacesAttr(read=ResourceScope.read, write=None)

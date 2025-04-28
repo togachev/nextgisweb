@@ -21,7 +21,7 @@ export class LayerInfoPlugin extends PluginBase {
         ] as DescriptionWebMapPluginConfig;
         return {
             ...state,
-            enabled: !!(state.enabled && data.description_layer && data.description_style),
+            enabled: !!(state.enabled && data.description_layer) || !!(state.enabled && data.description_style),
         };
     }
 

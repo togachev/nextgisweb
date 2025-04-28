@@ -49,21 +49,19 @@ export const DescComponent = (props) => {
     const { display, content, type } = props;
 
     const DescComp = ({ content }) => {
-        return (
-            <>{
-                content?.map((item, index) => {
-                    const title = item.type === "webmap_desc" ? msgWebmap : item.type === "layer" ? msgLayer : msgStyle;
-                    return (
-                        <span key={index}>
-                            {content.length > 1 && (
-                                <Divider style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
-                            )}
-                            {parse(item.description, options)}
-                        </span >
-                    )
-                })
-            }</>
-        )
+        return content?.map((item, index) => {
+            const title = item.type === "webmap_desc" ? msgWebmap : item.type === "layer" ? msgLayer : msgStyle;
+            if (item.description) {
+                return (
+                    <span key={index} >
+                        {content.length > 1 && (
+                            <Divider style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
+                        )}
+                        {parse(item.description, options)}
+                    </span >
+                )
+            }
+        })
     };
 
     const options = {
@@ -108,8 +106,6 @@ export const DescComponent = (props) => {
         data_ = parse(display.config.webmapDescription, options)
     }
     else if (content.content instanceof Array && content.type === "map") {
-        console.log(type);
-
         data_ = (<DescComp content={content.content} />)
     }
     else {

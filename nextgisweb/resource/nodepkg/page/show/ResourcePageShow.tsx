@@ -50,7 +50,12 @@ export function ResourcePageShow({
     const { data: resourceData, error: resourceError } = useRouteGet({
         name: "resource.item",
         params: { id: resourceId },
-        options: { cache: true },
+        options: {
+            cache: true,
+            query: {
+                description: false,
+            },
+        },
     });
 
     const components = useComponents(sectionsConfig);

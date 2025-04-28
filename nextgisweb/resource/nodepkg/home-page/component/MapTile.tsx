@@ -33,6 +33,9 @@ export const MapTile = (props) => {
     const showDescription = async () => {
         const value = await route("resource.item", id).get({
             cache: true,
+            query: {
+                serialization: "resource",
+            },
         });
         setDescValue(value.resource.description)
         setIsModalOpen(true);
