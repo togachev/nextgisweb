@@ -60,7 +60,6 @@ export const ResourceSectionDescription: ResourceSection = ({
                     </Button>
                 </div>
             }
-            <div className="result-description">
                 {descValue &&
                     <>
                         <div className="result-title">
@@ -75,7 +74,6 @@ export const ResourceSectionDescription: ResourceSection = ({
                         <DescComponent content={descValue} />
                     </>
                 }
-            </div>
         </div>
     );
 };
