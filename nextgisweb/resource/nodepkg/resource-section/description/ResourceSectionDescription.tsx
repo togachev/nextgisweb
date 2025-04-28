@@ -1,11 +1,12 @@
-import { CSSProperties, useState } from "react";
+import { useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import { Button, Spin } from "@nextgisweb/gui/antd";
+import { Alert, Button, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { LoadingOutlined } from "@ant-design/icons";
 
 import { DescComponent } from "@nextgisweb/resource/description";
 import type { ResourceSection } from "../type";
+import "./ResourceSectionDescription.less";
 
 export const ResourceSectionDescription: ResourceSection = ({
     resourceData,
@@ -45,21 +46,31 @@ export const ResourceSectionDescription: ResourceSection = ({
         return;
     }
 
-    const style: CSSProperties = { fontWeight: 500, fontSize: 18 };
-
     return (
-        <>
-            {descValue !== undefined ?
-                <Button style={style} onClick={handleClose}>{gettext("Close description")}</Button> :
-                <Button style={style}
-                    iconPosition="end"
-                    icon={<Spin indicator={<LoadingOutlined spin />} spinning={spinning} percent={percent} />}
-                    onClick={showLoader}
-                >
-                    {gettext("Upload description")}
-                </Button>}
-            {descValue && <DescComponent content={descValue} />}
-        </>
+        <div className="description-panel">
+            {!descValue &&
+                <div className="button-upload">
+                    <Button
+                        iconPosition="end"
+                        icon={<Spin indicator={<LoadingOutlined spin />} spinning={spinning} percent={percent} />}
+                        onClick={showLoader}
+                    >
+                        {gettext("Upload description")}
+                    </Button>
+                </div>}
+            {descValue &&
+                <>
+                <Alert
+                showIcon
+                    className="alert-info"
+                    message={gettext("Uploaded description")}
+                    type="success"
+                    onClose={handleClose}
+                    closable
+                />
+                <DescComponent content={descValue} /></>
+            }
+        </div>
     );
 };
 
