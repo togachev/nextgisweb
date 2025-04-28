@@ -1167,6 +1167,7 @@ def getMaplist(request) -> JSONType:
                 idx=wmg.id,
                 id_pos=wmg.id_pos,
                 action_map=res_wmg.action_map,
+                update=res.has_permission(ResourceScope.update, request.user),
                 preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
                 preview_description=None if res_social == None else res_social.preview_description))
 

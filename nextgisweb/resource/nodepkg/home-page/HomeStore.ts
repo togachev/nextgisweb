@@ -206,13 +206,6 @@ export class HomeStore {
         });
     };
 
-    private async getPermission(id: number) {
-        const resp = await route("resource.permission", id).get({
-            cache: true,
-        });
-        return resp;
-    };
-
     private async maplist() {
         const resp = await route("resource.maplist").get();
         return resp.result;

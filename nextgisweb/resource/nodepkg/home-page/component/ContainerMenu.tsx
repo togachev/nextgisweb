@@ -88,8 +88,10 @@ export const ContainerMenu = (props) => {
                 updatePosition(item.id, index)
             })
             store.setSourceGroup(false);
-            setRadioValue(itemIds[0])
-        } else {
+            setRadioValue(itemIds[0]);
+            store.getMapValues("all");
+        }
+        else {
             store.setSourceGroup(true);
         }
     }, [disable]);

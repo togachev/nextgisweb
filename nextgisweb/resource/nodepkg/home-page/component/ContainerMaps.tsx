@@ -37,7 +37,7 @@ const SortableMaps = (props) => {
         cursor: disable ? "pointer" : "move",
     };
     const preview = routeURL("resource.preview", item.id);
-
+    
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
             <div
@@ -99,7 +99,9 @@ export const ContainerMaps = (props) => {
                 updatePosition(item.idx, index);
             })
             store.setSourceMaps(false);
-        } else {
+            store.getMapValues("maps");
+        }
+        else {
             store.setSourceMaps(true);
         }
     }, [disable]);

@@ -128,18 +128,6 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
         }
     };
 
-    useMemo(() => {
-        store.getMapValues("all")
-    }, []);
-
-    useEffect(() => {
-        (store.sourceGroup === false) && store.getMapValues("all");
-    }, [store.sourceGroup]);
-
-    useEffect(() => {
-        (store.sourceMaps === false) && store.getMapValues("maps");
-    }, [store.sourceMaps]);
-
     return (
         <>
             <ConfigProvider
