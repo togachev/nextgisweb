@@ -25,7 +25,7 @@ export const MapTile = (props) => {
     const { upath_info } = props.config;
     const { size } = props;
 
-    const preview = routeURL("resource.preview", id);
+    const preview = routeURL("maptile.preview", id);
     const urlWebmap = routeURL("webmap.display", id);
 
     const urlWebmapSettings = routeURL("resource.update", id);
