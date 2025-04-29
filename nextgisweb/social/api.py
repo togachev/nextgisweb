@@ -24,7 +24,7 @@ def maptile(resource, request):
     img.thumbnail(size=(300, 200))
 
     mem_file = BytesIO()
-    img.save(mem_file, "WEBP", quality=100)
+    img.save(mem_file, "WEBP", quality=80)
     mem_file.seek(0)
 
     return Response(mem_file.getvalue(), content_type="image/webp", request=request)
