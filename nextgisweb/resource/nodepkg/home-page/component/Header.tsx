@@ -15,8 +15,8 @@ import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
-
 import { UploadComponent, ControlForm, ModalComponent } from ".";
+import { useReload } from "./useReload";
 
 import "./Header.less";
 
@@ -29,6 +29,8 @@ export const Header = observer(({ store, config }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
     const [status, setStatus] = useState(false);
     const [open, setOpen] = useState(false);
+    const [load, setLoad] = useState({ status: false, url: "" });
+    const [reload, reloading] = useReload();
     const [form] = Form.useForm();
 
     const paramsFileHeader = {
@@ -122,10 +124,13 @@ export const Header = observer(({ store, config }) => {
         store.setValueHeader(value);
         store.setInitialHeader(value);
         store.saveSetting(value, "home_page_header");
+        setLoad({ status: false, url: "" });
+        reload();
     };
 
     const onValuesChange = (changedValues: any, values: any) => {
         store.setValueHeader(values)
+        values.picture && setLoad({ status: true, url: `data:${values.picture[0].type};base64,` + values.picture[0].url })
     };
 
     useEffect(() => {
@@ -133,7 +138,7 @@ export const Header = observer(({ store, config }) => {
             if (status === true) {
                 form.resetFields();
                 store.setValueHeader(store.initialHeader);
-                store.updateStatusFile("done", "picture", "initialHeader", "valueHeader", "setValueHeader")
+                store.updateStatusFile("done", "picture", "initialHeader", "valueHeader", "setValueHeader");
             }
         } finally {
             setStatus(false);
@@ -142,6 +147,7 @@ export const Header = observer(({ store, config }) => {
 
     const resetForm = () => {
         setStatus(true);
+        setLoad({ status: false, url: "" });
     };
 
     const openForm = () => {
@@ -150,10 +156,11 @@ export const Header = observer(({ store, config }) => {
 
     const handleCancel = () => {
         setStatus(true);
-        setOpen(false)
+        setOpen(false);
+        setLoad({ status: false, url: "" });
     };
 
-    const urlPicture = store.valueHeader?.picture && store.valueHeader?.picture[0]?.status === "done" ? store.valueHeader?.picture[0]?.url : "";
+    const urlPicture = store.valueHeader?.picture && store.valueHeader?.picture[0]?.status === "done" ? routeURL("pyramid.asset.bheader") + `?ckey=${config.ckey}` : "";
 
     const formHeader = (
         <Form
@@ -230,13 +237,13 @@ export const Header = observer(({ store, config }) => {
                 </span>
             </Space>
         </Form>
-        )
+    )
 
     return (
         <>
             <div
                 className="header-home-page"
-                style={{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${urlPicture})` }}
+                style={reloading ? null : { backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${load.status === true ? load.url : urlPicture})` }}
             >
                 <div className="control-button">
                     {config.isAdministrator === true && !open && (<Button

@@ -1,6 +1,6 @@
 import os
 import os.path
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from datetime import datetime, timedelta
 from hashlib import md5
 from itertools import chain
@@ -96,6 +96,32 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
     )
 
     if ckey == core.settings_get("pyramid", "custom_css.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
+
+@inject()
+def asset_header_background(request, *, ckey: Optional[str] = None, core: CoreComponent):
+    if (data := core.settings_get("pyramid", "home_page_header", None)) is None:
+        raise HTTPNotFound()
+
+    response = Response(b64decode(data["picture"][0]["url"]), content_type=data["picture"][0]["type"], request=request)
+
+    if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
+
+@inject()
+def asset_footer_logo(request, *, ckey: Optional[str] = None, core: CoreComponent):
+    if (data := core.settings_get("pyramid", "home_page_footer", None)) is None:
+        raise HTTPNotFound()
+
+    response = Response(b64decode(data["logo"][0]["url"]), content_type=data["logo"][0]["type"], request=request)
+
+    if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
         response.cache_control.public = True
         response.cache_control.max_age = 86400
 
@@ -543,6 +569,8 @@ def setup_pyramid(comp, config):
     config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
     config.add_route("pyramid.asset.header_image", "/header_image.webp", get=asset_header_image)
     config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
+    config.add_route("pyramid.asset.bheader", "/pyramid/bheader", get=asset_header_background)    
+    config.add_route("pyramid.asset.lfooter", "/pyramid/lfooter", get=asset_footer_logo)
     config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
     config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
 

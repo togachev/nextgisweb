@@ -37,14 +37,18 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     const getBase64 = (file: FileType | Blob): Promise<string> =>
         new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            if (reader.readAsDataURL && file instanceof Blob) {
-                reader.readAsDataURL(file);
+            reader.onloadend = function () {
+                const base64data = btoa(String.fromCharCode.apply(null, new Uint8Array(reader.result as ArrayBuffer)));
+                resolve(base64data);
+            }
+            if (reader.readAsArrayBuffer && file instanceof Blob) {
+                reader.readAsArrayBuffer(file);
             }
             reader.onerror = reject;
         });
 
     const handleChange: UploadProps["onChange"] = async ({ file, fileList }) => {
+
         if (!file.url) {
             file.url = await getBase64(file as FileType);
         }
@@ -57,7 +61,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
             file.url = await getBase64(file as FileType);
         }
 
-        setPreviewImage(file.url);
+        setPreviewImage(`data:${file.type};base64,` + file.url);
         setPreviewOpen(true);
     };
 
@@ -144,6 +148,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                 url: e.file.url,
                 size: e.file.size,
                 status: e.file.status,
+                type: e.file.type,
             }];
         }
     };

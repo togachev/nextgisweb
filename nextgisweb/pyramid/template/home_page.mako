@@ -3,7 +3,7 @@
     from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.resource.view import HOME_PAGE_JSENTRY
 %>
-
+<% ckey = request.env.core.settings_get('pyramid', 'logo.ckey') %>
 <%
     try:
         user = request.user
@@ -15,6 +15,7 @@
         "isAdministrator": is_administrator,
         "upath_info": upath_info,
         "type": "home_page",
+        "ckey": ckey,
     }
 %>
 

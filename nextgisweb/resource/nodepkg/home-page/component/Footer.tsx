@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Col, ColorPicker, Row, Button, Form, Divider, Input, Space } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
@@ -122,7 +123,7 @@ export const Footer = observer(({ store, config }) => {
         setOpen(false)
     };
 
-    const urlLogo = store.valueFooter?.logo && store.valueFooter?.logo[0]?.status === "done" ? store.valueFooter?.logo[0]?.url : undefined
+    const urlLogo = store.valueFooter?.logo && store.valueFooter?.logo[0]?.status === "done" ? routeURL("pyramid.asset.lfooter") + `?ckey=${config.ckey}` : undefined
 
     const formFooter = (
         <Form
