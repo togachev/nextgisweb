@@ -7,8 +7,8 @@ import Cog from "@nextgisweb/icon/mdi/cog";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import { UploadComponent, ControlForm, ModalComponent } from ".";
+import { useReload } from "./useReload";
 
 import "./Footer.less";
 
@@ -72,6 +72,8 @@ const ColorComponent = observer(({ store }) => {
 export const Footer = observer(({ store, config }) => {
     const [status, setStatus] = useState(false);
     const [open, setOpen] = useState(false);
+    const [load, setLoad] = useState({ status: false, url: "" });
+    const [reload, reloading] = useReload();
     const [form] = Form.useForm();
 
     const paramsFileFooter = {
@@ -91,10 +93,12 @@ export const Footer = observer(({ store, config }) => {
         store.setValueFooter(value);
         store.setInitialFooter(value);
         store.saveSetting(value, "home_page_footer");
+        setLoad({ status: false, url: "" });
     };
 
-    const onValuesChange = () => {
+    const onValuesChange = (changedValues: any, values: any) => {
         store.setValueFooter(form.getFieldsValue());
+        values.logo && setLoad({ status: true, url: `data:${values.logo[0].type};base64,` + values.logo[0].url })
     };
 
     useEffect(() => {
@@ -112,6 +116,7 @@ export const Footer = observer(({ store, config }) => {
 
     const resetForm = () => {
         setStatus(true);
+        setLoad({ status: false, url: "" });
     };
 
     const openForm = () => {
@@ -120,7 +125,8 @@ export const Footer = observer(({ store, config }) => {
 
     const handleCancel = () => {
         setStatus(true);
-        setOpen(false)
+        setOpen(false);
+        setLoad({ status: false, url: "" });
     };
 
     const urlLogo = store.valueFooter?.logo && store.valueFooter?.logo[0]?.status === "done" ? routeURL("pyramid.asset.lfooter") + `?ckey=${config.ckey}` : undefined
@@ -227,7 +233,7 @@ export const Footer = observer(({ store, config }) => {
             </Space>
         </Form>
     )
-    
+
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground, color: store.valueFooter?.colorText, fontWeight: 500 }}>
             <div className="control-button">
@@ -244,7 +250,7 @@ export const Footer = observer(({ store, config }) => {
             <Row className="footer-info">
                 <Col className="logo-col" flex={1}>
                     <span className="uriit-logo">
-                        <img src={urlLogo} />
+                        {reloading ? null : <img src={load.status === true ? load.url : urlLogo} />}
                     </span>
                 </Col>
                 <Col flex={4} >
