@@ -234,7 +234,7 @@ export const Footer = observer(({ store, config }) => {
                     <Button
                         className="icon-pensil"
                         title={gettext("Setting footer")}
-                        type="default"
+                        type="text"
                         icon={<Cog />}
                         onClick={openForm}
                     />)}

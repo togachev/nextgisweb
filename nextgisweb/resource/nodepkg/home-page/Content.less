@@ -33,15 +33,20 @@ input {
 	}
 
 	.icon-pensil {
-		color: var(--text-base);
+		color: #e6e6e6;
 		display: flex;
 		align-items: center;
-		background-color: #fff;
+		background-color: #d1d0d09f !important;
 		margin: 5px 0 0 5px;
 		z-index: 1000;
-		width: 32px;
-		height: 32px;
-		font-size: 18px;
+		width: 28px;
+		height: 28px;
+		font-size: 16px;
+
+		&:hover {
+			color: #fff !important;
+			background-color: #8a8a8a9f !important;
+		}
 	}
 
 	.icon-edit-control {
@@ -527,7 +532,7 @@ div:has(> .upload-footer) {
 }
 
 .grid-card-meta-title {
-	font-weight: 600;
+	font-weight: 500;
 	font-size: 16px;
 	overflow: hidden;
 	white-space: initial;
@@ -546,15 +551,17 @@ div:has(> .upload-footer) {
 }
 
 .button-edit-save {
-	color: var(--text-base);
+	color: var(--text-secondary) !important;
 	display: flex;
 	align-items: center;
-	font-size: 18px;
+	font-size: 16px;
 	position: relative;
 	top: -32px;
+	width: 28px !important;
+	height: 28px !important;
 
 	&:hover {
-		color: var(--primary) !important;
+		color: var(--text-base) !important;
 	}
 }
 

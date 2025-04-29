@@ -242,7 +242,7 @@ export const Header = observer(({ store, config }) => {
                     {config.isAdministrator === true && !open && (<Button
                         className="icon-pensil"
                         title={gettext("Setting header")}
-                        type="default"
+                        type="text"
                         icon={<Cog />}
                         onClick={openForm}
                     />)}
