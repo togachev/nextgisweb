@@ -41,26 +41,14 @@ export interface UrlPhoneProps {
     value: string;
 };
 
-export interface ServicesProps {
-    value: string;
-    list: UrlPhoneProps[];
-};
-
-export interface AddressProps {
-    value: string;
-    phone: UrlPhoneProps[];
-};
-
-export interface FooterNameProps {
-    base_year: string;
-    name: string;
-};
-
 export interface FooterProps {
-    services: ServicesProps;
-    address: AddressProps;
-    footer_name: FooterNameProps;
-    logo: UploadFile[];
+    service: UrlPhoneProps[];
+    service_name: string;
+    address_phone: UrlPhoneProps[];
+    address_name: string;
+    footer_name: string;
+    base_year: string;
+    img: UploadFile[];
     colorBackground: string;
     colorText: string;
 };
@@ -74,7 +62,7 @@ export interface HeaderProps {
     first_name: string;
     last_name: string;
     menu: UrlMenuProps[];
-    picture: UploadFile[];
+    img: UploadFile[];
 };
 
 type Action = keyof Pick<HomeStore,
@@ -216,9 +204,9 @@ export class HomeStore {
         return resp;
     };
 
-    private async getSetting(key) {
+    private async getFilterSetting(key, subkey) {
         const resp = await route("pyramid.csettings").get({
-            query: { pyramid: [key] },
+            query: { pyramid: [key], subkey: subkey },
             cache: true,
         });
         return resp;
@@ -226,7 +214,7 @@ export class HomeStore {
 
     @actionHandler
     async getValuesHeader(status: string) {
-        this.getSetting("home_page_header")
+        this.getFilterSetting("home_page_header", "img")
             .then((data) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_header).length > 0) {
@@ -234,12 +222,12 @@ export class HomeStore {
                         status === "loading" && this.setInitialHeader(data.pyramid.home_page_header);
                     }
                 }
-            });
+            })
     };
 
     @actionHandler
     async getValuesFooter(status: string) {
-        this.getSetting("home_page_footer")
+        this.getFilterSetting("home_page_footer", "img")
             .then((data) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_footer).length > 0) {

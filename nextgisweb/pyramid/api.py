@@ -482,8 +482,6 @@ class csetting:
                 cskey = (self.skey[0], self.skey[1] + ".ckey")
             core.settings_set(*cskey, gensecret(8))
 
-class SubParams(Struct, kw_only=True):
-    picture: Annotated[str, None]
 
 def setup_pyramid_csettings(comp, config):
     NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
@@ -567,11 +565,8 @@ def setup_pyramid_csettings(comp, config):
    
             av = dict()
             for a in attrs:
-
                 if (ap := cread[a]) is None:
-
                     if not is_administrator:
-
                         if "home_page_header" in attrs:
                             sf[cid] = cgetters["home_page_header"]()
                         elif "home_page_footer" in attrs:
@@ -586,10 +581,13 @@ def setup_pyramid_csettings(comp, config):
                 if exclude is not None:
                     if "home_page_header" in attrs:
                         h = av["home_page_header"]
-                        h.picture = []
+                        if getattr(h, exclude, None) is not None and getattr(h, exclude, None) is not UNSET:
+                            getattr(h, exclude, None)[0]["url"] = None
                     if "home_page_footer" in attrs:
                         f = av["home_page_footer"]
-                        f.logo = []
+                        if getattr(f, exclude, None) is not None and getattr(f, exclude, None) is not UNSET:
+                            getattr(f, exclude, None)[0]["url"] = None
+
         return CSettingsRead(**sf)
 
     # Patch signature to get parameter extraction working
@@ -720,33 +718,21 @@ class Metrics(Struct):
     yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
 
 
-class Services(Struct):
-    value: str
-    list: List[Dict[str, Any]]
-
-
-class Address(Struct):
-    value: str
-    phone: List[Dict[str, Any]]
-
-
-class FooterName(Struct):
-    base_year: str
-    name: str
-
-
 class HomePageHeaders(Struct):
     first_name: str = UNSET
     last_name: str = UNSET
     menu: List[Dict[str, Any]] = UNSET
-    picture: List[Dict[str, Any]] = UNSET
+    img: List[Dict[str, Any]] = UNSET
 
 
 class HomePageFooters(Struct):
-    services: Union[Services, UnsetType] = UNSET
-    address: Union[Address, UnsetType] = UNSET
-    footer_name: Union[FooterName, UnsetType] = UNSET
-    logo: List[Dict[str, Any]] = UNSET
+    service: List[Dict[str, Any]] = UNSET
+    service_name: str = UNSET
+    address_phone: List[Dict[str, Any]] = UNSET
+    address_name: str = UNSET
+    footer_name: str = UNSET
+    base_year: str = UNSET
+    img: List[Dict[str, Any]] = UNSET
     colorBackground: str = UNSET
     colorText: str = UNSET
 

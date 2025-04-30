@@ -102,11 +102,11 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
     return response
 
 @inject()
-def asset_header_background(request, *, ckey: Optional[str] = None, core: CoreComponent):
+def asset_header_img(request, *, ckey: Optional[str] = None, core: CoreComponent):
     if (data := core.settings_get("pyramid", "home_page_header", None)) is None:
         raise HTTPNotFound()
 
-    response = Response(b64decode(data["picture"][0]["url"]), content_type=data["picture"][0]["type"], request=request)
+    response = Response(b64decode(data["img"][0]["url"]), content_type=data["img"][0]["type"], request=request)
 
     if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
         response.cache_control.public = True
@@ -115,11 +115,11 @@ def asset_header_background(request, *, ckey: Optional[str] = None, core: CoreCo
     return response
 
 @inject()
-def asset_footer_logo(request, *, ckey: Optional[str] = None, core: CoreComponent):
+def asset_footer_img(request, *, ckey: Optional[str] = None, core: CoreComponent):
     if (data := core.settings_get("pyramid", "home_page_footer", None)) is None:
         raise HTTPNotFound()
 
-    response = Response(b64decode(data["logo"][0]["url"]), content_type=data["logo"][0]["type"], request=request)
+    response = Response(b64decode(data["img"][0]["url"]), content_type=data["img"][0]["type"], request=request)
 
     if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
         response.cache_control.public = True
@@ -569,8 +569,8 @@ def setup_pyramid(comp, config):
     config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
     config.add_route("pyramid.asset.header_image", "/header_image.webp", get=asset_header_image)
     config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
-    config.add_route("pyramid.asset.bheader", "/pyramid/bheader", get=asset_header_background)    
-    config.add_route("pyramid.asset.lfooter", "/pyramid/lfooter", get=asset_footer_logo)
+    config.add_route("pyramid.asset.imgheader", "/pyramid/imgheader", get=asset_header_img)    
+    config.add_route("pyramid.asset.imgfooter", "/pyramid/imgfooter", get=asset_footer_img)
     config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
     config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
 

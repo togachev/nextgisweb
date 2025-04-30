@@ -39,7 +39,7 @@ export const Header = observer(({ store, config }) => {
         type: "image/webp",
         formatName: "WEBP",
         className: "upload-header",
-        key: "picture",
+        key: "img",
         values: "valueHeader",
         valuesInitial: "initialHeader",
         setValues: "setValueHeader",
@@ -54,7 +54,7 @@ export const Header = observer(({ store, config }) => {
         }
     };
 
-    const colorText = { color: store.valueFooter?.colorText };
+    const colorText = { color: store.valueFooter?.colorText ? store.valueFooter?.colorText : "var(--error)" };
     const urlResShow = routeURL("resource.show", 0);
     const items: MenuItem[] = [];
 
@@ -69,10 +69,10 @@ export const Header = observer(({ store, config }) => {
     items.push({
         key: "auth",
         label: authenticated ?
-            (<span className="auth-login"><Account /></span>) :
+            (<span style={colorText} className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
-                (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
-                (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
+                (<a style={colorText} onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
+                (<a style={colorText} href={ngwConfig.logoutUrl}>{signInText}</a>),
         children:
             authenticated && [
                 {
@@ -82,25 +82,25 @@ export const Header = observer(({ store, config }) => {
                 },
                 {
                     key: "resources",
-                    label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
+                    label: (<a href={urlResShow} style={colorText} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
                     extra: <span style={colorText}><FolderOutline /></span>,
                 },
                 config.isAdministrator === true && {
                     key: "control-panel",
                     extra: <span style={colorText}><Cog /></span>,
-                    label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
+                    label: (<a style={colorText} href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
-                    label: (<div className="warning">{gettext("Invitation session")}</div>),
+                    label: (<div style={colorText} className="warning">{gettext("Invitation session")}</div>),
                     key: gettext("Invitation session"),
                 },
                 {
-                    label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
+                    label: (<a style={colorText} target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
                     extra: <span style={colorText}><AccountCogOutline /></span>,
                     key: gettext("Settings"),
                 },
                 {
-                    label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
+                    label: (<a onClick={() => authStore.logout()} style={colorText} className="auth-login">{gettext("Sign out")}</a>),
                     extra: <span style={colorText}><Logout /></span>,
                     key: gettext("Sign out"),
                 },
@@ -113,7 +113,7 @@ export const Header = observer(({ store, config }) => {
                 selectable={false}
                 mode="horizontal"
                 items={items}
-                theme="dark"
+                // theme="dark"
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
                 triggerSubMenuAction="hover"
             />)
@@ -130,7 +130,7 @@ export const Header = observer(({ store, config }) => {
 
     const onValuesChange = (changedValues: any, values: any) => {
         store.setValueHeader(values)
-        values.picture && setLoad({ status: true, url: `data:${values.picture[0].type};base64,` + values.picture[0].url })
+        values.img && setLoad({ status: true, url: `data:${values.img[0].type};base64,` + values.img[0].url })
     };
 
     useEffect(() => {
@@ -138,7 +138,7 @@ export const Header = observer(({ store, config }) => {
             if (status === true) {
                 form.resetFields();
                 store.setValueHeader(store.initialHeader);
-                store.updateStatusFile("done", "picture", "initialHeader", "valueHeader", "setValueHeader");
+                store.updateStatusFile("done", "img", "initialHeader", "valueHeader", "setValueHeader");
             }
         } finally {
             setStatus(false);
@@ -151,7 +151,7 @@ export const Header = observer(({ store, config }) => {
     };
 
     const openForm = () => {
-        setOpen(true)
+        setOpen(true);
     };
 
     const handleCancel = () => {
@@ -160,7 +160,7 @@ export const Header = observer(({ store, config }) => {
         setLoad({ status: false, url: "" });
     };
 
-    const urlPicture = store.valueHeader?.picture && store.valueHeader?.picture[0]?.status === "done" ? routeURL("pyramid.asset.bheader") + `?ckey=${config.ckey}` : "";
+    const urlPicture = store.valueHeader && store.valueHeader?.img && store.valueHeader?.img[0]?.status === "done" ? routeURL("pyramid.asset.imgheader") + `?ckey=${config.ckey}` : "";
 
     const formHeader = (
         <Form
