@@ -94,6 +94,7 @@ export const Footer = observer(({ store, config }) => {
         store.setInitialFooter(value);
         store.saveSetting(value, "home_page_footer");
         setLoad({ status: false, url: "" });
+        reload();
     };
 
     const onValuesChange = (changedValues: any, values: any) => {

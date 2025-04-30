@@ -30,6 +30,7 @@ from nextgisweb.lib.apitype import (
     Gap,
     StatusCode,
     fillgap,
+    Query,
 )
 from nextgisweb.lib.imptool import module_from_stack
 
@@ -481,6 +482,8 @@ class csetting:
                 cskey = (self.skey[0], self.skey[1] + ".ckey")
             core.settings_set(*cskey, gensecret(8))
 
+class SubParams(Struct, kw_only=True):
+    picture: Annotated[str, None]
 
 def setup_pyramid_csettings(comp, config):
     NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
@@ -537,17 +540,20 @@ def setup_pyramid_csettings(comp, config):
         CSettingsRead = defstruct("CSettingsRead", rfields)
         CSettingsUpdate = defstruct("CSettingsUpdate", ufields)
 
-    def get(request, **kwargs) -> CSettingsRead:
+    def get(
+        request,
+        **kwargs
+    ) -> CSettingsRead:
         """Read component settings"""
 
         is_administrator = request.user.is_administrator
         require_permission = request.user.require_permission
-
+        exclude = request.GET.get("subkey")
         sf = dict()
         for cid, attrs in kwargs.items():
             cgetters = getters[cid]
             cread = read[cid]
-
+            
             if "all" in attrs:
                 if len(attrs) > 1:
                     raise ValidationError(
@@ -558,11 +564,14 @@ def setup_pyramid_csettings(comp, config):
                     )
                 else:
                     attrs = list(cgetters)
-
+   
             av = dict()
             for a in attrs:
+
                 if (ap := cread[a]) is None:
+
                     if not is_administrator:
+
                         if "home_page_header" in attrs:
                             sf[cid] = cgetters["home_page_header"]()
                         elif "home_page_footer" in attrs:
@@ -574,7 +583,13 @@ def setup_pyramid_csettings(comp, config):
                 av[a] = cgetters[a]()
             if len(av) > 0:
                 sf[cid] = av
-
+                if exclude is not None:
+                    if "home_page_header" in attrs:
+                        h = av["home_page_header"]
+                        h.picture = []
+                    if "home_page_footer" in attrs:
+                        f = av["home_page_footer"]
+                        f.logo = []
         return CSettingsRead(**sf)
 
     # Patch signature to get parameter extraction working
