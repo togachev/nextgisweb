@@ -1,6 +1,6 @@
 import os
 import os.path
-from base64 import b64decode, b64encode
+from base64 import b64decode
 from datetime import datetime, timedelta
 from hashlib import md5
 from itertools import chain
@@ -45,7 +45,6 @@ ICON_JSENTRY = jsentry("@nextgisweb/pyramid/icon")
 UPDATE_JSENTRY = jsentry("@nextgisweb/pyramid/update")
 LAYOUT_JSENTRY = jsentry("@nextgisweb/pyramid/layout")
 BREADCRUMB_JSENTRY = jsentry("@nextgisweb/pyramid/breadcrumb")
-
 
 def asset(request):
     component = request.matchdict["component"]
@@ -101,25 +100,16 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
 
     return response
 
-@inject()
-def asset_header_img(request, *, ckey: Optional[str] = None, core: CoreComponent):
-    if (data := core.settings_get("pyramid", "home_page_header", None)) is None:
-        raise HTTPNotFound()
-
-    response = Response(b64decode(data["img"][0]["url"]), content_type=data["img"][0]["type"], request=request)
-
-    if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
-        response.cache_control.public = True
-        response.cache_control.max_age = 86400
-
-    return response
 
 @inject()
-def asset_footer_img(request, *, ckey: Optional[str] = None, core: CoreComponent):
-    if (data := core.settings_get("pyramid", "home_page_footer", None)) is None:
+def asset_home_page_img(request, *, ckey: Optional[str] = None, core: CoreComponent):
+
+    ikey = request.matchdict["ikey"]
+    if (data := core.settings_get("pyramid", ikey, None)) is None:
         raise HTTPNotFound()
 
-    response = Response(b64decode(data["img"][0]["url"]), content_type=data["img"][0]["type"], request=request)
+    file = data["img"][0]["url"].split(",")
+    response = Response(b64decode(file[1]), content_type=data["img"][0]["type"], request=request)
 
     if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
         response.cache_control.public = True
@@ -569,8 +559,7 @@ def setup_pyramid(comp, config):
     config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
     config.add_route("pyramid.asset.header_image", "/header_image.webp", get=asset_header_image)
     config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
-    config.add_route("pyramid.asset.imgheader", "/pyramid/imgheader", get=asset_header_img)    
-    config.add_route("pyramid.asset.imgfooter", "/pyramid/imgfooter", get=asset_footer_img)
+    config.add_route("pyramid.asset.himg", "/pyramid/{ikey:str}/img", get=asset_home_page_img)
     config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
     config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
 

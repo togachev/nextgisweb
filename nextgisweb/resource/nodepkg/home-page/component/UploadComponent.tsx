@@ -5,16 +5,14 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import FileArrowUpDownOutline from "@nextgisweb/icon/mdi/file-arrow-up-down-outline";
 import Eye from "@nextgisweb/icon/mdi/eye";
-import { HomeStore } from "../HomeStore";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 
 const { Text } = Typography;
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
-export const UploadComponent = observer(({ store: storeProp, params }) => {
-    const [store] = useState(() => storeProp || new HomeStore());
-    const { size, extension, key, type, formatName, className, values } = params;
+export const UploadComponent = observer(({ store, params }) => {
+    const { size, extension, key, type, formatName, className, values, hkey } = params;
 
     const TYPE_FILE = [
         {
@@ -37,22 +35,18 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
     const getBase64 = (file: FileType | Blob): Promise<string> =>
         new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onloadend = function () {
-                const base64data = btoa(String.fromCharCode.apply(null, new Uint8Array(reader.result as ArrayBuffer)));
-                resolve(base64data);
-            }
-            if (reader.readAsArrayBuffer && file instanceof Blob) {
-                reader.readAsArrayBuffer(file);
+            reader.onload = () => resolve(reader.result as string);
+            if (reader.readAsDataURL && file instanceof Blob) {
+                reader.readAsDataURL(file);
             }
             reader.onerror = reject;
         });
-
     const handleChange: UploadProps["onChange"] = async ({ file, fileList }) => {
-
         if (!file.url) {
             file.url = await getBase64(file as FileType);
         }
 
+        store.setUrlImg({ ...store.ulrImg, [hkey]: file.url });
         setFiles(fileList);
     };
 
@@ -61,7 +55,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
             file.url = await getBase64(file as FileType);
         }
 
-        setPreviewImage(`data:${file.type};base64,` + file.url);
+        setPreviewImage(file.url);
         setPreviewOpen(true);
     };
 
@@ -110,13 +104,13 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
         itemRender: (originNode, file, fileList, actions) => {
             return (
                 <Space wrap={true}>
-                    <Button
+                    {file.route === undefined && <Button
                         className="icon-file"
                         icon={<Eye />}
                         type="default"
                         onClick={actions.preview}
                         title={gettext("Preview file")}
-                    />
+                    />}
                     <Button
                         className="icon-file"
                         icon={<DeleteOffOutline />}
@@ -149,6 +143,7 @@ export const UploadComponent = observer(({ store: storeProp, params }) => {
                 size: e.file.size,
                 status: e.file.status,
                 type: e.file.type,
+                route: false,
             }];
         }
     };

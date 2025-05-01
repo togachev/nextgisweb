@@ -38,7 +38,7 @@ const ColorComponent = observer(({ store }) => {
                                 colors: colorsFooter,
                             },
                         ]}
-                        allowClear value={store.valueFooter?.colorText}
+                        allowClear value={store.valueFooter?.colorBackground}
                     />
                 </Form.Item>
             </Space>
@@ -65,14 +65,36 @@ const ColorComponent = observer(({ store }) => {
                         allowClear value={store.valueFooter?.colorText} />
                 </Form.Item>
             </Space>
+            <Space direction="horizontal" wrap={false}>
+                {gettext("Color text menu")}
+                <Form.Item
+                    noStyle
+                    name="colorTextMenu"
+                    getValueFromEvent={(color) => {
+                        return "#" + color.toHex();
+                    }}
+                >
+                    <ColorPicker
+                        presets={[
+                            {
+                                label: gettext("Default color text"),
+                                colors: ["#212529"],
+                            },
+                            {
+                                label: gettext("Primary colors"),
+                                colors: colorsFooter,
+                            },
+                        ]}
+                        allowClear value={store.valueFooter?.colorTextMenu} />
+                </Form.Item>
+            </Space>
         </Space>
     );
 });
 
-export const Footer = observer(({ store, config }) => {
+export const Footer = observer(({ store }) => {
     const [status, setStatus] = useState(false);
     const [open, setOpen] = useState(false);
-    const [load, setLoad] = useState({ status: false, url: "" });
     const [reload, reloading] = useReload();
     const [form] = Form.useForm();
 
@@ -86,20 +108,22 @@ export const Footer = observer(({ store, config }) => {
         values: "valueFooter",
         valuesInitial: "initialFooter",
         setValues: "setValueFooter",
+        hkey: "footer",
     }
 
     const onFinish = (value) => {
+        console.log(value);
+        
         setOpen(false);
         store.setValueFooter(value);
         store.setInitialFooter(value);
         store.saveSetting(value, "home_page_footer");
-        setLoad({ status: false, url: "" });
+        store.setUrlImg({ ...store.ulrImg, footer: value.img ? value.img[0]?.url : "" });
         reload();
     };
 
     const onValuesChange = (changedValues: any, values: any) => {
-        store.setValueFooter(form.getFieldsValue());
-        values.img && setLoad({ status: true, url: `data:${values.img[0].type};base64,` + values.img[0].url })
+        store.setValueFooter(values);
     };
 
     useEffect(() => {
@@ -108,6 +132,9 @@ export const Footer = observer(({ store, config }) => {
                 form.resetFields();
                 store.setValueFooter(store.initialFooter);
                 store.updateStatusFile("done", "img", "initialFooter", "valueFooter", "setValueFooter")
+                store.initialFooter?.img && store.initialFooter?.img[0]?.status === "done" ?
+                    store.setUrlImg({ ...store.ulrImg, footer: routeURL("pyramid.asset.himg", { ikey: "home_page_footer" }) + `?ckey=${store.config.ckey}` }) :
+                    store.setUrlImg({ ...store.ulrImg, footer: "" });
             }
         } finally {
             setStatus(false);
@@ -117,7 +144,6 @@ export const Footer = observer(({ store, config }) => {
 
     const resetForm = () => {
         setStatus(true);
-        setLoad({ status: false, url: "" });
     };
 
     const openForm = () => {
@@ -127,10 +153,7 @@ export const Footer = observer(({ store, config }) => {
     const handleCancel = () => {
         setStatus(true);
         setOpen(false);
-        setLoad({ status: false, url: "" });
     };
-
-    const urlLogo = store.valueFooter?.img && store.valueFooter?.img[0]?.status === "done" ? routeURL("pyramid.asset.imgfooter") + `?ckey=${config.ckey}` : undefined
 
     const formFooter = (
         <Form
@@ -238,7 +261,7 @@ export const Footer = observer(({ store, config }) => {
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground ? store.valueFooter?.colorBackground : "var(--icon-color)", color: store.valueFooter?.colorText, fontWeight: 500 }}>
             <div className="control-button">
-                {config.isAdministrator === true && !open && (
+                {store.config.isAdministrator === true && !open && (
                     <Button
                         className="icon-pensil"
                         title={gettext("Setting footer")}
@@ -251,7 +274,7 @@ export const Footer = observer(({ store, config }) => {
             <Row className="footer-info">
                 <Col className="logo-col" flex={1}>
                     <span className="uriit-logo">
-                        {reloading ? null : <img src={load.status === true ? load.url : urlLogo} />}
+                        <img src={reloading ? null : store.ulrImg?.footer ? store.ulrImg.footer : ""} />
                     </span>
                 </Col>
                 <Col flex={4} >

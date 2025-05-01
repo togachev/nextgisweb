@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 
 const SortableMaps = (props) => {
-    const { item, disable, config, size, store } = props;
+    const { item, disable, size, store } = props;
 
     const {
         attributes,
@@ -45,7 +45,7 @@ const SortableMaps = (props) => {
                 title={item.display_name}
                 style={style}
             >
-                {disable ? (<MapTile config={config} item={item} store={store} size={size} />) :
+                {disable ? (<MapTile item={item} store={store} size={size} />) :
                     (<div className="drag-item"><div className="content-drag">
                         {item?.display_name}
                     </div>
@@ -66,7 +66,7 @@ const SortableMaps = (props) => {
 };
 
 export const ContainerMaps = (props) => {
-    const { store, config, size } = props;
+    const { store, size } = props;
     const [disable, setDisable] = useState(true);
     const [activeId, setActiveId] = useState(null);
     const itemIds = useMemo(() => store.itemsMapsGroup.map((item) => item.idx), [store.itemsMapsGroup]);
@@ -109,7 +109,7 @@ export const ContainerMaps = (props) => {
 
     return (
         <div className="dnd-container-maps">
-            {config.isAdministrator === true &&
+            {store.config.isAdministrator === true &&
                 (<ButtonSave icon={<CogTransfer />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
@@ -148,7 +148,6 @@ export const ContainerMaps = (props) => {
                                     disable={disable}
                                     store={store}
                                     activeId={activeId}
-                                    config={config}
                                     size={size}
                                 />
                             )

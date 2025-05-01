@@ -546,7 +546,8 @@ def setup_pyramid_csettings(comp, config):
 
         is_administrator = request.user.is_administrator
         require_permission = request.user.require_permission
-        exclude = request.GET.get("subkey")
+        exclude = request.GET.get("nkey")
+        include = request.GET.get("ekey")
         sf = dict()
         for cid, attrs in kwargs.items():
             cgetters = getters[cid]
@@ -587,6 +588,15 @@ def setup_pyramid_csettings(comp, config):
                         f = av["home_page_footer"]
                         if getattr(f, exclude, None) is not None and getattr(f, exclude, None) is not UNSET:
                             getattr(f, exclude, None)[0]["url"] = None
+                if include is not None:
+                    if "home_page_header" in attrs:
+                        h = av["home_page_header"]
+                        if getattr(h, include, None) is not None and getattr(h, include, None) is not UNSET:
+                            av["home_page_header"] = getattr(h, include, None)
+                    if "home_page_footer" in attrs:
+                        f = av["home_page_footer"]
+                        if getattr(f, include, None) is not None and getattr(f, include, None) is not UNSET:
+                            av["home_page_footer"] = getattr(f, include, None)
 
         return CSettingsRead(**sf)
 
@@ -735,6 +745,7 @@ class HomePageFooters(Struct):
     img: List[Dict[str, Any]] = UNSET
     colorBackground: str = UNSET
     colorText: str = UNSET
+    colorTextMenu: str = UNSET
 
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))
 csetting("home_path", Optional[str])

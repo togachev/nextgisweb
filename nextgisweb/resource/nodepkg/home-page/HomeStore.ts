@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { extractError } from "@nextgisweb/gui/error";
 
 import type { UploadFile } from "@nextgisweb/gui/antd";
@@ -51,6 +51,7 @@ export interface FooterProps {
     img: UploadFile[];
     colorBackground: string;
     colorText: string;
+    colorTextMenu: string;
 };
 
 export interface UrlMenuProps {
@@ -63,6 +64,18 @@ export interface HeaderProps {
     last_name: string;
     menu: UrlMenuProps[];
     img: UploadFile[];
+};
+
+interface ConfigProps {
+    ckey: string;
+    isAdministrator: boolean;
+    type: string;
+    upath_info: string[];
+};
+
+interface ImgUrlKey {
+    header: string;
+    footer: string;
 };
 
 type Action = keyof Pick<HomeStore,
@@ -78,6 +91,8 @@ export class HomeStore {
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
 
+    @observable.ref accessor config: ConfigProps;
+
     @observable.shallow accessor listMaps: ListMapProps[] = [];
     @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
     @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
@@ -91,11 +106,19 @@ export class HomeStore {
     @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
     @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
 
-    constructor() {
+    @observable.shallow accessor ulrImg: ImgUrlKey;
+
+    constructor({ config }) {
+        this.config = config
         this.getWidthMenu();
         this.getMapValues("all");
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
+    };
+
+    @action
+    setUrlImg(ulrImg: ImgUrlKey) {
+        this.ulrImg = ulrImg;
     };
 
     @action
@@ -174,6 +197,7 @@ export class HomeStore {
                 [nameArray]: val,
             };
             this[setState](value);
+            
         } else {
             const value = {
                 ...this[state],
@@ -204,9 +228,9 @@ export class HomeStore {
         return resp;
     };
 
-    private async getFilterSetting(key, subkey) {
+    private async getFilterSetting(key, nkey, ekey) {
         const resp = await route("pyramid.csettings").get({
-            query: { pyramid: [key], subkey: subkey },
+            query: { pyramid: [key], nkey: nkey, ekey: ekey },
             cache: true,
         });
         return resp;
@@ -214,10 +238,16 @@ export class HomeStore {
 
     @actionHandler
     async getValuesHeader(status: string) {
-        this.getFilterSetting("home_page_header", "img")
+        this.getFilterSetting("home_page_header", "", "")
             .then((data) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_header).length > 0) {
+
+                        if (data.pyramid.home_page_header?.img && data.pyramid.home_page_header?.img[0]?.status === "done") {
+                            data.pyramid.home_page_header.img[0].route = true;
+                            this.setUrlImg({ ...this.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) + `?ckey=${this.config.ckey}` });
+                        }
+
                         this.setValueHeader(data.pyramid.home_page_header);
                         status === "loading" && this.setInitialHeader(data.pyramid.home_page_header);
                     }
@@ -227,10 +257,16 @@ export class HomeStore {
 
     @actionHandler
     async getValuesFooter(status: string) {
-        this.getFilterSetting("home_page_footer", "img")
+        this.getFilterSetting("home_page_footer", "", "")
             .then((data) => {
                 if (data.pyramid) {
                     if (Object.keys(data.pyramid.home_page_footer).length > 0) {
+
+                        if (data.pyramid.home_page_footer?.img && data.pyramid.home_page_footer?.img[0]?.status === "done") {
+                            data.pyramid.home_page_footer.img[0].route = true;
+                            this.setUrlImg({ ...this.ulrImg, footer: routeURL("pyramid.asset.himg", { ikey: "home_page_footer" }) + `?ckey=${this.config.ckey}` });
+                        }
+
                         this.setValueFooter(data.pyramid.home_page_footer);
                         status === "loading" && this.setInitialFooter(data.pyramid.home_page_footer);
                     }

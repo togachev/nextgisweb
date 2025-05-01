@@ -25,11 +25,10 @@ type MenuItem = Required<MenuProps>["items"][number];
 const { Title } = Typography;
 const signInText = gettext("Sign in");
 
-export const Header = observer(({ store, config }) => {
+export const Header = observer(({ store }) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
     const [status, setStatus] = useState(false);
     const [open, setOpen] = useState(false);
-    const [load, setLoad] = useState({ status: false, url: "" });
     const [reload, reloading] = useReload();
     const [form] = Form.useForm();
 
@@ -43,6 +42,7 @@ export const Header = observer(({ store, config }) => {
         values: "valueHeader",
         valuesInitial: "initialHeader",
         setValues: "setValueHeader",
+        hkey: "header",
     };
 
     const showLoginModal = () => {
@@ -54,7 +54,8 @@ export const Header = observer(({ store, config }) => {
         }
     };
 
-    const colorText = { color: store.valueFooter?.colorText ? store.valueFooter?.colorText : "var(--error)" };
+    const colorText = { color: store.valueFooter?.colorText ? store.valueFooter?.colorText : "var(--icon-color)" };
+    const colorTextMenu = { color: store.valueFooter?.colorTextMenu ? store.valueFooter?.colorTextMenu : "var(--icon-color)" };
     const urlResShow = routeURL("resource.show", 0);
     const items: MenuItem[] = [];
 
@@ -69,39 +70,39 @@ export const Header = observer(({ store, config }) => {
     items.push({
         key: "auth",
         label: authenticated ?
-            (<span style={colorText} className="auth-login"><Account /></span>) :
+            (<span style={colorTextMenu} className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
-                (<a style={colorText} onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
-                (<a style={colorText} href={ngwConfig.logoutUrl}>{signInText}</a>),
+                (<a style={colorTextMenu} onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
+                (<a style={colorTextMenu} href={ngwConfig.logoutUrl}>{signInText}</a>),
         children:
             authenticated && [
                 {
                     key: "user-name",
-                    label: <span style={colorText} className="account-name">{userDisplayName}</span>,
+                    label: <span style={colorTextMenu} className="account-name">{userDisplayName}</span>,
                     type: "group",
                 },
                 {
                     key: "resources",
-                    label: (<a href={urlResShow} style={colorText} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
-                    extra: <span style={colorText}><FolderOutline /></span>,
+                    label: (<a href={urlResShow} style={colorTextMenu} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
+                    extra: <span style={colorTextMenu}><FolderOutline /></span>,
                 },
-                config.isAdministrator === true && {
+                store.config.isAdministrator === true && {
                     key: "control-panel",
-                    extra: <span style={colorText}><Cog /></span>,
-                    label: (<a style={colorText} href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
+                    extra: <span style={colorTextMenu}><Cog /></span>,
+                    label: (<a style={colorTextMenu} href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
-                    label: (<div style={colorText} className="warning">{gettext("Invitation session")}</div>),
+                    label: (<div style={colorTextMenu} className="warning">{gettext("Invitation session")}</div>),
                     key: gettext("Invitation session"),
                 },
                 {
-                    label: (<a style={colorText} target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    extra: <span style={colorText}><AccountCogOutline /></span>,
+                    label: (<a style={colorTextMenu} target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
+                    extra: <span style={colorTextMenu}><AccountCogOutline /></span>,
                     key: gettext("Settings"),
                 },
                 {
-                    label: (<a onClick={() => authStore.logout()} style={colorText} className="auth-login">{gettext("Sign out")}</a>),
-                    extra: <span style={colorText}><Logout /></span>,
+                    label: (<a onClick={() => authStore.logout()} style={colorTextMenu} className="auth-login">{gettext("Sign out")}</a>),
+                    extra: <span style={colorTextMenu}><Logout /></span>,
                     key: gettext("Sign out"),
                 },
             ],
@@ -113,9 +114,8 @@ export const Header = observer(({ store, config }) => {
                 selectable={false}
                 mode="horizontal"
                 items={items}
-                // theme="dark"
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
-                triggerSubMenuAction="hover"
+                triggerSubMenuAction="click"
             />)
     };
 
@@ -124,13 +124,12 @@ export const Header = observer(({ store, config }) => {
         store.setValueHeader(value);
         store.setInitialHeader(value);
         store.saveSetting(value, "home_page_header");
-        setLoad({ status: false, url: "" });
+        store.setUrlImg({ ...store.ulrImg, header: value.img ? value.img[0]?.url : "" });
         reload();
     };
 
     const onValuesChange = (changedValues: any, values: any) => {
         store.setValueHeader(values)
-        values.img && setLoad({ status: true, url: `data:${values.img[0].type};base64,` + values.img[0].url })
     };
 
     useEffect(() => {
@@ -139,6 +138,9 @@ export const Header = observer(({ store, config }) => {
                 form.resetFields();
                 store.setValueHeader(store.initialHeader);
                 store.updateStatusFile("done", "img", "initialHeader", "valueHeader", "setValueHeader");
+                store.initialHeader?.img && store.initialHeader?.img[0]?.status === "done" ?
+                    store.setUrlImg({ ...store.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) + `?ckey=${store.config.ckey}` }) :
+                    store.setUrlImg({ ...store.ulrImg, header: "" });
             }
         } finally {
             setStatus(false);
@@ -147,7 +149,6 @@ export const Header = observer(({ store, config }) => {
 
     const resetForm = () => {
         setStatus(true);
-        setLoad({ status: false, url: "" });
     };
 
     const openForm = () => {
@@ -157,10 +158,7 @@ export const Header = observer(({ store, config }) => {
     const handleCancel = () => {
         setStatus(true);
         setOpen(false);
-        setLoad({ status: false, url: "" });
     };
-
-    const urlPicture = store.valueHeader && store.valueHeader?.img && store.valueHeader?.img[0]?.status === "done" ? routeURL("pyramid.asset.imgheader") + `?ckey=${config.ckey}` : "";
 
     const formHeader = (
         <Form
@@ -243,10 +241,10 @@ export const Header = observer(({ store, config }) => {
         <>
             <div
                 className="header-home-page"
-                style={reloading ? null : { backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${load.status === true ? load.url : urlPicture})` }}
+                style={reloading ? null : { backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${store.ulrImg?.header ? store.ulrImg.header : ""})` }}
             >
                 <div className="control-button">
-                    {config.isAdministrator === true && !open && (<Button
+                    {store.config.isAdministrator === true && !open && (<Button
                         className="icon-pensil"
                         title={gettext("Setting header")}
                         type="text"

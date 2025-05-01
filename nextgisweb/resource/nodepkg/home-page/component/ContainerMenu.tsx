@@ -59,7 +59,7 @@ const SortableMenu = (props) => {
 };
 
 export const ContainerMenu = (props) => {
-    const { store, config } = props;
+    const { store } = props;
     const [disable, setDisable] = useState(true);
     const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
 
@@ -100,7 +100,7 @@ export const ContainerMenu = (props) => {
 
     return (
         <div className="dnd-container-menu">
-            {config.isAdministrator === true &&
+            {store.config.isAdministrator === true &&
                 (<ButtonSave icon={<CogTransfer />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div

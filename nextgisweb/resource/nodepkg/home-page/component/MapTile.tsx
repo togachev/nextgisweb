@@ -20,10 +20,10 @@ const { Text, Link } = Typography;
 export const MapTile = (props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
-    
+
     const { id, display_name, preview_fileobj_id, description_status, update } = props.item;
-    const { upath_info } = props.config;
-    const { size } = props;
+    const { store, size } = props;
+    const { upath_info } = store.config;
 
     const preview = routeURL("maptile.preview", id);
     const urlWebmap = routeURL("webmap.display", id);

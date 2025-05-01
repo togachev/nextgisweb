@@ -79,7 +79,7 @@ export function ImageUploader<M extends boolean = boolean>({
 
     const Preview = () => {
         return (
-            <div className="uploader--image uploader--complete">df
+            <div className="uploader--image uploader--complete">
                 <div
                     className="uploader__dropzone"
                     style={{

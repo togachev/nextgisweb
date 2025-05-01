@@ -51,8 +51,8 @@ const sizeTile = {
 }
 
 export const Content = observer(({ onChanges, config, ...rest }) => {
-    const [store] = useState(() => new HomeStore());
-    
+    const [store] = useState(() => new HomeStore({ config: config }));
+
     const [minStatus, setMinStatus] = useState(window.innerWidth > 785 ? "large" : "small");
 
     const [size, setSize] = useState(minStatus === "large" ? sizeTile.large : sizeTile.small);
@@ -174,7 +174,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                     },
                 }}
             >
-                <Header store={store} config={config} />
+                <Header store={store} />
                 <div className="main">
                     <div className="content">
                         <div className="search-block">
@@ -212,16 +212,16 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                         </div>
                         <div className="menu-maps">
                             <div className="menu-list">
-                                {store.groupMapsGrid.length > 0 && <ContainerMenu config={config} store={store} />}
+                                {store.groupMapsGrid.length > 0 && <ContainerMenu store={store} />}
                             </div>
                             <div className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 && <ContainerMaps config={config} size={size} store={store} />}
+                                {store.itemsMapsGroup.length > 0 && <ContainerMaps size={size} store={store} />}
                             </div>
                         </div>
                     </div>
                     <FloatButton.BackTop />
                 </div>
-                <Footer store={store} config={config} />
+                <Footer store={store} />
             </ConfigProvider >
         </>
     )
