@@ -55,13 +55,13 @@ export const Header = observer(({ store }) => {
     };
 
     const colorText = { color: store.valueFooter?.colorText ? store.valueFooter?.colorText : "var(--icon-color)" };
-    const colorTextMenu = { color: store.valueFooter?.colorTextMenu ? store.valueFooter?.colorTextMenu : "var(--icon-color)" };
+
     const urlResShow = routeURL("resource.show", 0);
     const items: MenuItem[] = [];
 
     store.valueHeader?.menu?.map((item, index) => items.push({
         key: index,
-        label: (<a href={item?.value} target="_blank" rel="noopener noreferrer" style={colorText}>{item?.name}</a>),
+        label: (<a href={item?.value} target="_blank" rel="noopener noreferrer">{item?.name}</a>),
         name: item?.name,
         value: item?.value,
         className: "menu-label"
@@ -70,39 +70,39 @@ export const Header = observer(({ store }) => {
     items.push({
         key: "auth",
         label: authenticated ?
-            (<span style={colorTextMenu} className="auth-login"><Account /></span>) :
+            (<span className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
-                (<a style={colorTextMenu} onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
-                (<a style={colorTextMenu} href={ngwConfig.logoutUrl}>{signInText}</a>),
+                (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
+                (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
         children:
             authenticated && [
                 {
                     key: "user-name",
-                    label: <span style={colorTextMenu} className="account-name">{userDisplayName}</span>,
+                    label: <span className="account-name">{userDisplayName}</span>,
                     type: "group",
                 },
                 {
                     key: "resources",
-                    label: (<a href={urlResShow} style={colorTextMenu} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
-                    extra: <span style={colorTextMenu}><FolderOutline /></span>,
+                    label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
+                    extra: <FolderOutline />,
                 },
                 store.config.isAdministrator === true && {
                     key: "control-panel",
-                    extra: <span style={colorTextMenu}><Cog /></span>,
-                    label: (<a style={colorTextMenu} href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
+                    extra: <Cog />,
+                    label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
-                    label: (<div style={colorTextMenu} className="warning">{gettext("Invitation session")}</div>),
+                    label: (<div className="warning">{gettext("Invitation session")}</div>),
                     key: gettext("Invitation session"),
                 },
                 {
-                    label: (<a style={colorTextMenu} target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    extra: <span style={colorTextMenu}><AccountCogOutline /></span>,
+                    label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
+                    extra: <AccountCogOutline />,
                     key: gettext("Settings"),
                 },
                 {
-                    label: (<a onClick={() => authStore.logout()} style={colorTextMenu} className="auth-login">{gettext("Sign out")}</a>),
-                    extra: <span style={colorTextMenu}><Logout /></span>,
+                    label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
+                    extra: <Logout />,
                     key: gettext("Sign out"),
                 },
             ],
@@ -115,7 +115,6 @@ export const Header = observer(({ store }) => {
                 mode="horizontal"
                 items={items}
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
-                triggerSubMenuAction="click"
             />)
     };
 

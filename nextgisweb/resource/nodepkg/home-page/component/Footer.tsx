@@ -65,29 +65,6 @@ const ColorComponent = observer(({ store }) => {
                         allowClear value={store.valueFooter?.colorText} />
                 </Form.Item>
             </Space>
-            <Space direction="horizontal" wrap={false}>
-                {gettext("Color text menu")}
-                <Form.Item
-                    noStyle
-                    name="colorTextMenu"
-                    getValueFromEvent={(color) => {
-                        return "#" + color.toHex();
-                    }}
-                >
-                    <ColorPicker
-                        presets={[
-                            {
-                                label: gettext("Default color text"),
-                                colors: ["#212529"],
-                            },
-                            {
-                                label: gettext("Primary colors"),
-                                colors: colorsFooter,
-                            },
-                        ]}
-                        allowClear value={store.valueFooter?.colorTextMenu} />
-                </Form.Item>
-            </Space>
         </Space>
     );
 });

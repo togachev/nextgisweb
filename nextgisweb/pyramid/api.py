@@ -745,7 +745,6 @@ class HomePageFooters(Struct):
     img: List[Dict[str, Any]] = UNSET
     colorBackground: str = UNSET
     colorText: str = UNSET
-    colorTextMenu: str = UNSET
 
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))
 csetting("home_path", Optional[str])
