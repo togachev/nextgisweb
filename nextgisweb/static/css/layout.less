@@ -172,16 +172,15 @@ a[class*=" icon-"]:hover:before {
 /* -- Header --*/
 
 .ngw-pyramid-layout-header {
-    align-items: center;
-    border-bottom: 0 solid var(--divider-color);
-    box-sizing: border-box;
     display: flex;
-    gap: 10px;
-    height: 40px;
-    min-width: 0;
-    padding: 0;
     position: relative;
-    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    box-sizing: border-box;
+    border-bottom: 0 solid var(--divider-color);
+    padding: 0;
+    min-width: 0;
+    height: 40px;
 
     &::before {
         position: absolute;
@@ -192,54 +191,29 @@ a[class*=" icon-"]:hover:before {
         content: "";
     }
 
-
-    >div.panel-text {
+    > a {
         display: flex;
-        align-items: center;
+        flex-shrink: 1;
+        justify-content: center;
+        box-sizing: content-box;
+        min-width: 40px;
 
-        >a {
-            display: flex;
-            flex-shrink: 1;
-            justify-content: center;
-            box-sizing: content-box;
-            min-width: 40px;
-
-            >img {
-                display: block;
-            }
-        }
-
-        >div.text {
-            color: var(--primary);
-            flex-grow: 1;
-            font-family: var(--ngw-head-font-family-list);
-            font-size: 16px;
-            font-weight: var(--ngw-head-font-weight);
-            padding: 0 5px 0 5px;
-            overflow: hidden;
-            white-space: initial;
-            text-overflow: ellipsis;
-            line-height: 20.7px;
-            text-align: left;
-            letter-spacing: normal;
-            -webkit-line-clamp: 1;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
+        > img {
+            display: block;
         }
     }
 
-    >div.text {
-        flex-grow: 1;
-        color: var(--primary);
-        font-weight: var(--ngw-head-font-weight);
-        font-size: 16px;
-        font-family: var(--ngw-head-font-family);
+    > div.text {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+        color: var(--primary);
         display: -webkit-box;
+        flex-grow: 1;
+        font-family: var(--ngw-head-font-family);
+        font-size: 16px;
+        font-weight: var(--ngw-head-font-weight);
+        line-height: 18px;
         overflow: hidden;
-        overflow-wrap: anywhere;
-        line-height: 1.2;
     }
 
     >div.container {
