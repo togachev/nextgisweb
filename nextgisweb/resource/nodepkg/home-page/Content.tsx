@@ -147,11 +147,10 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                         Menu: {
                             lineWidth: 1,
                             itemBg: "transparent",
-                            // colorBgElevated:'#ededed',
-                            groupTitleColor: `${store.valueFooter?.colorText}`,
-                            itemColor: `${store.valueFooter?.colorText}`,
-                            popupBg: `${store.valueFooter?.colorBackground}`,
-                            itemHoverColor: `${store.valueFooter?.colorBackground}`,
+                            groupTitleColor: `${store.valueFooter?.colorBackground}`,
+                            itemColor: `${store.valueFooter?.colorBackground}`,
+                            popupBg: `${store.valueFooter?.colorText}`,
+                            itemHoverColor: `${store.valueFooter?.colorText}`,
                             itemHoverBg: "var(--icon-color)",
                         },
                         Segmented: {

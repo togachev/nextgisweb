@@ -546,8 +546,8 @@ def setup_pyramid_csettings(comp, config):
 
         is_administrator = request.user.is_administrator
         require_permission = request.user.require_permission
-        exclude = request.GET.get("nkey")
-        include = request.GET.get("ekey")
+        exclude = request.GET.get("nkey") # exclude object
+        include = request.GET.get("ekey") # include only this object
         sf = dict()
         for cid, attrs in kwargs.items():
             cgetters = getters[cid]
