@@ -152,6 +152,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
                             popupBg: `${store.valueFooter?.colorText}`,
                             itemHoverColor: `${store.valueFooter?.colorText}`,
                             itemHoverBg: "var(--icon-color)",
+                            itemPaddingInline: 8,
                         },
                         Segmented: {
                             trackBg: "transparent",

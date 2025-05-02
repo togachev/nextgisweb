@@ -32,20 +32,35 @@ input {
 		}
 	}
 
+
+
 	.icon-pensil {
-		color: #e6e6e6;
+		color: var(--text-secondary);
 		display: flex;
 		align-items: center;
-		background-color: #d1d0d09f !important;
 		margin: 5px 0 0 5px;
 		z-index: 1000;
 		width: 28px;
 		height: 28px;
 		font-size: 16px;
+	}
 
+	.button-edit-save {
+		color: var(--text-secondary) !important;
+		display: flex;
+		align-items: center;
+		font-size: 16px;
+		position: relative;
+		top: -32px;
+		width: 28px !important;
+		height: 28px !important;
+	}
+
+	.button-edit-save,
+	.icon-pensil {
 		&:hover {
-			color: #fff !important;
-			background-color: #8a8a8a9f !important;
+			color: #000000 !important;
+			background-color: var(--icon-color) !important;
 		}
 	}
 
@@ -548,21 +563,6 @@ div:has(> .upload-footer) {
 
 .grid-card-meta-title-min {
 	line-height: 2;
-}
-
-.button-edit-save {
-	color: var(--text-secondary) !important;
-	display: flex;
-	align-items: center;
-	font-size: 16px;
-	position: relative;
-	top: -32px;
-	width: 28px !important;
-	height: 28px !important;
-
-	&:hover {
-		color: var(--text-base) !important;
-	}
 }
 
 .edit-group-maps,

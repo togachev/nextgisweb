@@ -84,11 +84,11 @@ export const Header = observer(({ store }) => {
                 {
                     key: "resources",
                     label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
-                    extra: <FolderOutline />,
+                    icon: <FolderOutline />,
                 },
                 store.config.isAdministrator === true && {
                     key: "control-panel",
-                    extra: <Cog />,
+                    icon: <Cog />,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
@@ -97,12 +97,12 @@ export const Header = observer(({ store }) => {
                 },
                 {
                     label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
-                    extra: <AccountCogOutline />,
+                    icon: <AccountCogOutline />,
                     key: gettext("Settings"),
                 },
                 {
                     label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
-                    extra: <Logout />,
+                    icon: <Logout />,
                     key: gettext("Sign out"),
                 },
             ],
