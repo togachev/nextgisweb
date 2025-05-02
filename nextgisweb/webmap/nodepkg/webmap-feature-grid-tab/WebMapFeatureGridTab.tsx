@@ -94,6 +94,11 @@ export function WebMapFeatureGridTab({
                     const fid = newVal[0];
                     if (fid !== undefined) {
                         const query = itemConfig.current.layerHighligh === true ? { geom: true } : { geom: false };
+                        Object.assign(query, {
+                            dt_format: "iso",
+                            fields: [],
+                            extensions: [],
+                        });
                         route("feature_layer.feature.item", {
                             id: layerId,
                             fid,
@@ -124,6 +129,11 @@ export function WebMapFeatureGridTab({
                         action: () => {
                             const fid = store.selectedIds[0];
                             const query = { geom: true };
+                            Object.assign(query, {
+                                dt_format: "iso",
+                                fields: [],
+                                extensions: [],
+                            });
                             if (fid !== undefined) {
                                 route("feature_layer.feature.item", {
                                     id: layerId,
