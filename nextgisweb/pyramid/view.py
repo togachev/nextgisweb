@@ -78,15 +78,6 @@ def asset_favicon(request, *, pyramid: PyramidComponent):
 
 
 @inject()
-def asset_header_image(request, *, pyramid: PyramidComponent):
-    fn_header_image = request.env.pyramid.options["header_image"]
-    if os.path.isfile(fn_header_image):
-        return FileResponse(fn_header_image, request=request, content_type="image/webp")
-    else:
-        raise HTTPNotFound()
-
-
-@inject()
 def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
     response = Response(
         core.settings_get("pyramid", "custom_css", ""),
@@ -557,7 +548,6 @@ def setup_pyramid(comp, config):
     # OTHERS
 
     config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
-    config.add_route("pyramid.asset.header_image", "/header_image.webp", get=asset_header_image)
     config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
     config.add_route("pyramid.asset.himg", "/pyramid/{ikey:str}/img", get=asset_home_page_img)
     config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
@@ -810,7 +800,7 @@ def _setup_pyramid_debugtoolbar(comp, config):
     settings = config.registry.settings
     if hosts := dt_opt.get("hosts", "0.0.0.0/0" if comp.env.core.debug else None):
         settings["debugtoolbar.hosts"] = hosts
-    settings["debugtoolbar.exclude_prefixes"] = ["/static/", "/favicon.ico", "/header_image.webp"]
+    settings["debugtoolbar.exclude_prefixes"] = ["/static/", "/favicon.ico"]
     settings["debugtoolbar.show_on_exc_only"] = True
     settings["debugtoolbar.max_visible_requests"] = 25
     config.include(pyramid_debugtoolbar)
@@ -829,7 +819,6 @@ def _setup_pyramid_tm(comp, config):
     skip_tm_path_info = (
         "/static/",
         "/favicon.ico",
-        "/header_image.webp",
         "/api/component/pyramid/route",
         "/_debug_toolbar/",
     )
