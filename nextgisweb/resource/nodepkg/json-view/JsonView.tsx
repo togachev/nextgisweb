@@ -26,8 +26,7 @@ export function JsonView({ id }: JsonViewProps) {
         return <LoadingWrapper />;
     }
 
-    const onChange: CheckboxProps['onChange'] = (e) => {
-        console.log('checked = ', e.target.checked);
+    const onChange: CheckboxProps["onChange"] = (e) => {
         setChecked(e.target.checked);
     };
 
