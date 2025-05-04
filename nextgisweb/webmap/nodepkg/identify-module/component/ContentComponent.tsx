@@ -176,10 +176,12 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
         setHeightPanel(store.valueRnd.height - 70);
         if (store.fixPos !== null) {
             const result = options.find(item => item.key === store.fixPanel);
-            result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.store.setFixContentItem(options.find(item => item.key === "attributes"));
+            result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.setFixContentItem(options.find(item => item.key === "attributes"));
         } else {
             const result = options.find(item => item.key === store.fixPanel);
-            result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.store.setFixContentItem(options.find(item => item.key === "attributes"));
+            result ?
+                store.setFixContentItem(options.find(item => item.key === result.key)) :
+                store.setFixContentItem(options.find(item => item.key === "attributes"));
         }
     }, [store.attribute]);
 
