@@ -55,7 +55,7 @@ export const useSource = (display: Display) => {
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
         const geom = item && item.itemConfig.layerHighligh === true ? true : false;
-        const query = { geom: geom };
+        const query = { geom: geom, dt_format: "iso" };
 
         attrs === false && Object.assign(query, { fields: attrs })
 
