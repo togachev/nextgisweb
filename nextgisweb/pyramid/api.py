@@ -579,24 +579,26 @@ def setup_pyramid_csettings(comp, config):
                 av[a] = cgetters[a]()
             if len(av) > 0:
                 sf[cid] = av
+
+                # filter key name object
                 if exclude is not None:
                     if "home_page_header" in attrs:
                         h = av["home_page_header"]
                         if getattr(h, exclude, None) is not None and getattr(h, exclude, None) is not UNSET:
-                            getattr(h, exclude, None)[0]["url"] = None
+                            setattr(h, exclude, None)
                     if "home_page_footer" in attrs:
                         f = av["home_page_footer"]
                         if getattr(f, exclude, None) is not None and getattr(f, exclude, None) is not UNSET:
-                            getattr(f, exclude, None)[0]["url"] = None
+                            setattr(f, exclude, None)
                 if include is not None:
                     if "home_page_header" in attrs:
                         h = av["home_page_header"]
                         if getattr(h, include, None) is not None and getattr(h, include, None) is not UNSET:
-                            av["home_page_header"] = getattr(h, include, None)
+                            av["home_page_header"] = dict(zip([include], [getattr(h, include, None)]))
                     if "home_page_footer" in attrs:
                         f = av["home_page_footer"]
                         if getattr(f, include, None) is not None and getattr(f, include, None) is not UNSET:
-                            av["home_page_footer"] = getattr(f, include, None)
+                            av["home_page_footer"] = dict(zip([include], [getattr(f, include, None)]))
 
         return CSettingsRead(**sf)
 
