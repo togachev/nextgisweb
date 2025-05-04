@@ -31,12 +31,14 @@ export function JsonView({ id }: JsonViewProps) {
     };
 
     return (<>
-        <Checkbox checked={checked} onChange={onChange}>
-            {checked ?
-                gettext("Disable view description") :
-                gettext("Enable view description")
-            }
-        </Checkbox>
+        {data && data.resource.description_status &&
+            <Checkbox checked={checked} onChange={onChange}>
+                {checked ?
+                    gettext("Disable view description") :
+                    gettext("Enable view description")
+                }
+            </Checkbox>
+        }
         <Code value={body} lang="json" readOnly lineNumbers></Code>
     </>);
 }
