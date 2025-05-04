@@ -293,6 +293,7 @@ def resource_section_main(obj, *, request, **kwargs):
         .join(WebMapGroupResource, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id).filter(WebMapGroupResource.resource_id == request.context.id)
 
     groupMap = result["groupMap"] = []
+    result["read"] = request.context.has_permission(ResourceScope.create, request.user)
     for resource_wmg, wmg_resource in query:
         groupMap.append((tr(resource_wmg.webmap_group_name)))
 

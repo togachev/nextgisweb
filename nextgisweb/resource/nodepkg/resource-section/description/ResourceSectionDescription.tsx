@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import { Button, Spin } from "@nextgisweb/gui/antd";
+import { Collapse, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { LoadingOutlined } from "@ant-design/icons";
-import Close from "@nextgisweb/icon/mdi/close";
 import { DescComponent } from "@nextgisweb/resource/description";
 import type { ResourceSection } from "../type";
+import type { CollapseProps } from "@nextgisweb/gui/antd";
+
 import "./ResourceSectionDescription.less";
 
 export const ResourceSectionDescription: ResourceSection = ({
@@ -38,38 +39,25 @@ export const ResourceSectionDescription: ResourceSection = ({
             }
         }, 100);
     };
-    const handleClose = () => {
-        setDescValue(undefined);
-    };
 
     if (!description_status) {
         return;
     }
 
+    const items: CollapseProps["items"] = [
+        {
+            key: "description",
+            label: !descValue ? gettext("View resource description") : gettext("Collapse description"),
+            children: descValue && <DescComponent content={descValue} />,
+            extra: <Spin indicator={<LoadingOutlined spin />} spinning={spinning} percent={percent} />,
+        },
+    ];
+
     return (
         <div className="description-panel">
             {!descValue ?
-                <div className="button-upload">
-                    <Button
-                        iconPosition="end"
-                        icon={<Spin indicator={<LoadingOutlined spin />} spinning={spinning} percent={percent} />}
-                        onClick={showLoader}
-                        type="link"
-                    >
-                        {gettext("View resource description")}
-                    </Button>
-                </div> :
-                <div className="result-description">
-                    <div className="result-title">
-                        <div className="title">{gettext("Description")}</div>
-                        <Button
-                            icon={<Close />}
-                            onClick={handleClose}
-                            type="link"
-                        />
-                    </div>
-                    <DescComponent content={descValue} />
-                </div>
+                <Collapse size="large" items={items} onChange={showLoader} /> :
+                <Collapse size="large" items={items} defaultActiveKey={['description']} />
             }
         </div>
     );

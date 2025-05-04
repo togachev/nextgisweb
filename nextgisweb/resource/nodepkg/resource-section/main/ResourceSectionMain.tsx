@@ -15,6 +15,7 @@ interface ResourceSectionMainProps extends ResourceSectionProps {
     groupMap: string[];
     creatable?: ResourceCls[];
     cls?: string;
+    read: boolean;
 }
 
 const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
@@ -23,6 +24,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
     summary,
     creatable,
     cls,
+    read,
 }) => {
     return (
         <>
@@ -44,8 +46,8 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                     ))}
                 </dl>
             )}
-            {cls === "webmap" && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
-            {cls === "webmap" && groupMap.length > 0 && (
+            {read && cls === "webmap" && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
+            {read && cls === "webmap" && groupMap.length > 0 && (
                 <Flex gap="4px 0" wrap>
                     {groupMap.map((k, idx) => (
                         <Tag key={idx}>{k}</Tag>
