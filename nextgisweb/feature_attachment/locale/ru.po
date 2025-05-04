@@ -1,4 +1,3 @@
-#: amd/ngw-feature-attachment/DisplayWidget.js:9
 #: nodepkg/attachment-bundle/ol-control/control.ts:21
 #: nodepkg/attachment-bundle/ol-control/control.ts:37
 #: nodepkg/attachment-bundle/plugin/plugin.ts:16

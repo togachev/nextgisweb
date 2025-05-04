@@ -109,9 +109,11 @@ export const DisplayWidget = observer(
 DisplayWidget.displayName = "Display";
 
 export function DisplayLoader({ id }: { id: number }) {
-    const { data: config, isLoading } = useRouteGet("webmap.display_config", {
-        id,
-    });
+    const { data: config, isLoading } = useRouteGet(
+        "webmap.display_config",
+        { id },
+        // { query: { description: false } }, # для отключения описания карты
+    );
 
     if (isLoading || !config) {
         return (

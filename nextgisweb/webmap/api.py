@@ -498,7 +498,15 @@ def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
     return ExtentWSEN(*parts) if None not in parts else None
 
 
-def display_config(obj, request) -> DisplayConfig:
+def display_config(
+    obj,
+    request,
+    *,
+    description: Annotated[
+        bool,
+        Meta(description="Description resources"),
+    ] = True,
+) -> DisplayConfig:
     request.resource_permission(ResourceScope.read)
 
     # Map level plugins
@@ -647,6 +655,9 @@ def display_config(obj, request) -> DisplayConfig:
             options[k] = obj.options[k]
         else:
             options[k] = v.default()
+    description_view = ""
+    if description:
+        description_view = obj.description
 
     return DisplayConfig(
         webmapId=obj.id,
@@ -674,7 +685,7 @@ def display_config(obj, request) -> DisplayConfig:
                 manage=WebMapScope.annotation_manage in permissions,
             ),
         ),
-        webmapDescription=obj.description,
+        webmapDescription=description_view,
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
