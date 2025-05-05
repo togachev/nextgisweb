@@ -101,7 +101,6 @@ export const DescComponent = (props) => {
             }
         }
     };
-    console.log(content);
     
     let data_;
     if (content === undefined && type === "map") {

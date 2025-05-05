@@ -42,7 +42,7 @@ export class LayerInfoPlugin extends PluginBase {
         };
     }
 
-    private async loadDescripton(id) {
+    private async loadDescripton(id, type) {
         const value = await route("resource.item", {
             id: id,
         }).get({
@@ -51,8 +51,12 @@ export class LayerInfoPlugin extends PluginBase {
                 description: true,
                 serialization: "resource",
             }
-        });
-        return value.resource.description;
+        })
+            .then(item => ({
+                description: item?.resource?.description,
+                type: type,
+            }))
+        return value;
     }
 
     private async openLayerInfo(nodeData) {
@@ -68,48 +72,14 @@ export class LayerInfoPlugin extends PluginBase {
         if (Object.values(data).length > 0) {
             const { layer_id, style_id } = data;
             try {
+                vectorType.includes(nodeData.layerCls) && layer_id &&
+                    await this.loadDescripton(layer_id, "layer").then(i => content.push(i));
 
-                const desc_layer = vectorType.includes(nodeData.layerCls) && layer_id && await route("resource.item", {
-                    id: layer_id,
-                }).get({
-                    cache: true,
-                    query: {
-                        description: true,
-                        serialization: "resource",
-                    }
-                });
-                content.push({
-                    description: desc_layer?.resource?.description,
-                    type: "layer",
-                })
+                style_id &&
+                    await this.loadDescripton(style_id, "style").then(i => content.push(i));
 
-                const desc_style = style_id && await route("resource.item", {
-                    id: style_id,
-                }).get({
-                    cache: true,
-                    query: {
-                        description: true,
-                        serialization: "resource",
-                    }
-                });
-                content.push({
-                    description: desc_style?.resource?.description,
-                    type: "style",
-                })
-
-                const desc_webmap = this.display.config.webmapDescription && await route("resource.item", {
-                    id: this.display.config.webmapId,
-                }).get({
-                    cache: true,
-                    query: {
-                        description: true,
-                        serialization: "resource",
-                    }
-                });
-                content.push({
-                    description: desc_webmap?.resource?.description,
-                    type: "webmap_desc",
-                })
+                this.display.config.webmapDescription &&
+                    await this.loadDescripton(this.display.config.webmapId, "webmap_desc").then(i => content.push(i));
 
                 let panel = pm.getPanel<DescriptionStore>(pkey);
                 if (!panel) {

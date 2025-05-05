@@ -43,8 +43,6 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
             loadDescripton(display.config.webmapId)
                 .then(i => {
                     const lsw = content?.content ? content?.content : [];
-                    console.log(lsw);
-                    
                     const webmap_desc = lsw.length > 0 ?
                         [] : display.config.webmapDescription === true ?
                             [{ description: i, type: "webmap_desc", }] : []
