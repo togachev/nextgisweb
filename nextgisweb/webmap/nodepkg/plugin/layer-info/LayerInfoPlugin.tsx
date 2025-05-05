@@ -17,9 +17,13 @@ interface DescriptionContentProps {
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
+        const infoConfig = this.display.itemConfig;
+        const data = infoConfig?.plugin[
+            this.identity
+        ] as DescriptionWebMapPluginConfig;
         return {
             ...state,
-            enabled: !!(state.enabled),
+            enabled: !!(state.enabled && data.style_id) || !!(state.enabled && data.layer_id),
         };
     }
 
@@ -73,13 +77,13 @@ export class LayerInfoPlugin extends PluginBase {
 
                 const description_layer = resource_layer?.resource?.description;
                 const description_style = resource_style?.resource?.description;
-
+                
                 vectorType.includes(nodeData.layerCls) && description_layer && content.push({
                     description: description_layer,
                     type: "layer",
                 });
 
-                description_style && content.push({
+                vectorType.includes(nodeData.layerCls) &&description_style && content.push({
                     description: description_style,
                     type: "style",
                 });
