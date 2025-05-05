@@ -344,6 +344,13 @@ class Resource(Base, metaclass=ResourceMeta):
         if hasattr(res, "external_resource_id") and res.resource_field_name is not None and res.external_field_name is not None and res.external_resource_id is not None:
             return res.id
 
+    @classmethod
+    def description_status(self, res):
+        if res.description:
+            return True
+        else:
+            return False
+
 class ResourceWebMapGroup(Base):
     __tablename__ = "resource_wmg"
 

@@ -42,6 +42,19 @@ export class LayerInfoPlugin extends PluginBase {
         };
     }
 
+    private async loadDescripton(id) {
+        const value = await route("resource.item", {
+            id: id,
+        }).get({
+            cache: true,
+            query: {
+                description: true,
+                serialization: "resource",
+            }
+        });
+        return value.resource.description;
+    }
+
     private async openLayerInfo(nodeData) {
         const pm = this.display.panelManager;
         const pkey = "info";
@@ -55,7 +68,8 @@ export class LayerInfoPlugin extends PluginBase {
         if (Object.values(data).length > 0) {
             const { layer_id, style_id } = data;
             try {
-                const resource_layer = layer_id ? await route("resource.item", {
+
+                const desc_layer = vectorType.includes(nodeData.layerCls) && layer_id && await route("resource.item", {
                     id: layer_id,
                 }).get({
                     cache: true,
@@ -63,9 +77,13 @@ export class LayerInfoPlugin extends PluginBase {
                         description: true,
                         serialization: "resource",
                     }
-                }) : "";
+                });
+                content.push({
+                    description: desc_layer?.resource?.description,
+                    type: "layer",
+                })
 
-                const resource_style = style_id ? await route("resource.item", {
+                const desc_style = style_id && await route("resource.item", {
                     id: style_id,
                 }).get({
                     cache: true,
@@ -73,26 +91,26 @@ export class LayerInfoPlugin extends PluginBase {
                         description: true,
                         serialization: "resource",
                     }
-                }) : "";
-
-                const description_layer = resource_layer?.resource?.description;
-                const description_style = resource_style?.resource?.description;
-                
-                vectorType.includes(nodeData.layerCls) && description_layer && content.push({
-                    description: description_layer,
-                    type: "layer",
                 });
-
-                vectorType.includes(nodeData.layerCls) &&description_style && content.push({
-                    description: description_style,
-                    type: "style",
-                });
-
                 content.push({
-                    description: this.display.config.webmapDescription,
-                    type: "webmap_desc",
+                    description: desc_style?.resource?.description,
+                    type: "style",
+                })
+
+                const desc_webmap = this.display.config.webmapDescription && await route("resource.item", {
+                    id: this.display.config.webmapId,
+                }).get({
+                    cache: true,
+                    query: {
+                        description: true,
+                        serialization: "resource",
+                    }
                 });
-                
+                content.push({
+                    description: desc_webmap?.resource?.description,
+                    type: "webmap_desc",
+                })
+
                 let panel = pm.getPanel<DescriptionStore>(pkey);
                 if (!panel) {
                     panel = (await pm.registerPlugin(pkey)) as DescriptionStore;

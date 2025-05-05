@@ -501,11 +501,6 @@ def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
 def display_config(
     obj,
     request,
-    *,
-    description: Annotated[
-        bool,
-        Meta(description="Description resources"),
-    ] = True,
 ) -> DisplayConfig:
     request.resource_permission(ResourceScope.read)
 
@@ -655,9 +650,6 @@ def display_config(
             options[k] = obj.options[k]
         else:
             options[k] = v.default()
-    description_view = ""
-    if description:
-        description_view = obj.description
 
     return DisplayConfig(
         webmapId=obj.id,
@@ -685,7 +677,7 @@ def display_config(
                 manage=WebMapScope.annotation_manage in permissions,
             ),
         ),
-        webmapDescription=description_view,
+        webmapDescription=obj.description_status(obj),
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useRef } from "react";
-
+import { useEffect, useMemo, useRef, useState } from "react";
+import { route } from "@nextgisweb/pyramid/api";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
@@ -10,62 +10,56 @@ import type DescriptionStore from "./DescriptionStore";
 
 import "./DescriptionPanel.less";
 
-const zoomToFeature = (
-    display: Display,
-    resourceId: number,
-    featureId: number
-) => {
-    display.featureHighlighter
-        .highlightFeatureById(featureId, resourceId)
-        .then((feature) => {
-            display.map.zoomToFeature(feature);
-        });
-};
+interface DescProps {
+    description?: string;
+    type?: string;
+}
+
+interface ContentProps {
+    content?: DescProps[] | [];
+    type?: string;
+}
+
+const loadDescripton = async (id) => {
+    const value = await route("resource.item", {
+        id: id,
+    }).get({
+        cache: true,
+        query: {
+            description: true,
+            serialization: "resource",
+        }
+    });
+    return value?.resource?.description
+}
 
 const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
     ({ store, display }) => {
-        const nodeRef = useRef<HTMLDivElement>(null);
+        const [desc, setDesc] = useState<ContentProps>();
 
         const content = store.content;
-
-        const contentDiv = useMemo(() => {
-            return (
-                // <div
-                //     className="content"
-                //     ref={nodeRef}
-                //     dangerouslySetInnerHTML={{
-                //         __html: content ?? "",
-                //     }}
-                // />
-                <DescComponent display={display} content={content} />
-            );
-        }, [content]);
-
+        
         useEffect(() => {
-            if (!nodeRef || !nodeRef.current) {
-                console.warn("InfoPanel: nodeRef | nodeRef.current are empty");
-                return;
-            }
-
-            nodeRef.current.querySelectorAll("a, span").forEach((el) => {
-                const tagName = el.tagName.toLowerCase();
-                const linkText = el.getAttribute(
-                    tagName === "a" ? "href" : "data-target"
-                );
-                if (linkText && /^\d+:\d+$/.test(linkText)) {
-                    el.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const [resourceId, featureId] = linkText.split(":");
-                        zoomToFeature(
-                            display,
-                            Number(resourceId),
-                            Number(featureId)
-                        );
+            loadDescripton(display.config.webmapId)
+                .then(i => {
+                    const lsw = content?.content ? content?.content : [];
+                    console.log(lsw);
+                    
+                    const webmap_desc = lsw.length > 0 ?
+                        [] : display.config.webmapDescription === true ?
+                            [{ description: i, type: "webmap_desc", }] : []
+                    const union = [...Array.from(
+                        new Set([
+                            ...lsw,
+                            ...webmap_desc
+                        ])
+                    )]
+                    setDesc({
+                        content: union,
+                        type: "map"
                     });
-                }
-            });
-        }, [display]);
+                })
+        }, [store.content]);
 
         return (
             <PanelContainer
@@ -76,7 +70,7 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
-                {contentDiv}
+                {desc && <DescComponent display={display} content={desc} />}
             </PanelContainer>
         );
     }

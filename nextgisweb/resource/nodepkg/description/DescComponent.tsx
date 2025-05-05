@@ -101,11 +101,13 @@ export const DescComponent = (props) => {
             }
         }
     };
+    console.log(content);
+    
     let data_;
     if (content === undefined && type === "map") {
         data_ = parse(display.config.webmapDescription, options)
     }
-    else if (content.content instanceof Array && content.type === "map") {
+    else if (content?.content instanceof Array && content.type === "map") {
         data_ = (<DescComp content={content.content} />)
     }
     else {

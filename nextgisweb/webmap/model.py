@@ -548,7 +548,7 @@ class WebMapSerializer(Serializer, resource=WebMap):
     bookmark_resource = SResource(read=ResourceScope.read, write=ResourceScope.update)
 
     root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
-
+    test = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
     active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     extent_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
