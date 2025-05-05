@@ -51,7 +51,7 @@ export class LayerInfoPlugin extends PluginBase {
         if (Object.values(data).length > 0) {
             const { layer_id, style_id } = data;
             try {
-                const resource_layer = await route("resource.item", {
+                const resource_layer = layer_id ? await route("resource.item", {
                     id: layer_id,
                 }).get({
                     cache: true,
@@ -59,9 +59,9 @@ export class LayerInfoPlugin extends PluginBase {
                         description: true,
                         serialization: "resource",
                     }
-                });
+                }) : "";
 
-                const resource_style = await route("resource.item", {
+                const resource_style = style_id ? await route("resource.item", {
                     id: style_id,
                 }).get({
                     cache: true,
@@ -69,10 +69,10 @@ export class LayerInfoPlugin extends PluginBase {
                         description: true,
                         serialization: "resource",
                     }
-                });
+                }) : "";
 
-                const description_layer = resource_layer.resource.description;
-                const description_style = resource_style.resource.description;
+                const description_layer = resource_layer?.resource?.description;
+                const description_style = resource_style?.resource?.description;
 
                 vectorType.includes(nodeData.layerCls) && description_layer && content.push({
                     description: description_layer,
