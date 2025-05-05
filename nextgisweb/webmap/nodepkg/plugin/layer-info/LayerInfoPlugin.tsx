@@ -1,5 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { errorModal } from "@nextgisweb/gui/error";
 import type DescriptionStore from "@nextgisweb/webmap/panel/description/DescriptionStore";
+import { route } from "@nextgisweb/pyramid/api";
 import type { PluginState } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import { PluginBase } from "../PluginBase";
@@ -15,13 +17,9 @@ interface DescriptionContentProps {
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
-        const infoConfig = this.display.itemConfig;
-        const data = infoConfig?.plugin[
-            this.identity
-        ] as DescriptionWebMapPluginConfig;
         return {
             ...state,
-            enabled: !!(state.enabled && data.description_layer) || !!(state.enabled && data.description_style),
+            enabled: !!(state.enabled),
         };
     }
 
@@ -51,30 +49,58 @@ export class LayerInfoPlugin extends PluginBase {
         const vectorType = ["postgis_layer", "vector_layer"];
 
         if (Object.values(data).length > 0) {
+            const { layer_id, style_id } = data;
+            try {
+                const resource_layer = await route("resource.item", {
+                    id: layer_id,
+                }).get({
+                    cache: true,
+                    query: {
+                        description: true,
+                        serialization: "resource",
+                    }
+                });
 
-            vectorType.includes(nodeData.layerCls) && data.description_layer && content.push({
-                description: data.description_layer,
-                type: "layer",
-            });
+                const resource_style = await route("resource.item", {
+                    id: style_id,
+                }).get({
+                    cache: true,
+                    query: {
+                        description: true,
+                        serialization: "resource",
+                    }
+                });
 
-            data.description_style && content.push({
-                description: data.description_style,
-                type: "style",
-            });
+                const description_layer = resource_layer.resource.description;
+                const description_style = resource_style.resource.description;
 
-            content.push({
-                description: this.display.config.webmapDescription,
-                type: "webmap_desc",
-            });
-            
-            let panel = pm.getPanel<DescriptionStore>(pkey);
-            if (!panel) {
-                panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
+                vectorType.includes(nodeData.layerCls) && description_layer && content.push({
+                    description: description_layer,
+                    type: "layer",
+                });
+
+                description_style && content.push({
+                    description: description_style,
+                    type: "style",
+                });
+
+                content.push({
+                    description: this.display.config.webmapDescription,
+                    type: "webmap_desc",
+                });
+                
+                let panel = pm.getPanel<DescriptionStore>(pkey);
+                if (!panel) {
+                    panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
+                }
+                if (panel) {
+                    panel.setContent({ content: content, type: "map" });
+                }
+                pm.activatePanel(pkey);
+
+            } catch (err) {
+                errorModal(err);
             }
-            if (panel) {
-                panel.setContent({ content: content, type: "map" });
-            }
-            pm.activatePanel(pkey);
         }
     }
 }

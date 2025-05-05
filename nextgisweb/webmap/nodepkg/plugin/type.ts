@@ -3,9 +3,8 @@ export interface FeatureLayerWebMapPluginConfig {
     readonly: boolean;
 }
 export interface DescriptionWebMapPluginConfig {
-    description: string | null;
-    description_style: string | null;
-    description_layer: string | null;
+    layer_id: string | number | null;
+    style_id: string | number | null;
 }
 export interface LayerEditorWebMapPluginConfig {
     writable: boolean;

@@ -11,11 +11,11 @@ class LayerInfoPlugin(WebmapLayerPlugin):
         payload = dict()
 
         if style.description is not None and layer.description is None:
-            payload["description_style"] = style.description
+            payload["style_id"] = style.id
         elif style.description is None and layer.description is not None:
-            payload["description_layer"] = layer.description
+            payload["layer_id"] = layer.id
         elif style.description is not None and layer.description is not None:
-            payload["description_style"] = style.description
-            payload["description_layer"] = layer.description
+            payload["style_id"] = style.id
+            payload["layer_id"] = layer.id
 
         return (cls.entry, payload)
