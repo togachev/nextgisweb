@@ -62,7 +62,7 @@ export const ContentComponent: FC = observer((props) => {
     const firstItem = store.data.find(i => i.id === id);
 
     const heightRadio = 135; /* ~ height and padding 2px */
-    const [heightPanel, setHeightPanel] = useState();
+    const [heightPanel, setHeightPanel] = useState<number | undefined>();
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
