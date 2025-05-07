@@ -62,7 +62,7 @@ export const ContentComponent: FC = observer((props) => {
     const firstItem = store.data.find(i => i.id === id);
 
     const heightRadio = 135; /* ~ height and padding 2px */
-    const [heightPanel, setHeightPanel] = useState<number | undefined>();
+    const [heightPanel, setHeightPanel] = useState<number>(1);
 
     const urlRegex = /^\s*(((((https?|http?|ftp|file|e1c):\/\/))|(((mailto|tel):)))[\S]+)\s*$/i;
     const emailRegex = new RegExp(/\S+@\S+\.\S+/);
@@ -178,7 +178,7 @@ export const ContentComponent: FC = observer((props) => {
         setHeightPanel(store.valueRnd.height - 70);
         if (store.fixPos !== null) {
             console.log(options);
-            
+
             const result = options.find(item => item.key === store.fixPanel);
             result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.setFixContentItem(options.find(item => item.key === "attributes"));
         } else {
@@ -242,7 +242,9 @@ export const ContentComponent: FC = observer((props) => {
                                             options.map((item, i) => {
                                                 if (!item.hidden) {
                                                     return (
-                                                        <Radio.Button key={i} title={item.title} value={item.value}>{item.label}</Radio.Button>
+                                                        <Radio.Button key={i} title={item.title} value={item.value}>
+                                                            {item.label}
+                                                        </Radio.Button>
                                                     )
                                                 }
                                             })
