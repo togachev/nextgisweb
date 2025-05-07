@@ -1,6 +1,6 @@
 import { action, observable } from "mobx";
 
-import type { DataProps, Rnd } from "./type";
+import type { DataProps, Rnd, OptionProps } from "./type";
 
 export class IdentifyStore {
     @observable accessor layerName: string | null = null;
@@ -10,14 +10,14 @@ export class IdentifyStore {
     @observable accessor fullscreen = false;
 
     @observable.ref accessor data: DataProps[] = [];
-    @observable.ref accessor selected: DataProps | null = null;
+    @observable.ref accessor selected: DataProps;
     @observable.ref accessor attribute: object | null = null;
     @observable.ref accessor extensions: object | null = null;
     @observable.ref accessor currentUrlParams: string | null = null;
     @observable.ref accessor contextUrl: string | null = null;
-    @observable.ref accessor fixContentItem: string | null = null;
+    @observable.ref accessor fixContentItem: OptionProps;
     @observable.ref accessor linkToGeometry: string | null = null;
-    @observable.ref accessor valueRnd: Rnd | null = null;
+    @observable.ref accessor valueRnd: Rnd;
     @observable.ref accessor fixPos: Rnd | null = null;
     @observable.ref accessor fixPanel: string | null = null;
     @observable.ref accessor result: object | undefined = undefined;
@@ -108,7 +108,7 @@ export class IdentifyStore {
     };
 
     @action
-    setFixContentItem(fixContentItem: string) {
+    setFixContentItem(fixContentItem: OptionProps) {
         this.fixContentItem = fixContentItem;
     };
 

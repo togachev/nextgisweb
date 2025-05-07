@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";

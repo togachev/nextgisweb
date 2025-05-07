@@ -18,6 +18,7 @@ import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 
+import type { OptionProps, ContentProps } from "../type";
 
 const { Link } = Typography;
 const settings = webmapSettings;
@@ -46,7 +47,8 @@ const LinkToGeometryFeature = ({ store, display }) => {
     }
 };
 
-export const ContentComponent: FC = observer(({ store: storeProp, display }) => {
+export const ContentComponent: FC = observer((props) => {
+    const { store: storeProp, display } = props as ContentProps
     const [store] = useState(() => storeProp);
     const { id, layerId } = store.selected;
     const { copyValue, contextHolder } = useCopy();
@@ -118,7 +120,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
             emptyValue;
     };
 
-    const options: any[] = [];
+    const options: OptionProps[] = [];
 
     if (attrs) {
         options.push({
@@ -161,7 +163,7 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
         children: store.extensions !== null && store.extensions.attachment !== null ? (<AttachmentTable attachments={store.extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
     });
 
-    if (firstItem.relation) {
+    if (firstItem?.relation) {
         options.push({
             label: (<span className="icon-style"><LineChartOutlined /></span>),
             value: "relation",
@@ -175,6 +177,8 @@ export const ContentComponent: FC = observer(({ store: storeProp, display }) => 
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);
         if (store.fixPos !== null) {
+            console.log(options);
+            
             const result = options.find(item => item.key === store.fixPanel);
             result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.setFixContentItem(options.find(item => item.key === "attributes"));
         } else {

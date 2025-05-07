@@ -1,4 +1,4 @@
-import React, { Component, createRef, RefObject } from "react";
+import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
@@ -13,10 +13,10 @@ import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
 import OlGeomPoint from "ol/geom/Point";
-
+import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import type { Display } from "@nextgisweb/webmap/display";
 import type { EventProps, ParamsProps, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
-
+import type { DataProps, Params } from "./type";
 import "./IdentifyModule.less";
 
 const settings = webmapSettings;
@@ -36,7 +36,7 @@ class Control extends Interaction {
         this.tool = options.tool;
     }
 
-    handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
+    handleClickEvent(e: MapBrowserEvent): boolean {
         if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
             this.tool._overlayInfo(e, "popup", false);
             e.preventDefault();
@@ -65,16 +65,16 @@ export class IdentifyModule extends Component {
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
     private control: Interaction;
-    private popup: HTMLDivElement;
-    private point_popup: HTMLDivElement;
-    private point_context: HTMLDivElement;
-    private root_popup: React.ReactElement;
-    private root_context: React.ReactElement;
-    private refPopup: RefObject<Element>;
-    private refContext: RefObject<Element>;
+    private popup = document.createElement("div");
+    private point_popup = document.createElement("div");
+    private point_context = document.createElement("div");
+    private root_popup = createRoot(this.popup);
+    private root_context = createRoot(this.point_context);
+    private refPopup = React.createRef<HTMLDivElement>();
+    private refContext = createRef<HTMLDivElement>();
 
     constructor(props: Display) {
-        super(props)
+        super(props);
 
         this.display = props;
         this.displaySrid = 3857;
@@ -86,15 +86,8 @@ export class IdentifyModule extends Component {
 
         this._addOverlay();
 
-        this.popup = document.createElement("div");
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-        this.root_popup = createRoot(this.popup);
-        this.point_context = document.createElement("div");
-        this.root_context = createRoot(this.point_context);
-
-        this.refPopup = createRef();
-        this.refContext = createRef();
     };
 
     activate = () => {
@@ -161,8 +154,10 @@ export class IdentifyModule extends Component {
             .then((transformed) => {
                 const t = transformed.find(i => i.srs_id !== this.displaySrid)
                 const wktPoint = wkt.readGeometry(t.geom);
-                const transformedCoord = wktPoint.getCoordinates();
-                return transformedCoord;
+                if (wktPoint instanceof SimpleGeometry) {
+                    const transformedCoord = wktPoint.getCoordinates();
+                    return transformedCoord;
+                }
             });
 
         let count;
@@ -203,14 +198,28 @@ export class IdentifyModule extends Component {
                 }
             }
 
-            const value = this.response.data.find(x => x.value === this.selected)
+            const value = this.response.data.find(x => x.value === this.selected) as DataProps
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
-            this.root_popup.render(<PopupComponent params={{ op, position, response: this.response, selectedValue: value }} display={this.display} visible={this._visible} ref={this.refPopup} />);
+
+            const propsPopup = {
+                params: { op, position, response: this.response, selected: value },
+                display: this.display,
+                visible: this._visible
+            } as Params
+
+            this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
             this._setValue(this.point_context, "context")
-            this.root_context.render(<ContextComponent array_context={array_context} params={{ op, position }} display={this.display} visible={this._visible} ref={this.refContext} />);
+
+            const propsContext = {
+                params: { op, position },
+                display: this.display,
+                visible: this._visible
+            } as Params
+
+            this.root_context.render(<ContextComponent {...propsContext} ref={this.refContext} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         }
     };

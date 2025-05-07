@@ -1,6 +1,7 @@
+import { ReactElement } from "react";
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import type { Display } from "@nextgisweb/webmap/display";
-
+import { IdentifyStore } from "../IdentifyStore";
 export interface RelationProps {
     external_resource_id: number;
     relation_key: string;
@@ -8,14 +9,14 @@ export interface RelationProps {
 }
 
 export interface DataProps {
-    id: number;
-    label: string;    
-    layerId: number;
-    desc: string;   
-    dop: number;
-    styleId: number;
-    value: string;
-    permission: string;
+    id?: number;
+    label?: string;    
+    layerId?: number;
+    desc?: string;   
+    dop?: number;
+    styleId?: number;
+    value?: string;
+    permission?: string;
     relation?: RelationProps;
 }
 
@@ -115,4 +116,18 @@ export type ContextItemProps = {
     borderColor: string;
     data: AxisProps[];
     labels: string[];
+}
+
+export type OptionProps = {
+    children: ReactElement;
+    hidden: boolean;
+    key: string;
+    label: ReactElement;
+    title: string;
+    value: string;
+}
+
+export type ContentProps = {
+    display: Display;
+    store: IdentifyStore;
 }

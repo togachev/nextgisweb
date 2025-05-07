@@ -1,6 +1,6 @@
 import parse, { attributesToProps, Element, domToReact } from "html-react-parser";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Image, Divider } from "@nextgisweb/gui/antd";
+import { Image, Divider, Space } from "@nextgisweb/gui/antd";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
@@ -50,15 +50,27 @@ export const DescComponent = (props) => {
 
     const DescComp = ({ content }) => {
         return content?.map((item, index) => {
-            const title = item.type === "webmap_desc" ? msgWebmap : item.type === "layer" ? msgLayer : msgStyle;
+            let title;
+            switch (item.type) {
+                case "webmap_desc":
+                    title = msgWebmap;
+                    break;
+                case "layer":
+                    title = msgLayer;
+                    break;
+                case "style":
+                    title = msgStyle;
+                    break;
+            }
+
             if (item.description) {
                 return (
-                    <span key={index} >
+                    <Space key={index} direction="vertical" style={{ width: "100%" }}>
                         {content.length > 1 && (
-                            <Divider style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
+                            <Divider variant="dotted" style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
                         )}
                         {parse(item.description, options)}
-                    </span >
+                    </Space>
                 )
             }
         })
@@ -78,7 +90,7 @@ export const DescComponent = (props) => {
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {
-                return <span {...props} >{domToReact(item.children, options)}</span>;
+                return <span style={{ width: "100%" }} {...props} >{domToReact(item.children, options)}</span>;
             }
 
             if (display === undefined) {
@@ -101,7 +113,7 @@ export const DescComponent = (props) => {
             }
         }
     };
-    
+
     let data_;
     if (content === undefined && type === "map") {
         data_ = parse(display.config.webmapDescription, options)

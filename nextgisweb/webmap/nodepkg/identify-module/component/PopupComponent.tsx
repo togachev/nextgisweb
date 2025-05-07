@@ -18,7 +18,7 @@ import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { useSource } from "../hook/useSource";
 
-import type { DataProps, Params } from "./type";
+import type { DataProps, Params, Props } from "../type";
 import topic from "@nextgisweb/webmap/compat/topic";
 
 const { Option } = Select;
@@ -32,22 +32,23 @@ const CheckOnlyOne = ({ store }) => {
     };
 
     return (
-        <Tag.CheckableTag
-            checked={store.fixPopup}
-            onChange={onChange}
-            className="legend-hide-button"
-            title={store.fixPopup ? msgFixOffPopup : msgFixPopup}
-        >
-            {store.fixPopup ? <PinOff /> : <Pin />}
-        </Tag.CheckableTag>
+        <span title={store.fixPopup ? msgFixOffPopup : msgFixPopup}>
+            <Tag.CheckableTag
+                checked={store.fixPopup}
+                onChange={onChange}
+                className="legend-hide-button"
+            >
+                {store.fixPopup ? <PinOff /> : <Pin />}
+            </Tag.CheckableTag>
+        </span>
     );
 };
 
 export default observer(
     forwardRef<Element>(
-        function PopupComponent(props: Params, ref: RefObject<Element>) {
-            const { params, visible, display } = props;
-            const { op, position, response, selectedValue } = params;
+        function PopupComponent(props, ref) {
+            const { params, visible, display } = props as Params;
+            const { op, position, response, selected: selectedValue } = params as Props;
             const { getAttribute, generateUrl } = useSource(display);
             const imodule = display.identify_module;
             const opts = display.config.options;
@@ -68,7 +69,7 @@ export default observer(
                     fixPanel: urlParams.pn ? urlParams.pn :
                         attrs === true ? "attributes" :
                             attrs === false && geoms === true ? "geom_info" :
-                                    (attrs === false && geoms === false) && "description",
+                                (attrs === false && geoms === false) && "description",
                 }));
 
             imodule.identifyStore = store;
@@ -108,7 +109,7 @@ export default observer(
                     }) :
                     topic.publish("feature.unhighlight")
 
-                    store.setContextUrl(generateUrl({ res: val, st: response.data, pn: store.fixPanel }));
+                store.setContextUrl(generateUrl({ res: val, st: response.data, pn: store.fixPanel }));
 
                 if (key === true) {
                     store.setUpdate(false);
@@ -126,7 +127,7 @@ export default observer(
                     LinkToGeometry(selectVal)
                 } else {
                     store.setContextUrl(generateUrl({ res: null, st: null, pn: null }));
-                    store.setSelected(null);
+                    store.setSelected({});
                     store.setData([]);
                     topic.publish("feature.unhighlight");
                 }
@@ -137,7 +138,7 @@ export default observer(
             }, [store.currentUrlParams]);
 
             useEffect(() => {
-                if (store.update === true) {
+                if (store.selected && store.update === true) {
                     getContent(store.selected, true);
                 }
             }, [store.update]);
@@ -146,12 +147,11 @@ export default observer(
                 if (store.fixPopup) {
                     store.setFixPos(store.valueRnd);
                     store.setFixPanel(store.fixContentItem.key)
-                } else {
-                    store.setFixPos(null);
                 }
             }, [store.fixPopup]);
 
-            const onChangeSelect = (value: { value: number; label: string }) => {
+            const onChangeSelect = (value) => {
+
                 const selectedValue = store.data.find(item => item.value === value.value);
                 const copy = { ...selectedValue };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
@@ -160,10 +160,13 @@ export default observer(
                 LinkToGeometry(copy);
             };
 
-            const filterOption = (input: string, option?: { label: string; value: string; desc: string }) => {
+            const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
                 if ((option?.label ?? "").toLowerCase().includes(input.toLowerCase()) ||
-                    (option?.desc ?? "").toLowerCase().includes(input.toLowerCase()))
+                    (option?.desc ?? "").toLowerCase().includes(input.toLowerCase())) {
                     return true
+                } else {
+                    return false
+                }
             }
 
             const editFeature = useMemo(() => {
@@ -273,8 +276,8 @@ export default observer(
                             allowAnyClick={true}
                             enableResizing={count > 0 ? (store.fixPos === null ? true : false) : false}
                             disableDragging={count > 0 && store.fixPos !== null ? true : false}
-                            position={count > 0 && store.fixPos !== null ? { x: store.fixPos.x, y: store.fixPos.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
-                            size={count > 0 && store.fixPos !== null ? { width: store.fixPos.width, height: store.fixPos.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
+                            position={count > 0 && store.fixPos !== null ? { x: store.fixPos?.x, y: store.fixPos?.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
+                            size={count > 0 && store.fixPos !== null ? { width: store.fixPos?.width, height: store.fixPos?.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
                             onDragStop={(e, d) => {
                                 if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
                                     store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
@@ -288,17 +291,17 @@ export default observer(
                                 store.setValueRnd({ ...store.valueRnd, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y });
                             }}
                         >
-                            <div ref={ref} className="popup-position" >
+                            <div ref={ref as any} className="popup-position" >
                                 <div className="title">
                                     <div className="title-name"
                                         onClick={(e) => {
                                             if (count > 0 && e.detail === 2) {
                                                 setTimeout(() => {
                                                     if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
-                                                        store.setValueRnd({...store.valueRnd, width: position.width, height: position.height, x: position.x, y: position.y });
+                                                        store.setValueRnd({ ...store.valueRnd, width: position.width, height: position.height, x: position.x, y: position.y });
                                                         store.setFullscreen(false)
                                                     } else {
-                                                        store.setValueRnd({...store.valueRnd, width: W, height: H, x: fX, y: fY });
+                                                        store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: fX, y: fY });
                                                         store.setFullscreen(true)
                                                     }
                                                 }, 200)
@@ -324,14 +327,14 @@ export default observer(
                                             onClick={() => {
                                                 if (count > 0 && store.fixPos === null) {
                                                     if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
-                                                        store.setValueRnd({...store.valueRnd, width: position.width, height: position.height, x: position.x, y: position.y });
+                                                        store.setValueRnd({ ...store.valueRnd, width: position.width, height: position.height, x: position.x, y: position.y });
                                                         store.setFullscreen(false)
                                                     } else {
-                                                        store.setValueRnd({...store.valueRnd, width: W, height: H, x: fX, y: fY });
+                                                        store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: fX, y: fY });
                                                         store.setFullscreen(true)
                                                     }
                                                     if (store.valueRnd.width < W && store.valueRnd.width > position.width || store.valueRnd.height < H && store.valueRnd.height > position.height) {
-                                                        store.setValueRnd({...store.valueRnd, width: W, height: H, x: fX, y: fY });
+                                                        store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: fX, y: fY });
                                                         store.setFullscreen(true)
                                                     }
                                                 }
@@ -346,7 +349,7 @@ export default observer(
                                             visible({ hidden: true, overlay: undefined, key: "popup" })
                                             topic.publish("feature.unhighlight");
                                             store.setFullscreen(false)
-                                            store.setValueRnd({...store.valueRnd, x: -9999, y: -9999 });
+                                            store.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
                                         }} >
                                         <CloseIcon />
                                     </span>
@@ -360,7 +363,7 @@ export default observer(
                                             filterOption={filterOption}
                                             showSearch
                                             size="small"
-                                            value={store.selected}
+                                            value={{ label: store.selected.label, value: store.selected.value }}
                                             style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
                                             onChange={onChangeSelect}
                                         >
