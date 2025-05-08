@@ -1,4 +1,4 @@
-import { forwardRef, RefObject, useMemo, useState, useEffect } from "react";
+import { forwardRef, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";

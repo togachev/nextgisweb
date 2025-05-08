@@ -1,4 +1,4 @@
-import { forwardRef, RefObject } from "react";
+import { forwardRef } from "react";
 import { createPortal } from "react-dom";
 import { useOutsideClick } from "../hook/useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
