@@ -156,117 +156,117 @@ msgstr "Изменить геометрию для фильтра"
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:35
+#: nodepkg/imodule/component/ContentComponent.tsx:35
 msgid "HTML code of the geometry link, for insertion into the description"
 msgstr "HTML-код ссылки на геометрию для вставки в описание"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:39
+#: nodepkg/imodule/component/ContentComponent.tsx:39
 msgid "HTML code copied"
 msgstr "HTML-код скопирован"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:76
+#: nodepkg/imodule/component/ContentComponent.tsx:76
 msgid "Email address copied"
 msgstr "Адрес электронной почты скопирован"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:128
+#: nodepkg/imodule/component/ContentComponent.tsx:128
 #: nodepkg/panel/identify/component/FeatureInfoSection.tsx:77
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:140 option/__init__.py:24
+#: nodepkg/imodule/component/ContentComponent.tsx:140 option/__init__.py:24
 msgid "Geometry info"
 msgstr "Информация о геометрии"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:150
+#: nodepkg/imodule/component/ContentComponent.tsx:150
 #: nodepkg/panel/description/plugin.tsx:10
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:36
 #: nodepkg/settings-widget/SettingsWidget.tsx:57
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:159
+#: nodepkg/imodule/component/ContentComponent.tsx:159
 msgid "Attachments"
 msgstr "Вложения"
 
-#: nodepkg/identify-module/component/ContentComponent.tsx:169
-#: nodepkg/identify-module/component/GraphPanel.tsx:32
+#: nodepkg/imodule/component/ContentComponent.tsx:169
+#: nodepkg/imodule/component/GraphPanel.tsx:32
 msgid "Graphs"
 msgstr "Графики"
 
-#: nodepkg/identify-module/component/ContextComponent.tsx:39
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:29
+#: nodepkg/imodule/component/ContextComponent.tsx:39
+#: nodepkg/imodule/component/CoordinateComponent.tsx:29
 msgid "Copy coordinates"
 msgstr "Скопировать координаты"
 
-#: nodepkg/identify-module/component/ContextComponent.tsx:40
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:30
+#: nodepkg/imodule/component/ContextComponent.tsx:40
+#: nodepkg/imodule/component/CoordinateComponent.tsx:30
 msgid "Coordinates copied"
 msgstr "Координаты скопированы"
 
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:20
+#: nodepkg/imodule/component/CoordinateComponent.tsx:20
 msgid "Update web map url."
 msgstr ""
 
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:21
+#: nodepkg/imodule/component/CoordinateComponent.tsx:21
 msgid "Double click will return the original page address."
 msgstr ""
 
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:51
+#: nodepkg/imodule/component/CoordinateComponent.tsx:51
 msgid "Copy link to object"
 msgstr "Копировать ссылку на объект"
 
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:51
+#: nodepkg/imodule/component/CoordinateComponent.tsx:51
 msgid "Copy link to location"
 msgstr "Копировать ссылку на местоположение"
 
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:53
+#: nodepkg/imodule/component/CoordinateComponent.tsx:53
 msgid "Object reference copied"
 msgstr "Ссылка на объект скопирована"
 
-#: nodepkg/identify-module/component/CoordinateComponent.tsx:53
+#: nodepkg/imodule/component/CoordinateComponent.tsx:53
 msgid "Location link copied"
 msgstr "Ссылка на местоположение скопирована"
 
-#: nodepkg/identify-module/component/GraphPanel.tsx:32
+#: nodepkg/imodule/component/GraphPanel.tsx:32
 msgid "Graph"
 msgstr "График"
 
-#: nodepkg/identify-module/component/GraphPanel.tsx:76
+#: nodepkg/imodule/component/GraphPanel.tsx:76
 msgid "Hide chart legend"
 msgstr "Скрыть легенду диаграммы"
 
-#: nodepkg/identify-module/component/GraphPanel.tsx:77
+#: nodepkg/imodule/component/GraphPanel.tsx:77
 msgid "Show chart legend"
 msgstr "Показать легенду диаграммы"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:25
+#: nodepkg/imodule/component/PopupComponent.tsx:25
 #: nodepkg/panel/identify/lookup.ts:30
 msgid "The data is not available for reading"
 msgstr "Данные недоступны для чтения"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:28
+#: nodepkg/imodule/component/PopupComponent.tsx:28
 msgid "Lock popup position"
 msgstr "Заблокировать позицию всплывающего окна"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:29
+#: nodepkg/imodule/component/PopupComponent.tsx:29
 msgid "Disable lock popup position"
 msgstr "Отключить блокировку всплывающего окна"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:183
+#: nodepkg/imodule/component/PopupComponent.tsx:183
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
 #: nodepkg/plugin/layer-editor/LayerEditor.tsx:134
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:322
+#: nodepkg/imodule/component/PopupComponent.tsx:322
 msgid "Сollapse fullscreen popup"
 msgstr "Свернуть полноэкранное всплывающее окно"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:322
+#: nodepkg/imodule/component/PopupComponent.tsx:322
 msgid "Open fullscreen popup"
 msgstr "Открыть полноэкранное всплывающее окно"
 
-#: nodepkg/identify-module/component/PopupComponent.tsx:343
+#: nodepkg/imodule/component/PopupComponent.tsx:343
 msgid "Close"
 msgstr "Закрыть"
 

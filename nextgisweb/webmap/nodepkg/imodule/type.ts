@@ -1,7 +1,13 @@
 import { ReactElement } from "react";
 import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import type { Display } from "@nextgisweb/webmap/display";
+import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
+
+import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
+import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
+
 import { IdentifyStore } from "../IdentifyStore";
+
 export interface RelationProps {
     external_resource_id: number;
     relation_key: string;
@@ -10,9 +16,9 @@ export interface RelationProps {
 
 export interface DataProps {
     id?: number;
-    label?: string;    
+    label?: string;
     layerId?: number;
-    desc?: string;   
+    desc?: string;
     dop: number;
     styleId?: number;
     value?: string;
@@ -51,6 +57,8 @@ export interface EventProps {
     request: RequestProps | undefined;
     point: number[];
 }
+
+export type ExtensionsProps = Record<string, unknown | null>;
 
 export interface Response {
     featureCount: number;
@@ -130,4 +138,20 @@ export type OptionProps = {
 export type ContentProps = {
     display: Display;
     store: IdentifyStore;
+}
+
+export interface FeatureIdentify<F extends Attrs = Attrs> {
+    id: number;
+    layerId: number;
+    label: string;
+    fields: F;
+    parent: string;
+    relation: RelationProps;
+}
+export interface AttributeProps{
+    attr: string;
+    datatype: string;
+    format_field: FormatNumberFieldData
+    key: number;
+    value: string;
 }

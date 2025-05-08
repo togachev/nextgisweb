@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Dropdown, Typography } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
 import ResourceHome from "./icons/resource_home.svg";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -65,8 +65,6 @@ export const BreadcrumbComponent = ({ bcpath, current_id }: BreadcrumbComponentP
     }
 
     useMemo(() => bcpath?.map(item => getCollection(item)), []);
-
-
 
     const TitleBc = (itm) => {
         const { iconHome, title, href, sep, items } = itm;

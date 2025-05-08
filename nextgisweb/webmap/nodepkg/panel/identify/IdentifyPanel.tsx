@@ -10,12 +10,12 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
-import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/imodule/component/GraphPanel";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 
 import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
 import { FeatureEditButton } from "./FeatureEditButton";

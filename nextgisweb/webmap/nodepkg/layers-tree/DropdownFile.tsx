@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dropdown, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import Paperclip from "@nextgisweb/icon/mdi/paperclip";
 import Download from "@nextgisweb/icon/mdi/download";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";

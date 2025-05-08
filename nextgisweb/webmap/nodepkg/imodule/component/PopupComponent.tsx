@@ -8,21 +8,20 @@ import Pin from "@nextgisweb/icon/mdi/pin";
 import PinOff from "@nextgisweb/icon/mdi/pin-off";
 import { Rnd } from "react-rnd";
 import { ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
-import { IdentifyStore } from "../IdentifyStore";
+import { Store } from "../Store";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import showModal from "@nextgisweb/gui/showModal";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
-import { useSource } from "../hook/useSource";
+import { getEntries } from "../useSource";
 
-import type { DataProps, Params, Props } from "../type";
+import type { Params, Props } from "../type";
 import topic from "@nextgisweb/webmap/compat/topic";
 
 const { Option } = Select;
-const forbidden = gettext("The data is not available for reading")
+const forbidden = gettext("The data is not available for reading");
 
 const CheckOnlyOne = ({ store }) => {
     const msgFixPopup = gettext("Lock popup position");
@@ -49,16 +48,23 @@ export default observer(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue } = params as Props;
-            const { getAttribute, generateUrl } = useSource(display);
-            const imodule = display.identify_module;
+
+            const urlParams = display.getUrlParams()
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
             const geoms = opts["webmap.identification_geometry"];
-            const count = response.featureCount;
-            const urlParams = display.getUrlParams()
+            const imodule = display.imodule;
+            const count = imodule.countFeature;
+            const offHP = imodule.offHP;
+            const offset = display.clientSettings.offset_point;
+            const fX = offHP + offset;
+            const fY = offHP + offset;
+            const W = window.innerWidth - offHP - offset * 2;
+            const H = window.innerHeight - offHP - offset * 2;
 
             const [store] = useState(
-                () => new IdentifyStore({
+                () => new Store({
+                    display: display,
                     valueRnd: {
                         x: position.x,
                         y: position.y,
@@ -72,49 +78,7 @@ export default observer(
                                 (attrs === false && geoms === false) && "description",
                 }));
 
-            imodule.identifyStore = store;
-
-            const offHP = imodule.offHP;
-            const offset = display.clientSettings.offset_point;
-            const fX = offHP + offset;
-            const fY = offHP + offset;
-
-            const W = window.innerWidth - offHP - offset * 2;
-            const H = window.innerHeight - offHP - offset * 2;
-
-            const LinkToGeometry = async (value: DataProps) => {
-                const styles: number[] = [];
-                const items = await display.getVisibleItems();
-                items.map(i => {
-                    styles.push(i.styleId);
-                });
-                store.setLinkToGeometry(value.layerId + ":" + value.id + ":" + styles);
-            }
-
-            const getContent = async (val: DataProps, key: boolean) => {
-                const res = await getAttribute(val, key);
-                store.setExtensions(res.feature.extensions);
-
-                res?.dataSource?.then(i => {
-                    store.setAttribute(i);
-                });
-
-                const highlights = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
-
-                highlights === true ?
-                    topic.publish("feature.highlight", {
-                        geom: res.feature.geom,
-                        featureId: res.feature.id,
-                        layerId: res.resourceId,
-                    }) :
-                    topic.publish("feature.unhighlight")
-
-                store.setContextUrl(generateUrl({ res: val, st: response.data, pn: store.fixPanel }));
-
-                if (key === true) {
-                    store.setUpdate(false);
-                }
-            }
+            imodule.iStore = store;
 
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
@@ -123,23 +87,24 @@ export default observer(
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
                     store.setSelected(selectVal);
                     store.setData(response.data);
-                    getContent(selectVal, false);
-                    LinkToGeometry(selectVal)
+                    store.getContent(selectVal, false);
+                    store.LinkToGeometry(selectVal);
                 } else {
-                    store.setContextUrl(generateUrl({ res: null, st: null, pn: null }));
+                    store.generateUrl({ res: null, st: null, pn: null });
                     store.setSelected({});
                     store.setData([]);
+                    store.setLinkToGeometry(null);
                     topic.publish("feature.unhighlight");
                 }
             }, [response]);
 
             useEffect(() => {
-                store.setContextUrl(generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel }));
+                store.setContextUrl(store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel }));
             }, [store.currentUrlParams]);
 
             useEffect(() => {
                 if (store.selected && store.update === true) {
-                    getContent(store.selected, true);
+                    store.getContent(store.selected, true);
                 }
             }, [store.update]);
 
@@ -150,14 +115,13 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
-            const onChangeSelect = (value) => {
-
+            const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
                 const copy = { ...selectedValue };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
                 store.setSelected(copy);
-                getContent(copy, false);
-                LinkToGeometry(copy);
+                store.getContent(copy, false);
+                store.LinkToGeometry(copy);
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
@@ -381,9 +345,7 @@ export default observer(
                                 )}
                                 {store.selected && store.selected.permission !== "Forbidden" && (
                                     <div className="content">
-                                        <ContentComponent
-                                            // linkToGeometryFeature={linkToGeometryFeature} 
-                                            store={store} display={display} />
+                                        <ContentComponent store={store} display={display} />
                                     </div>
                                 )}
                                 {op === "popup" && (<div className="footer-popup">

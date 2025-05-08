@@ -31,7 +31,7 @@ import type { StoreGroupConfig, StoreItemConfig } from "../compat/type";
 import { entrypointsLoader } from "../compat/util/entrypointLoader";
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
 import { Identify } from "../map-controls/tool/Identify";
-import { IdentifyModule } from "../identify-module";
+import { IModule } from "../imodule";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { MapStore } from "../ol/MapStore";
@@ -77,7 +77,7 @@ export class Display {
     mapStates: IMapStatesObserver;
     mapToolbar?: MapToolbar;
 
-    identify_module?: IdentifyModule;
+    imodule?: IModule;
     identify?: Identify;
     featureHighlighter: FeatureHighlighter;
     readonly plugins: Record<string, PluginBase> = {};
@@ -263,13 +263,13 @@ export class Display {
 
         const controlsReady = buildControls(this);
 
-        if (this.clientSettings.identify_module) {
+        if (this.clientSettings.imodule) {
             if (controlsReady.has("im")) {
                 const { control } = controlsReady.get("im");
-                this.identify_module = control;
-                this.mapStates.addState("identify_module", this.identify_module);
-                this.mapStates.setDefaultState("identify_module", true);
-                this._identifyModuleUrlParams();
+                this.imodule = control;
+                this.mapStates.addState("imodule", this.imodule);
+                this.mapStates.setDefaultState("imodule", true);
+                this._iModuleUrlParams();
             }
         } else {
             if (controlsReady.has("id")) {
@@ -676,7 +676,7 @@ export class Display {
         });
     }
 
-    private _identifyModuleUrlParams() {
+    private _iModuleUrlParams() {
         const urlParams = this.urlParams;
         if (
             !(
@@ -694,7 +694,7 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        this.identify_module?.identifyModuleUrlParams({ lon, lat, attribute, st, slf, pn })
+        this.imodule?.iModuleUrlParams({ lon, lat, attribute, st, slf, pn })
             .then((result) => {
                 if (result) return;
                 errorModal({
@@ -757,7 +757,7 @@ export class Display {
         } else {
             activePanelKey = this.config.active_panel
         }
-        
+
         const onChangePanel = (panel?: PanelStore) => {
             if (panel) {
                 setURLParam("panel", panel.name);

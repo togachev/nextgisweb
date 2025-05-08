@@ -31,7 +31,7 @@ const { Title } = Typography;
 
 const INPUT_DEFAULT_WIDTH = { width: "100%" };
 
-const identifyModuleMsg = gettext(
+const iModuleMsg = gettext(
     "Updated identification popup"
 );
 
@@ -63,7 +63,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             setGeocoder(allValues.address_geocoder);
         }
     };
-    
+
     return (
         <Form
             name="webmap_settings"
@@ -148,12 +148,12 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                     <Space direction="horizontal">
                         <Form.Item
                             noStyle
-                            name="identify_module"
+                            name="imodule"
                             valuePropName="checked"
                         >
                             <Switch />
                         </Form.Item>
-                        {identifyModuleMsg}
+                        {iModuleMsg}
                     </Space>
                 </Col>
                 <Col span={8}>

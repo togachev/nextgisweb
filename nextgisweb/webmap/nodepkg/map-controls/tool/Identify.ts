@@ -11,7 +11,7 @@ import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";

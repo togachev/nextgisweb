@@ -114,7 +114,7 @@ export const FeatureGridActions = observer(
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
                 <Space.Compact key="feature-item-open">
-                    {!webmapSettings.identify_module && (<Tooltip title={!props.isFit && msgOpenTitle}>
+                    {!webmapSettings.imodule && (<Tooltip title={!props.isFit && msgOpenTitle}>
                         <Button
                             disabled={!selectedIds.length}
                             size={size}
@@ -123,7 +123,6 @@ export const FeatureGridActions = observer(
                             {props.isFit && msgOpenTitle}
                         </Button>
                     </Tooltip>)}
-
                     <Tooltip title={msgOpenOnNewPage} key="open-new-page">
                         <Button
                             disabled={!selectedIds.length}

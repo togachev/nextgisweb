@@ -14,7 +14,7 @@ export const useSource = (display: Display) => {
     const attrs = opts["webmap.identification_attributes"];
 
     const generateUrl = ({ res, st, pn }) => {
-        const imodule = display.identify_module;
+        const imodule = display.imodule;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
         const webmapId = display.config.webmapId;

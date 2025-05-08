@@ -36,7 +36,7 @@ export interface WebmapSettings {
     legend_symbols: unknown;
     hide_nav_menu: boolean;
     offset_point: number;
-    identify_module: boolean;
+    imodule: boolean;
     popup_size: PopupSize;
 }
 

@@ -1,4 +1,3 @@
-import { FC } from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
@@ -7,11 +6,10 @@ import VectorLink from "@nextgisweb/icon/mdi/vector-link";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import { observer } from "mobx-react-lite";
 
-export const CoordinateComponent: FC = observer(({ store, display, count, op }) => {
+export const CoordinateComponent = observer(({ store, display, count, op }) => {
     const { copyValue, contextHolder } = useCopy();
-    const imodule = display.identify_module;
-    const lon = imodule.lonlat[0];
-    const lat = imodule.lonlat[1];
+    const imodule = display.imodule;
+    const [lon, lat] = imodule.lonlat;
 
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);

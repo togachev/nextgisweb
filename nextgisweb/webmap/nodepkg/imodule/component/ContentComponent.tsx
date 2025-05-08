@@ -12,10 +12,10 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { observer } from "mobx-react-lite";
-import { GraphPanel } from "@nextgisweb/webmap/identify-module/component/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/imodule/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
-import { getEntries } from "@nextgisweb/webmap/identify-module/hook/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 
 import type { OptionProps, ContentProps } from "../type";
@@ -24,7 +24,7 @@ const { Link } = Typography;
 const settings = webmapSettings;
 
 const LinkToGeometryFeature = ({ store, display }) => {
-    const imodule = display.identify_module;
+    const imodule = display.imodule;
     const { copyValue, contextHolder } = useCopy();
 
     if (store.selected) {

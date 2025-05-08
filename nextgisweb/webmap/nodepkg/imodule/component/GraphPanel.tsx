@@ -27,7 +27,7 @@ export const GraphPanel = observer(({ item, store }) => {
     const [result, setResult] = useState();
 
     const chartRef = useRef(null);
-    const imodule = webmapSettings.identify_module;
+    const imodule = webmapSettings.imodule;
 
     const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 

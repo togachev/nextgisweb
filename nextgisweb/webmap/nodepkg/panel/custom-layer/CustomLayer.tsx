@@ -14,7 +14,7 @@ import { DrawFeatures } from "./DrawFeatures";
 const loading = gettext("Loading")
 const creation = gettext("Creation")
 
-const disableIdentifyModule = gettext("When the panel is active, layer identification is disabled.");
+const disableIModule = gettext("When the panel is active, layer identification is disabled.");
 
 const CustomLayer = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
@@ -36,10 +36,10 @@ const CustomLayer = observer<PanelPluginWidgetProps>(({ store, display }) => {
     ];
 
     let info = null;
-    if (disableIdentifyModule) {
+    if (disableIModule) {
         info = (
             <Alert
-                message={disableIdentifyModule}
+                message={disableIModule}
                 type="warning"
                 closable
             />

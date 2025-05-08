@@ -17,7 +17,7 @@ class IdentifyBody(Struct, kw_only=True):
     srs: int
     styles: List[int]
 
-class IdentifyModuleBody(Struct, kw_only=True):
+class IModuleBody(Struct, kw_only=True):
     geom: str
     srs: int
     styles: List[object]
@@ -81,7 +81,7 @@ def identify(request, *, body: IdentifyBody) -> JSONType:
 
     return result
 
-def identify_module(request, *, body: IdentifyModuleBody) -> JSONType:
+def imodule(request, *, body: IModuleBody) -> JSONType:
 
     try:
         geom = Geometry.from_wkt(body.geom, srid=body.srs)
@@ -166,7 +166,7 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "feature_layer.identify_module",
-        "/api/feature_layer/identify_module",
-        post=identify_module,
+        "feature_layer.imodule",
+        "/api/feature_layer/imodule",
+        post=imodule,
     )

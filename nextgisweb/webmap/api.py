@@ -393,7 +393,7 @@ csetting("measurement_srid", int, default=4326)
 csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
 csetting("max_count_file_upload", float, default=10)
-csetting("identify_module", bool, default=False)
+csetting("imodule", bool, default=False)
 csetting("offset_point", int, default=10)
 csetting("popup_size", PopupSize, default=dict(width=350, height=350))
 

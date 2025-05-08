@@ -15,6 +15,6 @@ panelRegistry(COMP_ID, {
     applyToTinyMap: true,
 
     isEnabled: () => {
-        return !webmapSettings.identify_module;
+        return !webmapSettings.imodule;
     },
 });

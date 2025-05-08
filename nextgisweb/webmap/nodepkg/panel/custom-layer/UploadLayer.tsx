@@ -135,12 +135,12 @@ export function UploadLayer({ display }: Display) {
 
             if (display.panelManager.getActivePanelName() === "custom-layer") {
                 setFeatures(displayFeatureInfo(e.pixel));
-                if (display.identify_module?.identifyStore) {
-                    const imodule = display.identify_module
+                if (display.imodule?.iStore) {
+                    const imodule = display.imodule
                     imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
                     topic.publish("feature.unhighlight");
-                    imodule.identifyStore.setFullscreen(false)
-                    imodule.identifyStore.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                    imodule.iStore.setFullscreen(false)
+                    imodule.iStore.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
                 }
             }
         });
