@@ -4,7 +4,7 @@ import { EditIcon } from "@nextgisweb/gui/icon";
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { findNode } from "@nextgisweb/gui/util/tree";
-
+import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import type { PluginBase } from "../plugin/PluginBase";
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
@@ -33,6 +33,8 @@ export type TreeWebmapItem = TreeNodeData & {
     legendIcon?: React.ReactNode;
     treeItem: TreeItemConfig;
 };
+
+const iconResources = ["wmsclient_layer", "tmsclient_layer", "tileset"]
 
 interface LayersTreeProps {
     store: WebmapStore;
@@ -231,7 +233,12 @@ export const LayersTree = observer(
             const edit = item.type === "layer" && item.editable === true ? true : false;
             return (
                 <Row className="item-title">
-                    <Col className={edit ? "legend-title edit-title" : "legend-title"}>{title}</Col>
+                    <Col className={edit ? "legend-title edit-title" : "legend-title"}>
+                        {iconResources.includes(item.cls) && <span className="icon-resources">
+                            <SvgIcon icon={`rescls-${item.cls}`} />
+                        </span>}
+                        {title}
+                    </Col>
                     {edit && (<Col className="edit-icon"><EditIcon /></Col>)}
                 </Row>
             )

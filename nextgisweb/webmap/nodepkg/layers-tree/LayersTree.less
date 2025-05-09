@@ -7,8 +7,8 @@
     .ant-tree-treenode {
         padding: 0;
 
-        > .ant-tree-indent {
-            > .ant-tree-indent-unit {
+        >.ant-tree-indent {
+            >.ant-tree-indent-unit {
                 width: var(--ngw-webmap-layers-tree-indent);
 
                 &::before {
@@ -17,11 +17,11 @@
             }
         }
 
-        > .ant-tree-switcher {
+        >.ant-tree-switcher {
             margin-inline-end: 0;
             width: var(--ngw-webmap-layers-tree-switcher, 6px);
 
-            > .ant-tree-switcher-leaf-line {
+            >.ant-tree-switcher-leaf-line {
                 &::after {
                     width: 6px;
                     height: 14px;
@@ -30,8 +30,8 @@
         }
 
         &.ant-tree-treenode-leaf-last {
-            > .ant-tree-switcher {
-                > .ant-tree-switcher-leaf-line {
+            >.ant-tree-switcher {
+                >.ant-tree-switcher-leaf-line {
                     &::before {
                         height: 14px !important;
                     }
@@ -45,7 +45,7 @@
     }
 
     .ant-tree-switcher-line-icon {
-        vertical-align: -0.3em;
+        vertical-align: -0.2em;
     }
 
     .ant-tree-checkbox {
@@ -95,6 +95,10 @@
                     justify-content: space-between;
                     width: 100%;
                     flex-wrap: nowrap;
+
+                    .icon-resources {
+                        margin: 0 10px;
+                    }
                 }
 
                 .legend-title {
