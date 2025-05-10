@@ -34,7 +34,14 @@ export function PreviewLayer({
 
     const { data: resData, isLoading: isResLoading } = useRouteGet(
         "resource.item",
-        { id }
+        { id },
+        {
+            cache: true,
+            query: {
+                description: false,
+                serialization: "resource",
+            }
+        }
     );
 
     const layerType = useMemo(() => {
@@ -94,10 +101,10 @@ export function PreviewLayer({
         () =>
             extentData
                 ? {
-                      extent: extentData.extent,
-                      srs: { id: 4326 },
-                      padding,
-                  }
+                    extent: extentData.extent,
+                    srs: { id: 4326 },
+                    padding,
+                }
                 : undefined,
         [extentData, padding]
     );

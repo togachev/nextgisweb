@@ -53,9 +53,16 @@ export const FeatureGrid = observer(
             "feature_layer.feature.count",
             { id }
         );
-        const { data: resourceData, isLoading } = useRouteGet("resource.item", {
-            id,
-        });
+        const { data: resourceData, isLoading } = useRouteGet(
+            "resource.item",
+            { id },
+            {
+                cache: true,
+                query: {
+                    description: false,
+                }
+            }
+        );
 
         useEffect(() => {
             // Do not refresh on init version

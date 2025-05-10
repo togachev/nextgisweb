@@ -23,6 +23,9 @@ export async function updateFeaturesValue({
 }: UpdateFeaturesValue) {
     const res = await route("resource.item", resourceId).get({
         cache: true,
+        query: {
+            description: false,
+        }
     });
 
     const featureLayer = res.feature_layer;
