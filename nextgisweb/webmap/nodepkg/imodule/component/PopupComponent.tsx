@@ -343,7 +343,7 @@ export default observer(
                                         {editFeature}
                                     </div>
                                 )}
-                                {store.selected && store.selected.permission !== "Forbidden" && (
+                                {count > 0 && store.selected && store.selected.permission !== "Forbidden" && (
                                     <div className="content">
                                         <ContentComponent store={store} display={display} />
                                     </div>

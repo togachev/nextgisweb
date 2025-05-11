@@ -14,9 +14,12 @@ import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 import { load, lookup } from "./lookup";
 
-export const getFieldsInfo = async (resourceId: number) => {
+export const getFieldsInfo = async (resourceId: number, description?: boolean) => {
     const resourceInfo = await route("resource.item", resourceId).get({
         cache: true,
+        query: {
+            description: description,
+        }
     });
     const fieldmap: Map<string, FeatureLayerFieldRead> = new Map();
     const promises: Promise<Record<string, string>>[] = [];
@@ -106,7 +109,7 @@ export async function fieldValuesToDataSource(
                 dataItem.value = <a href={href}>{val as string}</a>;
             } else {
                 if (field.lookup_table) {
-                    
+
                     const lval = await lookup(
                         field.lookup_table.id,
                         val as string,
@@ -121,11 +124,11 @@ export async function fieldValuesToDataSource(
                 dataItem.value = getNumberValue(dataItem) as string;
             }
         }
-        
+
         // else {
         //     dataItem.value = gettext("N/A");
         // }
-        
+
         dataSource.push(dataItem);
     }
     return dataSource;

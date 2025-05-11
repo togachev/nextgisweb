@@ -174,7 +174,7 @@ export class Store {
                 extensions: null
             }
         if (res.permission !== "Forbidden") {
-            const fieldsInfo = await getFieldsInfo(resourceId);
+            const fieldsInfo = await getFieldsInfo(resourceId, false);
             const { fields } = feature;
             const abortController = new AbortController();
             const dataSource = fieldValuesToDataSource(fields, fieldsInfo, {
