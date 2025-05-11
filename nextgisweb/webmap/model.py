@@ -42,6 +42,7 @@ Base.depends_on("resource")
 ACTIVE_PANEL_VALUES = ("layers", "search", "custom-layer", "print", "bookmark", "info", "share", "annotation", "none")
 ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
+LAYER_GEOM_EXISTS = ("mapserver_style", "qgis_vector_style")
 
 class WebMapScope(Scope):
     identity = "webmap"
@@ -283,6 +284,15 @@ class WebMapItem(Base):
     def scale_range(self):
         return (self.layer_min_scale_denom, self.layer_max_scale_denom)
 
+    def _resource_cls(self, id):
+        if self.layer_style_id is not None:
+            (res_cls,) = DBSession.query(Resource.cls).where(Resource.id == id).one()
+            if res_cls in LAYER_GEOM_EXISTS:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 @sa_event.listens_for(WebMapItem, "load")
 def load_webmap_item_children(target, context):
@@ -346,7 +356,8 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
     layer_adapter: str
     draw_order_position: Union[int, None]
     legend_symbols: Union[LegendSymbolsEnum, None]
-
+    check_geom_exists: bool
+            
     @classmethod
     def from_model(cls, obj):
         style_parent_id = None
@@ -368,6 +379,7 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
             draw_order_position=obj.draw_order_position,
             legend_symbols=obj.legend_symbols,
             style_parent_id=style_parent_id,
+            check_geom_exists=obj._resource_cls(obj.layer_style_id),
         )
 
 

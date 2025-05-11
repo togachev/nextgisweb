@@ -125,6 +125,7 @@ const {
     legend_symbols: layerLegendSymbols,
     layer_style_id: layerStyleId,
     draw_order_position: layerDrawOrderPosition,
+    check_geom_exists: checkGeomExists,
     $load: layerLoad,
     $error: layerError,
 } = mapper<Layer, WebMapItemLayerWrite>(mapperOpts);
@@ -144,6 +145,7 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
     readonly layerLegendSymbols = layerLegendSymbols.init(null, this);
     readonly layerStyleId = layerStyleId.init(-1, this);
     readonly layerDrawOrderPosition = layerDrawOrderPosition.init(null, this);
+    readonly checkGeomExists = checkGeomExists.init(null, this);
 
     constructor(store: ItemsStore, data: ItemData<WebMapItemLayerWrite>) {
         super(store, data);

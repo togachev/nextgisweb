@@ -96,16 +96,18 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                         </CheckboxValue>
                     </Space>
                 </Lot>
-                <Lot row>
-                    <Space size="middle">
-                        <CheckboxValue {...item.layerHighligh.cprops()}>
-                            {msgLayerHighligh}
-                        </CheckboxValue>
-                        <CheckboxValue {...item.editGeom.cprops()}>
-                            {msgEditGeom}
-                        </CheckboxValue>
-                    </Space>
-                </Lot>
+                {item.checkGeomExists.value &&
+                    <Lot row>
+                        <Space size="middle">
+                            <CheckboxValue {...item.layerHighligh.cprops()}>
+                                {msgLayerHighligh}
+                            </CheckboxValue>
+                            <CheckboxValue {...item.editGeom.cprops()}>
+                                {msgEditGeom}
+                            </CheckboxValue>
+                        </Space>
+                    </Lot>
+                }
                 <LotMV
                     row
                     label={msgResource}
@@ -156,7 +158,7 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                     props={{ mode: "transparency", valuePercent: true }}
                 />
             </Area>
-            <Area pad  labelColumn={false}>
+            <Area pad labelColumn={false}>
                 <ResourceFile id={item.layerStyleId.value} {...item.fileResourceVisible.cprops()} />
             </Area>
         </>
