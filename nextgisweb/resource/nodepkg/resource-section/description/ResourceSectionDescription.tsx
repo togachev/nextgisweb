@@ -2,7 +2,7 @@ import { useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
 import { Collapse, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { LoadingOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, LoadingOutlined } from "@ant-design/icons";
 import { DescComponent } from "@nextgisweb/resource/description";
 import type { ResourceSection } from "../type";
 import type { CollapseProps } from "@nextgisweb/gui/antd";
@@ -61,10 +61,13 @@ export const ResourceSectionDescription: ResourceSection = ({
 
     return (
         <div className="description-panel">
-            {!descValue ?
-                <Collapse size="large" items={items} onChange={showLoader} /> :
-                <Collapse size="large" items={items} defaultActiveKey={["description"]} onChange={onChange} />
-            }
+            <Collapse
+                defaultActiveKey={!descValue ? [] : ["description"]}
+                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                size="small"
+                items={items}
+                onChange={!descValue ? showLoader : onChange}
+            />
         </div>
     );
 };

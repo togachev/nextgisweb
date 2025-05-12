@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
@@ -12,7 +12,10 @@ import type { CoordinateProps } from "../type";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 export const CoordinateComponent = observer((props) => {
-    const { store, display, count, op } = props as CoordinateProps
+    const { store: storeProp, display, op } = props as CoordinateProps
+
+    const [store] = useState(() => storeProp);
+
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.imodule;
     const [lon, lat] = imodule.lonlat;
@@ -23,12 +26,12 @@ export const CoordinateComponent = observer((props) => {
     const msgUpdate = [
         gettext("Update web map url."),
         gettext("Double click will return the original page address."),
-        gettext("Right click will update the page address without creating a popup."),
+        gettext("Right click to update the address with the current web map coverage."),
     ];
 
     const msgCopy = [
-        count > 0 ? gettext("Copy link to object") : gettext("Copy link to location"),
-        gettext("Right click will copy the page address without creating a popup."),
+        store.countFeature > 0 ? gettext("Copy link to object") : gettext("Copy link to location"),
+        gettext("Right click to copy the current web map coverage."),
     ];
 
     const handleClick = useCallback((e) => {
@@ -36,31 +39,33 @@ export const CoordinateComponent = observer((props) => {
         switch (e.type) {
             case "click":
                 if (e.detail === 2) {
-                    window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))
-                }
-                if (e.detail === 1) {
-                    window.history.pushState({}, "", store.contextUrl)
+                    window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId));
+                } else if (e.detail === 1) {
+                    window.history.pushState({}, "", store.contextUrl);
                 }
                 break;
             case "contextmenu":
                 display.getVisibleItems().then((visibleItems) => {
                     const permalink = getPermalink({ display, visibleItems });
-                    window.history.pushState({}, "", permalink)
+                    window.history.pushState({}, "", decodeURIComponent(permalink));
                 });
                 break;
         }
     }, []);
 
     const handleClickCopy = useCallback((e) => {
+        const messageClickCopy = store.countFeature > 0 ? gettext("Object reference copied") : gettext("Location link copied");
+        const messageContextMenuCopy = gettext("Current web map coverage copied");
+
         e.preventDefault();
         switch (e.type) {
             case "click":
-                copyValue(store.contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"));
+                copyValue(store.contextUrl, messageClickCopy);
                 break;
             case "contextmenu":
                 display.getVisibleItems().then((visibleItems) => {
                     const permalink = getPermalink({ display, visibleItems });
-                    copyValue(permalink, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"));
+                    copyValue(decodeURIComponent(permalink), messageContextMenuCopy);
                 });
                 break;
         }

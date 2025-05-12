@@ -46,7 +46,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                     ))}
                 </dl>
             )}
-            {read && cls === "webmap" && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
+            {read && cls === "webmap" && (<Divider orientation="left">{gettext("Web Map Groups")}</Divider>)}
             {read && cls === "webmap" && groupMap.length > 0 && (
                 <Flex gap="4px 0" wrap>
                     {groupMap.map((k, idx) => (

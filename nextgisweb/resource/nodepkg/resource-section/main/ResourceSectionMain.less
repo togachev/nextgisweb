@@ -3,13 +3,13 @@ dl.ngw-resource-main-section-summary {
     grid-template-columns: auto 1fr;
     gap: 8px 4px;
 
-    > dt,
-    > dd {
+    >dt,
+    >dd {
         margin: 0;
         padding: 0;
     }
 
-    > dt {
+    >dt {
         display: flex;
         gap: 4px;
         min-width: 15ch;
@@ -18,11 +18,9 @@ dl.ngw-resource-main-section-summary {
         &:after {
             display: inline-block;
             flex-grow: 1;
-            background-image: radial-gradient(
-                circle,
-                currentcolor 0.75px,
-                transparent 0.75px
-            );
+            background-image: radial-gradient(circle,
+                    currentcolor 0.75px,
+                    transparent 0.75px);
             background-position: left 0 top 10px;
             background-size: 6px 10px;
             background-repeat: repeat-x;
@@ -30,4 +28,9 @@ dl.ngw-resource-main-section-summary {
             content: "";
         }
     }
+}
+
+.ant-divider-horizontal.ant-divider-with-text::before,
+.ant-divider-horizontal.ant-divider-with-text::after {
+    transform: translateY(0%);
 }

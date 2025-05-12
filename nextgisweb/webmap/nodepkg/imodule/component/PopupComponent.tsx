@@ -53,8 +53,9 @@ export default observer(
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
             const geoms = opts["webmap.identification_geometry"];
+
             const imodule = display.imodule;
-            const count = imodule.countFeature;
+
             const offHP = imodule.offHP;
             const offset = display.clientSettings.offset_point;
             const fX = offHP + offset;
@@ -82,19 +83,21 @@ export default observer(
             
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
-                if (count > 0) {
+                if (imodule.countFeature > 0) {
                     const selectVal = selectedValue ? selectedValue : response.data[0];
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
                     store.setSelected(selectVal);
                     store.setData(response.data);
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
+                    store.setCountFeature(imodule.countFeature);
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
                     store.setData([]);
                     store.setLinkToGeometry("");
                     topic.publish("feature.unhighlight");
+                    store.setCountFeature(0);
                 }
             }, [response]);
 
@@ -136,7 +139,7 @@ export default observer(
             }
 
             const editFeature = useMemo(() => {
-                if (count > 0 && store.selected) {
+                if (store.countFeature > 0 && store.selected) {
                     const { id, layerId, styleId } = store.selected;
                     const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
 
@@ -177,7 +180,7 @@ export default observer(
             }, [store.selected]);
 
             const contentProps = { store: store, display: display };
-            const coordinateProps = { display: display, count: count, store: store, op: "popup" };
+            const coordinateProps = { display: display, store: store, op: "popup" };
 
             return (
                 createPortal(
@@ -243,10 +246,10 @@ export default observer(
                             minWidth={position.width}
                             minHeight={position.height}
                             allowAnyClick={true}
-                            enableResizing={count > 0 ? (store.fixPos === null ? true : false) : false}
-                            disableDragging={count > 0 && store.fixPos !== null ? true : false}
-                            position={count > 0 && store.fixPos !== null ? { x: store.fixPos?.x, y: store.fixPos?.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
-                            size={count > 0 && store.fixPos !== null ? { width: store.fixPos?.width, height: store.fixPos?.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
+                            enableResizing={store.countFeature > 0 ? (store.fixPos === null ? true : false) : false}
+                            disableDragging={store.countFeature > 0 && store.fixPos !== null ? true : false}
+                            position={store.countFeature > 0 && store.fixPos !== null ? { x: store.fixPos?.x, y: store.fixPos?.y } : { x: store.valueRnd.x, y: store.valueRnd.y }}
+                            size={store.countFeature > 0 && store.fixPos !== null ? { width: store.fixPos?.width, height: store.fixPos?.height } : { width: store.valueRnd.width, height: store.valueRnd.height }}
                             onDragStop={(e, d) => {
                                 if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
                                     store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
@@ -264,7 +267,7 @@ export default observer(
                                 <div className="title">
                                     <div className="title-name"
                                         onClick={(e) => {
-                                            if (count > 0 && e.detail === 2) {
+                                            if (store.countFeature > 0 && e.detail === 2) {
                                                 setTimeout(() => {
                                                     if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
                                                         store.setValueRnd({ ...store.valueRnd, width: position.width, height: position.height, x: position.x, y: position.y });
@@ -279,8 +282,8 @@ export default observer(
                                             }
                                         }}
                                     >
-                                        <span className="object-select">Объектов: {count}</span>
-                                        {count > 0 && store.selected && (
+                                        <span className="object-select">Объектов: {store.countFeature}</span>
+                                        {store.countFeature > 0 && store.selected && (
                                             <span
                                                 title={store.selected?.desc}
                                                 className="layer-name">
@@ -288,13 +291,13 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    {count > 0 && <CheckOnlyOne store={store} />}
-                                    {count > 0 && store.selected && (
+                                    {store.countFeature > 0 && <CheckOnlyOne store={store} />}
+                                    {store.countFeature > 0 && store.selected && (
                                         <span
                                             title={store.fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}
-                                            className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                            className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                             onClick={() => {
-                                                if (count > 0 && store.fixPos === null) {
+                                                if (store.countFeature > 0 && store.fixPos === null) {
                                                     if (store.valueRnd.width > position.width || store.valueRnd.height > position.height) {
                                                         store.setValueRnd({ ...store.valueRnd, width: position.width, height: position.height, x: position.x, y: position.y });
                                                         store.setFullscreen(false)
@@ -313,7 +316,7 @@ export default observer(
                                     )}
                                     <span
                                         title={gettext("Close")}
-                                        className={count > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                        className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
                                             visible({ hidden: true, overlay: undefined, key: "popup" })
                                             topic.publish("feature.unhighlight");
@@ -323,7 +326,7 @@ export default observer(
                                         <CloseIcon />
                                     </span>
                                 </div>
-                                {count > 0 && store.selected && (
+                                {store.countFeature > 0 && store.selected && (
                                     <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
                                         <Select
                                             labelInValue
@@ -348,7 +351,7 @@ export default observer(
                                         {editFeature}
                                     </div>
                                 )}
-                                {count > 0 && store.selected && store.selected.permission !== "Forbidden" && (
+                                {store.countFeature > 0 && store.selected && store.selected.permission !== "Forbidden" && (
                                     <div className="content">
                                         <ContentComponent {...contentProps} />
                                     </div>

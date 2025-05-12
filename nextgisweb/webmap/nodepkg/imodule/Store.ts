@@ -9,6 +9,7 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
     @observable accessor layerName: string | null = null;
+    @observable accessor countFeature: number | null = null;
     @observable accessor fixPopup = false;
     @observable accessor hideLegend = true;
     @observable accessor update = false;
@@ -38,6 +39,11 @@ export class Store {
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
     }
+
+    @action
+    setCountFeature(countFeature: number) {
+        this.countFeature = countFeature;
+    };
 
     @action
     setValueRnd(valueRnd: Rnd) {
@@ -137,7 +143,7 @@ export class Store {
             }) :
             topic.publish("feature.unhighlight")
 
-        this.generateUrl({ res: val, st: this.data, pn: this.fixPanel });
+        this.generateUrl({ res: val, st: this.data, pn: this.fixPanel, disable: false });
 
         if (key === true) {
             this.setUpdate(false);
@@ -201,9 +207,7 @@ export class Store {
                         styles.push(item.styleId);
                     }
                 });
-                return styles;
-            })
-            .then(styles => {
+
                 const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
                 const result = [...new Set(st?.map(a => a.styleId))];
 
@@ -226,7 +230,7 @@ export class Store {
                 const url = routeURL("webmap.display", webmapId);
                 const link = origin + url + "?" + paramsUrl.toString();
 
-                this.setContextUrl(link);
+                this.setContextUrl(decodeURIComponent(link));
             })
     };
 
