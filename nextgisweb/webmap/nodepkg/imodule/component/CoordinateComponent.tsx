@@ -1,5 +1,7 @@
+import { useCallback } from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { Button } from "@nextgisweb/gui/antd";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import VectorLink from "@nextgisweb/icon/mdi/vector-link";
@@ -7,6 +9,7 @@ import UpdateLink from "@nextgisweb/icon/mdi/update";
 import { observer } from "mobx-react-lite";
 
 import type { CoordinateProps } from "../type";
+import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 export const CoordinateComponent = observer((props) => {
     const { store, display, count, op } = props as CoordinateProps
@@ -20,7 +23,50 @@ export const CoordinateComponent = observer((props) => {
     const msgUpdate = [
         gettext("Update web map url."),
         gettext("Double click will return the original page address."),
+        gettext("Right click will update the page address without creating a popup."),
     ];
+
+    const msgCopy = [
+        count > 0 ? gettext("Copy link to object") : gettext("Copy link to location"),
+        gettext("Right click will copy the page address without creating a popup."),
+    ];
+
+    const handleClick = useCallback((e) => {
+        e.preventDefault();
+        switch (e.type) {
+            case "click":
+                if (e.detail === 2) {
+                    window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))
+                }
+                if (e.detail === 1) {
+                    window.history.pushState({}, "", store.contextUrl)
+                }
+                break;
+            case "contextmenu":
+                display.getVisibleItems().then((visibleItems) => {
+                    const permalink = getPermalink({ display, visibleItems });
+                    window.history.pushState({}, "", permalink)
+                });
+                break;
+        }
+    }, []);
+
+    const handleClickCopy = useCallback((e) => {
+        e.preventDefault();
+        switch (e.type) {
+            case "click":
+                copyValue(store.contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"));
+                break;
+            case "contextmenu":
+                display.getVisibleItems().then((visibleItems) => {
+                    const permalink = getPermalink({ display, visibleItems });
+                    copyValue(permalink, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"));
+                });
+                break;
+        }
+    }, []);
+
+
 
     return (
         <div className="footer-coordinate-component">
@@ -37,23 +83,22 @@ export const CoordinateComponent = observer((props) => {
             </span>
             {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
                 <div className="link-block">
-                    <span className="link-button"
+                    <Button
+                        type="text"
+                        icon={<UpdateLink />}
                         title={msgUpdate.join("\n")}
-                        onClick={(e) => {
-                            if (e.detail === 2) {
-                                window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))
-                            }
-                            if (e.detail === 1) {
-                                window.history.pushState({}, "", store.contextUrl)
-                            }
-                        }}
-                    ><UpdateLink /></span>
-                    <span className="link-button"
-                        title={count > 0 ? gettext("Copy link to object") : gettext("Copy link to location")}
-                        onClick={() => {
-                            copyValue(store.contextUrl, count > 0 ? gettext("Object reference copied") : gettext("Location link copied"))
-                        }}
-                    ><VectorLink /></span>
+                        className="link-button"
+                        onClick={handleClick}
+                        onContextMenu={handleClick}
+                    />
+                    <Button
+                        type="text"
+                        icon={<VectorLink />}
+                        title={msgCopy.join("\n")}
+                        className="link-button"
+                        onClick={handleClickCopy}
+                        onContextMenu={handleClickCopy}
+                    />
                 </div>
             )}
         </div>

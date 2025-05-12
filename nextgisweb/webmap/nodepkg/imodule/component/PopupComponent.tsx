@@ -90,7 +90,7 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                 } else {
-                    store.generateUrl({ res: null, st: null, pn: null });
+                    store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
                     store.setData([]);
                     store.setLinkToGeometry("");
@@ -99,7 +99,7 @@ export default observer(
             }, [response]);
 
             useEffect(() => {
-                store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel })
+                store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel, disable: false })
             }, [store.currentUrlParams]);
 
             useEffect(() => {
