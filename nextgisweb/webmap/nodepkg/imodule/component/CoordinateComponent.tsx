@@ -6,7 +6,10 @@ import VectorLink from "@nextgisweb/icon/mdi/vector-link";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import { observer } from "mobx-react-lite";
 
-export const CoordinateComponent = observer(({ store, display, count, op }) => {
+import type { CoordinateProps } from "../type";
+
+export const CoordinateComponent = observer((props) => {
+    const { store, display, count, op } = props as CoordinateProps
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.imodule;
     const [lon, lat] = imodule.lonlat;

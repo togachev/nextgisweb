@@ -193,7 +193,7 @@ export class IModule extends Component {
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
             if (this.display.config.identify_order_enabled) {
-                this.response.data.sort((a, b) => a.dop - b.dop);
+                this.response.data.sort((a, b) => Number(a.dop) - Number(b.dop));
             } else {
                 if (!p) {
                     const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});

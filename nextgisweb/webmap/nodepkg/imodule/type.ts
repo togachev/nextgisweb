@@ -19,7 +19,7 @@ export interface DataProps {
     label?: string;
     layerId?: number;
     desc?: string;
-    dop: number;
+    dop?: number;
     styleId?: number;
     value?: string;
     permission?: string;
@@ -138,6 +138,13 @@ export type OptionProps = {
 export type ContentProps = {
     display: Display;
     store: Store;
+}
+
+export type CoordinateProps = {
+    display: Display;
+    store: Store;
+    count: number;
+    op: string;
 }
 
 export interface FeatureIdentify<F extends Attrs = Attrs> {

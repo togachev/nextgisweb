@@ -172,7 +172,10 @@ export default observer(
                         )
                     }
                 }
-            }, [store.selected])
+            }, [store.selected]);
+
+            const contentProps = { store: store, display: display };
+            const coordinateProps = { display: display, count: count, store: store, op: "popup" };
 
             return (
                 createPortal(
@@ -345,11 +348,11 @@ export default observer(
                                 )}
                                 {count > 0 && store.selected && store.selected.permission !== "Forbidden" && (
                                     <div className="content">
-                                        <ContentComponent store={store} display={display} />
+                                        <ContentComponent {...contentProps} />
                                     </div>
                                 )}
                                 {op === "popup" && (<div className="footer-popup">
-                                    <CoordinateComponent display={display} count={count} store={store} op="popup" />
+                                    <CoordinateComponent {...coordinateProps} />
                                 </div>)}
                             </div>
                         </Rnd >
