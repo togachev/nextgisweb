@@ -129,8 +129,7 @@ export class Store {
         });
 
         const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
-        console.log(highlights);
-        
+
         highlights === true ?
             topic.publish("feature.highlight", {
                 geom: res.feature.geom,
@@ -194,35 +193,40 @@ export class Store {
         const webmapId = this.display.config.webmapId;
         const zoom = this.display.map.zoom;
 
-        const styles: string[] = [];
-        Object.entries(this.display.webmapStore._layers).find(item => {
-            const itm: StoreItem = item[1];
-            if (itm.itemConfig.visibility === true) {
-                styles.push(itm.itemConfig.styleId);
-            }
-        });
+        this.display.getVisibleItems()
+            .then((items) => {
+                const styles: string[] = [];
+                items.forEach((i) => {
+                    const item = this.display.itemStore.dumpItem(i);
+                    if (item.visibility === true) {
+                        styles.push(item.styleId);
+                    }
+                });
+                return styles;
+            })
+            .then(styles => {
+                const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+                const result = [...new Set(st?.map(a => a.styleId))];
 
-        const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-        const result = [...new Set(st?.map(a => a.styleId))];
+                const panel = this.display.panelManager.getActivePanelName();
 
-        const panel = this.display.panelManager.getActivePanelName();
+                const obj = res ?
+                    { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
+                    { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
 
-        const obj = res ?
-            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
-            { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
+                panel !== "share" && Object.assign(obj, { panel: panel });
 
-        panel !== "share" && Object.assign(obj, { panel: panel });
+                const paramsUrl = new URLSearchParams();
 
-        const paramsUrl = new URLSearchParams();
+                Object.entries(obj)?.map(([key, value]) => {
+                    paramsUrl.append(key, value);
+                })
 
-        Object.entries(obj)?.map(([key, value]) => {
-            paramsUrl.append(key, value);
-        })
+                const url = routeURL("webmap.display", webmapId);
+                const link = origin + url + "?" + paramsUrl.toString();
 
-        const url = routeURL("webmap.display", webmapId);
-        const link = origin + url + "?" + paramsUrl.toString();
-
-        this.setContextUrl(link);
+                this.setContextUrl(link);
+            })
     };
 
     async LinkToGeometry(value: DataProps) {

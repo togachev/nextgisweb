@@ -6,7 +6,7 @@ import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
 import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 
-import { IdentifyStore } from "../IdentifyStore";
+import { Store } from "../Store";
 
 export interface RelationProps {
     external_resource_id: number;
@@ -19,7 +19,7 @@ export interface DataProps {
     label?: string;
     layerId?: number;
     desc?: string;
-    dop?: number;
+    dop: number;
     styleId?: number;
     value?: string;
     permission?: string;
@@ -27,8 +27,8 @@ export interface DataProps {
 }
 
 export interface UrlParamsProps {
-    lon: number | string;
-    lat: number | string;
+    lon?: number;
+    lat?: number;
     attribute: string | boolean;
     st?: string;
     slf?: string;
@@ -137,7 +137,7 @@ export type OptionProps = {
 
 export type ContentProps = {
     display: Display;
-    store: IdentifyStore;
+    store: Store;
 }
 
 export interface FeatureIdentify<F extends Attrs = Attrs> {

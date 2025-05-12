@@ -182,7 +182,7 @@ export class IModule extends Component {
                 const wktPoint = wkt.readGeometry(t.geom);
                 if (wktPoint instanceof SimpleGeometry) {
                     const transformedCoord = wktPoint.getCoordinates();
-                    this.lonlat = transformedCoord;
+                    this.lonlat = transformedCoord ? transformedCoord : [];
                 }
             });
     }
@@ -261,8 +261,8 @@ export class IModule extends Component {
                         const item = itemConfig[i.id];
                         if (
                             !item.identifiable ||
-                            mapResolution >= item.maxResolution ||
-                            mapResolution < item.minResolution
+                            mapResolution && mapResolution >= item.maxResolution ||
+                            mapResolution && mapResolution < item.minResolution
                         ) {
                             return;
                         }
@@ -343,14 +343,16 @@ export class IModule extends Component {
                 json: {
                     srs_from: 4326,
                     srs_to: Array.from(srsMap.keys()),
-                    geom: wkt.writeGeometry(new OlGeomPoint([val.lon, val.lat])),
+                    geom: wkt.writeGeometry(new OlGeomPoint([Number(val.lon), Number(val.lat)])),
                 },
             })
             .then((transformed) => {
                 const t = transformed.find(i => i.srs_id !== 4326)
                 const wktPoint = wkt.readGeometry(t.geom);
-                const transformedCoord = wktPoint.getCoordinates();
-                return transformedCoord;
+                if (wktPoint instanceof SimpleGeometry) {
+                    const transformedCoord = wktPoint.getCoordinates();
+                    return transformedCoord;
+                }
             })
             .then((transformedCoord) => {
                 const params: ParamsProps[] = [];
