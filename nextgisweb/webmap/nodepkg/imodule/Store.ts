@@ -120,7 +120,7 @@ export class Store {
         this.linkToGeometry = linkToGeometry;
     };
 
-    private async getContent(val: DataProps, key: boolean) {
+    async getContent(val: DataProps, key: boolean) {
         const res = await this.getAttribute(val, key);
         this.setExtensions(res.feature.extensions);
 
@@ -129,7 +129,8 @@ export class Store {
         });
 
         const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
-
+        console.log(highlights);
+        
         highlights === true ?
             topic.publish("feature.highlight", {
                 geom: res.feature.geom,
@@ -186,7 +187,7 @@ export class Store {
         }
     }
 
-    private async generateUrl({ res, st, pn }) {
+    async generateUrl({ res, st, pn }) {
         const imodule = this.display.imodule;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
@@ -224,7 +225,7 @@ export class Store {
         this.setContextUrl(link);
     };
 
-    private async LinkToGeometry(value: DataProps) {
+    async LinkToGeometry(value: DataProps) {
         const styles: number[] = [];
         const items = await this.display.getVisibleItems();
         items.map(i => {

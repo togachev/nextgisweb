@@ -19,7 +19,7 @@ export interface DataProps {
     label?: string;
     layerId?: number;
     desc?: string;
-    dop: number;
+    dop?: number;
     styleId?: number;
     value?: string;
     permission?: string;

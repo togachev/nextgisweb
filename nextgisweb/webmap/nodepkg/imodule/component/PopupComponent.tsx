@@ -93,13 +93,13 @@ export default observer(
                     store.generateUrl({ res: null, st: null, pn: null });
                     store.setSelected({});
                     store.setData([]);
-                    store.setLinkToGeometry(null);
+                    store.setLinkToGeometry("");
                     topic.publish("feature.unhighlight");
                 }
             }, [response]);
 
             useEffect(() => {
-                store.setContextUrl(store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel }));
+                store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel })
             }, [store.currentUrlParams]);
 
             useEffect(() => {
