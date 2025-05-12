@@ -15,24 +15,38 @@ Chart.register(...registerables);
 Chart.register(Title);
 
 import { context, params } from "../constant";
-import type { ContextItemProps } from "../type";
+import type { ContextItemProps, DataProps, GraphPanelProps, RelationProps } from "../type";
 
 import "./GraphPanel.less";
 
+type ResultProps = {
+    data: {
+        datasets: ContextItemProps[]
+    };
+    props: DataProps;
+}
+
 const emptyValue = (<Empty style={{ marginBlock: 10 }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)
 
-export const GraphPanel = observer(({ item, store }) => {
+export const GraphPanel = observer((props) => {
+    const { item, store: storeProp } = props as GraphPanelProps;
     const sizeFont = 16;
+    const [store] = useState(() => storeProp || undefined);
+    const [result, setResult] = useState<ResultProps>();
     const [hideLegend, setHideLegend] = useState(true);
-    const [result, setResult] = useState();
+    const [resize, setResize] = useState();
 
     const chartRef = useRef(null);
     const imodule = webmapSettings.imodule;
 
     const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 
-    const loadData = async (item) => {
-        const { external_resource_id, relation_key, relation_value } = item.relation;
+    useEffect(() => {
+        setResize(store?.fullscreen);
+    }, [store?.fullscreen, store?.valueRnd])
+
+    const loadData = async (item: DataProps) => {
+        const { external_resource_id, relation_key, relation_value } = item.relation as RelationProps;
         const key_rel = "fld_" + relation_key;
         const json = {
             [key_rel]: relation_value,
@@ -51,10 +65,10 @@ export const GraphPanel = observer(({ item, store }) => {
         });
 
         const data: ContextItemProps[] = [];
-        Object.keys(context).map(item => {
-            const copy: ContextItemProps = structuredClone(context[item]);
+        Object.keys(context).map(itm => {
+            const copy = structuredClone(context[itm]);
             feature.map(i => {
-                if (item === i.fields.type) {
+                if (itm === i.fields.type) {
                     Object.assign(copy, { key: i.fields.type });
                     Object.assign(copy, params);
                     copy.data.push({ y: i.fields.value, x: i.fields.year });
@@ -63,7 +77,6 @@ export const GraphPanel = observer(({ item, store }) => {
             })
             data.push(copy)
         })
-
         const obj = { props: item, data: { datasets: data } };
         feature.length > 0 ? setResult(obj) : setResult(undefined);
     }
@@ -83,10 +96,11 @@ export const GraphPanel = observer(({ item, store }) => {
                 checked={hideLegend}
                 onChange={onChange}
                 className="legend-hide-button"
-                title={hideLegend ? msgShowLegend : msgHideLegend}
-                style={!store?.fixPanel ? {} : { position: "absolute", right: 0 }}
+                style={!imodule && !store?.fixPanel ? {} : { position: "absolute", right: 0 }}
             >
-                {hideLegend ? <EyeOff /> : <Eye />}
+                <span title={hideLegend ? msgShowLegend : msgHideLegend}>
+                    {hideLegend ? <EyeOff /> : <Eye />}
+                </span>
             </Tag.CheckableTag>
         );
     };
@@ -165,7 +179,7 @@ export const GraphPanel = observer(({ item, store }) => {
 
         const styleResize = store?.fixPos !== null ?
             { height: store?.fixPos?.height - 76 } :
-            { height: store.valueRnd?.height - 76 }
+            { height: store?.valueRnd?.height - 76 }
 
         const styleGtaph = hideLegend ?
             { height: webmapSettings.popup_size.height } :
@@ -179,7 +193,7 @@ export const GraphPanel = observer(({ item, store }) => {
                     options={options}
                     plugins={[plugin]}
                     data={value?.data}
-                    style={store ? styleResize : undefined}
+                    style={imodule ? resize ? styleResize : styleResize : undefined}
                 />
             </div>
         )
@@ -187,23 +201,22 @@ export const GraphPanel = observer(({ item, store }) => {
 
     return (
         <>
-            <div className="panel-content-container">
-                <div className={!imodule ? "right-graph" : undefined}>
-                    {!imodule && (<h3>
-                        <LineChartOutlined />
-                        {msgGraphs}
-                    </h3>)}
-                    {result && !store?.fixPanel && item?.relation && (<HideLegend />)}
-                </div>
-            </div>
-            <div className="panel-content-container">
-                <div className="fill">
-                    <div className="relation-item">
-                        {result && store?.fixPanel === "relation" && item?.relation && (<HideLegend />)}
+            {!imodule ?
+                <div className="ngw-webmap-panel-section" style={{ color: "var(--primary)" }}>
+                    <div className="title">
+                        <div className="icon"><LineChartOutlined /></div>
+                        <div className="content">{msgGraphs}</div>
+                        <div className="suffix">{result && <HideLegend />}</div>
+                    </div>
+                    <div className="content">
                         {result ? (<GraphComponent value={result} />) : emptyValue}
                     </div>
+                </div> :
+                <div className="relation-item">
+                    {result && store?.fixPanel === "relation" && item?.relation && (<HideLegend />)}
+                    {result ? (<GraphComponent value={result} />) : emptyValue}
                 </div>
-            </div>
+            }
         </>
     );
 });

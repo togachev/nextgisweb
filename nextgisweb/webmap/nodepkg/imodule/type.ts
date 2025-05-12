@@ -9,9 +9,9 @@ import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 import { Store } from "../Store";
 
 export interface RelationProps {
-    external_resource_id: number;
-    relation_key: string;
-    relation_value: number;
+    external_resource_id?: number;
+    relation_key?: string;
+    relation_value?: number;
 }
 
 export interface DataProps {
@@ -118,10 +118,10 @@ export type AxisProps = {
 }
 
 export type ContextItemProps = {
-    label: string;
-    pointBorderColor: string;
-    backgroundColor: string;
-    borderColor: string;
+    label?: string;
+    pointBorderColor?: string;
+    backgroundColor?: string;
+    borderColor?: string;
     data: AxisProps[];
     labels: string[];
 }
@@ -145,6 +145,11 @@ export type CoordinateProps = {
     store: Store;
     count: number;
     op: string;
+}
+
+export type GraphPanelProps = {
+    store: Store;
+    item: DataProps;
 }
 
 export interface FeatureIdentify<F extends Attrs = Attrs> {

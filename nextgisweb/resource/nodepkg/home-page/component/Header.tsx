@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Button, Form, Input, Menu, Space, Typography } from "@nextgisweb/gui/antd";
-import type { MenuProps } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
@@ -18,6 +17,9 @@ import Cog from "@nextgisweb/icon/mdi/cog";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
 
+import type { MenuProps } from "@nextgisweb/gui/antd";
+import type { HomeStore } from "../HeaderProps";
+
 import "./Header.less";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -25,7 +27,11 @@ type MenuItem = Required<MenuProps>["items"][number];
 const { Title } = Typography;
 const signInText = gettext("Sign in");
 
-export const Header = observer(({ store }) => {
+type HeaderProps = {
+    store: HomeStore;
+}
+
+export const Header = observer(({ store }: HeaderProps) => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
     const [status, setStatus] = useState(false);
     const [open, setOpen] = useState(false);

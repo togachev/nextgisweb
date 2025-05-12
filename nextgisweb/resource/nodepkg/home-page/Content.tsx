@@ -11,6 +11,21 @@ import GridLarge from "@nextgisweb/icon/mdi/grid-large";
 import Grid from "@nextgisweb/icon/mdi/grid";
 import "./Content.less";
 
+import type { ParamsOf } from "@nextgisweb/gui/type";
+type AutoProps = ParamsOf<typeof AutoComplete>;
+
+interface ConfigProps {
+    isAdministrator: string;
+    upath_info: string;
+    type: string;
+    ckey: string;
+}
+
+interface ContentProps extends Omit<AutoProps, "onChange"> {
+    onChange?: AutoProps["onSelect"];
+    config: ConfigProps;
+}
+
 const resourcesToOptions = (resourcesInfo) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
@@ -50,7 +65,7 @@ const sizeTile = {
     small: { minW: 150, maxW: 150, minH: 150, maxH: 160, cardCoverH: 120, cardBodyH: 40, min: true },
 }
 
-export const Content = observer(({ onChanges, config, ...rest }) => {
+export const Content = observer(({ onChanges, config, ...rest }: ContentProps) => {
     const [store] = useState(() => new HomeStore({ config: config }));
 
     const [minStatus, setMinStatus] = useState(window.innerWidth > 785 ? "large" : "small");
@@ -60,7 +75,7 @@ export const Content = observer(({ onChanges, config, ...rest }) => {
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
-    const [acStatus, setAcSatus] = useState("");
+    const [acStatus, setAcSatus] = useState<AutoProps["status"]>("");
 
     const makeQuery = useMemo(() => {
         if (search && search.length > 2) {

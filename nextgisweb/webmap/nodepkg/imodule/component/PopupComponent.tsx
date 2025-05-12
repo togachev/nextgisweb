@@ -79,7 +79,7 @@ export default observer(
                 }));
 
             imodule.iStore = store;
-
+            
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
                 if (count > 0) {
@@ -112,6 +112,8 @@ export default observer(
                 if (store.fixPopup) {
                     store.setFixPos(store.valueRnd);
                     store.setFixPanel(store.fixContentItem.key)
+                } else {
+                    store.setFixPos(null);
                 }
             }, [store.fixPopup]);
 
@@ -269,7 +271,7 @@ export default observer(
                                                         store.setFullscreen(false)
                                                     } else {
                                                         store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: fX, y: fY });
-                                                        store.setFullscreen(true)
+                                                        store.setFullscreen(true);
                                                     }
                                                 }, 200)
                                             } else {

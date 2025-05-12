@@ -164,13 +164,14 @@ export const ContentComponent: FC = observer((props) => {
     });
 
     if (firstItem?.relation) {
+        const graphProps = { item: firstItem, store: store }
         options.push({
             label: (<span className="icon-style"><LineChartOutlined /></span>),
             value: "relation",
             key: "relation",
             title: gettext("Graphs"),
             hidden: false,
-            children: firstItem && firstItem.relation && (<GraphPanel item={firstItem} store={store} />),
+            children: firstItem && firstItem.relation && (<GraphPanel {...graphProps} />),
         })
     }
 
@@ -193,6 +194,7 @@ export const ContentComponent: FC = observer((props) => {
         store.setFixContentItem(options.find(item => item.key === key));
         store.setFixPanel(key);
         store.setCurrentUrlParams(key);
+        reload();
     };
 
     const items: MenuProps["items"] = useMemo(() => {

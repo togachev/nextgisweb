@@ -9,10 +9,15 @@ import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
+import { HomeStore } from "../HomeStore";
 
 import "./Footer.less";
 
-const ColorComponent = observer(({ store }) => {
+type FooterProps = {
+    store: HomeStore;
+}
+
+const ColorComponent = observer(({ store }: FooterProps) => {
 
     const colorsFooter = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#FFFFFF", "#000000", "#106A90"];
 
@@ -69,7 +74,7 @@ const ColorComponent = observer(({ store }) => {
     );
 });
 
-export const Footer = observer(({ store }) => {
+export const Footer = observer(({ store }: FooterProps) => {
     const [status, setStatus] = useState(false);
     const [open, setOpen] = useState(false);
     const [reload, reloading] = useReload();
@@ -90,7 +95,7 @@ export const Footer = observer(({ store }) => {
 
     const onFinish = (value) => {
         console.log(value);
-        
+
         setOpen(false);
         store.setValueFooter(value);
         store.setInitialFooter(value);

@@ -6,7 +6,6 @@ import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel
 
 import type { AttributeProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { StoreItem } from "@nextgisweb/webmap/type";
 
 export class Store {
     @observable accessor layerName: string | null = null;
@@ -51,7 +50,7 @@ export class Store {
     };
 
     @action
-    setFixPos(fixPos: Rnd) {
+    setFixPos(fixPos: Rnd | null) {
         this.fixPos = fixPos;
     };
 
