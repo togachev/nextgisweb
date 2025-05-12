@@ -224,6 +224,9 @@ export default observer(
                                     colorPrimaryActive: "#00000010",
                                     colorPrimaryHover: "#00000010",
                                     borderRadiusSM: 2,
+                                },
+                                Message: {
+                                    colorSuccess: "var(--primary)",
                                 }
                             }
                         }}

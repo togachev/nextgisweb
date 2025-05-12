@@ -13,14 +13,25 @@ interface CopyToClipboardButtonProps extends ButtonProps {
 
 export function CopyToClipboardButton({
     children,
-    messageInfo,
+    messageInfo: text,
     getTextToCopy,
     iconOnly,
     ...restParams
 }: CopyToClipboardButtonProps) {
+
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const messageInfo = (text) => {
+        messageApi.open({
+            type: "success",
+            content: text,
+            duration: 2,
+        });
+    };
+
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(getTextToCopy());
-        message.info(messageInfo || gettext("Copied to clipboard"));
+        messageInfo(text || gettext("Copied to clipboard"));
     };
 
     let buttonContent: React.ReactNode | null = null;
@@ -36,6 +47,7 @@ export function CopyToClipboardButton({
             }}
             {...restParams}
         >
+            {contextHolder}
             {buttonContent}
         </Button>
     );

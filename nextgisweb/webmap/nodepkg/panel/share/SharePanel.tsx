@@ -6,6 +6,7 @@ import type React from "react";
 import {
     Alert,
     Button,
+    ConfigProvider,
     Input,
     InputNumber,
     Modal,
@@ -329,150 +330,159 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     );
 
     return (
-        <PanelContainer title={store.title} close={store.close}>
-            <PanelSection flex>
-                <CodeArea value={mapLink} />
-                {favorites.contextHolder}
-                <Space.Compact aling="baseline">
-                    <CopyToClipboardButton
-                        getTextToCopy={() => mapLink}
-                        messageInfo={
-                            // pretties-ignore
-                            gettext("The map link copied to clipboard.")
-                        }
-                    >
-                        {gettext("Copy link")}
-                    </CopyToClipboardButton>
-
-                    {!ngwConfig.isGuest && (
-                        <Tooltip title={msgAddFragmentToFavorites}>
-                            <Button
-                                onClick={() => setFavLabelModalOpen(true)}
-                                icon={<FavoriteIcon />}
-                            />
-                        </Tooltip>
-                    )}
-                    <UpdateMapUrl
-                        mapLink={mapLink}
-                        display={display}
-                        setUrl={() => window.history.pushState({}, "", mapLink)}
-                        resetUrl={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
-                    />
-                </Space.Compact>
-                {!ngwConfig.isGuest && (
-                    <Modal
-                        transitionName=""
-                        maskTransitionName=""
-                        title={msgAddFragmentToFavorites}
-                        closeIcon={false}
-                        open={favLabelModalOpen}
-                        afterOpenChange={(open) => {
-                            if (open && favLabelRef.current) {
-                                favLabelRef.current.focus();
+        <ConfigProvider
+            theme={{
+                components: {
+                    Message: {
+                        colorSuccess: "var(--primary)",
+                    },
+                },
+            }}>
+            <PanelContainer title={store.title} close={store.close}>
+                <PanelSection flex>
+                    <CodeArea value={mapLink} />
+                    {favorites.contextHolder}
+                    <Space.Compact aling="baseline">
+                        <CopyToClipboardButton
+                            getTextToCopy={() => mapLink}
+                            messageInfo={
+                                // pretties-ignore
+                                gettext("The map link copied to clipboard.")
                             }
-                        }}
-                        onCancel={() => {
-                            setFavLabelModalOpen(false);
-                            setFavlabelValue("");
-                        }}
-                        onOk={() => {
-                            addToFavorites(mapLink, favLabelValue);
-                            setFavLabelModalOpen(false);
-                            setFavlabelValue("");
-                        }}
-                    >
-                        <Input
-                            ref={favLabelRef}
-                            value={favLabelValue}
-                            placeholder={gettext("Optional fragment label")}
-                            onChange={(e) => {
-                                setFavlabelValue(e.target.value);
+                        >
+                            {gettext("Copy link")}
+                        </CopyToClipboardButton>
+
+                        {!ngwConfig.isGuest && (
+                            <Tooltip title={msgAddFragmentToFavorites}>
+                                <Button
+                                    onClick={() => setFavLabelModalOpen(true)}
+                                    icon={<FavoriteIcon />}
+                                />
+                            </Tooltip>
+                        )}
+                        <UpdateMapUrl
+                            mapLink={mapLink}
+                            display={display}
+                            setUrl={() => window.history.pushState({}, "", mapLink)}
+                            resetUrl={() => window.history.pushState({}, "", routeURL("webmap.display", display.config.webmapId))}
+                        />
+                    </Space.Compact>
+                    {!ngwConfig.isGuest && (
+                        <Modal
+                            transitionName=""
+                            maskTransitionName=""
+                            title={msgAddFragmentToFavorites}
+                            closeIcon={false}
+                            open={favLabelModalOpen}
+                            afterOpenChange={(open) => {
+                                if (open && favLabelRef.current) {
+                                    favLabelRef.current.focus();
+                                }
+                            }}
+                            onCancel={() => {
+                                setFavLabelModalOpen(false);
+                                setFavlabelValue("");
+                            }}
+                            onOk={() => {
+                                addToFavorites(mapLink, favLabelValue);
+                                setFavLabelModalOpen(false);
+                                setFavlabelValue("");
+                            }}
+                        >
+                            <Input
+                                ref={favLabelRef}
+                                value={favLabelValue}
+                                placeholder={gettext("Optional fragment label")}
+                                onChange={(e) => {
+                                    setFavlabelValue(e.target.value);
+                                }}
+                            />
+                        </Modal>
+                    )}
+                </PanelSection>
+                <PanelSection title={gettext("Embed code for your site")} flex>
+                    <div className="input-group">
+                        <span className="grow">{gettext("Map size:")}</span>
+                        <InputNumber
+                            title={gettext("Width, px")}
+                            value={widthMap}
+                            onChange={(v) => {
+                                if (v !== null) setWidthMap(v);
                             }}
                         />
-                    </Modal>
-                )}
-            </PanelSection>
-            <PanelSection title={gettext("Embed code for your site")} flex>
-                <div className="input-group">
-                    <span className="grow">{gettext("Map size:")}</span>
-                    <InputNumber
-                        title={gettext("Width, px")}
-                        value={widthMap}
-                        onChange={(v) => {
-                            if (v !== null) setWidthMap(v);
-                        }}
-                    />
-                    <CloseIcon />
-                    <InputNumber
-                        title={gettext("Height, px")}
-                        value={heightMap}
-                        onChange={(v) => {
-                            if (v !== null) setHeightMap(v);
-                        }}
-                    />
-                    <span>{gettext("px")}</span>
-                </div>
-                <div className="input-group column">
-                    <label>{gettext("Map tools")}</label>
-                    <ToolsSelect value={controls} onChange={setControls} />
-                </div>
-                <div className="input-group column">
-                    <label>{gettext("Panels")}</label>
-                    <PanelsSelect
-                        value={panels}
-                        options={panelsOptions}
-                        onChange={setPanels}
-                        className="panels-select"
-                    />
-                </div>
-                {activePanelSelect}
-                <div className="input-group">
-                    <Switch
-                        size="small"
-                        checked={addLinkToMap}
-                        onChange={(v) => setAddLinkToMap(v)}
-                    />
-                    <span className="checkbox__label">
-                        {gettext("Link to main map")}
-                    </span>
-                </div>
-                <div className="input-group">
-                    <Switch
-                        size="small"
-                        checked={generateEvents}
-                        onChange={(v) => setGenerateEvents(v)}
-                    />
-                    <span className="checkbox__label">
-                        {gettext("Generate events")}
-                    </span>
-                </div>
-                <div className="input-group  column">
-                    <label>{gettext("Embed code")}</label>
-                    <CodeArea value={embedCode} rows={4} />
-                </div>
-                <form action={previewUrl} method="POST" target="_blank">
-                    <input
-                        type="hidden"
-                        name="iframe"
-                        value={encodeURI(embedCode)}
-                    />
-                    <Space.Compact>
-                        <CopyToClipboardButton
-                            getTextToCopy={() => embedCode}
-                            messageInfo={gettext(
-                                "The embed code copied to clipboard."
-                            )}
-                        >
-                            {gettext("Copy code")}
-                        </CopyToClipboardButton>
-                        <Button icon={<PreviewIcon />} htmlType="submit">
-                            {gettext("Preview")}
-                        </Button>
-                    </Space.Compact>
-                </form>
-                <CORSWarning />
-            </PanelSection>
-        </PanelContainer>
+                        <CloseIcon />
+                        <InputNumber
+                            title={gettext("Height, px")}
+                            value={heightMap}
+                            onChange={(v) => {
+                                if (v !== null) setHeightMap(v);
+                            }}
+                        />
+                        <span>{gettext("px")}</span>
+                    </div>
+                    <div className="input-group column">
+                        <label>{gettext("Map tools")}</label>
+                        <ToolsSelect value={controls} onChange={setControls} />
+                    </div>
+                    <div className="input-group column">
+                        <label>{gettext("Panels")}</label>
+                        <PanelsSelect
+                            value={panels}
+                            options={panelsOptions}
+                            onChange={setPanels}
+                            className="panels-select"
+                        />
+                    </div>
+                    {activePanelSelect}
+                    <div className="input-group">
+                        <Switch
+                            size="small"
+                            checked={addLinkToMap}
+                            onChange={(v) => setAddLinkToMap(v)}
+                        />
+                        <span className="checkbox__label">
+                            {gettext("Link to main map")}
+                        </span>
+                    </div>
+                    <div className="input-group">
+                        <Switch
+                            size="small"
+                            checked={generateEvents}
+                            onChange={(v) => setGenerateEvents(v)}
+                        />
+                        <span className="checkbox__label">
+                            {gettext("Generate events")}
+                        </span>
+                    </div>
+                    <div className="input-group  column">
+                        <label>{gettext("Embed code")}</label>
+                        <CodeArea value={embedCode} rows={4} />
+                    </div>
+                    <form action={previewUrl} method="POST" target="_blank">
+                        <input
+                            type="hidden"
+                            name="iframe"
+                            value={encodeURI(embedCode)}
+                        />
+                        <Space.Compact>
+                            <CopyToClipboardButton
+                                getTextToCopy={() => embedCode}
+                                messageInfo={gettext(
+                                    "The embed code copied to clipboard."
+                                )}
+                            >
+                                {gettext("Copy code")}
+                            </CopyToClipboardButton>
+                            <Button icon={<PreviewIcon />} htmlType="submit">
+                                {gettext("Preview")}
+                            </Button>
+                        </Space.Compact>
+                    </form>
+                    <CORSWarning />
+                </PanelSection>
+            </PanelContainer>
+        </ConfigProvider>
     );
 });
 
