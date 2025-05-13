@@ -31,27 +31,27 @@ export const NavigationMenu = observer(({ store, display }: { store: PanelManage
 
     const infomap = display.config.infomap;
 
-    const items: MenuProps['items'] = [
+    const items: MenuProps["items"] = [
         {
-            key: '1',
+            key: "1",
+            label: (
+                <Link target="_blank" href={infomap.resource}><span title={gettext("Resources")} className="iconLinks">{gettext("Resources")}</span></Link>
+            ),
+            icon: <Home />,
+        },
+        {
+            key: "2",
             label: (
                 <Link target="_blank" href={infomap.link}><span title={gettext("Map properties")} className="iconLinks">{gettext("Map properties")}</span></Link>
             ),
             icon: <Information />,
         },
         {
-            key: '2',
+            key: "3",
             label: (
                 <Link target="_blank" href={infomap.update}><span title={gettext("Map settings")} className="iconLinks">{gettext("Map settings")}</span></Link>
             ),
             icon: <Cogs />,
-        },
-        {
-            key: '3',
-            label: (
-                <Link target="_blank" href={infomap.resource}><span title={gettext("Resources")} className="iconLinks">{gettext("Resources")}</span></Link>
-            ),
-            icon: <Home />,
         },
     ];
 
