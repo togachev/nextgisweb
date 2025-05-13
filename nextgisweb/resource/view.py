@@ -310,6 +310,7 @@ def resource_section_main(obj, *, request, **kwargs):
 
     result["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
     result["cls"] = obj.cls
+    result["social"] = obj.social is not None and obj.social.preview_fileobj_id is not None
     return result
 
 

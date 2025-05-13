@@ -29,6 +29,22 @@ def maptile(resource, request):
 
     return Response(mem_file.getvalue(), content_type="image/webp", request=request)
 
+def webmap_main(resource, request):
+    if resource.social is None or resource.social.preview_fileobj is None:
+        raise HTTPNotFound()
+
+    fn = resource.social.preview_fileobj.filename()
+
+    img = Image.open(fn)
+    
+    img.thumbnail(size=(116, 79))
+
+    mem_file = BytesIO()
+    img.save(mem_file, "WEBP", quality=80)
+    mem_file.seek(0)
+
+    return Response(mem_file.getvalue(), content_type="image/webp", request=request)
+
 def setup_pyramid(comp, config):
     config.add_route(
         "resource.preview",
@@ -42,4 +58,11 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/maptile",
         factory=resource_factory,
         get=maptile,
+    )
+
+    config.add_route(
+        "webmap_main.preview",
+        "/api/resource/{id}/webmap_main",
+        factory=resource_factory,
+        get=webmap_main,
     )
