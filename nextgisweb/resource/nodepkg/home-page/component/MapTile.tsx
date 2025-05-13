@@ -3,7 +3,6 @@ import { Button, Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
-import ImageOff from "@nextgisweb/icon/mdi/image-off";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
