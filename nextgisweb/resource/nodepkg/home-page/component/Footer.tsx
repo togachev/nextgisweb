@@ -253,54 +253,56 @@ export const Footer = observer(({ store }: FooterProps) => {
                     />)}
             </div>
             <ModalComponent title={gettext("Footer setting")} form={formFooter} open={open} handleCancel={handleCancel} />
-            <Row className="footer-info">
-                <Col className="logo-col" flex={1}>
-                    <span className="uriit-logo">
-                        <img src={reloading ? null : store.ulrImg?.footer ? store.ulrImg.footer : ""} />
-                    </span>
-                </Col>
-                <Col flex={4} >
-                    <span className="block-info">
-                        <Row className="name-center">
-                            <Col className="address">{store.valueFooter?.service_name}</Col>
-                        </Row>
-                        {store.valueFooter?.service?.map((item, index) => {
-                            return (
-                                <Row key={index} className="service-list">
-                                    <Col className="service-url">
-                                        <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.colorText }}>
-                                            {item?.name}
-                                        </a>
-                                    </Col>
-                                </Row>
-                            )
-                        })}
-                        <Divider />
-                        <Row className="address-content" justify="space-between">
-                            <Col className="address">
-                                {store.valueFooter?.address_name}
-                            </Col>
-                            <Col className="phone">
-                                {store.valueFooter?.address_phone?.map((item, index) => {
-                                    return (
-                                        <Space key={index} className="phone-item" wrap>
-                                            <div className="name">{item?.name}</div>
-                                            <div className="value">{item?.value}</div>
-                                        </Space>
-                                    )
-                                })}
-                            </Col>
-                        </Row>
-                    </span>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <div className="uriit-footer-name">
-                        © {store.valueFooter?.base_year}-{new Date().getFullYear()} {store.valueFooter?.footer_name}
-                    </div>
-                </Col>
-            </Row>
+            <div className="footer-block">
+                <Row className="footer-info">
+                    <Col className="logo-col" flex={1}>
+                        <span className="uriit-logo">
+                            <img src={reloading ? null : store.ulrImg?.footer ? store.ulrImg.footer : ""} />
+                        </span>
+                    </Col>
+                    <Col flex={4} >
+                        <span className="block-info">
+                            <Row className="name-center">
+                                <Col className="address">{store.valueFooter?.service_name}</Col>
+                            </Row>
+                            {store.valueFooter?.service?.map((item, index) => {
+                                return (
+                                    <Row key={index} className="service-list">
+                                        <Col className="service-url">
+                                            <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.colorText }}>
+                                                {item?.name}
+                                            </a>
+                                        </Col>
+                                    </Row>
+                                )
+                            })}
+                            <Divider />
+                            <Row className="address-content" justify="space-between">
+                                <Col className="address">
+                                    {store.valueFooter?.address_name}
+                                </Col>
+                                <Col className="phone">
+                                    {store.valueFooter?.address_phone?.map((item, index) => {
+                                        return (
+                                            <Space key={index} className="phone-item" wrap>
+                                                <div className="name">{item?.name}</div>
+                                                <div className="value">{item?.value}</div>
+                                            </Space>
+                                        )
+                                    })}
+                                </Col>
+                            </Row>
+                        </span>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <div className="uriit-footer-name">
+                            © {store.valueFooter?.base_year}-{new Date().getFullYear()} {store.valueFooter?.footer_name}
+                        </div>
+                    </Col>
+                </Row>
+            </div>
         </div >
     );
 })

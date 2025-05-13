@@ -257,17 +257,19 @@ export const Header = observer(({ store }: HeaderProps) => {
                         onClick={openForm}
                     />)}
                 </div>
-                <div className="menus">
-                    <div className="menu-component">
-                        <div className="button-link">
-                            <MenuContainer />
+                <div className="header-block">
+                    <div className="menus">
+                        <div className="menu-component">
+                            <div className="button-link">
+                                <MenuContainer />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="name-site">
-                    <div className="title">
-                        <Title className="name-site-a" style={colorText} level={1} >{store.valueHeader?.first_name}</Title>
-                        <Title className="name-site-b" style={colorText} level={5} >{store.valueHeader?.last_name}</Title>
+                    <div className="name-site">
+                        <div className="title">
+                            <Title className="name-site-a" style={colorText} level={1} >{store.valueHeader?.first_name}</Title>
+                            <Title className="name-site-b" style={colorText} level={5} >{store.valueHeader?.last_name}</Title>
+                        </div>
                     </div>
                 </div>
             </div >

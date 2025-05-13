@@ -171,6 +171,7 @@ export const Content = observer(({ onChanges, config, ...rest }: ContentProps) =
                         },
                         Segmented: {
                             trackBg: "transparent",
+                            trackPadding: 0,
                         },
                         Tooltip: {
                             colorBgSpotlight: "#fff",
