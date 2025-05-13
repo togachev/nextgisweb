@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
+import { ConfigProvider, Tooltip } from "@nextgisweb/gui/antd";
 
 interface PageTitleProps {
     title?: string;
@@ -23,13 +24,25 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
     }, []);
 
     return (
-        <h1
-            className={classNames("ngw-pyramid-layout-title", {
-                "pull-right": pullRight,
-            })}
-        >
-            <div className="title-class">{ititle}</div>
-            {children}
-        </h1>
+        <ConfigProvider
+            theme={{
+                components: {
+                    Tooltip: {
+                        colorBgSpotlight: "var(--on-primary-text)",
+                        colorTextLightSolid: "var(--text-base)",
+                    },
+                },
+            }}>
+            <h1
+                className={classNames("ngw-pyramid-layout-title", {
+                    "pull-right": pullRight,
+                })}
+            >
+                <Tooltip style={{ pointerEvents: "none" }} title={ititle}>
+                    <div title={ititle} className="title-class">{ititle}</div>
+                </Tooltip>
+                {children}
+            </h1>
+        </ConfigProvider>
     );
 }

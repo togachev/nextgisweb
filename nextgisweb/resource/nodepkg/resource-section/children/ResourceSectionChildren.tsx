@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Table } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Table, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
@@ -55,129 +55,141 @@ export const ResourceSectionChildren = ({
     const rowSelection = useMemo<TableProps["rowSelection"] | undefined>(() => {
         return allowBatch
             ? {
-                  type: "checkbox",
-                  getCheckboxProps: () => ({
-                      disabled: batchDeletingInProgress,
-                  }),
-                  selectedRowKeys: selected,
-                  onChange: (selectedRowKeys) => {
-                      setSelected(selectedRowKeys.map(Number));
-                  },
-              }
+                type: "checkbox",
+                getCheckboxProps: () => ({
+                    disabled: batchDeletingInProgress,
+                }),
+                selectedRowKeys: selected,
+                onChange: (selectedRowKeys) => {
+                    setSelected(selectedRowKeys.map(Number));
+                },
+            }
             : undefined;
     }, [allowBatch, selected, batchDeletingInProgress]);
 
     return (
-        <Table
-            className="ngw-resource-resource-section-children"
-            size="middle"
-            card={true}
-            dataSource={items}
-            rowKey="id"
-            rowSelection={rowSelection}
-        >
-            <Column
-                title={gettext("Display name")}
-                className="displayName"
-                dataIndex="displayName"
-                sorter={sorterFactory("displayName")}
-                render={(value, record: Resource) => (
-                    <SvgIconLink
-                        href={record.cls === "webmap" ?
-                            routeURL("resource.show", record.id) + "/display" :
-                            routeURL("resource.show", record.id)
-                        }
-                        target={
-                            record.cls === "webmap" ?
-                                "_blank" :
-                                "_self"
-                        }
-                        icon={`rescls-${record.cls}`}
-                    >
-                        <span className="name-style">{value}</span>
-                    </SvgIconLink>
-                )}
-            />
-            <Column
-                title={gettext("Type")}
-                responsive={["md"]}
-                className="cls"
-                dataIndex="clsDisplayName"
-                sorter={sorterFactory("clsDisplayName")}
-            />
-            <Column
-                title={gettext("Owner")}
-                responsive={["xl"]}
-                className="ownerUser"
-                dataIndex="ownerUserDisplayName"
-                sorter={sorterFactory("ownerUserDisplayName")}
-            />
-            {creationDateVisible && (
+        <ConfigProvider
+            theme={{
+                components: {
+                    Tooltip: {
+                        colorBgSpotlight: "var(--on-primary-text)",
+                        colorTextLightSolid: "var(--text-base)",
+                    },
+                },
+            }}>
+            <Table
+                className="ngw-resource-resource-section-children"
+                size="middle"
+                card={true}
+                dataSource={items}
+                rowKey="id"
+                rowSelection={rowSelection}
+            >
                 <Column
-                    title={gettext("Created")}
+                    title={gettext("Display name")}
+                    className="displayName"
+                    dataIndex="displayName"
+                    sorter={sorterFactory("displayName")}
+                    render={(value, record: Resource) => (
+                        <SvgIconLink
+                            href={record.cls === "webmap" ?
+                                routeURL("resource.show", record.id) + "/display" :
+                                routeURL("resource.show", record.id)
+                            }
+                            target={
+                                record.cls === "webmap" ?
+                                    "_blank" :
+                                    "_self"
+                            }
+                            icon={`rescls-${record.cls}`}
+                        >
+                            <Tooltip style={{ pointerEvents: "none" }} key={value} title={value}>
+                                <span className="name-style">{value}</span>
+                            </Tooltip>
+                        </SvgIconLink>
+                    )}
+                />
+                <Column
+                    title={gettext("Type")}
+                    responsive={["md"]}
+                    className="cls"
+                    dataIndex="clsDisplayName"
+                    sorter={sorterFactory("clsDisplayName")}
+                />
+                <Column
+                    title={gettext("Owner")}
                     responsive={["xl"]}
-                    className="creationDate"
-                    dataIndex="creationDate"
-                    sorter={sorterFactory("creationDate")}
-                    render={(text) => {
-                        if (text && !text.startsWith("1970")) {
-                            return (
-                                <div style={{ whiteSpace: "nowrap" }}>
-                                    {utc(text).local().format("L LTS")}
-                                </div>
-                            );
-                        }
-                        return "";
-                    }}
+                    className="ownerUser"
+                    dataIndex="ownerUserDisplayName"
+                    sorter={sorterFactory("ownerUserDisplayName")}
                 />
-            )}
-            {storageEnabled && volumeVisible && (
-                <Column
-                    title={gettext("Volume")}
-                    className="volume"
-                    sorter={(a: Resource, b: Resource) =>
-                        volumeValues[a.id] - volumeValues[b.id]
-                    }
-                    render={(_, record: Resource) => {
-                        if (volumeValues[record.id] !== undefined) {
-                            return formatSize(volumeValues[record.id]);
-                        } else {
+                {creationDateVisible && (
+                    <Column
+                        title={gettext("Created")}
+                        responsive={["xl"]}
+                        className="creationDate"
+                        dataIndex="creationDate"
+                        sorter={sorterFactory("creationDate")}
+                        render={(text) => {
+                            if (text && !text.startsWith("1970")) {
+                                return (
+                                    <div style={{ whiteSpace: "nowrap" }}>
+                                        {utc(text).local().format("L LTS")}
+                                    </div>
+                                );
+                            }
                             return "";
-                        }
-                    }}
-                />
-            )}
-            <Column
-                title={
-                    <MenuDropdown
-                        data={resourceChildren}
-                        items={items}
-                        selected={selected}
-                        allowBatch={allowBatch}
-                        resourceId={resourceId}
-                        volumeVisible={volumeVisible}
-                        storageEnabled={storageEnabled}
-                        creationDateVisible={creationDateVisible}
-                        setBatchDeletingInProgress={setBatchDeletingInProgress}
-                        setCreationDateVisible={setCreationDateVisible}
-                        setVolumeVisible={setVolumeVisible}
-                        setVolumeValues={setVolumeValues}
-                        setAllowBatch={setAllowBatch}
-                        setSelected={setSelected}
-                        setItems={setItems}
-                    />
-                }
-                className="actions"
-                dataIndex="actions"
-                render={(actions, record: Resource) => (
-                    <RenderActions
-                        actions={actions}
-                        id={record.id}
-                        setTableItems={setItems}
+                        }}
                     />
                 )}
-            />
-        </Table>
+                {storageEnabled && volumeVisible && (
+                    <Column
+                        title={gettext("Volume")}
+                        className="volume"
+                        sorter={(a: Resource, b: Resource) =>
+                            volumeValues[a.id] - volumeValues[b.id]
+                        }
+                        render={(_, record: Resource) => {
+                            if (volumeValues[record.id] !== undefined) {
+                                return formatSize(volumeValues[record.id]);
+                            } else {
+                                return "";
+                            }
+                        }}
+                    />
+                )}
+                <Column
+                    title={
+                        <MenuDropdown
+                            data={resourceChildren}
+                            items={items}
+                            selected={selected}
+                            allowBatch={allowBatch}
+                            resourceId={resourceId}
+                            volumeVisible={volumeVisible}
+                            storageEnabled={storageEnabled}
+                            creationDateVisible={creationDateVisible}
+                            setBatchDeletingInProgress={setBatchDeletingInProgress}
+                            setCreationDateVisible={setCreationDateVisible}
+                            setVolumeVisible={setVolumeVisible}
+                            setVolumeValues={setVolumeValues}
+                            setAllowBatch={setAllowBatch}
+                            setSelected={setSelected}
+                            setItems={setItems}
+                        />
+                    }
+                    className="actions"
+                    dataIndex="actions"
+                    render={(actions, record: Resource) => (
+                        <RenderActions
+                            actions={actions}
+                            id={record.id}
+                            setTableItems={setItems}
+                        />
+                    )}
+                />
+            </Table>
+        </ConfigProvider>
     );
 };
 
