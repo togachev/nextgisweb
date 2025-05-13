@@ -88,15 +88,12 @@ export const MapTile = (props) => {
                             </div>
                         </Link> :
                         <Link title={display_name} className="link-map" href={urlWebmap} target="_blank">
-                            {size.min ? <TitleMap /> : <Empty description="" image={<ImageOff />} />}
+                            {size.min ? <TitleMap /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                         </Link>
                 }
             >
                 <Meta
                     className="meta-card"
-                    style={{
-                        fontWeight: 500,
-                    }}
                     title={
                         <div className="title-map">
                             <span title={display_name} className="title">
