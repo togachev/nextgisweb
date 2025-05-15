@@ -38,7 +38,7 @@ export const SystemInfoUpdate = observer(() => {
     const [status, data] = updateStore.state;
     if (status === "disabled") return <></>;
 
-    assert(distribution);
+    distribution && assert(distribution);
 
     let cn, msg, extra, btn;
     if (status === "loading") {
