@@ -30,7 +30,7 @@ type UpdateStatus =
 export class UpdateStore {
     @observable.ref accessor state: UpdateStatus = ["disabled"];
 
-    private forceResolve: () => void = () => {};
+    private forceResolve: () => void = () => { };
 
     constructor() {
         if (ngupdateUrl) {
@@ -80,9 +80,10 @@ export class UpdateStore {
 
         const errback = () => this.setState(["error"]);
         const process = ({ distribution: udist }: UpdateQueryResponse) => {
-            console.log(udist);
-            
             const { status } = udist;
+            if (status === undefined) {
+                return;
+            }
             if (status === "not_found" || status === "up_to_date") {
                 this.setState([status]);
             } else if (
