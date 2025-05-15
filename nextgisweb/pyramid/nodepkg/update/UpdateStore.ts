@@ -7,8 +7,8 @@ const query_delay_ms = 3 * 60 * 1000;
 const { ngupdateUrl, distribution } = ngwConfig;
 
 interface UpdateQueryResponse {
-    distribution?: {
-        status?: "not_found" | "has_update" | "has_urgent_update" | "up_to_date";
+    distribution: {
+        status: "not_found" | "has_update" | "has_urgent_update" | "up_to_date";
         latest?: {
             version: string;
             date: string;
@@ -102,7 +102,7 @@ export class UpdateStore {
             }
         };
 
-        fetch(url).then((resp) => resp.json().then(process, errback), errback);
+        distribution && fetch(url).then((resp) => resp.json().then(process, errback), errback);
     }
 
     @action
