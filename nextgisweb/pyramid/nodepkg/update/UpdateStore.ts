@@ -102,7 +102,7 @@ export class UpdateStore {
             }
         };
 
-        distribution && fetch(url).then((resp) => resp.json().then(process, errback), errback);
+        fetch(url).then((resp) => resp.json().then(process, errback), errback);
     }
 
     @action

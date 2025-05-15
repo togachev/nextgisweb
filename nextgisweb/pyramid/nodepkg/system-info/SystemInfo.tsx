@@ -52,7 +52,7 @@ export function SystemInfo({ packages, platform, browser }: SystemInfoProps) {
                         ].join(" ")}
                     </h2>
                 )}
-                <SystemInfoUpdate />
+                {distribution && (<SystemInfoUpdate />)}
                 <SimpleTable>
                     <thead>
                         <tr>
