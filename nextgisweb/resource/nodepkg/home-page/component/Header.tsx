@@ -144,7 +144,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                 store.setValueHeader(store.initialHeader);
                 store.updateStatusFile("done", "img", "initialHeader", "valueHeader", "setValueHeader");
                 store.initialHeader?.img && store.initialHeader?.img[0]?.status === "done" ?
-                    store.setUrlImg({ ...store.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) + `?ckey=${store.config.ckey}` }) :
+                    store.setUrlImg({ ...store.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) }) :
                     store.setUrlImg({ ...store.ulrImg, header: "" });
             }
         } finally {

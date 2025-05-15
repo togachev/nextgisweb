@@ -67,7 +67,6 @@ export interface HeaderProps {
 };
 
 interface ConfigProps {
-    ckey: string;
     isAdministrator: boolean;
     type: string;
     upath_info: string[];
@@ -197,7 +196,7 @@ export class HomeStore {
                 [nameArray]: val,
             };
             this[setState](value);
-            
+
         } else {
             const value = {
                 ...this[state],
@@ -245,7 +244,7 @@ export class HomeStore {
 
                         if (data.pyramid.home_page_header?.img && data.pyramid.home_page_header?.img[0]?.status === "done") {
                             data.pyramid.home_page_header.img[0].route = true;
-                            this.setUrlImg({ ...this.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) + `?ckey=${this.config.ckey}` });
+                            this.setUrlImg({ ...this.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) });
                         }
 
                         this.setValueHeader(data.pyramid.home_page_header);
@@ -264,7 +263,7 @@ export class HomeStore {
 
                         if (data.pyramid.home_page_footer?.img && data.pyramid.home_page_footer?.img[0]?.status === "done") {
                             data.pyramid.home_page_footer.img[0].route = true;
-                            this.setUrlImg({ ...this.ulrImg, footer: routeURL("pyramid.asset.himg", { ikey: "home_page_footer" }) + `?ckey=${this.config.ckey}` });
+                            this.setUrlImg({ ...this.ulrImg, footer: routeURL("pyramid.asset.himg", { ikey: "home_page_footer" }) });
                         }
 
                         this.setValueFooter(data.pyramid.home_page_footer);

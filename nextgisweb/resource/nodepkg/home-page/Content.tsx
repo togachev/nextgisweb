@@ -18,7 +18,6 @@ interface ConfigProps {
     isAdministrator: string;
     upath_info: string;
     type: string;
-    ckey: string;
 }
 
 interface ContentProps extends Omit<AutoProps, "onChange"> {

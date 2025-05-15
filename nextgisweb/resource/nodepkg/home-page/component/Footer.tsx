@@ -115,7 +115,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                 store.setValueFooter(store.initialFooter);
                 store.updateStatusFile("done", "img", "initialFooter", "valueFooter", "setValueFooter")
                 store.initialFooter?.img && store.initialFooter?.img[0]?.status === "done" ?
-                    store.setUrlImg({ ...store.ulrImg, footer: routeURL("pyramid.asset.himg", { ikey: "home_page_footer" }) + `?ckey=${store.config.ckey}` }) :
+                    store.setUrlImg({ ...store.ulrImg, footer: routeURL("pyramid.asset.himg", { ikey: "home_page_footer" }) }) :
                     store.setUrlImg({ ...store.ulrImg, footer: "" });
             }
         } finally {

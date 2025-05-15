@@ -102,10 +102,6 @@ def asset_home_page_img(request, *, ckey: Optional[str] = None, core: CoreCompon
     file = data["img"][0]["url"].split(",")
     response = Response(b64decode(file[1]), content_type=data["img"][0]["type"], request=request)
 
-    if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
-        response.cache_control.public = True
-        response.cache_control.max_age = 86400
-
     return response
 
 
