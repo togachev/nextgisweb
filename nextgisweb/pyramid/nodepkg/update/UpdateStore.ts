@@ -80,6 +80,8 @@ export class UpdateStore {
 
         const errback = () => this.setState(["error"]);
         const process = ({ distribution: udist }: UpdateQueryResponse) => {
+            console.log(udist);
+            
             const { status } = udist;
             if (status === "not_found" || status === "up_to_date") {
                 this.setState([status]);
