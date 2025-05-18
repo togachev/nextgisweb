@@ -98,7 +98,7 @@ class FileStorageComponent(Component):
 
     def maintenance(self):
         super().maintenance()
-        self.cleanup(dry_run=False)
+        self.cleanup(dry_run=False, unreferenced=True)
 
     def cleanup(self, *, dry_run, unreferenced=False, orphaned=True):
         logger.info("Cleaning up file storage...")

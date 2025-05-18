@@ -93,7 +93,7 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
 
 
 @inject()
-def asset_home_page_img(request, *, ckey: Optional[str] = None, core: CoreComponent):
+def asset_home_page_img(request, *, core: CoreComponent):
 
     ikey = request.matchdict["ikey"]
     if (data := core.settings_get("pyramid", ikey, None)) is None:
