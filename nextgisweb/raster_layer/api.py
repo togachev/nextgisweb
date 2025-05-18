@@ -208,3 +208,7 @@ def setup_pyramid(comp, config):
         factory=raster_layer_factory,
         get=download,
     )
+
+    from . import api_identify
+
+    api_identify.setup_pyramid(comp, config)

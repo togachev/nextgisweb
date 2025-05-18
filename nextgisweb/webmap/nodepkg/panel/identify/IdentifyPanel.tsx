@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { Alert } from "@nextgisweb/gui/antd";
@@ -9,8 +9,10 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import type { Display } from "@nextgisweb/webmap/display";
+import topic from "@nextgisweb/webmap/compat/topic";
 import { GraphPanel } from "@nextgisweb/webmap/imodule/component/GraphPanel";
+import type { Display } from "@nextgisweb/webmap/display";
+import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -22,7 +24,13 @@ import { FeatureEditButton } from "./FeatureEditButton";
 import type IdentifyStore from "./IdentifyStore";
 import { FeatureInfoSection } from "./component/FeatureInfoSection";
 import { FeatureSelector } from "./component/FeatureSelector";
-import type { FeatureInfo, IdentifyInfo, FeatureIdentify } from "./identification";
+import { RasterInfoSection } from "./component/RasterInfoSection";
+import type {
+    FeatureInfo,
+    FeatureIdentify,
+    IdentifyInfo,
+    IdentifyInfoItem,
+} from "./identification";
 import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
 import "./IdentifyPanel.less";
@@ -54,8 +62,11 @@ const loadFeatureItem = async (
 
 const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
     ({ display, store }) => {
-        const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
+        const [featureInfo, setFeatureInfo] = useState<IdentifyInfoItem>();
         const [featureItem, setFeatureItem] = useState<FeatureItem>();
+        const [featuresInfoList, setFeaturesInfoList] = useState<
+            IdentifyInfoItem[]
+        >([]);
         const [relationInfo, setRelationInfo] = useState<FeatureIdentify>();
 
         const { trackPromise, isLoading } = useLoading();
@@ -76,12 +87,22 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
         }, [isNotFound]);
 
         const updateFeatureItem = useCallback(
-            async (featureInfo: FeatureInfo | undefined) => {
+            async (featureInfo: IdentifyInfoItem | undefined) => {
                 abort();
 
                 setFeatureItem(undefined);
 
-                if (!featureInfo) {
+                if (!featureInfo || featureInfo.type !== "feature_layer") {
+                    if (identifyInfo?.point) {
+                        const [x, y] = identifyInfo.point;
+                        const highlightEvent: HighlightEvent = {
+                            coordinates: [x, y],
+                        };
+                        topic.publish("feature.highlight", highlightEvent);
+                    } else {
+                        topic.publish("feature.unhighlight");
+                    }
+
                     return;
                 }
                 const signal = makeSignal();
@@ -108,22 +129,28 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
         );
 
         const onFeatureChange = useCallback(
-            (featureInfo: FeatureInfo | undefined) => {
+            (featureInfo: IdentifyInfoItem | undefined) => {
                 setFeatureInfo(featureInfo);
                 updateFeatureItem(featureInfo);
             },
             [updateFeatureItem]
         );
 
-        const featuresInfoList = useMemo(() => {
+        useEffect(() => {
             abort();
-            if (!identifyInfo) return [];
-            const options = identifyInfoToFeaturesInfo(identifyInfo, display);
-            if (options.length) {
-                const first = options[0];
-                onFeatureChange(first);
+            if (!identifyInfo) {
+                setFeaturesInfoList([]);
+            } else {
+                const options = identifyInfoToFeaturesInfo(
+                    identifyInfo,
+                    display
+                );
+                if (options.length) {
+                    const first = options[0];
+                    onFeatureChange(first);
+                }
+                setFeaturesInfoList(options);
             }
-            return options;
         }, [identifyInfo, display, onFeatureChange, abort]);
 
         let loadElement = null;
@@ -138,29 +165,40 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
         }
 
         let featureInfoSection;
-        if (featureItem && featureInfo) {
-            const measurementSrid =
-                display.config.measureSrsId || measurementSridSetting;
+        let rasterInfoSection;
+        if (featureInfo) {
+            if (featureItem) {
+                const measurementSrid =
+                    display.config.measureSrsId || measurementSridSetting;
 
-            const opts = display.config.options;
-            featureInfoSection = (
-                <FeatureInfoSection
-                    resourceId={featureInfo.layerId}
-                    featureItem={featureItem}
-                    measurementSrid={measurementSrid}
-                    showGeometryInfo={opts["webmap.identification_geometry"]}
-                    showAttributes={opts["webmap.identification_attributes"]}
-                    attributePanelAction={
-                        <FeatureEditButton
-                            display={display}
-                            resourceId={featureInfo.layerId}
-                            featureId={featureItem.id}
-                            onUpdate={() => updateFeatureItem(featureInfo)}
-                        />
-                    }
-                    highlights={highlights}
-                />
-            );
+                const opts = display.config.options;
+                featureInfoSection = (
+                    <FeatureInfoSection
+                        resourceId={featureInfo.layerId}
+                        featureItem={featureItem}
+                        measurementSrid={measurementSrid}
+                        showGeometryInfo={
+                            opts["webmap.identification_geometry"]
+                        }
+                        showAttributes={
+                            opts["webmap.identification_attributes"]
+                        }
+                        attributePanelAction={
+                            <FeatureEditButton
+                                display={display}
+                                resourceId={featureInfo.layerId}
+                                featureId={featureItem.id}
+                                onUpdate={() => updateFeatureItem(featureInfo)}
+                            />
+                        }
+                        highlights={highlights}
+                    />
+                );
+            }
+            const item = identifyInfo?.response[featureInfo.layerId];
+            if (item && "color_interpretation" in item) {
+                rasterInfoSection = <RasterInfoSection item={item} />;
+            }
         }
 
         let relationElement;
@@ -216,6 +254,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 {relationElement}
                 {loadElement}
                 {featureInfoSection}
+                {rasterInfoSection}
             </PanelContainer>
         );
     }

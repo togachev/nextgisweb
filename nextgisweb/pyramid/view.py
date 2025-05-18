@@ -16,6 +16,7 @@ from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from sqlalchemy import text
+from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo
@@ -45,6 +46,25 @@ ICON_JSENTRY = jsentry("@nextgisweb/pyramid/icon")
 UPDATE_JSENTRY = jsentry("@nextgisweb/pyramid/update")
 LAYOUT_JSENTRY = jsentry("@nextgisweb/pyramid/layout")
 BREADCRUMB_JSENTRY = jsentry("@nextgisweb/pyramid/breadcrumb")
+
+class ModelFactory:
+    def __init__(self, context, *, key="id", tdef=int):
+        self.key = key
+        self.tdef = tdef
+        self.context = context
+
+    def __call__(self, request):
+        model_id = request.path_param[self.key]
+        try:
+            obj = self.context.filter(self.context.id == model_id).one()
+        except NoResultFound:
+            raise HTTPNotFound
+        return obj
+
+    @property
+    def annotations(self):
+        return {self.key: self.tdef}
+
 
 def asset(request):
     component = request.matchdict["component"]
