@@ -344,13 +344,6 @@ def metrics(request):
     )
 
 
-@viewargs(renderer="home_page.mako")
-def home_page(request):
-    return dict(
-        custom_layout=True
-    )
-
-
 def test_request(request):
     comp = request.env.pyramid
     handler = comp.test_request_handler
@@ -609,10 +602,6 @@ def setup_pyramid(comp, config):
         "/control-panel/metrics",
     ).add_view(metrics)
 
-    config.add_route(
-        "home_page",
-        "/map-list",
-    ).add_view(home_page)
 
     config.add_route("pyramid.locale", "/locale/{locale:str}").add_view(locale)
 

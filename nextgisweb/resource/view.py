@@ -18,7 +18,7 @@ from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
-from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 
 from .event import OnChildClasses, OnDeletePrompt
@@ -387,6 +387,13 @@ def resource_section_external_access(obj, *, request, **kwargs):
     return {"links": links} if len(links) > 0 else None
 
 
+@viewargs(renderer="home_page.mako")
+def home_page(request):
+    return dict(
+        custom_layout=True
+    )
+
+
 def setup_pyramid(comp, config):
     def resource_permission(request, permission, resource=None):
         if isinstance(resource, Permission):
@@ -442,6 +449,8 @@ def setup_pyramid(comp, config):
         "/control-panel/resource-export",
         get=resource_export,
     )
+
+    config.add_route("home_page", "/map-list").add_view(home_page)
 
     config.add_route(
         "resource.webmap_group",

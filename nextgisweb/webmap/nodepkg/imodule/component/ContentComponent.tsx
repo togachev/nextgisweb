@@ -1,4 +1,4 @@
-import { FC, useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { ConfigProvider, Descriptions, Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
 import type { DescriptionsProps, MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
@@ -47,7 +47,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
     }
 };
 
-export const ContentComponent: FC = observer((props) => {
+export const ContentComponent = observer((props) => {
     const { store: storeProp, display } = props as ContentProps
     const [store] = useState(() => storeProp);
     const { id, layerId } = store.selected;
@@ -194,7 +194,6 @@ export const ContentComponent: FC = observer((props) => {
         store.setFixContentItem(options.find(item => item.key === key));
         store.setFixPanel(key);
         store.setCurrentUrlParams(key);
-        reload();
     };
 
     const items: MenuProps["items"] = useMemo(() => {

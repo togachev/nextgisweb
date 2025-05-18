@@ -21,7 +21,6 @@ interface ConfigProps {
 }
 
 interface ContentProps extends Omit<AutoProps, "onChange"> {
-    onChange?: AutoProps["onSelect"];
     config: ConfigProps;
 }
 
@@ -64,7 +63,7 @@ const sizeTile = {
     small: { minW: 150, maxW: 150, minH: 150, maxH: 160, cardCoverH: 120, cardBodyH: 40, min: true },
 }
 
-export const Content = observer(({ onChanges, config, ...rest }: ContentProps) => {
+export const Content = observer(({ config, ...rest }: ContentProps) => {
     const [store] = useState(() => new HomeStore({ config: config }));
 
     const [minStatus, setMinStatus] = useState(window.innerWidth > 785 ? "large" : "small");
@@ -136,6 +135,10 @@ export const Content = observer(({ onChanges, config, ...rest }: ContentProps) =
         }
     }, [makeQuery]);
 
+    const onChanges: AutoProps["onSelect"] = (_value, option) => {
+        window.location.href = option.url;
+    };
+
     const onSelect = (v, opt) => {
         if (onChanges) {
             onChanges(v, opt);
@@ -149,7 +152,6 @@ export const Content = observer(({ onChanges, config, ...rest }: ContentProps) =
                     token: {
                         fontFamily: "Montserrat",
                         colorPrimaryBorder: "#106a90",
-
                     },
                     components: {
                         Modal: {
@@ -198,6 +200,7 @@ export const Content = observer(({ onChanges, config, ...rest }: ContentProps) =
                                     onSelect={onSelect}
                                     options={options}
                                     status={acStatus}
+                                    notFoundContent={search.length > 0 && gettext("Webmap not found")}
                                     {...rest}
                                 >
                                     <Input

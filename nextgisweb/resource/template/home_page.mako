@@ -26,12 +26,7 @@
         ngwEntry(${json_js(HOME_PAGE_JSENTRY)}),
     ]).then(([reactBoot, {Avatar, Menu, Content}]) => {
         const config = ${json_js(config)};
-        reactBoot(Content, {
-                onChanges: function(v, opt) {
-                    window.location.href = opt.url
-                },
-                config
-            }, 
+        reactBoot(Content, { config }, 
             document.getElementById("content")
         );
     });

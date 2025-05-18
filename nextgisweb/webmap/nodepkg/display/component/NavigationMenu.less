@@ -26,34 +26,29 @@
         &:hover>svg.icon {
             opacity: 1;
         }
-
-
     }
-}
 
-.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
-    padding: 5px;
-}
+    .info-block {
+        bottom: 0px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
 
-.infoblock {
-    bottom: 0px;
-    display: flex;
+        a {
+            height: 40px;
+            font-size: 24px;
 
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
+            &>svg.icon {
+                opacity: 0.5;
+                font-size: 24px;
+                color: var(--on-primary-text);
+            }
 
-    .iconLinks {
-        opacity: 0.5;
-        cursor: pointer;
-        height: 32px;
-        user-select: none;
-        text-align: center;
-        font-size: 24px;
-
-        &:hover {
-            opacity: 1;
-            color: rgb(255, 255, 255);
+            &.active>svg.icon,
+            &:hover>svg.icon {
+                opacity: 1;
+            }
         }
     }
 }
