@@ -65,6 +65,16 @@ export interface Response {
     data: DataProps[];
 }
 
+interface ResourceId {
+    id: number;
+}
+
+export interface ResponseRaster {
+    color_interpretation: string[];
+    resource: ResourceId;
+    values: number[];
+}
+
 export interface Rnd {
     x: number;
     y: number;
@@ -88,6 +98,7 @@ export interface Position {
 export interface Props {
     op: string;
     response: Response;
+    responseRaster: ResponseRaster[];
     position: Position;
     selected: DataProps;
 }
@@ -160,7 +171,7 @@ export interface FeatureIdentify<F extends Attrs = Attrs> {
     parent: string;
     relation: RelationProps;
 }
-export interface AttributeProps{
+export interface AttributeProps {
     attr: string;
     datatype: string;
     format_field: FormatNumberFieldData

@@ -47,8 +47,10 @@ export default observer(
     forwardRef<Element>(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
-            const { op, position, response, selected: selectedValue } = params as Props;
+            const { op, position, response, responseRaster, selected: selectedValue } = params as Props;
 
+            console.log(responseRaster);
+            
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
