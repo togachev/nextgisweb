@@ -16,7 +16,7 @@ import OlGeomPoint from "ol/geom/Point";
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
 
 import type { Display } from "@nextgisweb/webmap/display";
-import type { DataProps, EventProps, ParamsProps, Params, Response, ResponseRaster, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
+import type { DataProps, EventProps, ParamsProps, Params, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
 
 import "./IModule.less";
 
@@ -67,7 +67,6 @@ export class IModule extends Component {
     private displaySrid: number;
     private lonlat: number[];
     private response: Response;
-    private responseRaster: ResponseRaster[];
     private countFeature: number;
     private offHP: number;
     private olmap: olMap;
@@ -152,6 +151,9 @@ export class IModule extends Component {
     isNumeric = (string) => Number.isFinite(+string);
 
     getResponse = async (op: string, p, e: MapBrowserEvent) => {
+        const point = this.olmap.getCoordinateFromPixel(e.pixel);
+        console.log(point);
+        
         if (this.params.request !== undefined && (op === "popup" || p.value.attribute === true)) {
             await route("feature_layer.imodule")
                 .post({
@@ -159,22 +161,13 @@ export class IModule extends Component {
                 })
                 .then(item => {
                     this.countFeature = item.featureCount;
-                    this.response = { data: item.data, featureCount: item.featureCount };
+                    this.response = { data: item.data, featureCount: item.featureCount, point: point };
                 });
-            if (this.params.request.rasterLayers.length) {
-                const [x, y] = this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]);
-                await route("raster_layer.identify").get({
-                    query: { resources: this.params.request.rasterLayers, x, y },
-                })
-                    .then(item => {
-                        this.responseRaster = item.items;
-                    });
-            }
         } else {
             this.countFeature = 0;
-            this.response = { data: [], featureCount: 0 };
-            this.responseRaster = [];
+            this.response = { data: [], featureCount: 0, point: [] };
         }
+        console.log(this.response);
     }
 
     getLonLat = async () => {
@@ -217,7 +210,7 @@ export class IModule extends Component {
             this._setValue(this.point_popup, "popup");
 
             const propsPopup = {
-                params: { op, position, response: this.response, responseRaster: this.responseRaster, selected: value },
+                params: { op, position, response: this.response, selected: value },
                 display: this.display,
                 visible: this._visible
             } as Params
@@ -262,10 +255,8 @@ export class IModule extends Component {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
-
         if (op === "popup" && p === false) {
             const styles: StylesRequest[] = [];
-            const rasterLayers: number[] = [];
             this.display.getVisibleItems()
                 .then((items) => {
                     const itemConfig = this.display.getItemConfig();
@@ -280,11 +271,7 @@ export class IModule extends Component {
                             return;
                         }
                         if (item.identification) {
-                            if (item.identification.mode === "feature_layer") {
-                                styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
-                            } else if (item.identification.mode === "raster_layer") {
-                                rasterLayers.push(item.identification.resource.id);
-                            }
+                            styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
                         }
                     });
                 })
@@ -292,7 +279,7 @@ export class IModule extends Component {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
                 styles: styles,
-                rasterLayers: rasterLayers,
+                point: this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]),
                 status: attr,
             }
         }

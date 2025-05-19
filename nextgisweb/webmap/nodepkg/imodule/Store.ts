@@ -3,8 +3,8 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
-
-import type { AttributeProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
+import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
+import type { AttributeProps, DataProps, ExtensionsProps, Response, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
@@ -27,18 +27,24 @@ export class Store {
     @observable.ref accessor fixPos: Rnd | null = null;
     @observable.ref accessor fixPanel: string | null = null;
     @observable.ref accessor display: Display;
+    @observable.ref accessor responsePoint: number[] = [];
 
     constructor({
         display,
         valueRnd,
         fixPos,
-        fixPanel
+        fixPanel,
     }) {
         this.display = display;
         this.valueRnd = valueRnd;
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
     }
+
+    @action
+    setResponsePoint(responsePoint: number[]) {
+        this.responsePoint = responsePoint;
+    };
 
     @action
     setCountFeature(countFeature: number) {
@@ -126,27 +132,40 @@ export class Store {
     };
 
     async getContent(val: DataProps, key: boolean) {
-        const res = await this.getAttribute(val, key);
-        this.setExtensions(res.feature.extensions);
+        if (val.type === "vector") {
+            const res = await this.getAttribute(val, key);
+            this.setExtensions(res.feature.extensions);
 
-        res?.dataSource?.then(i => {
-            this.setAttribute(i);
-        });
+            res?.dataSource?.then(i => {
+                this.setAttribute(i);
+            });
 
-        const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
+            const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
 
-        highlights === true ?
-            topic.publish("feature.highlight", {
-                geom: res.feature.geom,
-                featureId: res.feature.id,
-                layerId: res.resourceId,
-            }) :
-            topic.publish("feature.unhighlight")
+            highlights === true ?
+                topic.publish("feature.highlight", {
+                    geom: res.feature.geom,
+                    featureId: res.feature.id,
+                    layerId: res.resourceId,
+                }) :
+                topic.publish("feature.unhighlight")
 
-        this.generateUrl({ res: val, st: this.data, pn: this.fixPanel, disable: false });
+            this.generateUrl({ res: val, st: this.data, pn: this.fixPanel, disable: false });
 
-        if (key === true) {
-            this.setUpdate(false);
+            if (key === true) {
+                this.setUpdate(false);
+            }
+        } else {
+            if (this.responsePoint) {
+                const [x, y] = this.responsePoint;
+                const highlightEvent: HighlightEvent = {
+                    coordinates: [x, y],
+                };
+                topic.publish("feature.highlight", highlightEvent);
+            } else {
+                topic.publish("feature.unhighlight");
+            }
+
         }
     }
 

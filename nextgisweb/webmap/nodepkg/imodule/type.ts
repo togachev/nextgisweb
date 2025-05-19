@@ -14,6 +14,16 @@ export interface RelationProps {
     relation_value?: number;
 }
 
+interface ResourceId {
+    id: number;
+}
+
+export interface ResponseRaster {
+    color_interpretation: string[];
+    resource: ResourceId;
+    values: number[];
+}
+
 export interface DataProps {
     id?: number;
     label?: string;
@@ -24,6 +34,8 @@ export interface DataProps {
     value?: string;
     permission?: string;
     relation?: RelationProps;
+    type: string;
+    raster?: ResponseRaster;
 }
 
 export interface UrlParamsProps {
@@ -63,16 +75,7 @@ export type ExtensionsProps = Record<string, unknown | null>;
 export interface Response {
     featureCount: number;
     data: DataProps[];
-}
-
-interface ResourceId {
-    id: number;
-}
-
-export interface ResponseRaster {
-    color_interpretation: string[];
-    resource: ResourceId;
-    values: number[];
+    point: number[];
 }
 
 export interface Rnd {
@@ -98,7 +101,6 @@ export interface Position {
 export interface Props {
     op: string;
     response: Response;
-    responseRaster: ResponseRaster[];
     position: Position;
     selected: DataProps;
 }

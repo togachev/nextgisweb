@@ -75,6 +75,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
         const identifyInfo = store.identifyInfo;
 
         const highlights = featureInfo && getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureInfo.layerId)?.[1].itemConfig.layerHighligh;
+
         const isNotFound =
             identifyInfo && identifyInfo.response.featureCount === 0;
 

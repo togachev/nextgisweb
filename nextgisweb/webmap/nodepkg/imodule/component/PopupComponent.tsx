@@ -47,9 +47,7 @@ export default observer(
     forwardRef<Element>(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
-            const { op, position, response, responseRaster, selected: selectedValue } = params as Props;
-
-            console.log(responseRaster);
+            const { op, position, response, selected: selectedValue } = params as Props;
             
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
@@ -93,6 +91,7 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
+                    store.setResponsePoint(response.point);
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -102,7 +101,7 @@ export default observer(
                     store.setCountFeature(0);
                 }
             }, [response]);
-
+            
             useEffect(() => {
                 store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel, disable: false })
             }, [store.currentUrlParams]);
@@ -129,6 +128,9 @@ export default observer(
                 store.setSelected(copy);
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
+                console.log(value, store.selected);
+                
+                store.setResponsePoint(response.point);
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
@@ -347,7 +349,7 @@ export default observer(
                                             {store.data.map((item, index) => {
                                                 const alias = item.permission === "Forbidden" ? forbidden : item.label;
                                                 return (
-                                                    <Option key={index} value={item.value} label={alias} desc={item.desc}>
+                                                    <Option key={index} type={item.type} value={item.value} label={alias} desc={item.desc}>
                                                         {alias}
                                                     </Option>
                                                 )

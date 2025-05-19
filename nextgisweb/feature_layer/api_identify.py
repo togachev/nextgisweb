@@ -1,15 +1,28 @@
-from typing import List
+from typing import Annotated, Any, List
 
 from msgspec import Struct
+from osgeo import gdal
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceScope
+from nextgisweb.resource import DataScope, Resource, ResourceRef, ResourceScope
+from nextgisweb.raster_layer.model import COLOR_INTERPRETATION, RasterLayer
 
 from .interface import IFeatureLayer
+
+
+class Point(Struct, kw_only=True):
+    x: float
+    y: float
+
+
+class RasterLayerIdentifyItem(Struct, kw_only=True):
+    resource: ResourceRef
+    color_interpretation: list[str]
+    values: list[Any]
 
 
 class IdentifyBody(Struct, kw_only=True):
@@ -17,11 +30,14 @@ class IdentifyBody(Struct, kw_only=True):
     srs: int
     styles: List[int]
 
+
 class IModuleBody(Struct, kw_only=True):
     geom: str
     srs: int
     styles: List[object]
     status: bool
+    point: List[object]
+
 
 def identify(request, *, body: IdentifyBody) -> JSONType:
     """Find features intersecting geometry"""
@@ -150,13 +166,58 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                             permission="Read",
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                             fields=f.fields,
+                            type="vector",
                             relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None,
                         )
                     )
+        elif layer.cls == "raster_layer":
+            if layer.has_permission(DataScope.read, request.user):
+                ds = layer.gdal_dataset()
+                if (values := val_at_coord(ds, body.point)) is None:
+                    continue
 
+                color_interpretation = [
+                    COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
+                    for bidx in range(1, layer.band_count + 1)
+                ]
+
+                options.append(
+                    dict(
+                        desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
+                        layerId=layer.id,
+                        styleId=style.id,
+                        dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
+                        label=[x["label"] for x in body.styles if x["id"] == style.id][0],
+                        permission="Read",
+                        type="raster",
+                        raster=RasterLayerIdentifyItem(
+                            resource=ResourceRef(id=layer.id),
+                            color_interpretation=color_interpretation,
+                            values=values.flatten().tolist(),
+                        )
+                    )
+                )
     result["data"] = options
     result["featureCount"] = len(options)
     return result
+
+def val_at_coord(ds: gdal.Dataset, point: Point):
+    """Simplified version of gdallocationinfo with less options. Borrowed from
+    https://github.com/OSGeo/gdal/blob/master/swig/python/gdal-utils/osgeo_utils/samples/gdallocationinfo.py
+    """
+
+    # Read geotransform matrix and calculate corresponding pixel coordinates
+    geotransform = ds.GetGeoTransform()
+    inv_geotransform = gdal.InvGeoTransform(geotransform)
+    i = int(inv_geotransform[0] + inv_geotransform[1] * point[0] + inv_geotransform[2] * point[1])
+    j = int(inv_geotransform[3] + inv_geotransform[4] * point[0] + inv_geotransform[5] * point[1])
+
+    if i < 0 or i >= ds.RasterXSize or j < 0 or j >= ds.RasterYSize:
+        return None
+
+    result = ds.ReadAsArray(i, j, 1, 1)
+    return result
+
 
 def setup_pyramid(comp, config):
     config.add_route(
