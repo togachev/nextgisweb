@@ -107,9 +107,10 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
     result = dict()
     query = DBSession.query(Resource).filter(Resource.id.in_([i["id"] for i in body.styles]))
     options = []
+
     for style in query:
         layer = style.parent
-        
+
         if hasattr(layer, "feature_query"):
             if not layer.has_permission(DataScope.read, request.user):
                 query = layer.feature_query()
@@ -172,19 +173,18 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                             relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None,
                         )
                     )
+
         if layer.cls == "raster_layer":
-            
             if layer.has_permission(DataScope.read, request.user):
                 ds = layer.gdal_dataset()
-                
+
                 if (values := val_at_coord(ds, body.point)) is None:
                     continue
-                
+
                 color_interpretation = [
                     COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
                     for bidx in range(1, layer.band_count + 1)
                 ]
-                
 
                 inSRef = ds.GetSpatialRef()
                 outSRef = osr.SpatialReference()
@@ -197,7 +197,7 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                 attr = list()
                 for i, (color, value) in enumerate(zip(color_interpretation, values.flatten().tolist())):
                     attr.append(dict(key=i, attr=color, value=value, datatype="INTEGER", format_field=dict()))
-                
+
                 options.append(
                     dict(
                         desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
@@ -208,10 +208,10 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         permission="Read",
                         type="raster",
                         attr=attr,
-                        value=str(style.id) + ":" + str(layer.id) + ":" + str(point.GetY()) + ":" + str(point.GetX()),
+                        value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
                     )
                 )
-        
+
     result["data"] = options
     result["featureCount"] = len(options)
     

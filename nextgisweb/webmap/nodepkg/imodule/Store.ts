@@ -27,7 +27,6 @@ export class Store {
     @observable.ref accessor fixPos: Rnd | null = null;
     @observable.ref accessor fixPanel: string | null = null;
     @observable.ref accessor display: Display;
-    @observable.ref accessor responsePoint: number[] = [];
 
     constructor({
         display,
@@ -40,11 +39,6 @@ export class Store {
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
     }
-
-    @action
-    setResponsePoint(responsePoint: number[]) {
-        this.responsePoint = responsePoint;
-    };
 
     @action
     setCountFeature(countFeature: number) {
@@ -139,8 +133,6 @@ export class Store {
 
             res?.dataSource?.then(i => {
                 this.setAttribute(i);
-                console.log(i);
-                
             });
 
             const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
@@ -160,7 +152,6 @@ export class Store {
             }
         }
         else if (val.type === "raster") {
-            console.log(val.attr);
             this.setAttribute(val.attr);
             this.generateUrl({ res: val, st: this.data, pn: this.fixPanel, disable: false });
             topic.publish("feature.unhighlight");

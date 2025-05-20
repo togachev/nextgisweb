@@ -94,8 +94,6 @@ export const Footer = observer(({ store }: FooterProps) => {
     }
 
     const onFinish = (value) => {
-        console.log(value);
-
         setOpen(false);
         store.setValueFooter(value);
         store.setInitialFooter(value);

@@ -48,7 +48,7 @@ export default observer(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue } = params as Props;
-
+            
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
@@ -91,7 +91,6 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
-                    store.setResponsePoint(response.point);
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -128,7 +127,6 @@ export default observer(
                 store.setSelected(copy);
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
-                store.setResponsePoint(response.point);
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

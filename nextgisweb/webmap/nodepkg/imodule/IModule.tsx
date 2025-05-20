@@ -183,7 +183,8 @@ export class IModule extends Component {
                 const wktPoint = wkt.readGeometry(t.geom);
                 if (wktPoint instanceof SimpleGeometry) {
                     const transformedCoord = wktPoint.getCoordinates();
-                    this.lonlat = transformedCoord ? transformedCoord : [];
+                    const fixedArray = transformedCoord.map(number => parseFloat(number.toFixed(12)));
+                    this.lonlat = fixedArray ? fixedArray : [];
                 }
             });
     }
@@ -204,7 +205,7 @@ export class IModule extends Component {
             }
 
             const value = this.response.data.find(x => x.value === this.selected) as DataProps;
-
+            
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
 
@@ -274,6 +275,7 @@ export class IModule extends Component {
                         }
                     });
                 })
+            
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
@@ -298,11 +300,12 @@ export class IModule extends Component {
                         });
                     })
                 })
+            
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
                 styles: p.value.params,
-                point: this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]),
+                point: p?.coordinate,
                 status: attr,
             }
         }
@@ -372,7 +375,7 @@ export class IModule extends Component {
                 })
 
                 this.selected = val.slf;
-
+                
                 const value = {
                     attribute: val.attribute,
                     pn: val.pn,
@@ -380,7 +383,7 @@ export class IModule extends Component {
                     lat: val.lat,
                     params,
                 }
-
+                
                 const p = { value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent = {
@@ -394,6 +397,7 @@ export class IModule extends Component {
                     ],
                     type: "singleclick"
                 };
+                
                 this._overlayInfo(simulateEvent, "popup", p)
             });
     };

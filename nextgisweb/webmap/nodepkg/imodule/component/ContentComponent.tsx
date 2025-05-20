@@ -185,8 +185,6 @@ export const ContentComponent = observer((props) => {
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);
         if (store.fixPos !== null) {
-            console.log(options);
-
             const result = options.find(item => item.key === store.fixPanel);
             result ? store.setFixContentItem(options.find(item => item.key === result.key)) : store.setFixContentItem(options.find(item => item.key === "attributes"));
         } else {
