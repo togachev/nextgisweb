@@ -150,8 +150,7 @@ export class IModule extends Component {
 
     isNumeric = (string) => Number.isFinite(+string);
 
-    getResponse = async (op: string, p, e: MapBrowserEvent) => {
-        const point = this.olmap.getCoordinateFromPixel(e.pixel);
+    getResponse = async (op: string, p) => {
         if (this.params.request !== undefined && (op === "popup" || p.value.attribute === true)) {
             await route("feature_layer.imodule")
                 .post({
@@ -192,7 +191,7 @@ export class IModule extends Component {
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
-        await this.getResponse(op, p, event);
+        await this.getResponse(op, p);
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
             if (this.display.config.identify_order_enabled) {

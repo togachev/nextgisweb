@@ -9,7 +9,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceRef, ResourceScope
-from nextgisweb.raster_layer.model import COLOR_INTERPRETATION, RasterLayer
+from nextgisweb.raster_layer.model import COLOR_INTERPRETATION
 
 from .interface import IFeatureLayer
 

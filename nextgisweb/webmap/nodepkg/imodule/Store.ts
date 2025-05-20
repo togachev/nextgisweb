@@ -3,8 +3,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
-import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
-import type { AttributeProps, DataProps, ExtensionsProps, Response, Rnd, OptionProps } from "./type";
+import type { AttributeProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
