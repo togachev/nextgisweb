@@ -1,5 +1,4 @@
 import { ReactElement } from "react";
-import type { RequestProps } from "@nextgisweb/webmap/panel/diagram/type";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
 
@@ -18,24 +17,19 @@ interface ResourceId {
     id: number;
 }
 
-export interface ResponseRaster {
-    color_interpretation: string[];
-    resource: ResourceId;
-    values: number[];
-}
-
-export interface DataProps {
+export interface DataProps<F extends Attrs = Attrs> {
     id?: number;
     label?: string;
     layerId?: number;
     desc?: string;
     dop?: number;
-    styleId?: number;
+    styleId: number;
     value?: string;
     permission?: string;
     relation?: RelationProps;
-    type: string;
-    raster?: ResponseRaster;
+    type?: string;
+    fields?: F;
+    attr: AttributeProps[];
 }
 
 export interface UrlParamsProps {
@@ -66,7 +60,7 @@ export interface ParamsProps {
 }
 
 export interface EventProps {
-    request: RequestProps | undefined;
+    request: RequestProps;
     point: number[];
 }
 
@@ -75,7 +69,6 @@ export type ExtensionsProps = Record<string, unknown | null>;
 export interface Response {
     featureCount: number;
     data: DataProps[];
-    point: number[];
 }
 
 export interface Rnd {
@@ -123,6 +116,8 @@ export type RequestProps = {
     srs: number;
     geom: string;
     styles: string[];
+    point: number[];
+    status: boolean;
 }
 
 export type AxisProps = {

@@ -9,7 +9,7 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
     @observable accessor layerName: string | null = null;
-    @observable accessor countFeature: number | null = null;
+    @observable accessor countFeature: number;;
     @observable accessor fixPopup = false;
     @observable accessor hideLegend = true;
     @observable accessor update = false;
@@ -17,7 +17,7 @@ export class Store {
 
     @observable.ref accessor data: DataProps[] = [];
     @observable.ref accessor selected: DataProps;
-    @observable.ref accessor attribute: AttributeProps;
+    @observable.ref accessor attribute: AttributeProps[] = [];
     @observable.ref accessor extensions: ExtensionsProps | null = null;
     @observable.ref accessor currentUrlParams: string | null = null;
     @observable.ref accessor contextUrl: string | null = null;
@@ -92,7 +92,7 @@ export class Store {
     };
 
     @action
-    setAttribute(attribute: AttributeProps) {
+    setAttribute(attribute: AttributeProps[]) {
         this.attribute = attribute;
     };
 
@@ -134,10 +134,13 @@ export class Store {
     async getContent(val: DataProps, key: boolean) {
         if (val.type === "vector") {
             const res = await this.getAttribute(val, key);
+
             this.setExtensions(res.feature.extensions);
 
             res?.dataSource?.then(i => {
                 this.setAttribute(i);
+                console.log(i);
+                
             });
 
             const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
@@ -155,17 +158,15 @@ export class Store {
             if (key === true) {
                 this.setUpdate(false);
             }
-        } else {
-            if (this.responsePoint) {
-                const [x, y] = this.responsePoint;
-                const highlightEvent: HighlightEvent = {
-                    coordinates: [x, y],
-                };
-                topic.publish("feature.highlight", highlightEvent);
-            } else {
-                topic.publish("feature.unhighlight");
+        }
+        else if (val.type === "raster") {
+            console.log(val.attr);
+            this.setAttribute(val.attr);
+            this.generateUrl({ res: val, st: this.data, pn: this.fixPanel, disable: false });
+            topic.publish("feature.unhighlight");
+            if (key === true) {
+                this.setUpdate(false);
             }
-
         }
     }
 
@@ -211,6 +212,7 @@ export class Store {
     }
 
     async generateUrl({ res, st, pn, disable }) {
+
         const imodule = this.display.imodule;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];
@@ -227,7 +229,7 @@ export class Store {
                     }
                 });
 
-                const selected = [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+                const selected = res?.type === "raster" ? [res?.styleId + ":" + res?.layerId + ":" + lon + ":" + lat] : [res?.styleId + ":" + res?.layerId + ":" + res?.id];
                 const result = [...new Set(st?.map(a => a.styleId))];
 
                 const panel = this.display.panelManager.getActivePanelName();

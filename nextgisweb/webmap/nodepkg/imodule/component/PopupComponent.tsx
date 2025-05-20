@@ -48,7 +48,7 @@ export default observer(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue } = params as Props;
-            
+
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
@@ -80,7 +80,7 @@ export default observer(
                 }));
 
             imodule.iStore = store;
-            
+
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
                 if (imodule.countFeature > 0) {
@@ -101,7 +101,7 @@ export default observer(
                     store.setCountFeature(0);
                 }
             }, [response]);
-            
+
             useEffect(() => {
                 store.generateUrl({ res: response.data[0], st: response.data, pn: store.fixPanel, disable: false })
             }, [store.currentUrlParams]);
@@ -128,8 +128,6 @@ export default observer(
                 store.setSelected(copy);
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
-                console.log(value, store.selected);
-                
                 store.setResponsePoint(response.point);
             };
 
@@ -143,7 +141,7 @@ export default observer(
             }
 
             const editFeature = useMemo(() => {
-                if (store.countFeature > 0 && store.selected) {
+                if (store.countFeature > 0 && store.selected && store.selected.type === "vector") {
                     const { id, layerId, styleId } = store.selected;
                     const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
 

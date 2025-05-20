@@ -134,46 +134,53 @@ export const ContentComponent = observer((props) => {
         })
     }
 
-    if (geoms) {
+
+    if (store.selected.type === "vector") {
+        if (geoms) {
+            options.push({
+                label: (<span className="icon-style"><QueryStats /></span>),
+                value: "geom_info",
+                key: "geom_info",
+                title: gettext("Geometry info"),
+                hidden: !settings.show_geometry_info,
+                children: settings.show_geometry_info ? (<GeometryInfo showInfo resourceId={layerId} featureId={id} srid={4326} />) : emptyValue
+            })
+        }
+
         options.push({
-            label: (<span className="icon-style"><QueryStats /></span>),
-            value: "geom_info",
-            key: "geom_info",
-            title: gettext("Geometry info"),
-            hidden: !settings.show_geometry_info,
-            children: settings.show_geometry_info ? (<GeometryInfo showInfo resourceId={layerId} featureId={id} srid={4326} />) : emptyValue
-        })
-    }
-
-    options.push({
-        label: (<span className="icon-style"><Info /></span>),
-        value: "description",
-        key: "description",
-        title: gettext("Description"),
-        hidden: false,
-        children: store.extensions !== null && store.extensions.description !== null ? (<DescComponent type="feature" display={display} content={store.extensions?.description} />) : emptyValue
-    });
-
-    options.push({
-        label: (<span className="icon-style"><Attachment /></span>),
-        value: "attachment",
-        key: "attachment",
-        title: gettext("Attachments"),
-        hidden: false,
-        children: store.extensions !== null && store.extensions.attachment !== null ? (<AttachmentTable attachments={store.extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
-    });
-
-    if (firstItem?.relation) {
-        const graphProps = { item: firstItem, store: store }
-        options.push({
-            label: (<span className="icon-style"><LineChartOutlined /></span>),
-            value: "relation",
-            key: "relation",
-            title: gettext("Graphs"),
+            label: (<span className="icon-style"><Info /></span>),
+            value: "description",
+            key: "description",
+            title: gettext("Description"),
             hidden: false,
-            children: firstItem && firstItem.relation && (<GraphPanel {...graphProps} />),
-        })
+            children: store.extensions !== null && store.extensions.description !== null ? (<DescComponent type="feature" display={display} content={store.extensions?.description} />) : emptyValue
+        });
+
+        options.push({
+            label: (<span className="icon-style"><Attachment /></span>),
+            value: "attachment",
+            key: "attachment",
+            title: gettext("Attachments"),
+            hidden: false,
+            children: store.extensions !== null && store.extensions.attachment !== null ? (<AttachmentTable attachments={store.extensions?.attachment} isSmall={true} resourceId={layerId} featureId={id} />) : emptyValue
+        });
+
+        if (firstItem?.relation) {
+            const graphProps = { item: firstItem, store: store }
+            options.push({
+                label: (<span className="icon-style"><LineChartOutlined /></span>),
+                value: "relation",
+                key: "relation",
+                title: gettext("Graphs"),
+                hidden: false,
+                children: firstItem && firstItem.relation && (<GraphPanel {...graphProps} />),
+            })
+        }
     }
+
+
+
+
 
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);

@@ -152,8 +152,6 @@ export class IModule extends Component {
 
     getResponse = async (op: string, p, e: MapBrowserEvent) => {
         const point = this.olmap.getCoordinateFromPixel(e.pixel);
-        console.log(point);
-        
         if (this.params.request !== undefined && (op === "popup" || p.value.attribute === true)) {
             await route("feature_layer.imodule")
                 .post({
@@ -161,13 +159,12 @@ export class IModule extends Component {
                 })
                 .then(item => {
                     this.countFeature = item.featureCount;
-                    this.response = { data: item.data, featureCount: item.featureCount, point: point };
+                    this.response = { data: item.data, featureCount: item.featureCount };
                 });
         } else {
             this.countFeature = 0;
-            this.response = { data: [], featureCount: 0, point: [] };
+            this.response = { data: [], featureCount: 0 };
         }
-        console.log(this.response);
     }
 
     getLonLat = async () => {
@@ -193,6 +190,7 @@ export class IModule extends Component {
 
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
         const offset = op === "context" ? 0 : settings.offset_point;
+
         await this.getResponse(op, p, event);
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
@@ -206,6 +204,7 @@ export class IModule extends Component {
             }
 
             const value = this.response.data.find(x => x.value === this.selected) as DataProps;
+
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
 
@@ -303,6 +302,7 @@ export class IModule extends Component {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
                 styles: p.value.params,
+                point: this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]),
                 status: attr,
             }
         }
@@ -372,6 +372,7 @@ export class IModule extends Component {
                 })
 
                 this.selected = val.slf;
+
                 const value = {
                     attribute: val.attribute,
                     pn: val.pn,
