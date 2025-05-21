@@ -190,7 +190,6 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         type="raster",
                         attr=None,
                         value=str(style.id) + ":" + str(layer.id),
-                        point=body.point,
                     )
                 )
             else:
@@ -218,7 +217,6 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         type="raster",
                         attr=attr,
                         value=str(style.id) + ":" + str(layer.id),
-                        point=body.point,
                     )
                 )
 

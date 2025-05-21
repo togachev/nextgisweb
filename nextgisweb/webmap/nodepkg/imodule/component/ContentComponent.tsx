@@ -23,17 +23,21 @@ import type { OptionProps, ContentProps } from "../type";
 const { Link } = Typography;
 const settings = webmapSettings;
 
+const msgHTMLFeature = gettext("HTML code of the geometry link, for insertion into the description");
+const msgHTMLRaster = gettext("HTML code link of the raster layer extent, for insertion into the description");
+
 const LinkToGeometryFeature = ({ store, display }) => {
     const imodule = display.imodule;
     const { copyValue, contextHolder } = useCopy();
-
+    console.log(store.selected.type);
+    
     if (store.selected) {
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === store.selected.styleId)?.[1];
 
         if (!imodule._isEditEnabled(display, item)) { return false; }
         return (
             <span
-                title={gettext("HTML code of the geometry link, for insertion into the description")}
+                title={store.selected.type === "vector" ? msgHTMLFeature : msgHTMLRaster}
                 className="link-button"
                 onClick={() => {
                     const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
@@ -191,10 +195,6 @@ export const ContentComponent = observer((props) => {
             })
         }
     }
-
-
-
-
 
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);

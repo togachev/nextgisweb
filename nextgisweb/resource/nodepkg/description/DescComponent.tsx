@@ -1,32 +1,38 @@
-import parse, { attributesToProps, Element, domToReact } from "html-react-parser";
+import parse, { attributesToProps, Element, domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Image, Divider, Space } from "@nextgisweb/gui/antd";
-import OlGeomPoint from "ol/geom/Point";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import topic from "@nextgisweb/webmap/compat/topic";
+import { route } from "@nextgisweb/pyramid/api";
+import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import Info from "@nextgisweb/icon/material/info/outline";
 
-import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
+import type { Display } from "@nextgisweb/webmap/display";
+
 import "./DescComponent.less";
 
 const msgWebmap = gettext("Webmap");
 const msgLayer = gettext("Layer");
 const msgStyle = gettext("Style");
+const msgActiveLink = gettext("Links are active only in the open web map");
+const msgZoomToFeature = gettext("Tap to move closer to the object");
+const msgZoomToRaster = gettext("Click to move closer to the raster layer");
 
-const zoomToFeature = (display, resourceId, featureId, result) => {
+const zoomToFeature = (display, layerId, featureId, styles) => {
     display.featureHighlighter
-        .highlightFeatureById(featureId, resourceId)
+        .highlightFeatureById(featureId, layerId)
         .then((feature) => {
-            const styles: number[] = [];
+            const visibleStyles: number[] = [];
             const itemConfig = display.getItemConfig();
             Object.keys(itemConfig).forEach(function (key) {
-                if (result.includes(itemConfig[key].styleId)) {
-                    styles.push(itemConfig[key].id);
+                if (styles.includes(itemConfig[key].styleId)) {
+                    visibleStyles.push(itemConfig[key].id);
                 }
             });
 
             display.map.zoomToFeature(feature);
-            display.webmapStore.setChecked(styles);
-            display.webmapStore._updateLayersVisibility(styles);
+            display.webmapStore.setChecked(visibleStyles);
+            display.webmapStore._updateLayersVisibility(visibleStyles);
         });
 };
 
@@ -36,37 +42,73 @@ const destroyPopup = (display) => {
     display.imodule.iStore.setValueRnd({ ...display.imodule.iStore.valueRnd, x: -9999, y: -9999 });
 }
 
-const zoomTo = (display, coords) => {
-    const point = new OlGeomPoint(coords);
-    display.map.zoomToExtent(point.getExtent());
-    const highlightEvent: HighlightEvent = { coordinates: coords };
-    topic.publish("feature.highlight", highlightEvent);
-    
+const zoomToRasterExtent = async (display, styleId, styles) => {
+    topic.publish("feature.unhighlight");
+
+    const { extent } = await route("layer.extent", {
+        id: styleId,
+    }).get({ cache: true });
+
+    display.map.zoomToNgwExtent(extent, {
+        displayProjection: display.displayProjection,
+    });
+
+    const visibleStyles: number[] = [];
+    const itemConfig = display.getItemConfig();
+    Object.keys(itemConfig).forEach(function (key) {
+        if (styles.includes(itemConfig[key].styleId)) {
+            visibleStyles.push(itemConfig[key].id);
+        }
+    });
+
+    display.webmapStore.setChecked(visibleStyles);
+    display.webmapStore._updateLayersVisibility(visibleStyles);
 };
 
-const GetData = ({ item, options, resourceId, fid, point, result, display }) => {
+interface GetDataProps {
+    type: string;
+    item: Element;
+    options: HTMLReactParserOptions;
+    layerId: number | string;
+    styleId?: number;
+    fid?: number | string;
+    styles: number[];
+    display: Display;
+}
 
-    const { data: data } = useRouteGet(
-        "resource.permission",
-        { id: resourceId },
-        { cache: true }
-    );
+const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }: GetDataProps) => {
+    const { data: data } = useRouteGet("resource.permission", { id: layerId }, { cache: true });
 
-    if (fid) {
+    if (type === "v") {
         if (data?.data.read) {
-            return (<a onClick={() => {
-                zoomToFeature(display, resourceId, fid, result);
-                display.imodule && display.imodule.iStore && destroyPopup(display);
-            }}>{domToReact(item.children, options)}</a>);
+            return (
+                <div
+                    className="link-type-active"
+                    title={msgZoomToFeature}
+                    onClick={() => {
+                        zoomToFeature(display, layerId, fid, styles)
+                        display.imodule && display.imodule.iStore && destroyPopup(display);
+                    }}>
+                    <Space direction="horizontal"><SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}</Space>
+                </div>
+            );
         } else {
             return <></>;
         }
-    } else if (point) {
+    } else if (type === "r") {
         if (data?.data.read) {
-            return (<a onClick={() => {
-                zoomTo(display, point.split(",").map(Number));
-                display.imodule && display.imodule.iStore && destroyPopup(display);
-            }}>{domToReact(item.children, options)}</a>);
+            return (
+                <div
+                    className="link-type-active"
+                    title={msgZoomToRaster}
+                    onClick={() => {
+                        zoomToRasterExtent(display, styleId, styles);
+                        display.imodule && display.imodule.iStore && destroyPopup(display);
+                    }}
+                >
+                    <Space direction="horizontal"><SvgIcon icon={`rescls-raster_layer`} />{domToReact(item.children, options)}</Space>
+                </div>
+            );
         } else {
             return <></>;
         }
@@ -74,7 +116,7 @@ const GetData = ({ item, options, resourceId, fid, point, result, display }) => 
         if (!data?.data.read) {
             return <></>
         } else {
-            return (<>{domToReact(item.children, options)}</>);
+            return (<Space className="link-type" title={msgActiveLink} direction="horizontal">{domToReact(item.children, options)}<Info /></Space>);
         }
     }
 }
@@ -130,21 +172,16 @@ export const DescComponent = (props) => {
             if (display) {
                 if (item instanceof Element && item.name === "a") {
                     if (/^[a-z]:\d+:.*$/.test(item.attribs.href)) {
-                        const [type, resId, val, styles] = item.attribs.href.split(":");
-                        if (type === "v") {
-                            const result = Array.from(styles.split(","), Number)
-                            return <GetData item={item} options={options} resourceId={resId} fid={val} result={result} display={display} />
-                        } else if (type === "r") {
-                            const result = Array.from(styles.split(","), Number)
-                            return <GetData item={item} options={options} resourceId={resId} point={val} result={result} display={display} />
-                        }
+                        const [type, layerId, val, styles] = item.attribs.href.split(":");
+                        const styles_ = Array.from(styles.split(","), Number)
+                        return <GetData type={type} item={item} options={options} layerId={layerId} fid={val} styleId={val} styles={styles_} display={display} />
                     }
                 }
             } else if (display === undefined) {
                 if (item instanceof Element && item.name === "a") {
                     if (/^[a-z]:\d+:.*$/.test(item.attribs.href)) {
                         const array = item.attribs.href.split(":");
-                        return <GetData item={item} options={options} resourceId={array[1]} />
+                        return <GetData item={item} options={options} layerId={array[1]} />
                     }
                 }
             }
