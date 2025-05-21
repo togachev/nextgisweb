@@ -74,7 +74,7 @@ const GetData = ({ item, options, resourceId, fid, point, result, display }) => 
         if (!data?.data.read) {
             return <></>
         } else {
-            return (<span>{domToReact(item.children, options)}</span>);
+            return (<>{domToReact(item.children, options)}</>);
         }
     }
 }
@@ -124,7 +124,7 @@ export const DescComponent = (props) => {
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {
-                return <span style={{ width: "100%" }} {...props} >{domToReact(item.children, options)}</span>;
+                return <div style={{ width: "100%" }} {...props} >{domToReact(item.children, options)}</div>;
             }
 
             if (display) {
