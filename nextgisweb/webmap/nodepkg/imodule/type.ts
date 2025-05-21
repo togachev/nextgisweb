@@ -25,6 +25,7 @@ export interface DataProps<F extends Attrs = Attrs> {
     dop?: number;
     styleId: number;
     value?: string;
+    point?: string;
     permission?: string;
     relation?: RelationProps;
     type?: string;

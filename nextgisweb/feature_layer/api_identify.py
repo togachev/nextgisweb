@@ -175,9 +175,25 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                     )
 
         if layer.cls == "raster_layer":
-            if layer.has_permission(DataScope.read, request.user):
-                ds = layer.gdal_dataset()
+            ds = layer.gdal_dataset()
+            attr = list()
 
+            if not layer.has_permission(DataScope.read, request.user):
+                options.append(
+                    dict(
+                        desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
+                        layerId=layer.id,
+                        styleId=style.id,
+                        dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
+                        label="Forbidden",
+                        permission="Forbidden",
+                        type="raster",
+                        attr=None,
+                        value=str(style.id) + ":" + str(layer.id),
+                        point=body.point,
+                    )
+                )
+            else:
                 if (values := val_at_coord(ds, body.point)) is None:
                     continue
 
@@ -186,17 +202,10 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                     for bidx in range(1, layer.band_count + 1)
                 ]
 
-                inSRef = ds.GetSpatialRef()
-                outSRef = osr.SpatialReference()
-                outSRef.ImportFromEPSG(4326)
-                point = ogr.Geometry(ogr.wkbPoint)
-                point.AssignSpatialReference(inSRef) 
-                point.AddPoint(body.point[0], body.point[1])
-                point.TransformTo(outSRef)
+                value_channel = ["{} ({:02})".format(b_, a_) for a_, b_ in zip(color_interpretation, values.flatten().tolist())]
 
-                attr = list()
-                for i, (color, value) in enumerate(zip(color_interpretation, values.flatten().tolist())):
-                    attr.append(dict(key=i, attr=color, value=value, datatype="INTEGER", format_field=dict()))
+                for i, value in enumerate(value_channel):
+                    attr.append(dict(key=i, attr=i, value=value, datatype="STRING", format_field=dict()))
 
                 options.append(
                     dict(
@@ -208,7 +217,8 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         permission="Read",
                         type="raster",
                         attr=attr,
-                        value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
+                        value=str(style.id) + ":" + str(layer.id),
+                        point=body.point,
                     )
                 )
 

@@ -1,9 +1,11 @@
 import parse, { attributesToProps, Element, domToReact } from "html-react-parser";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Image, Divider, Space } from "@nextgisweb/gui/antd";
-
+import OlGeomPoint from "ol/geom/Point";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import topic from "@nextgisweb/webmap/compat/topic";
 
+import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 import "./DescComponent.less";
 
 const msgWebmap = gettext("Webmap");
@@ -28,11 +30,43 @@ const zoomToFeature = (display, resourceId, featureId, result) => {
         });
 };
 
-const GetData = ({ item, options, resourceId, fid, result, display }) => {
-    const { data: data } = useRouteGet("resource.permission", { id: resourceId }, { cache: true });
+const destroyPopup = (display) => {
+    display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" });
+    display.imodule.iStore.setFullscreen(false)
+    display.imodule.iStore.setValueRnd({ ...display.imodule.iStore.valueRnd, x: -9999, y: -9999 });
+}
+
+const zoomTo = (display, coords) => {
+    const point = new OlGeomPoint(coords);
+    display.map.zoomToExtent(point.getExtent());
+    const highlightEvent: HighlightEvent = { coordinates: coords };
+    topic.publish("feature.highlight", highlightEvent);
+    
+};
+
+const GetData = ({ item, options, resourceId, fid, point, result, display }) => {
+
+    const { data: data } = useRouteGet(
+        "resource.permission",
+        { id: resourceId },
+        { cache: true }
+    );
+
     if (fid) {
         if (data?.data.read) {
-            return (<a onClick={() => { zoomToFeature(display, resourceId, fid, result); }}>{domToReact(item.children, options)}</a>);
+            return (<a onClick={() => {
+                zoomToFeature(display, resourceId, fid, result);
+                display.imodule.iStore && destroyPopup(display);
+            }}>{domToReact(item.children, options)}</a>);
+        } else {
+            return <></>;
+        }
+    } else if (point) {
+        if (data?.data.read) {
+            return (<a onClick={() => {
+                zoomTo(display, point.split(",").map(Number));
+                display.imodule.iStore && destroyPopup(display);
+            }}>{domToReact(item.children, options)}</a>);
         } else {
             return <></>;
         }
@@ -93,21 +127,24 @@ export const DescComponent = (props) => {
                 return <span style={{ width: "100%" }} {...props} >{domToReact(item.children, options)}</span>;
             }
 
-            if (display === undefined) {
-                if (item instanceof Element && item.name === "a") {
-                    if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
-                        const [resId] = item.attribs.href.split(":");
-                        return <GetData item={item} options={options} resourceId={resId} />
-                    }
-                }
-            }
-
             if (display) {
                 if (item instanceof Element && item.name === "a") {
-                    if (/^\d+:\d+:\d+.*$/.test(item.attribs.href)) {
-                        const [resId, fid, styles] = item.attribs.href.split(":");
-                        const result = Array.from(styles.split(","), Number)
-                        return <GetData item={item} options={options} resourceId={resId} fid={fid} result={result} display={display} />
+                    if (/^[a-z]:\d+:.*$/.test(item.attribs.href)) {
+                        const [type, resId, val, styles] = item.attribs.href.split(":");
+                        if (type === "v") {
+                            const result = Array.from(styles.split(","), Number)
+                            return <GetData item={item} options={options} resourceId={resId} fid={val} result={result} display={display} />
+                        } else if (type === "r") {
+                            const result = Array.from(styles.split(","), Number)
+                            return <GetData item={item} options={options} resourceId={resId} point={val} result={result} display={display} />
+                        }
+                    }
+                }
+            } else if (display === undefined) {
+                if (item instanceof Element && item.name === "a") {
+                    if (/^[a-z]:\d+:.*$/.test(item.attribs.href)) {
+                        const array = item.attribs.href.split(":");
+                        return <GetData item={item} options={options} resourceId={array[1]} />
                     }
                 }
             }
@@ -117,11 +154,9 @@ export const DescComponent = (props) => {
     let data_;
     if (content === undefined && type === "map") {
         data_ = parse(display.config.webmapDescription, options)
-    }
-    else if (content?.content instanceof Array && content.type === "map") {
+    } else if (content?.content instanceof Array && content.type === "map") {
         data_ = (<DescComp content={content.content} />)
-    }
-    else {
+    } else {
         data_ = parse(content, options)
     }
 

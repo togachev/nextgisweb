@@ -11,7 +11,8 @@ import EyeOoutline from "@nextgisweb/icon/mdi/eye-outline";
 export class StyleSettingsPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
-        const typeLayer = ["postgis_layer", "vector_layer"];
+        const typeLayer = ["postgis_layer", "vector_layer", "raster_layer"];
+        
         return {
             ...state,
             enabled: !!(state.enabled && !this.display.tinyConfig && typeLayer.includes(nodeData.layerCls)),

@@ -7,7 +7,7 @@ import Attachment from "@nextgisweb/icon/material/attachment";
 import TableRows from "@nextgisweb/icon/material/table_rows";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
@@ -46,6 +46,8 @@ const LinkToGeometryFeature = ({ store, display }) => {
         )
     }
 };
+
+const msgBand = gettextf("Band {}");
 
 export const ContentComponent = observer((props) => {
     const { store: storeProp, display } = props as ContentProps
@@ -86,15 +88,27 @@ export const ContentComponent = observer((props) => {
         const items: DescriptionsProps["items"] = [];
         if (attribute.length > 0) {
             if (attribute.length > 1) {
-                attribute.map((item) => {
-                    if (item.value !== null) {
-                        items.push({
-                            key: item.key,
-                            label: item.attr,
-                            children: (<RenderValue attribute={item} />),
-                        })
-                    }
-                })
+                if (store.selected.type === "raster") {
+                    attribute.map((item) => {
+                        if (item.value !== null) {
+                            items.push({
+                                key: item.key,
+                                label: msgBand(item.attr),
+                                children: (<RenderValue attribute={item} />),
+                            })
+                        }
+                    })
+                } else {
+                    attribute.map((item) => {
+                        if (item.value !== null) {
+                            items.push({
+                                key: item.key,
+                                label: item.attr,
+                                children: (<RenderValue attribute={item} />),
+                            })
+                        }
+                    })
+                }
             } else {
                 attribute.map((item) => {
                     if (item.value !== null) {

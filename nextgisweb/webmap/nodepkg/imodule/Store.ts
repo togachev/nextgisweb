@@ -251,6 +251,8 @@ export class Store {
         items.map(i => {
             styles.push(i.styleId);
         });
-        this.setLinkToGeometry(value.layerId + ":" + value.id + ":" + styles);
+        value.type === "vector" ?
+            this.setLinkToGeometry("v:" + value.layerId + ":" + value.id + ":" + styles) :
+            this.setLinkToGeometry("r:" + value.layerId + ":" + value.point + ":" + styles)
     }
 }
