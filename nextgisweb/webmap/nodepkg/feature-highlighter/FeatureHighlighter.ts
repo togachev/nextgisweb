@@ -32,6 +32,7 @@ export class FeatureHighlighter {
     private _wkt: WKT;
     private _zIndex = 1000;
     private _strokeColor = "rgba(255,255,0,1)";
+    private _strokeColorBlack = "rgb(0, 0, 0)";
 
     private _highlightStyle?: Style;
 
@@ -81,8 +82,26 @@ export class FeatureHighlighter {
             this._highlightStyle?.getStroke() ||
             new Stroke({
                 color: this._strokeColor,
-                width: 2,
-            });
+                width: 3,
+            })
+
+        return new Style({
+            image: new RegularShape({
+                points: 4,
+                radius: 10,
+                angle: Math.PI / 4,
+                stroke,
+            }),
+        });
+    }
+
+    private _getCrossStyleBlack(): Style {
+        const stroke =
+            this._highlightStyle?.getStroke() ||
+            new Stroke({
+                color: this._strokeColorBlack,
+                width: 1,
+            })
 
         return new Style({
             image: new RegularShape({
@@ -115,7 +134,7 @@ export class FeatureHighlighter {
                 layerId: e.layerId,
                 featureId: e.featureId,
             });
-            feature.setStyle(this._getCrossStyle());
+            feature.setStyle([this._getCrossStyle(), this._getCrossStyleBlack()]);
         } else {
             if (e.feature) {
                 feature = e.feature;
