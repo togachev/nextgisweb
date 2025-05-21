@@ -56,7 +56,7 @@ const GetData = ({ item, options, resourceId, fid, point, result, display }) => 
         if (data?.data.read) {
             return (<a onClick={() => {
                 zoomToFeature(display, resourceId, fid, result);
-                display.imodule.iStore && destroyPopup(display);
+                display.imodule && display.imodule.iStore && destroyPopup(display);
             }}>{domToReact(item.children, options)}</a>);
         } else {
             return <></>;
@@ -65,7 +65,7 @@ const GetData = ({ item, options, resourceId, fid, point, result, display }) => 
         if (data?.data.read) {
             return (<a onClick={() => {
                 zoomTo(display, point.split(",").map(Number));
-                display.imodule.iStore && destroyPopup(display);
+                display.imodule && display.imodule.iStore && destroyPopup(display);
             }}>{domToReact(item.children, options)}</a>);
         } else {
             return <></>;
