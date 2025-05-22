@@ -202,7 +202,6 @@ export class IModule extends Component {
                     this.response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
                 }
             }
-            console.log(this.response.data, this.selected);
             
             const value = this.response.data.find(x => x.value === this.selected) as DataProps;
             
@@ -375,7 +374,6 @@ export class IModule extends Component {
                 })
 
                 this.selected = val.slf;
-                console.log(val.slf);
                 
                 const value = {
                     attribute: val.attribute,
