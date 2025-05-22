@@ -18,7 +18,7 @@ import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
-
+import { ShareFeature } from "./ShareFeature";
 import type { OptionProps, ContentProps } from "../type";
 
 const { Link } = Typography;
@@ -54,7 +54,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
 const msgBand = gettextf("Band {}");
 
 export const ContentComponent = observer((props) => {
-    const { store: storeProp, display } = props as ContentProps
+    const { store: storeProp, display } = props as ContentProps;
     const [store] = useState(() => storeProp);
     const { id, layerId } = store.selected;
     const { copyValue, contextHolder } = useCopy();
@@ -196,13 +196,14 @@ export const ContentComponent = observer((props) => {
         }
     }
 
+    const shareFeatureProps = { display: display, store: store };
     options.push({
         label: (<span className="icon-style"><Share /></span>),
         value: "share_feature",
         key: "share_feature",
         title: gettext("Feature share"),
         hidden: false,
-        children: <>{JSON.stringify(store.selected)}</>,
+        children: <ShareFeature {...shareFeatureProps} />,
     })
 
     useEffect(() => {

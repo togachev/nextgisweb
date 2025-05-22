@@ -216,7 +216,7 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         permission="Read",
                         type="raster",
                         attr=attr,
-                        value=str(style.id) + ":" + str(layer.id),
+                        value=str(style.id) + ":" + str(layer.id) + ":raster",
                     )
                 )
 

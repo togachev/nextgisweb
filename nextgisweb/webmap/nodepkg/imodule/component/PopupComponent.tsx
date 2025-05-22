@@ -127,6 +127,8 @@ export default observer(
                 store.setSelected(copy);
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
+                console.log(copy);
+                
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

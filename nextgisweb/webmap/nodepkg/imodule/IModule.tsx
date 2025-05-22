@@ -374,6 +374,7 @@ export class IModule extends Component {
                 })
 
                 this.selected = val.slf;
+                console.log(val.slf);
                 
                 const value = {
                     attribute: val.attribute,
