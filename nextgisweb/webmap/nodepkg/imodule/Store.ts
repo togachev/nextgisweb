@@ -223,11 +223,11 @@ export class Store {
                 const result = [...new Set(st?.map(a => a.styleId))];
 
                 const panel = this.display.panelManager.getActivePanelName();
-
+                const pn_ = pn !== "share_feature" ? pn : "attributes"
                 const obj = disable ?
-                    { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
+                    { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn_, base: this.display.map.baseLayer?.name } :
                     res ?
-                        { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
+                        { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn_, base: this.display.map.baseLayer?.name } :
                         { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
 
                 panel !== "share" && Object.assign(obj, { panel: panel });
