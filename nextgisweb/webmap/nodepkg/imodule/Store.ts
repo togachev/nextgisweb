@@ -202,7 +202,6 @@ export class Store {
     }
 
     async generateUrl({ res, st, pn, disable }) {
-
         const imodule = this.display.imodule;
         const lon = imodule.lonlat[0];
         const lat = imodule.lonlat[1];

@@ -178,6 +178,14 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
             ds = layer.gdal_dataset()
             attr = list()
 
+            inSRef = ds.GetSpatialRef()
+            outSRef = osr.SpatialReference()
+            outSRef.ImportFromEPSG(4326)
+            point = ogr.Geometry(ogr.wkbPoint)
+            point.AssignSpatialReference(inSRef) 
+            point.AddPoint(body.point[0], body.point[1])
+            point.TransformTo(outSRef)
+
             if not layer.has_permission(DataScope.read, request.user):
                 options.append(
                     dict(
@@ -189,7 +197,7 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         permission="Forbidden",
                         type="raster",
                         attr=None,
-                        value=str(style.id) + ":" + str(layer.id),
+                        value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
                     )
                 )
             else:
@@ -216,7 +224,7 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         permission="Read",
                         type="raster",
                         attr=attr,
-                        value=str(style.id) + ":" + str(layer.id) + ":raster",
+                        value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
                     )
                 )
 
