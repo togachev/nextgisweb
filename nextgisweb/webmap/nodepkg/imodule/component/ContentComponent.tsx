@@ -5,6 +5,7 @@ import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
 import Attachment from "@nextgisweb/icon/material/attachment";
 import TableRows from "@nextgisweb/icon/material/table_rows";
+import Share from "@nextgisweb/icon/material/share";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -29,7 +30,7 @@ const msgHTMLRaster = gettext("HTML code link of the raster layer extent, for in
 const LinkToGeometryFeature = ({ store, display }) => {
     const imodule = display.imodule;
     const { copyValue, contextHolder } = useCopy();
-    
+
     if (store.selected) {
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === store.selected.styleId)?.[1];
 
@@ -194,6 +195,15 @@ export const ContentComponent = observer((props) => {
             })
         }
     }
+
+    options.push({
+        label: (<span className="icon-style"><Share /></span>),
+        value: "share_feature",
+        key: "share_feature",
+        title: gettext("Feature share"),
+        hidden: false,
+        children: <>{JSON.stringify(store.selected)}</>,
+    })
 
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);
