@@ -29,7 +29,6 @@ const msgHTMLRaster = gettext("HTML code link of the raster layer extent, for in
 const LinkToGeometryFeature = ({ store, display }) => {
     const imodule = display.imodule;
     const { copyValue, contextHolder } = useCopy();
-    console.log(store.selected.type);
     
     if (store.selected) {
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === store.selected.styleId)?.[1];
