@@ -5,7 +5,6 @@ import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
 import Attachment from "@nextgisweb/icon/material/attachment";
 import TableRows from "@nextgisweb/icon/material/table_rows";
-import Share from "@nextgisweb/icon/material/share";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -18,7 +17,7 @@ import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
-// import { ShareFeature } from "./ShareFeature";
+
 import type { OptionProps, ContentProps } from "../type";
 
 const { Link } = Typography;
@@ -196,16 +195,6 @@ export const ContentComponent = observer((props) => {
         }
     }
 
-    // const shareFeatureProps = { display: display, store: store };
-    // options.push({
-    //     label: (<span className="icon-style"><Share /></span>),
-    //     value: "share_feature",
-    //     key: "share_feature",
-    //     title: gettext("Feature share"),
-    //     hidden: false,
-    //     children: <ShareFeature {...shareFeatureProps} />,
-    // })
-
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);
         if (store.fixPos !== null) {
@@ -272,7 +261,7 @@ export const ContentComponent = observer((props) => {
                                             options.map((item, i) => {
                                                 if (!item.hidden) {
                                                     return (
-                                                        <Radio.Button key={i} title={item.title} value={item.value}>
+                                                        <Radio.Button color="primary" variant="filled" key={i} title={item.title} value={item.value}>
                                                             {item.label}
                                                         </Radio.Button>
                                                     )

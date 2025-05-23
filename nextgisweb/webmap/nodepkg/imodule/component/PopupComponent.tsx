@@ -48,7 +48,7 @@ export default observer(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue } = params as Props;
-            
+
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
@@ -128,7 +128,7 @@ export default observer(
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
                 console.log(copy);
-                
+
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
@@ -188,6 +188,9 @@ export default observer(
                 createPortal(
                     <ConfigProvider
                         theme={{
+                            token: {
+                                colorPrimary: "#106a90",
+                            },
                             components: {
                                 Dropdown: {
                                     paddingBlock: 5,
@@ -197,9 +200,13 @@ export default observer(
                                     lineHeight: 1,
                                 },
                                 Radio: {
+                                    buttonSolidCheckedActiveBg: "transparent",
+                                    buttonSolidCheckedColor: "var(--primary)",
+                                    buttonSolidCheckedBg: "#bccccf",
                                     buttonPaddingInline: 3,
                                     buttonSolidCheckedHoverBg: "var(--icon-color)",
                                     colorPrimary: "var(--primary)",
+                                    colorBorder: "transparent",
                                     borderRadius: 4,
                                     controlHeight: 24,
                                     fontSize: 16,

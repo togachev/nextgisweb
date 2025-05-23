@@ -75,8 +75,6 @@ export { default as Table } from "./table";
 export { default as Tabs } from "./tabs";
 export { default as InputBigInteger } from "./input-big-integer";
 
-export type { BaseButtonProps } from "antd/es/button/button";
-
 export type { CarouselRef } from "antd/es/carousel";
 export type { SizeType } from "antd/es/config-provider/SizeContext";
 export type { TextAreaProps } from "antd/es/input";

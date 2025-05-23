@@ -3,6 +3,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
+import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 import type { AttributeProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
@@ -20,6 +21,7 @@ export class Store {
     @observable.ref accessor extensions: ExtensionsProps | null = null;
     @observable.ref accessor currentUrlParams: string | null = null;
     @observable.ref accessor contextUrl: string | null = null;
+    @observable.ref accessor permalink: string | null = null;
     @observable.ref accessor fixContentItem: OptionProps;
     @observable.ref accessor linkToGeometry: string | null = null;
     @observable.ref accessor valueRnd: Rnd;
@@ -112,6 +114,11 @@ export class Store {
     @action
     setContextUrl(contextUrl: string) {
         this.contextUrl = contextUrl;
+    };
+
+    @action
+    setPermalink(permalink: string) {
+        this.permalink = permalink;
     };
 
     @action
@@ -250,9 +257,17 @@ export class Store {
         items.map(i => {
             styles.push(i.styleId);
         });
-        
+
         value.type === "vector" ?
             this.setLinkToGeometry("v:" + value.layerId + ":" + value.id + ":" + styles) :
             this.setLinkToGeometry("r:" + value.layerId + ":" + value.styleId + ":" + styles)
+    }
+
+    async updatePermalink() {
+        const display = this.display
+        await this.display.getVisibleItems().then((visibleItems) => {
+            const permalink = getPermalink({ display, visibleItems });
+            this.setPermalink(decodeURIComponent(permalink));
+        })
     }
 }
