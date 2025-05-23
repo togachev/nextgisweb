@@ -1,20 +1,27 @@
 import { useCallback, useState } from "react";
+import { observer } from "mobx-react-lite";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
+import type { BaseButtonProps } from "@nextgisweb/gui/antd";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import VectorLink from "@nextgisweb/icon/mdi/vector-link";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
-import { observer } from "mobx-react-lite";
+import LockReset from "@nextgisweb/icon/mdi/lock-reset";
+import Fullscreen from "@nextgisweb/icon/mdi/fullscreen";
+import ContentCopy from "@nextgisweb/icon/mdi/content-copy";
+
+import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
+import { ButtonCheckboxGroup } from "./ButtonCheckboxGroup";
+import { useComponent } from "../useSource";
 
 import type { CoordinateProps } from "../type";
-import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 export const CoordinateComponent = observer((props) => {
     const { store: storeProp, display, op } = props as CoordinateProps
-
     const [store] = useState(() => storeProp);
+    const { status, setStatus, valueCheckbox } = useComponent(display);
 
     const { copyValue, contextHolder } = useCopy();
     const imodule = display.imodule;
@@ -71,7 +78,14 @@ export const CoordinateComponent = observer((props) => {
         }
     }, []);
 
-
+    const propsButton = {
+        icons: [
+            // { label: <LockReset />, value: "reset", disabled: false },
+            { label: <UpdateLink />, value: "popup", disabled: false },
+            { label: <Fullscreen />, value: "extent", disabled: false },
+        ],
+        store: store
+    }
 
     return (
         <div className="footer-coordinate-component">
@@ -88,14 +102,8 @@ export const CoordinateComponent = observer((props) => {
             </span>
             {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
                 <div className="link-block">
-                    <Button
-                        type="text"
-                        icon={<UpdateLink />}
-                        title={msgUpdate.join("\n")}
-                        className="link-button"
-                        onClick={handleClick}
-                        onContextMenu={handleClick}
-                    />
+                    <ButtonCheckboxGroup {...propsButton} />
+                    {/* <ButtonUpdateUrl {...updateUrl("reset")} /> */}
                     <Button
                         type="text"
                         icon={<VectorLink />}

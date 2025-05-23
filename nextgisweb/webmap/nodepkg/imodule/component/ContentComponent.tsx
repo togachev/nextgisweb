@@ -18,7 +18,7 @@ import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
-import { ShareFeature } from "./ShareFeature";
+// import { ShareFeature } from "./ShareFeature";
 import type { OptionProps, ContentProps } from "../type";
 
 const { Link } = Typography;
@@ -196,15 +196,15 @@ export const ContentComponent = observer((props) => {
         }
     }
 
-    const shareFeatureProps = { display: display, store: store };
-    options.push({
-        label: (<span className="icon-style"><Share /></span>),
-        value: "share_feature",
-        key: "share_feature",
-        title: gettext("Feature share"),
-        hidden: false,
-        children: <ShareFeature {...shareFeatureProps} />,
-    })
+    // const shareFeatureProps = { display: display, store: store };
+    // options.push({
+    //     label: (<span className="icon-style"><Share /></span>),
+    //     value: "share_feature",
+    //     key: "share_feature",
+    //     title: gettext("Feature share"),
+    //     hidden: false,
+    //     children: <ShareFeature {...shareFeatureProps} />,
+    // })
 
     useEffect(() => {
         setHeightPanel(store.valueRnd.height - 70);
