@@ -100,7 +100,7 @@ export const CoordinateComponent = observer((props) => {
                 </span>
                 <span className="coords">{coordsVisible}</span>
             </span>
-            {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
+            {!display.tinyConfig && op === "popup" && store.countFeature ===0 && store.contextUrl !== null && (
                 <div className="link-block">
                     <ButtonCheckboxGroup {...propsButton} />
                     {/* <ButtonUpdateUrl {...updateUrl("reset")} /> */}
