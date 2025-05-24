@@ -6,18 +6,14 @@ import { Button } from "@nextgisweb/gui/antd";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 
-const msgResetUrl = gettext("Reset url");
-
 export const ButtonCheckboxGroup = (props) => {
     const { items, store, display } = props;
-    const obj = items.reduce((acc, curr) => ({ ...acc, [curr.value]: false }), {});
+    const obj = items.reduce((acc, curr) => ({ ...acc, [curr.value]: curr.status }), {});
     const urls = items.reduce((acc, curr) => ({ ...acc, [curr.value]: curr.url }), {});
 
     const [status, setStatus] = useState(obj);
     const [activeKey, setActiveKey] = useState();
 
-    // console.log(window.location.href, items.find(i => i.url === store.contextUrl).url);
-    
     useMemo(() => {
         setStatus(obj);
         store.updatePermalink();
@@ -47,22 +43,22 @@ export const ButtonCheckboxGroup = (props) => {
         })
     }, []);
 
-    const propsUpdate = (itm) => {
+    const propsUpdate = (item) => {
         return {
-            icon: !status[itm.value] ? itm.label : <LockReset />,
-            onClick: () => onChange(itm.value),
-            color: !status[itm.value] ? "defaut" : "primary",
+            icon: status[item.value] ? <LockReset /> : item.label,
+            onClick: () => onChange(item.value),
+            color: status[item.value] ? "primary" : "defaut",
             variant: "filled",
             type: "text",
             size: "small",
-            title: status[itm.value] && activeKey ? msgResetUrl : "",
+            title: status[item.value] ? gettext("Reset url") : item.title,
         }
     }
 
-    return items.map((itm, index) => {
+    return items.map((item, index) => {
         return (
             <div key={index}>
-                <Button {...propsUpdate(itm)} />
+                <Button {...propsUpdate(item)} />
             </div>
         )
     })

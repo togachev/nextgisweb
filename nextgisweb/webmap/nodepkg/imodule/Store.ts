@@ -9,11 +9,13 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
     @observable accessor layerName: string | null = null;
-    @observable accessor countFeature: number;;
+    @observable accessor countFeature: number;
     @observable accessor fixPopup = false;
     @observable accessor hideLegend = true;
     @observable accessor update = false;
     @observable accessor fullscreen = false;
+    @observable accessor currentUrlExtentStatus = false;
+    @observable accessor currentUrlStatus = false;
 
     @observable.ref accessor data: DataProps[] = [];
     @observable.ref accessor selected: DataProps;
@@ -40,6 +42,16 @@ export class Store {
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
     }
+
+    @action
+    setCurrentUrlExtentStatus(currentUrlExtentStatus: boolean) {
+        this.currentUrlExtentStatus = currentUrlExtentStatus;
+    };
+
+    @action
+    setCurrentUrlStatus(currentUrlStatus: boolean) {
+        this.currentUrlStatus = currentUrlStatus;
+    };
 
     @action
     setCountFeature(countFeature: number) {
@@ -226,14 +238,14 @@ export class Store {
                 });
 
                 const selected = res?.type === "raster" ? [res?.styleId + ":" + res?.layerId + ":" + lon + ":" + lat] : [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-                const result = [...new Set(st?.map(a => a.styleId))];
+                const result = [...new Set(st?.map(a => a.styleId))].sort();
 
                 const panel = this.display.panelManager.getActivePanelName();
-                const pn_ = pn !== "share_feature" ? pn : "attributes"
+
                 const obj = disable ?
-                    { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn_, base: this.display.map.baseLayer?.name } :
+                    { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: "attributes", base: this.display.map.baseLayer?.name } :
                     res ?
-                        { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn_, base: this.display.map.baseLayer?.name } :
+                        { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: "attributes", base: this.display.map.baseLayer?.name } :
                         { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
 
                 panel !== "share" && Object.assign(obj, { panel: panel });

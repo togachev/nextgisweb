@@ -44,8 +44,16 @@ export const CoordinateComponent = observer((props) => {
 
     const propsButton = {
         items: [
-            { label: <UpdateLink />, value: "popup", url: store.contextUrl },
-            { label: <Fullscreen />, value: "extent", url: store.permalink },
+            {
+                label: <UpdateLink />, value: "popup", url: store.contextUrl,
+                status: store.currentUrlStatus,
+                title: gettext("Update current web map address")
+            },
+            {
+                label: <Fullscreen />, value: "extent", url: store.permalink,
+                status: store.currentUrlExtentStatus,
+                title: gettext("Set current map coverage")
+            },
         ],
         store,
         display,

@@ -91,6 +91,10 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
+
+                    // statuses to update the current address bar when opening a popup
+                    selectedValue ? store.setCurrentUrlStatus(true) : store.setCurrentUrlStatus(false);
+                    !window.location.href.includes("pn=") && window.location.href.includes("lon=") ? store.setCurrentUrlExtentStatus(true) : store.setCurrentUrlExtentStatus(false);
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -127,8 +131,6 @@ export default observer(
                 store.setSelected(copy);
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
-                console.log(copy);
-
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
