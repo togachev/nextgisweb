@@ -39,7 +39,7 @@ class Control extends Interaction {
 
     handleClickEvent(e: MapBrowserEvent): boolean {
         if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-            this.tool._overlayInfo(e, "popup", false);
+            this.tool._overlayInfo(e, "popup", false, "click");
             e.preventDefault();
         }
         // else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
@@ -47,7 +47,7 @@ class Control extends Interaction {
         //     e.preventDefault();
         // }
         else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-            this.tool._overlayInfo(e, "context", false);
+            this.tool._overlayInfo(e, "context", false, "click");
             e.preventDefault();
         }
         return true;
@@ -188,7 +188,7 @@ export class IModule extends Component {
             });
     }
 
-    displayFeatureInfo = async (event: MapBrowserEvent, op: string, p) => {
+    displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         await this.getResponse(op, p);
@@ -202,16 +202,21 @@ export class IModule extends Component {
                     this.response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
                 }
             }
-            
-            const value = this.response.data.find(x => x.value === this.selected) as DataProps;
-            
+            let value;
+            if (mode === "click") {
+                value = this.response.data[0];
+            }
+            else if (mode === "simulate") {
+                value = this.response.data.find(x => x.value === this.selected) as DataProps;
+            }
+
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
 
             const propsPopup = {
-                params: { op, position, response: this.response, selected: value },
+                params: { mode: mode, op, position, response: this.response, selected: value },
                 display: this.display,
-                visible: this._visible
+                visible: this._visible,
             } as Params
 
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
@@ -250,7 +255,7 @@ export class IModule extends Component {
     //     console.log(e.pixel, op, p);
     // };
 
-    _overlayInfo = async (e: MapBrowserEvent, op: string, p) => {
+    _overlayInfo = async (e: MapBrowserEvent, op: string, p, mode) => {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
@@ -274,7 +279,7 @@ export class IModule extends Component {
                         }
                     });
                 })
-            
+
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(e.pixel),
@@ -299,7 +304,7 @@ export class IModule extends Component {
                         });
                     })
                 })
-            
+
             request = {
                 srs: this.displaySrid,
                 geom: this._requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
@@ -317,7 +322,7 @@ export class IModule extends Component {
         await this.getLonLat();
 
         if (this.display.panelManager.getActivePanelName() !== "custom-layer") {
-            this.displayFeatureInfo(e, op, p);
+            this.displayFeatureInfo(e, op, p, mode);
         }
     };
 
@@ -374,7 +379,7 @@ export class IModule extends Component {
                 })
 
                 this.selected = val.slf;
-                
+
                 const value = {
                     attribute: val.attribute,
                     pn: val.pn,
@@ -382,7 +387,7 @@ export class IModule extends Component {
                     lat: val.lat,
                     params,
                 }
-                
+
                 const p = { value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent = {
@@ -396,8 +401,8 @@ export class IModule extends Component {
                     ],
                     type: "singleclick"
                 };
-                
-                this._overlayInfo(simulateEvent, "popup", p)
+
+                this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
     };
 }

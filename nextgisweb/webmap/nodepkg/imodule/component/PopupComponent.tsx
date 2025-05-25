@@ -47,7 +47,7 @@ export default observer(
     forwardRef<Element>(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
-            const { op, position, response, selected: selectedValue } = params as Props;
+            const { op, position, response, selected: selectedValue, mode } = params as Props;
 
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
@@ -83,6 +83,16 @@ export default observer(
 
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
+
+                // statuses to update the current address bar when opening a popup
+                if (mode === "simulate") {
+                    store.setCurrentUrlExtentStatus(false);
+                    store.setCurrentUrlStatus(true);
+                } else {
+                    store.setCurrentUrlStatus(false);
+                    !window.location.href.includes("pn=") && window.location.href.includes("lon=") && store.setCurrentUrlExtentStatus(true)
+                }
+
                 if (imodule.countFeature > 0) {
                     const selectVal = selectedValue ? selectedValue : response.data[0];
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
@@ -92,9 +102,8 @@ export default observer(
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
 
-                    // statuses to update the current address bar when opening a popup
-                    selectedValue ? store.setCurrentUrlStatus(true) : store.setCurrentUrlStatus(false);
-                    !window.location.href.includes("pn=") && window.location.href.includes("lon=") ? store.setCurrentUrlExtentStatus(true) : store.setCurrentUrlExtentStatus(false);
+
+
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});

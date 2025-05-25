@@ -97,6 +97,7 @@ export interface Props {
     response: Response;
     position: Position;
     selected: DataProps;
+    mode: string;
 }
 
 export interface ContextProps {

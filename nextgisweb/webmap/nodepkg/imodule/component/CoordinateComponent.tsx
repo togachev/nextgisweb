@@ -6,7 +6,7 @@ import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import VectorLink from "@nextgisweb/icon/mdi/vector-link";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
-import Fullscreen from "@nextgisweb/icon/mdi/fullscreen";
+import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import { ButtonCheckboxGroup } from "./ButtonCheckboxGroup";
 
 import type { CoordinateProps } from "../type";
@@ -50,7 +50,7 @@ export const CoordinateComponent = observer((props) => {
                 title: gettext("Update current web map address")
             },
             {
-                label: <Fullscreen />, value: "extent", url: store.permalink,
+                label: <FitToScreenOutline />, value: "extent", url: store.permalink,
                 status: store.currentUrlExtentStatus,
                 title: gettext("Set current map coverage")
             },
