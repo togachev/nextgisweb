@@ -1,15 +1,12 @@
-body {
+.ngw-webmap-display-loader {
     display: flex;
+    position: absolute;
     flex-direction: column;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
+    inset: 0;
 
-    >.webmap-wrapper {
+    > .ngw-webmap-display {
+        position: relative;
         flex-grow: 1;
-        min-width: 0;
         min-height: 0;
     }
 }
