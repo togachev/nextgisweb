@@ -5,7 +5,7 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";
-
+import type { Display } from "@nextgisweb/webmap/display";
 import { getExtensionsComps } from "../extensions";
 
 import { FieldsTable } from "./FieldsTable";
@@ -24,9 +24,11 @@ export interface FeatureInfoSectionProps {
     showGeometryPreview?: boolean;
     attributePanelAction?: ReactElement;
     highlights: boolean;
+    display: Display;
 }
 
 export function FeatureInfoSection({
+    display,
     resourceId,
     featureItem,
     showAttributes = true,
@@ -57,6 +59,7 @@ export function FeatureInfoSection({
                         <ExtensionComponent
                             featureItem={featureItem}
                             resourceId={resourceId}
+                            display={display}
                         ></ExtensionComponent>
                     </Suspense>
                 );

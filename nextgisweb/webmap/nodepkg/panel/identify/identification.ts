@@ -81,6 +81,7 @@ export interface FeatureSelectorProps {
 export interface IdentifyExtensionComponentProps<F extends Attrs = Attrs> {
     featureItem: FeatureItem<F>;
     resourceId: number;
+    display: Display;
 }
 
 export interface IdentifyResultProps {

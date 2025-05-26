@@ -170,7 +170,7 @@ export const ContentComponent = observer((props) => {
             key: "description",
             title: gettext("Description"),
             hidden: false,
-            children: store.extensions !== null && store.extensions.description !== null ? (<DescComponent type="feature" display={display} content={store.extensions?.description} />) : emptyValue
+            children: store.extensions !== null && store.extensions.description !== null ? (<DescComponent display={display} content={store.extensions?.description} />) : emptyValue
         });
 
         options.push({

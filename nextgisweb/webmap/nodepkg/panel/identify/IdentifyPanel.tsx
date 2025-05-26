@@ -175,6 +175,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 const opts = display.config.options;
                 featureInfoSection = (
                     <FeatureInfoSection
+                        display={display}
                         resourceId={featureInfo.layerId}
                         featureItem={featureItem}
                         measurementSrid={measurementSrid}
