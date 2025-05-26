@@ -1,14 +1,12 @@
-import { useCallback, useState } from "react";
+import { debounce } from "lodash-es";
+import { useCallback, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import VectorLink from "@nextgisweb/icon/mdi/vector-link";
-import UpdateLink from "@nextgisweb/icon/mdi/update";
-import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
-import { ButtonCheckboxGroup } from "./ButtonCheckboxGroup";
-
+import { UrlButton } from "./UrlButton";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
@@ -42,22 +40,34 @@ export const CoordinateComponent = observer((props) => {
         }
     }, []);
 
-    const propsButton = {
-        items: [
-            {
-                label: <UpdateLink />, value: "popup", url: store.contextUrl,
-                status: store.currentUrlStatus,
-                title: gettext("Update current web map address")
-            },
-            {
-                label: <FitToScreenOutline />, value: "extent", url: store.permalink,
-                status: store.currentUrlExtentStatus,
-                title: gettext("Set current map coverage")
-            },
-        ],
-        store,
-        display,
-    }
+    useEffect(() => {
+        let isMounted = true;
+
+        const updateTexts = debounce(() => {
+            display.mapExtentDeferred.then(() => {
+                if (!isMounted) return;
+                store.updatePermalink();
+            });
+        });
+
+        const mapView = display.map.olMap.getView();
+        mapView.on("change", updateTexts);
+        const listener = display.itemStore.on("Set", updateTexts);
+
+        updateTexts();
+
+        return () => {
+            isMounted = false;
+            mapView.un("change", updateTexts);
+            listener.remove();
+        };
+    }, [
+        display.mapExtentDeferred,
+        display.itemStore,
+        display.map.baseLayer,
+        display.map.olMap,
+        store.updatePermalink,
+    ]);
 
     return (
         <div className="footer-coordinate-component">
@@ -74,7 +84,7 @@ export const CoordinateComponent = observer((props) => {
             </span>
             {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
                 <div className="link-block">
-                    <ButtonCheckboxGroup {...propsButton} />
+                    <UrlButton {...{ store }} />
                     <Button
                         type="text"
                         icon={<VectorLink />}

@@ -83,16 +83,7 @@ export default observer(
 
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
-
-                // statuses to update the current address bar when opening a popup
-                if (mode === "simulate") {
-                    store.setCurrentUrlExtentStatus(false);
-                    store.setCurrentUrlStatus(true);
-                } else {
-                    store.setCurrentUrlStatus(false);
-                    !window.location.href.includes("pn=") && window.location.href.includes("lon=") && store.setCurrentUrlExtentStatus(true)
-                }
-
+                store.setMode(mode);
                 if (imodule.countFeature > 0) {
                     const selectVal = selectedValue ? selectedValue : response.data[0];
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
@@ -101,9 +92,6 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
-
-
-
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});

@@ -8,15 +8,13 @@ import type { AttributeProps, DataProps, ExtensionsProps, Rnd, OptionProps } fro
 import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
-    @observable accessor layerName: string | null = null;
-    @observable accessor countFeature: number;
     @observable accessor fixPopup = false;
     @observable accessor hideLegend = true;
     @observable accessor update = false;
     @observable accessor fullscreen = false;
-    @observable accessor currentUrlExtentStatus = false;
-    @observable accessor currentUrlStatus = false;
 
+    @observable.ref accessor mode: string;
+    @observable.ref accessor countFeature: number;
     @observable.ref accessor data: DataProps[] = [];
     @observable.ref accessor selected: DataProps;
     @observable.ref accessor attribute: AttributeProps[] = [];
@@ -44,13 +42,8 @@ export class Store {
     }
 
     @action
-    setCurrentUrlExtentStatus(currentUrlExtentStatus: boolean) {
-        this.currentUrlExtentStatus = currentUrlExtentStatus;
-    };
-
-    @action
-    setCurrentUrlStatus(currentUrlStatus: boolean) {
-        this.currentUrlStatus = currentUrlStatus;
+    setMode(mode: string) {
+        this.mode = mode;
     };
 
     @action
@@ -81,11 +74,6 @@ export class Store {
     @action
     setFixPopup(fixPopup: boolean) {
         this.fixPopup = fixPopup;
-    };
-
-    @action
-    setLayerName(layerName: string) {
-        this.layerName = layerName;
     };
 
     @action

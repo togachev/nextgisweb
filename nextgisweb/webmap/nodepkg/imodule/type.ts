@@ -170,10 +170,22 @@ export interface FeatureIdentify<F extends Attrs = Attrs> {
     parent: string;
     relation: RelationProps;
 }
+
 export interface AttributeProps {
     attr: string;
     datatype: string;
     format_field: FormatNumberFieldData
     key: number;
     value: string;
+}
+
+interface ControlProps {
+    icon: ReactElement;
+    url?: string;
+    title: string;
+    status: boolean;
+}
+
+export interface ControlUrlProps {
+    [key: string]: ControlProps;
 }
