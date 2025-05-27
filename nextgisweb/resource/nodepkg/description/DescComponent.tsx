@@ -89,8 +89,10 @@ const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }
                         zoomToFeature(display, layerId, fid, styles)
                         display.imodule && display.imodule.iStore && destroyPopup(display);
                     }}>
-                    <Space direction="horizontal"><SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}</Space>
-                </div>
+                    <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
+                        <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
+                    </Space>
+                </div >
             );
         } else {
             return <></>;
@@ -106,7 +108,9 @@ const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }
                         display.imodule && display.imodule.iStore && destroyPopup(display);
                     }}
                 >
-                    <Space direction="horizontal"><SvgIcon icon={`rescls-raster_layer`} />{domToReact(item.children, options)}</Space>
+                    <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
+                        <SvgIcon icon={`rescls-raster_layer`} />{domToReact(item.children, options)}
+                    </Space>
                 </div>
             );
         } else {
