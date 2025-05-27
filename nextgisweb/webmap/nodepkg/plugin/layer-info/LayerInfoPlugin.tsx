@@ -67,7 +67,7 @@ export class LayerInfoPlugin extends PluginBase {
         ] as DescriptionWebMapPluginConfig;
 
         const content: DescriptionContentProps[] = [];
-        const vectorType = ["postgis_layer", "vector_layer"];
+        const vectorType = ["postgis_layer", "vector_layer", "raster_layer"];
 
         if (Object.values(data).length > 0) {
             const { layer_id, style_id } = data;
