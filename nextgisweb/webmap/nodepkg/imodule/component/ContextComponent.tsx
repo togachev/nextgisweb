@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useOutsideClick } from "../useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ConfigProvider } from "@nextgisweb/gui/antd";
 
 import Location from "@nextgisweb/icon/material/my_location";
 import type { Params, Props } from "../type";
@@ -21,42 +22,54 @@ export default forwardRef<Element>(
 
         return (
             createPortal(
-                <div key={new Date} ref={ref as any} className="context-position" style={{
-                    width: position.width,
-                    left: position.x,
-                    top: position.y,
-                    position: "absolute",
-                    zIndex: 10,
-                }}>
-                    {contextHolder}
-                    <span
-                        className="context-coord"
-                        onClick={() => {
-                            visible({ hidden: true, overlay: undefined, key: op });
-                        }}
-                    >
-                        <span
-                            className="coordinate-value"
-                            title={gettext("Copy coordinates")}
-                            onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
-                        >
-                            <span className="icon-location"><Location /></span>
-                            <span className="coords">{coordsVisible}</span>
-                        </span>
-                    </span>
-                    {array_context?.map(item => {
-                        if (item.visible) {
-                            return (
-                                <div className="context-item" key={item.key} onClick={() => {
-                                    visible({ hidden: true, overlay: undefined, key: op });
-                                    alert(item.result)
-                                }} >
-                                    <span>{item.title}</span>
-                                </div>
-                            )
+                <ConfigProvider
+                    theme={{
+                        token: {
+                            colorPrimary: "#106a90",
+                        },
+                        components: {
+                            Message: {
+                                colorSuccess: "var(--primary)",
+                            }
                         }
-                    })}
-                </div>,
+                    }}>
+                    <div key={new Date} ref={ref as any} className="context-position" style={{
+                        width: position.width,
+                        left: position.x,
+                        top: position.y,
+                        position: "absolute",
+                        zIndex: 10,
+                    }}>
+                        {contextHolder}
+                        <span
+                            className="context-coord"
+                            onClick={() => {
+                                visible({ hidden: true, overlay: undefined, key: op });
+                            }}
+                        >
+                            <span
+                                className="coordinate-value"
+                                title={gettext("Copy coordinates")}
+                                onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
+                            >
+                                <span className="icon-location"><Location /></span>
+                                <span className="coords">{coordsVisible}</span>
+                            </span>
+                        </span>
+                        {array_context?.map(item => {
+                            if (item.visible) {
+                                return (
+                                    <div className="context-item" key={item.key} onClick={() => {
+                                        visible({ hidden: true, overlay: undefined, key: op });
+                                        alert(item.result)
+                                    }} >
+                                        <span>{item.title}</span>
+                                    </div>
+                                )
+                            }
+                        })}
+                    </div>
+                </ConfigProvider>,
                 document.body
             )
         )
