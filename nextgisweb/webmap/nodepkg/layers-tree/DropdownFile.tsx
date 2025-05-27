@@ -64,7 +64,7 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
         })
     })
 
-    return (
+    return items.length > 0 && (
         <Dropdown
             menu={{
                 items,
