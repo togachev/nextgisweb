@@ -183,7 +183,9 @@ interface ControlProps {
     icon: ReactElement;
     url?: string;
     title: string;
-    status: boolean;
+    status: boolean | string;
+    checked?: boolean;
+    disable?: boolean;
 }
 
 export interface ControlUrlProps {

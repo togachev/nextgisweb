@@ -4,7 +4,7 @@ import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
-import type { AttributeProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
+import type { AttributeProps, ControlUrlProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
@@ -13,6 +13,8 @@ export class Store {
     @observable accessor update = false;
     @observable accessor fullscreen = false;
 
+    @observable.ref accessor control: ControlUrlProps;
+    @observable.ref accessor activeControlKey: string;
     @observable.ref accessor mode: string;
     @observable.ref accessor countFeature: number;
     @observable.ref accessor data: DataProps[] = [];
@@ -34,12 +36,24 @@ export class Store {
         valueRnd,
         fixPos,
         fixPanel,
+        control,
     }) {
         this.display = display;
         this.valueRnd = valueRnd;
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
+        this.control = control;
     }
+
+    @action
+    setControl(control: ControlUrlProps) {
+        this.control = control;
+    };
+
+    @action
+    setActiveControlKey(activeControlKey: string) {
+        this.activeControlKey = activeControlKey;
+    };
 
     @action
     setMode(mode: string) {

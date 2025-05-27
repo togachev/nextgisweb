@@ -6,6 +6,9 @@ import CloseIcon from "@nextgisweb/icon/material/close";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 import Pin from "@nextgisweb/icon/mdi/pin";
 import PinOff from "@nextgisweb/icon/mdi/pin-off";
+import UpdateLink from "@nextgisweb/icon/mdi/update";
+import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
+import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 import { Rnd } from "react-rnd";
 import { ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
 import { Store } from "../Store";
@@ -77,6 +80,27 @@ export default observer(
                         attrs === true ? "attributes" :
                             attrs === false && geoms === true ? "geom_info" :
                                 (attrs === false && geoms === false) && "description",
+                    control: {
+                        reset: {
+                            icon: <LockReset />,
+                            title: gettext("Reset url"),
+                            disabled: true,
+                        },
+                        popup: {
+                            icon: <UpdateLink />,
+                            url: "",
+                            title: gettext("Update current web map address"),
+                            status: false,
+                            checked: false,
+                        },
+                        fixedscreen: {
+                            icon: <FitToScreenOutline />,
+                            url: "",
+                            title: gettext("Set current map coverage"),
+                            status: false,
+                            checked: false,
+                        }
+                    },
                 }));
 
             imodule.iStore = store;
@@ -84,6 +108,7 @@ export default observer(
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
                 store.setMode(mode);
+
                 if (imodule.countFeature > 0) {
                     const selectVal = selectedValue ? selectedValue : response.data[0];
                     selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
@@ -199,11 +224,7 @@ export default observer(
                                     lineHeight: 1,
                                 },
                                 Radio: {
-                                    buttonSolidCheckedActiveBg: "transparent",
-                                    buttonSolidCheckedColor: "var(--primary)",
-                                    buttonSolidCheckedBg: "#bccccf",
                                     buttonPaddingInline: 3,
-                                    buttonSolidCheckedHoverBg: "var(--icon-color)",
                                     colorPrimary: "var(--primary)",
                                     colorBorder: "transparent",
                                     borderRadius: 4,
@@ -224,6 +245,7 @@ export default observer(
                                     colorLink: "var(--text-base)",
                                     colorLinkHover: "var(--primary)",
                                     defaultHoverColor: "var(--primary)",
+                                    borderRadius: 4,
                                 },
                                 Tag: {
                                     colorFillSecondary: "#00000010",

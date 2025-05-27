@@ -251,17 +251,18 @@ export const ContentComponent = observer((props) => {
                         (
                             <div ref={panelRef} className="radio-group" >
                                 <Radio.Group
-                                    buttonStyle="solid"
                                     onChange={onValuesChange}
                                     value={store.fixContentItem?.value}
                                     className="radio-component"
                                 >
-                                    <Space direction="vertical" style={{ rowGap: 2, padding: 2 }} >
+                                    <Space direction="vertical"
+                                    style={{ rowGap: 2, padding: 2 }}
+                                    >
                                         {
                                             options.map((item, i) => {
                                                 if (!item.hidden) {
                                                     return (
-                                                        <Radio.Button color="primary" variant="filled" key={i} title={item.title} value={item.value}>
+                                                        <Radio.Button color="default" variant="text" key={i} title={item.title} value={item.value}>
                                                             {item.label}
                                                         </Radio.Button>
                                                     )

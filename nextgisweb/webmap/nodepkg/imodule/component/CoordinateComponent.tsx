@@ -1,12 +1,12 @@
 import { debounce } from "lodash-es";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
-import VectorLink from "@nextgisweb/icon/mdi/vector-link";
-import { UrlButton } from "./UrlButton";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
@@ -19,26 +19,6 @@ export const CoordinateComponent = observer((props) => {
 
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
-
-    const msgCopy = [
-        store.countFeature > 0 ? gettext("Copy link to object") : gettext("Copy link to location"),
-        gettext("Right click to copy the current web map coverage."),
-    ];
-
-    const handleClickCopy = useCallback((e) => {
-        const messageClickCopy = store.countFeature > 0 ? gettext("Object reference copied") : gettext("Location link copied");
-        const messageContextMenuCopy = gettext("Current web map coverage copied");
-
-        e.preventDefault();
-        switch (e.type) {
-            case "click":
-                copyValue(store.contextUrl, messageClickCopy);
-                break;
-            case "contextmenu":
-                copyValue(store.permalink, messageContextMenuCopy);
-                break;
-        }
-    }, []);
 
     useEffect(() => {
         let isMounted = true;
@@ -66,8 +46,90 @@ export const CoordinateComponent = observer((props) => {
         display.itemStore,
         display.map.baseLayer,
         display.map.olMap,
-        store.updatePermalink,
     ]);
+
+    const msgCopyActiveContext = {
+        popup: store.countFeature > 0 ? gettext("Object reference copied") : gettext("Location link copied"),
+        fixedscreen: gettext("Current web map coverage copied"),
+    }
+
+    const msgCopyActive = (value) => {
+        return msgCopyActiveContext[value]
+    }
+
+    useEffect(() => {
+        const updateUrl = store.activeControlKey && store.control[store.activeControlKey].checked;
+        switch (store.activeControlKey && store.control[store.activeControlKey].status) {
+            case true:
+                updateUrl && (
+                    window.history.pushState({}, "", store.control[store.activeControlKey].url), // link update
+                    copyValue(store.control[store.activeControlKey].url, msgCopyActive(store.activeControlKey)) // link copying
+                );
+                break;
+            case false:
+                updateUrl && (
+                    window.history.pushState({}, "", ngwConfig.applicationUrl + routeURL("webmap.display", display.config.webmapId)) // reset link to original value
+                );
+                break;
+        }
+    }, [store.control]);
+
+    useEffect(() => {
+        const values = { ...store.control }
+        Object.keys(values).forEach((key) => {
+            if (key === "popup") {
+                values[key].url = store.contextUrl;
+                values[key].checked = store.mode === "simulate" && store.contextUrl ? true : false;
+                values["reset"].disabled = !window.location.href.includes("lon=") ? true : false;
+            } else if (key === "fixedscreen") {
+                values[key].url = store.permalink;
+                values[key].checked = false;
+            }
+        })
+        store.setControl(values);
+    }, [store.permalink, store.contextUrl]);
+
+    const onClick = (name) => {
+        store.setActiveControlKey(name);
+        store.setMode("click");
+        const values = { ...store.control }
+
+        if (name === "reset") {
+            ["popup", "fixedscreen"].map((key) => {
+                values[key].status = false;
+                values[key].checked = false;
+                values["reset"].disabled = true;
+            })
+            store.setControl(values);
+            window.history.pushState({}, "", ngwConfig.applicationUrl + routeURL("webmap.display", display.config.webmapId));
+
+        } else {
+            Object.keys(values).forEach((key) => {
+                values["reset"].disabled = false;
+                if (key === name) {
+                    values[key].status = true;
+                    values[key].checked = true;
+                } else {
+                    values[key].status = false;
+                    values[key].checked = false;
+                }
+            })
+            store.setControl(values);
+        }
+    };
+
+    const propsUpdate = (name, value) => {
+        return {
+            icon: value.icon,
+            onClick: () => onClick(name),
+            color: value.checked && "primary",
+            variant: "outlined",
+            type: "text",
+            size: "small",
+            title: value.title,
+            disabled: value.disabled && store.mode !== "simulate",
+        }
+    }
 
     return (
         <div className="footer-coordinate-component">
@@ -84,15 +146,18 @@ export const CoordinateComponent = observer((props) => {
             </span>
             {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
                 <div className="link-block">
-                    <UrlButton {...{ store }} />
-                    <Button
-                        type="text"
-                        icon={<VectorLink />}
-                        title={msgCopy.join("\n")}
-                        className="link-button"
-                        onClick={handleClickCopy}
-                        onContextMenu={handleClickCopy}
-                    />
+                    {
+                        store.control &&
+                        getEntries(store.control).map(([name, value], index) => {
+                            return (
+                                <div key={index}>
+                                    <Button
+                                        {...propsUpdate(name, value)}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
                 </div>
             )}
         </div>
