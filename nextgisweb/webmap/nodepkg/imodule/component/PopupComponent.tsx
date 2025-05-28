@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState, useEffect } from "react";
+import { forwardRef, useCallback, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
@@ -10,7 +10,7 @@ import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 import { Rnd } from "react-rnd";
-import { ConfigProvider, Select, Tag } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
 import { Store } from "../Store";
 import { observer } from "mobx-react-lite";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
@@ -29,21 +29,22 @@ const forbidden = gettext("The data is not available for reading");
 const CheckOnlyOne = ({ store }) => {
     const msgFixPopup = gettext("Lock popup position");
     const msgFixOffPopup = gettext("Disable lock popup position");
-    const onChange = (checked: boolean) => {
-        store.setFixPopup(checked);
-    };
 
-    return (
-        <span title={store.fixPopup ? msgFixOffPopup : msgFixPopup}>
-            <Tag.CheckableTag
-                checked={store.fixPopup}
-                onChange={onChange}
-                className="legend-hide-button"
-            >
-                {store.fixPopup ? <PinOff /> : <Pin />}
-            </Tag.CheckableTag>
-        </span>
-    );
+    const onClick = useCallback((e) => {
+        e.preventDefault();
+        store.setFixPopup(!store.fixPopup);
+    }, []);
+
+    const props = {
+        icon: store.fixPopup ? <PinOff /> : <Pin />,
+        onTouchEnd: onClick,
+        onClick: onClick,
+        type: "text",
+        size: "small",
+        title: store.fixPopup ? msgFixOffPopup : msgFixPopup,
+    }
+
+    return (<Button {...props} />);
 };
 
 export default observer(

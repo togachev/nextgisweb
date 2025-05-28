@@ -1,5 +1,5 @@
 import { debounce } from "lodash-es";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { observer } from "mobx-react-lite";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -89,7 +89,8 @@ export const CoordinateComponent = observer((props) => {
         store.setControl(values);
     }, [store.permalink, store.contextUrl]);
 
-    const onClick = (name) => {
+    const onClick = useCallback((e, name) => {
+        e.preventDefault();
         store.setActiveControlKey(name);
         store.setMode("click");
         const values = { ...store.control }
@@ -116,12 +117,13 @@ export const CoordinateComponent = observer((props) => {
             })
             store.setControl(values);
         }
-    };
+    }, []);
 
     const propsUpdate = (name, value) => {
         return {
             icon: value.icon,
-            onClick: () => onClick(name),
+            onTouchEnd: (e) => onClick(e, name),
+            onClick: (e) => onClick(e, name),
             color: value.checked && "primary",
             variant: "outlined",
             type: "text",
