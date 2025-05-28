@@ -38,18 +38,18 @@ class Control extends Interaction {
     }
 
     handleClickEvent(e: MapBrowserEvent): boolean {
-        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-            this.tool._overlayInfo(e, "popup", false, "click");
-            e.preventDefault();
-        }
-        // else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
-        //     this.tool._popupMultiple(e, "multi", false);
+        // if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+        //     this.tool._overlayInfo(e, "popup", false, "click");
         //     e.preventDefault();
         // }
-        else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-            this.tool._overlayInfo(e, "context", false, "click");
-            e.preventDefault();
-        }
+        // // else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
+        // //     this.tool._popupMultiple(e, "multi", false);
+        // //     e.preventDefault();
+        // // }
+        // else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+        //     this.tool._overlayInfo(e, "context", false, "click");
+        //     e.preventDefault();
+        // }
         return true;
     }
 }
@@ -98,6 +98,20 @@ export class IModule extends Component {
 
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
+        console.log(this.olmap.targetElement_);
+
+        this.olmap.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            this._overlayInfo(e, "context", false, "click");
+        });
+
+        this.olmap.targetElement_.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.pixel = [e.touches[0].pageX - this.offHP, e.touches[0].pageY - this.offHP];
+            e.coordinate = this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]);
+            this._overlayInfo(e, "popup", false, "click");
+        }, true);
+
     };
 
     activate = () => {
@@ -198,7 +212,7 @@ export class IModule extends Component {
                 this.response.data.sort((a, b) => Number(a.dop) - Number(b.dop));
             } else {
                 if (!p) {
-                    const orderObj = this.params.request.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
+                    const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
                     this.response.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
                 }
             }
@@ -256,6 +270,8 @@ export class IModule extends Component {
     // };
 
     _overlayInfo = async (e: MapBrowserEvent, op: string, p, mode) => {
+        console.log(e);
+
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
