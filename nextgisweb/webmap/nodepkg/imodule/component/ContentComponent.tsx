@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { ConfigProvider, Descriptions, Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Descriptions, Dropdown, Empty, Radio, Space, Typography } from "@nextgisweb/gui/antd";
 import type { DescriptionsProps, MenuProps } from "@nextgisweb/gui/antd";
 import Info from "@nextgisweb/icon/material/info/outline";
 import QueryStats from "@nextgisweb/icon/material/query_stats";
@@ -35,9 +35,11 @@ const LinkToGeometryFeature = ({ store, display }) => {
 
         if (!imodule._isEditEnabled(display, item)) { return false; }
         return (
-            <span
+            <Button
                 title={store.selected.type === "vector" ? msgHTMLFeature : msgHTMLRaster}
-                className="link-button"
+                className="icon-symbol"
+                type="text"
+                size="small"
                 onClick={() => {
                     const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
                     copyValue(linkToGeometryString, gettext("HTML code copied"));
@@ -45,7 +47,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
             >
                 {contextHolder}
                 <Identifier />
-            </span>
+            </Button>
         )
     }
 };
@@ -256,7 +258,7 @@ export const ContentComponent = observer((props) => {
                                     className="radio-component"
                                 >
                                     <Space direction="vertical"
-                                    style={{ rowGap: 2, padding: 2 }}
+                                        style={{ rowGap: 2, padding: 2 }}
                                     >
                                         {
                                             options.map((item, i) => {

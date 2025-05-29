@@ -42,6 +42,7 @@ const CheckOnlyOne = ({ store }) => {
         type: "text",
         size: "small",
         title: store.fixPopup ? msgFixOffPopup : msgFixPopup,
+        className: "icon-symbol",
     }
 
     return (<Button {...props} />);
@@ -178,9 +179,11 @@ export default observer(
                         return false;
                     } else {
                         return (
-                            <span
+                            <Button
                                 title={gettext("Edit")}
-                                className="link-button"
+                                className="icon-symbol"
+                                type="text"
+                                size="small"
                                 onClick={() => {
                                     const featureId = id;
                                     const resourceId = layerId;
@@ -200,7 +203,7 @@ export default observer(
                                 }}
                             >
                                 <EditNote />
-                            </span>
+                            </Button>
                         )
                     }
                 }
