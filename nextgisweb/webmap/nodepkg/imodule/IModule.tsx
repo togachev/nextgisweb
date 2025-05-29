@@ -2,7 +2,7 @@ import { computed } from "mobx";
 import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
-import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
+import { Map as olMap, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
@@ -16,7 +16,7 @@ import OlGeomPoint from "ol/geom/Point";
 import SimpleGeometry from "ol/geom/SimpleGeometry";
 
 import type { Display } from "@nextgisweb/webmap/display";
-import type { DataProps, EventProps, ParamsProps, Params, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
+import type { DataProps, EventProps, ParamsProps, Params, Response, CustomEventProps, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
 
 import "./IModule.less";
 
@@ -188,7 +188,7 @@ export class IModule extends Component {
             });
     }
 
-    displayFeatureInfo = async (event: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
+    displayFeatureInfo = async (event: CustomEventProps, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         await this.getResponse(op, p);
@@ -254,12 +254,12 @@ export class IModule extends Component {
 
     // to activate multiple selection of objects
     /*
-    _popupMultiple = (e: MapBrowserEvent<UIEvent>, op: string, p) => {
+    _popupMultiple = (e: CustomEventProps, op: string, p) => {
         console.log(e.pixel, op, p);
     };
     */
 
-    _overlayInfo = async (e: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
+    _overlayInfo = async (e: CustomEventProps, op: string, p, mode) => {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
@@ -394,7 +394,7 @@ export class IModule extends Component {
 
                 const p = { value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
-                const simulateEvent = {
+                const simulateEvent: CustomEventProps = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
                     target: "map",
@@ -403,7 +403,7 @@ export class IModule extends Component {
                             (pixel[0] + 340 + this.offHP) :
                             (pixel[0] + this.offHP), (pixel[1] + this.offHP)
                     ],
-                    type: "singleclick"
+                    type: "click"
                 };
 
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")

@@ -191,3 +191,11 @@ interface ControlProps {
 export interface ControlUrlProps {
     [key: string]: ControlProps;
 }
+
+export interface CustomEventProps {
+    coordinate: number[];
+    map: Display;
+    target: string;
+    pixel: number[];
+    type: string;
+}
