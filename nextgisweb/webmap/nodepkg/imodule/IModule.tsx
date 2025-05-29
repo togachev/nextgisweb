@@ -66,11 +66,13 @@ export class IModule extends Component {
         this.olmap = this.display.map.olMap;
         this.getSrsInfo();
         this._addOverlay();
-
+        
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
 
-        this.display.mapNode.addEventListener("contextmenu", (e) => {
+        const view = this.olmap.getViewport();
+
+        view.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             this.getPixels(e)
                 .then(pixel => {
@@ -80,7 +82,7 @@ export class IModule extends Component {
                 });
         });
 
-        this.display.mapNode.addEventListener("click", (e) => {
+        view.addEventListener("click", (e) => {
             if (e.ctrlKey === false && e.shiftKey === false) {
                 e.preventDefault();
                 this.getPixels(e)
