@@ -1,4 +1,4 @@
-import { computed } from "mobx";
+import { action, computed, observable } from "mobx";
 import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
@@ -17,8 +17,11 @@ import SimpleGeometry from "ol/geom/SimpleGeometry";
 
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps, EventProps, ParamsProps, Params, Response, CustomEventProps, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
+import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import "./IModule.less";
+
+type SrsInfoMap = Map<number, SRSRead>;
 
 const settings = webmapSettings;
 const wkt = new WKT();
@@ -31,6 +34,8 @@ const array_context = [ //для создания кнопок в контекс
 ];
 
 export class IModule extends Component {
+
+    @observable accessor srsMap: SrsInfoMap;
 
     private display: Display;
     private displaySrid: number;
@@ -58,7 +63,7 @@ export class IModule extends Component {
         this.displaySrid = 3857;
         this.offHP = !this.display.tinyConfig ? 40 : 0;
         this.olmap = this.display.map.olMap;
-
+        this.getSrsInfo();
         this._addOverlay();
 
         this.point_popup = document.createElement("div");
@@ -93,9 +98,21 @@ export class IModule extends Component {
         */
     };
 
+    @action
+    setSrsMap(srsMap: SrsInfoMap) {
+        this.srsMap = srsMap;
+    };
+
     @computed
     get activePanel() {
         return this.display.panelManager.getActivePanelName();
+    }
+
+    private async getSrsInfo() {
+        route("spatial_ref_sys.collection").get()
+            .then(srsInfo => {
+                this.setSrsMap(new Map(srsInfo.map((s) => [s.id, s])))
+            })
     }
 
     private getPixels(e) {
@@ -167,13 +184,11 @@ export class IModule extends Component {
     }
 
     getLonLat = async () => {
-        const srsInfo = await route("spatial_ref_sys.collection").get();
-        const srsMap = new Map(srsInfo.map((s) => [s.id, s]));
         await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
                     srs_from: this.displaySrid,
-                    srs_to: Array.from(srsMap.keys()),
+                    srs_to: Array.from(this.srsMap.keys()),
                     geom: wkt.writeGeometry(new Point(this.params.point)),
                 },
             })
@@ -190,7 +205,6 @@ export class IModule extends Component {
 
     displayFeatureInfo = async (event: CustomEventProps, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
-
         await this.getResponse(op, p);
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
@@ -354,13 +368,11 @@ export class IModule extends Component {
     };
 
     _responseContext = async (val: UrlParamsProps) => {
-        const srsInfo = await route("spatial_ref_sys.collection").get();
-        const srsMap = new Map(srsInfo.map((s) => [s.id, s]));
         await route("spatial_ref_sys.geom_transform.batch")
             .post({
                 json: {
                     srs_from: 4326,
-                    srs_to: Array.from(srsMap.keys()),
+                    srs_to: Array.from(this.srsMap.keys()),
                     geom: wkt.writeGeometry(new OlGeomPoint([Number(val.lon), Number(val.lat)])),
                 },
             })
