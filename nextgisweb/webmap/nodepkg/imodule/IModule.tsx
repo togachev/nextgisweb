@@ -188,7 +188,7 @@ export class IModule extends Component {
             });
     }
 
-    displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
+    displayFeatureInfo = async (event: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         await this.getResponse(op, p);
@@ -254,12 +254,12 @@ export class IModule extends Component {
 
     // to activate multiple selection of objects
     /*
-    _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
+    _popupMultiple = (e: MapBrowserEvent<UIEvent>, op: string, p) => {
         console.log(e.pixel, op, p);
     };
     */
 
-    _overlayInfo = async (e: MapBrowserEvent, op: string, p, mode) => {
+    _overlayInfo = async (e: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
