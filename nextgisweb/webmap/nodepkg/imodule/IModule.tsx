@@ -1,9 +1,9 @@
+import { computed } from "mobx";
 import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import { Interaction } from "ol/interaction";
 import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
@@ -22,37 +22,6 @@ import "./IModule.less";
 
 const settings = webmapSettings;
 const wkt = new WKT();
-
-interface ControlOptions {
-    tool: IModule;
-}
-
-class Control extends Interaction {
-    private tool: IModule;
-
-    constructor(options: ControlOptions) {
-        super({
-            handleEvent: (e) => this.handleClickEvent(e),
-        });
-        this.tool = options.tool;
-    }
-
-    handleClickEvent(e: MapBrowserEvent): boolean {
-        // if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-        //     this.tool._overlayInfo(e, "popup", false, "click");
-        //     e.preventDefault();
-        // }
-        // // else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
-        // //     this.tool._popupMultiple(e, "multi", false);
-        // //     e.preventDefault();
-        // // }
-        // else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
-        //     this.tool._overlayInfo(e, "context", false, "click");
-        //     e.preventDefault();
-        // }
-        return true;
-    }
-}
 
 const array_context = [ //для создания кнопок в контекстном меню
     { key: 1, title: "Действие 1", result: "Действие 1 выполнено", visible: false },
@@ -74,7 +43,6 @@ export class IModule extends Component {
     private selected: string | undefined;
     private overlay_popup: Overlay;
     private overlay_context: Overlay;
-    private control: Interaction;
     private popup = document.createElement("div");
     private point_popup = document.createElement("div");
     private point_context = document.createElement("div");
@@ -90,37 +58,55 @@ export class IModule extends Component {
         this.displaySrid = 3857;
         this.offHP = !this.display.tinyConfig ? 40 : 0;
         this.olmap = this.display.map.olMap;
-        this.control = new Control({ tool: this });
-        this.control.setActive(false);
-        this.olmap.addInteraction(this.control);
 
         this._addOverlay();
 
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-        console.log(this.olmap.targetElement_);
 
-        this.olmap.addEventListener('contextmenu', (e) => {
+        this.display.mapNode.addEventListener('contextmenu', (e) => {
             e.preventDefault();
+            e.pixel = this.getPixels(e);
+            e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
             this._overlayInfo(e, "context", false, "click");
         });
 
-        this.olmap.targetElement_.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.pixel = [e.touches[0].pageX - this.offHP, e.touches[0].pageY - this.offHP];
-            e.coordinate = this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]);
-            this._overlayInfo(e, "popup", false, "click");
-        }, true);
+        this.display.mapNode.addEventListener('click', (e) => {
+            if (e.ctrlKey === false && e.shiftKey === false) {
+                e.preventDefault();
+                e.pixel = this.getPixels(e);
+                e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
+                this._overlayInfo(e, "popup", false, "click");
+            }
+        });
 
+        // to activate multiple selection of objects
+        /*
+        this.display.mapNode.addEventListener('click', (e) => {
+            if (e.shiftKey === true) {
+                e.preventDefault();
+                e.pixel = this.getPixels(e);
+                e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
+                this._popupMultiple(e, "multi", false);
+            }
+        });
+        */
     };
 
-    activate = () => {
-        this.control.setActive(true);
-    };
+    @computed
+    get activePanel() {
+        return this.display.panelManager.getActivePanelName();
+    }
 
-    deactivate = () => {
-        this.control.setActive(false);
-    };
+    private getPixels(e) {
+        const pixel = [
+            this.activePanel && this.activePanel !== "none" ?
+                e.clientX - 340 - this.offHP :
+                e.clientX - this.offHP,
+            e.clientY - this.offHP
+        ];
+        return pixel;
+    }
 
     _setValue = (value: HTMLElement, key: string) => {
         key === "popup" ?
@@ -195,7 +181,7 @@ export class IModule extends Component {
                 const t = transformed.find(i => i.srs_id !== this.displaySrid)
                 const wktPoint = wkt.readGeometry(t.geom);
                 if (wktPoint instanceof SimpleGeometry) {
-                    const transformedCoord = wktPoint.getCoordinates();
+                    const transformedCoord = wktPoint.getCoordinates() as number[];
                     const fixedArray = transformedCoord.map(number => parseFloat(number.toFixed(12)));
                     this.lonlat = fixedArray ? fixedArray : [];
                 }
@@ -241,8 +227,9 @@ export class IModule extends Component {
             const propsContext = {
                 params: { op, position },
                 display: this.display,
-                visible: this._visible
-            } as Params
+                visible: this._visible,
+                array_context: array_context,
+            } as Params;
 
             this.root_context.render(<ContextComponent {...propsContext} ref={this.refContext} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "context" });
@@ -265,13 +252,14 @@ export class IModule extends Component {
         this.display.imodule.root_popup.render();
     };
 
-    // _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
-    //     console.log(e.pixel, op, p);
-    // };
+    // to activate multiple selection of objects
+    /*
+    _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
+        console.log(e.pixel, op, p);
+    };
+    */
 
     _overlayInfo = async (e: MapBrowserEvent, op: string, p, mode) => {
-        console.log(e);
-
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;

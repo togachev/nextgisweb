@@ -111,7 +111,7 @@ export interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: Display;
-    array_context: ContextProps[];
+    array_context: ContextProps[] | [];
 }
 
 export type RequestProps = {
