@@ -13,7 +13,7 @@ import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
 import OlGeomPoint from "ol/geom/Point";
-import SimpleGeometry from 'ol/geom/SimpleGeometry';
+import SimpleGeometry from "ol/geom/SimpleGeometry";
 
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps, EventProps, ParamsProps, Params, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
@@ -64,14 +64,14 @@ export class IModule extends Component {
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
 
-        this.display.mapNode.addEventListener('contextmenu', (e) => {
+        this.display.mapNode.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             e.pixel = this.getPixels(e);
             e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
             this._overlayInfo(e, "context", false, "click");
         });
 
-        this.display.mapNode.addEventListener('click', (e) => {
+        this.display.mapNode.addEventListener("click", (e) => {
             if (e.ctrlKey === false && e.shiftKey === false) {
                 e.preventDefault();
                 e.pixel = this.getPixels(e);
@@ -82,7 +82,7 @@ export class IModule extends Component {
 
         // to activate multiple selection of objects
         /*
-        this.display.mapNode.addEventListener('click', (e) => {
+        this.display.mapNode.addEventListener("click", (e) => {
             if (e.shiftKey === true) {
                 e.preventDefault();
                 e.pixel = this.getPixels(e);
