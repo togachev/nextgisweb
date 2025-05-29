@@ -57,8 +57,8 @@ export const getPermalink = ({
         }
     }
     if (center) {
-        params["lon"] = center[0].toFixed(4);
-        params["lat"] = center[1].toFixed(4);
+        params["lon"] = center[0].toFixed(6);
+        params["lat"] = center[1].toFixed(6);
     }
 
     let annot: AnnotationVisibleMode | undefined | null = null;

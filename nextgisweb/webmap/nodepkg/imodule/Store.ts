@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -221,7 +221,10 @@ export class Store {
             return { updateName: undefined, feature: feature, resourceId: -1 };
         }
     }
-
+    @computed
+    get activePanel() {
+        return this.display.panelManager.getActivePanelName();
+    }
     async generateUrl({ res, st, pn, disable }) {
         const imodule = this.display.imodule;
         const lon = imodule.lonlat[0];
@@ -281,7 +284,8 @@ export class Store {
         const display = this.display
         await this.display.getVisibleItems().then((visibleItems) => {
             const permalink = getPermalink({ display, visibleItems });
-            this.setPermalink(decodeURIComponent(permalink));
+            const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
+            this.setPermalink(decodeURIComponent(permalink + '&panel=' + String(panel)));
         })
     }
 }

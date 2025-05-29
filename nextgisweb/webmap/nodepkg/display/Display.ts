@@ -268,8 +268,6 @@ export class Display {
             if (controlsReady.has("im")) {
                 const { control } = controlsReady.get("im");
                 this.imodule = control;
-                this.mapStates.addState("imodule", this.imodule);
-                // this.mapStates.setDefaultState("imodule", true);
                 this._iModuleUrlParams();
             }
         } else {
@@ -677,7 +675,7 @@ export class Display {
         });
     }
 
-    private _iModuleUrlParams() {
+    private async _iModuleUrlParams() {
         const urlParams = this.urlParams;
         if (
             !(
@@ -695,16 +693,7 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        this.imodule?.iModuleUrlParams({ lon, lat, attribute, st, slf, pn })
-            .then((result) => {
-                if (result) return;
-                errorModal({
-                    title: gettext("Object not found"),
-                    message: gettext(
-                        "Object from URL parameters not found"
-                    ),
-                });
-            });
+        await this.imodule?.iModuleUrlParams({ lon, lat, attribute, st, slf, pn })
     }
 
     private _identifyFeatureByAttrValue() {

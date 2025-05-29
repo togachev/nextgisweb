@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, observable } from "mobx";
 import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
@@ -12,7 +12,6 @@ import { Point } from "ol/geom";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
-import OlGeomPoint from "ol/geom/Point";
 import SimpleGeometry from "ol/geom/SimpleGeometry";
 
 import type { Display } from "@nextgisweb/webmap/display";
@@ -35,32 +34,34 @@ const array_context = [ //для создания кнопок в контекс
 
 export class IModule extends Component {
 
-    @observable accessor srsMap: SrsInfoMap;
+    display: Display;
+    displaySrid: number;
+    LonLatSrid: number;
+    lonlat: number[];
+    response: Response;
+    countFeature: number;
+    offHP: number;
+    olmap: olMap;
+    params: EventProps;
+    selected: string | undefined;
+    overlay_popup: Overlay;
+    overlay_context: Overlay;
+    popup = document.createElement("div");
+    point_popup = document.createElement("div");
+    point_context = document.createElement("div");
+    root_popup = createRoot(this.popup);
+    root_context = createRoot(this.point_context);
+    refPopup = React.createRef<HTMLDivElement>();
+    refContext = createRef<HTMLDivElement>();
 
-    private display: Display;
-    private displaySrid: number;
-    private lonlat: number[];
-    private response: Response;
-    private countFeature: number;
-    private offHP: number;
-    private olmap: olMap;
-    private params: EventProps;
-    private selected: string | undefined;
-    private overlay_popup: Overlay;
-    private overlay_context: Overlay;
-    private popup = document.createElement("div");
-    private point_popup = document.createElement("div");
-    private point_context = document.createElement("div");
-    private root_popup = createRoot(this.popup);
-    private root_context = createRoot(this.point_context);
-    private refPopup = React.createRef<HTMLDivElement>();
-    private refContext = createRef<HTMLDivElement>();
+    @observable.ref accessor srsMap: SrsInfoMap;
 
     constructor(props: Display) {
         super(props);
 
         this.display = props;
         this.displaySrid = 3857;
+        this.LonLatSrid = 4326;
         this.offHP = !this.display.tinyConfig ? 40 : 0;
         this.olmap = this.display.map.olMap;
         this.getSrsInfo();
@@ -71,17 +72,23 @@ export class IModule extends Component {
 
         this.display.mapNode.addEventListener("contextmenu", (e) => {
             e.preventDefault();
-            e.pixel = this.getPixels(e);
-            e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
-            this._overlayInfo(e, "context", false, "click");
+            this.getPixels(e)
+                .then(pixel => {
+                    e.pixel = pixel
+                    e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
+                    this._overlayInfo(e, "context", false, "click");
+                });
         });
 
         this.display.mapNode.addEventListener("click", (e) => {
             if (e.ctrlKey === false && e.shiftKey === false) {
                 e.preventDefault();
-                e.pixel = this.getPixels(e);
-                e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
-                this._overlayInfo(e, "popup", false, "click");
+                this.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel
+                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
+                        this._overlayInfo(e, "popup", false, "click");
+                    });
             }
         });
 
@@ -90,34 +97,41 @@ export class IModule extends Component {
         this.display.mapNode.addEventListener("click", (e) => {
             if (e.shiftKey === true) {
                 e.preventDefault();
-                e.pixel = this.getPixels(e);
-                e.coordinate = this.olmap.getCoordinateFromPixel(e.pixel);
-                this._popupMultiple(e, "multi", false);
+                e.pixel = this.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel;
+                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
+                        this._popupMultiple(e, "multi", false);
+                    });
             }
         });
         */
     };
 
-    @action
-    setSrsMap(srsMap: SrsInfoMap) {
-        this.srsMap = srsMap;
+    // to activate multiple selection of objects
+    /*
+    _popupMultiple = (e: CustomEventProps, op: string, p) => {
+        console.log(e.pixel, op, p);
     };
+    */
 
-    @computed
-    get activePanel() {
-        return this.display.panelManager.getActivePanelName();
+    @action
+    private setSrsMap(srsMap: SrsInfoMap) {
+        this.srsMap = srsMap;
     }
 
-    private async getSrsInfo() {
-        route("spatial_ref_sys.collection").get()
+    getSrsInfo = async () => {
+        await route("spatial_ref_sys.collection").get()
             .then(srsInfo => {
-                this.setSrsMap(new Map(srsInfo.map((s) => [s.id, s])))
+                this.setSrsMap(new Map(srsInfo.map((s) => [s.id, s])));
+                return srsInfo;
             })
     }
 
-    private getPixels(e) {
+    getPixels = async (e) => {
+        const activePanel = this.display.panelManager.getActivePanelName()
         const pixel = [
-            this.activePanel && this.activePanel !== "none" ?
+            activePanel && activePanel !== "none" ?
                 e.clientX - 340 - this.offHP :
                 e.clientX - this.offHP,
             e.clientY - this.offHP
@@ -183,28 +197,9 @@ export class IModule extends Component {
         }
     }
 
-    getLonLat = async () => {
-        await route("spatial_ref_sys.geom_transform.batch")
-            .post({
-                json: {
-                    srs_from: this.displaySrid,
-                    srs_to: Array.from(this.srsMap.keys()),
-                    geom: wkt.writeGeometry(new Point(this.params.point)),
-                },
-            })
-            .then((transformed) => {
-                const t = transformed.find(i => i.srs_id !== this.displaySrid)
-                const wktPoint = wkt.readGeometry(t.geom);
-                if (wktPoint instanceof SimpleGeometry) {
-                    const transformedCoord = wktPoint.getCoordinates() as number[];
-                    const fixedArray = transformedCoord.map(number => parseFloat(number.toFixed(12)));
-                    this.lonlat = fixedArray ? fixedArray : [];
-                }
-            });
-    }
-
     displayFeatureInfo = async (event: CustomEventProps, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
+
         await this.getResponse(op, p);
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
@@ -266,12 +261,24 @@ export class IModule extends Component {
         this.display.imodule.root_popup.render();
     };
 
-    // to activate multiple selection of objects
-    /*
-    _popupMultiple = (e: CustomEventProps, op: string, p) => {
-        console.log(e.pixel, op, p);
+    transformCoordinate = async (from, to, point) => {
+        return await route("spatial_ref_sys.geom_transform.batch")
+            .post({
+                json: {
+                    srs_from: from,
+                    srs_to: Array.from(to),
+                    geom: wkt.writeGeometry(new Point(point)),
+                },
+            })
+            .then((transformed) => {
+                const t = transformed.find(i => i.srs_id !== from)
+                const wktPoint = wkt.readGeometry(t.geom);
+                if (wktPoint instanceof SimpleGeometry) {
+                    const transformedCoord = wktPoint.getCoordinates() as number[];
+                    return transformedCoord;
+                }
+            });
     };
-    */
 
     _overlayInfo = async (e: CustomEventProps, op: string, p, mode) => {
         const opts = this.display.config.options;
@@ -337,7 +344,11 @@ export class IModule extends Component {
             request: request,
         }
 
-        await this.getLonLat();
+        await this.transformCoordinate(this.displaySrid, this.srsMap.keys(), this.params.point)
+            .then((transformedCoord) => {
+                const fixedArray = transformedCoord.map(number => parseFloat(number.toFixed(12)));
+                this.lonlat = fixedArray ? fixedArray : [];
+            })
 
         if (this.display.panelManager.getActivePanelName() !== "custom-layer") {
             this.displayFeatureInfo(e, op, p, mode);
@@ -360,30 +371,19 @@ export class IModule extends Component {
     iModuleUrlParams = async ({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) => {
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
-            this._responseContext({ lon, lat, attribute: false });
+            await this.responseContext({ lon, lat, attribute: false });
         } else if (slf_ instanceof String) {
-            this._responseContext({ lon, lat, attribute: true, st, slf, pn });
+            await this.responseContext({ lon, lat, attribute: true, st, slf, pn })
         }
         return true;
     };
 
-    _responseContext = async (val: UrlParamsProps) => {
-        await route("spatial_ref_sys.geom_transform.batch")
-            .post({
-                json: {
-                    srs_from: 4326,
-                    srs_to: Array.from(this.srsMap.keys()),
-                    geom: wkt.writeGeometry(new OlGeomPoint([Number(val.lon), Number(val.lat)])),
-                },
+    async responseContext(val: UrlParamsProps) {
+        const srsInfo = await route("spatial_ref_sys.collection").get()
+            .then(srsInfo => {
+                return new Map(srsInfo.map((s) => [s.id, s]));
             })
-            .then((transformed) => {
-                const t = transformed.find(i => i.srs_id !== 4326)
-                const wktPoint = wkt.readGeometry(t.geom);
-                if (wktPoint instanceof SimpleGeometry) {
-                    const transformedCoord = wktPoint.getCoordinates();
-                    return transformedCoord;
-                }
-            })
+        await this.transformCoordinate(this.LonLatSrid, srsInfo.keys(), [Number(val.lon), Number(val.lat)])
             .then((transformedCoord) => {
                 const params: ParamsProps[] = [];
                 val.st?.split(",").map(i => {
@@ -421,4 +421,4 @@ export class IModule extends Component {
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
     };
-}
+};

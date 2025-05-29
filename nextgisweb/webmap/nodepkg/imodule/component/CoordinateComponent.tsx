@@ -46,6 +46,7 @@ export const CoordinateComponent = observer((props) => {
         display.itemStore,
         display.map.baseLayer,
         display.map.olMap,
+        display.panelManager.getActivePanelName()
     ]);
 
     const msgCopyActiveContext = {
