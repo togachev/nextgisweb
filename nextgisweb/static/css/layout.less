@@ -260,52 +260,6 @@ a[class*=" icon-"]:hover:before {
 
 @import "include.less";
 
-.maplist_link {
-    transition: background-color 0.5s;
-}
-
-.maplist_link:hover {
-    background-color: var(--secondary);
-}
-
-
-
-.footer {
-    align-items: center;
-    background-color: var(--primary);
-    bottom: 0;
-    color: #fff;
-    display: flex;
-    font-size: 14px;
-    // font-weight: 600;
-    height: 30px;
-    justify-content: center;
-    margin-top: 0;
-    position: relative;
-    text-align: center;
-    width: 100%;
-    z-index: 0;
-}
-
-.parentDescClass {
-    overflow: auto !important;
-}
-
-div.descClass img {
-    max-width: 100%;
-}
-
-.nextgis.claro .dijitTabContainerTop-tabs .dijitTab {
-    top: 0;
-    border-top: 1px solid transparent;
-    margin-bottom: 0;
-    font-size: 13px;
-    height: 26px;
-    line-height: 24px;
-    font-variant: unset;
-}
-
-.claro .dijitTabListContainer-top .tabStripButton {
-    margin-top: 1px !important;
-    padding: 4px 3px;
-}
+// To prevent FOUC, import it as soon as possible. When the SPA or global
+// spinner is done, switch to a normal import from Header.tsx.
+@import "../../pyramid/nodepkg/layout/header/Header.less";
