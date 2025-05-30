@@ -3,8 +3,10 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
     const H = window.innerHeight;
     const context_item = 34;
     const length = array_context.filter(item => item.visible === true).length
-    const px = p && p.value ? event.pixel[0] : event.originalEvent.clientX;
-    const py = p && p.value ? event.pixel[1] : event.originalEvent.clientY;
+    const pointerType = event.originalEvent ? event.originalEvent.pointerType : event.pointerType;
+    
+    const px = p && p.value ? event.pixel[0] : pointerType === "mouse" ? event.originalEvent.clientX : event.clientX;
+    const py = p && p.value ? event.pixel[1] : pointerType === "mouse" ? event.originalEvent.clientY :event.clientY;
     
     const context_height = 24 + context_item * length;
     const context_width = 180;

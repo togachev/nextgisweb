@@ -40,8 +40,8 @@ class Control extends Interaction {
         this.tool = options.tool;
     }
 
-    handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
-        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+    handleClickEvent(e: MapBrowserEvent): boolean {
+        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false && e.originalEvent.pointerType === "mouse") {
             this.tool._overlayInfo(e, "popup", false, "click");
             e.preventDefault();
         }
@@ -49,7 +49,7 @@ class Control extends Interaction {
         //     this.tool._popupMultiple(e, "multi", false);
         //     e.preventDefault();
         // }
-        else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+        else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false && e.originalEvent.pointerType === "mouse") {
             this.tool._overlayInfo(e, "context", false, "click");
             e.preventDefault();
         }
@@ -78,7 +78,7 @@ export class IModule extends Component {
     selected: string | undefined;
     overlay_popup: Overlay;
     overlay_context: Overlay;
-    private control: Interaction;
+    control: Interaction;
     popup = document.createElement("div");
     point_popup = document.createElement("div");
     point_context = document.createElement("div");
@@ -105,14 +105,54 @@ export class IModule extends Component {
 
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-    };
+        
+        const view = this.olmap.getViewport();
+        view.addEventListener("click", (e: any) => {
+            if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
+                e.preventDefault();
+                this.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel
+                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
+                        this._overlayInfo(e, "popup", false, "click");
+                    });
+            }
+        });
+        view.addEventListener("contextmenu", (e: any) => {
+            if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
+                e.preventDefault();
+                this.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel
+                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
+                        this._overlayInfo(e, "context", false, "click");
+                    });
+            }
+        });
 
+        
+        /*--------------------------------------------------------
+        // to activate multiple selection of objects
+        this.display.mapNode.addEventListener("click", (e) => {
+            if (e.shiftKey === true && e.pointerType === "touch") {
+                e.preventDefault();
+                e.pixel = this.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel;
+                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
+                        this._popupMultiple(e, "multi", false);
+                    });
+            }
+        });
+        --------------------------------------------------------*/
+    };
+    
+    /*--------------------------------------------------------
     // to activate multiple selection of objects
-    /*
-    _popupMultiple = (e: MapBrowserEvent<UIEvent>, op: string, p) => {
+    _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
         console.log(e.pixel, op, p);
     };
-    */
+    --------------------------------------------------------*/
 
     activate = () => {
         this.control.setActive(true);
@@ -204,7 +244,7 @@ export class IModule extends Component {
         }
     }
 
-    displayFeatureInfo = async (event: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
+    displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         await this.getResponse(op, p);
@@ -287,7 +327,7 @@ export class IModule extends Component {
             });
     };
 
-    _overlayInfo = async (e: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
+    _overlayInfo = async (e: MapBrowserEvent, op: string, p, mode) => {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
@@ -413,7 +453,7 @@ export class IModule extends Component {
 
                 const p = { value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
-                const simulateEvent: MapBrowserEvent<UIEvent> = {
+                const simulateEvent: any = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
                     target: "map",

@@ -1,9 +1,8 @@
 import { ReactElement } from "react";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
+import type { Attrs } from "@nextgisweb/feature-layer/type";
 
 import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
-import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 
 import { Store } from "../Store";
 
@@ -11,10 +10,6 @@ export interface RelationProps {
     external_resource_id?: number;
     relation_key?: string;
     relation_value?: number;
-}
-
-interface ResourceId {
-    id: number;
 }
 
 export interface DataProps<F extends Attrs = Attrs> {
@@ -177,25 +172,4 @@ export interface AttributeProps {
     format_field: FormatNumberFieldData
     key: number;
     value: string;
-}
-
-interface ControlProps {
-    icon: ReactElement;
-    url?: string;
-    title: string;
-    status: boolean | string;
-    checked?: boolean;
-    disable?: boolean;
-}
-
-export interface ControlUrlProps {
-    [key: string]: ControlProps;
-}
-
-export interface CustomEventProps {
-    coordinate: number[];
-    map: Display;
-    target: string;
-    pixel: number[];
-    type: string;
 }
