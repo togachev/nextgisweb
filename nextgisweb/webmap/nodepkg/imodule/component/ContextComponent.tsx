@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useOutsideClick } from "../useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { ConfigProvider } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider } from "@nextgisweb/gui/antd";
 
 import Location from "@nextgisweb/icon/material/my_location";
 import type { Params, Props } from "../type";
@@ -47,14 +47,15 @@ export default forwardRef<Element>(
                                 visible({ hidden: true, overlay: undefined, key: op });
                             }}
                         >
-                            <span
+                            <Button
+                                type="text"
+                                icon={<Location />}
                                 className="coordinate-value"
                                 title={gettext("Copy coordinates")}
                                 onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
                             >
-                                <span className="icon-location"><Location /></span>
-                                <span className="coords">{coordsVisible}</span>
-                            </span>
+                                {coordsVisible}
+                            </Button>
                         </span>
                         {array_context?.map(item => {
                             if (item.visible) {

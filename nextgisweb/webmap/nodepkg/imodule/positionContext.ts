@@ -9,10 +9,10 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
     const py = p && p.value ? event.pixel[1] : pointerType === "mouse" ? event.originalEvent.clientY :event.clientY;
     
     const context_height = 24 + context_item * length;
-    const context_width = 180;
+    const context_width = 200;
     const popup_height = settings.popup_size.height;
     const popup_width = settings.popup_size.width;
-    const coords_not_count_w = 250;
+    const coords_not_count_w = 270;
     const coords_not_count_h = 51;
 
     let width, height;

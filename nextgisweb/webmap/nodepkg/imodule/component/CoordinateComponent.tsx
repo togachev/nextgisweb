@@ -137,16 +137,15 @@ export const CoordinateComponent = observer((props) => {
     return (
         <div className="footer-coordinate-component">
             {contextHolder}
-            <span
+            <Button
+                type="text"
+                icon={<Location />}
                 className="coordinate-value"
                 title={gettext("Copy coordinates")}
                 onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
             >
-                <span className="icon-location">
-                    <Location />
-                </span>
-                <span className="coords">{coordsVisible}</span>
-            </span>
+                {coordsVisible}
+            </Button>
             {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
                 <div className="link-block">
                     {
