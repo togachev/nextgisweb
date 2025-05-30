@@ -268,6 +268,8 @@ export class Display {
             if (controlsReady.has("im")) {
                 const { control } = controlsReady.get("im");
                 this.imodule = control;
+                this.mapStates.addState("imodule", this.imodule);
+                this.mapStates.setDefaultState("imodule", true);
                 this._iModuleUrlParams();
             }
         } else {

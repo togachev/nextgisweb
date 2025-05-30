@@ -2,8 +2,9 @@ import { action, observable } from "mobx";
 import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
-import { Map as olMap, Overlay } from "ol";
+import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
+import { Interaction } from "ol/interaction";
 import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
@@ -15,7 +16,7 @@ import { positionContext } from "./positionContext"
 import SimpleGeometry from "ol/geom/SimpleGeometry";
 
 import type { Display } from "@nextgisweb/webmap/display";
-import type { DataProps, EventProps, ParamsProps, Params, Response, CustomEventProps, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
+import type { DataProps, EventProps, ParamsProps, Params, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import "./IModule.less";
@@ -24,6 +25,37 @@ type SrsInfoMap = Map<number, SRSRead>;
 
 const settings = webmapSettings;
 const wkt = new WKT();
+
+interface ControlOptions {
+    tool: IModule;
+}
+
+class Control extends Interaction {
+    private tool: IModule;
+
+    constructor(options: ControlOptions) {
+        super({
+            handleEvent: (e) => this.handleClickEvent(e),
+        });
+        this.tool = options.tool;
+    }
+
+    handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
+        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+            this.tool._overlayInfo(e, "popup", false, "click");
+            e.preventDefault();
+        }
+        // else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
+        //     this.tool._popupMultiple(e, "multi", false);
+        //     e.preventDefault();
+        // }
+        else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false) {
+            this.tool._overlayInfo(e, "context", false, "click");
+            e.preventDefault();
+        }
+        return true;
+    }
+}
 
 const array_context = [ //для создания кнопок в контекстном меню
     { key: 1, title: "Действие 1", result: "Действие 1 выполнено", visible: false },
@@ -46,6 +78,7 @@ export class IModule extends Component {
     selected: string | undefined;
     overlay_popup: Overlay;
     overlay_context: Overlay;
+    private control: Interaction;
     popup = document.createElement("div");
     point_popup = document.createElement("div");
     point_context = document.createElement("div");
@@ -64,58 +97,30 @@ export class IModule extends Component {
         this.LonLatSrid = 4326;
         this.offHP = !this.display.tinyConfig ? 40 : 0;
         this.olmap = this.display.map.olMap;
+        this.control = new Control({ tool: this });
+        this.control.setActive(false);
+        this.olmap.addInteraction(this.control);
         this.getSrsInfo();
         this._addOverlay();
-        
+
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-
-        const view = this.olmap.getViewport();
-
-        view.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-            this.getPixels(e)
-                .then(pixel => {
-                    e.pixel = pixel
-                    e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
-                    this._overlayInfo(e, "context", false, "click");
-                });
-        });
-
-        view.addEventListener("click", (e) => {
-            if (e.ctrlKey === false && e.shiftKey === false) {
-                e.preventDefault();
-                this.getPixels(e)
-                    .then(pixel => {
-                        e.pixel = pixel
-                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
-                        this._overlayInfo(e, "popup", false, "click");
-                    });
-            }
-        });
-
-        // to activate multiple selection of objects
-        /*
-        this.display.mapNode.addEventListener("click", (e) => {
-            if (e.shiftKey === true) {
-                e.preventDefault();
-                e.pixel = this.getPixels(e)
-                    .then(pixel => {
-                        e.pixel = pixel;
-                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
-                        this._popupMultiple(e, "multi", false);
-                    });
-            }
-        });
-        */
     };
 
     // to activate multiple selection of objects
     /*
-    _popupMultiple = (e: CustomEventProps, op: string, p) => {
+    _popupMultiple = (e: MapBrowserEvent<UIEvent>, op: string, p) => {
         console.log(e.pixel, op, p);
     };
     */
+
+    activate = () => {
+        this.control.setActive(true);
+    };
+
+    deactivate = () => {
+        this.control.setActive(false);
+    };
 
     @action
     private setSrsMap(srsMap: SrsInfoMap) {
@@ -199,7 +204,7 @@ export class IModule extends Component {
         }
     }
 
-    displayFeatureInfo = async (event: CustomEventProps, op: string, p, mode) => {
+    displayFeatureInfo = async (event: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         await this.getResponse(op, p);
@@ -282,7 +287,7 @@ export class IModule extends Component {
             });
     };
 
-    _overlayInfo = async (e: CustomEventProps, op: string, p, mode) => {
+    _overlayInfo = async (e: MapBrowserEvent<UIEvent>, op: string, p, mode) => {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         let request;
@@ -408,7 +413,7 @@ export class IModule extends Component {
 
                 const p = { value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
-                const simulateEvent: CustomEventProps = {
+                const simulateEvent: MapBrowserEvent<UIEvent> = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
                     target: "map",
