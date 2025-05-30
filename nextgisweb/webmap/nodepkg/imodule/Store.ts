@@ -225,6 +225,12 @@ export class Store {
     get activePanel() {
         return this.display.panelManager.getActivePanelName();
     }
+
+    @computed
+    get panelSize() {
+        return this.activePanel ? 340 : 0;
+    }
+
     async generateUrl({ res, st, pn, disable }) {
         const imodule = this.display.imodule;
         const lon = imodule.lonlat[0];

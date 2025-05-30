@@ -224,8 +224,7 @@ export default observer(
                         .highlightFeatureById(store.selected.id, store.selected.layerId)
                         .then((feature) => {
                             display.map.zoomToFeature(feature);
-                            store.setValueRnd({ ...store.valueRnd, y: window.innerHeight - position.height, x: 0 });
-                            store.setFixPopup(true);
+                            store.setValueRnd({ ...store.valueRnd, x: window.innerWidth - position.width - offset, y: offHP + offset });
                         });
                 }, 250);
             };
@@ -234,8 +233,7 @@ export default observer(
                 setTimeout(() => {
                     const point = new OlGeomPoint(imodule.params.point);
                     display.map.zoomToExtent(point.getExtent());
-                    store.setValueRnd({ ...store.valueRnd, y: window.innerHeight - position.height, x: 0 });
-                    store.setFixPopup(true);
+                    store.setValueRnd({ ...store.valueRnd, x: window.innerWidth - position.width - offset, y: offHP + offset });
                 }, 250);
             };
 
@@ -327,7 +325,7 @@ export default observer(
                                 store.setValueRnd({ ...store.valueRnd, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y });
                             }}
                         >
-                            <div ref={ref as any} className="popup-position" >
+                            <div ref={ref as any} className="popup-position">
                                 <div className="title">
                                     <div className="title-name"
                                         onClick={(e) => {

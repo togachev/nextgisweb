@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import React, { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { pointClick } from "./icons/icon";
@@ -105,7 +105,7 @@ export class IModule extends Component {
 
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-        
+
         const view = this.olmap.getViewport();
         view.addEventListener("click", (e: any) => {
             if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
@@ -130,7 +130,7 @@ export class IModule extends Component {
             }
         });
 
-        
+
         /*--------------------------------------------------------
         // to activate multiple selection of objects
         this.display.mapNode.addEventListener("click", (e) => {
@@ -146,7 +146,7 @@ export class IModule extends Component {
         });
         --------------------------------------------------------*/
     };
-    
+
     /*--------------------------------------------------------
     // to activate multiple selection of objects
     _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
@@ -167,6 +167,16 @@ export class IModule extends Component {
         this.srsMap = srsMap;
     }
 
+    @computed
+    get _activePanel() {
+        return this.display.panelManager.getActivePanelName();
+    }
+
+    @computed
+    get _panelSize() {
+        return this._activePanel ? 340 : 0;
+    }
+
     getSrsInfo = async () => {
         await route("spatial_ref_sys.collection").get()
             .then(srsInfo => {
@@ -179,7 +189,7 @@ export class IModule extends Component {
         const activePanel = this.display.panelManager.getActivePanelName()
         const pixel = [
             activePanel && activePanel !== "none" ?
-                e.clientX - 340 - this.offHP :
+                e.clientX - this._panelSize - this.offHP :
                 e.clientX - this.offHP,
             e.clientY - this.offHP
         ];
@@ -459,7 +469,7 @@ export class IModule extends Component {
                     target: "map",
                     pixel: [
                         this.display.panelManager.getActivePanelName() !== "none" ?
-                            (pixel[0] + 340 + this.offHP) :
+                            (pixel[0] + this._panelSize + this.offHP) :
                             (pixel[0] + this.offHP), (pixel[1] + this.offHP)
                     ],
                     type: "click"
