@@ -67,19 +67,6 @@ class Control extends Interaction {
                     });
             }
         });
-
-        /*------------to activate multiple selection of objects----------------------------------*/
-        // view.addEventListener("click", (e) => {
-        //     if (e.shiftKey === true && e.pointerType === "touch") {
-        //         e.preventDefault();
-        //         this.tool.getPixels(e)
-        //             .then(pixel => {
-        //                 e.pixel = pixel;
-        //                 e.coordinate = olmal.getCoordinateFromPixel(pixel);
-        //                 this.tool._popupMultiple(e, "multi", false);
-        //             });
-        //     }
-        // });
     }
 
     handleClickEvent(e: MapBrowserEvent): boolean {
@@ -154,13 +141,6 @@ export class IModule extends Component {
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
     };
-
-    /*--------------------------------------------------------
-    // to activate multiple selection of objects
-    _popupMultiple = (e: MapBrowserEvent, op: string, p) => {
-        console.log(e.pixel, op, p);
-    };
-    --------------------------------------------------------*/
 
     activate = () => {
         this.control.setActive(true);
