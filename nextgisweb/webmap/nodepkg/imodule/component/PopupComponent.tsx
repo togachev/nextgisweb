@@ -21,7 +21,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { getEntries } from "../useSource";
-import { route } from "@nextgisweb/pyramid/api";
 
 import type { Params, Props } from "../type";
 import topic from "@nextgisweb/webmap/compat/topic";

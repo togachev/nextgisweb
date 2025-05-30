@@ -38,18 +38,65 @@ class Control extends Interaction {
             handleEvent: (e) => this.handleClickEvent(e),
         });
         this.tool = options.tool;
+        this.handleTouchEvent();
+    }
+
+    /* ---------- listen for single-click event or context menu for the touch screen ----------*/
+    handleTouchEvent() {
+        const olmal = this.tool.display.map.olMap;
+        const view = olmal.getViewport();
+        view.addEventListener("click", (e: any) => {
+            if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
+                e.preventDefault();
+                this.tool.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel;
+                        e.coordinate = olmal.getCoordinateFromPixel(pixel);
+                        this.tool._overlayInfo(e, "popup", false, "click");
+                    });
+            }
+        });
+        view.addEventListener("contextmenu", (e: any) => {
+            if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
+                e.preventDefault();
+                this.tool.getPixels(e)
+                    .then(pixel => {
+                        e.pixel = pixel;
+                        e.coordinate = olmal.getCoordinateFromPixel(pixel);
+                        this.tool._overlayInfo(e, "context", false, "click");
+                    });
+            }
+        });
+
+        /*------------to activate multiple selection of objects----------------------------------*/
+        // view.addEventListener("click", (e) => {
+        //     if (e.shiftKey === true && e.pointerType === "touch") {
+        //         e.preventDefault();
+        //         this.tool.getPixels(e)
+        //             .then(pixel => {
+        //                 e.pixel = pixel;
+        //                 e.coordinate = olmal.getCoordinateFromPixel(pixel);
+        //                 this.tool._popupMultiple(e, "multi", false);
+        //             });
+        //     }
+        // });
     }
 
     handleClickEvent(e: MapBrowserEvent): boolean {
-        if (e.type === "singleclick" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false && e.originalEvent.pointerType === "mouse") {
+        if (
+            e.type === "singleclick"
+            && e.originalEvent.ctrlKey === false
+            && e.originalEvent.shiftKey === false
+            && e.originalEvent.pointerType === "mouse"
+        ) {
             this.tool._overlayInfo(e, "popup", false, "click");
             e.preventDefault();
-        }
-        // else if (e.type === "singleclick" && e.originalEvent.shiftKey === true) {
-        //     this.tool._popupMultiple(e, "multi", false);
-        //     e.preventDefault();
-        // }
-        else if (e.type === "contextmenu" && e.originalEvent.ctrlKey === false && e.originalEvent.shiftKey === false && e.originalEvent.pointerType === "mouse") {
+        } else if (
+            e.type === "contextmenu"
+            && e.originalEvent.ctrlKey === false
+            && e.originalEvent.shiftKey === false
+            && e.originalEvent.pointerType === "mouse"
+        ) {
             this.tool._overlayInfo(e, "context", false, "click");
             e.preventDefault();
         }
@@ -57,7 +104,8 @@ class Control extends Interaction {
     }
 }
 
-const array_context = [ //для создания кнопок в контекстном меню
+/* to create buttons in the context menu */
+const array_context = [
     { key: 1, title: "Действие 1", result: "Действие 1 выполнено", visible: false },
     { key: 2, title: "Действие 2", result: "Действие 2 выполнено", visible: false },
     { key: 3, title: "Действие 3", result: "Действие 3 выполнено", visible: false },
@@ -105,46 +153,6 @@ export class IModule extends Component {
 
         this.point_popup = document.createElement("div");
         this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
-
-        const view = this.olmap.getViewport();
-        view.addEventListener("click", (e: any) => {
-            if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
-                e.preventDefault();
-                this.getPixels(e)
-                    .then(pixel => {
-                        e.pixel = pixel
-                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
-                        this._overlayInfo(e, "popup", false, "click");
-                    });
-            }
-        });
-        view.addEventListener("contextmenu", (e: any) => {
-            if (e.ctrlKey === false && e.shiftKey === false && e.pointerType === "touch") {
-                e.preventDefault();
-                this.getPixels(e)
-                    .then(pixel => {
-                        e.pixel = pixel
-                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
-                        this._overlayInfo(e, "context", false, "click");
-                    });
-            }
-        });
-
-
-        /*--------------------------------------------------------
-        // to activate multiple selection of objects
-        this.display.mapNode.addEventListener("click", (e) => {
-            if (e.shiftKey === true && e.pointerType === "touch") {
-                e.preventDefault();
-                e.pixel = this.getPixels(e)
-                    .then(pixel => {
-                        e.pixel = pixel;
-                        e.coordinate = this.olmap.getCoordinateFromPixel(pixel);
-                        this._popupMultiple(e, "multi", false);
-                    });
-            }
-        });
-        --------------------------------------------------------*/
     };
 
     /*--------------------------------------------------------
