@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import { Collapse, Spin } from "@nextgisweb/gui/antd";
+import { Collapse, Divider, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { CaretRightOutlined, LoadingOutlined } from "@ant-design/icons";
 import { DescComponent } from "@nextgisweb/resource/description";
@@ -61,6 +61,7 @@ export const ResourceSectionDescription: ResourceSection = ({
 
     return (
         <div className="description-panel">
+            <Divider orientation="left" orientationMargin="0">{gettext("Description")}</Divider>
             <Collapse
                 defaultActiveKey={!descValue ? [] : ["description"]}
                 expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
