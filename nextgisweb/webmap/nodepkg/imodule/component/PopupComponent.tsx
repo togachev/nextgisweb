@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import OlGeomPoint from "ol/geom/Point";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
@@ -9,6 +10,7 @@ import PinOff from "@nextgisweb/icon/mdi/pin-off";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
+import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import { Rnd } from "react-rnd";
 import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
 import { Store } from "../Store";
@@ -19,6 +21,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { getEntries } from "../useSource";
+import { route } from "@nextgisweb/pyramid/api";
 
 import type { Params, Props } from "../type";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -40,9 +43,11 @@ const CheckOnlyOne = ({ store }) => {
         onTouchEnd: onClick,
         onClick: onClick,
         type: "text",
+        variant: "text",
         size: "small",
+        color: store.fixPopup && "danger",
         title: store.fixPopup ? msgFixOffPopup : msgFixPopup,
-        className: "icon-symbol",
+        className: !store.fixPopup ? "icon-symbol" : "icon-checked",
     }
 
     return (<Button {...props} />);
@@ -212,6 +217,28 @@ export default observer(
             const contentProps = { store: store, display: display };
             const coordinateProps = { display: display, store: store, op: "popup" };
 
+            const zoomTo = () => {
+                if (!store.selected) return;
+                setTimeout(() => {
+                    display.featureHighlighter
+                        .highlightFeatureById(store.selected.id, store.selected.layerId)
+                        .then((feature) => {
+                            display.map.zoomToFeature(feature);
+                            store.setValueRnd({ ...store.valueRnd, y: window.innerHeight - position.height, x: 0 });
+                            store.setFixPopup(true);
+                        });
+                }, 250);
+            };
+
+            const zoomToPoint = () => {
+                setTimeout(() => {
+                    const point = new OlGeomPoint(imodule.params.point);
+                    display.map.zoomToExtent(point.getExtent());
+                    store.setValueRnd({ ...store.valueRnd, y: window.innerHeight - position.height, x: 0 });
+                    store.setFixPopup(true);
+                }, 250);
+            };
+
             return (
                 createPortal(
                     <ConfigProvider
@@ -328,6 +355,20 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
+                                    {store.countFeature > 0 && store.selected && (
+                                        <Button
+                                            title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to identification point")}
+                                            type="text"
+                                            size="small"
+                                            onClick={
+                                                store.selected?.type === "vector" ? zoomTo :
+                                                    store.selected?.type === "raster" ? zoomToPoint :
+                                                        undefined}
+                                            icon={<ZoomInMapIcon />}
+                                            style={{ flex: "0 0 auto" }}
+                                            className="icon-symbol"
+                                        />
+                                    )}
                                     {store.countFeature > 0 && <CheckOnlyOne store={store} />}
                                     {store.countFeature > 0 && store.selected && (
                                         <span
