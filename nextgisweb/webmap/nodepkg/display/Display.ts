@@ -113,6 +113,8 @@ export class Display {
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
+    @observable.ref accessor panelSize = 342;
+
     constructor({
         config,
         tinyConfig,
@@ -227,6 +229,12 @@ export class Display {
             }
         );
     }
+
+    @action
+    setPanelSize(panelSize: number) {
+        this.panelSize = panelSize;
+    }
+
     startup({
         target,
         leftTopControlPane,

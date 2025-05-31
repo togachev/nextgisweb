@@ -1,7 +1,6 @@
 import { action, computed, observable } from "mobx";
-import React, { Component, createRef } from "react";
+import React, { Component, createRef, RefObject, ReactElement } from "react";
 import { createRoot } from "react-dom/client";
-import { pointClick } from "./icons/icon";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { Interaction } from "ol/interaction";
@@ -10,6 +9,7 @@ import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
 import { route } from "@nextgisweb/pyramid/api";
 import { Point } from "ol/geom";
+import PointClickComponent from "./component/PointClickComponent";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
@@ -114,13 +114,17 @@ export class IModule extends Component {
     overlay_popup: Overlay;
     overlay_context: Overlay;
     control: Interaction;
-    popup = document.createElement("div");
-    point_popup = document.createElement("div");
-    point_context = document.createElement("div");
-    root_popup = createRoot(this.popup);
-    root_context = createRoot(this.point_context);
-    refPopup = React.createRef<HTMLDivElement>();
-    refContext = createRef<HTMLDivElement>();
+
+    point_popup: HTMLDivElement;
+    popup: HTMLDivElement;
+    point_context: HTMLDivElement;
+
+    root_point_popup: ReactElement;
+    root_popup: ReactElement;
+    root_context: ReactElement;
+
+    refPopup: RefObject;
+    refContext: RefObject;
 
     @observable.ref accessor srsMap: SrsInfoMap;
 
@@ -139,7 +143,15 @@ export class IModule extends Component {
         this._addOverlay();
 
         this.point_popup = document.createElement("div");
-        this.point_popup.innerHTML = `<span class="icon-position">${pointClick}</span>`;
+        this.popup = document.createElement("div");
+        this.root_context = document.createElement("div");
+
+        this.root_point_popup = createRoot(this.point_popup);
+        this.root_popup = createRoot(this.popup);
+        this.root_context = createRoot(this.root_context);
+
+        this.refPopup = React.createRef<HTMLDivElement>();
+        this.refContext = createRef<HTMLDivElement>();
     };
 
     activate = () => {
@@ -162,7 +174,7 @@ export class IModule extends Component {
 
     @computed
     get _panelSize() {
-        return this._activePanel ? 340 : 0;
+        return this._activePanel && this._activePanel !== "none" ? this.display.panelSize : 0;
     }
 
     getSrsInfo = async () => {
@@ -177,7 +189,7 @@ export class IModule extends Component {
         const activePanel = this.display.panelManager.getActivePanelName()
         const pixel = [
             activePanel && activePanel !== "none" ?
-                e.clientX - this._panelSize - this.offHP :
+                e.clientX - this.display.panelSize - this.offHP :
                 e.clientX - this.offHP,
             e.clientY - this.offHP
         ];
@@ -271,8 +283,9 @@ export class IModule extends Component {
                 params: { mode: mode, op, position, response: this.response, selected: value },
                 display: this.display,
                 visible: this._visible,
-            } as Params
+            } as Params;
 
+            this.root_point_popup.render(<PointClickComponent display={this.display} event={event} response={this.response} selected={value} countFeature={this.countFeature} />);
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
@@ -286,7 +299,6 @@ export class IModule extends Component {
             } as Params;
 
             this.root_context.render(<ContextComponent {...propsContext} ref={this.refContext} />);
-            this._visible({ hidden: false, overlay: this.params.point, key: "context" });
         }
     };
 
@@ -457,7 +469,7 @@ export class IModule extends Component {
                     target: "map",
                     pixel: [
                         this.display.panelManager.getActivePanelName() !== "none" ?
-                            (pixel[0] + this._panelSize + this.offHP) :
+                            (pixel[0] + this.display.panelSize + this.offHP) :
                             (pixel[0] + this.offHP), (pixel[1] + this.offHP)
                     ],
                     type: "click"

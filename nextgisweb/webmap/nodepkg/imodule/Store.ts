@@ -4,7 +4,7 @@ import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
-import type { AttributeProps, ControlUrlProps, DataProps, ExtensionsProps, Rnd, OptionProps } from "./type";
+import type { AttributeProps, ControlUrlProps, DataProps, ExtensionsProps, PopupZoom, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
@@ -14,6 +14,7 @@ export class Store {
     @observable accessor fullscreen = false;
 
     @observable.ref accessor control: ControlUrlProps;
+    @observable.ref accessor popupZoom: PopupZoom;
     @observable.ref accessor activeControlKey: string;
     @observable.ref accessor mode: string;
     @observable.ref accessor countFeature: number;
@@ -37,13 +38,21 @@ export class Store {
         fixPos,
         fixPanel,
         control,
+        popup,
+        point,
     }) {
         this.display = display;
         this.valueRnd = valueRnd;
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
         this.control = control;
+        this.popupZoom = popup;
     }
+
+    @action
+    setPopupZoom(popupZoom: PopupZoom) {
+        this.popupZoom = popupZoom;
+    };
 
     @action
     setControl(control: ControlUrlProps) {
@@ -228,7 +237,7 @@ export class Store {
 
     @computed
     get panelSize() {
-        return this.activePanel ? 340 : 0;
+        return this.activePanel ? this.display.panelSize : 0;
     }
 
     async generateUrl({ res, st, pn, disable }) {

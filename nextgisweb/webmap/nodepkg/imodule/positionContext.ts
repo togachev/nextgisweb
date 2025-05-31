@@ -15,6 +15,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
     const popup_width = settings.popup_size.width;
     const coords_not_count_w = 270;
     const coords_not_count_h = 51;
+    const default_point = { top: 0, left: 0, display: "block" };
 
     let width, height;
 
@@ -129,7 +130,12 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             H - height - offset >= py
             && W - width - offset >= px
         ) {
-            return { x: px + offset, y: py + offset, width: width, height: height }
+            return {
+                popup: {
+                    x: window.innerWidth - width, y: window.innerHeight - height
+                },
+                x: px + offset, y: py + offset, width: width, height: height
+            }
         }
 
         /*top right*/
@@ -137,7 +143,12 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             H - height - offset >= py
             && W - width - offset < px
         ) {
-            return { x: px - width - offset, y: py + offset, width: width, height: height }
+            return {
+                popup: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                x: px - width - offset, y: py + offset, width: width, height: height
+            }
         }
 
         /*bottom left*/
@@ -145,7 +156,12 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             H - height - offset < py
             && W - width >= px
         ) {
-            return { x: px + offset, y: py - height - offset, width: width, height: height }
+            return {
+                popup: {
+                    x: window.innerWidth - width, y: offHP
+                },
+                x: px + offset, y: py - height - offset, width: width, height: height
+            }
         }
 
         /*bottom right*/
@@ -153,7 +169,12 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             W - width - offset < px
             && H - height - offset < py
         ) {
-            return { x: px - width - offset, y: py - height - offset, width: width, height: height }
+            return {
+                popup: {
+                    x: offHP, y: offHP,
+                },
+                x: px - width - offset, y: py - height - offset, width: width, height: height
+            }
         }
     }
 };

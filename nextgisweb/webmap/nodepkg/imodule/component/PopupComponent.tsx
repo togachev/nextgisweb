@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import OlGeomPoint from "ol/geom/Point";
+import { route } from "@nextgisweb/pyramid/api";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
@@ -107,7 +107,12 @@ export default observer(
                             checked: false,
                         }
                     },
+                    popup: position.popup,
                 }));
+
+            topic.subscribe("update.point", () => {
+                store.setValueRnd({ ...store.valueRnd, x: store.popupZoom.x, y: store.popupZoom.y });
+            });
 
             imodule.iStore = store;
 
@@ -123,6 +128,7 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
+                    store.setPopupZoom(position.popup);
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -159,6 +165,7 @@ export default observer(
                 store.setSelected(copy);
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
+                topic.publish("visible.point", copy);
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
@@ -223,16 +230,20 @@ export default observer(
                         .highlightFeatureById(store.selected.id, store.selected.layerId)
                         .then((feature) => {
                             display.map.zoomToFeature(feature);
-                            store.setValueRnd({ ...store.valueRnd, x: window.innerWidth - position.width - offset, y: offHP + offset });
+                            store.setValueRnd({ ...store.valueRnd, x: store.popupZoom.x, y: store.popupZoom.y });
                         });
                 }, 250);
             };
 
-            const zoomToPoint = () => {
+            const zoomToRasterExtent = async () => {
+                const { extent } = await route("layer.extent", {
+                    id: store.selected.styleId,
+                }).get();
                 setTimeout(() => {
-                    const point = new OlGeomPoint(imodule.params.point);
-                    display.map.zoomToExtent(point.getExtent());
-                    store.setValueRnd({ ...store.valueRnd, x: window.innerWidth - position.width - offset, y: offHP + offset });
+                    display.map.zoomToNgwExtent(extent, {
+                        displayProjection: display.displayProjection,
+                    });
+                    store.setValueRnd({ ...store.valueRnd, x: store.popupZoom.x, y: store.popupZoom.y });
                 }, 250);
             };
 
@@ -354,13 +365,15 @@ export default observer(
                                     </div>
                                     {store.countFeature > 0 && store.selected && (
                                         <Button
-                                            title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to identification point")}
+                                            title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
                                             type="text"
                                             size="small"
-                                            onClick={
-                                                store.selected?.type === "vector" ? zoomTo :
-                                                    store.selected?.type === "raster" ? zoomToPoint :
-                                                        undefined}
+                                            onClick={() => {
+                                                topic.publish("unvisible.point");
+                                                store.selected?.type === "vector" ? zoomTo() :
+                                                    store.selected?.type === "raster" ? zoomToRasterExtent() :
+                                                        undefined;
+                                            }}
                                             icon={<ZoomInMapIcon />}
                                             style={{ flex: "0 0 auto" }}
                                             className="icon-symbol"

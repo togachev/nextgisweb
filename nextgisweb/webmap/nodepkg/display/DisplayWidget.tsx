@@ -64,6 +64,10 @@ export const DisplayWidget = observer(
         >([350, undefined]);
 
         useEffect(() => {
+            display.setPanelSize(horizontalPanelSize[0] ? horizontalPanelSize[0] - 8 : horizontalPanelSize[1] - 8);
+        }, [display, display.mapExtentDeferred, horizontalPanelSize]);
+
+        useEffect(() => {
             if (mapRefs) {
                 display.startup(mapRefs);
             }

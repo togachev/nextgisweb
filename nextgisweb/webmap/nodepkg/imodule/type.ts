@@ -80,19 +80,25 @@ export interface Visible {
     key: string;
 }
 
+export interface PopupZoom {
+    x: number;
+    y: number;
+}
+
 export interface Position {
     x: number;
     y: number;
     width: number;
     height: number;
+    popup?: PopupZoom;
 }
 
 export interface Props {
     op: string;
     response: Response;
     position: Position;
-    selected: DataProps;
-    mode: string;
+    selected?: DataProps;
+    mode?: string;
 }
 
 export interface ContextProps {
@@ -106,7 +112,7 @@ export interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: Display;
-    array_context: ContextProps[] | [];
+    array_context?: ContextProps[] | [];
 }
 
 export type RequestProps = {
