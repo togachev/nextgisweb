@@ -42,7 +42,7 @@ export default function PointClickComponent({ display, event, params, countFeatu
     const zoomToRasterExtent = async () => {
         const { extent } = await route("layer.extent", {
             id: selected.styleId,
-        }).get();
+        }).get({ cache: true });
         setTimeout(() => {
             display.map.zoomToNgwExtent(extent, {
                 displayProjection: display.displayProjection,

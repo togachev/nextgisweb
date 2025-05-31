@@ -238,7 +238,7 @@ export default observer(
             const zoomToRasterExtent = async () => {
                 const { extent } = await route("layer.extent", {
                     id: store.selected.styleId,
-                }).get();
+                }).get({ cache: true });
                 setTimeout(() => {
                     display.map.zoomToNgwExtent(extent, {
                         displayProjection: display.displayProjection,
