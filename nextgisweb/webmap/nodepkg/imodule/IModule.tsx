@@ -1,5 +1,5 @@
 import { action, computed, observable } from "mobx";
-import React, { Component, createRef, RefObject, ReactElement } from "react";
+import { Component, createRef, RefObject, ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
@@ -150,7 +150,7 @@ export class IModule extends Component {
         this.root_popup = createRoot(this.popup);
         this.root_context = createRoot(this.root_context);
 
-        this.refPopup = React.createRef<HTMLDivElement>();
+        this.refPopup = createRef<HTMLDivElement>();
         this.refContext = createRef<HTMLDivElement>();
     };
 
@@ -279,13 +279,21 @@ export class IModule extends Component {
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_popup, "popup");
 
+            const propsPoint = {
+                params: { response: this.response, selected: value },
+                display: this.display,
+                countFeature: this.countFeature,
+                event: event,
+            } as Params;
+
             const propsPopup = {
                 params: { mode: mode, op, position, response: this.response, selected: value },
                 display: this.display,
                 visible: this._visible,
             } as Params;
 
-            this.root_point_popup.render(<PointClickComponent display={this.display} event={event} response={this.response} selected={value} countFeature={this.countFeature} />);
+            this.root_point_popup.render(<PointClickComponent {...propsPoint} />);
+
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {

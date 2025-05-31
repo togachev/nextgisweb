@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { Attrs } from "@nextgisweb/feature-layer/type";
-
+import { MapBrowserEvent } from "ol";
 import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
 
 import { Store } from "../Store";
@@ -113,6 +113,8 @@ export interface Params {
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: Display;
     array_context?: ContextProps[] | [];
+    countFeature?: number;
+    event: MapBrowserEvent;
 }
 
 export type RequestProps = {

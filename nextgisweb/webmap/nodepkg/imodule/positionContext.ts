@@ -15,7 +15,6 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
     const popup_width = settings.popup_size.width;
     const coords_not_count_w = 270;
     const coords_not_count_h = 51;
-    const default_point = { top: 0, left: 0, display: "block" };
 
     let width, height;
 

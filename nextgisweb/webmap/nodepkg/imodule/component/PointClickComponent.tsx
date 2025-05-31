@@ -4,7 +4,10 @@ import { route } from "@nextgisweb/pyramid/api";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import topic from "@nextgisweb/webmap/compat/topic";
 
-export default function PointClickComponent({ display, event, response, selected: value, countFeature }) {
+import type { Params, Props } from "../type";
+
+export default function PointClickComponent({ display, event, params, countFeature }: Params) {
+    const { response, selected: value } = params as Props;
     const selectVal = value ? value : response.data[0];
 
     const [selected, setSelected] = useState<object>(value);

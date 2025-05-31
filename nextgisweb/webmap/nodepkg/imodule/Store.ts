@@ -39,7 +39,6 @@ export class Store {
         fixPanel,
         control,
         popup,
-        point,
     }) {
         this.display = display;
         this.valueRnd = valueRnd;
