@@ -6,7 +6,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 
 import type { Params, Props } from "../type";
 
-export default function PointClickComponent({ display, event, params, countFeature }: Params) {
+export default function PopupClick({ display, event, params, countFeature }: Params) {
     const { response, selected: value } = params as Props;
     const selectVal = value ? value : response.data[0];
 

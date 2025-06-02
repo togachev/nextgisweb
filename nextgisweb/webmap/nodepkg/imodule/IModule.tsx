@@ -1,6 +1,7 @@
 import { action, computed, observable } from "mobx";
-import { Component, createRef, RefObject, ReactElement } from "react";
+import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
+import type {Root as ReactRoot} from 'react-dom/client';
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { Interaction } from "ol/interaction";
@@ -9,7 +10,7 @@ import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
 import { route } from "@nextgisweb/pyramid/api";
 import { Point } from "ol/geom";
-import PointClickComponent from "./component/PointClickComponent";
+import PopupClick from "./component/PopupClick";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
@@ -115,16 +116,16 @@ export class IModule extends Component {
     overlay_context: Overlay;
     control: Interaction;
 
-    point_popup: HTMLDivElement;
-    popup: HTMLDivElement;
-    point_context: HTMLDivElement;
+    point_popup = document.createElement("div");
+    popup = document.createElement("div");
+    point_context = document.createElement("div");
 
-    root_point_popup: ReactElement;
-    root_popup: ReactElement;
-    root_context: ReactElement;
+    refPopup = createRef<HTMLDivElement>();
+    refContext = createRef<HTMLDivElement>();
 
-    refPopup: RefObject;
-    refContext: RefObject;
+    private root_point_popup: ReactRoot | null = null;
+    private root_popup: ReactRoot | null = null;
+    private root_point_context: ReactRoot | null = null;
 
     @observable.ref accessor srsMap: SrsInfoMap;
 
@@ -142,16 +143,9 @@ export class IModule extends Component {
         this.getSrsInfo();
         this._addOverlay();
 
-        this.point_popup = document.createElement("div");
-        this.popup = document.createElement("div");
-        this.root_context = document.createElement("div");
-
         this.root_point_popup = createRoot(this.point_popup);
         this.root_popup = createRoot(this.popup);
-        this.root_context = createRoot(this.root_context);
-
-        this.refPopup = createRef<HTMLDivElement>();
-        this.refContext = createRef<HTMLDivElement>();
+        this.root_point_context = createRoot(this.point_context);
     };
 
     activate = () => {
@@ -292,8 +286,8 @@ export class IModule extends Component {
                 visible: this._visible,
             } as Params;
 
-            this.root_point_popup.render(<PointClickComponent {...propsPoint} />);
 
+            this.root_point_popup.render(<PopupClick {...propsPoint} />);
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
@@ -306,7 +300,7 @@ export class IModule extends Component {
                 array_context: array_context,
             } as Params;
 
-            this.root_context.render(<ContextComponent {...propsContext} ref={this.refContext} />);
+            this.root_point_context.render(<ContextComponent {...propsContext} ref={this.refContext} />);
         }
     };
 
