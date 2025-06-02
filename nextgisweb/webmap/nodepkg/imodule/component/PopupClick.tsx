@@ -3,7 +3,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { ConfigProvider, Tooltip } from "@nextgisweb/gui/antd";
 
 import type { Params, Props } from "../type";
 
@@ -53,42 +52,27 @@ export default function PopupClick({ display, event, params, countFeature }: Par
     };
 
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Tooltip: {
-                        borderRadius: 2,
-                        lineHeight: 1,
-                        fontSize: 12,
-                        controlHeight: 22,
-                        colorBgSpotlight: "rgb(255 255 255 / 80%)",
-                        colorTextLightSolid: "--text-base",
-                    },
-                },
+        <span
+            style={{
+                display: visible ? "block" : "none",
+                cursor: countFeature > 0 ? "pointer" : "auto",
+            }}
+            className="icon-position"
+            onClick={() => {
+                if (countFeature > 0) {
+                    selected?.type === "vector" ? zoomTo() :
+                        selected?.type === "raster" ? zoomToRasterExtent() :
+                            undefined
+                    setVisible(false);
+                }
             }}>
             <span
-
-                style={{
-                    display: visible ? "block" : "none",
-                    cursor: countFeature > 0 ? "pointer" : "auto",
-                }}
-                className="icon-position"
-                onClick={() => {
-                    if (countFeature > 0) {
-                        selected?.type === "vector" ? zoomTo() :
-                            selected?.type === "raster" ? zoomToRasterExtent() :
-                                undefined
-                        setVisible(false);
-                    }
-                }}>
-                <Tooltip
-                    overlayInnerStyle={{ pointerEvents: "none", fontWeight: 500 }}
-                    title={selected?.type === "vector" ?
-                        gettext("Zoom to feature") :
-                        gettext("Zoom to raster layer")}>
-                    <PointClick />
-                </Tooltip>
+                style={{ fontWeight: 500 }}
+                title={countFeature > 0 ? selected?.type === "vector" ?
+                    gettext("Zoom to feature") :
+                    gettext("Zoom to raster layer") : undefined}>
+                <PointClick />
             </span>
-        </ConfigProvider>
+        </span>
     )
 };
