@@ -12,6 +12,7 @@ const NOTIFICATION_ORDER = ["success", "danger"];
 export interface MenuItem {
     className?: string;
     href?: string;
+    target?: string;
     title?: ReactNode;
     notification?: string;
 }
@@ -38,7 +39,7 @@ class LayoutStore {
             if (
                 !current ||
                 NOTIFICATION_ORDER.indexOf(notification) >
-                    NOTIFICATION_ORDER.indexOf(current)
+                NOTIFICATION_ORDER.indexOf(current)
             ) {
                 current = notification;
             }
@@ -52,12 +53,14 @@ export const layoutStore = new LayoutStore();
 layoutStore.addMenuItem({
     href: routeURL("resource.show", 0),
     title: gettext("Resources"),
+    target: "_blank",
 });
 
 if (ngwConfig.controlPanel) {
     layoutStore.addMenuItem({
         href: routeURL("pyramid.control_panel"),
         title: gettext("Control panel"),
+        target: "_blank",
     });
 }
 
@@ -65,5 +68,6 @@ if (settings["help_page_url"]) {
     layoutStore.addMenuItem({
         href: url(settings["help_page_url"]),
         title: gettext("Help"),
+        target: "_blank",
     });
 }
