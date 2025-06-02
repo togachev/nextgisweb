@@ -36,7 +36,7 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
     const [open, setOpen] = useState(false);
 
     const handleMenuClick: MenuProps["onClick"] = (e) => {
-        e.domEvent.stopPropagation();
+        // e.domEvent.stopPropagation();
         setOpen(false);
     };
 
@@ -73,6 +73,12 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
             trigger={["click"]}
             onOpenChange={handleOpenChange}
             open={open}
+            destroyPopupOnHide
+            dropdownRender={(menu) => (
+                <div className="dropdown-file">
+                    {menu}
+                </div>
+            )}
         >
             <span
                 title={DownloadAttachedFiles}

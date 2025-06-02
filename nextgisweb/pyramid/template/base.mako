@@ -4,25 +4,16 @@
     from types import SimpleNamespace
     from msgspec import NODEFAULT
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
-    from nextgisweb.pyramid.view import ICON_JSENTRY
-    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
-    from nextgisweb.pyramid.view import BREADCRUMB_JSENTRY
-    import json
+    from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY
 %>
-
-<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
 
 <%
     effective_title = None if title is UNDEFINED else title
-    if hasattr(next, 'title'):
-        new_title = next.title()
-        effective_title = new_title if (new_title is not None) else effective_title
-
     bcpath = list()
     if obj is not None:
         bcpath = breadcrumb_path(obj, request)
         if len(bcpath) > 0 and effective_title is None:
-            effective_title = bcpath[-1].label
+            effective_title = bcpath[-1].title
             bcpath = bcpath[:-1]
 
     system_name = request.env.core.system_full_name()
@@ -34,14 +25,15 @@
             value = dict()
             value["idx"] = idx
             value["id"] = bc.id
-            value["href"] = bc.link
+            value["link"] = bc.link
             if bc.icon:
                 value["icon"] = bc.icon
-            if bc.label:
-                value["title"] = bc.label
+            if bc.title:
+                value["title"] = bc.title
             array.append(value)
     
 %>
+
 <html>
 <head>
     <title>${head_title}</title>
@@ -64,10 +56,6 @@
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
     <script src="${request.static_url('main/ngwEntry.js')}"></script>
     
-    %if hasattr(self, 'assets'):
-        ${self.assets()}
-    %endif
-
     %if hasattr(self, 'head'):
         ${self.head()}
     %endif
@@ -90,7 +78,24 @@
     ${include_head | n}
 </head>
 
-<body class="<%block name='body_class'/>">
+<%def name="render_dynmenu()">
+    <%
+        dynmenu_kwargs = SimpleNamespace(request=request)
+        if (dynmenu := context.get("dynmenu", NODEFAULT)) is NODEFAULT:
+            if obj and (dynmenu := getattr(obj, "__dynmenu__", NODEFAULT)) is not NODEFAULT:
+                dynmenu_kwargs.obj = obj
+    %>
+    %if (dynmenu is not NODEFAULT) and dynmenu:
+        <div class="ngw-pyramid-layout-sidebar">
+            <%include
+                file="nextgisweb:pyramid/template/dynmenu.mako"
+                args="dynmenu=dynmenu, args=dynmenu_kwargs"
+            />
+        </div>
+    %endif
+</%def>
+
+<body>
     %if not custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]
@@ -98,34 +103,22 @@
             if maxheight: lclasses += ["ngw-pyramid-layout-vstretch"]
         %>
         <div class="${' '.join(lclasses)}">
-            <%include
-                file="nextgisweb:pyramid/template/header.mako"
-                args="title=system_name, hide_resource_filter=hasattr(self, 'hide_resource_filter')"
-            />
-
-            <%
-                if (dynmenu := context.get("dynmenu", NODEFAULT)) is not NODEFAULT:
-                    if dynmenu:
-                        dynmenu_kwargs = context.get('dynmenu_kwargs', SimpleNamespace(request=request))
-                    else:
-                        dynmenu_kwargs = None
-                elif obj and (dynmenu := getattr(obj,'__dynmenu__', None)):
-                    dynmenu_kwargs = SimpleNamespace(obj=obj, request=request)
-                else:
-                    dynmenu_kwargs = None
-                has_dynmenu = dynmenu_kwargs is not None
-            %>
-
+            <%include file="nextgisweb:pyramid/template/header.mako" args="header=system_name"/>
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-                        <div id="breadcrumb"></div>
+                        %if len(bcpath) > 0:
+                            <div id="breadcrumbs" class="ngw-pyramid-layout-breadcrumbs-stub"></div>
+                            <%include file="nextgisweb:gui/template/react_boot.mako" args="
+                                jsentry=LAYOUT_JSENTRY,
+                                name='BreadcrumbComponent',
+                                props={'items': array, 'current_id': obj.id},
+                                element='breadcrumbs',
+                            "/>
+                        %endif
 
                         <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
-                            %if hasattr(next, 'title_ext'):
-                                <div class="ext">${next.title_ext()}</div>
-                            %endif
                         </h1>
 
                         %if hasattr(next, 'body'):
@@ -135,22 +128,7 @@
                         %endif
                     </div>
                 </div>
-                <% 
-                    sidebar = getattr(next, 'sidebar', None)
-                    has_sidebar = getattr(next, 'has_sidebar', lambda: True)()
-                %>
-                %if not has_sidebar:
-                    <% pass %>
-                %elif sidebar := getattr(next, 'sidebar', None):
-                    <div class="ngw-pyramid-layout-sidebar">${sidebar()}</div>
-                %elif has_dynmenu:
-                    <div class="ngw-pyramid-layout-sidebar">
-                        <%include
-                            file="nextgisweb:pyramid/template/dynmenu.mako"
-                            args="dynmenu=dynmenu, args=dynmenu_kwargs"
-                        />
-                    </div>
-                %endif
+                ${render_dynmenu()}
             </div>
         </div>
     %else:
@@ -158,22 +136,3 @@
     %endif
 </body>
 </html>
-
-%if obj and not custom_layout:
-    <script type="text/javascript">
-        Promise.all([
-            ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
-            ngwEntry(${json_js(BREADCRUMB_JSENTRY)}),
-        ]).then(([reactBoot, {BreadcrumbComponent}]) => {
-            const bcpath = ${json_js(array)};
-            reactBoot(
-                BreadcrumbComponent,
-                {
-                    bcpath,
-                    current_id: ${json_js(obj.id)},
-                },
-                document.getElementById("breadcrumb")
-            );
-        });
-    </script>
-%endif

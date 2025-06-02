@@ -2,13 +2,8 @@
 
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<% system_name = request.env.core.system_full_name() %>
-
 <div class="ngw-pyramid-layout">
-    <%include
-        file="nextgisweb:pyramid/template/header.mako"
-        args="title=system_name, hide_resource_filter=True"
-    />
+    <%include file="nextgisweb:pyramid/template/header.mako"/>
     <div
         id="content"
         class="ngw-pyramid-layout-crow"
@@ -16,13 +11,9 @@
     ></div>
 </div>
 
-<script type="text/javascript">
-    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
-        reactBoot(
-            ${json_js(entrypoint)},
-            ${json_js(dict(error=error_json))},
-            "content",
-            { name: "ErrorPage" }
-        );
-    });
-</script>
+<%include file="nextgisweb:gui/template/react_boot.mako" args="
+    jsentry=entrypoint,
+    name='ErrorPage',
+    props={'error': error_json},
+    element='content',
+"/>
