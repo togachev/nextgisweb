@@ -113,7 +113,7 @@ export interface Params {
     visible: ({ hidden, overlay, key }: Visible) => void;
     display: Display;
     array_context?: ContextProps[] | [];
-    countFeature?: number;
+    countFeature: number;
     event: MapBrowserEvent;
 }
 

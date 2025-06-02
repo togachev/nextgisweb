@@ -3,6 +3,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import topic from "@nextgisweb/webmap/compat/topic";
+import { ConfigProvider, Tooltip } from "@nextgisweb/gui/antd";
 
 import type { Params, Props } from "../type";
 
@@ -10,7 +11,7 @@ export default function PopupClick({ display, event, params, countFeature }: Par
     const { response, selected: value } = params as Props;
     const selectVal = value ? value : response.data[0];
 
-    const [selected, setSelected] = useState<object>(value);
+    const [selected, setSelected] = useState(value);
     const [visible, setVisible] = useState<boolean>(true);
 
     useEffect(() => {
@@ -41,7 +42,7 @@ export default function PopupClick({ display, event, params, countFeature }: Par
 
     const zoomToRasterExtent = async () => {
         const { extent } = await route("layer.extent", {
-            id: selected.styleId,
+            id: selected?.styleId,
         }).get({ cache: true });
         setTimeout(() => {
             display.map.zoomToNgwExtent(extent, {
@@ -52,22 +53,42 @@ export default function PopupClick({ display, event, params, countFeature }: Par
     };
 
     return (
-        <span
-            title={selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
-            style={{
-                display: visible ? "block" : "none",
-                cursor: countFeature > 0 && "pointer",
-            }}
-            className="icon-position"
-            onClick={() => {
-                if (countFeature > 0) {
-                    selected?.type === "vector" ? zoomTo() :
-                        selected?.type === "raster" ? zoomToRasterExtent() :
-                            undefined
-                    setVisible(false);
-                }
+        <ConfigProvider
+            theme={{
+                components: {
+                    Tooltip: {
+                        borderRadius: 2,
+                        lineHeight: 1,
+                        fontSize: 12,
+                        controlHeight: 22,
+                        colorBgSpotlight: "rgb(255 255 255 / 80%)",
+                        colorTextLightSolid: "--text-base",
+                    },
+                },
             }}>
-            <PointClick />
-        </span>
+            <span
+
+                style={{
+                    display: visible ? "block" : "none",
+                    cursor: countFeature > 0 ? "pointer" : "auto",
+                }}
+                className="icon-position"
+                onClick={() => {
+                    if (countFeature > 0) {
+                        selected?.type === "vector" ? zoomTo() :
+                            selected?.type === "raster" ? zoomToRasterExtent() :
+                                undefined
+                        setVisible(false);
+                    }
+                }}>
+                <Tooltip
+                    overlayInnerStyle={{ pointerEvents: "none", fontWeight: 500 }}
+                    title={selected?.type === "vector" ?
+                        gettext("Zoom to feature") :
+                        gettext("Zoom to raster layer")}>
+                    <PointClick />
+                </Tooltip>
+            </span>
+        </ConfigProvider>
     )
 };

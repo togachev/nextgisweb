@@ -1,7 +1,7 @@
 import { action, computed, observable } from "mobx";
 import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
-import type {Root as ReactRoot} from 'react-dom/client';
+import type { Root as ReactRoot } from 'react-dom/client';
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { Interaction } from "ol/interaction";
@@ -129,10 +129,10 @@ export class IModule extends Component {
 
     @observable.ref accessor srsMap: SrsInfoMap;
 
-    constructor(props: Display) {
-        super(props);
+    constructor(display: Display) {
+        super(display);
 
-        this.display = props;
+        this.display = display;
         this.displaySrid = 3857;
         this.LonLatSrid = 4326;
         this.offHP = !this.display.tinyConfig ? 40 : 0;
