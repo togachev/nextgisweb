@@ -1,8 +1,4 @@
-<%!
-    import nextgisweb.pyramid as m
-    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
-    from nextgisweb.resource.view import HOME_PAGE_JSENTRY
-%>
+<%! from nextgisweb.resource.view import HOME_PAGE_JSENTRY %>
 <%
     try:
         user = request.user
@@ -20,14 +16,9 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <div id="content" class="wrapper-home-page"></div>
 
-<script type="text/javascript">
-    Promise.all([
-        ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
-        ngwEntry(${json_js(HOME_PAGE_JSENTRY)}),
-    ]).then(([reactBoot, {Avatar, Menu, Content}]) => {
-        const config = ${json_js(config)};
-        reactBoot(Content, { config }, 
-            document.getElementById("content")
-        );
-    });
-</script>
+<%include file="nextgisweb:gui/template/react_boot.mako" args="
+    jsentry=HOME_PAGE_JSENTRY,
+    name='Content',
+    props={'config': config},
+    element='content',
+"/>
