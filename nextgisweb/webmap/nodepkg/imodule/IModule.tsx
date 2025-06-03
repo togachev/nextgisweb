@@ -129,6 +129,7 @@ export class IModule extends Component {
     private root_point_context: ReactRoot | null = null;
 
     @observable.ref accessor srsMap: SrsInfoMap;
+    @observable accessor activePoint = false;
 
     constructor(display: Display) {
         super(display);
@@ -156,6 +157,11 @@ export class IModule extends Component {
     deactivate = () => {
         this.control.setActive(false);
     };
+
+    @action
+    private setActivePoint(activePoint: boolean) {
+        this.activePoint = activePoint;
+    }
 
     @action
     private setSrsMap(srsMap: SrsInfoMap) {
@@ -279,6 +285,7 @@ export class IModule extends Component {
                 display: this.display,
                 countFeature: this.countFeature,
                 event: event,
+                activePoint: this.activePoint,
             } as Params;
 
             const propsPopup = {

@@ -28,13 +28,14 @@ import topic from "@nextgisweb/webmap/compat/topic";
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading");
 
-const CheckOnlyOne = ({ store }) => {
+const CheckOnlyOne = ({ store, imodule }) => {
     const msgFixPopup = gettext("Lock popup position");
     const msgFixOffPopup = gettext("Disable lock popup position");
 
     const onClick = useCallback((e) => {
         e.preventDefault();
         store.setFixPopup(!store.fixPopup);
+        imodule.setActivePoint(!imodule.activePoint);
     }, []);
 
     const props = {
@@ -345,7 +346,7 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    {store.countFeature > 0 && <CheckOnlyOne store={store} />}
+                                    {store.countFeature > 0 && <CheckOnlyOne imodule={imodule} store={store} />}
                                     {store.countFeature > 0 && store.selected && (
                                         <span
                                             title={store.fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}

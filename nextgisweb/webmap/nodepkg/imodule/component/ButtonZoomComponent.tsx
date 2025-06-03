@@ -7,7 +7,7 @@ import type { ContentProps } from "../type";
 
 export const ButtonZoomComponent = ({ display, store }: ContentProps) => {
     const imodule = display.imodule;
-    return store.countFeature > 0 && store.selected && (
+    return store.fixPos === null && !store.collapse && store.countFeature > 0 && store.selected && (
         <Button
             title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
             type="text"
