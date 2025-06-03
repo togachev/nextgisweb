@@ -82,7 +82,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { bottomRight: false },
                 x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -96,7 +96,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topLeft: false },
                 x: px + offset, y: py + offset, width: width, height: height
             }
         }
@@ -111,7 +111,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topLeft: false },
                 x: px - width / 2, y: py + offset, width: width, height: height
             }
         }
@@ -125,7 +125,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topRight: false },
                 x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
@@ -140,7 +140,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topLeft: false },
                 x: px + offset, y: py - height / 2, width: width, height: height
             }
         }
@@ -155,7 +155,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topRight: false },
                 x: px - offset - width, y: py - height / 2, width: width, height: height
             }
         }
