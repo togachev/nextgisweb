@@ -169,6 +169,7 @@ export default observer(
                 store.getContent(copy, false);
                 store.LinkToGeometry(copy);
                 topic.publish("visible.point", copy);
+                store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
