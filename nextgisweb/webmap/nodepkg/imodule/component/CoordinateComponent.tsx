@@ -10,7 +10,7 @@ import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
-    const { store: storeProp, display, op } = props as CoordinateProps
+    const { store: storeProp, display, op, ButtonZoomComponent } = props as CoordinateProps
     const [store] = useState(() => storeProp);
 
     const { copyValue, contextHolder } = useCopy();
@@ -137,31 +137,35 @@ export const CoordinateComponent = observer((props) => {
     return (
         <div className="footer-coordinate-component">
             {contextHolder}
-            <Button
-                type="text"
-                icon={<Location />}
-                className="coordinate-value"
-                title={gettext("Copy coordinates")}
-                onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
-            >
-                {coordsVisible}
-            </Button>
-            {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
-                <div className="link-block">
-                    {
-                        store.control &&
-                        getEntries(store.control).map(([name, value], index) => {
-                            return (
-                                <div key={index}>
-                                    <Button
-                                        {...propsUpdate(name, value)}
-                                    />
-                                </div>
-                            )
-                        })
-                    }
-                </div>
-            )}
+            {store.buttonZoom["bottomLeft"] && <ButtonZoomComponent />}
+            <div className="coordinate-and-controls">
+                <Button
+                    type="text"
+                    icon={<Location />}
+                    className="coordinate-value"
+                    title={gettext("Copy coordinates")}
+                    onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
+                >
+                    {coordsVisible}
+                </Button>
+                {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
+                    <div className="link-block">
+                        {
+                            store.control &&
+                            getEntries(store.control).map(([name, value], index) => {
+                                return (
+                                    <div key={index}>
+                                        <Button
+                                            {...propsUpdate(name, value)}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                )}
+            </div>
+            {store.buttonZoom["bottomRight"] && <ButtonZoomComponent />}
         </div>
     )
 });

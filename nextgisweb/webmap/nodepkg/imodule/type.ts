@@ -80,9 +80,16 @@ export interface Visible {
     key: string;
 }
 
-export interface PopupZoom {
+export interface PointClickProps {
     x: number;
     y: number;
+}
+
+export interface ButtonZoom {
+    topLeft?: boolean;
+    topRight?: boolean;
+    bottomLeft?: boolean;
+    bottomRight?: boolean;
 }
 
 export interface Position {
@@ -90,7 +97,8 @@ export interface Position {
     y: number;
     width: number;
     height: number;
-    popup?: PopupZoom;
+    pointClick: PointClickProps;
+    buttonZoom: ButtonZoom;
 }
 
 export interface Props {
@@ -158,6 +166,7 @@ export type CoordinateProps = {
     store: Store;
     count: number;
     op: string;
+    ButtonZoomComponent: ReactElement;
 }
 
 export type GraphPanelProps = {
@@ -180,4 +189,17 @@ export interface AttributeProps {
     format_field: FormatNumberFieldData
     key: number;
     value: string;
+}
+
+interface ControlProps {
+    icon: ReactElement;
+    url?: string;
+    title: string;
+    status?: boolean | string;
+    checked?: boolean;
+    disable?: boolean;
+}
+
+export interface ControlUrlProps {
+    [key: string]: ControlProps;
 }

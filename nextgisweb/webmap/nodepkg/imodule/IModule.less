@@ -8,6 +8,17 @@
     line-height: 0;
 }
 
+.zoom-button {
+    background-color: rgb(136, 74, 74);
+    width: 24px;
+    height: 24px;
+    aspect-ratio: 1 / 1;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 [hidden] {
     display: none !important;
 }
@@ -337,27 +348,34 @@
             width: 100%;
             justify-content: space-between;
 
-            .link-block {
-                display: inline-flex;
+            .coordinate-and-controls {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
                 align-items: center;
 
-                .ant-btn-variant-text:disabled {
-                    cursor: auto !important;
-                    color: rgba(0, 0, 0, 0.25) !important;
+                .link-block {
+                    display: inline-flex;
+                    align-items: center;
 
-                    &:hover {
+                    .ant-btn-variant-text:disabled {
+                        cursor: auto !important;
                         color: rgba(0, 0, 0, 0.25) !important;
+
+                        &:hover {
+                            color: rgba(0, 0, 0, 0.25) !important;
+                        }
                     }
-                }
 
-                button {
-                    box-shadow: none !important;
-                    font-size: 16px;
+                    button {
+                        box-shadow: none !important;
+                        font-size: 16px;
 
-                    &:hover {
-                        background-color: rgba(0, 0, 0, 0.04);
-                        color: var(--primary);
-                        border-radius: 4px;
+                        &:hover {
+                            background-color: rgba(0, 0, 0, 0.04);
+                            color: var(--primary);
+                            border-radius: 4px;
+                        }
                     }
                 }
             }

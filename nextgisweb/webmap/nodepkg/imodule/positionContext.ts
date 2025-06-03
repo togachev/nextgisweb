@@ -130,9 +130,10 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && W - width - offset >= px
         ) {
             return {
-                popup: {
+                pointClick: {
                     x: window.innerWidth - width, y: window.innerHeight - height
                 },
+                buttonZoom: { topLeft: false },
                 x: px + offset, y: py + offset, width: width, height: height
             }
         }
@@ -143,9 +144,10 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && W - width - offset < px
         ) {
             return {
-                popup: {
+                pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
+                buttonZoom: { topRight: false },
                 x: px - width - offset, y: py + offset, width: width, height: height
             }
         }
@@ -156,9 +158,10 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && W - width >= px
         ) {
             return {
-                popup: {
+                pointClick: {
                     x: window.innerWidth - width, y: offHP
                 },
+                buttonZoom: { bottomLeft: false },
                 x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -169,9 +172,10 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && H - height - offset < py
         ) {
             return {
-                popup: {
+                pointClick: {
                     x: offHP, y: offHP,
                 },
+                buttonZoom: { bottomRight: false },
                 x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }

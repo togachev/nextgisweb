@@ -4,7 +4,7 @@ import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
-import type { AttributeProps, ControlUrlProps, DataProps, ExtensionsProps, PopupZoom, Rnd, OptionProps } from "./type";
+import type { AttributeProps, ButtonZoom, ControlUrlProps, DataProps, ExtensionsProps, PointClickProps, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
 export class Store {
@@ -14,7 +14,8 @@ export class Store {
     @observable accessor fullscreen = false;
 
     @observable.ref accessor control: ControlUrlProps;
-    @observable.ref accessor popupZoom: PopupZoom;
+    @observable.ref accessor pointClick: PointClickProps;
+    @observable.ref accessor buttonZoom: ButtonZoom;
     @observable.ref accessor activeControlKey: string;
     @observable.ref accessor mode: string;
     @observable.ref accessor countFeature: number;
@@ -38,19 +39,26 @@ export class Store {
         fixPos,
         fixPanel,
         control,
-        popup,
+        pointClick,
+        buttonZoom,
     }) {
         this.display = display;
         this.valueRnd = valueRnd;
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
         this.control = control;
-        this.popupZoom = popup;
+        this.pointClick = pointClick;
+        this.buttonZoom = buttonZoom;
     }
 
     @action
-    setPopupZoom(popupZoom: PopupZoom) {
-        this.popupZoom = popupZoom;
+    setButtonZoom(buttonZoom: ButtonZoom) {
+        this.buttonZoom = buttonZoom;
+    };
+
+    @action
+    setPointClick(pointClick: PointClickProps) {
+        this.pointClick = pointClick;
     };
 
     @action

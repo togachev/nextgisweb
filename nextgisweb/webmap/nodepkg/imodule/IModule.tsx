@@ -15,6 +15,7 @@ import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
 import SimpleGeometry from "ol/geom/SimpleGeometry";
+import topic from "@nextgisweb/webmap/compat/topic";
 
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps, EventProps, ParamsProps, Params, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
@@ -116,14 +117,14 @@ export class IModule extends Component {
     overlay_context: Overlay;
     control: Interaction;
 
-    point_popup = document.createElement("div");
+    point_click = document.createElement("div");
     popup = document.createElement("div");
     point_context = document.createElement("div");
 
     refPopup = createRef<HTMLDivElement>();
     refContext = createRef<HTMLDivElement>();
 
-    private root_point_popup: ReactRoot | null = null;
+    private root_point_click: ReactRoot | null = null;
     private root_popup: ReactRoot | null = null;
     private root_point_context: ReactRoot | null = null;
 
@@ -143,7 +144,7 @@ export class IModule extends Component {
         this.getSrsInfo();
         this._addOverlay();
 
-        this.root_point_popup = createRoot(this.point_popup);
+        this.root_point_click = createRoot(this.point_click);
         this.root_popup = createRoot(this.popup);
         this.root_point_context = createRoot(this.point_context);
     };
@@ -271,7 +272,7 @@ export class IModule extends Component {
             }
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
-            this._setValue(this.point_popup, "popup");
+            this._setValue(this.point_click, "popup");
 
             const propsPoint = {
                 params: { response: this.response, selected: value },
@@ -287,7 +288,7 @@ export class IModule extends Component {
             } as Params;
 
 
-            this.root_point_popup.render(<PopupClick {...propsPoint} />);
+            this.root_point_click.render(<PopupClick {...propsPoint} />);
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
@@ -479,5 +480,30 @@ export class IModule extends Component {
 
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
+    };
+
+    zoomTo(val) {
+        if (!val) return;
+        setTimeout(() => {
+            this.display.featureHighlighter
+                .highlightFeatureById(val.id, val.layerId)
+                .then((feature) => {
+                    this.display.map.zoomToFeature(feature);
+                    topic.publish("update.point");
+                });
+        }, 150);
+    };
+
+    async zoomToRasterExtent(val) {
+        const { extent } = await route("layer.extent", {
+            id: val?.styleId,
+        }).get({ cache: true });
+
+        setTimeout(() => {
+            this.display.map.zoomToNgwExtent(extent, {
+                displayProjection: this.display.displayProjection,
+            });
+            topic.publish("update.point");
+        }, 150);
     };
 };

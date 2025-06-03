@@ -1,6 +1,5 @@
 import { forwardRef, useCallback, useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { route } from "@nextgisweb/pyramid/api";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
 import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
 import CloseIcon from "@nextgisweb/icon/material/close";
@@ -107,11 +106,13 @@ export default observer(
                             checked: false,
                         }
                     },
-                    popup: position.popup,
+                    pointClick: position.pointClick,
+                    buttonZoom: position.buttonZoom,
                 }));
 
             topic.subscribe("update.point", () => {
-                store.setValueRnd({ ...store.valueRnd, x: store.popupZoom.x, y: store.popupZoom.y });
+                store.setValueRnd({ ...store.valueRnd, x: store.pointClick.x, y: store.pointClick.y });
+                store.setButtonZoom({});
             });
 
             imodule.iStore = store;
@@ -128,7 +129,8 @@ export default observer(
                     store.getContent(selectVal, false);
                     store.LinkToGeometry(selectVal);
                     store.setCountFeature(imodule.countFeature);
-                    store.setPopupZoom(position.popup);
+                    store.setPointClick(position.pointClick);
+                    store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -136,6 +138,7 @@ export default observer(
                     store.setLinkToGeometry("");
                     topic.publish("feature.unhighlight");
                     store.setCountFeature(0);
+                    store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: false });
                 }
             }, [response]);
 
@@ -220,32 +223,25 @@ export default observer(
                 }
             }, [store.selected]);
 
+            const ButtonZoomComponent = () => (store.countFeature > 0 && store.selected && (
+                <Button
+                    title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
+                    type="text"
+                    size="small"
+                    onClick={() => {
+                        topic.publish("unvisible.point");
+                        store.selected?.type === "vector" ? imodule.zoomTo(store.selected) :
+                            store.selected?.type === "raster" ? imodule.zoomToRasterExtent(store.selected) :
+                                undefined;
+                    }}
+                    icon={<ZoomInMapIcon />}
+                    style={{ flex: "0 0 auto" }}
+                    className="icon-symbol"
+                />
+            ));
+
             const contentProps = { store: store, display: display };
-            const coordinateProps = { display: display, store: store, op: "popup" };
-
-            const zoomTo = () => {
-                if (!store.selected) return;
-                setTimeout(() => {
-                    display.featureHighlighter
-                        .highlightFeatureById(store.selected.id, store.selected.layerId)
-                        .then((feature) => {
-                            display.map.zoomToFeature(feature);
-                            store.setValueRnd({ ...store.valueRnd, x: store.popupZoom.x, y: store.popupZoom.y });
-                        });
-                }, 250);
-            };
-
-            const zoomToRasterExtent = async () => {
-                const { extent } = await route("layer.extent", {
-                    id: store.selected.styleId,
-                }).get({ cache: true });
-                setTimeout(() => {
-                    display.map.zoomToNgwExtent(extent, {
-                        displayProjection: display.displayProjection,
-                    });
-                    store.setValueRnd({ ...store.valueRnd, x: store.popupZoom.x, y: store.popupZoom.y });
-                }, 250);
-            };
+            const coordinateProps = { display: display, store: store, op: "popup", ButtonZoomComponent: ButtonZoomComponent };
 
             return (
                 createPortal(
@@ -337,6 +333,7 @@ export default observer(
                         >
                             <div ref={ref as any} className="popup-position">
                                 <div className="title">
+                                    {store.buttonZoom["topLeft"] && <ButtonZoomComponent />}
                                     <div className="title-name"
                                         onClick={(e) => {
                                             if (store.countFeature > 0 && e.detail === 2) {
@@ -363,22 +360,6 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    {store.countFeature > 0 && store.selected && (
-                                        <Button
-                                            title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
-                                            type="text"
-                                            size="small"
-                                            onClick={() => {
-                                                topic.publish("unvisible.point");
-                                                store.selected?.type === "vector" ? zoomTo() :
-                                                    store.selected?.type === "raster" ? zoomToRasterExtent() :
-                                                        undefined;
-                                            }}
-                                            icon={<ZoomInMapIcon />}
-                                            style={{ flex: "0 0 auto" }}
-                                            className="icon-symbol"
-                                        />
-                                    )}
                                     {store.countFeature > 0 && <CheckOnlyOne store={store} />}
                                     {store.countFeature > 0 && store.selected && (
                                         <span
@@ -413,6 +394,7 @@ export default observer(
                                         }} >
                                         <CloseIcon />
                                     </span>
+                                    {store.buttonZoom["topRight"] && <ButtonZoomComponent />}
                                 </div>
                                 {store.countFeature > 0 && store.selected && (
                                     <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >

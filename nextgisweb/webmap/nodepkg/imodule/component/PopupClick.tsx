@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { route } from "@nextgisweb/pyramid/api";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import topic from "@nextgisweb/webmap/compat/topic";
 
@@ -27,30 +26,6 @@ export default function PopupClick({ display, event, params, countFeature }: Par
         setVisible(false);
     });
 
-    const zoomTo = () => {
-        if (!selected) return;
-        setTimeout(() => {
-            display.featureHighlighter
-                .highlightFeatureById(selected.id, selected.layerId)
-                .then((feature) => {
-                    display.map.zoomToFeature(feature);
-                    topic.publish("update.point");
-                });
-        }, 250);
-    };
-
-    const zoomToRasterExtent = async () => {
-        const { extent } = await route("layer.extent", {
-            id: selected?.styleId,
-        }).get({ cache: true });
-        setTimeout(() => {
-            display.map.zoomToNgwExtent(extent, {
-                displayProjection: display.displayProjection,
-            });
-            topic.publish("update.point");
-        }, 250);
-    };
-
     return (
         <span
             style={{
@@ -60,8 +35,8 @@ export default function PopupClick({ display, event, params, countFeature }: Par
             className="icon-position"
             onClick={() => {
                 if (countFeature > 0) {
-                    selected?.type === "vector" ? zoomTo() :
-                        selected?.type === "raster" ? zoomToRasterExtent() :
+                    selected?.type === "vector" ? display.imodule.zoomTo(selected) :
+                        selected?.type === "raster" ? display.imodule.zoomToRasterExtent(selected) :
                             undefined
                     setVisible(false);
                 }
