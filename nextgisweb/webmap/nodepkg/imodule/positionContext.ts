@@ -53,7 +53,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topLeft: false },
                 x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -68,7 +68,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topLeft: false },
                 x: px - width / 2, y: py - height - offset, width: width, height: height
             }
         }
@@ -78,11 +78,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             (W - width / 2) <= px
             && (H - height / 2) <= py
         ) {
+            console.log(1);
+            
             return {
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomRight: false },
+                buttonZoom: { topLeft: false },
                 x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -125,7 +127,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { topRight: false },
+                buttonZoom: { topLeft: false },
                 x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
@@ -155,7 +157,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { topRight: false },
+                buttonZoom: { topLeft: false },
                 x: px - offset - width, y: py - height / 2, width: width, height: height
             }
         }

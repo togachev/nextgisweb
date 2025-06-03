@@ -31,6 +31,7 @@ export default function PopupClick({ display, event, params, countFeature }: Par
             style={{
                 display: visible ? "block" : "none",
                 cursor: countFeature > 0 && display.imodule.activePoint ? "pointer" : "auto",
+                pointerEvents: countFeature > 0 && display.imodule.activePoint ? "auto" : "none",
             }}
             className="icon-position"
             onClick={() => {
