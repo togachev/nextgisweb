@@ -49,7 +49,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             width / 2 + offHP >= px
             && (H - height / 2) < py
         ) {
-            return { x: px + offset, y: py - height - offset, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px + offset, y: py - height - offset, width: width, height: height
+            }
         }
 
         /* bottom */
@@ -58,7 +64,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && width / 2 + offHP <= px
             && (H - height / 2) <= py
         ) {
-            return { x: px - width / 2, y: py - height - offset, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px - width / 2, y: py - height - offset, width: width, height: height
+            }
         }
 
         /* bottom right */
@@ -66,7 +78,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             (W - width / 2) <= px
             && (H - height / 2) <= py
         ) {
-            return { x: px - width - offset, y: py - height - offset, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px - width - offset, y: py - height - offset, width: width, height: height
+            }
         }
 
         /* top left */
@@ -74,7 +92,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             height / 2 + offHP >= py
             && width / 2 + offHP >= px
         ) {
-            return { x: px + offset, y: py + offset, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px + offset, y: py + offset, width: width, height: height
+            }
         }
 
         /* top */
@@ -83,7 +107,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && (width / 2) < px
             && (W - width / 2) > px
         ) {
-            return { x: px - width / 2, y: py + offset, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px - width / 2, y: py + offset, width: width, height: height
+            }
         }
 
         /* top right */
@@ -91,7 +121,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             height / 2 + offHP >= py
             && (W - width / 2) <= px
         ) {
-            return { x: px - offset - width, y: py + offset, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px - offset - width, y: py + offset, width: width, height: height
+            }
         }
 
         /* left */
@@ -100,7 +136,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && (H - height / 2) > py
             && width / 2 + offHP > px
         ) {
-            return { x: px + offset, y: py - height / 2, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px + offset, y: py - height / 2, width: width, height: height
+            }
         }
 
         /* right */
@@ -109,7 +151,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && (H - height / 2) > py
             && (W - width / 2) <= px
         ) {
-            return { x: px - offset - width, y: py - height / 2, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px - offset - width, y: py - height / 2, width: width, height: height
+            }
         }
 
         /* center */
@@ -119,7 +167,13 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             && width / 2 + offHP < px
             && (W - width / 2) > px
         ) {
-            return { x: px - width / 2, y: py - height / 2, width: width, height: height }
+            return {
+                pointClick: {
+                    x: offHP, y: window.innerHeight - height
+                },
+                buttonZoom: { bottomLeft: false },
+                x: px - width / 2, y: py - height / 2, width: width, height: height
+            }
         }
     }
 

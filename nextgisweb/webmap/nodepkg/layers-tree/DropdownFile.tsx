@@ -35,8 +35,7 @@ const { Link } = Typography;
 export function DropdownFile({ nodeData }: DropdownFileProps) {
     const [open, setOpen] = useState(false);
 
-    const handleMenuClick: MenuProps["onClick"] = (e) => {
-        // e.domEvent.stopPropagation();
+    const handleMenuClick: MenuProps["onClick"] = () => {
         setOpen(false);
     };
 

@@ -166,7 +166,6 @@ export type CoordinateProps = {
     store: Store;
     count: number;
     op: string;
-    ButtonZoomComponent: ReactElement;
 }
 
 export type GraphPanelProps = {

@@ -484,14 +484,12 @@ export class IModule extends Component {
 
     zoomTo(val) {
         if (!val) return;
-        setTimeout(() => {
-            this.display.featureHighlighter
-                .highlightFeatureById(val.id, val.layerId)
-                .then((feature) => {
-                    this.display.map.zoomToFeature(feature);
-                    topic.publish("update.point");
-                });
-        }, 150);
+        this.display.featureHighlighter
+            .highlightFeatureById(val.id, val.layerId)
+            .then((feature) => {
+                this.display.map.zoomToFeature(feature);
+                topic.publish("update.point", true);
+            });
     };
 
     async zoomToRasterExtent(val) {
@@ -499,11 +497,9 @@ export class IModule extends Component {
             id: val?.styleId,
         }).get({ cache: true });
 
-        setTimeout(() => {
-            this.display.map.zoomToNgwExtent(extent, {
-                displayProjection: this.display.displayProjection,
-            });
-            topic.publish("update.point");
-        }, 150);
+        this.display.map.zoomToNgwExtent(extent, {
+            displayProjection: this.display.displayProjection,
+        });
+        topic.publish("update.point", true);
     };
 };

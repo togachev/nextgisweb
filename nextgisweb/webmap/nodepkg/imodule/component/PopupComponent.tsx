@@ -9,7 +9,7 @@ import PinOff from "@nextgisweb/icon/mdi/pin-off";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
-import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
+
 import { Rnd } from "react-rnd";
 import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
 import { Store } from "../Store";
@@ -19,6 +19,7 @@ import showModal from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
+import { ButtonZoomComponent } from "./ButtonZoomComponent";
 import { getEntries } from "../useSource";
 
 import type { Params, Props } from "../type";
@@ -110,9 +111,9 @@ export default observer(
                     buttonZoom: position.buttonZoom,
                 }));
 
-            topic.subscribe("update.point", () => {
-                store.setValueRnd({ ...store.valueRnd, x: store.pointClick.x, y: store.pointClick.y });
-                store.setButtonZoom({});
+            topic.subscribe("update.point", (status) => {
+                store.setValueRnd({ ...store.valueRnd, x: store.pointClick.x, y: store.pointClick.y, width: position.width, height: position.height });
+                status && store.setButtonZoom({});
             });
 
             imodule.iStore = store;
@@ -224,25 +225,8 @@ export default observer(
                 }
             }, [store.selected]);
 
-            const ButtonZoomComponent = () => (store.countFeature > 0 && store.selected && (
-                <Button
-                    title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
-                    type="text"
-                    size="small"
-                    onClick={() => {
-                        topic.publish("unvisible.point");
-                        store.selected?.type === "vector" ? imodule.zoomTo(store.selected) :
-                            store.selected?.type === "raster" ? imodule.zoomToRasterExtent(store.selected) :
-                                undefined;
-                    }}
-                    icon={<ZoomInMapIcon />}
-                    style={{ flex: "0 0 auto" }}
-                    className="icon-symbol"
-                />
-            ));
-
             const contentProps = { store: store, display: display };
-            const coordinateProps = { display: display, store: store, op: "popup", ButtonZoomComponent: ButtonZoomComponent };
+            const coordinateProps = { display: display, store: store, op: "popup" };
 
             return (
                 createPortal(
@@ -334,7 +318,7 @@ export default observer(
                         >
                             <div ref={ref as any} className="popup-position">
                                 <div className="title">
-                                    {store.buttonZoom["topLeft"] && <ButtonZoomComponent />}
+                                    {store.buttonZoom["topLeft"] && <ButtonZoomComponent {...contentProps} />}
                                     <div className="title-name"
                                         onClick={(e) => {
                                             if (store.countFeature > 0 && e.detail === 2) {
@@ -395,7 +379,7 @@ export default observer(
                                         }} >
                                         <CloseIcon />
                                     </span>
-                                    {store.buttonZoom["topRight"] && <ButtonZoomComponent />}
+                                    {store.buttonZoom["topRight"] && <ButtonZoomComponent {...contentProps} />}
                                 </div>
                                 {store.countFeature > 0 && store.selected && (
                                     <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
