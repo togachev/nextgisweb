@@ -171,7 +171,7 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
                 pointClick: {
                     x: offHP, y: window.innerHeight - height
                 },
-                buttonZoom: { bottomLeft: false },
+                buttonZoom: { topLeft: false },
                 x: px - width / 2, y: py - height / 2, width: width, height: height
             }
         }
