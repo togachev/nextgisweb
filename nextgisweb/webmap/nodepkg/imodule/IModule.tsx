@@ -9,13 +9,14 @@ import { fromExtent } from "ol/geom/Polygon";
 import { WKT } from "ol/format";
 import { boundingExtent } from "ol/extent";
 import { route } from "@nextgisweb/pyramid/api";
-import { Point } from "ol/geom";
+import OlGeomPoint from "ol/geom/Point";
 import PopupClick from "./component/PopupClick";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
 import SimpleGeometry from "ol/geom/SimpleGeometry";
 import topic from "@nextgisweb/webmap/compat/topic";
+import { transform } from 'ol/proj';
 
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps, EventProps, ParamsProps, Params, Response, StylesRequest, UrlParamsProps, VisibleProps } from "./type";
@@ -105,8 +106,11 @@ export class IModule extends Component {
 
     display: Display;
     displaySrid: number;
+    webMercator: string;
     LonLatSrid: number;
+    wgs84: string;
     lonlat: number[];
+    coordinate: number[];
     response: Response;
     countFeature: number;
     offHP: number;
@@ -129,14 +133,15 @@ export class IModule extends Component {
     private root_point_context: ReactRoot | null = null;
 
     @observable.ref accessor srsMap: SrsInfoMap;
-    @observable accessor activePoint = false;
 
     constructor(display: Display) {
         super(display);
 
         this.display = display;
         this.displaySrid = 3857;
+        this.webMercator = "EPSG:3857";
         this.LonLatSrid = 4326;
+        this.wgs84 = "EPSG:4326";
         this.offHP = !this.display.tinyConfig ? 40 : 0;
         this.olmap = this.display.map.olMap;
         this.control = new Control({ tool: this });
@@ -157,11 +162,6 @@ export class IModule extends Component {
     deactivate = () => {
         this.control.setActive(false);
     };
-
-    @action
-    private setActivePoint(activePoint: boolean) {
-        this.activePoint = activePoint;
-    }
 
     @action
     private setSrsMap(srsMap: SrsInfoMap) {
@@ -258,7 +258,12 @@ export class IModule extends Component {
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
-        await this.getResponse(op, p);
+        if (p.selected) {
+            this.response = { data: [p.data], featureCount: 1 }
+        } else {
+            await this.getResponse(op, p);
+        }
+
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
             if (this.display.config.identify_order_enabled) {
@@ -276,6 +281,9 @@ export class IModule extends Component {
             else if (mode === "simulate") {
                 value = this.response.data.find(x => x.value === this.selected) as DataProps;
             }
+            else if (mode === "selected") {
+                value = this.response.data[0];
+            }
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
             this._setValue(this.point_click, "popup");
@@ -285,17 +293,19 @@ export class IModule extends Component {
                 display: this.display,
                 countFeature: this.countFeature,
                 event: event,
-                activePoint: this.activePoint,
             } as Params;
 
             const propsPopup = {
-                params: { mode: mode, op, position, response: this.response, selected: value },
+                params: { mode: mode, op, position, response: this.response, selected: value, point: p?.point },
                 display: this.display,
-                visible: this._visible,
             } as Params;
 
+            if (p === false) {
+                this.root_point_click.render(<PopupClick {...propsPoint} />);
+            } else if (p.point === true) {
+                this.root_point_click.render(<PopupClick {...propsPoint} />);
+            }
 
-            this.root_point_click.render(<PopupClick {...propsPoint} />);
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
@@ -324,8 +334,14 @@ export class IModule extends Component {
         return !readOnly;
     };
 
-    _render = () => {
+    popup_destroy = () => {
+        topic.publish("feature.unhighlight");
         this.display.imodule.root_popup.render();
+        this.display.imodule.root_point_click.render();
+    };
+
+    point_context_destroy = () => {
+        this.display.imodule.root_point_context.render();
     };
 
     transformCoordinate = async (from, to, point) => {
@@ -345,6 +361,10 @@ export class IModule extends Component {
                     return transformedCoord;
                 }
             });
+    };
+
+    transformCoord = async (coord, from, to) => {
+        return await transform(coord, from, to);
     };
 
     _overlayInfo = async (e: MapBrowserEvent, op: string, p, mode) => {
@@ -405,14 +425,14 @@ export class IModule extends Component {
                 status: attr,
             }
         }
-
+        this.coordinate = e.coordinate;
         this.params = {
             point: e.coordinate,
             request: request,
         }
 
-        await this.transformCoordinate(this.displaySrid, this.srsMap.keys(), this.params.point)
-            .then((transformedCoord) => {
+        await this.transformCoord(this.params.point, this.webMercator, this.wgs84)
+            .then(transformedCoord => {
                 const fixedArray = transformedCoord.map(number => parseFloat(number.toFixed(12)));
                 this.lonlat = fixedArray ? fixedArray : [];
             })
@@ -450,8 +470,10 @@ export class IModule extends Component {
             .then(srsInfo => {
                 return new Map(srsInfo.map((s) => [s.id, s]));
             })
-        await this.transformCoordinate(this.LonLatSrid, srsInfo.keys(), [Number(val.lon), Number(val.lat)])
+        await this.transformCoord([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator)
             .then((transformedCoord) => {
+                console.log(transformedCoord);
+
                 const params: ParamsProps[] = [];
                 val.st?.split(",").map(i => {
                     params.push({
@@ -471,8 +493,9 @@ export class IModule extends Component {
                     params,
                 }
 
-                const p = { value, coordinate: transformedCoord };
+                const p = { point: true, value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
+
                 const simulateEvent: any = {
                     coordinate: p && p.coordinate,
                     map: this.olmap,
@@ -484,7 +507,6 @@ export class IModule extends Component {
                     ],
                     type: "click"
                 };
-
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
     };
@@ -495,11 +517,16 @@ export class IModule extends Component {
             .highlightFeatureById(val.id, val.layerId)
             .then((feature) => {
                 this.display.map.zoomToFeature(feature);
-                topic.publish("update.point", true);
             });
     };
 
-    async zoomToRasterExtent(val) {
+    zoomToExtent(extent) {
+        this.display.map.zoomToExtent(extent, {
+            displayProjection: this.display.displayProjection,
+        });
+    };
+
+    async zoomToLayerExtent(val) {
         const { extent } = await route("layer.extent", {
             id: val?.styleId,
         }).get({ cache: true });
@@ -508,5 +535,11 @@ export class IModule extends Component {
             displayProjection: this.display.displayProjection,
         });
         topic.publish("update.point", true);
+    };
+
+    zoomToPoint(val) {
+        if (!val) return;
+        const point = new OlGeomPoint(val);
+        this.display.map.zoomToExtent(point.getExtent());
     };
 };

@@ -10,7 +10,7 @@ import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
-    const { store: storeProp, display, op } = props as CoordinateProps
+    const { store: storeProp, display, op, point } = props as CoordinateProps
     const [store] = useState(() => storeProp);
 
     const { copyValue, contextHolder } = useCopy();
@@ -130,7 +130,7 @@ export const CoordinateComponent = observer((props) => {
             type: "text",
             size: "small",
             title: value.title,
-            disabled: value.disabled && store.mode !== "simulate",
+            disabled: value.disabled && store.mode !== "simulate" || name === "popup" && point === false && true,
         }
     };
 

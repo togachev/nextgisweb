@@ -107,6 +107,7 @@ export interface Props {
     position: Position;
     selected?: DataProps;
     mode?: string;
+    point?: boolean;
 }
 
 export interface ContextProps {
@@ -123,7 +124,6 @@ export interface Params {
     array_context?: ContextProps[] | [];
     countFeature: number;
     event: MapBrowserEvent;
-    activePoint: boolean;
 }
 
 export type RequestProps = {
@@ -167,6 +167,7 @@ export type CoordinateProps = {
     store: Store;
     count: number;
     op: string;
+    point?: boolean;
 }
 
 export type GraphPanelProps = {

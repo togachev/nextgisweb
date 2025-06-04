@@ -136,11 +136,8 @@ export function UploadLayer({ display }: Display) {
             if (display.panelManager.getActivePanelName() === "custom-layer") {
                 setFeatures(displayFeatureInfo(e.pixel));
                 if (display.imodule?.iStore) {
-                    const imodule = display.imodule
-                    imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
                     topic.publish("feature.unhighlight");
-                    imodule.iStore.setFullscreen(false)
-                    imodule.iStore.setValueRnd(prev => ({ ...prev, x: -9999, y: -9999 }));
+                    display.imodule && display.imodule.popup_destroy();
                 }
             }
         });

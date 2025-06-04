@@ -49,6 +49,7 @@ import type {
     TinyConfig,
 } from "../type";
 import type { TreeItemConfig } from "../type/TreeItems";
+
 import { setURLParam } from "../utils/URL";
 import { normalizeExtent } from "../utils/normalizeExtent";
 
@@ -274,11 +275,17 @@ export class Display {
 
         if (this.clientSettings.imodule) {
             if (controlsReady.has("im")) {
-                const { control } = controlsReady.get("im");
-                this.imodule = control;
-                this.mapStates.addState("imodule", this.imodule);
-                this.mapStates.setDefaultState("imodule", true);
-                this._iModuleUrlParams();
+                const controlObj = controlsReady.get("im");
+                if (
+                    controlObj &&
+                    controlObj.control &&
+                    controlObj.control instanceof IModule
+                ) {
+                    this.imodule = controlObj.control;
+                    this.mapStates.addState("imodule", this.imodule);
+                    this.mapStates.setDefaultState("imodule", true);
+                    this._iModuleUrlParams();
+                }
             }
         } else {
             if (controlsReady.has("id")) {

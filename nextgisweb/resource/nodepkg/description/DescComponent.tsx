@@ -36,12 +36,6 @@ const zoomToFeature = (display, layerId, featureId, styles) => {
         });
 };
 
-const destroyPopup = (display) => {
-    display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" });
-    display.imodule.iStore.setFullscreen(false)
-    display.imodule.iStore.setValueRnd({ ...display.imodule.iStore.valueRnd, x: -9999, y: -9999 });
-}
-
 const zoomToRasterExtent = async (display, styleId, styles) => {
     topic.publish("feature.unhighlight");
 
@@ -86,8 +80,8 @@ const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }
                     className="link-type-active"
                     title={msgZoomToFeature}
                     onClick={() => {
-                        zoomToFeature(display, layerId, fid, styles)
-                        display.imodule && display.imodule.iStore && destroyPopup(display);
+                        zoomToFeature(display, layerId, fid, styles);
+                        display.imodule && display.imodule.popup_destroy();
                     }}>
                     <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
                         <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
@@ -105,7 +99,7 @@ const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }
                     title={msgZoomToRaster}
                     onClick={() => {
                         zoomToRasterExtent(display, styleId, styles);
-                        display.imodule && display.imodule.iStore && destroyPopup(display);
+                        display.imodule && display.imodule.popup_destroy();
                     }}
                 >
                     <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>

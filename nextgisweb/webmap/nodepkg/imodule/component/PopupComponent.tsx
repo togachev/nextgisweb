@@ -22,6 +22,7 @@ import { CoordinateComponent } from "./CoordinateComponent";
 import { ButtonZoomComponent } from "./ButtonZoomComponent";
 import { getEntries } from "../useSource";
 
+import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Params, Props } from "../type";
 import topic from "@nextgisweb/webmap/compat/topic";
 
@@ -35,7 +36,6 @@ const CheckOnlyOne = ({ store, /*imodule*/ }) => {
     const onClick = useCallback((e) => {
         e.preventDefault();
         store.setFixPopup(!store.fixPopup);
-        // imodule.setActivePoint(!imodule.activePoint); /* click on point activation */
     }, []);
 
     const props = {
@@ -56,15 +56,18 @@ const CheckOnlyOne = ({ store, /*imodule*/ }) => {
 export default observer(
     forwardRef<Element>(
         function PopupComponent(props, ref) {
-            const { params, visible, display } = props as Params;
-            const { op, position, response, selected: selectedValue, mode } = params as Props;
+            const { params, display } = props as Params;
+            const { op, position, response, selected: selectedValue, mode, point } = params as Props;
+            const imodule = display.imodule;
+
+            const pm = display.panelManager;
+            const pkey = "selected-feature";
+            const panel = pm.getPanel<SelectedFeatureStore>(pkey);
 
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
             const attrs = opts["webmap.identification_attributes"];
             const geoms = opts["webmap.identification_geometry"];
-
-            const imodule = display.imodule;
 
             const offHP = imodule.offHP;
             const offset = display.clientSettings.offset_point;
@@ -117,7 +120,25 @@ export default observer(
                 status && store.setButtonZoom({});
             });
 
-            imodule.iStore = store;
+            const propsCoords = useCallback(() => {
+                const styles: string[] = [];
+                display.getVisibleItems()
+                    .then((items) => {
+                        items.forEach((i) => {
+                            const item = display.itemStore.dumpItem(i);
+                            if (item.visibility === true) {
+                                styles.push(item.styleId);
+                            }
+                        });
+                    })
+
+                return {
+                    coordinate: imodule.params.point,
+                    lonlat: imodule.lonlat,
+                    extent: display.map.olMap.getView().calculateExtent(),
+                    styles: styles
+                };
+            }, [response, display.mapExtentDeferred]);
 
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
@@ -133,6 +154,21 @@ export default observer(
                     store.setCountFeature(imodule.countFeature);
                     store.setPointClick(position.pointClick);
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
+
+                    const selectedProps = { ...selectVal };
+                    Object.assign(selectedProps, propsCoords());
+                    panel && panel.setSelectedFeatures({
+                        ...panel.selectedFeatures,
+                        [String(selectedProps.styleId)]: {
+                            ...panel.selectedFeatures[selectedProps.styleId],
+                            ...{
+                                items: {
+                                    ...panel.selectedFeatures[selectedProps.styleId].items,
+                                    [String(selectedProps.value)]: selectedProps
+                                }
+                            }
+                        }
+                    })
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -163,6 +199,18 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
+            useEffect(() => {
+                if (panel) {
+                    const newState = { ...panel.selectedFeatures };
+                    getEntries(newState)
+                        .map(([key, _]) => {
+                            if (Object.keys(newState[key].items).length > 10) {
+                                delete newState[key].items[Object.keys(newState[key].items)[0]];
+                            }
+                        });
+                }
+            }, [panel.selectedFeatures]);
+
             const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
                 const copy = { ...selectedValue };
@@ -172,6 +220,23 @@ export default observer(
                 store.LinkToGeometry(copy);
                 topic.publish("visible.point", copy);
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
+
+                const selectedProps = { ...selectedValue };
+                Object.assign(selectedProps, propsCoords());
+                if (panel) {
+                    panel.setSelectedFeatures({
+                        ...panel.selectedFeatures,
+                        [String(selectedProps.styleId)]: {
+                            ...panel.selectedFeatures[selectedProps.styleId],
+                            ...{
+                                items: {
+                                    ...panel.selectedFeatures[selectedProps.styleId].items,
+                                    [String(selectedProps.value)]: selectedProps
+                                }
+                            }
+                        }
+                    });
+                }
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
@@ -227,7 +292,7 @@ export default observer(
             }, [store.selected]);
 
             const contentProps = { store: store, display: display };
-            const coordinateProps = { display: display, store: store, op: "popup" };
+            const coordinateProps = { display: display, store: store, op: "popup", point: point };
 
             return (
                 createPortal(
@@ -346,7 +411,7 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    {store.countFeature > 0 && <CheckOnlyOne imodule={imodule} store={store} />}
+                                    {store.countFeature > 0 && <CheckOnlyOne {...{ imodule, store }} />}
                                     {store.countFeature > 0 && store.selected && (
                                         <span
                                             title={store.fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}
@@ -373,10 +438,7 @@ export default observer(
                                         title={gettext("Close")}
                                         className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
-                                            visible({ hidden: true, overlay: undefined, key: "popup" })
-                                            topic.publish("feature.unhighlight");
-                                            store.setFullscreen(false)
-                                            store.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
+                                            display.imodule.popup_destroy();
                                         }} >
                                         <CloseIcon />
                                     </span>

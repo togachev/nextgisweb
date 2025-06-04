@@ -4,6 +4,8 @@ import { getEntries } from "./useSource";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
+import { transform } from 'ol/proj';
+
 import type { AttributeProps, ButtonZoom, ControlUrlProps, DataProps, ExtensionsProps, PointClickProps, Rnd, OptionProps } from "./type";
 import type { Display } from "@nextgisweb/webmap/display";
 
@@ -49,6 +51,7 @@ export class Store {
         this.control = control;
         this.pointClick = pointClick;
         this.buttonZoom = buttonZoom;
+        this.display.imodule.iStore = this;
     }
 
     @action
@@ -225,6 +228,7 @@ export class Store {
                 fields: { Forbidden: "Forbidden" },
                 extensions: null
             }
+        
         if (res.permission !== "Forbidden") {
             const fieldsInfo = await getFieldsInfo(resourceId, false);
             const { fields } = feature;
@@ -249,8 +253,7 @@ export class Store {
 
     async generateUrl({ res, st, pn, disable }) {
         const imodule = this.display.imodule;
-        const lon = imodule.lonlat[0];
-        const lat = imodule.lonlat[1];
+        const [lon, lat] = transform(imodule.coordinate, 'EPSG:3857', 'EPSG:4326').map(number => parseFloat(number.toFixed(12)));
         const webmapId = this.display.config.webmapId;
         const zoom = this.display.map.zoom;
 
@@ -304,7 +307,7 @@ export class Store {
 
     async updatePermalink() {
         const display = this.display
-        await this.display.getVisibleItems().then((visibleItems) => {
+        await display.getVisibleItems().then((visibleItems) => {
             const permalink = getPermalink({ display, visibleItems });
             const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
             this.setPermalink(decodeURIComponent(permalink + '&panel=' + String(panel)));
