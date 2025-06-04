@@ -7,7 +7,6 @@ import { Button } from "@nextgisweb/gui/antd";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
-import { ButtonZoomComponent } from "./ButtonZoomComponent";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
@@ -135,12 +134,9 @@ export const CoordinateComponent = observer((props) => {
         }
     };
 
-    const contentProps = { store: store, display: display };
-
     return (
         <div className="footer-coordinate-component">
             {contextHolder}
-            {store.buttonZoom["bottomLeft"] && <ButtonZoomComponent {...contentProps} />}
             <div className="coordinate-and-controls">
                 <Button
                     type="text"
@@ -168,7 +164,6 @@ export const CoordinateComponent = observer((props) => {
                     </div>
                 )}
             </div>
-            {store.buttonZoom["bottomRight"] && <ButtonZoomComponent {...contentProps} />}
         </div>
     )
 });

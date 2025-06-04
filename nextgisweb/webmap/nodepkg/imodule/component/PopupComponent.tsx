@@ -319,7 +319,7 @@ export default observer(
                         >
                             <div ref={ref as any} className="popup-position">
                                 <div className="title">
-                                    {store.buttonZoom["topLeft"] && <ButtonZoomComponent {...contentProps} />}
+                                    {store.buttonZoom["topLeft"] && <div style={{ margin: "0 6px 0 0" }}><ButtonZoomComponent {...contentProps} /></div>}
                                     <div className="title-name"
                                         onClick={(e) => {
                                             if (store.countFeature > 0 && e.detail === 2) {
@@ -380,7 +380,7 @@ export default observer(
                                         }} >
                                         <CloseIcon />
                                     </span>
-                                    {store.buttonZoom["topRight"] && <ButtonZoomComponent {...contentProps} />}
+                                    {store.buttonZoom["topRight"] && <div style={{ margin: "0 0 0 6px" }}><ButtonZoomComponent {...contentProps} /></div>}
                                 </div>
                                 {store.countFeature > 0 && store.selected && (
                                     <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
@@ -413,7 +413,9 @@ export default observer(
                                     </div>
                                 )}
                                 {op === "popup" && (<div className="footer-popup">
+                                    {store.buttonZoom["bottomLeft"] && <div style={{ margin: "0 6px 0 0" }}><ButtonZoomComponent {...contentProps} /></div>}
                                     <CoordinateComponent {...coordinateProps} />
+                                    {store.buttonZoom["bottomRight"] && <div style={{ margin: "0 0 0 6px" }}><ButtonZoomComponent {...contentProps} /></div>}
                                 </div>)}
                             </div>
                         </Rnd >
