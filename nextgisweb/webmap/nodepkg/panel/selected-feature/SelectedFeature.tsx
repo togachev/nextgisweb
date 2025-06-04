@@ -19,7 +19,7 @@ const simulateProps = (display, item) => {
         lat: item.lonlat[1],
         params: [{ id: item.styleId, label: item.desc, dop: null }],
     }
-
+    // display.imodule.zoomToPoint(item.coordinate);
     const p = { value, coordinate: item.coordinate };
     const pixel = display.map.olMap.getPixelFromCoordinate(p.coordinate);
     const simulateEvent: any = {
@@ -33,8 +33,7 @@ const simulateProps = (display, item) => {
         ],
         type: "click"
     };
-
-    return display.imodule._overlayInfo(simulateEvent, "popup", p, "simulate")
+    return display.imodule._overlayInfo(simulateEvent, "popup", p, "simulate");
 }
 
 const ItemSelectValue = ({ display, store, items }) => {
@@ -62,7 +61,9 @@ const ItemSelectValue = ({ display, store, items }) => {
                         </div>
                         <div>
                             <Button type="text" icon={<DeleteOutline />} onClick={() => deleteRow(key)} />
-                            <Button type="text" icon={<EyeOutline />} onClick={() => simulateProps(display, value)} />
+                            <Button type="text" icon={<EyeOutline />} onClick={() => {
+                                simulateProps(display, value);
+                            }} />
                         </div>
                     </Space>
                 )

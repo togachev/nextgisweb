@@ -478,9 +478,16 @@ export class IModule extends Component {
                     type: "click"
                 };
                 console.log(simulateEvent, value);
-                
+
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
+    };
+
+    zoomToPoint(val) {
+        const point = new Point(val);
+        console.log(point);
+        
+        this.display.map.zoomToExtent(point.getExtent());
     };
 
     zoomTo(val) {
