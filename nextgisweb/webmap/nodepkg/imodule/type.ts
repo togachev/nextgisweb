@@ -123,7 +123,6 @@ export interface Params {
     array_context?: ContextProps[] | [];
     countFeature: number;
     event: MapBrowserEvent;
-    activePoint: boolean;
 }
 
 export type RequestProps = {

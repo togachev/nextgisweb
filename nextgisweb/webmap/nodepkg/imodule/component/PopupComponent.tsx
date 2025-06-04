@@ -22,6 +22,7 @@ import { CoordinateComponent } from "./CoordinateComponent";
 import { ButtonZoomComponent } from "./ButtonZoomComponent";
 import { getEntries } from "../useSource";
 
+import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Params, Props } from "../type";
 import topic from "@nextgisweb/webmap/compat/topic";
 
@@ -35,7 +36,6 @@ const CheckOnlyOne = ({ store, /*imodule*/ }) => {
     const onClick = useCallback((e) => {
         e.preventDefault();
         store.setFixPopup(!store.fixPopup);
-        // imodule.setActivePoint(!imodule.activePoint); /* click on point activation */
     }, []);
 
     const props = {
@@ -58,6 +58,10 @@ export default observer(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue, mode } = params as Props;
+
+            const pm = display.panelManager;
+            const pkey = "selected-feature";
+            const panel = pm.getPanel<SelectedFeatureStore>(pkey);
 
             const urlParams = display.getUrlParams()
             const opts = display.config.options;
@@ -133,6 +137,9 @@ export default observer(
                     store.setCountFeature(imodule.countFeature);
                     store.setPointClick(position.pointClick);
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
+
+                    panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectVal.id) + ':' + String(selectVal.layerId)]: selectVal });
+
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -172,6 +179,8 @@ export default observer(
                 store.LinkToGeometry(copy);
                 topic.publish("visible.point", copy);
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
+
+                panel && panel.setMultiSelected({ ...panel.multiSelected, [String(copy.id) + ':' + String(copy.layerId)]: copy });
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

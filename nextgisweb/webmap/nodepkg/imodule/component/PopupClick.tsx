@@ -31,17 +31,14 @@ export default function PopupClick({ display, event, params, countFeature }: Par
             style={{
                 display: visible ? "block" : "none",
                 cursor: countFeature > 0
-                    // && display.imodule.activePoint /* click on point activation */
                     ? "pointer" : "auto",
                 pointerEvents: countFeature > 0
-                    // && display.imodule.activePoint
                     ? "auto" : "none",
             }}
             className="icon-position"
             onClick={() => {
                 if (
                     countFeature > 0
-                    // && display.imodule.activePoint
                 ) {
                     selected?.type === "vector" ? display.imodule.zoomTo(selected) :
                         selected?.type === "raster" ? display.imodule.zoomToRasterExtent(selected) :
@@ -51,7 +48,7 @@ export default function PopupClick({ display, event, params, countFeature }: Par
             }}>
             <span
                 style={{ fontWeight: 500 }}
-                title={countFeature > 0 && display.imodule.activePoint ? selected?.type === "vector" ?
+                title={countFeature > 0 ? selected?.type === "vector" ?
                     gettext("Zoom to feature") :
                     gettext("Zoom to raster layer") : undefined}>
                 <PointClick />
