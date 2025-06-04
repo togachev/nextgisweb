@@ -28,7 +28,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 const { Option } = Select;
 const forbidden = gettext("The data is not available for reading");
 
-const CheckOnlyOne = ({ store, imodule }) => {
+const CheckOnlyOne = ({ store, /*imodule*/ }) => {
     const msgFixPopup = gettext("Lock popup position");
     const msgFixOffPopup = gettext("Disable lock popup position");
 

@@ -6,7 +6,7 @@ export const formattedFields = () => {
 
     const getNumberValue = (attribute: FeatureLayerFieldCol, val?: NgwAttributeType) => {
         const { format_field, value } = attribute;
-        const value_ = value !== null ? value : val;
+        const value_ = value && value !== null ? value : val;
 
         if (typeof value_ === "number") {
             const round = format_field?.round !== null ? { maximumFractionDigits: format_field?.round } : {};
