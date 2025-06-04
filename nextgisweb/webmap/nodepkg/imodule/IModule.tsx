@@ -477,7 +477,8 @@ export class IModule extends Component {
                     ],
                     type: "click"
                 };
-
+                console.log(simulateEvent, value);
+                
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
     };

@@ -58,7 +58,9 @@ export default observer(
         function PopupComponent(props, ref) {
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue, mode } = params as Props;
+            const imodule = display.imodule;
 
+            const propsCoords = { coordinate: imodule.params.point, lonlat: imodule.lonlat };
             const pm = display.panelManager;
             const pkey = "selected-feature";
             const panel = pm.getPanel<SelectedFeatureStore>(pkey);
@@ -68,7 +70,7 @@ export default observer(
             const attrs = opts["webmap.identification_attributes"];
             const geoms = opts["webmap.identification_geometry"];
 
-            const imodule = display.imodule;
+
 
             const offHP = imodule.offHP;
             const offset = display.clientSettings.offset_point;
@@ -138,7 +140,9 @@ export default observer(
                     store.setPointClick(position.pointClick);
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
-                    panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectVal.id) + ':' + String(selectVal.layerId)]: selectVal });
+                    const selectedProps = { ...selectVal };
+                    Object.assign(selectedProps, propsCoords);
+                    panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectedProps.value)]: selectedProps });
 
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
@@ -180,7 +184,9 @@ export default observer(
                 topic.publish("visible.point", copy);
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
-                panel && panel.setMultiSelected({ ...panel.multiSelected, [String(copy.id) + ':' + String(copy.layerId)]: copy });
+                const selectedProps = { ...selectedValue };
+                Object.assign(selectedProps, propsCoords);
+                panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectedProps.value)]: selectedProps });
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
