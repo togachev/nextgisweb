@@ -35,7 +35,7 @@ const CheckOnlyOne = ({ store, imodule }) => {
     const onClick = useCallback((e) => {
         e.preventDefault();
         store.setFixPopup(!store.fixPopup);
-        imodule.setActivePoint(!imodule.activePoint);
+        // imodule.setActivePoint(!imodule.activePoint); /* click on point activation */
     }, []);
 
     const props = {
