@@ -60,7 +60,6 @@ export default observer(
             const { op, position, response, selected: selectedValue, mode } = params as Props;
             const imodule = display.imodule;
 
-            const propsCoords = { coordinate: imodule.params.point, lonlat: imodule.lonlat };
             const pm = display.panelManager;
             const pkey = "selected-feature";
             const panel = pm.getPanel<SelectedFeatureStore>(pkey);
@@ -125,6 +124,10 @@ export default observer(
 
             imodule.iStore = store;
 
+            const propsCoords = useCallback(() => {
+                return { coordinate: imodule.params.point, lonlat: imodule.lonlat, extent: display.map.olMap.getView().calculateExtent() };
+            }, [response, display.mapExtentDeferred]);
+
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
                 store.setMode(mode);
@@ -141,9 +144,8 @@ export default observer(
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                     const selectedProps = { ...selectVal };
-                    Object.assign(selectedProps, propsCoords);
+                    Object.assign(selectedProps, propsCoords());
                     panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectedProps.value)]: selectedProps });
-
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -185,7 +187,7 @@ export default observer(
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                 const selectedProps = { ...selectedValue };
-                Object.assign(selectedProps, propsCoords);
+                Object.assign(selectedProps, propsCoords());
                 panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectedProps.value)]: selectedProps });
             };
 

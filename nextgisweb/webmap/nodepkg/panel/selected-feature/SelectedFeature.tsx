@@ -5,39 +5,15 @@ import { PanelContainer } from "../component";
 import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
 import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";
 import topic from "@nextgisweb/webmap/compat/topic";
+import { useSelected } from "./hook/useSelected";
 import type { PanelPluginWidgetProps } from "../registry";
 import type SelectedFeatureStore from "./SelectedFeatureStore";
 import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 
 import "./SelectedFeature.less";
 
-const simulateProps = (display, item) => {
-    const value = {
-        attribute: true,
-        pn: "attributes",
-        lon: item.lonlat[0],
-        lat: item.lonlat[1],
-        params: [{ id: item.styleId, label: item.desc, dop: null }],
-    }
-    // display.imodule.zoomToPoint(item.coordinate);
-    const p = { value, coordinate: item.coordinate };
-    const pixel = display.map.olMap.getPixelFromCoordinate(p.coordinate);
-    const simulateEvent: any = {
-        coordinate: p && p.coordinate,
-        map: display.map.olMap,
-        target: "map",
-        pixel: [
-            display.panelManager.getActivePanelName() !== "none" ?
-                (pixel[0] + display.panelSize + 40) :
-                (pixel[0] + 40), (pixel[1] + 40)
-        ],
-        type: "click"
-    };
-    return display.imodule._overlayInfo(simulateEvent, "popup", p, "simulate");
-}
-
 const ItemSelectValue = ({ display, store, items }) => {
-
+    const { simulatePointZoom } = useSelected(display);
     const deleteRow = (key) => {
         topic.publish("feature.unhighlight");
 
@@ -51,25 +27,21 @@ const ItemSelectValue = ({ display, store, items }) => {
         store.setMultiSelected(newObject);
     };
 
-    return (
-        <Space direction="vertical">
-            {getEntries(items).map(([key, value]) => {
-                return (
-                    <Space key={key} className="row-selected">
-                        <div>
-                            {value.label}
-                        </div>
-                        <div>
-                            <Button type="text" icon={<DeleteOutline />} onClick={() => deleteRow(key)} />
-                            <Button type="text" icon={<EyeOutline />} onClick={() => {
-                                simulateProps(display, value);
-                            }} />
-                        </div>
-                    </Space>
-                )
-            })}
-        </Space>
-    )
+    return getEntries(items).map((item) => {
+        return (
+            <div key={item[0]} className="row-selected">
+                <div className="label-item">
+                    {item[1].label}
+                </div>
+                <div className="control-item">
+                    <Button type="text" icon={<DeleteOutline />} onClick={() => deleteRow(item[0])} />
+                    <Button type="text" icon={<EyeOutline />} onClick={() => {
+                        simulatePointZoom(item);
+                    }} />
+                </div>
+            </div>
+        )
+    })
 }
 
 
@@ -85,7 +57,9 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
-                {store.multiSelected && <ItemSelectValue display={display} store={store} items={store.multiSelected} />}
+                {store.multiSelected &&
+                    <ItemSelectValue display={display} store={store} items={store.multiSelected} />
+                }
             </PanelContainer>
         );
     });

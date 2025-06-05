@@ -268,6 +268,7 @@ export class IModule extends Component {
                 value = this.response.data[0];
             }
             else if (mode === "simulate") {
+                this.selected = p.selected ? p.selected : this.selected;
                 value = this.response.data.find(x => x.value === this.selected) as DataProps;
             }
 
@@ -477,16 +478,13 @@ export class IModule extends Component {
                     ],
                     type: "click"
                 };
-                console.log(simulateEvent, value);
-
                 this._overlayInfo(simulateEvent, "popup", p, "simulate")
             });
     };
 
     zoomToPoint(val) {
+        if (!val) return;
         const point = new Point(val);
-        console.log(point);
-        
         this.display.map.zoomToExtent(point.getExtent());
     };
 
@@ -498,6 +496,12 @@ export class IModule extends Component {
                 this.display.map.zoomToFeature(feature);
                 topic.publish("update.point", true);
             });
+    };
+
+    zoomToExtent(extent) {
+        this.display.map.zoomToExtent(extent, {
+            displayProjection: this.display.displayProjection,
+        });
     };
 
     async zoomToRasterExtent(val) {
