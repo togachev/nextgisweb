@@ -154,8 +154,15 @@ export default observer(
 
                     const selectedProps = { ...selectVal };
                     Object.assign(selectedProps, propsCoords());
-                    const uniqueKey = panel.uniqueKey ? String(selectedProps.value + imodule.lonlat) : String(selectedProps.value);
-                    panel && panel.setMultiSelected({ ...panel.multiSelected, [uniqueKey]: selectedProps });
+                    let key;
+                    if (selectedProps.type === "vector") {
+                        key = String(selectedProps.value);
+                    } else {
+                        key = panel.uniqueKey ?
+                            String(selectedProps.value) :
+                            String(selectedProps.styleId + ":" + selectedProps.layerId);
+                    }
+                    panel && panel.setMultiSelected({ ...panel.multiSelected, [key]: selectedProps });
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -208,8 +215,15 @@ export default observer(
 
                 const selectedProps = { ...selectedValue };
                 Object.assign(selectedProps, propsCoords());
-                const uniqueKey = panel.uniqueKey ? String(selectedProps.value + imodule.lonlat) : String(selectedProps.value);
-                panel && panel.setMultiSelected({ ...panel.multiSelected, [uniqueKey]: selectedProps });
+                let key;
+                if (selectedProps.type === "vector") {
+                    key = String(selectedProps.value);
+                } else {
+                    key = panel.uniqueKey ?
+                        String(selectedProps.value) :
+                        String(selectedProps.styleId + ":" + selectedProps.layerId);
+                }
+                panel && panel.setMultiSelected({ ...panel.multiSelected, [key]: selectedProps });
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

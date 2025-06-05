@@ -13,7 +13,7 @@ import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 
 import "./SelectedFeature.less";
 
-const ItemSelectValue = ({ display, store, items }) => {
+const ItemSelectValue = ({ display, store }) => {
     const { simulatePointZoom, visibleItems } = useSelected(display);
     const deleteRow = (key) => {
         display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
@@ -26,7 +26,7 @@ const ItemSelectValue = ({ display, store, items }) => {
         store.setMultiSelected(newObject);
     };
 
-    return getEntries(items).map((item) => {
+    return getEntries(store.multiSelected).map((item) => {
         return (
             <div key={item[0]} className="row-selected">
                 <div title={item[1].label} className="label-item">
@@ -55,8 +55,10 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
 
         const onChange = (e) => {
-            store.setUniqueKey(e.target.checked)
+            store.setUniqueKey(e.target.checked);
+            store.setMultiSelected({})
         }
+
         return (
             <PanelContainer
                 className="ngw-webmap-custom-layer-panel"
@@ -69,7 +71,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             >
                 <Checkbox checked={store.uniqueKey} onChange={onChange}>test</Checkbox>
                 {store.multiSelected &&
-                    <ItemSelectValue display={display} store={store} items={store.multiSelected} />
+                    <ItemSelectValue display={display} store={store} />
                 }
             </PanelContainer>
         );
