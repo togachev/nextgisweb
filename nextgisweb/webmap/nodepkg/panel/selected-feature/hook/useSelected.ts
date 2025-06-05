@@ -23,7 +23,21 @@ export const useSelected = (display: Display) => {
 
 
     const overlayInfo = useCallback((event, p) => {
-        return display.imodule._overlayInfo(event, "popup", p, "simulate")
+        return display.imodule._overlayInfo(event, "popup", p, "selected")
+    }, [item]);
+
+    const visibleItems = useCallback((item) => {
+        const itm = item[1];
+
+        const visibleStyles: number[] = [];
+        const itemConfig = display.getItemConfig();
+        Object.keys(itemConfig).forEach(function (key) {
+            if (itm.styles.includes(itemConfig[key].styleId)) {
+                visibleStyles.push(itemConfig[key].id);
+            }
+        });
+        display.webmapStore.setChecked(visibleStyles);
+        display.webmapStore._updateLayersVisibility(visibleStyles);
     }, [item]);
 
     useEffect(() => {
@@ -54,5 +68,5 @@ export const useSelected = (display: Display) => {
         }
     }, [item, display.mapExtentDeferred])
 
-    return { simulatePointZoom };
+    return { simulatePointZoom, visibleItems };
 };

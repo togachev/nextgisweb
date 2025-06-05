@@ -69,8 +69,6 @@ export default observer(
             const attrs = opts["webmap.identification_attributes"];
             const geoms = opts["webmap.identification_geometry"];
 
-
-
             const offHP = imodule.offHP;
             const offset = display.clientSettings.offset_point;
             const fX = offHP + offset;
@@ -125,7 +123,18 @@ export default observer(
             imodule.iStore = store;
 
             const propsCoords = useCallback(() => {
-                return { coordinate: imodule.params.point, lonlat: imodule.lonlat, extent: display.map.olMap.getView().calculateExtent() };
+                const styles: string[] = [];
+                display.getVisibleItems()
+                    .then((items) => {
+                        items.forEach((i) => {
+                            const item = display.itemStore.dumpItem(i);
+                            if (item.visibility === true) {
+                                styles.push(item.styleId);
+                            }
+                        });
+                    })
+
+                return { coordinate: imodule.params.point, lonlat: imodule.lonlat, extent: display.map.olMap.getView().calculateExtent(), styles: styles };
             }, [response, display.mapExtentDeferred]);
 
             useEffect(() => {
@@ -145,7 +154,8 @@ export default observer(
 
                     const selectedProps = { ...selectVal };
                     Object.assign(selectedProps, propsCoords());
-                    panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectedProps.value)]: selectedProps });
+                    const uniqueKey = panel.uniqueKey ? String(selectedProps.value + imodule.lonlat) : String(selectedProps.value);
+                    panel && panel.setMultiSelected({ ...panel.multiSelected, [uniqueKey]: selectedProps });
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -176,6 +186,16 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
+            useEffect(() => {
+                if (panel) {
+                    const newState = Object.assign({}, panel.multiSelected);
+                    if (Object.keys(newState).length > 10) {
+                        delete newState[Object.keys(newState)[0]];
+                        panel.setMultiSelected(newState);
+                    }
+                }
+            }, [panel.multiSelected]);
+
             const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
                 const copy = { ...selectedValue };
@@ -188,7 +208,8 @@ export default observer(
 
                 const selectedProps = { ...selectedValue };
                 Object.assign(selectedProps, propsCoords());
-                panel && panel.setMultiSelected({ ...panel.multiSelected, [String(selectedProps.value)]: selectedProps });
+                const uniqueKey = panel.uniqueKey ? String(selectedProps.value + imodule.lonlat) : String(selectedProps.value);
+                panel && panel.setMultiSelected({ ...panel.multiSelected, [uniqueKey]: selectedProps });
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

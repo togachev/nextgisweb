@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, Checkbox } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
@@ -14,7 +14,7 @@ import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 import "./SelectedFeature.less";
 
 const ItemSelectValue = ({ display, store, items }) => {
-    const { simulatePointZoom } = useSelected(display);
+    const { simulatePointZoom, visibleItems } = useSelected(display);
     const deleteRow = (key) => {
         display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
         topic.publish("feature.unhighlight");
@@ -36,11 +36,13 @@ const ItemSelectValue = ({ display, store, items }) => {
                     <Button type="text" icon={<DeleteOutline />} onClick={() => deleteRow(item[0])} />
                     <Button type="text" icon={<EyeOutline />} onClick={() => {
                         simulatePointZoom(item);
+                        visibleItems(item);
                     }} />
                     <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                        visibleItems(item);
                         item[1]?.type === "vector" ? display.imodule.zoomTo(item[1]) :
                             item[1]?.type === "raster" ? display.imodule.zoomToRasterExtent(item[1]) :
-                                undefined
+                                undefined;
                     }} />
                 </div>
             </div>
@@ -51,6 +53,10 @@ const ItemSelectValue = ({ display, store, items }) => {
 
 const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
+
+        const onChange = (e) => {
+            store.setUniqueKey(e.target.checked)
+        }
         return (
             <PanelContainer
                 className="ngw-webmap-custom-layer-panel"
@@ -61,6 +67,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
+                <Checkbox checked={store.uniqueKey} onChange={onChange}>test</Checkbox>
                 {store.multiSelected &&
                     <ItemSelectValue display={display} store={store} items={store.multiSelected} />
                 }

@@ -288,7 +288,6 @@ export class IModule extends Component {
                 visible: this._visible,
             } as Params;
 
-
             this.root_point_click.render(<PopupClick {...propsPoint} />);
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
