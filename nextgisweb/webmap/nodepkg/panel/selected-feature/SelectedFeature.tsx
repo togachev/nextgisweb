@@ -1,9 +1,10 @@
 import { observer } from "mobx-react-lite";
-import { Button, Space } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
 import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";
+import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { useSelected } from "./hook/useSelected";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -15,8 +16,6 @@ import "./SelectedFeature.less";
 const ItemSelectValue = ({ display, store, items }) => {
     const { simulatePointZoom } = useSelected(display);
     const deleteRow = (key) => {
-        topic.publish("feature.unhighlight");
-
         display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
         topic.publish("feature.unhighlight");
         display.imodule.iStore.setFullscreen(false)
@@ -30,13 +29,18 @@ const ItemSelectValue = ({ display, store, items }) => {
     return getEntries(items).map((item) => {
         return (
             <div key={item[0]} className="row-selected">
-                <div className="label-item">
+                <div title={item[1].label} className="label-item">
                     {item[1].label}
                 </div>
                 <div className="control-item">
                     <Button type="text" icon={<DeleteOutline />} onClick={() => deleteRow(item[0])} />
                     <Button type="text" icon={<EyeOutline />} onClick={() => {
                         simulatePointZoom(item);
+                    }} />
+                    <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                        item[1]?.type === "vector" ? display.imodule.zoomTo(item[1]) :
+                            item[1]?.type === "raster" ? display.imodule.zoomToRasterExtent(item[1]) :
+                                undefined
                     }} />
                 </div>
             </div>
