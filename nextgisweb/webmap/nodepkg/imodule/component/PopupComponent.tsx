@@ -20,7 +20,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { ButtonZoomComponent } from "./ButtonZoomComponent";
-import { getEntries } from "../useSource";
+import { filterObject, getEntries } from "../useSource";
 
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Params, Props } from "../type";
@@ -59,6 +59,12 @@ export default observer(
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue, mode } = params as Props;
             const imodule = display.imodule;
+
+            const items = filterObject(display.getItemConfig(), ([_, v]) => v.type === "layer");
+
+            
+            // console.log(items.map(([key, value]) => ({ [key]: { id: value.styleId } })));
+            // console.log(items);
 
             const pm = display.panelManager;
             const pkey = "selected-feature";
@@ -134,7 +140,12 @@ export default observer(
                         });
                     })
 
-                return { coordinate: imodule.params.point, lonlat: imodule.lonlat, extent: display.map.olMap.getView().calculateExtent(), styles: styles };
+                return {
+                    coordinate: imodule.params.point,
+                    lonlat: imodule.lonlat,
+                    extent: display.map.olMap.getView().calculateExtent(),
+                    styles: styles
+                };
             }, [response, display.mapExtentDeferred]);
 
             useEffect(() => {
@@ -158,6 +169,7 @@ export default observer(
                     if (selectedProps.type === "vector") {
                         key = String(selectedProps.value);
                     } else {
+                        panel.setRasterIncludes(true);
                         key = panel.uniqueKey ?
                             String(selectedProps.value) :
                             String(selectedProps.styleId + ":" + selectedProps.layerId);
@@ -193,15 +205,26 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
-            useEffect(() => {
-                if (panel) {
-                    const newState = Object.assign({}, panel.multiSelected);
-                    if (Object.keys(newState).length > 10) {
-                        delete newState[Object.keys(newState)[0]];
-                        panel.setMultiSelected(newState);
-                    }
-                }
-            }, [panel.multiSelected]);
+            // useEffect(() => {
+            //     if (panel) {
+            //         const newState = Object.assign({}, panel.multiSelected);
+
+            //         const rasterExists = getEntries(newState).some(([_, value]) => value.type === "raster");
+            //         if (rasterExists) {
+            //             const lengthRaster = getEntries(newState).filter(([_, value]) => value.type === "raster").length;
+            //             const vectorLayers = filterObject(newState, ([_, v]) => v.type === "vector");
+            //             const rasterLayers = filterObject(newState, ([_, v]) => v.type === "raster");
+
+            //             if (lengthRaster > 10) {
+            //                 getEntries(rasterLayers).map(([key, value], index) => {
+            //                     index === 0 && value.type === "raster" && delete rasterLayers[key];
+            //                 })
+            //                 Object.assign(rasterLayers, vectorLayers);
+            //                 panel.setMultiSelected(rasterLayers);
+            //             }
+            //         }
+            //     }
+            // }, [panel.multiSelected]);
 
             const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
@@ -219,6 +242,7 @@ export default observer(
                 if (selectedProps.type === "vector") {
                     key = String(selectedProps.value);
                 } else {
+                    panel.setRasterIncludes(true);
                     key = panel.uniqueKey ?
                         String(selectedProps.value) :
                         String(selectedProps.styleId + ":" + selectedProps.layerId);

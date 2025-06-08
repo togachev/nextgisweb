@@ -1,14 +1,16 @@
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 import { Button, Checkbox } from "@nextgisweb/gui/antd";
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { filterObject, getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
 import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { useSelected } from "./hook/useSelected";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import type { PanelPluginWidgetProps } from "../registry";
-import type SelectedFeatureStore from "./SelectedFeatureStore";
 import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 
 import "./SelectedFeature.less";
@@ -51,12 +53,22 @@ const ItemSelectValue = ({ display, store }) => {
 }
 
 
-const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
+const SelectedFeature = observer<PanelPluginWidgetProps>(
     ({ display, store }) => {
-
+        console.log(store);
+        
         const onChange = (e) => {
             store.setUniqueKey(e.target.checked);
-            store.setMultiSelected({})
+
+            const newState = Object.assign({}, store.multiSelected);
+            const rasterExists = getEntries(newState).some(([_, value]) => value.type === "raster");
+
+            if (rasterExists) {
+                getEntries(newState).map(([key, value]) => {
+                    value.type === "raster" && delete newState[key];
+                })
+                store.setMultiSelected(newState);
+            }
         }
 
         return (
@@ -69,7 +81,11 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
-                <Checkbox checked={store.uniqueKey} onChange={onChange}>test</Checkbox>
+                {store.rasterIncludes && <div className="mode-raster-select">
+                    <Checkbox checked={store.uniqueKey} onChange={onChange}>
+                        {gettext("Pixel selection mode on one raster layer")}
+                    </Checkbox>
+                </div>}
                 {store.multiSelected &&
                     <ItemSelectValue display={display} store={store} />
                 }
