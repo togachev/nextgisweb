@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
 import { Button, Checkbox } from "@nextgisweb/gui/antd";
-import { filterObject, getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
 import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";

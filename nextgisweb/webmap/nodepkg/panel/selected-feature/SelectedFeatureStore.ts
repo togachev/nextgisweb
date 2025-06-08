@@ -1,9 +1,9 @@
 import { action, observable } from "mobx";
 import { PanelStore } from "@nextgisweb/webmap/panel";
-import { filterObject } from "@nextgisweb/webmap/imodule/useSource";
 
 import type { Display } from "@nextgisweb/webmap/display";
 import type { DataProps } from "@nextgisweb/webmap/imodule/type";
+import { getEntries } from "../../imodule/useSource";
 
 class SelectedFeatureStore extends PanelStore {
 
@@ -20,7 +20,15 @@ class SelectedFeatureStore extends PanelStore {
     }
 
     getItems = () => {
-        this.setSelectedFeatures(filterObject(this.display.getItemConfig(), ([_, v]) => v.type === "layer"));
+        const obj = {};
+        getEntries(this.display.getItemConfig()).map(([_, value]) => {
+            if (value.type === "layer") {
+                Object.assign(obj, {
+                    [value.styleId]: {},
+                })
+            }
+        });
+        this.setSelectedFeatures(obj);
     }
 
     @action

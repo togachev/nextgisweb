@@ -20,7 +20,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import { ButtonZoomComponent } from "./ButtonZoomComponent";
-import { filterObject, getEntries } from "../useSource";
+import { getEntries } from "../useSource";
 
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Params, Props } from "../type";
@@ -59,12 +59,6 @@ export default observer(
             const { params, visible, display } = props as Params;
             const { op, position, response, selected: selectedValue, mode } = params as Props;
             const imodule = display.imodule;
-
-            const items = filterObject(display.getItemConfig(), ([_, v]) => v.type === "layer");
-
-            
-            // console.log(items.map(([key, value]) => ({ [key]: { id: value.styleId } })));
-            // console.log(items);
 
             const pm = display.panelManager;
             const pkey = "selected-feature";
@@ -164,6 +158,18 @@ export default observer(
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                     const selectedProps = { ...selectVal };
+                    console.log(selectedProps.styleId);
+
+                    panel && panel.setSelectedFeatures({
+                        ...panel.selectedFeatures,
+                        [selectedProps.styleId]: {
+                            ...panel.selectedFeatures[selectedProps.styleId],
+                            ...{
+                                [String(selectedProps.value)]: selectedProps
+                            }
+                        }
+                    })
+
                     Object.assign(selectedProps, propsCoords());
                     let key;
                     if (selectedProps.type === "vector") {
@@ -204,6 +210,12 @@ export default observer(
                     store.setFixPos(null);
                 }
             }, [store.fixPopup]);
+
+            // useEffect(() => {
+            //     if (panel) {
+            //         /* selectedFeatures */
+            //     }
+            // }, [panel.selectedFeatures]);
 
             // useEffect(() => {
             //     if (panel) {
