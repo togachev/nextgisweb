@@ -1,17 +1,38 @@
 .row-selected {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     padding: 0 5px;
+    flex-direction: column;
 
-    .label-item {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .item-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        .label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .control-item {
+            display: flex;
+        }
     }
 
-    .control-item {
+
+    .label-child-element {
         display: flex;
+        align-items: center;
+        width: 100%;
+
+        .label-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 }
 

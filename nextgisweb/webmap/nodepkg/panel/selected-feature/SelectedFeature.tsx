@@ -1,78 +1,110 @@
 import { observer } from "mobx-react-lite";
-import { Button, Checkbox } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
+import SelectionMultipleMarker from "@nextgisweb/icon/mdi/selection-multiple-marker";
 import EyeOutline from "@nextgisweb/icon/mdi/eye-outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type SelectedFeatureStore from "./SelectedFeatureStore"
 import type { PanelPluginWidgetProps } from "../registry";
-import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 
 import "./SelectedFeature.less";
 
-const ItemSelectValue = ({ display, store }) => {
+const ItemSelectValue = observer(({ display, store }) => {
     const { simulatePointZoom, visibleItems } = useSelected(display);
-    const deleteRow = (key) => {
+
+    const deleteRow = (key, id) => {
         display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
         topic.publish("feature.unhighlight");
         display.imodule.iStore.setFullscreen(false)
         display.imodule.iStore.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
 
-        const newObject: DataProps = { ...store.multiSelected };
-        delete newObject[key];
-        store.setMultiSelected(newObject);
+        const newObject = { ...store.selectedFeatures };
+        delete newObject[key].items[id];
+        store.setSelectedFeatures(newObject);
     };
 
-    return getEntries(store.multiSelected).map((item) => {
-        return (
+    const onChange = (key) => {
+        store.setSelectedFeatures({
+            ...store.selectedFeatures,
+            [key]: {
+                ...store.selectedFeatures[key],
+                ...{
+                    checked: !store.selectedFeatures[key].checked,
+                }
+            }
+        })
+    }
+
+    return getEntries(store.selectedFeatures).map((item) => {
+        const key = item[0];
+        const { title, layerId, styleId } = item[1].value;
+        const { id, type, checked } = item[1];
+
+        return Object.keys(item[1].items).length > 0 && (
             <div key={item[0]} className="row-selected">
-                <div title={item[1].label} className="label-item">
-                    {item[1].label}
-                </div>
-                <div className="control-item">
-                    <Button type="text" icon={<DeleteOutline />} onClick={() => deleteRow(item[0])} />
-                    <Button type="text" icon={<EyeOutline />} onClick={() => {
-                        simulatePointZoom(item);
-                        visibleItems(item);
-                    }} />
+                <div className="item-label"                >
+                    <div title={title} className="label">
+                        {title}
+                    </div>
                     <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
-                        visibleItems(item);
-                        item[1]?.type === "vector" ? display.imodule.zoomTo(item[1]) :
-                            item[1]?.type === "raster" ? display.imodule.zoomToRasterExtent(item[1]) :
+                        display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
+                        display.imodule.iStore.setFullscreen(false)
+                        display.imodule.iStore.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
+                        type === "vector" ? display.imodule.zoomTo({ id, layerId }) :
+                            type === "raster" ? display.imodule.zoomToRasterExtent({ styleId }) :
                                 undefined;
                     }} />
+                    {Object.keys(item[1].items).length > 0 && type === "raster" &&
+                        <Button
+                            type="text"
+                            icon={<SelectionMultipleMarker />}
+                            title={gettext("Pixel selection mode on one raster layer")}
+                            onClick={() => { onChange(key) }}
+                            color={checked && "primary"}
+                            variant="outlined"
+                        />
+                    }
                 </div>
+                {
+                    Object.keys(item[1].items).length > 0 &&
+                    getEntries(item[1].items).map((item) => {
+                        return (
+                            <div key={item[0]} className="label-child-element">
+                                <div className="label-child">{item[1].desc}</div>
+                                <Button
+                                    type="text"
+                                    icon={<EyeOutline />}
+                                    onClick={() => {
+                                        simulatePointZoom(item);
+                                        visibleItems(item);
+                                    }}
+                                />
+                                <Button
+                                    type="text"
+                                    icon={<DeleteOutline />}
+                                    onClick={() => deleteRow(key, item[0])}
+                                />
+                            </div>
+                        )
+                    })
+                }
             </div>
         )
     })
-}
+});
 
 
-const SelectedFeature = observer<PanelPluginWidgetProps>(
+const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
-        console.log(store);
-        
-        const onChange = (e) => {
-            store.setUniqueKey(e.target.checked);
-
-            const newState = Object.assign({}, store.multiSelected);
-            const rasterExists = getEntries(newState).some(([_, value]) => value.type === "raster");
-
-            if (rasterExists) {
-                getEntries(newState).map(([key, value]) => {
-                    value.type === "raster" && delete newState[key];
-                })
-                store.setMultiSelected(newState);
-            }
-        }
-
         return (
             <PanelContainer
-                className="ngw-webmap-custom-layer-panel"
+                className="ngw-webmap-selected-feature-panel"
                 title={store.title}
                 close={store.close}
                 components={{
@@ -80,14 +112,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
-                {store.rasterIncludes && <div className="mode-raster-select">
-                    <Checkbox checked={store.uniqueKey} onChange={onChange}>
-                        {gettext("Pixel selection mode on one raster layer")}
-                    </Checkbox>
-                </div>}
-                {store.multiSelected &&
-                    <ItemSelectValue display={display} store={store} />
-                }
+                <ItemSelectValue display={display} store={store} />
             </PanelContainer>
         );
     });

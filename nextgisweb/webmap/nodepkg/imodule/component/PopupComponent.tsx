@@ -158,14 +158,17 @@ export default observer(
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                     const selectedProps = { ...selectVal };
-                    console.log(selectedProps.styleId);
 
                     panel && panel.setSelectedFeatures({
                         ...panel.selectedFeatures,
-                        [selectedProps.styleId]: {
+                        [String(selectedProps.styleId)]: {
                             ...panel.selectedFeatures[selectedProps.styleId],
                             ...{
-                                [String(selectedProps.value)]: selectedProps
+                                id: selectedProps.type === "vector" ? selectedProps.id : null,
+                                items: {
+                                    ...panel.selectedFeatures[selectedProps.styleId].items,
+                                    [String(selectedProps.value)]: selectedProps
+                                }
                             }
                         }
                     })
@@ -211,32 +214,25 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
-            // useEffect(() => {
-            //     if (panel) {
-            //         /* selectedFeatures */
-            //     }
-            // }, [panel.selectedFeatures]);
-
-            // useEffect(() => {
-            //     if (panel) {
-            //         const newState = Object.assign({}, panel.multiSelected);
-
-            //         const rasterExists = getEntries(newState).some(([_, value]) => value.type === "raster");
-            //         if (rasterExists) {
-            //             const lengthRaster = getEntries(newState).filter(([_, value]) => value.type === "raster").length;
-            //             const vectorLayers = filterObject(newState, ([_, v]) => v.type === "vector");
-            //             const rasterLayers = filterObject(newState, ([_, v]) => v.type === "raster");
-
-            //             if (lengthRaster > 10) {
-            //                 getEntries(rasterLayers).map(([key, value], index) => {
-            //                     index === 0 && value.type === "raster" && delete rasterLayers[key];
-            //                 })
-            //                 Object.assign(rasterLayers, vectorLayers);
-            //                 panel.setMultiSelected(rasterLayers);
-            //             }
-            //         }
-            //     }
-            // }, [panel.multiSelected]);
+            useEffect(() => {
+                if (panel) {
+                    const newState = { ...panel.selectedFeatures };
+                    getEntries(newState)
+                        .map(([key, _]) => {
+                            if (newState[key].checked) {
+                                if (Object.keys(newState[key].items).length > 5) {
+                                    delete newState[key].items[Object.keys(newState[key].items)[0]];
+                                }
+                            } else if (Object.keys(newState[key].items).length > 1) {
+                                const myObject = newState[key].items;
+                                const keys = Object.keys(myObject);
+                                const lastKey = keys[keys.length - 1];
+                                const lastValue = myObject[lastKey];
+                                newState[key].items = { [lastKey]: lastValue }
+                            }
+                        });
+                }
+            }, [panel.selectedFeatures]);
 
             const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
@@ -249,6 +245,21 @@ export default observer(
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                 const selectedProps = { ...selectedValue };
+
+                panel && panel.setSelectedFeatures({
+                    ...panel.selectedFeatures,
+                    [String(selectedProps.styleId)]: {
+                        ...panel.selectedFeatures[selectedProps.styleId],
+                        ...{
+                            id: selectedProps.type === "vector" ? selectedProps.id : null,
+                            items: {
+                                ...panel.selectedFeatures[selectedProps.styleId].items,
+                                [String(selectedProps.value)]: selectedProps
+                            }
+                        }
+                    }
+                })
+
                 Object.assign(selectedProps, propsCoords());
                 let key;
                 if (selectedProps.type === "vector") {

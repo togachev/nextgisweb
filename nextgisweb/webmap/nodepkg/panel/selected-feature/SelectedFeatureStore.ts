@@ -24,7 +24,11 @@ class SelectedFeatureStore extends PanelStore {
         getEntries(this.display.getItemConfig()).map(([_, value]) => {
             if (value.type === "layer") {
                 Object.assign(obj, {
-                    [value.styleId]: {},
+                    [value.styleId]: {
+                        value: value,
+                        type: value.layerCls === "raster_layer" ? "raster" : "vector",
+                        checked: false, items: {}
+                    },
                 })
             }
         });
