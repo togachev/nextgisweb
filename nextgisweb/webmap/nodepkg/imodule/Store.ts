@@ -49,6 +49,7 @@ export class Store {
         this.control = control;
         this.pointClick = pointClick;
         this.buttonZoom = buttonZoom;
+        this.display.imodule.iStore = this;
     }
 
     @action

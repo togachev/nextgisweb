@@ -27,7 +27,7 @@ class SelectedFeatureStore extends PanelStore {
                     [value.styleId]: {
                         value: value,
                         type: value.layerCls === "raster_layer" ? "raster" : "vector",
-                        checked: false, items: {}
+                        checked: true, items: {}
                     },
                 })
             }

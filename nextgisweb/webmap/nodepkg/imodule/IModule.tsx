@@ -1,4 +1,5 @@
 import { action, computed, observable } from "mobx";
+import { errorModal } from "@nextgisweb/gui/error";
 import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import type { Root as ReactRoot } from 'react-dom/client';
@@ -107,6 +108,7 @@ export class IModule extends Component {
     displaySrid: number;
     LonLatSrid: number;
     lonlat: number[];
+    coordinate: number[];
     response: Response;
     countFeature: number;
     offHP: number;
@@ -317,8 +319,14 @@ export class IModule extends Component {
         return !readOnly;
     };
 
-    _render = () => {
+    popup_destroy = () => {
+        topic.publish("feature.unhighlight");
         this.display.imodule.root_popup.render();
+        this.display.imodule.root_point_click.render();
+    };
+
+    point_context_destroy = () => {
+        this.display.imodule.root_point_context.render();
     };
 
     transformCoordinate = async (from, to, point) => {
@@ -398,7 +406,7 @@ export class IModule extends Component {
                 status: attr,
             }
         }
-
+        this.coordinate = e.coordinate;
         this.params = {
             point: e.coordinate,
             request: request,
@@ -503,7 +511,7 @@ export class IModule extends Component {
         });
     };
 
-    async zoomToRasterExtent(val) {
+    async zoomToLayerExtent(val) {
         const { extent } = await route("layer.extent", {
             id: val?.styleId,
         }).get({ cache: true });

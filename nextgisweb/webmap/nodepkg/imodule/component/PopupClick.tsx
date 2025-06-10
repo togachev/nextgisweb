@@ -41,7 +41,7 @@ export default function PopupClick({ display, event, params, countFeature }: Par
                     countFeature > 0
                 ) {
                     selected?.type === "vector" ? display.imodule.zoomTo(selected) :
-                        selected?.type === "raster" ? display.imodule.zoomToRasterExtent(selected) :
+                        selected?.type === "raster" ? (display.imodule.zoomToPoint(display.imodule.coordinate), topic.publish("update.point", true)) :
                             undefined
                     setVisible(false);
                 }

@@ -15,7 +15,7 @@ export const ButtonZoomComponent = ({ display, store }: ContentProps) => {
             onClick={() => {
                 topic.publish("unvisible.point");
                 store.selected?.type === "vector" ? imodule.zoomTo(store.selected) :
-                    store.selected?.type === "raster" ? imodule.zoomToRasterExtent(store.selected) :
+                    store.selected?.type === "raster" ? imodule.zoomToLayerExtent(store.selected) :
                         undefined;
             }}
             icon={<ZoomInMapIcon />}

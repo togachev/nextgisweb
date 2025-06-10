@@ -23,7 +23,7 @@ export const useSelected = (display: Display) => {
 
 
     const overlayInfo = useCallback((event, p) => {
-        return display.imodule._overlayInfo(event, "popup", p, "selected")
+        return display.imodule._overlayInfo(event, "popup", p, "simulate")
     }, [item]);
 
     const visibleItems = useCallback((item) => {

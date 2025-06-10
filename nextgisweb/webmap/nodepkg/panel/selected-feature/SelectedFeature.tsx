@@ -19,11 +19,7 @@ const ItemSelectValue = observer(({ display, store }) => {
     const { simulatePointZoom, visibleItems } = useSelected(display);
 
     const deleteRow = (key, id) => {
-        display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
-        topic.publish("feature.unhighlight");
-        display.imodule.iStore.setFullscreen(false)
-        display.imodule.iStore.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
-
+        display.imodule.popup_destroy();
         const newObject = { ...store.selectedFeatures };
         delete newObject[key].items[id];
         store.setSelectedFeatures(newObject);
@@ -43,53 +39,60 @@ const ItemSelectValue = observer(({ display, store }) => {
 
     return getEntries(store.selectedFeatures).map((item) => {
         const key = item[0];
-        const { title, layerId, styleId } = item[1].value;
-        const { id, type, checked } = item[1];
+        const { title, styleId } = item[1].value;
+        const { checked } = item[1];
 
         return Object.keys(item[1].items).length > 0 && (
             <div key={item[0]} className="row-selected">
-                <div className="item-label"                >
+                <div className="item-label">
                     <div title={title} className="label">
                         {title}
                     </div>
-                    <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
-                        display.imodule._visible({ hidden: true, overlay: undefined, key: "popup" })
-                        display.imodule.iStore.setFullscreen(false)
-                        display.imodule.iStore.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
-                        type === "vector" ? display.imodule.zoomTo({ id, layerId }) :
-                            type === "raster" ? display.imodule.zoomToRasterExtent({ styleId }) :
-                                undefined;
-                    }} />
-                    {Object.keys(item[1].items).length > 0 && type === "raster" &&
-                        <Button
-                            type="text"
-                            icon={<SelectionMultipleMarker />}
-                            title={gettext("Pixel selection mode on one raster layer")}
-                            onClick={() => { onChange(key) }}
-                            color={checked && "primary"}
-                            variant="outlined"
-                        />
-                    }
+                    <div className="control-item">
+                        <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                            display.imodule.popup_destroy();
+                            display.imodule.zoomToLayerExtent({ styleId });
+                        }} />
+                        {Object.keys(item[1].items).length > 0 &&
+                            <Button
+                                type="text"
+                                icon={<SelectionMultipleMarker />}
+                                title={gettext("Pixel selection mode on one raster layer")}
+                                onClick={() => { onChange(key) }}
+                                color={checked && "primary"}
+                                variant="outlined"
+                            />
+                        }
+                    </div>
                 </div>
                 {
                     Object.keys(item[1].items).length > 0 &&
                     getEntries(item[1].items).map((item) => {
                         return (
                             <div key={item[0]} className="label-child-element">
-                                <div className="label-child">{item[1].desc}</div>
-                                <Button
-                                    type="text"
-                                    icon={<EyeOutline />}
+                                <div
                                     onClick={() => {
                                         simulatePointZoom(item);
                                         visibleItems(item);
                                     }}
-                                />
-                                <Button
-                                    type="text"
-                                    icon={<DeleteOutline />}
-                                    onClick={() => deleteRow(key, item[0])}
-                                />
+                                    className="label-child">{item[1].label}
+                                </div>
+                                <div className="control-item">
+                                    <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                                        if (item[1].type === "vector") {
+                                            display.imodule.zoomTo(item[1])
+                                            topic.publish("unvisible.point");
+                                        } else if (item[1].type === "raster") {
+                                            display.imodule.zoomToPoint(item[1].coordinate);
+                                            topic.publish("update.point", true);
+                                        }
+                                    }} />
+                                    <Button
+                                        type="text"
+                                        icon={<DeleteOutline />}
+                                        onClick={() => deleteRow(key, item[0])}
+                                    />
+                                </div>
                             </div>
                         )
                     })

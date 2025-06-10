@@ -17,21 +17,30 @@
             white-space: nowrap;
         }
 
-        .control-item {
-            display: flex;
-        }
+
     }
 
+    .control-item {
+        display: flex;
+    }
 
     .label-child-element {
         display: flex;
         align-items: center;
         width: 100%;
+        justify-content: space-between;
 
         .label-child {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            border-radius: 3px;
+            padding: 0 5px;
+
+            &:hover {
+                cursor: pointer;
+                background-color: var(--divider-color);
+            }
         }
     }
 }

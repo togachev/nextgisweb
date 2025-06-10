@@ -120,8 +120,6 @@ export default observer(
                 status && store.setButtonZoom({});
             });
 
-            imodule.iStore = store;
-
             const propsCoords = useCallback(() => {
                 const styles: string[] = [];
                 display.getVisibleItems()
@@ -164,7 +162,6 @@ export default observer(
                         [String(selectedProps.styleId)]: {
                             ...panel.selectedFeatures[selectedProps.styleId],
                             ...{
-                                id: selectedProps.type === "vector" ? selectedProps.id : null,
                                 items: {
                                     ...panel.selectedFeatures[selectedProps.styleId].items,
                                     [String(selectedProps.value)]: selectedProps
@@ -251,7 +248,6 @@ export default observer(
                     [String(selectedProps.styleId)]: {
                         ...panel.selectedFeatures[selectedProps.styleId],
                         ...{
-                            id: selectedProps.type === "vector" ? selectedProps.id : null,
                             items: {
                                 ...panel.selectedFeatures[selectedProps.styleId].items,
                                 [String(selectedProps.value)]: selectedProps
@@ -259,7 +255,7 @@ export default observer(
                         }
                     }
                 })
-
+                
                 Object.assign(selectedProps, propsCoords());
                 let key;
                 if (selectedProps.type === "vector") {
@@ -472,10 +468,7 @@ export default observer(
                                         title={gettext("Close")}
                                         className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
-                                            visible({ hidden: true, overlay: undefined, key: "popup" })
-                                            topic.publish("feature.unhighlight");
-                                            store.setFullscreen(false)
-                                            store.setValueRnd({ ...store.valueRnd, x: -9999, y: -9999 });
+                                            display.imodule.popup_destroy();
                                         }} >
                                         <CloseIcon />
                                     </span>
