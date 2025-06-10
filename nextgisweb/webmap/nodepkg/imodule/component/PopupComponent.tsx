@@ -156,7 +156,7 @@ export default observer(
                     store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                     const selectedProps = { ...selectVal };
-
+                    Object.assign(selectedProps, propsCoords());
                     panel && panel.setSelectedFeatures({
                         ...panel.selectedFeatures,
                         [String(selectedProps.styleId)]: {
@@ -169,18 +169,6 @@ export default observer(
                             }
                         }
                     })
-
-                    Object.assign(selectedProps, propsCoords());
-                    let key;
-                    if (selectedProps.type === "vector") {
-                        key = String(selectedProps.value);
-                    } else {
-                        panel.setRasterIncludes(true);
-                        key = panel.uniqueKey ?
-                            String(selectedProps.value) :
-                            String(selectedProps.styleId + ":" + selectedProps.layerId);
-                    }
-                    panel && panel.setMultiSelected({ ...panel.multiSelected, [key]: selectedProps });
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -217,7 +205,7 @@ export default observer(
                     getEntries(newState)
                         .map(([key, _]) => {
                             if (newState[key].checked) {
-                                if (Object.keys(newState[key].items).length > 5) {
+                                if (Object.keys(newState[key].items).length > 10) {
                                     delete newState[key].items[Object.keys(newState[key].items)[0]];
                                 }
                             } else if (Object.keys(newState[key].items).length > 1) {
@@ -242,7 +230,7 @@ export default observer(
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
                 const selectedProps = { ...selectedValue };
-
+                Object.assign(selectedProps, propsCoords());
                 panel && panel.setSelectedFeatures({
                     ...panel.selectedFeatures,
                     [String(selectedProps.styleId)]: {
@@ -255,18 +243,6 @@ export default observer(
                         }
                     }
                 })
-                
-                Object.assign(selectedProps, propsCoords());
-                let key;
-                if (selectedProps.type === "vector") {
-                    key = String(selectedProps.value);
-                } else {
-                    panel.setRasterIncludes(true);
-                    key = panel.uniqueKey ?
-                        String(selectedProps.value) :
-                        String(selectedProps.styleId + ":" + selectedProps.layerId);
-                }
-                panel && panel.setMultiSelected({ ...panel.multiSelected, [key]: selectedProps });
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

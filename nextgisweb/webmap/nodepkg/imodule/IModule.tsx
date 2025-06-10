@@ -269,7 +269,7 @@ export class IModule extends Component {
             if (mode === "click") {
                 value = this.response.data[0];
             }
-            else if (mode === "simulate") {
+            else if (mode === "simulate" || mode === "selected") {
                 this.selected = p.selected ? p.selected : this.selected;
                 value = this.response.data.find(x => x.value === this.selected) as DataProps;
             }
@@ -501,7 +501,7 @@ export class IModule extends Component {
             .highlightFeatureById(val.id, val.layerId)
             .then((feature) => {
                 this.display.map.zoomToFeature(feature);
-                topic.publish("update.point", true);
+                // topic.publish("update.point", true);
             });
     };
 

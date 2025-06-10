@@ -40,17 +40,27 @@ export default function PopupClick({ display, event, params, countFeature }: Par
                 if (
                     countFeature > 0
                 ) {
-                    selected?.type === "vector" ? display.imodule.zoomTo(selected) :
-                        selected?.type === "raster" ? (display.imodule.zoomToPoint(display.imodule.coordinate), topic.publish("update.point", true)) :
-                            undefined
                     setVisible(false);
+                    if (selected?.type === "vector") {
+                        display.imodule.zoomTo(selected);
+                        topic.publish("update.point", true);
+                    } else if (selected?.type === "raster") {
+                        display.imodule.zoomToPoint(display.imodule.coordinate)
+                        const highlightEvent: HighlightEvent = {
+                            coordinates: display.imodule.coordinate,
+                        };
+                        topic.publish("feature.highlight", highlightEvent);
+                        topic.publish("update.point", true);
+                    }
                 }
-            }}>
+            }}
+        >
             <span
                 style={{ fontWeight: 500 }}
                 title={countFeature > 0 ? selected?.type === "vector" ?
                     gettext("Zoom to feature") :
-                    gettext("Zoom to raster layer") : undefined}>
+                    gettext("Zoom to raster layer") : undefined}
+            >
                 <PointClick />
             </span>
         </span>

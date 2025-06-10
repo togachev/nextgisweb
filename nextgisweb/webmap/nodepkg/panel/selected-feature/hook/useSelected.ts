@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-
+import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 
 export const useSelected = (display: Display) => {
-    const [item, setItem] = useState();
+    const [values, setValues] = useState();
 
-    const simulatePointZoom = (item) => {
-        setItem(item);
+    const simulatePointZoom = (value) => {
+        setValues(value);
     };
 
-    const simulateEvent = useCallback((p, pixel, map) => ({
+    const simulateEvent = (p, pixel, map) => ({
         coordinate: p && p.coordinate,
         map: map,
         target: "map",
@@ -19,15 +19,15 @@ export const useSelected = (display: Display) => {
                 (pixel[0] + 40), (pixel[1] + 40)
         ],
         type: "click"
-    }), [item]);
+    });
 
 
-    const overlayInfo = useCallback((event, p) => {
-        return display.imodule._overlayInfo(event, "popup", p, "simulate")
-    }, [item]);
+    const overlayInfo = (event, p) => {
+        return display.imodule._overlayInfo(event, "popup", p, "selected")
+    };
 
-    const visibleItems = useCallback((item) => {
-        const itm = item[1];
+    const visibleItems = (vals) => {
+        const itm = vals[1];
 
         const visibleStyles: number[] = [];
         const itemConfig = display.getItemConfig();
@@ -38,11 +38,11 @@ export const useSelected = (display: Display) => {
         });
         display.webmapStore.setChecked(visibleStyles);
         display.webmapStore._updateLayersVisibility(visibleStyles);
-    }, [item]);
+    };
 
     useEffect(() => {
-        if (item) {
-            const itm = item[1];
+        if (values) {
+            const itm = values.item[1];
 
             const value = {
                 attribute: true,
@@ -52,21 +52,19 @@ export const useSelected = (display: Display) => {
                 params: [{ id: itm.styleId, label: itm.desc, dop: null }],
             };
 
-            const p = { value, coordinate: itm.coordinate, selected: item[0] };
-            const pixel = display.map.olMap.getPixelFromCoordinate(itm.coordinate);
-            const event = simulateEvent(p, pixel, display.map.olMap);
+            const p = { value, coordinate: itm.coordinate, selected: values.item[0] };
 
-            overlayInfo(event, p);
-            display.imodule.zoomToExtent(itm.extent);
+            values.type === "vector" ?
+                display.imodule.zoomTo({ id: itm.id, layerId: itm.layerId }) :
+                display.imodule.zoomToPoint(itm.coordinate);
 
             display.map.olMap.once("postrender", function (e) {
-                const p = { value, coordinate: itm.coordinate, selected: item[0] };
                 const pixel = e.map.getPixelFromCoordinate(itm.coordinate);
                 const event = simulateEvent(p, pixel, e.map);
                 overlayInfo(event, p);
-            })
+            });
         }
-    }, [item, display.mapExtentDeferred])
+    }, [values])
 
     return { simulatePointZoom, visibleItems };
 };

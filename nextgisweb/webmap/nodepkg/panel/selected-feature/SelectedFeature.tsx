@@ -10,6 +10,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 import type SelectedFeatureStore from "./SelectedFeatureStore"
 import type { PanelPluginWidgetProps } from "../registry";
 
@@ -72,21 +73,29 @@ const ItemSelectValue = observer(({ display, store }) => {
                             <div key={item[0]} className="label-child-element">
                                 <div
                                     onClick={() => {
-                                        simulatePointZoom(item);
+                                        if (item[1].type === "vector") {
+                                            simulatePointZoom({ item: item, type: "vector" });
+                                        } else if (item[1].type === "raster") {
+                                            simulatePointZoom({ item: item, type: "raster" });
+                                        }
                                         visibleItems(item);
                                     }}
                                     className="label-child">{item[1].label}
                                 </div>
                                 <div className="control-item">
-                                    <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                                    {/* <Button type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                                        topic.publish("unvisible.point");
+                                        topic.publish("update.point", true);
                                         if (item[1].type === "vector") {
                                             display.imodule.zoomTo(item[1])
-                                            topic.publish("unvisible.point");
                                         } else if (item[1].type === "raster") {
                                             display.imodule.zoomToPoint(item[1].coordinate);
-                                            topic.publish("update.point", true);
+                                            const highlightEvent: HighlightEvent = {
+                                                coordinates: item[1].coordinate,
+                                            };
+                                            topic.publish("feature.highlight", highlightEvent);
                                         }
-                                    }} />
+                                    }} /> */}
                                     <Button
                                         type="text"
                                         icon={<DeleteOutline />}

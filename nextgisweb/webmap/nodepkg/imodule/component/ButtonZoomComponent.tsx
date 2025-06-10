@@ -14,9 +14,16 @@ export const ButtonZoomComponent = ({ display, store }: ContentProps) => {
             size="small"
             onClick={() => {
                 topic.publish("unvisible.point");
-                store.selected?.type === "vector" ? imodule.zoomTo(store.selected) :
-                    store.selected?.type === "raster" ? imodule.zoomToLayerExtent(store.selected) :
-                        undefined;
+                topic.publish("update.point", true);
+                if (store.selected?.type === "vector") {
+                    imodule.zoomTo(store.selected);
+                } else if (store.selected?.type === "raster") {
+                    display.imodule.zoomToPoint(display.imodule.coordinate);
+                    const highlightEvent: HighlightEvent = {
+                        coordinates: display.imodule.coordinate,
+                    };
+                    topic.publish("feature.highlight", highlightEvent);
+                }
             }}
             icon={<ZoomInMapIcon />}
             style={{ flex: "0 0 auto" }}

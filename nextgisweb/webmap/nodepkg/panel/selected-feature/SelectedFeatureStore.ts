@@ -8,10 +8,7 @@ import { getEntries } from "../../imodule/useSource";
 class SelectedFeatureStore extends PanelStore {
 
     display: Display;
-    @observable.ref accessor multiSelected: DataProps[] | undefined = [];
     @observable.ref accessor selectedFeatures: object;
-    @observable accessor uniqueKey = true;
-    @observable accessor rasterIncludes = false;
 
     constructor({ display, plugin, selectedFeatures }) {
         super({ display, plugin, selectedFeatures });
@@ -36,23 +33,8 @@ class SelectedFeatureStore extends PanelStore {
     }
 
     @action
-    setMultiSelected(multiSelected: DataProps[] | undefined) {
-        this.multiSelected = multiSelected;
-    }
-
-    @action
     setSelectedFeatures(selectedFeatures: object) {
         this.selectedFeatures = selectedFeatures;
-    }
-
-    @action
-    setUniqueKey(uniqueKey: boolean) {
-        this.uniqueKey = uniqueKey;
-    }
-
-    @action
-    setRasterIncludes(rasterIncludes: boolean) {
-        this.rasterIncludes = rasterIncludes;
     }
 }
 
