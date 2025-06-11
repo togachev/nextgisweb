@@ -45,17 +45,19 @@ export const useSelected = (display: Display) => {
     useEffect(() => {
         if (data) {
             const { key, value, type } = data;
-
+            console.log(value);
+            
             if (type === "vector") {
                 display.imodule.getFeature(value)
                     .then(i => {
                         const _wkt = new WKT();
                         const line = _wkt.readGeometry(i.geom)
-
+                        const coordinate = line.getFirstCoordinate();
+                        
                         display.imodule.transformCoordinate(
                             display.imodule.displaySrid,
                             display.imodule.srsMap.keys(),
-                            line.getFirstCoordinate()
+                            coordinate
                         )
                             .then((transformedCoord) => {
                                 const val = {
@@ -66,10 +68,11 @@ export const useSelected = (display: Display) => {
                                     params: [{ id: value.styleId, label: value.desc, dop: null }],
                                 };
 
-                                const p = { value: val, coordinate: value.coordinate, selected: key, data: value };
-                                display.imodule.zoomTo({ id: value.id, layerId: value.layerId })
+                                const p = { value: val, coordinate: coordinate, selected: key, data: value };
+                                display.imodule.zoomTo({ id: value.id, layerId: value.layerId });
+
                                 display.map.olMap.once("postrender", function (e) {
-                                    const pixel = e.map.getPixelFromCoordinate(value.coordinate);
+                                    const pixel = e.map.getPixelFromCoordinate(coordinate);
                                     const event = simulateEvent(p, pixel, e.map);
                                     overlayInfo(event, p);
                                 });
