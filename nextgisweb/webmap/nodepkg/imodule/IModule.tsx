@@ -253,7 +253,12 @@ export class IModule extends Component {
     displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
         const offset = op === "context" ? 0 : settings.offset_point;
 
-        await this.getResponse(op, p);
+        if (p.selected) {
+            this.response = { data: [p.data], featureCount: 1 }
+        } else {
+            await this.getResponse(op, p);
+        }
+
         const position = positionContext(event, offset, op, this.countFeature, settings, p, array_context, this.offHP);
         if (op === "popup") {
             if (this.display.config.identify_order_enabled) {
@@ -268,9 +273,11 @@ export class IModule extends Component {
             if (mode === "click") {
                 value = this.response.data[0];
             }
-            else if (mode === "simulate" || mode === "selected") {
-                this.selected = p.selected ? p.selected : this.selected;
+            else if (mode === "simulate") {
                 value = this.response.data.find(x => x.value === this.selected) as DataProps;
+            }
+            else if (mode === "selected") {
+                value = this.response.data[0];
             }
 
             this._visible({ hidden: true, overlay: undefined, key: "context" })
@@ -518,4 +525,12 @@ export class IModule extends Component {
         });
         topic.publish("update.point", true);
     };
+
+    async getFeature(val) {
+        const featureItem = await route("feature_layer.feature.item", {
+            id: val.layerId,
+            fid: val.id,
+        }).get();
+        return featureItem;
+    }
 };
