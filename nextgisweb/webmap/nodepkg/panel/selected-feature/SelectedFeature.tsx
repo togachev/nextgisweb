@@ -2,8 +2,9 @@ import { observer } from "mobx-react-lite";
 import { Button } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
-import DeleteOutline from "@nextgisweb/icon/mdi/delete-outline";
-import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
+import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box";
+import CloseBoxMultipleOutline from "@nextgisweb/icon/mdi/close-box-multiple";
+import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -17,53 +18,89 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
     const { simulatePointZoom, visibleItems } = useSelected(display);
     const imodule: IModule = display.imodule;
 
-    const deleteRow = (key, id) => {
+    const deleteRow = ({ key, ckey, all }) => {
         imodule.popup_destroy();
-        const newObject = { ...store.selectedFeatures };
-        delete newObject[key].items[id];
-        store.setSelectedFeatures(newObject);
+        if (all) {
+            const newObject = { ...store.selectedFeatures };
+            newObject[key].items = {};
+            store.setSelectedFeatures(newObject);
+        } else {
+            const newObject = { ...store.selectedFeatures };
+            delete newObject[key].items[ckey];
+            store.setSelectedFeatures(newObject);
+        }
     };
 
     return getEntries(store.selectedFeatures).map(([key, value]) => {
         const { title, styleId } = value.value;
-
+        const visibleReset = { value: null, status: true };
+        const visibleValue = { value: { styles: [styleId] }, status: false };
         return Object.keys(value.items).length > 0 && (
             <div key={key} className="row-selected">
                 <div className="item-label">
-                    <div title={title} className="label">
-                        {title}
-                    </div>
-                    <div className="control-item">
-                        <Button size="small" type="text" icon={<ZoomInMapIcon />} onClick={() => {
+                    <Button
+                        title={gettext("Zoom to layer")}
+                        className="label"
+                        size="small"
+                        type="text"
+                        onClick={() => {
                             imodule.popup_destroy();
                             imodule.zoomToLayerExtent({ styleId });
-                        }} />
+                            visibleItems(visibleValue);
+                        }}>
+                        {title}
+                    </Button>
+                    <div className="control-item">
+                        <Button
+                            icon={<LockReset />}
+                            title={gettext("Reset layers visibility")}
+                            size="small"
+                            type="text"
+                            onClick={() => {
+                                imodule.popup_destroy();
+                                display._zoomToInitialExtent();
+                                visibleItems(visibleReset);
+                            }} />
+                        <Button
+                            disabled={Object.keys(value.items).length <= 1}
+                            title={gettext("Delete selected all features")}
+                            type="text"
+                            size="small"
+                            icon={<CloseBoxMultipleOutline />}
+                            onClick={() => deleteRow({ key: key, ckey: null, all: true })}
+                        />
                     </div>
                 </div>
                 {
                     Object.keys(value.items).length > 0 &&
                     getEntries(value.items).map(([ckey, cvalue], index) => {
                         const id = index + 1;
+                        const cVisibleValue = { value: { styles: [cvalue.styleId] }, status: false };
                         return (
                             <div key={ckey} className="label-child-element">
-                                <div
+                                <Button
+                                    title={gettext("View information about the object")}
                                     onClick={() => {
                                         if (cvalue.type === "vector") {
                                             simulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
                                         } else if (cvalue.type === "raster") {
                                             simulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
                                         }
-                                        visibleItems({ value: cvalue });
+                                        visibleItems(cVisibleValue);
                                     }}
-                                    className="label-child">
+                                    className="label-child"
+                                    type="text"
+                                    size="small"
+                                >
                                     {cvalue.type === "vector" ? cvalue.label : `${id}. ${gettext("value raster")}`}
-                                </div>
+                                </Button>
                                 <div className="control-item">
                                     <Button
+                                        title={gettext("Delete selected feature")}
                                         type="text"
                                         size="small"
-                                        icon={<DeleteOutline />}
-                                        onClick={() => deleteRow(key, ckey)}
+                                        icon={<CloseBoxOutline />}
+                                        onClick={() => deleteRow({ key: key, ckey: ckey, all: false })}
                                     />
                                 </div>
                             </div>
