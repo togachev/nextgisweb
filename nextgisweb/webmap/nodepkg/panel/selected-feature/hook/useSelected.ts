@@ -1,12 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import topic from "@nextgisweb/webmap/compat/topic";
+
+import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 import type { Display } from "@nextgisweb/webmap/display";
 
+type Props = {
+    key: string;
+    value: DataProps;
+    type: string;
+}
+
 export const useSelected = (display: Display) => {
-    const [values, setValues] = useState();
+    const [data, setData] = useState<Props>();
 
     const simulatePointZoom = (value) => {
-        setValues(value);
+        setData(value);
     };
 
     const simulateEvent = (p, pixel, map) => ({
@@ -21,18 +29,15 @@ export const useSelected = (display: Display) => {
         type: "click"
     });
 
-
     const overlayInfo = (event, p) => {
         return display.imodule._overlayInfo(event, "popup", p, "selected")
     };
 
-    const visibleItems = (vals) => {
-        const itm = vals[1];
-
+    const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
         const itemConfig = display.getItemConfig();
         Object.keys(itemConfig).forEach(function (key) {
-            if (itm.styles.includes(itemConfig[key].styleId)) {
+            if (value.styles.includes(itemConfig[key].styleId)) {
                 visibleStyles.push(itemConfig[key].id);
             }
         });
@@ -41,30 +46,30 @@ export const useSelected = (display: Display) => {
     };
 
     useEffect(() => {
-        if (values) {
-            const itm = values.item[1];
+        if (data) {
+            const { key, value, type } = data;
 
-            const value = {
+            const val = {
                 attribute: true,
                 pn: "attributes",
-                lon: itm.lonlat[0],
-                lat: itm.lonlat[1],
-                params: [{ id: itm.styleId, label: itm.desc, dop: null }],
+                lon: value.lonlat[0],
+                lat: value.lonlat[1],
+                params: [{ id: value.styleId, label: value.desc, dop: null }],
             };
 
-            const p = { value, coordinate: itm.coordinate, selected: values.item[0] };
+            const p = { value: val, coordinate: value.coordinate, selected: key };
 
-            values.type === "vector" ?
-                display.imodule.zoomTo({ id: itm.id, layerId: itm.layerId }) :
-                display.imodule.zoomToPoint(itm.coordinate);
+            type === "vector" ?
+                (display.imodule.zoomTo({ id: value.id, layerId: value.layerId }), topic.publish("update.point", true)) :
+                display.imodule.zoomToPoint(value.coordinate);
 
             display.map.olMap.once("postrender", function (e) {
-                const pixel = e.map.getPixelFromCoordinate(itm.coordinate);
+                const pixel = e.map.getPixelFromCoordinate(value.coordinate);
                 const event = simulateEvent(p, pixel, e.map);
                 overlayInfo(event, p);
             });
         }
-    }, [values])
+    }, [data])
 
     return { simulatePointZoom, visibleItems };
 };

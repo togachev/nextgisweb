@@ -1,18 +1,32 @@
 import { action, observable } from "mobx";
 import { PanelStore } from "@nextgisweb/webmap/panel";
-
-import type { Display } from "@nextgisweb/webmap/display";
-import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 import { getEntries } from "../../imodule/useSource";
+
+import type { DataProps } from "./type";
+import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { Display } from "@nextgisweb/webmap/display";
+
+type ItemsProps = {
+    [key: string]: DataProps;
+}
+type SelectedFeaturesProps = {
+    items: ItemsProps[];
+    type: string;
+    value: TreeItemConfig
+}
+
+type Props = {
+    [key: string]: SelectedFeaturesProps;
+}
 
 class SelectedFeatureStore extends PanelStore {
 
     display: Display;
-    @observable.ref accessor selectedFeatures: object;
+    @observable.ref accessor selectedFeatures: Props;
 
-    constructor({ display, plugin, selectedFeatures }) {
-        super({ display, plugin, selectedFeatures });
-        this.display = display;
+    constructor(props) {
+        super(props);
+        this.display = props.display;
         this.getItems();
     }
 
@@ -24,7 +38,7 @@ class SelectedFeatureStore extends PanelStore {
                     [value.styleId]: {
                         value: value,
                         type: value.layerCls === "raster_layer" ? "raster" : "vector",
-                        checked: true, items: {}
+                        items: {},
                     },
                 })
             }
@@ -33,7 +47,7 @@ class SelectedFeatureStore extends PanelStore {
     }
 
     @action
-    setSelectedFeatures(selectedFeatures: object) {
+    setSelectedFeatures(selectedFeatures: Props) {
         this.selectedFeatures = selectedFeatures;
     }
 }

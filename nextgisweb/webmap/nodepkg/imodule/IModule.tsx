@@ -1,5 +1,4 @@
 import { action, computed, observable } from "mobx";
-import { errorModal } from "@nextgisweb/gui/error";
 import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import type { Root as ReactRoot } from 'react-dom/client';
@@ -287,7 +286,6 @@ export class IModule extends Component {
             const propsPopup = {
                 params: { mode: mode, op, position, response: this.response, selected: value },
                 display: this.display,
-                visible: this._visible,
             } as Params;
 
             this.root_point_click.render(<PopupClick {...propsPoint} />);
@@ -501,7 +499,6 @@ export class IModule extends Component {
             .highlightFeatureById(val.id, val.layerId)
             .then((feature) => {
                 this.display.map.zoomToFeature(feature);
-                // topic.publish("update.point", true);
             });
     };
 

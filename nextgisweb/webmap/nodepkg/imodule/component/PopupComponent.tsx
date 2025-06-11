@@ -56,7 +56,7 @@ const CheckOnlyOne = ({ store, /*imodule*/ }) => {
 export default observer(
     forwardRef<Element>(
         function PopupComponent(props, ref) {
-            const { params, visible, display } = props as Params;
+            const { params, display } = props as Params;
             const { op, position, response, selected: selectedValue, mode } = params as Props;
             const imodule = display.imodule;
 
@@ -204,16 +204,8 @@ export default observer(
                     const newState = { ...panel.selectedFeatures };
                     getEntries(newState)
                         .map(([key, _]) => {
-                            if (newState[key].checked) {
-                                if (Object.keys(newState[key].items).length > 10) {
-                                    delete newState[key].items[Object.keys(newState[key].items)[0]];
-                                }
-                            } else if (Object.keys(newState[key].items).length > 1) {
-                                const myObject = newState[key].items;
-                                const keys = Object.keys(myObject);
-                                const lastKey = keys[keys.length - 1];
-                                const lastValue = myObject[lastKey];
-                                newState[key].items = { [lastKey]: lastValue }
+                            if (Object.keys(newState[key].items).length > 10) {
+                                delete newState[key].items[Object.keys(newState[key].items)[0]];
                             }
                         });
                 }
@@ -417,7 +409,7 @@ export default observer(
                                             </span>
                                         )}
                                     </div>
-                                    {store.countFeature > 0 && <CheckOnlyOne imodule={imodule} store={store} />}
+                                    {store.countFeature > 0 && <CheckOnlyOne {...{ imodule, store }} />}
                                     {store.countFeature > 0 && store.selected && (
                                         <span
                                             title={store.fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}

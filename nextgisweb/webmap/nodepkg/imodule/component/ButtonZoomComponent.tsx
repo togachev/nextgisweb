@@ -3,6 +3,7 @@ import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import { Button } from "@nextgisweb/gui/antd";
 import topic from "@nextgisweb/webmap/compat/topic";
 
+import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 import type { ContentProps } from "../type";
 
 export const ButtonZoomComponent = ({ display, store }: ContentProps) => {
