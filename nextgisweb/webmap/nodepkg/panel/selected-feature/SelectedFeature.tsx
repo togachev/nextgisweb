@@ -62,7 +62,6 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                                 visibleItems(visibleReset);
                             }} />
                         <Button
-                            disabled={Object.keys(value.items).length <= 1}
                             title={gettext("Delete selected all features")}
                             type="text"
                             size="small"
