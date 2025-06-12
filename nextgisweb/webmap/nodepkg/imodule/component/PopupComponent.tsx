@@ -57,7 +57,7 @@ export default observer(
     forwardRef<Element>(
         function PopupComponent(props, ref) {
             const { params, display } = props as Params;
-            const { op, position, response, selected: selectedValue, mode } = params as Props;
+            const { op, position, response, selected: selectedValue, mode, point } = params as Props;
             const imodule = display.imodule;
 
             const pm = display.panelManager;
@@ -290,7 +290,7 @@ export default observer(
             }, [store.selected]);
 
             const contentProps = { store: store, display: display };
-            const coordinateProps = { display: display, store: store, op: "popup" };
+            const coordinateProps = { display: display, store: store, op: "popup", point: point };
 
             return (
                 createPortal(

@@ -1,6 +1,6 @@
 import { action, observable } from "mobx";
 import { PanelStore } from "@nextgisweb/webmap/panel";
-import { getEntries } from "../../imodule/useSource";
+import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 
 import type { DataProps } from "./type";
 import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
@@ -19,10 +19,18 @@ type Props = {
     [key: string]: SelectedFeaturesProps;
 }
 
+type SimulatePointZoomProps = {
+    key: string;
+    value: DataProps;
+    type: string;
+}
+
 class SelectedFeatureStore extends PanelStore {
 
     display: Display;
+    @observable accessor checked: boolean = false;
     @observable.ref accessor selectedFeatures: Props;
+    @observable.ref accessor simulatePointZoom: SimulatePointZoomProps;
 
     constructor(props) {
         super(props);
@@ -47,8 +55,18 @@ class SelectedFeatureStore extends PanelStore {
     }
 
     @action
+    setChecked(checked: boolean) {
+        this.checked = checked;
+    }
+
+    @action
     setSelectedFeatures(selectedFeatures: Props) {
         this.selectedFeatures = selectedFeatures;
+    }
+
+    @action
+    setSimulatePointZoom(simulatePointZoom: SimulatePointZoomProps) {
+        this.simulatePointZoom = simulatePointZoom;
     }
 }
 

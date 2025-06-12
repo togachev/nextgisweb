@@ -305,7 +305,7 @@ export class Store {
 
     async updatePermalink() {
         const display = this.display
-        await this.display.getVisibleItems().then((visibleItems) => {
+        await display.getVisibleItems().then((visibleItems) => {
             const permalink = getPermalink({ display, visibleItems });
             const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
             this.setPermalink(decodeURIComponent(permalink + '&panel=' + String(panel)));

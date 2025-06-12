@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
-import { Button } from "@nextgisweb/gui/antd";
+import { useCallback } from "react";
+import { Button, Checkbox } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box";
 import CloseBoxMultipleOutline from "@nextgisweb/icon/mdi/close-box-multiple";
-import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -15,7 +15,7 @@ import { IModule } from "@nextgisweb/webmap/imodule";
 import "./SelectedFeature.less";
 
 const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(({ display, store }) => {
-    const { simulatePointZoom, visibleItems } = useSelected(display);
+    const { visibleItems } = useSelected(display, store);
     const imodule: IModule = display.imodule;
 
     const deleteRow = ({ key, ckey, all }) => {
@@ -33,8 +33,6 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
 
     return getEntries(store.selectedFeatures).map(([key, value]) => {
         const { title, styleId } = value.value;
-        const visibleReset = { value: null, status: true };
-        const visibleValue = { value: { styles: [styleId] }, status: false };
         return Object.keys(value.items).length > 0 && (
             <div key={key} className="row-selected">
                 <div className="item-label">
@@ -46,27 +44,22 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                         onClick={() => {
                             imodule.popup_destroy();
                             imodule.zoomToLayerExtent({ styleId });
-                            visibleItems(visibleValue);
+                            visibleItems({ value: [styleId] });
                         }}>
                         {title}
                     </Button>
                     <div className="control-item">
                         <Button
-                            icon={<LockReset />}
-                            title={gettext("Reset layers visibility")}
-                            size="small"
-                            type="text"
-                            onClick={() => {
-                                imodule.popup_destroy();
-                                display._zoomToInitialExtent();
-                                visibleItems(visibleReset);
-                            }} />
-                        <Button
                             title={gettext("Delete selected all features")}
                             type="text"
                             size="small"
                             icon={<CloseBoxMultipleOutline />}
-                            onClick={() => deleteRow({ key: key, ckey: null, all: true })}
+                            onClick={() => {
+                                deleteRow({ key: key, ckey: null, all: true })
+                                display.imodule.popup_destroy();
+                                display._zoomToInitialExtent();
+                                visibleItems({ value: undefined });
+                            }}
                         />
                     </div>
                 </div>
@@ -74,18 +67,17 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                     Object.keys(value.items).length > 0 &&
                     getEntries(value.items).map(([ckey, cvalue], index) => {
                         const id = index + 1;
-                        const cVisibleValue = { value: { styles: [cvalue.styleId] }, status: false };
                         return (
                             <div key={ckey} className="label-child-element">
                                 <Button
                                     title={gettext("View information about the object")}
                                     onClick={() => {
                                         if (cvalue.type === "vector") {
-                                            simulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
+                                            store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
                                         } else if (cvalue.type === "raster") {
-                                            simulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
+                                            store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
                                         }
-                                        visibleItems(cVisibleValue);
+                                        visibleItems({ value: [cvalue.styleId] });
                                     }}
                                     className="label-child"
                                     type="text"
@@ -113,19 +105,39 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
 
 
 const SelectedFeature = observer<PanelPluginWidgetProps>(
-    ({ display, store }) => (
-        <PanelContainer
-            className="ngw-webmap-selected-feature-panel"
-            title={store.title}
-            close={store.close}
-            components={{
-                content: PanelContainer.Unpadded,
-                epilog: PanelContainer.Unpadded,
-            }}
-        >
-            <ItemSelectValue {...{ display, store }} />
-        </PanelContainer>
-    )
+    ({ display, store }) => {
+        const { visibleItems } = useSelected(display, store);
+
+        const onCheckedVisibleItems = useCallback((e) => {
+            store.setChecked(e.target.checked);
+            if (e.target.checked === false) {
+                display.imodule.popup_destroy();
+                visibleItems({ value: undefined });
+                display._zoomToInitialExtent();
+            }
+        }, []);
+
+        const defaultVisibleLayer = store.checked ? gettext("Turn on default layers visibility") : gettext("Turn off inactive layers");
+
+        return (
+            <PanelContainer
+                className="ngw-webmap-selected-feature-panel"
+                title={store.title}
+                close={store.close}
+                components={{
+                    content: PanelContainer.Unpadded,
+                    epilog: PanelContainer.Unpadded,
+                }}
+            >
+                <div className="control-visible">
+                    <Checkbox checked={store.checked} onChange={onCheckedVisibleItems}>
+                        {defaultVisibleLayer}
+                    </Checkbox>
+                </div>
+                <ItemSelectValue {...{ display, store }} />
+            </PanelContainer>
+        )
+    }
 );
 
 SelectedFeature.displayName = "SelectedFeature";

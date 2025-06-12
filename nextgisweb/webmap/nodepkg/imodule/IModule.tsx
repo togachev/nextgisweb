@@ -289,13 +289,18 @@ export class IModule extends Component {
                 countFeature: this.countFeature,
                 event: event,
             } as Params;
-
+            
             const propsPopup = {
-                params: { mode: mode, op, position, response: this.response, selected: value },
+                params: { mode: mode, op, position, response: this.response, selected: value, point: p?.point },
                 display: this.display,
             } as Params;
 
-            this.root_point_click.render(<PopupClick {...propsPoint} />);
+            if (p === false) {
+                this.root_point_click.render(<PopupClick {...propsPoint} />);
+            } else if (p.point === true) {
+                this.root_point_click.render(<PopupClick {...propsPoint} />);
+            }
+
             this.root_popup.render(<PopupComponent {...propsPopup} ref={this.refPopup} />);
             this._visible({ hidden: false, overlay: this.params.point, key: "popup" });
         } else {
@@ -477,7 +482,7 @@ export class IModule extends Component {
                     params,
                 }
 
-                const p = { value, coordinate: transformedCoord };
+                const p = { point: true, value, coordinate: transformedCoord };
                 const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
                 const simulateEvent: any = {
                     coordinate: p && p.coordinate,

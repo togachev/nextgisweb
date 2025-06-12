@@ -107,6 +107,7 @@ export interface Props {
     position: Position;
     selected?: DataProps;
     mode?: string;
+    point?: boolean;
 }
 
 export interface ContextProps {
@@ -166,6 +167,7 @@ export type CoordinateProps = {
     store: Store;
     count: number;
     op: string;
+    point?: boolean;
 }
 
 export type GraphPanelProps = {

@@ -1,18 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { WKT } from "ol/format";
-import type { DataProps } from "@nextgisweb/webmap/imodule/type";
 import type { Display } from "@nextgisweb/webmap/display";
+import type SelectedFeatureStore from "./SelectedFeatureStore";
 
-type Props = {
-    key: string;
-    value: DataProps;
-    type: string;
-}
-
-export const useSelected = (display: Display) => {
-    const [data, setData] = useState<Props>();
-
-    const simulatePointZoom = useCallback((value) => setData(value), []);
+export const useSelected = (display: Display, store: SelectedFeatureStore) => {
 
     const simulateEvent = (p, pixel, map) => ({
         coordinate: p && p.coordinate,
@@ -28,12 +19,12 @@ export const useSelected = (display: Display) => {
 
     const overlayInfo = (event, p) => display.imodule._overlayInfo(event, "popup", p, "selected");
 
-    const visibleItems = ({ value, status }) => {
+    const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
         const itemConfig = display.getItemConfig();
-        if (value && status === false) {
+        if (value && store.checked === true) {
             Object.keys(itemConfig).forEach(function (key) {
-                if (value.styles.includes(itemConfig[key].styleId)) {
+                if (value.includes(itemConfig[key].styleId)) {
                     visibleStyles.push(itemConfig[key].id);
                 }
             });
@@ -47,8 +38,8 @@ export const useSelected = (display: Display) => {
     };
 
     useEffect(() => {
-        if (data) {
-            const { key, value, type } = data;
+        if (store.simulatePointZoom) {
+            const { key, value, type } = store.simulatePointZoom;
             if (type === "vector") {
                 display.imodule.getFeature(value)
                     .then(i => {
@@ -56,11 +47,12 @@ export const useSelected = (display: Display) => {
                         const geometry = _wkt.readGeometry(i.geom);
                         const extent = geometry.getExtent()
                         display.imodule.zoomToExtent(extent);
+                        display.imodule.root_point_click.render();
 
                         display.map.olMap.once("postrender", function (e) {
                             const coordinate = e.map.getView().getCenter();
                             const val = { params: [] };
-                            const p = { value: val, coordinate: coordinate, selected: key, data: value };
+                            const p = { point: false, value: val, coordinate: coordinate, selected: key, data: value };
                             const pixel = e.map.getPixelFromCoordinate(coordinate);
                             const event = simulateEvent(p, pixel, e.map);
                             overlayInfo(event, p);
@@ -77,7 +69,7 @@ export const useSelected = (display: Display) => {
                 });
             }
         }
-    }, [data])
+    }, [store.simulatePointZoom]);
 
-    return { simulatePointZoom, visibleItems };
+    return { visibleItems };
 };
