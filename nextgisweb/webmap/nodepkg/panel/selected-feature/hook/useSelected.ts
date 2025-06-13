@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { WKT } from "ol/format";
 import type { Display } from "@nextgisweb/webmap/display";
 import type SelectedFeatureStore from "./SelectedFeatureStore";
 
 export const useSelected = (display: Display, store: SelectedFeatureStore) => {
+    const [map, setMap] = useState(display.map.olMap);
 
-    const simulateEvent = (p, pixel, map) => ({
+    const simulateEvent = (p, pixel) => ({
         coordinate: p && p.coordinate,
         map: map,
         target: "map",
@@ -37,9 +38,28 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         display.webmapStore._updateLayersVisibility(visibleStyles);
     };
 
+    const vectorRender = useCallback(() => {
+        const { key, value } = store.simulatePointZoom;
+        const val = { params: [] };
+        const coordinate = map.getView().getCenter();
+        const p = { point: false, value: val, coordinate: coordinate, selected: key, data: value };
+        const pixel = map.getPixelFromCoordinate(coordinate);
+        const event = simulateEvent(p, pixel);
+        overlayInfo(event, p);
+    }, [map]);
+
+    const rasterRender = useCallback(() => {
+        const { key, value } = store.simulatePointZoom;
+        const val = { params: [] };
+        const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
+        const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
+        const event = simulateEvent(p, pixel);
+        overlayInfo(event, p);
+    }, []);
+
     useEffect(() => {
         if (store.simulatePointZoom) {
-            const { key, value, type } = store.simulatePointZoom;
+            const { value, type } = store.simulatePointZoom;
             if (type === "vector") {
                 display.imodule.getFeature(value)
                     .then(i => {
@@ -47,25 +67,17 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                         const geometry = _wkt.readGeometry(i.geom);
                         const extent = geometry.getExtent()
                         display.imodule.zoomToExtent(extent);
-                        display.imodule.root_point_click.render();
 
-                        display.map.olMap.once("postrender", function (e) {
-                            const coordinate = e.map.getView().getCenter();
-                            const val = { params: [] };
-                            const p = { point: false, value: val, coordinate: coordinate, selected: key, data: value };
-                            const pixel = e.map.getPixelFromCoordinate(coordinate);
-                            const event = simulateEvent(p, pixel, e.map);
-                            overlayInfo(event, p);
-                        });
                     })
+                display.imodule.root_point_click.render();
+                map.once("postrender", (e) => {
+                    setMap(e.map);
+                });
+                vectorRender();
             } else {
-                const val = { params: [] };
-                const p = { value: val, coordinate: value.coordinate, selected: key, data: value };
                 display.imodule.zoomToPoint(value.coordinate);
-                display.map.olMap.once("postrender", function (e) {
-                    const pixel = e.map.getPixelFromCoordinate(value.coordinate);
-                    const event = simulateEvent(p, pixel, e.map);
-                    overlayInfo(event, p);
+                map.once("postrender", () => {
+                    rasterRender();
                 });
             }
         }
