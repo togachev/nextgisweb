@@ -535,7 +535,7 @@ export class IModule extends Component {
         const featureItem = await route("feature_layer.feature.item", {
             id: val.layerId,
             fid: val.id,
-        }).get({ cache: true });
+        }).get();
         return featureItem;
     }
 };

@@ -76,9 +76,13 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                 vectorRender();
             } else {
                 display.imodule.zoomToPoint(value.coordinate);
-                map.once("postrender", () => {
+                try {
+                    map.once("postrender", () => {
+                        rasterRender();
+                    });
+                } finally {
                     rasterRender();
-                });
+                }
             }
         }
     }, [store.simulatePointZoom]);
