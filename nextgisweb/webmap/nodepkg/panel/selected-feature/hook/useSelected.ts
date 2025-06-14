@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { WKT } from "ol/format";
 import type { Display } from "@nextgisweb/webmap/display";
 import type SelectedFeatureStore from "./SelectedFeatureStore";
 
 export const useSelected = (display: Display, store: SelectedFeatureStore) => {
-    const [map, setMap] = useState(display.map.olMap);
-
     const simulateEvent = (p, pixel) => ({
         coordinate: p && p.coordinate,
-        map: map,
+        map: display.map.olMap,
         target: "map",
         pixel: [
             display.panelManager.getActivePanelName() !== "none" ?
