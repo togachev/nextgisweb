@@ -19,16 +19,14 @@ export const ButtonZoomComponent = ({ display, store }: ContentProps) => {
                 if (store.selected?.type === "vector") {
                     imodule.zoomTo(store.selected);
                 } else if (store.selected?.type === "raster") {
-                    display.imodule.zoomToPoint({ coordinate: display.imodule.coordinate })
-                        .then(val => {
-                            const highlightEvent: HighlightEvent = {
-                                coordinates: val.coordinate,
-                            };
-                            topic.publish("feature.highlight", highlightEvent);
-                        })
+                    display.imodule.zoomToPoint(display.imodule.coordinate);
+                    const highlightEvent: HighlightEvent = {
+                        coordinates: display.imodule.coordinate,
+                    };
+                    topic.publish("feature.highlight", highlightEvent);
                 }
             }}
-            icon={< ZoomInMapIcon />}
+            icon={<ZoomInMapIcon />}
             style={{ flex: "0 0 auto" }}
             className="icon-symbol"
         />

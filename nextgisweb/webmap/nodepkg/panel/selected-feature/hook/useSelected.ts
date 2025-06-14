@@ -38,17 +38,18 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         display.webmapStore._updateLayersVisibility(visibleStyles);
     };
 
-    const vectorRender = useCallback(() => {
+    const vectorRender = () => {
         const { key, value } = store.simulatePointZoom;
         const val = { params: [] };
-        const coordinate = map.getView().getCenter();
+        const coordinate = display.map.olMap.getView().getCenter();
         const p = { point: false, value: val, coordinate: coordinate, selected: key, data: value };
-        const pixel = map.getPixelFromCoordinate(coordinate);
+        const pixel = display.map.olMap.getPixelFromCoordinate(coordinate);
         const event = simulateEvent(p, pixel);
         overlayInfo(event, p);
-    }, [map]);
+    };
 
-    const rasterRender = (key, value) => {
+    const rasterRender = () => {
+        const { key, value } = store.simulatePointZoom;
         const val = { params: [] };
         const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
         const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
@@ -68,21 +69,17 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                         display.imodule.zoomToExtent(extent);
                     })
                 display.imodule.root_point_click.render();
-                map.once("postrender", (e) => {
-                    setMap(e.map);
+                display.map.olMap.once("postrender", () => {
+                    vectorRender();
                 });
                 vectorRender();
             } else {
-                const { key, value } = store.simulatePointZoom;
-                display.imodule.zoomToPoint(value).then(i => {
-                    try {
-                        map.once("postrender", () => {
-                            rasterRender(key, i);
-                        });
-                    } finally {
-                        rasterRender(key, i);
-                    }
+                const { value } = store.simulatePointZoom;
+                display.imodule.zoomToPoint(value.coordinate);
+                display.map.olMap.once("postrender", () => {
+                    rasterRender();
                 });
+                rasterRender();
             }
         }
     }, [store.simulatePointZoom]);

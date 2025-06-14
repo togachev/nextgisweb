@@ -533,10 +533,9 @@ export class IModule extends Component {
         return featureItem;
     }
 
-    async zoomToPoint(val) {
-        if (!val.coordinate) return;
-        const point = new Point(val.coordinate);
+    zoomToPoint(val) {
+        if (!val) return;
+        const point = new Point(val);
         this.display.map.zoomToExtent(point.getExtent());
-        return val;
     };
 };
