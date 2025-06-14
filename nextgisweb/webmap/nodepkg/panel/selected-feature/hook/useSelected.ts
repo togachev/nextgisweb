@@ -75,9 +75,13 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
             } else {
                 const { key, value } = store.simulatePointZoom;
                 display.imodule.zoomToPoint(value).then(i => {
-                    map.once("postrender", () => {
+                    try {
+                        map.once("postrender", () => {
+                            rasterRender(key, i);
+                        });
+                    } finally {
                         rasterRender(key, i);
-                    });
+                    }
                 });
             }
         }
