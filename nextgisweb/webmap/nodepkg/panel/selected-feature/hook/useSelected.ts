@@ -48,14 +48,13 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         overlayInfo(event, p);
     }, [map]);
 
-    const rasterRender = useCallback(() => {
-        const { key, value } = store.simulatePointZoom;
+    const rasterRender = (key, value) => {
         const val = { params: [] };
         const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
         const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
         const event = simulateEvent(p, pixel);
         overlayInfo(event, p);
-    }, []);
+    };
 
     useEffect(() => {
         if (store.simulatePointZoom) {
@@ -67,7 +66,6 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                         const geometry = _wkt.readGeometry(i.geom);
                         const extent = geometry.getExtent()
                         display.imodule.zoomToExtent(extent);
-
                     })
                 display.imodule.root_point_click.render();
                 map.once("postrender", (e) => {
@@ -75,14 +73,12 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                 });
                 vectorRender();
             } else {
-                display.imodule.zoomToPoint(value.coordinate);
-                try {
+                const { key, value } = store.simulatePointZoom;
+                display.imodule.zoomToPoint(value).then(i => {
                     map.once("postrender", () => {
-                        rasterRender();
+                        rasterRender(key, i);
                     });
-                } finally {
-                    rasterRender();
-                }
+                });
             }
         }
     }, [store.simulatePointZoom]);

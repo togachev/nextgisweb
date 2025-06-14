@@ -48,7 +48,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                         }}>
                         {title}
                     </Button>
-                    {Object.keys(value.items).length > 1 && <div className="control-item">
+                    <div className="control-item">
                         <Button
                             title={gettext("Delete selected all features")}
                             type="text"
@@ -61,7 +61,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                                 visibleItems({ value: undefined });
                             }}
                         />
-                    </div>}
+                    </div>
                 </div>
                 {
                     Object.keys(value.items).length > 0 &&

@@ -46,11 +46,13 @@ export default function PopupClick({ display, event, params, countFeature }: Par
                     if (selected?.type === "vector") {
                         display.imodule.zoomTo(selected);
                     } else if (selected?.type === "raster") {
-                        display.imodule.zoomToPoint(display.imodule.coordinate)
-                        const highlightEvent: HighlightEvent = {
-                            coordinates: display.imodule.coordinate,
-                        };
-                        topic.publish("feature.highlight", highlightEvent);
+                        display.imodule.zoomToPoint({ coordinate: display.imodule.coordinate })
+                            .then(val => {
+                                const highlightEvent: HighlightEvent = {
+                                    coordinates: val.coordinate,
+                                };
+                                topic.publish("feature.highlight", highlightEvent);
+                            })
                     }
                 }
             }}

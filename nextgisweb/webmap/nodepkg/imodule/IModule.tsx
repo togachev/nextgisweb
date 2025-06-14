@@ -289,7 +289,7 @@ export class IModule extends Component {
                 countFeature: this.countFeature,
                 event: event,
             } as Params;
-            
+
             const propsPopup = {
                 params: { mode: mode, op, position, response: this.response, selected: value, point: p?.point },
                 display: this.display,
@@ -499,12 +499,6 @@ export class IModule extends Component {
             });
     };
 
-    zoomToPoint(val) {
-        if (!val) return;
-        const point = new Point(val);
-        this.display.map.zoomToExtent(point.getExtent());
-    };
-
     zoomTo(val) {
         if (!val) return;
         this.display.featureHighlighter
@@ -538,4 +532,11 @@ export class IModule extends Component {
         }).get();
         return featureItem;
     }
+
+    async zoomToPoint(val) {
+        if (!val.coordinate) return;
+        const point = new Point(val.coordinate);
+        this.display.map.zoomToExtent(point.getExtent());
+        return val;
+    };
 };
