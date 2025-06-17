@@ -78,8 +78,6 @@ const positionContext = (event, offset, op, count, settings, p, array_context, o
             (W - width / 2) <= px
             && (H - height / 2) <= py
         ) {
-            console.log(1);
-            
             return {
                 pointClick: {
                     x: offHP, y: window.innerHeight - height

@@ -3,8 +3,10 @@ import { useCallback } from "react";
 import { Button, Checkbox } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
+import Close from "@nextgisweb/icon/mdi/close";
 import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box-outline";
-import CloseBoxMultipleOutline from "@nextgisweb/icon/mdi/close-box-multiple";
+import CloseBoxMultiple from "@nextgisweb/icon/mdi/close-box-multiple";
+import FormatListBulleted from "@nextgisweb/icon/mdi/format-list-bulleted";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -35,7 +37,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
         const { title, styleId } = value.value;
         return Object.keys(value.items).length > 0 && (
             <div key={key} className="row-selected">
-                <div className="item-label">
+                {store.visibleLayerName && <div className="item-label">
                     <Button
                         title={gettext("Zoom to layer")}
                         className="label"
@@ -49,10 +51,10 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                     </Button>
                     <div className="control-item">
                         <Button
-                            title={gettext("Delete selected all features")}
+                            title={gettext("Clear selection of objects from current layer")}
                             type="text"
                             size="small"
-                            icon={<CloseBoxMultipleOutline />}
+                            icon={<CloseBoxOutline />}
                             onClick={() => {
                                 deleteRow({ key: key, ckey: null, all: true })
                                 imodule.popup_destroy();
@@ -61,7 +63,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                             }}
                         />
                     </div>
-                </div>
+                </div>}
                 {
                     Object.keys(value.items).length > 0 &&
                     getEntries(value.items).map(([ckey, cvalue], index) => {
@@ -90,7 +92,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                                         title={gettext("Delete selected feature")}
                                         type="text"
                                         size="small"
-                                        icon={<CloseBoxOutline />}
+                                        icon={<Close />}
                                         onClick={() => deleteRow({ key: key, ckey: ckey, all: false })}
                                     />
                                 </div>
@@ -117,7 +119,22 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
             }
         }, []);
 
-        const defaultVisibleLayer = store.checked ? gettext("Turn on default layers visibility") : gettext("Turn off inactive layers");
+        const onVisibleLayerName = useCallback(() => {
+            store.setVisibleLayerName(!store.visibleLayerName);
+        }, []);
+
+        const deleteAllRow = () => {
+            display.imodule.popup_destroy();
+            const newObject = { ...store.selectedFeatures };
+            getEntries(newObject).map(([_, value]) => value.items = {});
+            store.setSelectedFeatures(newObject);
+            display._zoomToInitialExtent();
+            visibleItems({ value: undefined });
+        };
+
+        const msgDefaultVisibleLayer = store.checked ? gettext("Turn on default layers visibility") : gettext("Turn off inactive layers");
+
+        const msgVisibleLayerName = store.visibleLayerName ? gettext("Hide layer name") : gettext("Show layer name");
 
         return (
             <PanelContainer
@@ -131,8 +148,28 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
             >
                 <div className="control-visible">
                     <Checkbox checked={store.checked} onChange={onCheckedVisibleItems}>
-                        {defaultVisibleLayer}
+                        {msgDefaultVisibleLayer}
                     </Checkbox>
+                    {store.countItems > 0 &&
+                        <div className="control-item">
+                            <Button
+                                title={msgVisibleLayerName}
+                                type="text"
+                                size="small"
+                                icon={<FormatListBulleted />}
+                                onClick={onVisibleLayerName}
+                                color={!store.visibleLayerName && "primary"}
+                                variant="filled"
+                            />
+                            <Button
+                                title={gettext("Clear all selected feature")}
+                                type="text"
+                                size="small"
+                                icon={<CloseBoxMultiple />}
+                                onClick={deleteAllRow}
+                            />
+                        </div>
+                    }
                 </div>
                 <ItemSelectValue {...{ display, store }} />
             </PanelContainer>

@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { PanelStore } from "@nextgisweb/webmap/panel";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { route } from "@nextgisweb/pyramid/api";
@@ -30,6 +30,7 @@ class SelectedFeatureStore extends PanelStore {
 
     display: Display;
     @observable accessor checked: boolean = true;
+    @observable accessor visibleLayerName: boolean = true;
     @observable.ref accessor selectedFeatures: Props;
     @observable.ref accessor activeKey: string;
     @observable.ref accessor simulatePointZoom: SimulatePointZoomProps;
@@ -38,6 +39,15 @@ class SelectedFeatureStore extends PanelStore {
         super(props);
         this.display = props.display;
         this.getItems();
+    }
+
+    @computed
+    get countItems() {
+        let count = 0;
+        getEntries(this.selectedFeatures).map(([_, value]) => {
+            count += Object.keys(value.items).length
+        });
+        return count;
     }
 
     getItems = () => {
@@ -59,6 +69,11 @@ class SelectedFeatureStore extends PanelStore {
     @action
     setChecked(checked: boolean) {
         this.checked = checked;
+    }
+
+    @action
+    setVisibleLayerName(visibleLayerName: boolean) {
+        this.visibleLayerName = visibleLayerName;
     }
 
     @action

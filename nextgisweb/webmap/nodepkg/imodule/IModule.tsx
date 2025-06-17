@@ -488,20 +488,23 @@ export class IModule extends Component {
                 }
 
                 const p = { point: true, value, coordinate: transformedCoord };
-                const pixel = this.olmap.getPixelFromCoordinate(p.coordinate);
-
-                const simulateEvent: any = {
-                    coordinate: p && p.coordinate,
-                    map: this.olmap,
-                    target: "map",
-                    pixel: [
-                        this.display.panelManager.getActivePanelName() !== "none" ?
-                            (pixel[0] + this.display.panelSize + this.offHP) :
-                            (pixel[0] + this.offHP), (pixel[1] + this.offHP)
-                    ],
-                    type: "click"
-                };
-                this._overlayInfo(simulateEvent, "popup", p, "simulate")
+                const display = this.display;
+                const imodule = this;
+                this.olmap.once("postrender", function (e) {
+                    const pixel = e.map.getPixelFromCoordinate(p.coordinate);
+                    const simulateEvent: any = {
+                        coordinate: p && p.coordinate,
+                        map: e.map,
+                        target: "map",
+                        pixel: [
+                            display.panelManager.getActivePanelName() !== "none" ?
+                                (pixel[0] + display.panelSize + imodule.offHP) :
+                                (pixel[0] + imodule.offHP), (pixel[1] + imodule.offHP)
+                        ],
+                        type: "click"
+                    };
+                    imodule._overlayInfo(simulateEvent, "popup", p, "simulate")
+                });
             });
     };
 
