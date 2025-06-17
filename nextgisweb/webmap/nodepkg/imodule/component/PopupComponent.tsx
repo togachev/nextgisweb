@@ -209,7 +209,7 @@ export default observer(
                             }
                         });
                 }
-            }, [panel.selectedFeatures]);
+            }, [panel]);
 
             const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
