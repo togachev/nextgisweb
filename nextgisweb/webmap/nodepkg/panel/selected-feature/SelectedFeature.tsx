@@ -1,14 +1,17 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
-import { Button, Checkbox } from "@nextgisweb/gui/antd";
+import { Alert, Button } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import Close from "@nextgisweb/icon/mdi/close";
 import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box-outline";
 import CloseBoxMultiple from "@nextgisweb/icon/mdi/close-box-multiple";
 import FormatListBulleted from "@nextgisweb/icon/mdi/format-list-bulleted";
+import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
+import Visibility from "@nextgisweb/icon/material/visibility";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { TemplateLink } from "@nextgisweb/gui/component";
 
 import type SelectedFeatureStore from "./SelectedFeatureStore"
 import type { PanelPluginWidgetProps } from "../registry";
@@ -106,13 +109,34 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
 });
 
 
+
+const InfoSelect = ({ count }) => {
+    if (count > 0) return <></>;
+    const msgFunction = gettext("Функции кнопок:");
+    const msgInfoSelect = [
+        gettext("1. Включение/выключение слоев по умолчанию при просмотре информации об объекте."),
+        gettext("2. Скрытие наименований слоев."),
+        gettext("3. Удаление всех выделенных объектов."),
+        gettext("4. Удаление части выделенных объектов для каждого слоя."),
+        gettext("5. Удаление одного объекта."),
+    ];
+    return (
+        <Alert
+            type="warning"
+            message={msgFunction}
+            description={msgInfoSelect.join(" \n")}
+            closable
+        />
+    );
+};
+
 const SelectedFeature = observer<PanelPluginWidgetProps>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
 
-        const onCheckedVisibleItems = useCallback((e) => {
-            store.setChecked(e.target.checked);
-            if (e.target.checked === false) {
+        const onCheckedVisibleItems = useCallback(() => {
+            store.setChecked(!store.checked);
+            if (store.checked === false) {
                 display.imodule.popup_destroy();
                 visibleItems({ value: undefined });
                 display._zoomToInitialExtent();
@@ -146,30 +170,38 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
+                <InfoSelect count={store.countItems} />
                 <div className="control-visible">
-                    <Checkbox checked={store.checked} onChange={onCheckedVisibleItems}>
-                        {msgDefaultVisibleLayer}
-                    </Checkbox>
-                    {store.countItems > 0 &&
-                        <div className="control-item">
-                            <Button
-                                title={msgVisibleLayerName}
-                                type="text"
-                                size="small"
-                                icon={<FormatListBulleted />}
-                                onClick={onVisibleLayerName}
-                                color={!store.visibleLayerName && "primary"}
-                                variant="filled"
-                            />
-                            <Button
-                                title={gettext("Clear all selected feature")}
-                                type="text"
-                                size="small"
-                                icon={<CloseBoxMultiple />}
-                                onClick={deleteAllRow}
-                            />
-                        </div>
-                    }
+                    <Button
+                        title={msgDefaultVisibleLayer}
+                        type="text"
+                        size="small"
+                        icon={store.checked ? <DisabledVisible /> : <Visibility />}
+                        onClick={onCheckedVisibleItems}
+                        color={store.checked && "primary"}
+                        variant="filled"
+                        disabled={store.countItems === 0}
+                    />
+                    <div className="control-item">
+                        <Button
+                            title={msgVisibleLayerName}
+                            type="text"
+                            size="small"
+                            icon={<FormatListBulleted />}
+                            onClick={onVisibleLayerName}
+                            color={!store.visibleLayerName && "primary"}
+                            variant="filled"
+                            disabled={store.countItems === 0}
+                        />
+                        <Button
+                            title={gettext("Clear all selected feature")}
+                            type="text"
+                            size="small"
+                            icon={<CloseBoxMultiple />}
+                            onClick={deleteAllRow}
+                            disabled={store.countItems === 0}
+                        />
+                    </div>
                 </div>
                 <ItemSelectValue {...{ display, store }} />
             </PanelContainer>
