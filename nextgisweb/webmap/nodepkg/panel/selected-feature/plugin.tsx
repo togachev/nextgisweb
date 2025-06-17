@@ -4,6 +4,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import FormatListBulleted from "@nextgisweb/icon/mdi/format-list-bulleted";
+import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 panelRegistry(COMP_ID, {
     widget: () => import("./SelectedFeature"),
@@ -14,7 +15,7 @@ panelRegistry(COMP_ID, {
     order: 11,
     applyToTinyMap: false,
 
-    isEnabled: () => {
-        return webmapSettings.imodule;
+    isEnabled: ({ config }: { config: DisplayConfig }) => {
+        return webmapSettings.imodule && config.selectFeaturePanel;
     },
 });

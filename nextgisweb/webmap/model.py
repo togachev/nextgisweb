@@ -39,7 +39,7 @@ from .option import WebMapOption
 
 Base.depends_on("resource")
 
-ACTIVE_PANEL_VALUES = ("layers", "search", "custom-layer", "print", "bookmark", "info", "share", "annotation", "none")
+ACTIVE_PANEL_VALUES = ("layers", "selected-feature", "search", "custom-layer", "print", "bookmark", "info", "share", "annotation", "none")
 ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
 LAYER_GEOM_EXISTS = ("mapserver_style", "qgis_vector_style")
@@ -88,6 +88,7 @@ class WebMap(Base, Resource):
 
     title = sa.Column(sa.Unicode)
     active_panel = sa.Column(saext.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
+    select_feature_panel = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_enabled = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_default = sa.Column(
         saext.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
@@ -562,6 +563,7 @@ class WebMapSerializer(Serializer, resource=WebMap):
     root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
     test = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
     active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    select_feature_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     extent_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
     extent_right = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)

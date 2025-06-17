@@ -528,7 +528,8 @@ class InfoMapConfig(Struct, kw_only=True):
 class DisplayConfig(Struct, kw_only=True):
     webmapId: int
     webmapTitle: str
-    active_panel: str
+    activePanel: str
+    selectFeaturePanel: bool
     infomap: InfoMapConfig
     webmapPlugin: Dict[str, Any]
     initialExtent: ExtentWSEN
@@ -732,7 +733,8 @@ def display_config(obj, request) -> DisplayConfig:
         rootItem=root_item,
         checkedItems=checked_items,
         expandedItems=expanded_items,
-        active_panel=obj.active_panel,
+        activePanel=obj.active_panel,
+        selectFeaturePanel=obj.select_feature_panel,
         infomap=dict(
             resource=request.route_url("resource.show", id=0),
             link=request.route_url("resource.show", id=obj.id),

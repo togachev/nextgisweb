@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 
-import { Badge, Button, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
+import { Badge, Button, CheckboxValue, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -34,6 +34,7 @@ const msgLayersEditing = gettext("Layers editing");
 const msgAdditionalOptions = gettext("Additional options");
 const msgConfigure = gettext("Configure");
 const msgActivePanel = gettext("Active panel");
+const msgSelectFeaturePanel = gettext("History of object selection");
 
 const msgDefault = gettext("Default");
 
@@ -50,6 +51,7 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
 
 const activePanelOptions: { value: ActivePanelType; label: string }[] = [
     { value: "layers", label: gettext("Layers") },
+    { value: "selected-feature", label: gettext("History of object selection") },
     { value: "search", label: gettext("Search") },
     { value: "custom-layer", label: gettext("Custom layers") },
     { value: "print", label: gettext("Print map") },
@@ -192,6 +194,13 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                                 count={Object.keys(store.options).length}
                             />
                         </Button>
+                    </Lot>
+                    <Lot row label={msgSelectFeaturePanel}>
+                        <CheckboxValue<boolean>
+                            style={{ width: "100%" }}
+                            checked={store.selectFeaturePanel}
+                            onChange={(v) => store.update({ selectFeaturePanel: v })}
+                        />
                     </Lot>
                 </Area>
                 <Modal

@@ -466,14 +466,8 @@ export class IModule extends Component {
     };
 
     async responseContext(val: UrlParamsProps) {
-        const srsInfo = await route("spatial_ref_sys.collection").get()
-            .then(srsInfo => {
-                return new Map(srsInfo.map((s) => [s.id, s]));
-            })
         await this.transformCoord([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator)
             .then((transformedCoord) => {
-                console.log(transformedCoord);
-
                 const params: ParamsProps[] = [];
                 val.st?.split(",").map(i => {
                     params.push({

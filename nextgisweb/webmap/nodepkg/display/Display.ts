@@ -758,11 +758,11 @@ export class Display {
     private _buildPanelManager() {
         let activePanelKey;
         if (!this.urlParams.panel) {
-            activePanelKey = this.config.active_panel
-        } else if (this.urlParams.panel !== this.config.active_panel) {
+            activePanelKey = this.config.activePanel
+        } else if (this.urlParams.panel !== this.config.activePanel) {
             activePanelKey = this.urlParams.panel
         } else {
-            activePanelKey = this.config.active_panel
+            activePanelKey = this.config.activePanel
         }
 
         const onChangePanel = (panel?: PanelStore) => {

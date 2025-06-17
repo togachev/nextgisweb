@@ -29,7 +29,7 @@ type SimulatePointZoomProps = {
 class SelectedFeatureStore extends PanelStore {
 
     display: Display;
-    @observable accessor checked: boolean = false;
+    @observable accessor checked: boolean = true;
     @observable.ref accessor selectedFeatures: Props;
     @observable.ref accessor activeKey: string;
     @observable.ref accessor simulatePointZoom: SimulatePointZoomProps;

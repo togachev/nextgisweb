@@ -23,6 +23,7 @@ export class SettingStore
 
     @observable accessor activePanel: WebMapRead["active_panel"] = "layers";    
     @observable.ref accessor editable = false;
+    @observable.ref accessor selectFeaturePanel = false;
     @observable.ref accessor annotationEnabled = false;
     @observable.ref accessor annotationDefault: AnnotationDefault = "no";
     @observable.ref accessor legendSymbols: WebMapRead["legend_symbols"] = null;
@@ -71,6 +72,7 @@ export class SettingStore
 
         this.initialValue = value;
         this.editable = value.editable;
+        this.selectFeaturePanel = value.select_feature_panel;
         this.annotationEnabled = value.annotation_enabled;
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
@@ -93,6 +95,7 @@ export class SettingStore
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
             active_panel: this.activePanel,
+            select_feature_panel: this.selectFeaturePanel,
             initial_extent: convertExtentToArray(this.initialExtent),
             constraining_extent: convertExtentToArray(this.constrainingExtent),
             title: this.title ? this.title : null,
