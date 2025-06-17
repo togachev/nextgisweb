@@ -336,12 +336,12 @@ export class IModule extends Component {
 
     popup_destroy = () => {
         topic.publish("feature.unhighlight");
-        this.display.imodule.root_popup.render();
-        this.display.imodule.root_point_click.render();
+        this.root_popup.render();
+        this.root_point_click.render();
     };
 
     point_context_destroy = () => {
-        this.display.imodule.root_point_context.render();
+        this.root_point_context.render();
     };
 
     transformCoordinate = async (from, to, point) => {
@@ -468,6 +468,7 @@ export class IModule extends Component {
     async responseContext(val: UrlParamsProps) {
         await this.transformCoord([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator)
             .then((transformedCoord) => {
+                const display = this.display;
                 const params: ParamsProps[] = [];
                 val.st?.split(",").map(i => {
                     params.push({
@@ -488,8 +489,7 @@ export class IModule extends Component {
                 }
 
                 const p = { point: true, value, coordinate: transformedCoord };
-                const display = this.display;
-                const imodule = this;
+
                 this.olmap.once("postrender", function (e) {
                     const pixel = e.map.getPixelFromCoordinate(p.coordinate);
                     const simulateEvent: any = {
@@ -498,12 +498,12 @@ export class IModule extends Component {
                         target: "map",
                         pixel: [
                             display.panelManager.getActivePanelName() !== "none" ?
-                                (pixel[0] + display.panelSize + imodule.offHP) :
-                                (pixel[0] + imodule.offHP), (pixel[1] + imodule.offHP)
+                                (pixel[0] + display.panelSize + display.imodule.offHP) :
+                                (pixel[0] + display.imodule.offHP), (pixel[1] + display.imodule.offHP)
                         ],
                         type: "click"
                     };
-                    imodule._overlayInfo(simulateEvent, "popup", p, "simulate")
+                    display.imodule._overlayInfo(simulateEvent, "popup", p, "simulate")
                 });
             });
     };

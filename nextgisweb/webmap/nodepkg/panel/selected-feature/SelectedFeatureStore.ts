@@ -10,10 +10,11 @@ import type { Display } from "@nextgisweb/webmap/display";
 type ItemsProps = {
     [key: string]: DataProps;
 }
+
 type SelectedFeaturesProps = {
     items: ItemsProps[];
     type: string;
-    value: TreeItemConfig
+    value: TreeItemConfig;
 }
 
 type Props = {
@@ -32,7 +33,6 @@ class SelectedFeatureStore extends PanelStore {
     @observable accessor checked: boolean = true;
     @observable accessor visibleLayerName: boolean = true;
     @observable.ref accessor selectedFeatures: Props;
-    @observable.ref accessor activeKey: string;
     @observable.ref accessor simulatePointZoom: SimulatePointZoomProps;
 
     constructor(props) {
@@ -79,11 +79,6 @@ class SelectedFeatureStore extends PanelStore {
     @action
     setSelectedFeatures(selectedFeatures: Props) {
         this.selectedFeatures = selectedFeatures;
-    }
-
-    @action
-    setActiveKey(activeKey: string) {
-        this.activeKey = activeKey;
     }
 
     @action

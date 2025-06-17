@@ -1,18 +1,18 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
-import { Alert, Button } from "@nextgisweb/gui/antd";
+import { Alert, Button, Descriptions, Popover } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
 import Close from "@nextgisweb/icon/mdi/close";
 import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box-outline";
 import CloseBoxMultiple from "@nextgisweb/icon/mdi/close-box-multiple";
-import FormatListBulleted from "@nextgisweb/icon/mdi/format-list-bulleted";
-import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
+import PlaylistRemove from "@nextgisweb/icon/mdi/playlist-remove";
 import Visibility from "@nextgisweb/icon/material/visibility";
+import InformationOutline from "@nextgisweb/icon/mdi/information-variant-circle-outline";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { TemplateLink } from "@nextgisweb/gui/component";
 
+import type { DescriptionsProps } from "@nextgisweb/gui/antd";
 import type SelectedFeatureStore from "./SelectedFeatureStore"
 import type { PanelPluginWidgetProps } from "../registry";
 import { IModule } from "@nextgisweb/webmap/imodule";
@@ -76,7 +76,6 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                                 <Button
                                     title={gettext("View information about the object")}
                                     onClick={() => {
-                                        store.setActiveKey(ckey);
                                         if (cvalue.type === "vector") {
                                             store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
                                         } else if (cvalue.type === "raster") {
@@ -108,24 +107,43 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
     })
 });
 
-
-
-const InfoSelect = ({ count }) => {
-    if (count > 0) return <></>;
-    const msgFunction = gettext("Функции кнопок:");
-    const msgInfoSelect = [
-        gettext("1. Включение/выключение слоев по умолчанию при просмотре информации об объекте."),
-        gettext("2. Скрытие наименований слоев."),
-        gettext("3. Удаление всех выделенных объектов."),
-        gettext("4. Удаление части выделенных объектов для каждого слоя."),
-        gettext("5. Удаление одного объекта."),
+const InfoSelect = () => {
+    const items: DescriptionsProps["items"] = [
+        {
+            key: "1",
+            label: <div className="icon-description"><Visibility /></div>,
+            children: gettext("Включение/выключение слоев по умолчанию при просмотре информации об объекте.")
+        },
+        {
+            key: "2",
+            label: <div className="icon-description"><PlaylistRemove /></div>,
+            children: gettext("Скрытие наименований слоев.")
+        },
+        {
+            key: "3",
+            label: <div className="icon-description"><CloseBoxMultiple /></div>,
+            children: gettext("Удаление всех выделенных объектов.")
+        },
+        {
+            key: "4",
+            label: <div className="icon-description"><CloseBoxOutline /></div>,
+            children: gettext("Удаление части выделенных объектов для каждого слоя.")
+        },
+        {
+            key: "5",
+            label: <div className="icon-description"><Close /></div>,
+            children: gettext("Удаление одного объекта.")
+        },
     ];
+
     return (
-        <Alert
-            type="warning"
-            message={msgFunction}
-            description={msgInfoSelect.join(" \n")}
-            closable
+        <Descriptions
+            styles={{ content: { padding: "5px" } }}
+            bordered
+            size="small"
+            column={1}
+            layout="horizontal"
+            items={items}
         />
     );
 };
@@ -157,7 +175,9 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
         };
 
         const msgDefaultVisibleLayer = store.checked ? gettext("Turn on default layers visibility") : gettext("Turn off inactive layers");
-
+        const msgFunction = gettext("Функции кнопок:");
+        const msgDescription = gettext("Description");
+        const msgSelectFeature = gettext("История выделения объектов векторных и растровых слоев веб-карты");
         const msgVisibleLayerName = store.visibleLayerName ? gettext("Hide layer name") : gettext("Show layer name");
 
         return (
@@ -170,13 +190,17 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
                     epilog: PanelContainer.Unpadded,
                 }}
             >
-                <InfoSelect count={store.countItems} />
+                {store.countItems === 0 && <Alert
+                    message={msgSelectFeature}
+                    banner
+                    showIcon={false}
+                />}
                 <div className="control-visible">
                     <Button
                         title={msgDefaultVisibleLayer}
                         type="text"
                         size="small"
-                        icon={store.checked ? <DisabledVisible /> : <Visibility />}
+                        icon={<Visibility />}
                         onClick={onCheckedVisibleItems}
                         color={store.checked && "primary"}
                         variant="filled"
@@ -187,7 +211,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
                             title={msgVisibleLayerName}
                             type="text"
                             size="small"
-                            icon={<FormatListBulleted />}
+                            icon={<PlaylistRemove />}
                             onClick={onVisibleLayerName}
                             color={!store.visibleLayerName && "primary"}
                             variant="filled"
@@ -201,6 +225,14 @@ const SelectedFeature = observer<PanelPluginWidgetProps>(
                             onClick={deleteAllRow}
                             disabled={store.countItems === 0}
                         />
+                        <Popover overlayClassName="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
+                            <Button
+                                title={msgDescription}
+                                type="text"
+                                size="small"
+                                icon={<InformationOutline />}
+                            />
+                        </Popover>
                     </div>
                 </div>
                 <ItemSelectValue {...{ display, store }} />
