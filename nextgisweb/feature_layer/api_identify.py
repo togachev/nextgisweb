@@ -170,6 +170,7 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                             value=str(style.id) + ":" + str(layer.id) + ":" + str(f.id),
                             fields=f.fields,
                             type="vector",
+                            checked=False,
                             relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None,
                         )
                     )
@@ -223,6 +224,7 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         label=[x["label"] for x in body.styles if x["id"] == style.id][0],
                         permission="Read",
                         type="raster",
+                        checked=False,
                         attr=attr,
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
                     )

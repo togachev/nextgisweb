@@ -35,6 +35,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
             store.setSelectedFeatures(newObject);
         }
     };
+    console.log(store.selectedFeatures);
 
     return getEntries(store.selectedFeatures).map(([key, value]) => {
         const { title, styleId } = value.value;

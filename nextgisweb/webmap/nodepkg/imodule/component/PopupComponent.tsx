@@ -140,6 +140,29 @@ export default observer(
                 };
             }, [response, display.mapExtentDeferred]);
 
+
+            const checkSelected = useCallback((itm, obj) => {
+                // getEntries(obj)
+                //     .map(([_, value]) => {
+                //         if (Object.keys(value.items).length >= 2) {
+                //             delete obj[value.value.styleId].items[Object.keys(obj[value.value.styleId].items)[0]]
+                //         }
+                //     });
+                const value = {
+                    ...obj,
+                    [String(itm.styleId)]: {
+                        ...obj[itm.styleId],
+                        ...{
+                            items: {
+                                ...obj[itm.styleId].items,
+                                [String(itm.value)]: itm
+                            }
+                        }
+                    }
+                }
+                panel.setSelectedFeatures(value)
+            }, [panel.selectedFeatures])
+
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
                 store.setMode(mode);
@@ -157,18 +180,10 @@ export default observer(
 
                     const selectedProps = { ...selectVal };
                     Object.assign(selectedProps, propsCoords());
-                    panel && panel.setSelectedFeatures({
-                        ...panel.selectedFeatures,
-                        [String(selectedProps.styleId)]: {
-                            ...panel.selectedFeatures[selectedProps.styleId],
-                            ...{
-                                items: {
-                                    ...panel.selectedFeatures[selectedProps.styleId].items,
-                                    [String(selectedProps.value)]: selectedProps
-                                }
-                            }
-                        }
-                    })
+                    if (panel) {
+                        const obj = { ...panel.selectedFeatures };
+                        checkSelected(selectedProps, obj)
+                    }
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
                     store.setSelected({});
@@ -199,18 +214,6 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
-            useEffect(() => {
-                if (panel) {
-                    const newState = { ...panel.selectedFeatures };
-                    getEntries(newState)
-                        .map(([key, _]) => {
-                            if (Object.keys(newState[key].items).length > 10) {
-                                delete newState[key].items[Object.keys(newState[key].items)[0]];
-                            }
-                        });
-                }
-            }, [panel]);
-
             const onChangeSelect = async (value) => {
                 const selectedValue = store.data.find(item => item.value === value.value);
                 const copy = { ...selectedValue };
@@ -221,22 +224,9 @@ export default observer(
                 topic.publish("visible.point", copy);
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
-                const selectedProps = { ...selectedValue };
-                Object.assign(selectedProps, propsCoords());
-                if (panel) {
-                    panel.setSelectedFeatures({
-                        ...panel.selectedFeatures,
-                        [String(selectedProps.styleId)]: {
-                            ...panel.selectedFeatures[selectedProps.styleId],
-                            ...{
-                                items: {
-                                    ...panel.selectedFeatures[selectedProps.styleId].items,
-                                    [String(selectedProps.value)]: selectedProps
-                                }
-                            }
-                        }
-                    });
-                }
+                // const selectedProps = { ...selectedValue };
+                // Object.assign(selectedProps, propsCoords());
+                // panel && panel.updateSelected(selectedProps)
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {

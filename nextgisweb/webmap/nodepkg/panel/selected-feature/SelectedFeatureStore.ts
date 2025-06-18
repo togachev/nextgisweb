@@ -38,19 +38,7 @@ class SelectedFeatureStore extends PanelStore {
     constructor(props) {
         super(props);
         this.display = props.display;
-        this.getItems();
-    }
 
-    @computed
-    get countItems() {
-        let count = 0;
-        getEntries(this.selectedFeatures).map(([_, value]) => {
-            count += Object.keys(value.items).length
-        });
-        return count;
-    }
-
-    getItems = () => {
         const obj = {};
         getEntries(this.display.getItemConfig()).map(([_, value]) => {
             if (value.type === "layer") {
@@ -63,7 +51,16 @@ class SelectedFeatureStore extends PanelStore {
                 })
             }
         });
-        this.setSelectedFeatures(obj);
+        this.selectedFeatures = obj;
+    }
+
+    @computed
+    get countItems() {
+        let count = 0;
+        getEntries(this.selectedFeatures).map(([_, value]) => {
+            count += Object.keys(value.items).length
+        });
+        return count;
     }
 
     @action
