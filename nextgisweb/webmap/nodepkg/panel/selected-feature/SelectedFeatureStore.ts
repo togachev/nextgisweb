@@ -32,8 +32,8 @@ class SelectedFeatureStore extends PanelStore {
     display: Display;
     @observable accessor checked: boolean = true;
     @observable accessor visibleLayerName: boolean = true;
-    @observable.ref accessor selectedFeatures: Props;
-    @observable.ref accessor simulatePointZoom: SimulatePointZoomProps;
+    @observable.shallow accessor selectedFeatures: Props;
+    @observable.shallow accessor simulatePointZoom: SimulatePointZoomProps;
 
     constructor(props) {
         super(props);

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Alert, Button, Descriptions, Popover } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
 import { PanelContainer } from "../component";
@@ -19,7 +19,7 @@ import { IModule } from "@nextgisweb/webmap/imodule";
 
 import "./SelectedFeature.less";
 
-const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(({ display, store }) => {
+const ItemSelectValue = ({ display, store }) => {
     const { visibleItems } = useSelected(display, store);
     const imodule: IModule = display.imodule;
 
@@ -35,7 +35,23 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
             store.setSelectedFeatures(newObject);
         }
     };
-    console.log(store.selectedFeatures);
+
+    const updateSelect = async (key, ckey, cvalue) => {
+        const obj = { ...store.selectedFeatures }
+
+        if (obj[key].items[ckey].checked) {
+            if (cvalue.type === "vector") {
+                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
+            } else if (cvalue.type === "raster") {
+                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
+            }
+            visibleItems({ value: [cvalue.styleId] });
+        } else {
+            imodule.popup_destroy();
+            display._zoomToInitialExtent();
+            visibleItems({ value: undefined });
+        }
+    }
 
     return getEntries(store.selectedFeatures).map(([key, value]) => {
         const { title, styleId } = value.value;
@@ -77,12 +93,22 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
                                 <Button
                                     title={gettext("View information about the object")}
                                     onClick={() => {
-                                        if (cvalue.type === "vector") {
-                                            store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
-                                        } else if (cvalue.type === "raster") {
-                                            store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
+                                        const obj = { ...store.selectedFeatures }
+                                        const value = {
+                                            ...obj,
+                                            [key]: {
+                                                ...obj[key],
+                                                items: {
+                                                    ...obj[key].items,
+                                                    [ckey]: {
+                                                        ...obj[key].items[ckey],
+                                                        checked: !obj[key].items[ckey].checked
+                                                    }
+                                                }
+                                            }
                                         }
-                                        visibleItems({ value: [cvalue.styleId] });
+                                        store.setSelectedFeatures(value);
+                                        updateSelect(key, ckey, cvalue); /*переделать*/
                                     }}
                                     className="label-child"
                                     type="text"
@@ -106,7 +132,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>((
             </div>
         )
     })
-});
+};
 
 const InfoSelect = () => {
     const items: DescriptionsProps["items"] = [

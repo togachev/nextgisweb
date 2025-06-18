@@ -140,28 +140,28 @@ export default observer(
                 };
             }, [response, display.mapExtentDeferred]);
 
-
-            const checkSelected = useCallback((itm, obj) => {
-                // getEntries(obj)
-                //     .map(([_, value]) => {
-                //         if (Object.keys(value.items).length >= 2) {
-                //             delete obj[value.value.styleId].items[Object.keys(obj[value.value.styleId].items)[0]]
-                //         }
-                //     });
+            const updateSelectFeatures = (panel, props) => {
+                const obj = { ...panel.selectedFeatures }
                 const value = {
                     ...obj,
-                    [String(itm.styleId)]: {
-                        ...obj[itm.styleId],
+                    [String(props.styleId)]: {
+                        ...obj[props.styleId],
                         ...{
                             items: {
-                                ...obj[itm.styleId].items,
-                                [String(itm.value)]: itm
+                                ...obj[props.styleId].items,
+                                [String(props.value)]: props
                             }
                         }
                     }
                 }
+                getEntries(value)
+                    .map(([key, _]) => {
+                        if (Object.keys(value[key].items).length > 10) {
+                            delete value[key].items[Object.keys(value[key].items)[0]];
+                        }
+                    });
                 panel.setSelectedFeatures(value)
-            }, [panel.selectedFeatures])
+            };
 
             useEffect(() => {
                 store.setValueRnd({ x: position.x, y: position.y, width: position.width, height: position.height });
@@ -181,8 +181,7 @@ export default observer(
                     const selectedProps = { ...selectVal };
                     Object.assign(selectedProps, propsCoords());
                     if (panel) {
-                        const obj = { ...panel.selectedFeatures };
-                        checkSelected(selectedProps, obj)
+                        updateSelectFeatures(panel, selectedProps)
                     }
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });
@@ -224,9 +223,11 @@ export default observer(
                 topic.publish("visible.point", copy);
                 store.setButtonZoom({ [Object.keys(position.buttonZoom)[0]]: true });
 
-                // const selectedProps = { ...selectedValue };
-                // Object.assign(selectedProps, propsCoords());
-                // panel && panel.updateSelected(selectedProps)
+                const selectedProps = { ...selectedValue };
+                Object.assign(selectedProps, propsCoords());
+                if (panel) {
+                    updateSelectFeatures(panel, selectedProps)
+                }
             };
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
