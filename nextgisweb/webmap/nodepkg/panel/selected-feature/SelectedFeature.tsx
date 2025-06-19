@@ -9,8 +9,8 @@ import CloseBoxMultiple from "@nextgisweb/icon/mdi/close-box-multiple";
 import PlaylistRemove from "@nextgisweb/icon/mdi/playlist-remove";
 import Visibility from "@nextgisweb/icon/material/visibility";
 import InformationOutline from "@nextgisweb/icon/mdi/information-variant-circle-outline";
+import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { WKT } from "ol/format";
 
 import type { DescriptionsProps } from "@nextgisweb/gui/antd";
 import type SelectedFeatureStore from "./SelectedFeatureStore"
@@ -21,139 +21,118 @@ import "./SelectedFeature.less";
 
 const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
-        const imodule: IModule = display.imodule;
+    const { visibleItems } = useSelected(display, store);
+    const imodule: IModule = display.imodule;
 
-        const deleteRow = ({ key, ckey, all }) => {
-            imodule.popup_destroy();
-            if (all) {
-                const newObject = { ...store.selectedFeatures };
-                newObject[key].items = {};
-                store.setSelectedFeatures(newObject);
-            } else {
-                const newObject = { ...store.selectedFeatures };
-                delete newObject[key].items[ckey];
-                store.setSelectedFeatures(newObject);
+    const deleteRow = ({ key, ckey, all }) => {
+        imodule.popup_destroy();
+        if (all) {
+            const newObject = { ...store.selectedFeatures };
+            newObject[key].items = {};
+            store.setSelectedFeatures(newObject);
+        } else {
+            const newObject = { ...store.selectedFeatures };
+            delete newObject[key].items[ckey];
+            store.setSelectedFeatures(newObject);
+        }
+    };
+
+    useEffect(() => {
+        const { achecked, ackey, acvalue } = store.activeChecked;
+        if (achecked) {
+            if (acvalue.type === "vector") {
+                store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
+            } else if (acvalue.type === "raster") {
+                store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "raster" });
             }
-        };
+            visibleItems({ value: [acvalue.styleId] });
 
-        useEffect(() => {
-            const { achecked, ackey, acvalue } = store.activeChecked;
-            if (achecked) {
-                if (acvalue.type === "vector") {
-                    store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
-                } else if (acvalue.type === "raster") {
-                    store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "raster" });
-                }
-                store.visibleItems({ value: [acvalue.styleId] });
+        } else {
+            store.display.imodule.popup_destroy();
+            store.display._zoomToInitialExtent();
+            visibleItems({ value: undefined });
+        }
+    }, [store.activeChecked]);
 
-            } else {
-                imodule && imodule.popup_destroy();
-                display._zoomToInitialExtent();
-                store.visibleItems({ value: undefined });
-            }
-        }, [store.activeChecked]);
-
-        useEffect(() => {
-            if (store.simulatePointZoom) {
-                const { type, value } = store.simulatePointZoom;
-                if (type === "vector") {
-                    store.getFeature(value)
-                        .then(i => {
-                            const _wkt = new WKT();
-                            const geometry = _wkt.readGeometry(i.geom);
-                            const extent = geometry.getExtent();
-                            imodule.zoomToExtent(extent);
-                        });
-                    imodule.root_point_click.render();
-                    store.vectorRender();
-                } else if (type === "raster") {
-                    imodule.zoomToPoint(value.coordinate);
-                    store.rasterRender();
-                }
-                display.map.olMap.renderSync();
-            }
-        }, [store.simulatePointZoom]);
-
-
-        return getEntries(store.selectedFeatures).map(([key, value]) => {
-            const { title, styleId } = value.value;
-            const { achecked, ackey } = store.activeChecked;
-            return Object.keys(value.items).length > 0 && (
-                <div key={key} className="row-selected">
-                    {store.visibleLayerName && <div className="item-label">
+    return getEntries(store.selectedFeatures).map(([key, value]) => {
+        const { title, styleId } = value.value;
+        const { achecked, ackey } = store.activeChecked;
+        return Object.keys(value.items).length > 0 && (
+            <div key={key} className="row-selected">
+                {store.visibleLayerName && <div className="item-label">
+                    <Button
+                        title={gettext("Zoom to layer")}
+                        className="label"
+                        size="small"
+                        type="text"
+                        onClick={() => {
+                            imodule.zoomToLayerExtent({ styleId });
+                            visibleItems({ value: [styleId] });
+                        }}>
+                        {title}
+                    </Button>
+                    <div className="control-item">
                         <Button
-                            title={gettext("Zoom to layer")}
-                            className="label"
-                            size="small"
+                            title={gettext("Clear selection of objects from current layer")}
                             type="text"
+                            size="small"
+                            icon={<CloseBoxOutline />}
                             onClick={() => {
-                                imodule.zoomToLayerExtent({ styleId });
-                                store.visibleItems({ value: [styleId] });
-                            }}>
-                            {title}
-                        </Button>
-                        <div className="control-item">
-                            <Button
-                                title={gettext("Clear selection of objects from current layer")}
-                                type="text"
-                                size="small"
-                                icon={<CloseBoxOutline />}
-                                onClick={() => {
-                                    deleteRow({ key: key, ckey: null, all: true })
-                                    imodule.popup_destroy();
-                                    display._zoomToInitialExtent();
-                                    store.visibleItems({ value: undefined });
-                                }}
-                            />
-                        </div>
-                    </div>}
-                    {
-                        Object.keys(value.items).length > 0 &&
-                        getEntries(value.items).map(([ckey, cvalue], index) => {
-                            const id = index + 1;
-                            return (
-                                <div key={ckey} className="label-child-element">
-                                    <Button
-                                        title={gettext("View information about the object")}
-                                        onClick={() => {
-                                            const obj = { ...store.activeChecked };
-                                            if (obj.ackey !== ckey) {
-                                                if (cvalue.type === "vector") {
-                                                    store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
-                                                } else if (cvalue.type === "raster") {
-                                                    store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
-                                                }
-                                                store.visibleItems({ value: [cvalue.styleId] });
-                                                store.setActiveChecked({ achecked: true, ackey: ckey, acvalue: cvalue })
-                                            } else {
-                                                store.setActiveChecked({ achecked: !obj.achecked, ackey: ckey, acvalue: cvalue })
+                                deleteRow({ key: key, ckey: null, all: true })
+                                imodule.popup_destroy();
+                                display._zoomToInitialExtent();
+                                visibleItems({ value: undefined });
+                            }}
+                        />
+                    </div>
+                </div>}
+                {
+                    Object.keys(value.items).length > 0 &&
+                    getEntries(value.items).map(([ckey, cvalue], index) => {
+                        const id = index + 1;
+                        return (
+                            <div key={ckey} className="label-child-element">
+                                <Button
+                                    title={gettext("View information about the object")}
+                                    onClick={() => {
+                                        const obj = { ...store.activeChecked };
+                                        if (obj.ackey !== ckey) {
+                                            if (cvalue.type === "vector") {
+                                                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
+                                            } else if (cvalue.type === "raster") {
+                                                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
                                             }
-                                        }}
-                                        className="label-child"
+                                            visibleItems({ value: [cvalue.styleId] });
+                                            store.setActiveChecked({ achecked: true, ackey: ckey, acvalue: cvalue })
+                                        } else {
+                                            store.setActiveChecked({ achecked: !obj.achecked, ackey: ckey, acvalue: cvalue })
+                                        }
+                                    }}
+                                    className="label-child"
+                                    type="text"
+                                    size="small"
+                                    color={achecked && ackey === ckey && "default"}
+                                    variant="filled"
+                                >
+                                    {cvalue.type === "vector" ? cvalue.label : `${id}. ${gettext("value raster")}`}
+                                </Button>
+                                <div className="control-item">
+                                    <Button
+                                        title={gettext("Delete selected feature")}
                                         type="text"
                                         size="small"
-                                        color={achecked && ackey === ckey && "default"}
-                                        variant="filled"
-                                    >
-                                        {cvalue.type === "vector" ? cvalue.label : `${id}. ${gettext("value raster")}`}
-                                    </Button>
-                                    <div className="control-item">
-                                        <Button
-                                            title={gettext("Delete selected feature")}
-                                            type="text"
-                                            size="small"
-                                            icon={<Close />}
-                                            onClick={() => deleteRow({ key: key, ckey: ckey, all: false })}
-                                        />
-                                    </div>
+                                        icon={<Close />}
+                                        onClick={() => deleteRow({ key: key, ckey: ckey, all: false })}
+                                    />
                                 </div>
-                            )
-                        })
-                    }
-                </div>
-            )
-        })
-    });
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        )
+    })
+});
 
 const InfoSelect = () => {
     const items: DescriptionsProps["items"] = [
@@ -198,14 +177,13 @@ const InfoSelect = () => {
 
 const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
-
-        const imodule: IModule = display.imodule;
+        const { visibleItems } = useSelected(display, store);
 
         const onCheckedVisibleItems = useCallback(() => {
             store.setChecked(!store.checked);
             if (store.checked === false) {
-                imodule.popup_destroy();
-                store.visibleItems({ value: undefined });
+                display.imodule.popup_destroy();
+                visibleItems({ value: undefined });
                 display._zoomToInitialExtent();
             }
         }, []);
@@ -215,12 +193,12 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         }, []);
 
         const deleteAllRow = () => {
-            imodule.popup_destroy();
+            display.imodule.popup_destroy();
             const newObject = { ...store.selectedFeatures };
             getEntries(newObject).map(([_, value]) => value.items = {});
             store.setSelectedFeatures(newObject);
             display._zoomToInitialExtent();
-            store.visibleItems({ value: undefined });
+            visibleItems({ value: undefined });
         };
 
         const msgDefaultVisibleLayer = store.checked ? gettext("Turn on default layers visibility") : gettext("Turn off inactive layers");
