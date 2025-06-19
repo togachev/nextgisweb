@@ -19,7 +19,8 @@ import { IModule } from "@nextgisweb/webmap/imodule";
 
 import "./SelectedFeature.less";
 
-const ItemSelectValue = ({ display, store }) => {
+const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
+    ({ display, store }) => {
     const { visibleItems } = useSelected(display, store);
     const imodule: IModule = display.imodule;
 
@@ -36,25 +37,26 @@ const ItemSelectValue = ({ display, store }) => {
         }
     };
 
-    const updateSelect = async (key, ckey, cvalue) => {
-        const obj = { ...store.selectedFeatures }
-
-        if (obj[key].items[ckey].checked) {
-            if (cvalue.type === "vector") {
-                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
-            } else if (cvalue.type === "raster") {
-                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
+    useEffect(() => {
+        const { achecked, ackey, acvalue } = store.activeChecked;
+        if (achecked) {
+            if (acvalue.type === "vector") {
+                store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
+            } else if (acvalue.type === "raster") {
+                store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "raster" });
             }
-            visibleItems({ value: [cvalue.styleId] });
+            visibleItems({ value: [acvalue.styleId] });
+
         } else {
-            imodule.popup_destroy();
-            display._zoomToInitialExtent();
+            store.display.imodule.popup_destroy();
+            store.display._zoomToInitialExtent();
             visibleItems({ value: undefined });
         }
-    }
+    }, [store.activeChecked]);
 
     return getEntries(store.selectedFeatures).map(([key, value]) => {
         const { title, styleId } = value.value;
+        const { achecked, ackey } = store.activeChecked;
         return Object.keys(value.items).length > 0 && (
             <div key={key} className="row-selected">
                 {store.visibleLayerName && <div className="item-label">
@@ -93,26 +95,24 @@ const ItemSelectValue = ({ display, store }) => {
                                 <Button
                                     title={gettext("View information about the object")}
                                     onClick={() => {
-                                        const obj = { ...store.selectedFeatures }
-                                        const value = {
-                                            ...obj,
-                                            [key]: {
-                                                ...obj[key],
-                                                items: {
-                                                    ...obj[key].items,
-                                                    [ckey]: {
-                                                        ...obj[key].items[ckey],
-                                                        checked: !obj[key].items[ckey].checked
-                                                    }
-                                                }
+                                        const obj = { ...store.activeChecked };
+                                        if (obj.ackey !== ckey) {
+                                            if (cvalue.type === "vector") {
+                                                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "vector" });
+                                            } else if (cvalue.type === "raster") {
+                                                store.setSimulatePointZoom({ key: ckey, value: cvalue, type: "raster" });
                                             }
+                                            visibleItems({ value: [cvalue.styleId] });
+                                            store.setActiveChecked({ achecked: true, ackey: ckey, acvalue: cvalue })
+                                        } else {
+                                            store.setActiveChecked({ achecked: !obj.achecked, ackey: ckey, acvalue: cvalue })
                                         }
-                                        store.setSelectedFeatures(value);
-                                        updateSelect(key, ckey, cvalue); /*переделать*/
                                     }}
                                     className="label-child"
                                     type="text"
                                     size="small"
+                                    color={achecked && ackey === ckey && "default"}
+                                    variant="filled"
                                 >
                                     {cvalue.type === "vector" ? cvalue.label : `${id}. ${gettext("value raster")}`}
                                 </Button>
@@ -132,7 +132,7 @@ const ItemSelectValue = ({ display, store }) => {
             </div>
         )
     })
-};
+});
 
 const InfoSelect = () => {
     const items: DescriptionsProps["items"] = [
@@ -175,7 +175,7 @@ const InfoSelect = () => {
     );
 };
 
-const SelectedFeature = observer<PanelPluginWidgetProps>(
+const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
 
