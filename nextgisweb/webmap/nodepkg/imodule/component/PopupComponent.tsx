@@ -181,7 +181,7 @@ export default observer(
                     const selectedProps = { ...selectVal };
                     Object.assign(selectedProps, propsCoords());
                     if (panel) {
-                        updateSelectFeatures(panel, selectedProps)
+                        updateSelectFeatures(panel, selectedProps);
                     }
                 } else {
                     store.generateUrl({ res: null, st: null, pn: null, disable: false });

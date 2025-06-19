@@ -232,7 +232,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                         size="small"
                         icon={<Visibility />}
                         onClick={onCheckedVisibleItems}
-                        color={store.checked && "primary"}
+                        color={store.checked && "default"}
                         variant="filled"
                         disabled={store.countItems === 0}
                     />
@@ -243,7 +243,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                             size="small"
                             icon={<PlaylistRemove />}
                             onClick={onVisibleLayerName}
-                            color={!store.visibleLayerName && "primary"}
+                            color={!store.visibleLayerName && "default"}
                             variant="filled"
                             disabled={store.countItems === 0}
                         />

@@ -14,7 +14,6 @@ import PopupClick from "./component/PopupClick";
 import PopupComponent from "./component/PopupComponent";
 import ContextComponent from "./component/ContextComponent";
 import { positionContext } from "./positionContext"
-import SimpleGeometry from "ol/geom/SimpleGeometry";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { transform } from 'ol/proj';
 
@@ -343,25 +342,6 @@ export class IModule extends Component {
 
     point_context_destroy = () => {
         this.root_point_context.render();
-    };
-
-    transformCoordinate = async (from, to, point) => {
-        return await route("spatial_ref_sys.geom_transform.batch")
-            .post({
-                json: {
-                    srs_from: from,
-                    srs_to: Array.from(to),
-                    geom: wkt.writeGeometry(new Point(point)),
-                },
-            })
-            .then((transformed) => {
-                const t = transformed.find(i => i.srs_id !== from)
-                const wktPoint = wkt.readGeometry(t.geom);
-                if (wktPoint instanceof SimpleGeometry) {
-                    const transformedCoord = wktPoint.getCoordinates() as number[];
-                    return transformedCoord;
-                }
-            });
     };
 
     transformCoord = async (coord, from, to) => {
