@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, observable } from "mobx";
 import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import type { Root as ReactRoot } from 'react-dom/client';
@@ -26,7 +26,6 @@ import "./IModule.less";
 type SrsInfoMap = Map<number, SRSRead>;
 
 const settings = webmapSettings;
-const wkt = new WKT();
 
 interface ControlOptions {
     tool: IModule;
@@ -165,16 +164,6 @@ export class IModule extends Component {
     @action
     private setSrsMap(srsMap: SrsInfoMap) {
         this.srsMap = srsMap;
-    }
-
-    @computed
-    get _activePanel() {
-        return this.display.panelManager.getActivePanelName();
-    }
-
-    @computed
-    get _panelSize() {
-        return this._activePanel && this._activePanel !== "none" ? this.display.panelSize : 0;
     }
 
     getSrsInfo = async () => {

@@ -38,18 +38,34 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         };
 
         useEffect(() => {
-            const { achecked, ackey, acvalue } = store.activeChecked;
-            if (achecked) {
-                if (acvalue.type === "vector") {
-                    store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
-                } else if (acvalue.type === "raster") {
-                    store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "raster" });
+            const { lchecked, lckey } = store.activeLayer;
+            if (store.countLayers > 0 && store.activeChecked.achecked === false) {
+                if (lchecked) {
+                    imodule?.zoomToLayerExtent({ styleId: Number(lckey) });
+                    visibleItems({ value: [Number(lckey)] });
+                } else {
+                    imodule?.popup_destroy();
+                    display._zoomToInitialExtent();
+                    visibleItems({ value: undefined });
                 }
-                visibleItems({ value: [acvalue.styleId] });
-            } else {
-                imodule?.popup_destroy();
-                display._zoomToInitialExtent();
-                visibleItems({ value: undefined });
+            }
+        }, [store.activeLayer]);
+
+        useEffect(() => {
+            const { achecked, ackey, acvalue } = store.activeChecked;
+            if (store.countItems > 0 && store.activeLayer.lchecked === false) {
+                if (achecked) {
+                    if (acvalue.type === "vector") {
+                        store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
+                    } else if (acvalue.type === "raster") {
+                        store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "raster" });
+                    }
+                    visibleItems({ value: [acvalue.styleId] });
+                } else {
+                    imodule?.popup_destroy();
+                    display._zoomToInitialExtent();
+                    visibleItems({ value: undefined });
+                }
             }
         }, [store.activeChecked]);
 
@@ -58,36 +74,52 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
 
         return getEntries(store.selectedFeatures).map(([key, value]) => {
             const { title, styleId } = value.value;
-            const { achecked, ackey } = store.activeChecked;
+
+            const objLayer = { ...store.activeLayer };
+
             return Object.keys(value.items).length > 0 && (
                 <div key={key} className="row-selected">
-                    {store.visibleLayerName && <div className="item-label">
-                        <Button
-                            title={[title, msgZoomToLayer].join(" \n")}
-                            className="label"
-                            size="small"
-                            type="text"
-                            onClick={() => {
-                                imodule?.zoomToLayerExtent({ styleId });
-                                visibleItems({ value: [styleId] });
-                            }}>
-                            {title}
-                        </Button>
-                        <div className="control-item">
+                    {store.visibleLayerName &&
+                        <div className="item-label">
                             <Button
-                                title={gettext("Clear selection of objects from current layer")}
-                                type="text"
+                                title={objLayer.lchecked ? [title, gettext("Initial extent")].join(" \n") : [title, msgZoomToLayer].join(" \n")}
+                                className="label"
                                 size="small"
-                                icon={<CloseBoxOutline />}
+                                type="text"
                                 onClick={() => {
-                                    deleteRow({ key: key, ckey: null, all: true })
-                                    imodule?.popup_destroy();
-                                    display._zoomToInitialExtent();
-                                    visibleItems({ value: undefined });
+                                    if (objLayer.lckey !== key) {
+                                        imodule?.zoomToLayerExtent({ styleId });
+                                        visibleItems({ value: [styleId] });
+                                        store.setActiveLayer({ lchecked: true, lckey: key, })
+                                    } else {
+                                        store.setActiveLayer({ lchecked: !objLayer.lchecked, lckey: key })
+                                    }
+                                    store.setActiveChecked({
+                                        ...store.activeChecked,
+                                        achecked: false,
+                                    });
                                 }}
-                            />
+                                color={objLayer.lchecked && objLayer.lckey === key && "primary"}
+                                variant="filled"
+                            >
+                                {title}
+                            </Button>
+                            <div className="control-item">
+                                <Button
+                                    title={gettext("Clear selection of objects from current layer")}
+                                    type="text"
+                                    size="small"
+                                    icon={<CloseBoxOutline />}
+                                    onClick={() => {
+                                        deleteRow({ key: key, ckey: null, all: true })
+                                        imodule?.popup_destroy();
+                                        display._zoomToInitialExtent();
+                                        visibleItems({ value: undefined });
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>}
+                    }
                     {
                         Object.keys(value.items).length > 0 &&
                         getEntries(value.items).map(([ckey, cvalue], index) => {
@@ -109,11 +141,15 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                             } else {
                                                 store.setActiveChecked({ achecked: !obj.achecked, ackey: ckey, acvalue: cvalue })
                                             }
+                                            store.setActiveLayer({
+                                                ...store.activeLayer,
+                                                lchecked: false,
+                                            });
                                         }}
                                         className="label-child"
                                         type="text"
                                         size="small"
-                                        color={achecked && ackey === ckey && "default"}
+                                        color={obj.achecked && obj.ackey === ckey && "primary"}
                                         variant="filled"
                                     >
                                         {cvalue.type === "vector" ? cvalue.label : `${id}. ${msgValueRaster}`}
@@ -226,33 +262,25 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                     showIcon={false}
                 />}
                 <div className="control-visible">
-                    <Button
-                        title={msgDefaultVisibleLayer}
-                        type="text"
-                        size="small"
-                        icon={<Visibility />}
-                        onClick={onCheckedVisibleItems}
-                        color={store.checked && "default"}
-                        variant="filled"
-                        disabled={store.countItems === 0}
-                    />
                     <div className="control-item">
+                        <Button
+                            title={msgDefaultVisibleLayer}
+                            type="text"
+                            size="small"
+                            icon={<Visibility />}
+                            onClick={onCheckedVisibleItems}
+                            color={store.checked && "primary"}
+                            variant="filled"
+                            disabled={store.countItems === 0}
+                        />
                         <Button
                             title={msgVisibleLayerName}
                             type="text"
                             size="small"
                             icon={<PlaylistRemove />}
                             onClick={onVisibleLayerName}
-                            color={!store.visibleLayerName && "default"}
+                            color={!store.visibleLayerName && "primary"}
                             variant="filled"
-                            disabled={store.countItems === 0}
-                        />
-                        <Button
-                            title={gettext("Clear all selected feature")}
-                            type="text"
-                            size="small"
-                            icon={<CloseBoxMultiple />}
-                            onClick={deleteAllRow}
                             disabled={store.countItems === 0}
                         />
                         <Popover overlayClassName="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
@@ -263,6 +291,16 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 icon={<InformationOutline />}
                             />
                         </Popover>
+                    </div>
+                    <div className="control-item">
+                        <Button
+                            title={gettext("Clear all selected feature")}
+                            type="text"
+                            size="small"
+                            icon={<CloseBoxMultiple />}
+                            onClick={deleteAllRow}
+                            disabled={store.countItems === 0}
+                        />
                     </div>
                 </div>
                 <ItemSelectValue {...{ display, store }} />

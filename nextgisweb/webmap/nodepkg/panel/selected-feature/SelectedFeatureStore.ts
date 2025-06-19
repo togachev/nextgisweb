@@ -27,6 +27,11 @@ type SimulatePointZoomProps = {
     type: string;
 }
 
+type ActiveLayerProps = {
+    lchecked: boolean;
+    lckey: string;
+}
+
 type ActiveCheckedProps = {
     achecked: boolean;
     ackey: string;
@@ -38,6 +43,7 @@ class SelectedFeatureStore extends PanelStore {
     display: Display;
     @observable accessor checked: boolean = true;
     @observable accessor visibleLayerName: boolean = true;
+    @observable.ref accessor activeLayer: ActiveLayerProps;
     @observable.ref accessor activeChecked: ActiveCheckedProps;
     @observable.ref accessor selectedFeatures: Props;
     @observable.ref accessor simulatePointZoom: SimulatePointZoomProps;
@@ -59,6 +65,10 @@ class SelectedFeatureStore extends PanelStore {
             }
         });
         this.selectedFeatures = obj;
+        this.activeLayer = {
+            lchecked: false,
+            lckey: "",
+        };
         this.activeChecked = {
             achecked: false,
             ackey: "",
@@ -75,6 +85,17 @@ class SelectedFeatureStore extends PanelStore {
         return count;
     }
 
+    @computed
+    get countLayers() {
+        let count = 0;
+        getEntries(this.selectedFeatures).map(([_, value]) => {
+            if (Object.keys(value.items).length > 0) {
+                count += 1
+            }
+        });
+        return count;
+    }
+
     @action
     setChecked(checked: boolean) {
         this.checked = checked;
@@ -83,6 +104,11 @@ class SelectedFeatureStore extends PanelStore {
     @action
     setVisibleLayerName(visibleLayerName: boolean) {
         this.visibleLayerName = visibleLayerName;
+    }
+
+    @action
+    setActiveLayer(activeLayer: ActiveLayerProps) {
+        this.activeLayer = activeLayer;
     }
 
     @action
