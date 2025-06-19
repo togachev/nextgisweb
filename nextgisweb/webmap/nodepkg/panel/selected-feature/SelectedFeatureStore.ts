@@ -113,6 +113,57 @@ class SelectedFeatureStore extends PanelStore {
         });
         return featureItem;
     }
+
+    simulateEvent(p, pixel) {
+        return {
+            coordinate: p && p.coordinate,
+            map: this.display.map.olMap,
+            target: "map",
+            pixel: [
+                this.display.panelManager.getActivePanelName() !== "none" ?
+                    (pixel[0] + this.display.panelSize + 40) :
+                    (pixel[0] + 40), (pixel[1] + 40)
+            ],
+            type: "click"
+        }
+    };
+
+    visibleItems({ value }) {
+        const visibleStyles: number[] = [];
+        const itemConfig = this.display.getItemConfig();
+        if (value && this.checked === true) {
+            Object.keys(itemConfig).forEach(function (key) {
+                if (value.includes(itemConfig[key].styleId)) {
+                    visibleStyles.push(itemConfig[key].id);
+                }
+            });
+        } else {
+            this.display.config.checkedItems.forEach(function (key) {
+                visibleStyles.push(itemConfig[key].id);
+            });
+        }
+        this.display.webmapStore.setChecked(visibleStyles);
+        this.display.webmapStore._updateLayersVisibility(visibleStyles);
+    };
+
+    vectorRender() {
+        const { key, value } = this.simulatePointZoom;
+        const val = { params: [] };
+        const coordinate = this.display.map.olMap.getView().getCenter();
+        const p = { point: false, value: val, coordinate: coordinate, selected: key, data: value };
+        const pixel = this.display.map.olMap.getPixelFromCoordinate(coordinate);
+        const event = this.simulateEvent(p, pixel);
+        this.display.imodule._overlayInfo(event, "popup", p, "selected")
+    };
+
+    rasterRender() {
+        const { key, value } = this.simulatePointZoom;
+        const val = { params: [] };
+        const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
+        const pixel = this.display.map.olMap.getPixelFromCoordinate(value.coordinate);
+        const event = this.simulateEvent(p, pixel);
+        this.display.imodule._overlayInfo(event, "popup", p, "selected")
+    };
 }
 
 export default SelectedFeatureStore;
