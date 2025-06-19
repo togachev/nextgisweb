@@ -259,7 +259,8 @@ export class IModule extends Component {
         const offset = op === "context" ? 0 : settings.offset_point;
 
         if (p.selected) {
-            this.response = { data: [p.data], featureCount: 1 }
+            this.response = { data: [p.data], featureCount: 1 };
+            this.countFeature = 1;
         } else {
             await this.getResponse(op, p);
         }
