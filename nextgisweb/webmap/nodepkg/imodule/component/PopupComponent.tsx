@@ -430,6 +430,10 @@ export default observer(
                                         className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
                                             display.imodule.popup_destroy();
+                                            panel && panel.setActiveChecked({
+                                                ...panel.activeChecked,
+                                                achecked: false,
+                                            });
                                         }} >
                                         <CloseIcon />
                                     </span>

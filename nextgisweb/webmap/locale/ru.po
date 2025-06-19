@@ -198,7 +198,7 @@ msgstr "Информация о геометрии"
 
 #: nodepkg/imodule/component/ContentComponent.tsx:173
 #: nodepkg/panel/description/plugin.tsx:10
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:181
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:208
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:38
 #: nodepkg/settings-widget/SettingsWidget.tsx:59
 msgid "Description"
@@ -272,21 +272,21 @@ msgstr "Обновить текущий адрес веб-карты"
 msgid "Set current map coverage"
 msgstr "Установить текущее покрытие карты"
 
-#: nodepkg/imodule/component/PopupComponent.tsx:265
+#: nodepkg/imodule/component/PopupComponent.tsx:256
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
 #: nodepkg/plugin/layer-editor/LayerEditor.tsx:134
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/imodule/component/PopupComponent.tsx:417
+#: nodepkg/imodule/component/PopupComponent.tsx:408
 msgid "Сollapse fullscreen popup"
 msgstr "Свернуть полноэкранное всплывающее окно"
 
-#: nodepkg/imodule/component/PopupComponent.tsx:417
+#: nodepkg/imodule/component/PopupComponent.tsx:408
 msgid "Open fullscreen popup"
 msgstr "Открыть полноэкранное всплывающее окно"
 
-#: nodepkg/imodule/component/PopupComponent.tsx:438
+#: nodepkg/imodule/component/PopupComponent.tsx:429
 msgid "Close"
 msgstr "Закрыть"
 
@@ -450,6 +450,7 @@ msgstr "Числовой масштаб"
 
 #: nodepkg/map-controls/map-controls.ts:103
 #: nodepkg/map-controls/map-controls.ts:106
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:99
 #: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Initial extent"
 msgstr "Начальный охват"
@@ -611,7 +612,7 @@ msgstr "Удалить слой"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:35
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:35
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:46
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:56
 #: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:18
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -925,63 +926,67 @@ msgstr "Уточните критерий поиска. Отображены п�
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:58
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:57
+msgid "Value raster layer"
+msgstr "Значение растрового слоя"
+
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:78
 msgid "Clear selection of objects from current layer"
 msgstr "Очистить выбор объектов из текущего слоя"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:78
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:99
 msgid "View information about the object"
 msgstr "Посмотреть информацию об объекте"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:96
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:123
 msgid "Delete selected feature"
 msgstr "Удалить выбранную функцию"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:117
-msgid "Включение/выключение слоев по умолчанию при просмотре информации об объекте."
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:144
+msgid "Turn layers on/off by default when viewing object information."
+msgstr "Включение/выключение слоев по умолчанию при просмотре информации об объекте."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:122
-msgid "Скрытие наименований слоев."
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:149
+msgid "Hide layer names."
+msgstr "Скрытие наименований слоев."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:127
-msgid "Удаление всех выделенных объектов."
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:154
+msgid "Delete all selected objects."
+msgstr "Удаление всех выделенных объектов."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:132
-msgid "Удаление части выделенных объектов для каждого слоя."
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:159
+msgid "Delete a portion of the selected objects for each layer."
+msgstr "Удаление части выделенных объектов для каждого слоя."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:137
-msgid "Удаление одного объекта."
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:164
+msgid "Delete a single object."
+msgstr "Удаление одного объекта."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:179
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:206
 msgid "Turn on default layers visibility"
 msgstr "Включить видимость слоев по умолчанию"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:179
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:206
 msgid "Turn off inactive layers"
 msgstr "Отключить неактивные слои"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:180
-msgid "Функции кнопок:"
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:207
+msgid "Button functions:"
+msgstr "Функции кнопок:"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:182
-msgid "История выделения объектов векторных и растровых слоев веб-карты"
-msgstr ""
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:209
+msgid "History of selection of objects of vector and raster layers of the web map"
+msgstr "История выделения объектов векторных и растровых слоев веб-карты"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:183
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:210
 msgid "Hide layer name"
 msgstr "Скрыть имя слоя"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:183
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:210
 msgid "Show layer name"
 msgstr "Показать имя слоя"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:223
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:250
 msgid "Clear all selected feature"
 msgstr "Очистить все выбранные функции"
 

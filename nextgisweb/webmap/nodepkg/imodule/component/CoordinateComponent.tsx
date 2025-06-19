@@ -125,7 +125,7 @@ export const CoordinateComponent = observer((props) => {
             icon: value.icon,
             onTouchEnd: (e) => onClick(e, name),
             onClick: (e) => onClick(e, name),
-            color: value.checked && "primary",
+            color: value.checked && "default",
             variant: "filled",
             type: "text",
             size: "small",
