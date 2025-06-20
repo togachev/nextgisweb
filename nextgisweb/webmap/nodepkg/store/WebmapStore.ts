@@ -156,7 +156,7 @@ export class WebmapStore {
         return updatedCheckedKeys;
     };
 
-    private _updateLayersVisibility = (checkedKeys: number[]) => {
+    _updateLayersVisibility = (checkedKeys: number[]) => {
         this._itemStore.fetch({
             query: { type: "layer" },
             queryOptions: { deep: true },

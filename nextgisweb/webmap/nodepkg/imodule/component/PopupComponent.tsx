@@ -43,9 +43,9 @@ const CheckOnlyOne = ({ store, /*imodule*/ }) => {
         onTouchEnd: onClick,
         onClick: onClick,
         type: "text",
-        variant: "text",
+        variant: "solid",
         size: "small",
-        color: store.fixPopup && "danger",
+        color: store.fixPopup && "primary",
         title: store.fixPopup ? msgFixOffPopup : msgFixPopup,
         className: !store.fixPopup ? "icon-symbol" : "icon-checked",
     }
