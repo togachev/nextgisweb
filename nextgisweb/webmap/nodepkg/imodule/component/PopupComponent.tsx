@@ -142,18 +142,21 @@ export default observer(
 
             const updateSelectFeatures = (panel, props) => {
                 const obj = { ...panel.selectedFeatures }
+                const [key] = getEntries(obj).filter(([_, val]) => val.styleId === props.styleId)[0];
+                
                 const value = {
                     ...obj,
-                    [String(props.styleId)]: {
-                        ...obj[props.styleId],
+                    [key]: {
+                        ...obj[key],
                         ...{
                             items: {
-                                ...obj[props.styleId].items,
+                                ...obj[key].items,
                                 [String(props.value)]: props
                             }
                         }
                     }
                 }
+                
                 getEntries(value)
                     .map(([key, _]) => {
                         if (Object.keys(value[key].items).length > 10) {

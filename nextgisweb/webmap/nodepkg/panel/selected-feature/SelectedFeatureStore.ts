@@ -56,19 +56,6 @@ class SelectedFeatureStore extends PanelStore {
         getEntries(this.display.getItemConfig()).map(([key, value]) => {
             if (value.type === "layer") {
                 Object.assign(obj, {
-                    [value.styleId]: {
-                        value: value,
-                        key: key,
-                        type: value.layerCls === "raster_layer" ? "raster" : "vector",
-                        items: {},
-                    },
-                })
-            }
-        });
-        const useKeyObj = {};
-        getEntries(this.display.getItemConfig()).map(([key, value]) => {
-            if (value.type === "layer") {
-                Object.assign(useKeyObj, {
                     [key]: {
                         value: value,
                         styleId: value.styleId,
@@ -78,8 +65,6 @@ class SelectedFeatureStore extends PanelStore {
                 })
             }
         });
-
-        console.log(this.display.getItemConfig(), useKeyObj, obj);
 
         this.selectedFeatures = obj;
         this.activeLayer = {
