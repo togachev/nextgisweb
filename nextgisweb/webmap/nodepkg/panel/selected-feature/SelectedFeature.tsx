@@ -114,7 +114,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                     type="text"
                                     onClick={() => lOnChecked(key, styleId)}
                                     color={objLayer.lchecked && objLayer.lckey === key && "primary"}
-                                    variant="solid"
+                                    variant="filled"
                                 >
                                     {title}
                                 </Button>
@@ -144,7 +144,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                     <div key={ckey} className="label-child-element">
                                         <div className="index-lf">{lindex}.{findex}</div>
                                         <Button
-                                            title={obj.achecked ? 
+                                            title={obj.achecked ?
                                                 [ftitle, gettext("Initial extent")].join(" \n") :
                                                 [ftitle, gettext("View information about the object")].join(" \n")}
                                             onClick={() => acOnChecked(ckey, cvalue)}
@@ -152,7 +152,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                             type="text"
                                             size="small"
                                             color={obj.achecked && obj.ackey === ckey && "primary"}
-                                            variant="solid"
+                                            variant="filled"
                                         >
                                             {ftitle}
                                         </Button>
@@ -226,7 +226,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             if (store.checked === false) {
                 imodule?.popup_destroy();
                 visibleItems({ value: undefined });
-            } 
+            }
             else {
                 const itemConfig = display.getItemConfig();
                 const visibleStyles: number[] = [];
@@ -270,6 +270,53 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                 className="ngw-webmap-selected-feature-panel"
                 title={store.title}
                 close={store.close}
+                prolog={
+                    <div className="control-visible">
+                        <div className="control-item">
+                            <Button
+                                title={msgDefaultVisibleLayer}
+                                type="text"
+                                size="small"
+                                icon={<Visibility />}
+                                onClick={onCheckedVisibleItems}
+                                color={store.checked && "primary"}
+                                variant="filled"
+                                disabled={store.countItems === 0}
+                            />
+                            <Button
+                                title={msgVisibleLayerName}
+                                type="text"
+                                size="small"
+                                icon={<PlaylistRemove />}
+                                onClick={onVisibleLayerName}
+                                color={!store.visibleLayerName && "primary"}
+                                variant="filled"
+                                disabled={
+                                    store.countItems === 0
+                                    || store.activeLayer.lchecked === true
+                                }
+                            />
+                            <Popover overlayClassName="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
+                                <Button
+                                    title={msgDescription}
+                                    type="text"
+                                    size="small"
+                                    icon={<InformationOutline />}
+                                />
+                            </Popover>
+                        </div>
+                        <div className="control-item">
+                            <Button
+                                title={gettext("Clear all selected feature")}
+                                type="text"
+                                size="small"
+                                icon={<CloseBoxMultiple />}
+                                onClick={deleteAllRow}
+                                disabled={store.countItems === 0}
+                            />
+                        </div>
+                    </div>
+                }
                 components={{
                     content: PanelContainer.Unpadded,
                     epilog: PanelContainer.Unpadded,
@@ -280,51 +327,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                     banner
                     showIcon={false}
                 />}
-                <div className="control-visible">
-                    <div className="control-item">
-                        <Button
-                            title={msgDefaultVisibleLayer}
-                            type="text"
-                            size="small"
-                            icon={<Visibility />}
-                            onClick={onCheckedVisibleItems}
-                            color={store.checked && "primary"}
-                            variant="solid"
-                            disabled={store.countItems === 0}
-                        />
-                        <Button
-                            title={msgVisibleLayerName}
-                            type="text"
-                            size="small"
-                            icon={<PlaylistRemove />}
-                            onClick={onVisibleLayerName}
-                            color={!store.visibleLayerName && "primary"}
-                            variant="solid"
-                            disabled={
-                                store.countItems === 0
-                                || store.activeLayer.lchecked === true
-                            }
-                        />
-                        <Popover overlayClassName="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
-                            <Button
-                                title={msgDescription}
-                                type="text"
-                                size="small"
-                                icon={<InformationOutline />}
-                            />
-                        </Popover>
-                    </div>
-                    <div className="control-item">
-                        <Button
-                            title={gettext("Clear all selected feature")}
-                            type="text"
-                            size="small"
-                            icon={<CloseBoxMultiple />}
-                            onClick={deleteAllRow}
-                            disabled={store.countItems === 0}
-                        />
-                    </div>
-                </div>
+
                 <ItemSelectValue {...{ display, store }} />
             </PanelContainer>
         )

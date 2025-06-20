@@ -43,7 +43,7 @@ const CheckOnlyOne = ({ store, /*imodule*/ }) => {
         onTouchEnd: onClick,
         onClick: onClick,
         type: "text",
-        variant: "solid",
+        variant: "filled",
         size: "small",
         color: store.fixPopup && "primary",
         title: store.fixPopup ? msgFixOffPopup : msgFixPopup,
