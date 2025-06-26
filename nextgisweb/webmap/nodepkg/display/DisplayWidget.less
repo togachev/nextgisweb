@@ -1,23 +1,29 @@
-body,.ngw-webmap-display-loader {
-    display: flex;
-    flex-direction: column;
+body {
     position: fixed;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
-
-    > .ngw-webmap-display {
-        position: relative;
-        flex-grow: 1;
-        min-height: 0;
-    }
+    flex-grow: 1;
+    min-height: 0;
 }
 
 .ngw-webmap-display {
+    position: fixed;
+    top: 40px;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    flex-grow: 1;
+    min-height: 0;
 
-    >.ant-splitter-panel,
-    >.ant-splitter-panel>.ant-splitter>.ant-splitter-panel {
-        padding: 0;
+    >.ant-splitter {
+        position: absolute;
+        inset: 0;
+
+        >.ant-splitter-panel,
+        >.ant-splitter-panel>.ant-splitter>.ant-splitter-panel {
+            padding: 0;
+        }
     }
 }

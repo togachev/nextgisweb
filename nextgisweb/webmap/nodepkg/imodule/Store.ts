@@ -241,14 +241,10 @@ export class Store {
             return { updateName: undefined, feature: feature, resourceId: -1 };
         }
     }
+
     @computed
     get activePanel() {
         return this.display.panelManager.getActivePanelName();
-    }
-
-    @computed
-    get panelSize() {
-        return this.activePanel ? this.display.panelSize : 0;
     }
 
     async generateUrl({ res, st, pn, disable }) {

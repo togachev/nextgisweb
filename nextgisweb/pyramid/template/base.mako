@@ -2,26 +2,32 @@
 
 <%!
     from types import SimpleNamespace
-    from msgspec import NODEFAULT
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY
 %>
 
 <%
-    effective_title = None if title is UNDEFINED else title
-    bcpath = list()
-    if obj is not None:
-        bcpath = breadcrumb_path(obj, request)
-        if len(bcpath) > 0 and effective_title is None:
-            effective_title = bcpath[-1].title
-            bcpath = bcpath[:-1]
+    if custom_layout is UNDEFINED and (c := getattr(next, "is_custom_layout", None)):
+        effective_custom_layout = c()
+    else:
+        effective_custom_layout = custom_layout
 
     system_name = request.env.core.system_full_name()
-    head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
+    effective_title = None if title is UNDEFINED else title
+    effective_header = system_name if header is UNDEFINED else header
+
+    breadcrumbs = list()
+    if obj is not UNDEFINED:
+        breadcrumbs = breadcrumb_path(obj, request)
+        if len(breadcrumbs) > 0 and effective_title is None:
+            effective_title = breadcrumbs[-1].title
+            breadcrumbs = breadcrumbs[:-1]
+
+    head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else system_name
 
     array = list()
-    if len(bcpath) > 0:
-        for idx, bc in enumerate(bcpath):
+    if len(breadcrumbs) > 0:
+        for idx, bc in enumerate(breadcrumbs):
             value = dict()
             value["idx"] = idx
             value["id"] = bc.id
@@ -31,13 +37,16 @@
             if bc.title:
                 value["title"] = bc.title
             array.append(value)
-    
 %>
 
 <html>
 <head>
     <title>${head_title}</title>
     <meta charset="utf-8">
+
+    %if adaptive:
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    %endif
     
     <%include
         file="nextgisweb:social/template/meta.mako"
@@ -78,50 +87,21 @@
     ${include_head | n}
 </head>
 
-<%def name="render_dynmenu()">
-    <%
-        dynmenu_kwargs = SimpleNamespace(request=request)
-        if (dynmenu := context.get("dynmenu", NODEFAULT)) is NODEFAULT:
-            if obj and (dynmenu := getattr(obj, "__dynmenu__", NODEFAULT)) is not NODEFAULT:
-                dynmenu_kwargs.obj = obj
-    %>
-    %if (dynmenu is not NODEFAULT) and dynmenu:
-        <div class="ngw-pyramid-layout-sidebar">
-            <%include file="nextgisweb:gui/template/react_boot.mako" args="
-                jsentry=LAYOUT_JSENTRY,
-                name='Dynmenu',
-                props={'items': dynmenu.json(dynmenu_kwargs)},
-            "/>
-        </div>
-    %endif
-</%def>
-
 <body>
-    %if not custom_layout:
+    %if not effective_custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]
             if maxwidth: lclasses += ["ngw-pyramid-layout-hstretch"]
             if maxheight: lclasses += ["ngw-pyramid-layout-vstretch"]
         %>
         <div class="${' '.join(lclasses)}">
-            <%include file="nextgisweb:pyramid/template/header.mako" args="header=system_name"/>
+            <%include file="nextgisweb:pyramid/template/header.mako" args="header=effective_header"/>
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-                        %if len(bcpath) > 0:
-                            <div id="breadcrumbs" class="ngw-pyramid-layout-breadcrumbs-stub"></div>
-                            <%include file="nextgisweb:gui/template/react_boot.mako" args="
-                                jsentry=LAYOUT_JSENTRY,
-                                name='BreadcrumbComponent',
-                                props={'items': array, 'current_id': obj.id},
-                                element='breadcrumbs',
-                            "/>
-                        %endif
-
                         <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
                         </h1>
-
                         %if hasattr(next, 'body'):
                             <div id="content" class="content" style="width: 100%">
                                 ${next.body()}
@@ -129,11 +109,17 @@
                         %endif
                     </div>
                 </div>
-                ${render_dynmenu()}
             </div>
         </div>
     %else:
-        ${next.body()}
+        ${next.body(
+            obj=obj,
+            title=effective_title,
+            header=effective_header,
+            breadcrumbs=array,
+            maxwidth=maxwidth,
+            maxheight=maxheight,
+        )}
     %endif
 </body>
 </html>

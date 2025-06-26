@@ -1,11 +1,11 @@
+import glob
 import os
-import shutil
 import subprocess
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List, Union
 from warnings import warn
-from zipfile import is_zipfile
+from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -14,7 +14,7 @@ from msgspec import UNSET
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
+from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf, ngettextf
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 
@@ -42,7 +42,7 @@ Base.depends_on("resource")
 
 PYRAMID_TARGET_SIZE = 512
 
-SUPPORTED_DRIVERS = ("GTiff",)
+SUPPORTED_DRIVERS = ("GTiff", "PNG", "JPEG")
 
 COLOR_INTERPRETATION = {
     gdal.GCI_Undefined: "Undefined",
@@ -74,6 +74,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     __scope__ = DataScope
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
+    fileobj_pam_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
     xsize = sa.Column(sa.Integer, nullable=False)
     ysize = sa.Column(sa.Integer, nullable=False)
@@ -81,7 +82,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     band_count = sa.Column(sa.Integer, nullable=False)
     cog = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    fileobj = orm.relationship(FileObj, cascade="all")
+    fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
+    fileobj_pam = orm.relationship(FileObj, foreign_keys=fileobj_pam_id, cascade="all")
 
     @classmethod
     def check_parent(cls, parent):
@@ -166,7 +168,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                     band.GetNoDataValue() is not None
                 )
 
-        # convert the mask band to the alpha band
+        # Convert the mask band to the alpha band
         if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
             bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
             bands.append("mask")
@@ -176,7 +178,21 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 ds = gdal.Translate(tf.name, ds, options=topts)
                 ds.GetRasterBand(alpha_band).SetColorInterpretation(gdal.GCI_AlphaBand)
                 ds = None
-                shutil.move(tf.name, filename)
+
+                # gdal.Translate may generate auxiliary files (e.g., .aux.xml)
+                # to store metadata or additional info - we include all such
+                # files in the ZIP archive to ensure nothing is lost.
+                base, _ = os.path.splitext(tf.name)
+                ds_files = glob.glob(base + ".*")
+                if filename.startswith("/vsizip/"):
+                    filename = filename[filename.find("{") + 1 : filename.find("}")]
+                with ZipFile(filename, "w") as zf:
+                    for file in ds_files:
+                        zf.write(file, arcname=os.path.basename(file))
+                        os.remove(file)
+
+                zip_filename = "/vsizip/{%s}" % filename
+                filename = f"{zip_filename}/{os.path.basename(tf.name)}"
                 ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
 
         try:
@@ -236,11 +252,10 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 )
             )
 
-        cmd.extend(("--config", "GDAL_PAM_ENABLED", "NO"))
         cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
         fobj = FileObj(component="raster_layer")
-        dst_file = str(comp.workdir_path(fobj, makedirs=True))
+        dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
         self.fileobj = fobj
 
         self.cog = cog
@@ -272,6 +287,16 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 subprocess.check_call(cmd)
                 os.unlink(tmp_file + ".ovr")
 
+        # GDAL Persistent Auxiliary Metadata (PAM)
+        if os.path.exists(aux_xml_file := dst_file + ".aux.xml"):
+            fobj_pam = FileObj(component="raster_layer")
+            fobj_pam = fobj_pam.copy_from(aux_xml_file)
+            self.fileobj_pam = fobj_pam
+            comp.workdir_path(fobj, fobj_pam, makedirs=True)
+        else:
+            # Cleanup PAM FileObj reference on replace
+            self.fileobj_pam = None
+
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
         try:
@@ -298,7 +323,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.band_count = ds.RasterCount
 
     def gdal_dataset(self):
-        fn = env.raster_layer.workdir_path(self.fileobj)
+        fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
         return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
 
     def build_overview(self, missing_only=False, fn=None):
@@ -306,7 +331,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             return
 
         if fn is None:
-            fn = env.raster_layer.workdir_path(self.fileobj)
+            fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
 
         if missing_only and fn.with_suffix(".ovr").exists():
             return
@@ -352,10 +377,17 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         subprocess.check_call(cmd)
 
     def get_info(self):
-        s = super()
-        return (s.get_info() if hasattr(s, "get_info") else ()) + (
-            (gettext("Data type"), self.dtype),
-            (gettext("COG"), self.cog),
+        band_summary = ngettextf(
+            "{n} band with {t} data type",
+            "{n} bands with {t} data type",
+            self.band_count,
+        )
+        return (
+            *(s() if (s := getattr(super(), "get_info", None)) else ()),
+            (gettext("Band summary"), band_summary(n=self.band_count, t=self.dtype)),
+            (gettext("Pixel dimensions"), "{} × {}".format(self.xsize, self.ysize)),
+            (gettext("Cloud Optimized GeoTIFF (COG)"), bool(self.cog)),
+            (gettext("Persistent auxiliary metadata (PAM)"), bool(self.fileobj_pam)),
         )
 
     # IBboxLayer implementation:
@@ -410,7 +442,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
 
 def estimate_raster_layer_data(resource):
-    fn = env.raster_layer.workdir_path(resource.fileobj)
+    fn = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
     return fn.stat().st_size + (0 if resource.cog else fn.with_suffix(".ovr").stat().st_size)
 
 
@@ -447,7 +479,7 @@ class CogAttr(SColumn):
             return
 
         cur_size = estimate_raster_layer_data(srlzr.obj)
-        fn = env.raster_layer.workdir_path(srlzr.obj.fileobj)
+        fn = env.raster_layer.workdir_path(srlzr.obj.fileobj, srlzr.obj.fileobj_pam)
         srlzr.obj.load_file(fn, cog=value)
 
         new_size = estimate_raster_layer_data(srlzr.obj)

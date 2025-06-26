@@ -39,7 +39,7 @@ class Control extends Interaction {
             handleEvent: (e) => this.handleClickEvent(e),
         });
         this.tool = options.tool;
-        this.handleTouchEvent();
+        // this.handleTouchEvent();
     }
 
     /* ---------- listen for single-click event or context menu for the touch screen ----------*/
@@ -77,7 +77,7 @@ class Control extends Interaction {
             && e.originalEvent.shiftKey === false
             && e.originalEvent.pointerType === "mouse"
         ) {
-            this.tool._overlayInfo(e, "popup", false, "click");
+            // this.tool._overlayInfo(e, "popup", false, "click");
             e.preventDefault();
         } else if (
             e.type === "contextmenu"
@@ -85,7 +85,7 @@ class Control extends Interaction {
             && e.originalEvent.shiftKey === false
             && e.originalEvent.pointerType === "mouse"
         ) {
-            this.tool._overlayInfo(e, "context", false, "click");
+            // this.tool._overlayInfo(e, "context", false, "click");
             e.preventDefault();
         }
         return true;

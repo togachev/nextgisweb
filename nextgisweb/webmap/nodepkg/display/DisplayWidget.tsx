@@ -2,9 +2,9 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
 
-import { Spin, Splitter } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import { Header } from "@nextgisweb/pyramid/layout/header/Header";
+import { Splitter } from "@nextgisweb/gui/antd";
+import { useLayout } from "@nextgisweb/pyramid/layout/useLayout";
+import type { Orientation } from "@nextgisweb/pyramid/layout/useLayout";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -14,8 +14,6 @@ import { Display } from "./Display";
 import { MapPane } from "./component/MapPane";
 import { NavigationMenu } from "./component/NavigationMenu";
 import { PanelSwitcher } from "./component/PanelSwitcher";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 import "./DisplayWidget.css";
 import "./DisplayWidget.less";
@@ -28,6 +26,16 @@ export interface DisplayComponentProps {
     className?: string;
     display?: Display;
     setMapRefs?: (val: MapRefs) => void;
+}
+
+const PANEL_MIN_HEIGHT = 20;
+const PANELS_DEF_LANDSCAPE_SIZE = 350;
+const PANELS_DEF_PORTRAIT_SIZE = "50%";
+
+function getDefultPanelSize(orientation: Orientation) {
+    return orientation === "portrait"
+        ? PANELS_DEF_PORTRAIT_SIZE
+        : PANELS_DEF_LANDSCAPE_SIZE;
 }
 
 export const DisplayWidget = observer(
@@ -45,91 +53,134 @@ export const DisplayWidget = observer(
                 })
         );
 
-        const [mapRefs, setMapRefs_] = useState<MapRefs>();
+        const { orientation, isPortrait, isMobile } = useLayout();
+
+        useEffect(() => {
+            display.setIsMobile(isMobile);
+        }, [display, isMobile]);
 
         const setMapRefs = useCallback(
             (mapRefs_: MapRefs) => {
-                setMapRefs_(mapRefs_);
-                if (setMapRefsProp) {
-                    setMapRefsProp(mapRefs_);
+                if (mapRefs_) {
+                    const mapNode = !!display.mapNode;
+
+                    display.startup(mapRefs_);
+                    if (mapNode) {
+                        if (display.mapToolbar) {
+                            display.mapStates.destroy();
+                            display.map?.olMap
+                                .getControls()
+                                .forEach((control) => {
+                                    control.dispose();
+                                });
+                            display.mapToolbar.dispose();
+                            display._mapSetup();
+                        }
+                    }
+                    if (setMapRefsProp) {
+                        setMapRefsProp(mapRefs_);
+                    }
                 }
             },
-            [setMapRefsProp]
+            [display, setMapRefsProp]
         );
 
         const { activePanel } = display.panelManager;
 
-        const [horizontalPanelSize, setHorizontalPanelSize] = useState<
-            (number | undefined)[]
-        >([350, undefined]);
+        const [panelSize, setPanelsSize] = useState<string | number>(
+            getDefultPanelSize(orientation)
+        );
 
         useEffect(() => {
-            display.setPanelSize(horizontalPanelSize[0] ? horizontalPanelSize[0] - 8 : horizontalPanelSize[1] - 8);
-        }, [display, display.mapExtentDeferred, horizontalPanelSize]);
+            setPanelsSize(() => {
+                return getDefultPanelSize(orientation);
+            });
 
-        useEffect(() => {
-            if (mapRefs) {
-                display.startup(mapRefs);
-            }
-        }, [display, mapRefs]);
+            display.setPanelSize(isPortrait ?
+                { width: 0, height: activePanel ? window.innerHeight / 2 : 0 } :
+                { width: activePanel ? 350 : 0, height: 0 })
+        }, [orientation]);
 
-        return (
-            <Splitter
-                className={classNames("ngw-webmap-display", className)}
-                onResize={setHorizontalPanelSize}
-            >
-                {display.panelManager.panels.size > 0 && (
-                    <Panel
-                        key="menu"
-                        resizable={false}
-                        size="50px"
-                        style={{ flexGrow: 0, flexShrink: 0 }}
-                    >
-                        <NavigationMenu display={display} store={display.panelManager} />
-                    </Panel>
-                )}
+        const onResize = useCallback(
+            (sizes: number[]) => {
+                const newPanelSize = sizes[1];
+                if (activePanel) {
+                    setPanelsSize(newPanelSize);
+                }
+            },
+            [activePanel]
+        );
+        const onResizeEnd = useCallback(
+            (sizes: number[]) => {
+                const newPanelSize = sizes[1];
+                if (activePanel) {
+                    if (newPanelSize < PANEL_MIN_HEIGHT) {
+                        display.panelManager.closePanel();
+                        setPanelsSize(getDefultPanelSize(orientation));
+                    }
+                }
+            },
+            [activePanel, display.panelManager, orientation]
+        );
+
+        const panels = [];
+
+        if (display.panelManager.panels.size > 0) {
+            panels.push(
+                <Panel
+                    key="menu"
+                    size={isPortrait ? "40px" : "50px"}
+                    resizable={false}
+                    style={{ flexGrow: 0, flexShrink: 0 }}
+                >
+                    <NavigationMenu
+                        layout={isPortrait ? "horizontal" : "vertical"}
+                        store={display.panelManager}
+                        display={display}
+                    />
+                </Panel>,
                 <Panel
                     key="panels"
-                    size={activePanel ? horizontalPanelSize[0] : 0}
+                    size={activePanel ? panelSize : 0}
                     resizable={!!activePanel}
                 >
                     <PanelSwitcher display={display} />
                 </Panel>
-                <Panel key="main">
-                    <Splitter layout="vertical">
-                        <Panel key="map">
-                            <MapPane setMapRefs={setMapRefs} />
+            );
+        }
+
+        panels.push(
+            <Panel
+                key="main"
+                min={isPortrait ? 200 : 400}
+                resizable={!!activePanel}
+            >
+                <Splitter layout="vertical">
+                    <Panel key="map" min={isPortrait ? 200 : 400}>
+                        <MapPane display={display} setMapRefs={setMapRefs} />
+                    </Panel>
+                    {display.tabsManager.tabs.length && (
+                        <Panel key="tabs">
+                            <WebMapTabs store={display.tabsManager} />
                         </Panel>
-                        {display.tabsManager.tabs.length && (
-                            <Panel key="tabs">
-                                <WebMapTabs store={display.tabsManager} />
-                            </Panel>
-                        )}
-                    </Splitter>
-                </Panel>
-            </Splitter>
+                    )}
+                </Splitter>
+            </Panel>
+        );
+
+        if (isPortrait) panels.reverse();
+
+        return (
+            <div className={classNames("ngw-webmap-display", className)}>
+                <Splitter
+                    layout={isPortrait ? "vertical" : "horizontal"}
+                    onResize={onResize}
+                    onResizeEnd={onResizeEnd}
+                >
+                    {panels}
+                </Splitter>
+            </div>
         );
     }
 );
 DisplayWidget.displayName = "Display";
-
-export function DisplayLoader({ id, title }: { id: number; title: string }) {
-    const { data: config, isLoading } = useRouteGet("webmap.display_config", {
-        id,
-    });
-
-    return (
-        <div className="ngw-webmap-display-loader">
-            <Header title={title} hideResourceFilter={true} hideMenu={true} />
-            {isLoading || !config ? (
-                <Spin
-                    size="large"
-                    fullscreen
-                    indicator={<LoadingOutlined spin />}
-                />
-            ) : (
-                <DisplayWidget config={config} />
-            )}
-        </div>
-    );
-}

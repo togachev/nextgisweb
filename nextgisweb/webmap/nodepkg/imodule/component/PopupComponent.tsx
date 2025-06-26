@@ -143,7 +143,7 @@ export default observer(
             const updateSelectFeatures = (panel, props) => {
                 const obj = { ...panel.selectedFeatures }
                 const [key] = getEntries(obj).filter(([_, val]) => val.styleId === props.styleId)[0];
-                
+
                 const value = {
                     ...obj,
                     [key]: {
@@ -156,7 +156,7 @@ export default observer(
                         }
                     }
                 }
-                
+
                 getEntries(value)
                     .map(([key, _]) => {
                         if (Object.keys(value[key].items).length > 10) {
@@ -379,7 +379,10 @@ export default observer(
                             <div ref={ref as any} className="popup-position">
                                 <div className="title">
                                     {store.buttonZoom["topLeft"] && <div style={{ margin: "0 6px 0 0" }}><ButtonZoomComponent {...contentProps} /></div>}
-                                    <div className="title-name"
+                                    <Button
+                                        className="title-name"
+                                        size="small"
+                                        type="text"
                                         onClick={(e) => {
                                             if (store.countFeature > 0 && e.detail === 2) {
                                                 setTimeout(() => {
@@ -395,19 +398,22 @@ export default observer(
                                                 e.stopPropagation();
                                             }
                                         }}
+                                        title={store.selected?.desc}
                                     >
                                         <span className="object-select">Объектов: {store.countFeature}</span>
                                         {store.countFeature > 0 && store.selected && (
                                             <span
-                                                title={store.selected?.desc}
                                                 className="layer-name">
                                                 {store.selected?.desc}
                                             </span>
                                         )}
-                                    </div>
+                                    </Button>
                                     {store.countFeature > 0 && <CheckOnlyOne {...{ imodule, store }} />}
                                     {store.countFeature > 0 && store.selected && (
-                                        <span
+                                        <Button
+                                            size="small"
+                                            type="text"
+                                            icon={store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
                                             title={store.fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}
                                             className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                             onClick={() => {
@@ -424,11 +430,11 @@ export default observer(
                                                         store.setFullscreen(true)
                                                     }
                                                 }
-                                            }} >
-                                            {store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
-                                        </span>
+                                            }}
+                                        />
                                     )}
-                                    <span
+                                    <Button
+                                        icon={<CloseIcon />}
                                         title={gettext("Close")}
                                         className={store.countFeature > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                         onClick={() => {
@@ -437,9 +443,7 @@ export default observer(
                                                 ...panel.activeChecked,
                                                 achecked: false,
                                             });
-                                        }} >
-                                        <CloseIcon />
-                                    </span>
+                                        }} />
                                     {store.buttonZoom["topRight"] && <div style={{ margin: "0 0 0 6px" }}><ButtonZoomComponent {...contentProps} /></div>}
                                 </div>
                                 {store.countFeature > 0 && store.selected && (

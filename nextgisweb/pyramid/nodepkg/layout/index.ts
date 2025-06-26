@@ -5,5 +5,6 @@ export { PageTitle } from "./PageTitle";
 export { Dynmenu } from "./dynmenu/Dynmenu";
 export { Breadcrumbs } from "./Breadcrumbs";
 export { BreadcrumbComponent } from "./BreadcrumbComponent";
+export { Base } from "./Base";
 export { Header } from "./header/Header";
 export { layoutStore } from "./store";

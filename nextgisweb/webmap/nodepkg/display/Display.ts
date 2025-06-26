@@ -55,6 +55,11 @@ import { normalizeExtent } from "../utils/normalizeExtent";
 
 import { displayURLParams } from "./displayURLParams";
 
+interface PanelSizeProps {
+    width: number;
+    height: number;
+}
+
 export class Display {
     private readonly emptyModeURLValue = "none";
     readonly _itemConfigById: Record<string, TreeItemConfig> = {};
@@ -114,7 +119,8 @@ export class Display {
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
-    @observable.ref accessor panelSize = 342;
+    @observable.ref accessor isMobile = false;
+    @observable.ref accessor panelSize: PanelSizeProps;
 
     constructor({
         config,
@@ -232,7 +238,7 @@ export class Display {
     }
 
     @action
-    setPanelSize(panelSize: number) {
+    setPanelSize(panelSize: PanelSizeProps) {
         this.panelSize = panelSize;
     }
 
@@ -254,6 +260,11 @@ export class Display {
     }
     _postCreate() {
         this._postCreateDeferred.resolve(true);
+    }
+
+    @action.bound
+    setIsMobile(val: boolean) {
+        this.isMobile = val;
     }
 
     // MAP & CONTROLS
@@ -304,14 +315,6 @@ export class Display {
         }
 
         topic.publish("/webmap/tools/initialized", true);
-
-        // Resize OpenLayers Map on container resize
-        const resizeObserver = new ResizeObserver(() => {
-            this.map.olMap.updateSize();
-        });
-        resizeObserver.observe(this.mapNode);
-
-        // resizeObserver.disconnect();
 
         appendTo(this.mapNode);
         this.mapDeferred.resolve(true);

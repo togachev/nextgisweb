@@ -15,17 +15,18 @@ import Font from "@ckeditor/ckeditor5-font/src/font.js";
 import FontFamily from "@ckeditor/ckeditor5-font/src/fontfamily.js";
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials.js";
 import Heading from "@ckeditor/ckeditor5-heading/src/heading.js";
+import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport.js";
 import {
     AutoImage,
-    Image,
-    ImageCaption,
-    ImageInsert,
     ImageResize,
-    ImageStyle,
-    ImageToolbar,
-    ImageUpload,
-    PictureEditing,
 } from "@ckeditor/ckeditor5-image";
+import Image from "@ckeditor/ckeditor5-image/src/image.js";
+import ImageCaption from "@ckeditor/ckeditor5-image/src/imagecaption.js";
+import ImageInsert from "@ckeditor/ckeditor5-image/src/imageinsert.js";
+import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle.js";
+import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar.js";
+import ImageUpload from "@ckeditor/ckeditor5-image/src/imageupload.js";
+import PictureEditing from "@ckeditor/ckeditor5-image/src/pictureediting.js";
 import Indent from "@ckeditor/ckeditor5-indent/src/indent.js";
 import Highlight from "@ckeditor/ckeditor5-highlight/src/highlight.js";
 import Link from "@ckeditor/ckeditor5-link/src/link.js";
@@ -97,6 +98,7 @@ Editor.builtinPlugins = [
     TableToolbar,
     TextTransformation,
     Base64UploadAdapter,
+    GeneralHtmlSupport,
     FindAndReplace,
     HorizontalLine,
     SpecialCharacters,
@@ -202,6 +204,16 @@ Editor.defaultConfig = {
                 }
             }
         }
+    },
+    htmlSupport: {
+        allow: [
+            {
+                name: "figure",
+                attributes: true,
+                classes: true,
+                styles: true,
+            },
+        ],
     },
     // This value must be kept in sync with the language defined in webpack.config.js.
     language: "en",

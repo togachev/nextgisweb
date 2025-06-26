@@ -13,46 +13,71 @@ import Home from "@nextgisweb/icon/mdi/home-circle";
 
 import "./NavigationMenu.less";
 
-export const NavigationMenu = observer(({ store, display }: { store: PanelManager, display: Display }) => {
-    const onClickItem = useCallback(
-        (name: string) => {
-            if (store.activePanelName === name) {
-                store.closePanel();
-            } else {
-                store.setActive(name, "menu");
-            }
-        },
-        [store]
-    );
+export interface NavigationMenuProps {
+    store: PanelManager;
+    layout?: "vertical" | "horizontal";
+    display: Display;
+}
 
-    const infomap = display.config.infomap;
-    const active = store.activePanel;
-    return (
-        <Row className="ngw-webmap-display-navigation-menu">
-            <Col>
-                {store.sorted().map(({ name, title, plugin }) => (
-                    <div
-                        key={name}
-                        title={title}
-                        onClick={() => onClickItem(name)}
-                        className={classNames(
-                            "ngw-webmap-display-navigation-menu-item",
-                            { "active": name === active?.name }
-                        )}
-                    >
-                        {plugin.icon}
-                    </div>
-                ))}
-            </Col>
-            {!display.tinyConfig && infomap.scope ? (
-                <Col className="info-block">
+export const NavigationMenu = observer<NavigationMenuProps>(
+    ({ store, layout = "vertical", display }) => {
+        const onClickItem = useCallback(
+            (name: string) => {
+                if (store.activePanelName === name) {
+                    store.closePanel();
+                } else {
+                    store.setActive(name, "menu");
+                }
+            },
+            [store]
+        );
+
+        const infomap = display.config.infomap;
+        const active = store.activePanel;
+
+        const CustomMenu = () => {
+            if (display.tinyConfig && !infomap.scope) return;
+            return (
+                <div className={classNames("info-block", layout)}>
                     <a title={gettext("Resources")} target="_blank" href={infomap.resource} className="iconLinks"><Home /></a>
                     <a title={gettext("Map properties")} target="_blank" href={infomap.link} className="iconLinks"><Information /></a>
                     <a title={gettext("Map settings")} target="_blank" href={infomap.update} className="iconLinks"><Cogs /></a>
-                </Col>
-            ) : <></>}
-        </Row>
-    );
-});
+                </div>
+            )
+        }
+
+        return (
+            <div className={classNames(
+                "custom-menu",
+                layout
+            )}>
+                <div
+                    className={classNames(
+                        "ngw-webmap-display-navigation-menu",
+                        layout
+                    )}
+                >
+                    {store.visiblePanels.map(({ name, title, plugin }) => (
+                        <div
+                            key={name}
+                            title={title}
+                            onClick={() => onClickItem(name)}
+                            className={classNames(
+                                "ngw-webmap-display-navigation-menu-item",
+                                { "active": name === active?.name }
+                            )}
+                            className={classNames("item", {
+                                "active": name === active?.name,
+                            })}
+                        >
+                            {plugin.icon}
+                        </div>
+                    ))}
+                </div>
+                <CustomMenu />
+            </div>
+        );
+    }
+);
 
 NavigationMenu.displayName = "NavigationMenu";

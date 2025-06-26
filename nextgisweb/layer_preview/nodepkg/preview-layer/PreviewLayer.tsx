@@ -44,33 +44,26 @@ export function PreviewLayer({
         }
     );
 
-    const layerType = useMemo(() => {
-        if (resData) {
-            const interfaces = resData?.resource.interfaces;
-            if (interfaces.some((iface) => mvtInterfaces.includes(iface))) {
-                return "MVT";
-            } else if (resData.raster_layer) {
-                return "geotiff";
-            }
-        }
-        return "XYZ";
-    }, [resData]);
+    let layerType: "MVT" | "geotiff" | "XYZ" = "XYZ";
+    let url: string | undefined;
+    let attributions: string | null | undefined;
 
-    const url = useMemo(() => {
-        if (resData?.basemap_layer) {
-            const base = resData.basemap_layer;
-            return base.url;
+    if (resData) {
+        const interfaces = resData.resource.interfaces;
+        if (interfaces.some((iface) => mvtInterfaces.includes(iface))) {
+            layerType = "MVT";
+        } else if (resData.raster_layer) {
+            layerType = "geotiff";
         }
-    }, [resData]);
 
-    const attributions = useMemo(() => {
-        if (resData?.basemap_layer) {
+        if (resData.basemap_layer) {
+            url = resData.basemap_layer.url;
             const base = resData.basemap_layer;
-            return base.copyright_url
+            attributions = base.copyright_url
                 ? `<a href="${base.copyright_url}" target="_blank">${base.copyright_text}</a>`
                 : base.copyright_text;
         }
-    }, [resData]);
+    }
 
     const { route: extentRoute } = useRoute("layer.extent", { id });
     const [extentData, setExtentData] = useState<Extent>();
@@ -78,22 +71,23 @@ export function PreviewLayer({
 
     useEffect(() => {
         const loadExtent = async () => {
-            if (
-                resData &&
-                resData.resource.interfaces.some((iface) =>
-                    extentInterfaces.includes(iface)
-                )
-            ) {
-                await extentRoute.get().then(setExtentData);
+            if (resData) {
+                if (
+                    resData.resource.interfaces.some((iface) =>
+                        extentInterfaces.includes(iface)
+                    )
+                ) {
+                    try {
+                        const data = await extentRoute.get();
+                        setExtentData(data);
+                    } catch {
+                        // ignore
+                    }
+                }
+                setIsExtentLoading(false);
             }
         };
-        loadExtent()
-            .catch(() => {
-                // ignore
-            })
-            .finally(() => {
-                setIsExtentLoading(false);
-            });
+        loadExtent();
     }, [extentRoute, resData]);
 
     const padding = useMemo(() => [20, 20, 20, 20], []);

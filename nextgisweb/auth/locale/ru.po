@@ -51,6 +51,8 @@ msgid ""
 "Maximum number of local users is reached. Your current plan local user number"
 " limit is {}."
 msgstr ""
+"Превышено максимальное количество локальных пользователей. Лимит текущего "
+"плана - {}."
 
 #: exception.py:7
 msgid "Invalid authorization header"
@@ -123,7 +125,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:328 view.py:417
+#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:327 view.py:416
 msgid "Users"
 msgstr "Пользователи"
 
@@ -143,7 +145,7 @@ msgstr "Описание"
 msgid "Sign in with {}"
 msgstr "Войти через {}"
 
-#: nodepkg/login/LoginForm.tsx:22 view.py:60
+#: nodepkg/login/LoginForm.tsx:22 view.py:59
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
@@ -250,7 +252,7 @@ msgstr "Для изменения пароля заполните это пол�
 msgid "Authorization link"
 msgstr "Авторизация по ссылке"
 
-#: nodepkg/user-widget/UserWidget.tsx:89 view.py:359 view.py:423
+#: nodepkg/user-widget/UserWidget.tsx:89 view.py:358 view.py:422
 msgid "Groups"
 msgstr "Группы"
 
@@ -329,27 +331,27 @@ msgstr "Просмотр"
 msgid "Manage"
 msgstr "Управление"
 
-#: permission.py:39 view.py:413
+#: permission.py:39 view.py:412
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
-#: view.py:75
+#: view.py:72
 msgid "Invitation session"
 msgstr "Сессия по приглашению"
 
-#: view.py:92
+#: view.py:89
 msgid "Session not found."
 msgstr "Сессия не найдена."
 
-#: view.py:96
+#: view.py:93
 msgid "Invalid 'expires' parameter."
 msgstr "Некорректный параметр 'expires'."
 
-#: view.py:98
+#: view.py:95
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:117
+#: view.py:114
 msgid ""
 "Failed to authenticate using the given authorization link. Please check the "
 "link and contact the administrator."
@@ -357,15 +359,15 @@ msgstr ""
 "Не удалось выполнить авторизацию с использованием указанной авторизационной "
 "ссылки. Пожалуйста, проверьте ссылку и свяжитесь с администратором."
 
-#: view.py:128
+#: view.py:125
 msgid "Usage of authorization link is forbidden for administrators."
 msgstr "Использование авторизационных ссылок запрещено для администраторов."
 
-#: view.py:167
+#: view.py:164
 msgid "Team membership required"
 msgstr "Необходимо участие в команде"
 
-#: view.py:168
+#: view.py:165
 msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
 "ask to be added to the team."
@@ -373,14 +375,14 @@ msgstr ""
 "Вы не являетесь участником команды этой Веб ГИС. Свяжитесь с администратором "
 "Веб ГИС для добавления в команду."
 
-#: view.py:320
+#: view.py:319
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:338
+#: view.py:337
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:370
+#: view.py:369
 msgid "Create new group"
 msgstr "Создать новую группу"
