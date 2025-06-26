@@ -58,6 +58,7 @@ import { displayURLParams } from "./displayURLParams";
 interface PanelSizeProps {
     width: number;
     height: number;
+    portrait: boolean;
 }
 
 export class Display {

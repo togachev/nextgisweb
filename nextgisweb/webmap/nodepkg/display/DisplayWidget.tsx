@@ -95,11 +95,26 @@ export const DisplayWidget = observer(
             setPanelsSize(() => {
                 return getDefultPanelSize(orientation);
             });
-
-            display.setPanelSize(isPortrait ?
-                { width: 0, height: activePanel ? window.innerHeight / 2 : 0 } :
-                { width: activePanel ? 350 : 0, height: 0 })
         }, [orientation]);
+
+        // useEffect(() => {
+        //     const ap = display.panelManager.getActivePanelName()
+        //     console.log(isMobile, isPortrait);
+            
+        //     if (isPortrait === false) {
+        //         if (ap) {
+        //             display.setPanelSize({ portrait: true, width: 350, height: 0 })
+        //         } else {
+        //             display.setPanelSize({ portrait: true, width: 0, height: 0 })
+        //         }
+        //     } else {
+        //         if (ap) {
+        //             display.setPanelSize({ portrait: false, width: 0, height: window.innerHeight / 2 })
+        //         } else {
+        //             display.setPanelSize({ portrait: false, width: 0, height: 0 })
+        //         }
+        //     }
+        // }, [isPortrait, isMobile]);
 
         const onResize = useCallback(
             (sizes: number[]) => {
