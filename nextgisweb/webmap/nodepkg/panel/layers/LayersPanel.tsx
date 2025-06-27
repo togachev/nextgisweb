@@ -9,16 +9,16 @@ import type { PanelPluginWidgetProps } from "../registry";
 import { BasemapSelector } from "./BasemapSelector";
 import { LayersDropdown } from "./LayersDropdown";
 
-import { useFeatures } from "./hook/useFeatures";
+import { useClickPoint } from "./hook/useClickPoint";
 
 import "./LayersPanel.less";
 
 const LayersPanel = observer<PanelPluginWidgetProps>(
     ({ store, display, ...props }) => {
 
-        const { source } = useFeatures(display);
+        const { pointClick } = useClickPoint(display);
 
-        console.log(source);
+        console.log(pointClick);
 
         const zoomToAllLayers = () => {
             const plugin =
