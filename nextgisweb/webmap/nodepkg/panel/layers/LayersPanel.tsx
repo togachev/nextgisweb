@@ -9,7 +9,7 @@ import type { PanelPluginWidgetProps } from "../registry";
 import { BasemapSelector } from "./BasemapSelector";
 import { LayersDropdown } from "./LayersDropdown";
 
-import { useClickPoint } from "./hook/useClickPoint";
+import { useClickPoint } from "@nextgisweb/webmap/map-controls/useClickPoint";
 
 import "./LayersPanel.less";
 
@@ -17,7 +17,6 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
     ({ store, display, ...props }) => {
 
         const { pointClick } = useClickPoint(display);
-
         console.log(pointClick);
 
         const zoomToAllLayers = () => {
