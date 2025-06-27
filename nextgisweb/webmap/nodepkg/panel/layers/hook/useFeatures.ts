@@ -26,59 +26,15 @@ export const useFeatures = (display: Display) => {
     const view = display.map.olMap.getViewport();
 
     useEffect(() => {
-        // view.addEventListener("click", (e: any) => {
-        //     if (e.pointerType === "touch") {
-        //         e.preventDefault();
-
-        //         setSource({ layerX: e.layerX, layerY: e.layerY, clientX: e.clientX, clientY: e.clientY, coordinate: olmap.getCoordinateFromPixel([e.layerX, e.layerY]) });
-        //     }
-        // });
-
-        // view.addEventListener("contextmenu", (e: any) => {
-        //     if (e.pointerType === "touch") {
-        //         e.preventDefault();
-        //         setSource({ layerX: e.layerX, layerY: e.layerY, clientX: e.clientX, clientY: e.clientY, coordinate: olmap.getCoordinateFromPixel([e.layerX, e.layerY]) });
-        //     }
-        // });
-
-        // view.addEventListener("click", (e: any) => {
-        //     e.preventDefault();
-        //     if (e.pointerType === "mouse") {
-        //         console.log("singleclick mouse");
-        //         setSource({ layerX: e.layerX, layerY: e.layerY, clientX: e.clientX, clientY: e.clientY, coordinate: olmap.getCoordinateFromPixel([e.layerX, e.layerY]) });
-        //     }
-        // });
-
-        olmap.on("singleclick", (e: any) => {
+        view.addEventListener("click", (e: any) => {
             e.preventDefault();
-            if (e.originalEvent.pointerType === "mouse") {
-                console.log("singleclick");
-                setSource({ layerX: e.pixel[0], layerY: e.pixel[1], clientX: e.originalEvent.clientX, clientY: e.originalEvent.clientY, coordinate: olmap.getCoordinateFromPixel(e.pixel) });
-            }
+            setSource({ layerX: e.layerX, layerY: e.layerY, clientX: e.clientX, clientY: e.clientY, coordinate: olmap.getCoordinateFromPixel([e.layerX, e.layerY]) });
         });
 
-        olmap.on("singleclick", (e: any) => {
+        view.addEventListener("contextmenu", (e: any) => {
             e.preventDefault();
-            console.log(e.originalEvent);
-            
-            if (e.originalEvent.pointerType === "touch") {
-                console.log("singleclick touch");
-                setSource({ layerX: e.pixel[0], layerY: e.pixel[1], clientX: e.originalEvent.clientX, clientY: e.originalEvent.clientY, coordinate: olmap.getCoordinateFromPixel(e.pixel) });
-            }
+            setSource({ layerX: e.layerX, layerY: e.layerY, clientX: e.clientX, clientY: e.clientY, coordinate: olmap.getCoordinateFromPixel([e.layerX, e.layerY]) });
         });
-
-        olmap.on("contextmenu", (e: any) => {
-            e.preventDefault();
-            console.log("contextmenu");
-            setSource({ layerX: e.pixel[0], layerY: e.pixel[1], clientX: e.originalEvent.clientX, clientY: e.originalEvent.clientY, coordinate: olmap.getCoordinateFromPixel(e.pixel) });
-        });
-
-        // view.addEventListener("contextmenu", (e: any) => {
-        //     if (e.pointerType === "mouse") {
-        //         e.preventDefault();
-        //         setSource({ layerX: e.layerX, layerY: e.layerY, clientX: e.clientX, clientY: e.clientY, coordinate: olmap.getCoordinateFromPixel([e.layerX, e.layerY]) });
-        //     }
-        // });
     }, []);
 
     return { source };

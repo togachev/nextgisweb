@@ -97,25 +97,6 @@ export const DisplayWidget = observer(
             });
         }, [orientation]);
 
-        // useEffect(() => {
-        //     const ap = display.panelManager.getActivePanelName()
-        //     console.log(isMobile, isPortrait);
-            
-        //     if (isPortrait === false) {
-        //         if (ap) {
-        //             display.setPanelSize({ portrait: true, width: 350, height: 0 })
-        //         } else {
-        //             display.setPanelSize({ portrait: true, width: 0, height: 0 })
-        //         }
-        //     } else {
-        //         if (ap) {
-        //             display.setPanelSize({ portrait: false, width: 0, height: window.innerHeight / 2 })
-        //         } else {
-        //             display.setPanelSize({ portrait: false, width: 0, height: 0 })
-        //         }
-        //     }
-        // }, [isPortrait, isMobile]);
-
         const onResize = useCallback(
             (sizes: number[]) => {
                 const newPanelSize = sizes[1];
@@ -157,6 +138,7 @@ export const DisplayWidget = observer(
                 <Panel
                     key="panels"
                     size={activePanel ? panelSize : 0}
+                    style={{ flexGrow: 0, flexShrink: 0 }}
                     resizable={!!activePanel}
                 >
                     <PanelSwitcher display={display} />
