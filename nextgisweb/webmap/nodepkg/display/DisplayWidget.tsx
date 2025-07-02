@@ -138,7 +138,6 @@ export const DisplayWidget = observer(
                 <Panel
                     key="panels"
                     size={activePanel ? panelSize : 0}
-                    style={{ flexGrow: 0, flexShrink: 0 }}
                     resizable={!!activePanel}
                 >
                     <PanelSwitcher display={display} />
@@ -151,6 +150,7 @@ export const DisplayWidget = observer(
                 key="main"
                 min={isPortrait ? 200 : 400}
                 resizable={!!activePanel}
+                
             >
                 <Splitter layout="vertical">
                     <Panel key="map" min={isPortrait ? 200 : 400}>
