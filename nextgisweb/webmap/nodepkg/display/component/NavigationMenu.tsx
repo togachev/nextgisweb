@@ -2,7 +2,6 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Row, Col } from "@nextgisweb/gui/antd";
 
 import type { PanelManager } from "../../panel/PanelManager";
 import type { Display } from "../Display";
@@ -62,10 +61,6 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                             key={name}
                             title={title}
                             onClick={() => onClickItem(name)}
-                            className={classNames(
-                                "ngw-webmap-display-navigation-menu-item",
-                                { "active": name === active?.name }
-                            )}
                             className={classNames("item", {
                                 "active": name === active?.name,
                             })}

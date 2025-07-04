@@ -150,7 +150,7 @@ export const DisplayWidget = observer(
                 key="main"
                 min={isPortrait ? 200 : 400}
                 resizable={!!activePanel}
-                
+
             >
                 <Splitter layout="vertical">
                     <Panel key="map" min={isPortrait ? 200 : 400}>
@@ -168,15 +168,20 @@ export const DisplayWidget = observer(
         if (isPortrait) panels.reverse();
 
         return (
-            <div className={classNames("ngw-webmap-display", className)}>
-                <Splitter
-                    layout={isPortrait ? "vertical" : "horizontal"}
-                    onResize={onResize}
-                    onResizeEnd={onResizeEnd}
-                >
-                    {panels}
-                </Splitter>
-            </div>
+            <>
+                <div className={classNames("ngw-webmap-display", className)}>
+                    <Splitter
+                        layout={isPortrait ? "vertical" : "horizontal"}
+                        onResize={onResize}
+                        onResizeEnd={onResizeEnd}
+                    >
+                        {panels}
+                    </Splitter>
+                </div>
+                <div id="portal-popup"></div>
+                <div id="portal-context"></div>
+            </>
+
         );
     }
 );

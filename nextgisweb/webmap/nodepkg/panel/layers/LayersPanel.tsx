@@ -1,23 +1,19 @@
 import { observer } from "mobx-react-lite";
-
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
+import PopupComponent from "./popup/PopupComponent";
+
 import type { PanelPluginWidgetProps } from "../registry";
 
 import { BasemapSelector } from "./BasemapSelector";
 import { LayersDropdown } from "./LayersDropdown";
 
-import { useClickPoint } from "@nextgisweb/webmap/map-controls/useClickPoint";
-
 import "./LayersPanel.less";
 
 const LayersPanel = observer<PanelPluginWidgetProps>(
     ({ store, display, ...props }) => {
-
-        const { pointClick } = useClickPoint(display);
-        console.log(pointClick);
 
         const zoomToAllLayers = () => {
             const plugin =
@@ -28,34 +24,37 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
         };
 
         return (
-            <PanelContainer
-                title={
-                    <>
-                        {store.title}
-                        <LayersDropdown
-                            onClick={(key) => {
-                                if (key === "zoomToAllLayers") {
-                                    zoomToAllLayers();
-                                }
-                            }}
-                        />
-                    </>
-                }
-                close={store.close}
-                epilog={<BasemapSelector map={display.map} />}
-                components={{
-                    content: PanelContainer.Unpadded,
-                    epilog: PanelContainer.Unpadded,
-                }}
-            >
-                <LayersTree
-                    store={display.webmapStore}
-                    onSelect={display.handleSelect.bind(display)}
-                    setLayerZIndex={display.map.setLayerZIndex.bind(display)}
-                    getWebmapPlugins={() => ({ ...display.plugins })}
-                    {...props}
-                />
-            </PanelContainer>
+            <>
+                <PanelContainer
+                    title={
+                        <>
+                            {store.title}
+                            <LayersDropdown
+                                onClick={(key) => {
+                                    if (key === "zoomToAllLayers") {
+                                        zoomToAllLayers();
+                                    }
+                                }}
+                            />
+                        </>
+                    }
+                    close={store.close}
+                    epilog={<BasemapSelector map={display.map} />}
+                    components={{
+                        content: PanelContainer.Unpadded,
+                        epilog: PanelContainer.Unpadded,
+                    }}
+                >
+                    <LayersTree
+                        store={display.webmapStore}
+                        onSelect={display.handleSelect.bind(display)}
+                        setLayerZIndex={display.map.setLayerZIndex.bind(display)}
+                        getWebmapPlugins={() => ({ ...display.plugins })}
+                        {...props}
+                    />
+                </PanelContainer>
+                <PopupComponent display={display} />
+            </>
         );
     }
 );
