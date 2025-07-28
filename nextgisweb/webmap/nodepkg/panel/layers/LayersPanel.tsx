@@ -3,8 +3,8 @@ import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
-import PopupComponent from "./popup/PopupComponent";
-
+import Imodule from "./popup/Imodule";
+import settings from "@nextgisweb/webmap/client-settings";
 import type { PanelPluginWidgetProps } from "../registry";
 
 import { BasemapSelector } from "./BasemapSelector";
@@ -53,7 +53,7 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                         {...props}
                     />
                 </PanelContainer>
-                <PopupComponent display={display} />
+                {settings.imodule && <Imodule display={display} />}
             </>
         );
     }
