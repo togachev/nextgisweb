@@ -47,12 +47,35 @@ export type StylesRequest = {
     dop: number;
 }
 
+export interface ParamsProps {
+    id: number;
+    label: string;
+    dop: number | null;
+}
+
+export interface ValueProps {
+    attribute: boolean;
+    pn: boolean;
+    lon: number;
+    lat: boolean;
+    params: ParamsProps;
+}
+
+export interface ResponseContextProps {
+    point: boolean;
+    value: ValueProps;
+    coordinate: number[]
+}
+
+
 export type RequestProps = {
     srs: number;
     geom: string;
-    styles: string[];
+    styles: StylesRequest[];
     point: number[];
     status: boolean;
+    op: string;
+    p: ResponseContextProps;
 }
 
 export type EventProps = {

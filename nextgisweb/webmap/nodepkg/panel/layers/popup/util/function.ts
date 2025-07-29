@@ -1,20 +1,48 @@
 import { RefObject, useEffect } from "react";
 
-const getPosition = async (px, py, store) => {
-    let width, height;
-    if (store.isMobile && store.countFeature > 0) {
-        if (store.isLandscape) {
-            width = store.sizeWindow.width / 2;
-            height = store.sizeWindow.height;
+const configSize = (store, key) => {
+    const { coords_not_count_w, coords_not_count_h, countFeature, popup_width, popup_height, sizeWindow } = store;
+
+    const size = {
+        full: {
+            width: countFeature > 0 ? popup_width : coords_not_count_w,
+            height: countFeature > 0 ? popup_height : coords_not_count_h,
+        },
+        size15: {
+            width: countFeature > 0 ? sizeWindow.width / 2 : coords_not_count_w,
+            height: countFeature > 0 ? sizeWindow.height / 2 : coords_not_count_h,
+        },
+        one: {
+            width: countFeature > 0 ? sizeWindow.width : coords_not_count_w,
+            height: countFeature > 0 ? sizeWindow.height : coords_not_count_h,
+        },
+        mobileLandscape: {
+            width: countFeature > 0 ? sizeWindow.width / 2 : coords_not_count_w,
+            height: countFeature > 0 ? sizeWindow.height : coords_not_count_h,
+        },
+        mobilePortrait: {
+            width: countFeature > 0 ? sizeWindow.width : coords_not_count_w,
+            height: countFeature > 0 ? sizeWindow.height / 2 : coords_not_count_h,
+        },
+    };
+    return size[key];
+}
+
+async function getPosition(px, py, store) {
+    const { offset, offHP, isMobile, isLandscape, isPortrait, countFeature, popup_width, popup_height, sizeWindow } = store;
+
+    if (isMobile && countFeature > 0) {
+        if (isLandscape) {
+            const { width, height } = configSize(store, "mobileLandscape");
 
             /* left */
             if (
-                px > store.sizeWindow.width / 2
+                px > sizeWindow.width / 2
             ) {
 
                 return {
                     pointClick: {
-                        x: store.offHP, y: store.sizeWindow.height - height
+                        x: offHP, y: sizeWindow.height - height
                     },
                     buttonZoom: { topLeft: false },
                     x: 0, y: 0, width: width, height: height
@@ -22,40 +50,39 @@ const getPosition = async (px, py, store) => {
             }
             /* right */
             if (
-                px <= store.sizeWindow.width / 2
+                px <= sizeWindow.width / 2
             ) {
                 return {
                     pointClick: {
-                        x: store.offHP, y: store.sizeWindow.height - height
+                        x: offHP, y: sizeWindow.height - height
                     },
                     buttonZoom: { topLeft: false },
-                    x: store.sizeWindow.width / 2, y: 0, width: width, height: height
+                    x: sizeWindow.width / 2, y: 0, width: width, height: height
                 }
             }
         } else {
-            width = store.sizeWindow.width;
-            height = store.sizeWindow.height / 2;
+            const { width, height } = configSize(store, "mobilePortrait");
 
             /* top */
             if (
-                py <= store.sizeWindow.height / 2
+                py <= sizeWindow.height / 2
             ) {
 
                 return {
                     pointClick: {
-                        x: store.offHP, y: store.sizeWindow.height - height
+                        x: offHP, y: sizeWindow.height - height
                     },
                     buttonZoom: { topLeft: false },
-                    x: 0, y: store.sizeWindow.height / 2, width: width, height: height
+                    x: 0, y: sizeWindow.height / 2, width: width, height: height
                 }
             }
             /* bottom */
             if (
-                py > store.sizeWindow.height / 2
+                py > sizeWindow.height / 2
             ) {
                 return {
                     pointClick: {
-                        x: store.offHP, y: store.sizeWindow.height - height
+                        x: offHP, y: sizeWindow.height - height
                     },
                     buttonZoom: { topLeft: false },
                     x: 0, y: 0, width: width, height: height
@@ -64,409 +91,482 @@ const getPosition = async (px, py, store) => {
         }
     }
     else if (
-        store.popup_width > store.sizeWindow.width ||
-        store.popup_height > store.sizeWindow.height
+        !isMobile &&
+        popup_width > sizeWindow.width ||
+        popup_height > sizeWindow.height
     ) {
-        width = store.sizeWindow.width;
-        height = store.sizeWindow.height;
+        const { width, height } = configSize(store, "one");
         return {
             pointClick: {
-                x: store.offHP, y: store.sizeWindow.height - height
+                x: offHP, y: sizeWindow.height - height
             },
             buttonZoom: { topLeft: false },
             x: 0, y: 0, width: width, height: height
         }
     }
     else if (
-        (store.popup_width <= store.sizeWindow.width && store.popup_width > store.sizeWindow.width / 1.5) ||
-        (store.popup_height <= store.sizeWindow.height && store.popup_height > store.sizeWindow.height / 1.5)
+        !isMobile &&
+        (popup_width <= sizeWindow.width && popup_width > sizeWindow.width / 1.5) ||
+        (popup_height <= sizeWindow.height && popup_height > sizeWindow.height / 1.5)
     ) {
-        width = store.sizeWindow.width / 2;
-        height = store.sizeWindow.height / 2;
+        const { width, height } = configSize(store, "size15");
 
         /* top left */
         if (
-            py <= store.sizeWindow.height - store.offset - height
-            && px <= store.sizeWindow.width - store.offset - width
+            py <= sizeWindow.height - offset - height
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: py + store.offset, width: width, height: height
+                x: px + offset, y: py + offset, width: width, height: height
             }
         }
 
         /* top */
         if (
-            py <= store.sizeWindow.height - store.offset - height
-            && px > store.sizeWindow.width - width - store.offset
-            && px < width + store.offset
+            py <= sizeWindow.height - offset - height
+            && px > sizeWindow.width - width - offset
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (store.sizeWindow.width - width) / 2, y: py + store.offset, width: width, height: height
+                x: (sizeWindow.width - width) / 2, y: py + offset, width: width, height: height
             }
         }
 
         /* top right */
         if (
-            py <= store.sizeWindow.height - store.offset - height
-            && px >= width + store.offset
+            py <= sizeWindow.height - offset - height
+            && px >= width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px - store.offset - width, y: py + store.offset, width: width, height: height
+                x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
 
         /*bottom left*/
         if (
-            py >= height + store.offset
-            && px <= store.sizeWindow.width - store.offset - width
+            py >= height + offset
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: py - height - store.offset, width: width, height: height
+                x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
 
         /* bottom */
         if (
-            py > height + store.offset
-            && px > store.sizeWindow.width - width - store.offset
-            && px < width + store.offset
+            py > height + offset
+            && px > sizeWindow.width - width - offset
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (store.sizeWindow.width - width) / 2, y: py - height - store.offset, width: width, height: height
+                x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
             }
         }
 
         /* bottom right */
         if (
-            py >= height + store.offset
-            && px >= width + store.offset
+            py >= height + offset
+            && px >= width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px - width - store.offset, y: py - height - store.offset, width: width, height: height
+                x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }
 
         /* left */
         if (
-            py > store.sizeWindow.height - store.offset - height
-            && py < height + store.offset
-            && px <= store.sizeWindow.width - store.offset - width
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: (store.sizeWindow.height - height) / 2, width: width, height: height
+                x: px + offset, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
 
         /* center top */
         if (
-            py > store.sizeWindow.height - store.offset - height
-            && py < height + store.offset
-            && px > store.sizeWindow.width - store.offset - width
-            && px < width + store.offset
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px > sizeWindow.width - offset - width
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (store.sizeWindow.width - width) / 2, y: (store.sizeWindow.height - height) / 2, width: width, height: height
+                x: (sizeWindow.width - width) / 2, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
 
         /* right */
         if (
-            py > store.sizeWindow.height - store.offset - height
-            && py < height + store.offset
-            && px >= width + store.offset
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px >= width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px - store.offset - width, y: (store.sizeWindow.height - height) / 2, width: width, height: height
+                x: px - offset - width, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
     }
     else if (
-        (store.popup_width <= store.sizeWindow.width / 1.5 && store.popup_width >= store.sizeWindow.width / 2) ||
-        (store.popup_height <= store.sizeWindow.height / 1.5 && store.popup_height >= store.sizeWindow.height / 2)
+        !isMobile &&
+        (popup_width <= sizeWindow.width / 1.5) ||
+        (popup_height <= sizeWindow.height / 1.5)
     ) {
-        width = store.popup_width;
-        height = store.popup_height;
+        const { width, height } = configSize(store, "full");
 
         /* top left */
         if (
-            py <= store.sizeWindow.height - store.offset - height
-            && px <= store.sizeWindow.width - store.offset - width
+            py <= sizeWindow.height - offset - height
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: py + store.offset, width: width, height: height
+                x: px + offset, y: py + offset, width: width, height: height
             }
         }
 
         /* top */
         if (
-            py <= store.sizeWindow.height - store.offset - height
-            && px > store.sizeWindow.width - width - store.offset
-            && px < width + store.offset
+            py <= sizeWindow.height - offset - height
+            && px > sizeWindow.width - width - offset
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (store.sizeWindow.width - width) / 2, y: py + store.offset, width: width, height: height
+                x: (sizeWindow.width - width) / 2, y: py + offset, width: width, height: height
             }
         }
 
         /* top right */
         if (
-            py <= store.sizeWindow.height - store.offset - height
-            && px >= width + store.offset
+            py <= sizeWindow.height - offset - height
+            && px >= width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px - store.offset - width, y: py + store.offset, width: width, height: height
+                x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
 
         /*bottom left*/
         if (
-            py >= height + store.offset
-            && px <= store.sizeWindow.width - store.offset - width
+            py >= height + offset
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: py - height - store.offset, width: width, height: height
+                x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
 
         /* bottom */
         if (
-            py > height + store.offset
-            && px > store.sizeWindow.width - width - store.offset
-            && px < width + store.offset
+            py > height + offset
+            && px > sizeWindow.width - width - offset
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (store.sizeWindow.width - width) / 2, y: py - height - store.offset, width: width, height: height
+                x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
             }
         }
 
         /* bottom right */
         if (
-            py >= height + store.offset
-            && px >= width + store.offset
+            py >= height + offset
+            && px >= width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px - width - store.offset, y: py - height - store.offset, width: width, height: height
+                x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }
 
         /* left */
         if (
-            py > store.sizeWindow.height - store.offset - height
-            && py < height + store.offset
-            && px <= store.sizeWindow.width - store.offset - width
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: (store.sizeWindow.height - height) / 2, width: width, height: height
+                x: px + offset, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
 
         /* center top */
         if (
-            py > store.sizeWindow.height - store.offset - height
-            && py < height + store.offset
-            && px > store.sizeWindow.width - store.offset - width
-            && px < width + store.offset
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px > sizeWindow.width - offset - width
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (store.sizeWindow.width - width) / 2, y: (store.sizeWindow.height - height) / 2, width: width, height: height
+                x: (sizeWindow.width - width) / 2, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
 
         /* right */
         if (
-            py > store.sizeWindow.height - store.offset - height
-            && py < height + store.offset
-            && px >= width + store.offset
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px >= width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px - store.offset - width, y: (store.sizeWindow.height - height) / 2, width: width, height: height
+                x: px - offset - width, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
     }
-    else if (
-        store.popup_width < store.sizeWindow.width / 2 && store.popup_height < store.sizeWindow.height / 2
-    ) {
-        width = store.popup_width;
-        height = store.popup_height;
+    else if (isMobile && countFeature === 0) {
+        const { width, height } = configSize(store, "full");
 
-        /*top left*/
+        /* top left */
         if (
-            py <= store.sizeWindow.height - height - store.offset
-            && px <= store.sizeWindow.width - width - store.offset
+            py <= sizeWindow.height - offset - height
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.sizeWindow.width - width, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + store.offset, y: py + store.offset, width: width, height: height
+                x: px + offset, y: py + offset, width: width, height: height
             }
         }
 
-        /*top right*/
+        /* top */
         if (
-            py <= store.sizeWindow.height - height - store.offset
-            && px > store.sizeWindow.width - width - store.offset
+            py <= sizeWindow.height - offset - height
+            && px > sizeWindow.width - width - offset
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.sizeWindow.height - height
+                    x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topRight: false },
-                x: px - width - store.offset, y: py + store.offset, width: width, height: height
+                buttonZoom: { topLeft: false },
+                x: (sizeWindow.width - width) / 2, y: py + offset, width: width, height: height
+            }
+        }
+
+        /* top right */
+        if (
+            py <= sizeWindow.height - offset - height
+            && px >= width + offset
+        ) {
+            return {
+                pointClick: {
+                    x: offHP, y: sizeWindow.height - height
+                },
+                buttonZoom: { topLeft: false },
+                x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
 
         /*bottom left*/
         if (
-            py > store.sizeWindow.height - height - store.offset
-            && px <= store.sizeWindow.width - width
+            py >= height + offset
+            && px <= sizeWindow.width - offset - width
         ) {
             return {
                 pointClick: {
-                    x: store.sizeWindow.width - width, y: store.offHP
+                    x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { bottomLeft: false },
-                x: px + store.offset, y: py - height - store.offset, width: width, height: height
+                buttonZoom: { topLeft: false },
+                x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
 
-        /*bottom right*/
+        /* bottom */
         if (
-            py > store.sizeWindow.height - height - store.offset
-            && px > store.sizeWindow.width - width - store.offset
+            py > height + offset
+            && px > sizeWindow.width - width - offset
+            && px < width + offset
         ) {
             return {
                 pointClick: {
-                    x: store.offHP, y: store.offHP,
+                    x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { bottomRight: false },
-                x: px - width - store.offset, y: py - height - store.offset, width: width, height: height
+                buttonZoom: { topLeft: false },
+                x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
+            }
+        }
+
+        /* bottom right */
+        if (
+            py >= height + offset
+            && px >= width + offset
+        ) {
+            return {
+                pointClick: {
+                    x: offHP, y: sizeWindow.height - height
+                },
+                buttonZoom: { topLeft: false },
+                x: px - width - offset, y: py - height - offset, width: width, height: height
+            }
+        }
+
+        /* left */
+        if (
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px <= sizeWindow.width - offset - width
+        ) {
+            return {
+                pointClick: {
+                    x: offHP, y: sizeWindow.height - height
+                },
+                buttonZoom: { topLeft: false },
+                x: px + offset, y: (sizeWindow.height - height) / 2, width: width, height: height
+            }
+        }
+
+        /* center top */
+        if (
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px > sizeWindow.width - offset - width
+            && px < width + offset
+        ) {
+            return {
+                pointClick: {
+                    x: offHP, y: sizeWindow.height - height
+                },
+                buttonZoom: { topLeft: false },
+                x: (sizeWindow.width - width) / 2, y: (sizeWindow.height - height) / 2, width: width, height: height
+            }
+        }
+
+        /* right */
+        if (
+            py > sizeWindow.height - offset - height
+            && py < height + offset
+            && px >= width + offset
+        ) {
+            return {
+                pointClick: {
+                    x: offHP, y: sizeWindow.height - height
+                },
+                buttonZoom: { topLeft: false },
+                x: px - offset - width, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
     }
 };
 
-const getPositionContext = async (px, py, store) => {
+async function getPositionContext(px, py, store) {
     let width, height;
-
-    width = store.context_width;
-    height = store.context_height;
+    const { context_height, context_width, offset, offHP, isMobile, isLandscape, countFeature, popup_width, popup_height, sizeWindow } = store;
+    width = context_width;
+    height = context_height;
 
     /*top left*/
     if (
-        py <= store.sizeWindow.height - height
-        && px <= store.sizeWindow.width - width
+        py <= sizeWindow.height - height
+        && px <= sizeWindow.width - width
     ) {
         return {
-            x: px, y: py, width: width, height: height
+            x: px + offset, y: py + offset, width: width, height: height
         }
     }
 
     /*top right*/
     if (
-        py <= store.sizeWindow.height - height
-        && px > store.sizeWindow.width - width
+        py <= sizeWindow.height - height
+        && px > sizeWindow.width - width
     ) {
         return {
-            x: px - width, y: py, width: width, height: height
+            x: px - offset - width, y: py + offset, width: width, height: height
         }
     }
 
     /*bottom left*/
     if (
-        py > store.sizeWindow.height - height
-        && px <= store.sizeWindow.width - width
+        py > sizeWindow.height - height
+        && px <= sizeWindow.width - width
     ) {
         return {
-            x: px, y: py - height, width: width, height: height
+            x: px + offset, y: py - offset - height, width: width, height: height
         }
     }
 
     /*bottom right*/
     if (
-        py > store.sizeWindow.height - height
-        && px > store.sizeWindow.width - width
+        py > sizeWindow.height - height
+        && px > sizeWindow.width - width
     ) {
         return {
-            x: px - width, y: py - height, width: width, height: height
+            x: px - offset - width, y: py - offset - height, width: width, height: height
         }
     }
 };
 
-const outsideClick = (ref: RefObject<HTMLElement>, handler: () => void) => {
+const outsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
     useEffect(() => {
         const listener = (e: MouseEvent) => {
             if (!ref.current || ref.current.contains(e.target as Node)) return;

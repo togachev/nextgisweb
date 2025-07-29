@@ -27,7 +27,7 @@ const context_item = 34;
 const length = array_context.filter(item => item.visible === true).length
 
 
-export class Store {
+export class PopupStore {
     display: Display;
     context_height: number;
     context_width: number;
@@ -54,6 +54,7 @@ export class Store {
     private rootPointClick: ReactRoot | null = null;
 
     @observable accessor isLandscape = false;
+    @observable accessor isPortrait = false;
     @observable accessor popupHidden = true;
     @observable accessor contextHidden = true;
     @observable accessor isMobile = false;
@@ -66,14 +67,18 @@ export class Store {
     @observable.ref accessor pointPopupClick: SourceProps;
     @observable.ref accessor pointContextClick: SourceProps;
     @observable.ref accessor valueRnd: Rnd;
+    @observable.ref accessor fixPos: Rnd | null = null;
+    @observable.ref accessor fixPanel: string | null = null;
 
     constructor({
         display,
         sizeWindow,
-        valueRnd,
+        fixPos,
+        fixPanel,
     }) {
         this.display = display;
-        this.valueRnd = valueRnd;
+        this.fixPos = fixPos;
+        this.fixPanel = fixPanel;
         this.context_height = 24 + context_item * length;
         this.context_width = 200;
         this.displaySrid = 3857;
@@ -96,6 +101,16 @@ export class Store {
         this.coords_not_count_h = 51;
 
     }
+
+    @action
+    setFixPos(fixPos: Rnd | null) {
+        this.fixPos = fixPos;
+    };
+
+    @action
+    setFixPanel(fixPanel: string) {
+        this.fixPanel = fixPanel;
+    };
 
     @action
     setParams(params: EventProps) {
@@ -130,6 +145,11 @@ export class Store {
     @action
     setIsLandscape(isLandscape: boolean) {
         this.isLandscape = isLandscape;
+    };
+
+    @action
+    setIsPortrait(isPortrait: boolean) {
+        this.isPortrait = isPortrait;
     };
 
     @action
@@ -190,14 +210,14 @@ export class Store {
         return await transform(coord, from, to);
     };
 
-    overlayInfo = async (e: MapBrowserEvent, op: string, p, lonlat) => {
+    async overlayInfo(e: MapBrowserEvent, op: string, p) {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
-        let request;
+        let requestProps: EventProps | undefined;
         if (op === "popup" && p === false) {
-            const styles: StylesRequest[] = [];
-            this.display.getVisibleItems()
+            await this.display.getVisibleItems()
                 .then((items) => {
+                    const styles: StylesRequest[] = [];
                     const itemConfig = this.display.getItemConfig();
                     const mapResolution = this.olmap.getView().getResolution();
                     items.map(i => {
@@ -213,19 +233,21 @@ export class Store {
                             styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
                         }
                     });
+                    requestProps = {
+                        point: e.coordinate,
+                        request: {
+                            srs: this.displaySrid,
+                            geom: this.requestGeomString(e.pixel),
+                            styles: styles,
+                            point: this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]),
+                            status: attr,
+                            op: op,
+                            p: p,
+                        },
+                    };
                 })
-
-            request = {
-                srs: this.displaySrid,
-                geom: this.requestGeomString(e.pixel),
-                styles: styles,
-                point: this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]),
-                status: attr,
-            }
-        }
-
-        if (op === "popup" && p && p.value.attribute === true) {
-            this.display.getVisibleItems()
+        } else if (op === "popup" && p && p.value.attribute === true) {
+            await this.display.getVisibleItems()
                 .then((items) => {
                     const itemConfig = this.display.getItemConfig();
                     p.value.params.map(itm => {
@@ -238,58 +260,40 @@ export class Store {
                             }
                         });
                     })
+                    requestProps = {
+                        point: e.coordinate,
+                        request: {
+                            srs: this.displaySrid,
+                            geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
+                            styles: p.value.params,
+                            point: p?.coordinate,
+                            status: attr,
+                            op: op,
+                            p: p,
+                        },
+                    };
                 })
-
-            request = {
-                srs: this.displaySrid,
-                geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
-                styles: p.value.params,
-                point: p?.coordinate,
-                status: attr,
-            }
         }
 
-        this.setParams({
-            point: e.coordinate,
-            request: request,
-        })
-
-        await this.transformCoord(this.params.point, this.webMercator, this.wgs84)
-            .then(transformedCoord => {
-                const fixedArray = transformedCoord.map(number => parseFloat(number.toFixed(12)));
-                lonlat = fixedArray ? fixedArray : [];
-            })
-
-        // if (this.display.panelManager.getActivePanelName() !== "custom-layer") {
-        //     this.displayFeatureInfo(e, op, p, "click");
-        // }
-        return {
-            point: e.coordinate,
-            request: request,
-        }
-
+        return new Promise(resolve => resolve(requestProps));
     };
 
-    getResponse = async (op: string, p) => {
-        if (this.params.request !== undefined && (op === "popup" || p.value.attribute === true)) {
-            await route("feature_layer.imodule")
+    async getResponse({ request }) {
+        if (request.op === "popup") {
+            const feature = await route("feature_layer.imodule")
                 .post({
-                    body: JSON.stringify(this.params.request),
+                    body: JSON.stringify(request),
                 })
-                .then(item => {
-                    this.setCountFeature(item.featureCount);
-                    this.setResponse({ data: item.data, featureCount: item.featureCount });
-                });
+            return new Promise(resolve => resolve(feature));
         } else {
-            this.setCountFeature(0);
-            this.setResponse({ data: [], featureCount: 0 });
+            return new Promise(resolve => resolve({ data: [], featureCount: 0 }));
         }
     }
 
 
-    displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
-        await this.getResponse(op, p);
-        console.log(this.countFeature, this.response);
+    // displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
+    //     await this.getResponse(op, p);
+    //     console.log(this.countFeature, this.response);
 
-    };
+    // };
 }
