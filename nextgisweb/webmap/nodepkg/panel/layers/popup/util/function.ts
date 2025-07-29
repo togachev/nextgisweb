@@ -9,8 +9,8 @@ const configSize = (store, key) => {
             height: countFeature > 0 ? popup_height : coords_not_count_h,
         },
         size15: {
-            width: countFeature > 0 ? sizeWindow.width / 2 : coords_not_count_w,
-            height: countFeature > 0 ? sizeWindow.height / 2 : coords_not_count_h,
+            width: countFeature > 0 ? sizeWindow.width * 0.65 : coords_not_count_w,
+            height: countFeature > 0 ? sizeWindow.height * 0.65 : coords_not_count_h,
         },
         one: {
             width: countFeature > 0 ? sizeWindow.width : coords_not_count_w,
@@ -29,7 +29,7 @@ const configSize = (store, key) => {
 }
 
 async function getPosition(px, py, store) {
-    const { offset, offHP, isMobile, isLandscape, isPortrait, countFeature, popup_width, popup_height, sizeWindow } = store;
+    const { offset, offHP, isMobile, isLandscape, countFeature, popup_width, popup_height, sizeWindow } = store;
 
     if (isMobile && countFeature > 0) {
         if (isLandscape) {
@@ -520,10 +520,9 @@ async function getPosition(px, py, store) {
 };
 
 async function getPositionContext(px, py, store) {
-    let width, height;
-    const { context_height, context_width, offset, offHP, isMobile, isLandscape, countFeature, popup_width, popup_height, sizeWindow } = store;
-    width = context_width;
-    height = context_height;
+    const { context_height, context_width, offset, sizeWindow } = store;
+    const width = context_width;
+    const height = context_height;
 
     /*top left*/
     if (
@@ -566,7 +565,7 @@ async function getPositionContext(px, py, store) {
     }
 };
 
-const outsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
+const useOutsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
     useEffect(() => {
         const listener = (e: MouseEvent) => {
             if (!ref.current || ref.current.contains(e.target as Node)) return;
@@ -577,4 +576,4 @@ const outsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
     }, [ref, handler]);
 }
 
-export { getPosition, getPositionContext, outsideClick };
+export { getPosition, getPositionContext, useOutsideClick };

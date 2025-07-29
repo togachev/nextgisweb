@@ -1,7 +1,6 @@
-import { action, computed, observable } from "mobx";
-import { Component, createRef } from "react";
+import { action, observable } from "mobx";
+import { createRef } from "react";
 import { createRoot } from "react-dom/client";
-import { createPortal } from "react-dom";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import settings from "@nextgisweb/webmap/client-settings";
@@ -14,7 +13,7 @@ import { route } from "@nextgisweb/pyramid/api";
 
 import type { Root as ReactRoot } from "react-dom/client";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { ButtonZoomProps, EventProps, Params, PointClickProps, Response, RequestProps, Rnd, SizeWindowProps, SourceProps, StylesRequest, VisibleProps } from "./type";
+import type { EventProps, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest } from "./type";
 
 const array_context = [
     { key: 1, title: "Действие 1", result: "Действие 1 выполнено", visible: false },
@@ -87,7 +86,7 @@ export class PopupStore {
         this.wgs84 = "EPSG:4326";
         this.sizeWindow = sizeWindow;
         this.olmap = this.display.map.olMap;
-        this._addOverlay();
+
         this.pointElement.className = "point-click";
         this.rootPointClick = createRoot(this.pointElement);
         this.popupElement.className = "popup-position";
@@ -99,7 +98,7 @@ export class PopupStore {
         this.offset = settings.offset_point;
         this.coords_not_count_w = 270;
         this.coords_not_count_h = 51;
-
+        this._addOverlay();
     }
 
     @action
@@ -180,17 +179,18 @@ export class PopupStore {
     _addOverlay = () => {
         this.overlayPoint = new Overlay({});
         this.olmap.addOverlay(this.overlayPoint);
+        this.overlayPoint.setElement(this.pointElement);
     };
 
     renderPoint = (e) => {
-        this.overlayPoint.setElement(this.pointElement);
-        this.overlayPoint.setPosition(e.coordinate);
         this.rootPointClick.render(<PointClick />);
+        this.overlayPoint.setPosition(e.coordinate);
     };
 
     point_destroy = () => {
         topic.publish("feature.unhighlight");
-        this.rootPointClick.render();
+        this.overlayPoint.setPosition(undefined);
+        this.setValueRnd({ ...this.valueRnd, width: 0, height: 0, x: -9999, y: -9999 });
     };
 
     requestGeomString = (pixel: number[]) => {
