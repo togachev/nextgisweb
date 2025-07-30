@@ -15,17 +15,16 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { DescriptionsProps } from "@nextgisweb/gui/antd";
 import type SelectedFeatureStore from "./SelectedFeatureStore"
 import type { PanelPluginWidgetProps } from "../registry";
-import { IModule } from "@nextgisweb/webmap/imodule";
 
 import "./SelectedFeature.less";
 
 const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
-        const imodule: IModule = display.imodule;
+        const imodule = display.popupStore;
 
         const deleteRow = ({ key, ckey, all }) => {
-            imodule?.popup_destroy();
+            imodule?.pointDestroy();
             if (all) {
                 const obj = { ...store.selectedFeatures };
                 store.setSelectedFeatures({
@@ -219,12 +218,12 @@ const InfoSelect = () => {
 const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
-        const imodule: IModule = display.imodule;
+        const imodule = display.popupStore;
 
         const onCheckedVisibleItems = useCallback(() => {
             store.setChecked(!store.checked);
             if (store.checked === false) {
-                imodule?.popup_destroy();
+                imodule?.pointDestroy();
                 visibleItems({ value: undefined });
             }
             else {

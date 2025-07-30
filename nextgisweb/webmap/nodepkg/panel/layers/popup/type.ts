@@ -1,5 +1,33 @@
+import { ReactElement } from "react";
 import type { Attrs } from "@nextgisweb/feature-layer/type";
 import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
+import type { Display } from "@nextgisweb/webmap/display";
+import { PopupStore } from "./PopupStore";
+
+export type ExtensionsProps = Record<string, unknown | null>;
+
+export interface UrlParamsProps {
+    lon?: number;
+    lat?: number;
+    attribute: string | boolean;
+    st?: string;
+    slf?: string;
+    pn?: string;
+}
+
+export type OptionProps = {
+    children: ReactElement;
+    hidden: boolean;
+    key: string;
+    label: ReactElement;
+    title: string;
+    value: string;
+}
+
+export type ContentProps = {
+    display: Display;
+    store: PopupStore;
+}
 
 export type SizeWindowProps = {
     width: number;
@@ -150,4 +178,17 @@ export interface Params {
     array_context?: ContextProps[] | [];
     countFeature: number;
     event: MapBrowserEvent;
+}
+
+interface ControlProps {
+    icon: ReactElement;
+    url?: string;
+    title: string;
+    status?: boolean | string;
+    checked?: boolean;
+    disable?: boolean;
+}
+
+export interface ControlUrlProps {
+    [key: string]: ControlProps;
 }

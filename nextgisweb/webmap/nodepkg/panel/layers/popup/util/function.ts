@@ -1,37 +1,78 @@
 import { RefObject, useEffect } from "react";
 
-const configSize = (store, key) => {
-    const { coords_not_count_w, coords_not_count_h, countFeature, popup_width, popup_height, sizeWindow } = store;
+type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
+export const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+
+type Entry<T> = {
+    [K in keyof T]: [K, T[K]];
+}[keyof T];
+
+export const filterObject = <T extends object>(
+    obj: T,
+    fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean,
+): Partial<T> => {
+    const next = { ...obj };
+
+    const entries: Entry<T>[] = [];
+
+    for (const key in obj) {
+        entries.push([key, obj[key]]);
+    }
+
+    for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        if (!fn(entry, i, entries)) {
+            delete next[entry[0]];
+        }
+    }
+
+    return next;
+}
+
+const useOutsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
+    useEffect(() => {
+        const listener = (e: MouseEvent) => {
+            if (!ref.current || ref.current.contains(e.target as Node)) return;
+            handler();
+        };
+        document.addEventListener("mousedown", listener);
+        return () => document.removeEventListener("mousedown", listener);
+    }, [ref, handler]);
+};
+
+const configSize = (store, key) => {
+    const { coords_not_count_w, coords_not_count_h, response, popup_width, popup_height, sizeWindow } = store;
+    const count = response.featureCount;
     const size = {
         full: {
-            width: countFeature > 0 ? popup_width : coords_not_count_w,
-            height: countFeature > 0 ? popup_height : coords_not_count_h,
+            width: response.featureCount > 0 ? popup_width : coords_not_count_w,
+            height: response.featureCount > 0 ? popup_height : coords_not_count_h,
         },
         size15: {
-            width: countFeature > 0 ? sizeWindow.width * 0.65 : coords_not_count_w,
-            height: countFeature > 0 ? sizeWindow.height * 0.65 : coords_not_count_h,
+            width: count > 0 ? sizeWindow.width * 0.65 : coords_not_count_w,
+            height: count > 0 ? sizeWindow.height * 0.65 : coords_not_count_h,
         },
         one: {
-            width: countFeature > 0 ? sizeWindow.width : coords_not_count_w,
-            height: countFeature > 0 ? sizeWindow.height : coords_not_count_h,
+            width: count > 0 ? sizeWindow.width : coords_not_count_w,
+            height: count > 0 ? sizeWindow.height : coords_not_count_h,
         },
         mobileLandscape: {
-            width: countFeature > 0 ? sizeWindow.width / 2 : coords_not_count_w,
-            height: countFeature > 0 ? sizeWindow.height : coords_not_count_h,
+            width: count > 0 ? sizeWindow.width / 2 : coords_not_count_w,
+            height: count > 0 ? sizeWindow.height : coords_not_count_h,
         },
         mobilePortrait: {
-            width: countFeature > 0 ? sizeWindow.width : coords_not_count_w,
-            height: countFeature > 0 ? sizeWindow.height / 2 : coords_not_count_h,
+            width: count > 0 ? sizeWindow.width : coords_not_count_w,
+            height: count > 0 ? sizeWindow.height / 2 : coords_not_count_h,
         },
     };
     return size[key];
-}
+};
 
 async function getPosition(px, py, store) {
-    const { offset, offHP, isMobile, isLandscape, countFeature, popup_width, popup_height, sizeWindow } = store;
-
-    if (isMobile && countFeature > 0) {
+    const { offset, offHP, isMobile, isLandscape, response, popup_width, popup_height, sizeWindow } = store;
+    const count = response.featureCount;
+    if (isMobile && count > 0) {
         if (isLandscape) {
             const { width, height } = configSize(store, "mobileLandscape");
 
@@ -288,7 +329,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { topRight: false },
                 x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
@@ -302,7 +343,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { bottomLeft: false },
                 x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -317,7 +358,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { bottomLeft: false },
                 x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
             }
         }
@@ -331,7 +372,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { bottomRight: false },
                 x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -377,12 +418,12 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { topRight: false },
                 x: px - offset - width, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
     }
-    else if (isMobile && countFeature === 0) {
+    else if (isMobile && count === 0) {
         const { width, height } = configSize(store, "full");
 
         /* top left */
@@ -423,7 +464,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { topRight: false },
                 x: px - offset - width, y: py + offset, width: width, height: height
             }
         }
@@ -437,7 +478,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { bottomLeft: false },
                 x: px + offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -452,7 +493,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { bottomLeft: false },
                 x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
             }
         }
@@ -466,7 +507,7 @@ async function getPosition(px, py, store) {
                 pointClick: {
                     x: offHP, y: sizeWindow.height - height
                 },
-                buttonZoom: { topLeft: false },
+                buttonZoom: { bottomRight: false },
                 x: px - width - offset, y: py - height - offset, width: width, height: height
             }
         }
@@ -564,16 +605,5 @@ async function getPositionContext(px, py, store) {
         }
     }
 };
-
-const useOutsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
-    useEffect(() => {
-        const listener = (e: MouseEvent) => {
-            if (!ref.current || ref.current.contains(e.target as Node)) return;
-            handler();
-        };
-        document.addEventListener("mousedown", listener);
-        return () => document.removeEventListener("mousedown", listener);
-    }, [ref, handler]);
-}
 
 export { getPosition, getPositionContext, useOutsideClick };

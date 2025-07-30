@@ -1,16 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { transform } from "ol/proj";
 import { observer } from "mobx-react-lite";
-import { Button, ConfigProvider, Space } from "@nextgisweb/gui/antd";
+import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
+import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
+import showModal from "@nextgisweb/gui/showModal";
 import { Rnd } from "react-rnd";
 import { PopupStore } from "./PopupStore";
-import CloseIcon from "@nextgisweb/icon/material/close";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { isMobile, useMobileOrientation } from "react-device-detect";
+import { isMobile as isM, useMobileOrientation } from "react-device-detect";
 import { getPosition, getPositionContext, useOutsideClick } from "./util/function";
+import { ButtonZoomComponent } from "./component/ButtonZoomComponent";
+import { ContentComponent } from "./component/ContentComponent";
+import { CoordinateComponent } from "./component/CoordinateComponent";
+import Pin from "@nextgisweb/icon/mdi/pin";
+import PinOff from "@nextgisweb/icon/mdi/pin-off";
+import OpenInFull from "@nextgisweb/icon/material/open_in_full";
+import CloseFullscreen from "@nextgisweb/icon/material/close_fullscreen";
+import CloseIcon from "@nextgisweb/icon/material/close";
+import EditNote from "@nextgisweb/icon/material/edit_note";
+import UpdateLink from "@nextgisweb/icon/mdi/update";
+import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
+import LockReset from "@nextgisweb/icon/mdi/lock-reset";
+import topic from "@nextgisweb/webmap/compat/topic";
+import { getEntries } from "./util/function";
 
+import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Display } from "@nextgisweb/webmap/display";
+import type { SizeType } from "@nextgisweb/gui/antd";
 
 import "./Imodule.less";
 
@@ -20,12 +37,45 @@ interface ImoduleProps {
 
 const webMercator = "EPSG:3857";
 const wgs84 = "EPSG:4326";
+const { Option } = Select;
+const forbidden = gettext("The data is not available for reading");
+
+const CheckOnlyOne = ({ store, size }) => {
+    const msgFixPopup = gettext("Lock popup position");
+    const msgFixOffPopup = gettext("Disable lock popup position");
+
+    const onClick = useCallback((e) => {
+        e.preventDefault();
+        store.setFixPopup(!store.fixPopup);
+    }, []);
+
+    const props = {
+        icon: store.fixPopup ? <PinOff /> : <Pin />,
+        onTouchEnd: onClick,
+        onClick: onClick,
+        type: "text",
+        variant: "filled",
+        size: size,
+        color: store.fixPopup && "primary",
+        title: store.fixPopup ? msgFixOffPopup : msgFixPopup,
+        className: !store.fixPopup ? "icon-symbol" : "icon-checked",
+    }
+
+    return (<Button {...props} />);
+};
+
 
 export default observer(
     function Imodule({ display }: ImoduleProps) {
-        const { isLandscape, isPortrait } = useMobileOrientation();
+        const { isLandscape: isL, isPortrait: isP } = useMobileOrientation();
         const [pos, setPos] = useState({ x: -9999, y: -9999, width: 0, height: 0 });
         const [posContext, setPosContext] = useState({ x: -9999, y: -9999, width: 0, height: 0 });
+
+        const [size, setSize] = useState<SizeType>("default");
+
+        const pm = display.panelManager;
+        const pkey = "selected-feature";
+        const panel = pm.getPanel<SelectedFeatureStore>(pkey);
 
         const urlParams = display.getUrlParams();
         const opts = display.config.options;
@@ -49,14 +99,37 @@ export default observer(
                     attrs === true ? "attributes" :
                         attrs === false && geoms === true ? "geom_info" :
                             (attrs === false && geoms === false) && "description",
+                control: {
+                    reset: {
+                        icon: <LockReset />,
+                        title: gettext("Reset url"),
+                        disabled: true,
+                    },
+                    popup: {
+                        icon: <UpdateLink />,
+                        url: "",
+                        title: gettext("Update current web map address"),
+                        status: false,
+                        checked: false,
+                    },
+                    fixedscreen: {
+                        icon: <FitToScreenOutline />,
+                        url: "",
+                        title: gettext("Set current map coverage"),
+                        status: false,
+                        checked: false,
+                    }
+                },
             }));
 
         const olmap = display.map.olMap;
 
+        const typeClick = isM ? "singleclick" : "click";
+
         const contextMenu = useCallback((e) => {
             if (e.dragging) return;
 
-            olmap.un("singleclick", singleClick);
+            isM && olmap.un("singleclick", click);
             e.preventDefault();
             getPositionContext(e.originalEvent.clientX, e.originalEvent.clientY, store)
                 .then(val => {
@@ -71,52 +144,62 @@ export default observer(
                 lonlat: lonlat,
             });
 
-            setTimeout(() => {
-                olmap.on("singleclick", singleClick);
+            isM && setTimeout(() => {
+                olmap.on("singleclick", click);
             }, 250);
             store.setContextHidden(false);
         }, []);
 
-        const singleClick = useCallback((e) => {
+        const click = useCallback((e) => {
             if (e.dragging) return;
             e.preventDefault();
             store.overlayInfo(e, "popup", false)
                 .then(props => {
+                    store.setParams(props);
                     return store.getResponse(props)
                 })
                 .then(item => {
-                    store.setCountFeature(item.featureCount);
                     store.setResponse({ data: item.data, featureCount: item.featureCount });
+                    store.setSelected(item.data[0]);
                 })
                 .then(() => {
                     getPosition(e.originalEvent.clientX, e.originalEvent.clientY, store)
                         .then(val => {
                             setPos(val);
-                            store.setValueRnd({ ...store.valueRnd, width: val?.width, height: val?.height, x: val?.x, y: val?.y - 40 });
+                            store.setValueRnd({
+                                ...store.valueRnd, width: val?.width, height: val?.height, x: val?.x, y: val?.y - 40,
+                                pointClick: val?.pointClick,
+                                buttonZoom: val?.buttonZoom,
+                            });
+                            store.contentGenerate();
                         })
                     store.renderPoint(e);
                     const lonlat = transform(e.coordinate, webMercator, wgs84);
                     store.setPointPopupClick({
-                        typeEvents: "singleclick",
+                        typeEvents: "click",
                         pixel: e.pixel,
                         clientPixel: [e.originalEvent.clientX, e.originalEvent.clientY],
                         coordinate: e.coordinate,
                         lonlat: lonlat,
                     });
                 })
+            // .then(() => {
+            //     console.log(store);
+            // })
             store.setContextHidden(true);
             store.setPopupHidden(false);
         }, [store.pointPopupClick]);
 
         useEffect(() => {
-            store.setIsLandscape(isLandscape);
-            store.setIsPortrait(isPortrait);
-            store.setIsMobile(isMobile);
-        }, [isLandscape, isPortrait, isMobile]);
+            store.setIsLandscape(isL);
+            store.setIsPortrait(isP);
+            store.setIsMobile(isM);
+            isM ? setSize("default") : setSize("small");
+        }, [isL, isP, isM]);
 
         useEffect(() => {
             if (display.panelManager.getActivePanelName() !== "custom-layer") {
-                olmap.on("singleclick", singleClick);
+                olmap.on(typeClick, click);
                 olmap.on("contextmenu", contextMenu);
 
                 const handleResize = () => {
@@ -128,12 +211,12 @@ export default observer(
                 window.addEventListener("resize", handleResize);
 
                 return () => {
-                    olmap.un("singleclick", singleClick);
+                    olmap.un(typeClick, click);
                     olmap.un("contextmenu", contextMenu);
                     window.removeEventListener("resize", handleResize);
                 };
             } else {
-                store.point_destroy();
+                store.pointDestroy();
             }
         }, [display.panelManager.activePanel]);
 
@@ -146,7 +229,8 @@ export default observer(
             }
         }, [store.fixPopup]);
 
-        const W = store.sizeWindow.width;
+        const W = window.innerWidth;
+        const H = window.innerHeight;
 
         const handleDragStop = (e, d) => {
             store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
@@ -154,6 +238,77 @@ export default observer(
 
         const lonlatPopup = store.pointPopupClick?.lonlat.map(number => parseFloat(number.toFixed(6)));
         const lonlatContext = store.pointContextClick?.lonlat.map(number => parseFloat(number.toFixed(6)));
+        const contentProps = { store: store, display: display };
+        const coordinateProps = { display: display, store: store, op: "popup", point: false };
+
+        const onChangeSelect = async (value) => {
+            const selectedValue = store.response.data.find(item => item.value === value.value);
+            const copy = { ...selectedValue };
+            copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
+            store.setSelected(copy);
+            store.getContent(copy, false);
+            store.LinkToGeometry(copy);
+            topic.publish("visible.point", copy);
+            store.setValueRnd({ ...store.valueRnd, buttonZoom: { [Object.keys(store.valueRnd?.buttonZoom)[0]]: true } });
+
+            // const selectedProps = { ...selectedValue };
+            // Object.assign(selectedProps, propsCoords());
+            // if (panel) {
+            //     updateSelectFeatures(panel, selectedProps)
+            // }
+        };
+
+        const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
+            if ((option?.label ?? "").toLowerCase().includes(input.toLowerCase()) ||
+                (option?.desc ?? "").toLowerCase().includes(input.toLowerCase())) {
+                return true
+            } else {
+                return false
+            }
+        };
+
+        const editFeature = useMemo(() => {
+            if (store.countFeature > 0 && store.selected && store.selected.type === "vector") {
+                const { id, layerId, styleId } = store.selected;
+                const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
+
+                if (display.isTinyMode() && !display.isTinyModePlugin("@nextgisweb/webmap/plugin/feature-layer")) {
+                    return false;
+                } else if (!store.isEditEnabled(display, item)) {
+                    return false;
+                } else if (store.selected.permission === "Forbidden") {
+                    return false;
+                } else {
+                    return (
+                        <Button
+                            title={gettext("Edit")}
+                            className="icon-symbol"
+                            type="text"
+                            size="small"
+                            onClick={() => {
+                                const featureId = id;
+                                const resourceId = layerId;
+                                showModal(FeatureEditorModal, {
+                                    transitionName: "",
+                                    maskTransitionName: "",
+                                    editorOptions: {
+                                        featureId,
+                                        resourceId: resourceId,
+                                        onSave: () => {
+                                            store.setUpdate(true);
+                                            topic.publish("feature.updated", { resourceId: layerId, featureId: id });
+                                        },
+                                    },
+                                });
+
+                            }}
+                        >
+                            <EditNote />
+                        </Button>
+                    )
+                }
+            }
+        }, [store.selected]);
 
         return (
             <>
@@ -246,17 +401,17 @@ export default observer(
                                 minWidth={pos?.width}
                                 minHeight={pos?.height}
                                 allowAnyClick={true}
-                                enableResizing={store.countFeature > 0 ?
+                                enableResizing={store.response.featureCount > 0 ?
                                     (store.fixPos === null ? true : false) :
                                     false}
-                                disableDragging={store.countFeature > 0 && store.fixPos !== null ?
+                                disableDragging={store.response.featureCount > 0 && store.fixPos !== null ?
                                     true :
                                     false}
                                 onDragStop={handleDragStop}
-                                position={store.countFeature > 0 && store.fixPos !== null ?
+                                position={store.response.featureCount > 0 && store.fixPos !== null ?
                                     { x: store.fixPos?.x, y: store.fixPos?.y } :
                                     { x: store.valueRnd?.x, y: store.valueRnd?.y }}
-                                size={store.countFeature > 0 && store.fixPos !== null ?
+                                size={store.response.featureCount > 0 && store.fixPos !== null ?
                                     { width: store.fixPos?.width, height: store.fixPos?.height } :
                                     { width: store.valueRnd?.width, height: store.valueRnd?.height }}
                                 onResize={(e, direction, ref, delta, position) => {
@@ -264,19 +419,110 @@ export default observer(
                                 }}
                             >
                                 <div className="popup">
-                                    <Space direction="vertical" className="control-button">
+                                    <div className="title">
+                                        {store.valueRnd.buttonZoom["topLeft"] && <div style={{ margin: "0 6px 0 0" }}><ButtonZoomComponent {...contentProps} /></div>}
+                                        <Button
+                                            className="title-name"
+                                            size={size}
+                                            type="text"
+                                            onClick={(e) => {
+                                                if (store.response.featureCount > 0 && e.detail === 2) {
+                                                    setTimeout(() => {
+                                                        if (store.valueRnd.width > pos.width || store.valueRnd.height > pos.height) {
+                                                            store.setValueRnd({ ...store.valueRnd, width: pos.width, height: pos.height, x: pos.x, y: pos.y });
+                                                            store.setFullscreen(false)
+                                                        } else {
+                                                            store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: store.fX, y: store.fY });
+                                                            store.setFullscreen(true);
+                                                        }
+                                                    }, 200)
+                                                } else {
+                                                    e.stopPropagation();
+                                                }
+                                            }}
+                                            title={store.selected?.desc}
+                                        >
+                                            <span className="object-select">Объектов: {store.response.featureCount}</span>
+                                            {store.response.featureCount > 0 && store.selected && (
+                                                <span
+                                                    className="layer-name">
+                                                    {store.selected?.desc}
+                                                </span>
+                                            )}
+                                        </Button>
+                                        {store.response.featureCount > 0 && <CheckOnlyOne {...{ store, size }} />}
+                                        {store.response.featureCount > 0 && (
+                                            <Button
+                                                size={size}
+                                                type="text"
+                                                icon={store.fullscreen === true ? (<CloseFullscreen />) : (<OpenInFull />)}
+                                                title={store.fullscreen === true ? gettext("Сollapse fullscreen popup") : gettext("Open fullscreen popup")}
+                                                className={store.response.featureCount > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
+                                                onClick={() => {
+                                                    if (store.response.featureCount > 0 && store.fixPos === null) {
+                                                        if (store.valueRnd.width > pos.width || store.valueRnd.height > pos.height) {
+                                                            store.setValueRnd({ ...store.valueRnd, width: pos.width, height: pos.height, x: pos.x, y: pos.y });
+                                                            store.setFullscreen(false)
+                                                        } else {
+                                                            store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: store.fX, y: store.fY });
+                                                            store.setFullscreen(true)
+                                                        }
+                                                        if (store.valueRnd.width < W && store.valueRnd.width > pos.width || store.valueRnd.height < H && store.valueRnd.height > pos.height) {
+                                                            store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: store.fX, y: store.fY });
+                                                            store.setFullscreen(true)
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        )}
                                         <Button
                                             icon={<CloseIcon />}
-                                            type="text"
                                             title={gettext("Close")}
-                                            size={!isMobile && "small"}
+                                            className={store.response.featureCount > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                             onClick={() => {
-                                                store.setPopupHidden(true);
-                                                store.setContextHidden(true);
-                                                store.point_destroy();
+                                                store.pointDestroy();
+                                                panel && panel.setActiveChecked({
+                                                    ...panel.activeChecked,
+                                                    achecked: false,
+                                                });
                                             }} />
-                                    </Space>
-                                    {lonlatPopup}
+                                        {store.valueRnd.buttonZoom["topRight"] && <div style={{ margin: "0 0 0 6px" }}><ButtonZoomComponent {...contentProps} /></div>}
+                                    </div>
+                                    {store.response.featureCount > 0 && store.selected && (
+                                        <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
+                                            <Select
+                                                labelInValue
+                                                optionLabelProp="label"
+                                                placement="topLeft"
+                                                filterOption={filterOption}
+                                                showSearch
+                                                size="small"
+                                                value={{ label: store.selected.label, value: store.selected.value }}
+                                                style={{ width: editFeature ? "calc(100% - 26px)" : "100%", padding: "0px 2px 0px 2px" }}
+                                                onChange={onChangeSelect}
+                                            >
+                                                {store.response.data.map((item, index) => {
+                                                    const alias = item.permission === "Forbidden" ? forbidden : item.label;
+                                                    return (
+                                                        <Option key={index} type={item.type} value={item.value} label={alias} desc={item.desc}>
+                                                            {alias}
+                                                        </Option>
+                                                    )
+                                                })}
+                                            </Select>
+                                            {editFeature}
+                                        </div>
+                                    )}
+                                    {store.response.featureCount > 0 && store.selected && store.selected.permission !== "Forbidden" && (
+                                        <div className="content">
+                                            <ContentComponent {...contentProps} />
+                                        </div>
+                                    )}
+                                    {(<div className="footer-popup">
+                                        {store.valueRnd.buttonZoom["bottomLeft"] && <div style={{ margin: "0 6px 0 0" }}><ButtonZoomComponent {...contentProps} /></div>}
+                                        <CoordinateComponent {...coordinateProps} />
+                                        {store.valueRnd.buttonZoom["bottomRight"] && <div style={{ margin: "0 0 0 6px" }}><ButtonZoomComponent {...contentProps} /></div>}
+                                    </div>)}
                                 </div>
                             </Rnd >
                         </ConfigProvider>,

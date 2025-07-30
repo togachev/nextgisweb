@@ -4,8 +4,8 @@ import type { Display } from "@nextgisweb/webmap/display";
 import type SelectedFeatureStore from "./SelectedFeatureStore";
 
 export const useSelected = (display: Display, store: SelectedFeatureStore) => {
-    const psizey = display.panelSize.height;
-    const psizex = display.panelSize.width;
+    const psizey = window.innerHeight;
+    const psizex = 350;
     
     const simulateEvent = (p, pixel) => ({
         coordinate: p && p.coordinate,

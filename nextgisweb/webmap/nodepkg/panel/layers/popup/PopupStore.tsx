@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
@@ -9,11 +9,18 @@ import { WKT } from "ol/format";
 import { fromExtent } from "ol/geom/Polygon";
 import { boundingExtent } from "ol/extent";
 import { transform } from "ol/proj";
-import { route } from "@nextgisweb/pyramid/api";
+import { getEntries } from "./util/function";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
+import OlGeomPoint from "ol/geom/Point";
 
 import type { Root as ReactRoot } from "react-dom/client";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { EventProps, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest } from "./type";
+import type { AttributeProps, DataProps, ControlUrlProps, ExtensionsProps, EventProps, OptionProps, ParamsProps, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
+
+const forbidden = gettext("The data is not available for reading");
 
 const array_context = [
     { key: 1, title: "Действие 1", result: "Действие 1 выполнено", visible: false },
@@ -32,7 +39,7 @@ export class PopupStore {
     context_width: number;
     displaySrid: number;
     webMercator: string;
-    LonLatSrid: number;
+    lonLatSrid: number;
     wgs84: string;
     overlayPoint: Overlay;
     olmap: olMap;
@@ -43,6 +50,8 @@ export class PopupStore {
     offset: number;
     coords_not_count_w: number;
     coords_not_count_h: number;
+    fX: number;
+    fY: number;
 
     pointElement = document.createElement("div");
     popupElement = document.createElement("div");
@@ -58,9 +67,10 @@ export class PopupStore {
     @observable accessor contextHidden = true;
     @observable accessor isMobile = false;
     @observable accessor fixPopup = false;
+    @observable accessor update = false;
+    @observable accessor fullscreen = false;
 
     @observable.ref accessor params: EventProps;
-    @observable.ref accessor countFeature: number;
     @observable.ref accessor response: Response;
     @observable.ref accessor sizeWindow: SizeWindowProps;
     @observable.ref accessor pointPopupClick: SourceProps;
@@ -68,23 +78,37 @@ export class PopupStore {
     @observable.ref accessor valueRnd: Rnd;
     @observable.ref accessor fixPos: Rnd | null = null;
     @observable.ref accessor fixPanel: string | null = null;
+    @observable.ref accessor selected: DataProps;
+    @observable.ref accessor contextUrl: string | null = null;
+    @observable.ref accessor extensions: ExtensionsProps | null = null;
+    @observable.ref accessor attribute: AttributeProps[] = [];
+    @observable.ref accessor linkToGeometry: string | null = null;
+    @observable.ref accessor fixContentItem: OptionProps;
+    @observable.ref accessor control: ControlUrlProps;
+    @observable.ref accessor permalink: string | null = null;
+    @observable.ref accessor activeControlKey: string;
+    @observable.ref accessor mode: string;
 
     constructor({
         display,
         sizeWindow,
         fixPos,
         fixPanel,
+        control,
     }) {
         this.display = display;
+        this.display.popupStore = this;
         this.fixPos = fixPos;
         this.fixPanel = fixPanel;
+        this.control = control;
         this.context_height = 24 + context_item * length;
         this.context_width = 200;
         this.displaySrid = 3857;
         this.webMercator = "EPSG:3857";
-        this.LonLatSrid = 4326;
+        this.lonLatSrid = 4326;
         this.wgs84 = "EPSG:4326";
         this.sizeWindow = sizeWindow;
+
         this.olmap = this.display.map.olMap;
 
         this.pointElement.className = "point-click";
@@ -98,8 +122,70 @@ export class PopupStore {
         this.offset = settings.offset_point;
         this.coords_not_count_w = 270;
         this.coords_not_count_h = 51;
+        this.fX = this.offHP + this.offset;
+        this.fY = this.offHP + this.offset;
         this._addOverlay();
     }
+
+    @action
+    setMode(mode: string) {
+        this.mode = mode;
+    };
+
+    @action
+    setActiveControlKey(activeControlKey: string) {
+        this.activeControlKey = activeControlKey;
+    };
+
+    @action
+    setPermalink(permalink: string) {
+        this.permalink = permalink;
+    };
+
+    @action
+    setControl(control: ControlUrlProps) {
+        this.control = control;
+    };
+
+    @action
+    setFixContentItem(fixContentItem: OptionProps) {
+        this.fixContentItem = fixContentItem;
+    };
+
+    @action
+    setFullscreen(fullscreen: boolean) {
+        this.fullscreen = fullscreen;
+    };
+
+    @action
+    setLinkToGeometry(linkToGeometry: string) {
+        this.linkToGeometry = linkToGeometry;
+    };
+
+    @action
+    setAttribute(attribute: AttributeProps[]) {
+        this.attribute = attribute;
+    };
+
+    @action
+    setExtensions(extensions: ExtensionsProps) {
+        this.extensions = extensions;
+    };
+
+    @action
+    setContextUrl(contextUrl: string) {
+        this.contextUrl = contextUrl;
+    };
+
+    @action
+    setUpdate(update: boolean) {
+        this.update = update;
+    };
+
+    @action
+    setSelected(selected: DataProps) {
+        this.selected = selected;
+    };
 
     @action
     setFixPos(fixPos: Rnd | null) {
@@ -114,11 +200,6 @@ export class PopupStore {
     @action
     setParams(params: EventProps) {
         this.params = params;
-    };
-
-    @action
-    setCountFeature(countFeature: number) {
-        this.countFeature = countFeature;
     };
 
     @action
@@ -176,24 +257,29 @@ export class PopupStore {
         this.valueRnd = valueRnd;
     };
 
-    _addOverlay = () => {
+    @computed
+    get activePanel() {
+        return this.display.panelManager.getActivePanelName();
+    }
+
+    _addOverlay() {
         this.overlayPoint = new Overlay({});
         this.olmap.addOverlay(this.overlayPoint);
         this.overlayPoint.setElement(this.pointElement);
     };
 
-    renderPoint = (e) => {
+    renderPoint(e) {
         this.rootPointClick.render(<PointClick />);
         this.overlayPoint.setPosition(e.coordinate);
     };
 
-    point_destroy = () => {
+    pointDestroy() {
         topic.publish("feature.unhighlight");
         this.overlayPoint.setPosition(undefined);
         this.setValueRnd({ ...this.valueRnd, width: 0, height: 0, x: -9999, y: -9999 });
     };
 
-    requestGeomString = (pixel: number[]) => {
+    requestGeomString(pixel: number[]) {
         const pixelRadius = settings.identify_radius;
 
         return new WKT().writeGeometry(
@@ -206,14 +292,14 @@ export class PopupStore {
         )
     };
 
-    transformCoord = async (coord, from, to) => {
+    async transformCoord(coord, from, to) {
         return await transform(coord, from, to);
     };
 
     async overlayInfo(e: MapBrowserEvent, op: string, p) {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
-        let requestProps: EventProps | undefined;
+        let requestProps: EventProps;
         if (op === "popup" && p === false) {
             await this.display.getVisibleItems()
                 .then((items) => {
@@ -278,6 +364,42 @@ export class PopupStore {
         return new Promise(resolve => resolve(requestProps));
     };
 
+    async LinkToGeometry(value: DataProps) {
+        const styles: number[] = [];
+        const items = await this.display.getVisibleItems();
+        items.map(i => {
+            styles.push(i.styleId);
+        });
+
+        value.type === "vector" ?
+            this.setLinkToGeometry("v:" + value.layerId + ":" + value.id + ":" + styles) :
+            this.setLinkToGeometry("r:" + value.layerId + ":" + value.styleId + ":" + styles)
+    }
+    async updatePermalink() {
+        const display = this.display
+        await display.getVisibleItems().then((visibleItems) => {
+            const permalink = getPermalink({ display, visibleItems });
+            const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
+            this.setPermalink(decodeURIComponent(permalink + '&panel=' + String(panel)));
+        })
+    }
+
+    async contentGenerate(value) {
+        if (this.response.featureCount > 0) {
+            const selectVal = value ? value : this.selected;
+            selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
+            this.getContent(selectVal, false);
+            this.LinkToGeometry(selectVal);
+            this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: true } });
+        } else {
+            this.generateUrl({ res: null, st: null, pn: null, disable: false });
+            this.setSelected({});
+            this.setLinkToGeometry("");
+            topic.publish("feature.unhighlight");
+            this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: false } });
+        }
+    }
+
     async getResponse({ request }) {
         if (request.op === "popup") {
             const feature = await route("feature_layer.imodule")
@@ -290,10 +412,220 @@ export class PopupStore {
         }
     }
 
+    async getAttribute(res: DataProps, key) {
+        const opts = this.display.config.options;
+        const attrs = opts["webmap.identification_attributes"];
 
-    // displayFeatureInfo = async (event: MapBrowserEvent, op: string, p, mode) => {
-    //     await this.getResponse(op, p);
-    //     console.log(this.countFeature, this.response);
+        const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
+        const item = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
+        const geom = item && item.itemConfig.layerHighligh === true ? true : false;
+        const query = { geom: geom, dt_format: "iso" };
 
-    // };
+        attrs === false && Object.assign(query, { fields: attrs })
+
+        const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
+            id: resourceId,
+            fid: res.id,
+        })
+            .get({
+                cache: !key ? true : false,
+                query,
+            })
+            .then(item => {
+                return item;
+            }) :
+            {
+                id: -1,
+                geom: "POINT EMPTY",
+                fields: { Forbidden: "Forbidden" },
+                extensions: null
+            }
+
+        if (res.permission !== "Forbidden") {
+            const fieldsInfo = await getFieldsInfo(resourceId, false);
+            const { fields } = feature;
+            const abortController = new AbortController();
+            const dataSource = fieldValuesToDataSource(fields, fieldsInfo, {
+                signal: abortController.signal,
+            });
+            return { dataSource, feature, resourceId };
+        } else {
+            return { updateName: undefined, feature: feature, resourceId: -1 };
+        }
+    }
+
+    async generateUrl({ res, st, pn, disable }) {
+        if (this.pointPopupClick) {
+            const [lon, lat] = this.pointPopupClick?.lonlat?.map(number => parseFloat(number.toFixed(12)));
+            const webmapId = this.display.config.webmapId;
+            const zoom = this.display.map.zoom;
+
+            this.display.getVisibleItems()
+                .then((items) => {
+                    const styles: string[] = [];
+                    items.forEach((i) => {
+                        const item = this.display.itemStore.dumpItem(i);
+                        if (item.visibility === true) {
+                            styles.push(item.styleId);
+                        }
+                    });
+
+                    const selected = res?.type === "raster" ? [res?.styleId + ":" + res?.layerId + ":" + lon + ":" + lat] : [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+                    const result = [...new Set(st?.map(a => a.styleId))].sort();
+
+                    const panel = this.display.panelManager.getActivePanelName();
+
+                    const obj = disable ?
+                        { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
+                        res ?
+                            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
+                            { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
+
+                    panel !== "share" && Object.assign(obj, { panel: panel });
+
+                    const paramsUrl = new URLSearchParams();
+
+                    Object.entries(obj)?.map(([key, value]) => {
+                        paramsUrl.append(key, value);
+                    })
+
+                    const url = routeURL("webmap.display", webmapId);
+                    const link = origin + url + "?" + paramsUrl.toString();
+
+                    this.setContextUrl(decodeURIComponent(link));
+                })
+        }
+    };
+
+    async getContent(val: DataProps, key: boolean) {
+        if (val.type === "vector") {
+            const res = await this.getAttribute(val, key);
+            this.setExtensions(res.feature.extensions);
+
+            res?.dataSource?.then(i => {
+                this.setAttribute(i);
+            });
+
+            const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
+
+            highlights === true ?
+                topic.publish("feature.highlight", {
+                    geom: res.feature.geom,
+                    featureId: res.feature.id,
+                    layerId: res.resourceId,
+                }) :
+                topic.publish("feature.unhighlight")
+
+            this.generateUrl({ res: val, st: this.response.data, pn: this.fixPanel, disable: false });
+
+            if (key === true) {
+                this.setUpdate(false);
+            }
+        }
+        else if (val.type === "raster") {
+            this.setAttribute(val.attr);
+            this.generateUrl({ res: val, st: this.response.data, pn: this.fixPanel, disable: false });
+            topic.publish("feature.unhighlight");
+            if (key === true) {
+                this.setUpdate(false);
+            }
+        }
+    }
+
+    async iModuleUrlParams({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) {
+        const slf_ = new String(slf);
+        if (attribute && attribute === "false") {
+            await this.responseContext({ lon, lat, attribute: false });
+        } else if (slf_ instanceof String) {
+            await this.responseContext({ lon, lat, attribute: true, st, slf, pn })
+        }
+        return true;
+    };
+
+    async responseContext(val: UrlParamsProps) {
+        await this.transformCoord([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator)
+            .then((transformedCoord) => {
+                const display = this.display;
+                const params: ParamsProps[] = [];
+                val.st?.split(",").map(i => {
+                    params.push({
+                        id: Number(i),
+                        label: "",
+                        dop: null,
+                    });
+                })
+
+                this.setSelected(val.slf);
+
+                const value = {
+                    attribute: val.attribute,
+                    pn: val.pn,
+                    lon: val.lon,
+                    lat: val.lat,
+                    params,
+                }
+
+                const p = { point: true, value, coordinate: transformedCoord };
+
+                this.olmap.once("postrender", function (e) {
+                    const pixel = e.map.getPixelFromCoordinate(p.coordinate);
+                    const simulateEvent: any = {
+                        coordinate: p && p.coordinate,
+                        map: e.map,
+                        target: "map",
+                        pixel: [
+                            display.panelManager.getActivePanelName() !== "none" ?
+                                (pixel[0] + display.panelSize + display.imodule.offHP) :
+                                (pixel[0] + display.imodule.offHP), (pixel[1] + display.imodule.offHP)
+                        ],
+                        type: "click"
+                    };
+                    display.imodule._overlayInfo(simulateEvent, "popup", p, "simulate")
+                });
+            });
+    };
+
+    zoomTo(val) {
+        if (!val) return;
+        this.display.featureHighlighter
+            .highlightFeatureById(val.id, val.layerId)
+            .then((feature) => {
+                this.display.map.zoomToFeature(feature);
+            });
+    };
+
+    zoomToExtent(extent) {
+        this.display.map.zoomToExtent(extent, {
+            displayProjection: this.display.displayProjection,
+        });
+    };
+
+    async zoomToLayerExtent(val) {
+        const { extent } = await route("layer.extent", {
+            id: val?.styleId,
+        }).get({ cache: true });
+
+        this.display.map.zoomToNgwExtent(extent, {
+            displayProjection: this.display.displayProjection,
+        });
+        topic.publish("update.point", true);
+    };
+
+    zoomToPoint(val) {
+        if (!val) return;
+        const point = new OlGeomPoint(val);
+        this.display.map.zoomToExtent(point.getExtent());
+    };
+
+    isEditEnabled(display: Display, item) {
+        const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
+
+        if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
+            return false;
+        }
+
+        const configLayerPlugin = item?.itemConfig.plugin["@nextgisweb/webmap/plugin/feature-layer"];
+        const readOnly = configLayerPlugin?.readonly;
+        return !readOnly;
+    };
 }

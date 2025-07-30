@@ -4,7 +4,7 @@ import { Button, ConfigProvider, Space } from "@nextgisweb/gui/antd";
 import { Rnd } from "react-rnd";
 import CloseIcon from "@nextgisweb/icon/material/close";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Store } from "../Store";
+import { PopupStore } from "../PopupStore";
 export default observer(
     // forwardRef<Element>(
     function PopupComponent(props) {
@@ -15,7 +15,7 @@ export default observer(
 
 
         // const [store] = useState(
-        //     () => new Store({
+        //     () => new PopupStore({
         //         display: display,
         //         valueRnd: {
         //             x: position.x,
