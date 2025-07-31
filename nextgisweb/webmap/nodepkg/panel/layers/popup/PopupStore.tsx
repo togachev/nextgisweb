@@ -15,6 +15,8 @@ import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 import OlGeomPoint from "ol/geom/Point";
+import PopupClick from "./component/PopupClick";
+import { getPosition } from "./util/function";
 
 import type { Root as ReactRoot } from "react-dom/client";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -50,6 +52,8 @@ export class PopupStore {
     offset: number;
     coords_not_count_w: number;
     coords_not_count_h: number;
+    wp: number;
+    hp: number;
     fX: number;
     fY: number;
 
@@ -61,11 +65,11 @@ export class PopupStore {
 
     private rootPointClick: ReactRoot | null = null;
 
-    @observable accessor isLandscape = false;
-    @observable accessor isPortrait = false;
+    @observable accessor isLandscape: boolean;
+    @observable accessor isPortrait: boolean;
     @observable accessor popupHidden = true;
     @observable accessor contextHidden = true;
-    @observable accessor isMobile = false;
+    @observable accessor isMobile: boolean;
     @observable accessor fixPopup = false;
     @observable accessor update = false;
     @observable accessor fullscreen = false;
@@ -88,6 +92,7 @@ export class PopupStore {
     @observable.ref accessor permalink: string | null = null;
     @observable.ref accessor activeControlKey: string;
     @observable.ref accessor mode: string;
+    @observable.ref accessor currentUrlParams: string | null = null;
 
     constructor({
         display,
@@ -95,10 +100,16 @@ export class PopupStore {
         fixPos,
         fixPanel,
         control,
+        isMobile,
+        isLandscape,
+        isPortrait,
     }) {
         this.display = display;
         this.display.popupStore = this;
         this.fixPos = fixPos;
+        this.isMobile = isMobile;
+        this.isLandscape = isLandscape;
+        this.isPortrait = isPortrait;
         this.fixPanel = fixPanel;
         this.control = control;
         this.context_height = 24 + context_item * length;
@@ -123,9 +134,16 @@ export class PopupStore {
         this.coords_not_count_w = 270;
         this.coords_not_count_h = 51;
         this.fX = this.offHP + this.offset;
-        this.fY = this.offHP + this.offset;
+        this.fY = this.offset;
+        this.wp = window.innerWidth - this.offHP - this.offset * 2;
+        this.hp = window.innerHeight - this.offHP - this.offset * 2;
         this._addOverlay();
     }
+
+    @action
+    setCurrentUrlParams(currentUrlParams: string) {
+        this.currentUrlParams = currentUrlParams;
+    };
 
     @action
     setMode(mode: string) {
@@ -333,6 +351,7 @@ export class PopupStore {
                     };
                 })
         } else if (op === "popup" && p && p.value.attribute === true) {
+            this.setMode("simulate");
             await this.display.getVisibleItems()
                 .then((items) => {
                     const itemConfig = this.display.getItemConfig();
@@ -346,7 +365,7 @@ export class PopupStore {
                             }
                         });
                     })
-                    requestProps = {
+                    const params = {
                         point: e.coordinate,
                         request: {
                             srs: this.displaySrid,
@@ -358,11 +377,39 @@ export class PopupStore {
                             p: p,
                         },
                     };
+                    this.getResponse(params)
+                        .then(item => {
+                            this.setResponse({ data: item.data, featureCount: item.featureCount });
+                            this.setSelected(item.data[0]);
+                        })
+                        .then(() => {
+                            getPosition(this.display, this.activePanel !== "none" ? e.pixel[0] + this.display.panelSize : e.pixel[0], e.pixel[1], this)
+                                .then(val => {
+                                    this.setValueRnd({
+                                        ...this.valueRnd, width: val?.width, height: val?.height, x: val?.x + this.offHP, y: val?.y,
+                                        pointClick: val?.pointClick,
+                                        buttonZoom: val?.buttonZoom,
+                                    });
+                                    this.contentGenerate();
+                                })
+                            this.renderPoint(e);
+
+                            this.setPointPopupClick({
+                                typeEvents: "click",
+                                pixel: e.pixel,
+                                clientPixel: e.pixel,
+                                coordinate: e.coordinate,
+                                lonlat: [params.request.p.value.lon, params.request.p.value.lat],
+                            });
+                            this.setPopupHidden(false);
+                        })
                 })
         }
 
         return new Promise(resolve => resolve(requestProps));
     };
+
+
 
     async LinkToGeometry(value: DataProps) {
         const styles: number[] = [];
@@ -573,14 +620,10 @@ export class PopupStore {
                         coordinate: p && p.coordinate,
                         map: e.map,
                         target: "map",
-                        pixel: [
-                            display.panelManager.getActivePanelName() !== "none" ?
-                                (pixel[0] + display.panelSize + display.imodule.offHP) :
-                                (pixel[0] + display.imodule.offHP), (pixel[1] + display.imodule.offHP)
-                        ],
+                        pixel: pixel,
                         type: "click"
                     };
-                    display.imodule._overlayInfo(simulateEvent, "popup", p, "simulate")
+                    display.popupStore.overlayInfo(simulateEvent, "popup", p)
                 });
             });
     };

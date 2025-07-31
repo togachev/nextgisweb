@@ -95,6 +95,8 @@ export const DisplayWidget = observer(
             setPanelsSize(() => {
                 return getDefultPanelSize(orientation);
             });
+            const value = getDefultPanelSize(orientation)
+            display.setPanelSize(value);
         }, [orientation]);
 
         const onResize = useCallback(
@@ -102,6 +104,7 @@ export const DisplayWidget = observer(
                 const newPanelSize = sizes[1];
                 if (activePanel) {
                     setPanelsSize(newPanelSize);
+                    display.setPanelSize(newPanelSize);
                 }
             },
             [activePanel]
@@ -113,6 +116,7 @@ export const DisplayWidget = observer(
                     if (newPanelSize < PANEL_MIN_HEIGHT) {
                         display.panelManager.closePanel();
                         setPanelsSize(getDefultPanelSize(orientation));
+                        display.setPanelSize(getDefultPanelSize(orientation));
                     }
                 }
             },
@@ -150,7 +154,6 @@ export const DisplayWidget = observer(
                 key="main"
                 min={isPortrait ? 200 : 400}
                 resizable={!!activePanel}
-
             >
                 <Splitter layout="vertical">
                     <Panel key="map" min={isPortrait ? 200 : 400}>

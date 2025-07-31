@@ -55,12 +55,6 @@ import { normalizeExtent } from "../utils/normalizeExtent";
 
 import { displayURLParams } from "./displayURLParams";
 
-interface PanelSizeProps {
-    width: number;
-    height: number;
-    portrait: boolean;
-}
-
 export class Display {
     private readonly emptyModeURLValue = "none";
     readonly _itemConfigById: Record<string, TreeItemConfig> = {};
@@ -121,7 +115,7 @@ export class Display {
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
     @observable.ref accessor isMobile = false;
-    @observable.ref accessor panelSize: PanelSizeProps;
+    @observable.ref accessor panelSize: string | number;
 
     constructor({
         config,
@@ -239,7 +233,7 @@ export class Display {
     }
 
     @action
-    setPanelSize(panelSize: PanelSizeProps) {
+    setPanelSize(panelSize: string | number) {
         this.panelSize = panelSize;
     }
 
@@ -285,34 +279,20 @@ export class Display {
 
         const controlsReady = buildControls(this);
 
-        if (this.clientSettings.imodule) {
-            if (controlsReady.has("im")) {
-                const controlObj = controlsReady.get("im");
-                if (
-                    controlObj &&
-                    controlObj.control &&
-                    controlObj.control instanceof IModule
-                ) {
-                    this.imodule = controlObj.control;
-                    this.mapStates.addState("imodule", this.imodule);
-                    this.mapStates.setDefaultState("imodule", true);
-                    this._iModuleUrlParams();
-                }
+        if (controlsReady.has("id")) {
+            const controlObj = controlsReady.get("id");
+            if (
+                controlObj &&
+                controlObj.control &&
+                controlObj.control instanceof Identify
+            ) {
+                this.identify = controlObj.control;
+                this.mapStates.addState("identifying", this.identify);
+                this.mapStates.setDefaultState("identifying", true);
+                this._identifyFeatureByAttrValue();
             }
         } else {
-            if (controlsReady.has("id")) {
-                const controlObj = controlsReady.get("id");
-                if (
-                    controlObj &&
-                    controlObj.control &&
-                    controlObj.control instanceof Identify
-                ) {
-                    this.identify = controlObj.control;
-                    this.mapStates.addState("identifying", this.identify);
-                    this.mapStates.setDefaultState("identifying", true);
-                    this._identifyFeatureByAttrValue();
-                }
-            }
+            this._iModuleUrlParams();
         }
 
         topic.publish("/webmap/tools/initialized", true);
@@ -714,7 +694,7 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        await this.imodule?.iModuleUrlParams({ lon, lat, attribute, st, slf, pn })
+        await this.popupStore?.iModuleUrlParams({ lon, lat, attribute, st, slf, pn })
     }
 
     private _identifyFeatureByAttrValue() {

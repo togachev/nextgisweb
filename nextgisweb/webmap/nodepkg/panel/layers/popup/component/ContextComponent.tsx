@@ -1,29 +1,78 @@
-import { observer } from "mobx-react-lite";
 import { forwardRef } from "react";
+import { createPortal } from "react-dom";
+import { useOutsideClick } from "../useOutsideClick";
+import { useCopy } from "@nextgisweb/webmap/useCopy";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { Button, ConfigProvider } from "@nextgisweb/gui/antd";
 
-export default observer(
-    forwardRef<Element>(
-        function ContextComponent(props, ref) {
+import Location from "@nextgisweb/icon/material/my_location";
+import type { Params, Props } from "../type";
 
-            const { pointContextClick, offset, context_width, context_height } = props.store;
+export default forwardRef<Element>(
+    function ContextComponent(props, ref) {
+        const { params, visible, display, array_context } = props as Params;
+        const { op, position } = params as Props;
+        useOutsideClick(ref, true);
+        const { copyValue, contextHolder } = useCopy();
+        const imodule = display.imodule;
+        const [lon, lat] = imodule.lonlat;
 
-            const lonlat = pointContextClick.lonlat.map(number => parseFloat(number.toFixed(6)));
-            return (
-                <div
-                    ref={ref}
-                    style={{
+        const coordsValue = lon + ", " + lat;
+        const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
+
+        return (
+            createPortal(
+                <ConfigProvider
+                    theme={{
+                        token: {
+                            colorPrimary: "#106a90",
+                        },
+                        components: {
+                            Message: {
+                                colorSuccess: "var(--primary)",
+                            }
+                        }
+                    }}>
+                    <div key={new Date} ref={ref as any} className="context-position" style={{
+                        width: position.width,
+                        left: position.x,
+                        top: position.y,
                         position: "absolute",
-                        top: pointContextClick.clientPixel[1],
-                        left: pointContextClick.clientPixel[0],
-                        backgroundColor: "#eee",
-                        width: context_width,
-                        height: context_height,
                         zIndex: 10,
-                    }}
-                >
-                    {lonlat[0]} {lonlat[1]}
-                </div>
+                    }}>
+                        {contextHolder}
+                        <span
+                            className="context-coord"
+                            onClick={() => {
+                                visible({ hidden: true, overlay: undefined, key: op });
+                            }}
+                        >
+                            <Button
+                                type="text"
+                                icon={<Location />}
+                                className="coordinate-value"
+                                title={gettext("Copy coordinates")}
+                                onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
+                            >
+                                {coordsVisible}
+                            </Button>
+                        </span>
+                        {array_context?.map(item => {
+                            if (item.visible) {
+                                return (
+                                    <div className="context-item" key={item.key} onClick={() => {
+                                        visible({ hidden: true, overlay: undefined, key: op });
+                                        alert(item.result)
+                                    }} >
+                                        <span>{item.title}</span>
+                                    </div>
+                                )
+                            }
+                        })}
+                    </div>
+                </ConfigProvider>,
+                document.body
             )
-        }
-    )
+        )
+    }
 );

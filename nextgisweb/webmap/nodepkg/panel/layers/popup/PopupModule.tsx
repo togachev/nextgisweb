@@ -29,9 +29,9 @@ import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature
 import type { Display } from "@nextgisweb/webmap/display";
 import type { SizeType } from "@nextgisweb/gui/antd";
 
-import "./Imodule.less";
+import "./PopupModule.less";
 
-interface ImoduleProps {
+interface PopupModuleProps {
     display: Display;
 }
 
@@ -66,7 +66,7 @@ const CheckOnlyOne = ({ store, size }) => {
 
 
 export default observer(
-    function Imodule({ display }: ImoduleProps) {
+    function PopupModule({ display }: PopupModuleProps) {
         const { isLandscape: isL, isPortrait: isP } = useMobileOrientation();
         const [pos, setPos] = useState({ x: -9999, y: -9999, width: 0, height: 0 });
         const [posContext, setPosContext] = useState({ x: -9999, y: -9999, width: 0, height: 0 });
@@ -94,6 +94,9 @@ export default observer(
                     width: window.innerWidth,
                     height: window.innerHeight,
                 },
+                isLandscape: isL,
+                isPortrait: isP,
+                isMobile: isM,
                 fixPos: null,
                 fixPanel: urlParams.pn ? urlParams.pn :
                     attrs === true ? "attributes" :
@@ -152,6 +155,7 @@ export default observer(
 
         const click = useCallback((e) => {
             if (e.dragging) return;
+            store.setMode("click");
             e.preventDefault();
             store.overlayInfo(e, "popup", false)
                 .then(props => {
@@ -163,7 +167,9 @@ export default observer(
                     store.setSelected(item.data[0]);
                 })
                 .then(() => {
-                    getPosition(e.originalEvent.clientX, e.originalEvent.clientY, store)
+                    console.log(e.originalEvent.clientX, e.originalEvent.clientY, e);
+
+                    getPosition(display, e.originalEvent.clientX, e.originalEvent.clientY, store)
                         .then(val => {
                             setPos(val);
                             store.setValueRnd({
@@ -175,6 +181,8 @@ export default observer(
                         })
                     store.renderPoint(e);
                     const lonlat = transform(e.coordinate, webMercator, wgs84);
+                    console.log(e);
+
                     store.setPointPopupClick({
                         typeEvents: "click",
                         pixel: e.pixel,
@@ -182,10 +190,7 @@ export default observer(
                         coordinate: e.coordinate,
                         lonlat: lonlat,
                     });
-                })
-            // .then(() => {
-            //     console.log(store);
-            // })
+                });
             store.setContextHidden(true);
             store.setPopupHidden(false);
         }, [store.pointPopupClick]);
@@ -229,9 +234,6 @@ export default observer(
             }
         }, [store.fixPopup]);
 
-        const W = window.innerWidth;
-        const H = window.innerHeight;
-
         const handleDragStop = (e, d) => {
             store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
         };
@@ -268,7 +270,7 @@ export default observer(
         };
 
         const editFeature = useMemo(() => {
-            if (store.countFeature > 0 && store.selected && store.selected.type === "vector") {
+            if (store.response?.featureCount > 0 && store.selected && store.selected.type === "vector") {
                 const { id, layerId, styleId } = store.selected;
                 const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
 
@@ -397,7 +399,7 @@ export default observer(
                                     topLeft: "hover-angle-top-left",
                                 }}
                                 cancel=".control-button"
-                                bounds={store.valueRnd?.width === W ? undefined : "window"}
+                                bounds={store.valueRnd?.width === store.wp ? undefined : "window"}
                                 minWidth={pos?.width}
                                 minHeight={pos?.height}
                                 allowAnyClick={true}
@@ -432,7 +434,7 @@ export default observer(
                                                             store.setValueRnd({ ...store.valueRnd, width: pos.width, height: pos.height, x: pos.x, y: pos.y });
                                                             store.setFullscreen(false)
                                                         } else {
-                                                            store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: store.fX, y: store.fY });
+                                                            store.setValueRnd({ ...store.valueRnd, width: store.wp, height: store.hp, x: store.fX, y: store.fY });
                                                             store.setFullscreen(true);
                                                         }
                                                     }, 200)
@@ -464,11 +466,11 @@ export default observer(
                                                             store.setValueRnd({ ...store.valueRnd, width: pos.width, height: pos.height, x: pos.x, y: pos.y });
                                                             store.setFullscreen(false)
                                                         } else {
-                                                            store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: store.fX, y: store.fY });
+                                                            store.setValueRnd({ ...store.valueRnd, width: store.wp, height: store.hp, x: store.fX, y: store.fY });
                                                             store.setFullscreen(true)
                                                         }
-                                                        if (store.valueRnd.width < W && store.valueRnd.width > pos.width || store.valueRnd.height < H && store.valueRnd.height > pos.height) {
-                                                            store.setValueRnd({ ...store.valueRnd, width: W, height: H, x: store.fX, y: store.fY });
+                                                        if (store.valueRnd.width < store.wp && store.valueRnd.width > pos.width || store.valueRnd.height < store.hp && store.valueRnd.height > pos.height) {
+                                                            store.setValueRnd({ ...store.valueRnd, width: store.wp, height: store.hp, x: store.fX, y: store.fY });
                                                             store.setFullscreen(true)
                                                         }
                                                     }

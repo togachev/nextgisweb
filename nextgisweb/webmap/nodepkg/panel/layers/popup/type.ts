@@ -6,6 +6,14 @@ import { PopupStore } from "./PopupStore";
 
 export type ExtensionsProps = Record<string, unknown | null>;
 
+export type CoordinateProps = {
+    display: Display;
+    store: Store;
+    count: number;
+    op: string;
+    point?: boolean;
+}
+
 export interface UrlParamsProps {
     lon?: number;
     lat?: number;

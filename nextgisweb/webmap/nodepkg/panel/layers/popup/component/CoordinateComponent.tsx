@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import Location from "@nextgisweb/icon/material/my_location";
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "../util/function";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
@@ -50,7 +50,7 @@ export const CoordinateComponent = observer((props) => {
     ]);
 
     const msgCopyActiveContext = {
-        popup: store.countFeature > 0 ? gettext("Object reference copied") : gettext("Location link copied"),
+        popup: store.response.featureCount > 0 ? gettext("Object reference copied") : gettext("Location link copied"),
         fixedscreen: gettext("Current web map coverage copied"),
     }
 
@@ -130,7 +130,7 @@ export const CoordinateComponent = observer((props) => {
             type: "text",
             size: "small",
             title: value.title,
-            disabled: value.disabled && store.mode !== "simulate" || name === "popup" && point === false && true,
+            // disabled: value.disabled && store.mode !== "simulate" || name === "popup" && point === false && true,
         }
     };
 

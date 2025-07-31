@@ -12,10 +12,10 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { observer } from "mobx-react-lite";
-import { GraphPanel } from "@nextgisweb/webmap/imodule/component/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/panel/layers/popup/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "../util/function";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 
 import type { OptionProps, ContentProps } from "../type";
@@ -27,13 +27,12 @@ const msgHTMLFeature = gettext("HTML code of the geometry link, for insertion in
 const msgHTMLRaster = gettext("HTML code link of the raster layer extent, for insertion into the description");
 
 const LinkToGeometryFeature = ({ store, display }) => {
-    const imodule = display.imodule;
     const { copyValue, contextHolder } = useCopy();
 
     if (store.selected) {
         const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === store.selected.styleId)?.[1];
 
-        if (!imodule._isEditEnabled(display, item)) { return false; }
+        if (!store.isEditEnabled(display, item)) { return false; }
         return (
             <Button
                 title={store.selected.type === "vector" ? msgHTMLFeature : msgHTMLRaster}
@@ -55,8 +54,6 @@ const LinkToGeometryFeature = ({ store, display }) => {
 const msgBand = gettextf("Band {}");
 
 export const ContentComponent = observer((props) => {
-    console.log(props);
-    
     const { store: storeProp, display } = props as ContentProps;
     const [store] = useState(() => storeProp);
     const { id, layerId } = store.selected;
