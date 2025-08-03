@@ -12,7 +12,7 @@ import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { AttachmentTable } from "@nextgisweb/feature-attachment/attachment-table";
 import { observer } from "mobx-react-lite";
-import { GraphPanel } from "@nextgisweb/webmap/panel/layers/popup/component/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/popup/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { getEntries } from "../util/function";

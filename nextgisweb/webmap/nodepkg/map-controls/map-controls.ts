@@ -10,7 +10,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
 
 import type { Display } from "../display";
-import { IModule } from "@nextgisweb/webmap/imodule";
 import { InfoScale } from "./control/InfoScale";
 import { InitialExtent } from "./control/InitialExtent";
 import { MyLocation } from "./control/MyLocation";
@@ -130,17 +129,6 @@ if (!webmapSettings.imodule) {
         },
         key: "id",
         mapStateKey: "identifying",
-        embeddedShowMode: "customize",
-        olMapControl: false,
-    })
-} else {
-    ControlsInfo.push({
-        key: "im",
-        label: gettext("Imodule"),
-        ctor: (display) => {
-            return new IModule(display);
-        },
-        mapStateKey: "imodule",
         embeddedShowMode: "customize",
         olMapControl: false,
     })

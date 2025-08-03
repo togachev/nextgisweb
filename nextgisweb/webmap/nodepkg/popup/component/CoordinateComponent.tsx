@@ -10,7 +10,7 @@ import { getEntries } from "../util/function";
 import type { CoordinateProps } from "../type";
 
 export const CoordinateComponent = observer((props) => {
-    const { store: storeProp, display, op, point } = props as CoordinateProps
+    const { store: storeProp, display, point } = props as CoordinateProps
     const [store] = useState(() => storeProp);
 
     const { copyValue, contextHolder } = useCopy();
@@ -81,7 +81,7 @@ export const CoordinateComponent = observer((props) => {
             if (key === "popup") {
                 values[key].url = store.contextUrl;
                 values[key].checked = store.mode === "simulate" && store.contextUrl ? true : false;
-                values["reset"].disabled = !window.location.href.includes("lon=") ? true : false;
+                values["reset"].disable = !window.location.href.includes("lon=") ? true : false;
             } else if (key === "fixedscreen") {
                 values[key].url = store.permalink;
                 values[key].checked = false;
@@ -100,14 +100,14 @@ export const CoordinateComponent = observer((props) => {
             ["popup", "fixedscreen"].map((key) => {
                 values[key].status = false;
                 values[key].checked = false;
-                values["reset"].disabled = true;
+                values["reset"].disable = true;
             })
             store.setControl(values);
             window.history.pushState({}, "", ngwConfig.applicationUrl + routeURL("webmap.display", display.config.webmapId));
 
         } else {
             Object.keys(values).forEach((key) => {
-                values["reset"].disabled = false;
+                values["reset"].disable = false;
                 if (key === name) {
                     values[key].status = true;
                     values[key].checked = true;
@@ -121,6 +121,8 @@ export const CoordinateComponent = observer((props) => {
     }, []);
 
     const propsUpdate = (name, value) => {
+        console.log(name, value.disable, store.mode, point);
+        
         return {
             icon: value.icon,
             onTouchEnd: (e) => onClick(e, name),
@@ -130,10 +132,10 @@ export const CoordinateComponent = observer((props) => {
             type: "text",
             size: "small",
             title: value.title,
-            // disabled: value.disabled && store.mode !== "simulate" || name === "popup" && point === false && true,
+            disabled: value.disable && point === false && true,
         }
     };
-
+    
     return (
         <div className="footer-coordinate-component">
             {contextHolder}
@@ -147,7 +149,7 @@ export const CoordinateComponent = observer((props) => {
                 >
                     {coordsVisible}
                 </Button>
-                {!display.tinyConfig && op === "popup" && store.contextUrl !== null && (
+                {!display.tinyConfig && store.contextUrl !== null && (
                     <div className="link-block">
                         {
                             store.control &&

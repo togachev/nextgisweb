@@ -3,7 +3,7 @@ import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
-import PopupModule from "./popup/PopupModule";
+import PopupModule from "@nextgisweb/webmap/popup/PopupModule";
 import settings from "@nextgisweb/webmap/client-settings";
 import type { PanelPluginWidgetProps } from "../registry";
 

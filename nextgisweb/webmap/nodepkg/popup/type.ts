@@ -8,7 +8,7 @@ export type ExtensionsProps = Record<string, unknown | null>;
 
 export type CoordinateProps = {
     display: Display;
-    store: Store;
+    store: PopupStore;
     count: number;
     op: string;
     point?: boolean;
@@ -110,7 +110,6 @@ export type RequestProps = {
     styles: StylesRequest[];
     point: number[];
     status: boolean;
-    op: string;
     p: ResponseContextProps;
 }
 
@@ -131,8 +130,6 @@ export interface Position {
     y: number;
     width: number;
     height: number;
-    pointClick: PointClickProps;
-    buttonZoom: ButtonZoom;
 }
 
 export interface RelationProps {
@@ -182,7 +179,7 @@ export interface Props {
 export interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
-    display: Display;
+    store: PopupStore;
     array_context?: ContextProps[] | [];
     countFeature: number;
     event: MapBrowserEvent;

@@ -32,7 +32,7 @@ import type { StoreGroupConfig, StoreItemConfig } from "../compat/type";
 import { entrypointsLoader } from "../compat/util/entrypointLoader";
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
 import { Identify } from "../map-controls/tool/Identify";
-import { IModule } from "../imodule";
+import { PopupStore } from "@nextgisweb/webmap/popup/PopupStore";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { MapStore } from "../ol/MapStore";
@@ -74,12 +74,12 @@ export class Display {
 
     itemStore: CustomItemFileWriteStore;
     webmapStore: WebmapStore;
+    popupStore: PopupStore;
     tabsManager: WebMapTabsStore;
     panelManager: PanelManager;
     mapStates: IMapStatesObserver;
     mapToolbar?: MapToolbar;
 
-    imodule?: IModule;
     identify?: Identify;
     featureHighlighter: FeatureHighlighter;
     readonly plugins: Record<string, PluginBase> = {};
@@ -196,6 +196,10 @@ export class Display {
             itemStore: this.itemStore,
         });
 
+        this.popupStore = new PopupStore({
+            display: this,
+        });
+
         this.mapDeferred.then(() => {
             this._itemStorePrepare();
         });
@@ -292,7 +296,7 @@ export class Display {
                 this._identifyFeatureByAttrValue();
             }
         } else {
-            this._iModuleUrlParams();
+            this.pModuleUrlParams();
         }
 
         topic.publish("/webmap/tools/initialized", true);
@@ -676,7 +680,7 @@ export class Display {
         });
     }
 
-    private async _iModuleUrlParams() {
+    private async pModuleUrlParams() {
         const urlParams = this.urlParams;
         if (
             !(
@@ -694,7 +698,7 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        await this.popupStore?.iModuleUrlParams({ lon, lat, attribute, st, slf, pn })
+        await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn })
     }
 
     private _identifyFeatureByAttrValue() {

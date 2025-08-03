@@ -214,7 +214,7 @@ async function getPosition(display, px, py, store) {
                     x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: (sizeWindow.width - (display.isMobile ? offHP * 2 : offHP) - width) / 2,
+                x: (sizeWindow.width + (display.isMobile ? 0 : offHP) - width) / 2,
                 y: py + offset, width: width, height: height
             }
         }
@@ -287,7 +287,7 @@ async function getPosition(display, px, py, store) {
                     x: offHP, y: sizeWindow.height - height
                 },
                 buttonZoom: { topLeft: false },
-                x: px + offset, y: (sizeWindow.height - (display.isMobile ? offHP * 2 : offHP) - height) / 2, width: width, height: height
+                x: px + offset, y: (sizeWindow.height + (display.isMobile ? 0 : offHP) - height) / 2, width: width, height: height
             }
         }
 

@@ -6,7 +6,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 import type { Params, Props } from "../type";
 
-export default function PopupClick({ display, event, params, countFeature }: Params) {
+export default function PopupClick({ store, event, params }: Params) {
     const { response, selected: value } = params as Props;
     const selectVal = value ? value : response.data[0];
 
@@ -31,24 +31,24 @@ export default function PopupClick({ display, event, params, countFeature }: Par
         <span
             style={{
                 display: visible ? "block" : "none",
-                cursor: countFeature > 0
+                cursor: response.featureCount > 0
                     ? "pointer" : "auto",
-                pointerEvents: countFeature > 0
+                pointerEvents: response.featureCount > 0
                     ? "auto" : "none",
             }}
             className="icon-position"
             onClick={() => {
                 if (
-                    countFeature > 0
+                    response.featureCount > 0
                 ) {
                     setVisible(false);
                     topic.publish("update.point", true);
                     if (selected?.type === "vector") {
-                        display.imodule.zoomTo(selected);
+                        store.zoomTo(selected);
                     } else if (selected?.type === "raster") {
-                        display.imodule.zoomToPoint(display.imodule.coordinate)
+                        store.zoomToPoint(event.coordinate)
                         const highlightEvent: HighlightEvent = {
-                            coordinates: display.imodule.coordinate,
+                            coordinates: event.coordinate,
                         };
                         topic.publish("feature.highlight", highlightEvent);
                     }
@@ -57,7 +57,7 @@ export default function PopupClick({ display, event, params, countFeature }: Par
         >
             <span
                 style={{ fontWeight: 500 }}
-                title={countFeature > 0 ? selected?.type === "vector" ?
+                title={response.featureCount > 0 ? selected?.type === "vector" ?
                     gettext("Zoom to feature") :
                     gettext("Zoom to raster layer") : undefined}
             >

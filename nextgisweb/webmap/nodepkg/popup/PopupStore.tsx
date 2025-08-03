@@ -1,8 +1,7 @@
 import { action, computed, observable } from "mobx";
-import { createRef } from "react";
+import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
-import { PointClick } from "@nextgisweb/webmap/icon";
 import settings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { WKT } from "ol/format";
@@ -16,11 +15,16 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 import OlGeomPoint from "ol/geom/Point";
 import PopupClick from "./component/PopupClick";
+import Popup from "./component/Popup";
 import { getPosition } from "./util/function";
+import UpdateLink from "@nextgisweb/icon/mdi/update";
+import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
+import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 
 import type { Root as ReactRoot } from "react-dom/client";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { AttributeProps, DataProps, ControlUrlProps, ExtensionsProps, EventProps, OptionProps, ParamsProps, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
+import type { AttributeProps, DataProps, ControlUrlProps, ExtensionsProps, EventProps, OptionProps, ParamsProps, Position, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
+import type { SizeType } from "@nextgisweb/gui/antd";
 
 const forbidden = gettext("The data is not available for reading");
 
@@ -35,7 +39,7 @@ const context_item = 34;
 const length = array_context.filter(item => item.visible === true).length
 
 
-export class PopupStore {
+export class PopupStore extends Component {
     display: Display;
     context_height: number;
     context_width: number;
@@ -61,9 +65,11 @@ export class PopupStore {
     popupElement = document.createElement("div");
     contextElement = document.createElement("div");
 
+    refPopup = createRef<HTMLDivElement>(null);
     refContext = createRef<HTMLDivElement>();
 
-    private rootPointClick: ReactRoot | null = null;
+    rootPointClick: ReactRoot | null = null;
+    rootPopup: ReactRoot | null = null;
 
     @observable accessor isLandscape: boolean;
     @observable accessor isPortrait: boolean;
@@ -76,10 +82,15 @@ export class PopupStore {
 
     @observable.ref accessor params: EventProps;
     @observable.ref accessor response: Response;
-    @observable.ref accessor sizeWindow: SizeWindowProps;
+    @observable.ref accessor sizeWindow: SizeWindowProps = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+    };
     @observable.ref accessor pointPopupClick: SourceProps;
     @observable.ref accessor pointContextClick: SourceProps;
     @observable.ref accessor valueRnd: Rnd;
+    @observable.ref accessor pos: Position = { x: -9999, y: -9999, width: 0, height: 0 };
+    @observable.ref accessor posContext: Position = { x: -9999, y: -9999, width: 0, height: 0 };
     @observable.ref accessor fixPos: Rnd | null = null;
     @observable.ref accessor fixPanel: string | null = null;
     @observable.ref accessor selected: DataProps;
@@ -91,40 +102,54 @@ export class PopupStore {
     @observable.ref accessor control: ControlUrlProps;
     @observable.ref accessor permalink: string | null = null;
     @observable.ref accessor activeControlKey: string;
-    @observable.ref accessor mode: string;
+    @observable.ref accessor mode: string | null = null;
+    @observable.ref accessor size: SizeType = "default";
     @observable.ref accessor currentUrlParams: string | null = null;
 
     constructor({
         display,
-        sizeWindow,
-        fixPos,
         fixPanel,
-        control,
-        isMobile,
-        isLandscape,
-        isPortrait,
     }) {
+        super(display);
+
         this.display = display;
-        this.display.popupStore = this;
-        this.fixPos = fixPos;
-        this.isMobile = isMobile;
-        this.isLandscape = isLandscape;
-        this.isPortrait = isPortrait;
         this.fixPanel = fixPanel;
-        this.control = control;
+        this.control = {
+            reset: {
+                icon: <LockReset />,
+                title: gettext("Reset url"),
+                disable: true,
+            },
+            popup: {
+                icon: <UpdateLink />,
+                url: "",
+                title: gettext("Update current web map address"),
+                status: false,
+                checked: false,
+                disable: false,
+            },
+            fixedscreen: {
+                icon: <FitToScreenOutline />,
+                url: "",
+                title: gettext("Set current map coverage"),
+                status: false,
+                checked: false,
+                disable: false,
+            }
+        };
         this.context_height = 24 + context_item * length;
         this.context_width = 200;
         this.displaySrid = 3857;
         this.webMercator = "EPSG:3857";
         this.lonLatSrid = 4326;
         this.wgs84 = "EPSG:4326";
-        this.sizeWindow = sizeWindow;
 
         this.olmap = this.display.map.olMap;
 
         this.pointElement.className = "point-click";
         this.rootPointClick = createRoot(this.pointElement);
         this.popupElement.className = "popup-position";
+        this.rootPopup = createRoot(this.popupElement);
         this.contextElement.className = "context-position";
 
         this.offHP = !this.display.tinyConfig ? 40 : 0;
@@ -137,12 +162,23 @@ export class PopupStore {
         this.fY = this.offset;
         this.wp = window.innerWidth - this.offHP - this.offset * 2;
         this.hp = window.innerHeight - this.offHP - this.offset * 2;
-        this._addOverlay();
+
+        this.addOverlay();
+    }
+
+    @computed
+    get activePanel() {
+        return this.display.panelManager.getActivePanelName();
     }
 
     @action
     setCurrentUrlParams(currentUrlParams: string) {
         this.currentUrlParams = currentUrlParams;
+    };
+
+    @action
+    setSize(size: string) {
+        this.size = size;
     };
 
     @action
@@ -275,19 +311,33 @@ export class PopupStore {
         this.valueRnd = valueRnd;
     };
 
-    @computed
-    get activePanel() {
-        return this.display.panelManager.getActivePanelName();
-    }
+    @action
+    setPos(pos: Rnd) {
+        this.pos = pos;
+    };
 
-    _addOverlay() {
+    @action
+    setPosContext(posContext: Rnd) {
+        this.posContext = posContext;
+    };
+
+    setValue = (value: HTMLElement) => {
+        this.overlayPoint.setElement(value)
+    };
+
+    addOverlay() {
         this.overlayPoint = new Overlay({});
         this.olmap.addOverlay(this.overlayPoint);
-        this.overlayPoint.setElement(this.pointElement);
     };
 
     renderPoint(e) {
-        this.rootPointClick.render(<PointClick />);
+        this.setValue(this.pointElement);
+        const propsPoint = {
+            params: { response: this.response, selected: this.selected },
+            store: this,
+            event: e,
+        };
+        this.rootPointClick.render(<PopupClick {...propsPoint} />);
         this.overlayPoint.setPosition(e.coordinate);
     };
 
@@ -314,11 +364,47 @@ export class PopupStore {
         return await transform(coord, from, to);
     };
 
-    async overlayInfo(e: MapBrowserEvent, op: string, p) {
+    async renderPopup(e) {
+        await this.getResponse()
+            .then(item => {
+                this.setResponse({ data: item.data, featureCount: item.featureCount });
+                this.setSelected(item.data[0]);
+                const pxy = this.mode === "simulate" ? e.pixel : [e.originalEvent.clientX, e.originalEvent.clientY];
+                const lonlat = transform(e.coordinate, this.webMercator, this.wgs84);
+                this.setPointPopupClick({
+                    typeEvents: "click",
+                    pixel: e.pixel,
+                    clientPixel: pxy,
+                    coordinate: e.coordinate,
+                    lonlat: lonlat,
+                });
+                getPosition(this.display, pxy[0], pxy[1], this)
+                    .then(val => {
+                        this.setPos(val);
+                        this.setValueRnd({
+                            ...this.valueRnd, width: val?.width, height: val?.height, x: val?.x, y: val?.y - this.offHP,
+                            pointClick: val?.pointClick,
+                            buttonZoom: val?.buttonZoom,
+                        });
+
+                    })
+            })
+            .then(() => {
+                this.contentGenerate();
+                this.renderPoint(e);
+                const propsPopup = { display: this.display, store: this };
+                this.rootPopup.render(<Popup {...propsPopup} ref={this.refPopup} />);
+                this.setContextHidden(true);
+                this.setPopupHidden(false);
+            });
+    }
+
+    async overlayInfo(e: MapBrowserEvent, props) {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
-        let requestProps: EventProps;
-        if (op === "popup" && p === false) {
+        this.setMode(props.type);
+
+        if (props.type === "click") {
             await this.display.getVisibleItems()
                 .then((items) => {
                     const styles: StylesRequest[] = [];
@@ -337,25 +423,26 @@ export class PopupStore {
                             styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
                         }
                     });
-                    requestProps = {
+
+                    this.setParams({
                         point: e.coordinate,
                         request: {
                             srs: this.displaySrid,
                             geom: this.requestGeomString(e.pixel),
                             styles: styles,
-                            point: this.olmap.getCoordinateFromPixel([e.pixel[0], e.pixel[1]]),
+                            point: e.coordinate,
                             status: attr,
-                            op: op,
-                            p: p,
+                            p: props.p,
                         },
-                    };
+                    });
+                    return this.renderPopup(e);
                 })
-        } else if (op === "popup" && p && p.value.attribute === true) {
-            this.setMode("simulate");
+        } else if (props.type === "simulate") {
+
             await this.display.getVisibleItems()
                 .then((items) => {
                     const itemConfig = this.display.getItemConfig();
-                    p.value.params.map(itm => {
+                    props.p.value.params.map(itm => {
                         items.some(x => {
                             if (itemConfig[x.id].styleId === itm.id) {
                                 const label = items.find(x => itemConfig[x.id].styleId === itm.id).label;
@@ -365,51 +452,21 @@ export class PopupStore {
                             }
                         });
                     })
-                    const params = {
+                    this.setParams({
                         point: e.coordinate,
                         request: {
                             srs: this.displaySrid,
-                            geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(p?.coordinate)),
-                            styles: p.value.params,
-                            point: p?.coordinate,
+                            geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(props.p.coordinate)),
+                            styles: props.p.value.params,
+                            point: props.p.coordinate,
                             status: attr,
-                            op: op,
-                            p: p,
+                            p: props.p,
                         },
-                    };
-                    this.getResponse(params)
-                        .then(item => {
-                            this.setResponse({ data: item.data, featureCount: item.featureCount });
-                            this.setSelected(item.data[0]);
-                        })
-                        .then(() => {
-                            getPosition(this.display, this.activePanel !== "none" ? e.pixel[0] + this.display.panelSize : e.pixel[0], e.pixel[1], this)
-                                .then(val => {
-                                    this.setValueRnd({
-                                        ...this.valueRnd, width: val?.width, height: val?.height, x: val?.x + this.offHP, y: val?.y,
-                                        pointClick: val?.pointClick,
-                                        buttonZoom: val?.buttonZoom,
-                                    });
-                                    this.contentGenerate();
-                                })
-                            this.renderPoint(e);
-
-                            this.setPointPopupClick({
-                                typeEvents: "click",
-                                pixel: e.pixel,
-                                clientPixel: e.pixel,
-                                coordinate: e.coordinate,
-                                lonlat: [params.request.p.value.lon, params.request.p.value.lat],
-                            });
-                            this.setPopupHidden(false);
-                        })
-                })
+                    });
+                    return this.renderPopup(e);
+                });
         }
-
-        return new Promise(resolve => resolve(requestProps));
     };
-
-
 
     async LinkToGeometry(value: DataProps) {
         const styles: number[] = [];
@@ -431,9 +488,9 @@ export class PopupStore {
         })
     }
 
-    async contentGenerate(value) {
+    async contentGenerate() {
         if (this.response.featureCount > 0) {
-            const selectVal = value ? value : this.selected;
+            const selectVal = this.selected;
             selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
             this.getContent(selectVal, false);
             this.LinkToGeometry(selectVal);
@@ -447,11 +504,11 @@ export class PopupStore {
         }
     }
 
-    async getResponse({ request }) {
-        if (request.op === "popup") {
+    async getResponse() {
+        if (this.mode === "click" || "simulate") {
             const feature = await route("feature_layer.imodule")
                 .post({
-                    body: JSON.stringify(request),
+                    body: JSON.stringify(this.params.request),
                 })
             return new Promise(resolve => resolve(feature));
         } else {
@@ -579,7 +636,7 @@ export class PopupStore {
         }
     }
 
-    async iModuleUrlParams({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) {
+    async pModuleUrlParams({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) {
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
             await this.responseContext({ lon, lat, attribute: false });
@@ -593,6 +650,7 @@ export class PopupStore {
         await this.transformCoord([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator)
             .then((transformedCoord) => {
                 const display = this.display;
+                const store = display.popupStore;
                 const params: ParamsProps[] = [];
                 val.st?.split(",").map(i => {
                     params.push({
@@ -620,10 +678,15 @@ export class PopupStore {
                         coordinate: p && p.coordinate,
                         map: e.map,
                         target: "map",
-                        pixel: pixel,
-                        type: "click"
+                        pixel: [
+                            store.activePanel !== "none" ?
+                                (pixel[0] + display.panelSize + store.offHP) :
+                                (pixel[0] + store.offHP), pixel[1] + store.offHP
+                        ],
+                        type: "simulate"
                     };
-                    display.popupStore.overlayInfo(simulateEvent, "popup", p)
+
+                    store.overlayInfo(simulateEvent, { type: "simulate", p: p })
                 });
             });
     };
