@@ -95,6 +95,7 @@ export interface ValueProps {
     lon: number;
     lat: boolean;
     params: ParamsProps;
+    selected: string;
 }
 
 export interface ResponseContextProps {
@@ -183,6 +184,7 @@ export interface Params {
     array_context?: ContextProps[] | [];
     countFeature: number;
     event: MapBrowserEvent;
+    replaceContent: boolean;
 }
 
 interface ControlProps {

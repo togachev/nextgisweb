@@ -121,7 +121,7 @@ export const CoordinateComponent = observer((props) => {
     }, []);
 
     const propsUpdate = (name, value) => {
-        console.log(name, value.disable, store.mode, point);
+        // console.log(name, value.disable, store.mode, point);
         
         return {
             icon: value.icon,

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { forwardRef, useCallback, useMemo, useRef } from "react";
+import { forwardRef, useCallback, useMemo, useImperativeHandle, useRef, useEffect } from "react";
 import { Button, ConfigProvider, Select } from "@nextgisweb/gui/antd";
 import { Rnd } from "react-rnd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -29,6 +29,7 @@ import "../PopupModule.less";
 interface PopupProps {
     display: Display;
     store: PopupStore;
+    replaceContent: boolean;
 }
 
 const { Option } = Select;
@@ -59,8 +60,19 @@ const CheckOnlyOne = ({ store }) => {
 };
 
 export default observer(
-    forwardRef<Element>(
-        function Popup({ display, store }: PopupProps, ref) {
+    forwardRef<HTMLElement, PopupProps>(
+        function Popup(props, ref) {
+            const { display, store, replaceContent } = props;
+            const innerRef = useRef<HTMLElement>(null);
+            useImperativeHandle(ref, () => innerRef.current!, [store.mode]);
+
+            const target = useRef(document.getElementById("portal-popup")).current;
+            const hasMounted = useRef(false);
+            if (!target) return null;
+            if (replaceContent && !hasMounted.current) {
+                target.innerHTML = '';
+                hasMounted.current = true;
+            }
 
             const pm = display.panelManager;
             const pkey = "selected-feature";
@@ -70,9 +82,8 @@ export default observer(
                 store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
             };
 
-            const onChangeSelect = async (value) => {
-                const selectedValue = store.response.data.find(item => item.value === value.value);
-                const copy = { ...selectedValue };
+            const onChangeSelect = useCallback((value) => {
+                const copy = { ...store.response.data.find(x => x.value === value.value) };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
                 store.setSelected(copy);
                 store.getContent(copy, false);
@@ -85,7 +96,7 @@ export default observer(
                 // if (panel) {
                 //     updateSelectFeatures(panel, selectedProps)
                 // }
-            };
+            }, []);
 
             const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
                 if ((option?.label ?? "").toLowerCase().includes(input.toLowerCase()) ||
@@ -142,6 +153,8 @@ export default observer(
             const contentProps = { store: store, display: display };
             const coordinateProps = { display: display, store: store, point: false };
 
+
+
             return createPortal(
                 <ConfigProvider
                     theme={{
@@ -195,7 +208,7 @@ export default observer(
                     }}
                 >
                     <Rnd
-                        ref={ref}
+                        ref={innerRef}
                         style={{ zIndex: 10, display: store.popupHidden ? "none" : "block", }}
                         resizeHandleClasses={{
                             right: "hover-right",
@@ -337,7 +350,7 @@ export default observer(
                         </div>
                     </Rnd >
                 </ConfigProvider>,
-                document.getElementById("portal-popup")
+                target
             )
         }
     )

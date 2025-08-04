@@ -321,21 +321,30 @@ export class PopupStore extends Component {
         this.posContext = posContext;
     };
 
-    setValue = (value: HTMLElement) => {
-        this.overlayPoint.setElement(value)
-    };
-
     addOverlay() {
-        this.overlayPoint = new Overlay({});
-        this.olmap.addOverlay(this.overlayPoint);
+
+        // if (this.olmap.getOverlayById('point-click')) {
+        //     this.olmap.getOverlayById('point-click').getId() === "point-click"
+
+        //     this.olmap.addOverlay(this.overlayPoint);
+        //     this.overlayPoint.setElement(this.pointElement)
+        // } else {
+            this.overlayPoint = new Overlay({
+                id: "point-click",
+            });
+            this.olmap.addOverlay(this.overlayPoint);
+            this.overlayPoint.setElement(this.pointElement)
+        // }
+// 
+
     };
 
     renderPoint(e) {
-        this.setValue(this.pointElement);
         const propsPoint = {
             params: { response: this.response, selected: this.selected },
             store: this,
             event: e,
+            replaceContent: true,
         };
         this.rootPointClick.render(<PopupClick {...propsPoint} />);
         this.overlayPoint.setPosition(e.coordinate);
@@ -367,8 +376,16 @@ export class PopupStore extends Component {
     async renderPopup(e) {
         await this.getResponse()
             .then(item => {
-                this.setResponse({ data: item.data, featureCount: item.featureCount });
-                this.setSelected(item.data[0]);
+                const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
+                const data = item.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
+                this.setResponse({ data: data, featureCount: item.featureCount });
+                if (this.mode === "click") {
+                    this.setSelected(data[0]);
+                } else if (this.mode === "simulate") {
+                    const val = { ...data.find(x => x.value === this.params.request.p.value.selected) } as DataProps;
+                    this.setSelected(val);
+                }
+
                 const pxy = this.mode === "simulate" ? e.pixel : [e.originalEvent.clientX, e.originalEvent.clientY];
                 const lonlat = transform(e.coordinate, this.webMercator, this.wgs84);
                 this.setPointPopupClick({
@@ -392,7 +409,7 @@ export class PopupStore extends Component {
             .then(() => {
                 this.contentGenerate();
                 this.renderPoint(e);
-                const propsPopup = { display: this.display, store: this };
+                const propsPopup = { display: this.display, store: this, replaceContent: true };
                 this.rootPopup.render(<Popup {...propsPopup} ref={this.refPopup} />);
                 this.setContextHidden(true);
                 this.setPopupHidden(false);
@@ -484,13 +501,13 @@ export class PopupStore extends Component {
         await display.getVisibleItems().then((visibleItems) => {
             const permalink = getPermalink({ display, visibleItems });
             const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
-            this.setPermalink(decodeURIComponent(permalink + '&panel=' + String(panel)));
+            this.setPermalink(decodeURIComponent(permalink + "&panel=" + String(panel)));
         })
     }
 
     async contentGenerate() {
         if (this.response.featureCount > 0) {
-            const selectVal = this.selected;
+            const selectVal = { ...this.selected };
             selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
             this.getContent(selectVal, false);
             this.LinkToGeometry(selectVal);
@@ -510,9 +527,9 @@ export class PopupStore extends Component {
                 .post({
                     body: JSON.stringify(this.params.request),
                 })
-            return new Promise(resolve => resolve(feature));
+            return new Promise<Response>(resolve => resolve(feature));
         } else {
-            return new Promise(resolve => resolve({ data: [], featureCount: 0 }));
+            return new Promise<Response>(resolve => resolve({ data: [], featureCount: 0 }));
         }
     }
 
@@ -660,13 +677,15 @@ export class PopupStore extends Component {
                     });
                 })
 
-                this.setSelected(val.slf);
+                // this.setSelected(val.slf);
+                // console.log(val.slf);
 
                 const value = {
                     attribute: val.attribute,
                     pn: val.pn,
                     lon: val.lon,
                     lat: val.lat,
+                    selected: val.slf,
                     params,
                 }
 
