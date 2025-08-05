@@ -3,8 +3,9 @@ import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
-import PopupModule from "@nextgisweb/webmap/popup/PopupModule";
+import { usePopup } from "@nextgisweb/webmap/popup/util/function";
 import settings from "@nextgisweb/webmap/client-settings";
+
 import type { PanelPluginWidgetProps } from "../registry";
 
 import { BasemapSelector } from "./BasemapSelector";
@@ -14,6 +15,8 @@ import "./LayersPanel.less";
 
 const LayersPanel = observer<PanelPluginWidgetProps>(
     ({ store, display, ...props }) => {
+
+        settings.imodule && usePopup(display);
 
         const zoomToAllLayers = () => {
             const plugin =
@@ -53,7 +56,6 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                         {...props}
                     />
                 </PanelContainer>
-                {settings.imodule && <PopupModule display={display} />}
             </>
         );
     }

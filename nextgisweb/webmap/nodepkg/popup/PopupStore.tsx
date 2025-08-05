@@ -56,8 +56,6 @@ export class PopupStore extends Component {
     offset: number;
     coords_not_count_w: number;
     coords_not_count_h: number;
-    wp: number;
-    hp: number;
     fX: number;
     fY: number;
 
@@ -65,7 +63,7 @@ export class PopupStore extends Component {
     popupElement = document.createElement("div");
     contextElement = document.createElement("div");
 
-    refPopup = createRef<HTMLDivElement>(null);
+    refPopup = createRef<HTMLDivElement>();
     refContext = createRef<HTMLDivElement>();
 
     rootPointClick: ReactRoot | null = null;
@@ -158,10 +156,8 @@ export class PopupStore extends Component {
         this.offset = settings.offset_point;
         this.coords_not_count_w = 270;
         this.coords_not_count_h = 51;
-        this.fX = this.offHP + this.offset;
-        this.fY = this.offset;
-        this.wp = window.innerWidth - this.offHP - this.offset * 2;
-        this.hp = window.innerHeight - this.offHP - this.offset * 2;
+        this.fX = 0;
+        this.fY = -40;
 
         this.addOverlay();
     }
@@ -409,7 +405,7 @@ export class PopupStore extends Component {
             .then(() => {
                 this.contentGenerate();
                 this.renderPoint(e);
-                const propsPopup = { display: this.display, store: this, replaceContent: true };
+                const propsPopup = { display: this.display, store: this };
                 this.rootPopup.render(<Popup {...propsPopup} ref={this.refPopup} />);
                 this.setContextHidden(true);
                 this.setPopupHidden(false);
@@ -455,7 +451,6 @@ export class PopupStore extends Component {
                     return this.renderPopup(e);
                 })
         } else if (props.type === "simulate") {
-
             await this.display.getVisibleItems()
                 .then((items) => {
                     const itemConfig = this.display.getItemConfig();
@@ -675,10 +670,7 @@ export class PopupStore extends Component {
                         label: "",
                         dop: null,
                     });
-                })
-
-                // this.setSelected(val.slf);
-                // console.log(val.slf);
+                });
 
                 const value = {
                     attribute: val.attribute,
@@ -690,7 +682,8 @@ export class PopupStore extends Component {
                 }
 
                 const p = { point: true, value, coordinate: transformedCoord };
-
+                const panelSize = store.activePanel !== "none" ? (display.isMobile ? 0 : display.panelSize) : 0;
+                
                 this.olmap.once("postrender", function (e) {
                     const pixel = e.map.getPixelFromCoordinate(p.coordinate);
                     const simulateEvent: any = {
@@ -698,9 +691,7 @@ export class PopupStore extends Component {
                         map: e.map,
                         target: "map",
                         pixel: [
-                            store.activePanel !== "none" ?
-                                (pixel[0] + display.panelSize + store.offHP) :
-                                (pixel[0] + store.offHP), pixel[1] + store.offHP
+                            pixel[0] + panelSize + store.offHP, pixel[1] + store.offHP
                         ],
                         type: "simulate"
                     };

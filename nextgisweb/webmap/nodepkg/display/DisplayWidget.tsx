@@ -63,7 +63,7 @@ export const DisplayWidget = observer(
             store.setIsLandscape(isL);
             store.setIsPortrait(isP);
             store.setIsMobile(isM);
-            store.setSize(isM ? "default" : "small");
+            store.setSize(isM ? "small" : "small");
         }, [isL, isP, isM]);
 
         useEffect(() => {

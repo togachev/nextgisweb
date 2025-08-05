@@ -24,12 +24,11 @@ import EditNote from "@nextgisweb/icon/material/edit_note";
 import type { Display } from "@nextgisweb/webmap/display";
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 
-import "../PopupModule.less";
+import "./Popup.less";
 
 interface PopupProps {
     display: Display;
     store: PopupStore;
-    replaceContent: boolean;
 }
 
 const { Option } = Select;
@@ -62,25 +61,25 @@ const CheckOnlyOne = ({ store }) => {
 export default observer(
     forwardRef<HTMLElement, PopupProps>(
         function Popup(props, ref) {
-            const { display, store, replaceContent } = props;
+            const { display, store } = props;
             const innerRef = useRef<HTMLElement>(null);
             useImperativeHandle(ref, () => innerRef.current!, [store.mode]);
-
-            const target = useRef(document.getElementById("portal-popup")).current;
-            const hasMounted = useRef(false);
-            if (!target) return null;
-            if (replaceContent && !hasMounted.current) {
-                target.innerHTML = '';
-                hasMounted.current = true;
-            }
 
             const pm = display.panelManager;
             const pkey = "selected-feature";
             const panel = pm.getPanel<SelectedFeatureStore>(pkey);
 
-            const handleDragStop = (e, d) => {
-                store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
-            };
+            const contentProps = { store: store, display: display };
+            const coordinateProps = { display: display, store: store, point: false };
+
+            useEffect(() => {
+                if (store.fixPopup) {
+                    store.setFixPos(store.valueRnd);
+                    store.setFixPanel(store.fixContentItem.key)
+                } else {
+                    store.setFixPos(null);
+                }
+            }, [store.fixPopup]);
 
             const onChangeSelect = useCallback((value) => {
                 const copy = { ...store.response.data.find(x => x.value === value.value) };
@@ -97,15 +96,6 @@ export default observer(
                 //     updateSelectFeatures(panel, selectedProps)
                 // }
             }, []);
-
-            const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
-                if ((option?.label ?? "").toLowerCase().includes(input.toLowerCase()) ||
-                    (option?.desc ?? "").toLowerCase().includes(input.toLowerCase())) {
-                    return true
-                } else {
-                    return false
-                }
-            };
 
             const editFeature = useMemo(() => {
                 if (store.response?.featureCount > 0 && store.selected && store.selected.type === "vector") {
@@ -150,11 +140,19 @@ export default observer(
                 }
             }, [store.selected]);
 
-            const contentProps = { store: store, display: display };
-            const coordinateProps = { display: display, store: store, point: false };
+            const handleDragStop = (e, d) => {
+                store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
+            };
 
-
-
+            const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
+                if ((option?.label ?? "").toLowerCase().includes(input.toLowerCase()) ||
+                    (option?.desc ?? "").toLowerCase().includes(input.toLowerCase())) {
+                    return true
+                } else {
+                    return false
+                }
+            };
+            
             return createPortal(
                 <ConfigProvider
                     theme={{
@@ -220,8 +218,8 @@ export default observer(
                             topRight: "hover-angle-top-right",
                             topLeft: "hover-angle-top-left",
                         }}
-                        cancel=".control-button"
-                        bounds={store.valueRnd?.width === store.wp ? undefined : "window"}
+                        cancel=".icon-symbol,.select-feature,.content,.footer-popup"
+                        bounds={store.valueRnd?.width === store.sizeWindow.width ? undefined : "window"}
                         minWidth={store.pos?.width}
                         minHeight={store.pos?.height}
                         allowAnyClick={true}
@@ -244,7 +242,11 @@ export default observer(
                     >
                         <div className="popup">
                             <div className="title">
-                                {store.valueRnd.buttonZoom["topLeft"] && <div style={{ margin: "0 6px 0 0" }}><ButtonZoomComponent {...contentProps} /></div>}
+                                {store.valueRnd.buttonZoom["topLeft"] && (
+                                    <div style={{ margin: "0 6px 0 0" }}>
+                                        <ButtonZoomComponent {...contentProps} />
+                                    </div>
+                                )}
                                 <Button
                                     className="title-name"
                                     size={store.size}
@@ -256,7 +258,7 @@ export default observer(
                                                     store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y });
                                                     store.setFullscreen(false)
                                                 } else {
-                                                    store.setValueRnd({ ...store.valueRnd, width: store.wp, height: store.hp, x: store.fX, y: store.fY });
+                                                    store.setValueRnd({ ...store.valueRnd, width: store.sizeWindow.width, height: store.sizeWindow.height, x: store.fX, y: store.fY });
                                                     store.setFullscreen(true);
                                                 }
                                             }, 200)
@@ -285,14 +287,15 @@ export default observer(
                                         onClick={() => {
                                             if (store.response.featureCount > 0 && store.fixPos === null) {
                                                 if (store.valueRnd.width > store.pos.width || store.valueRnd.height > store.pos.height) {
-                                                    store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y });
+                                                    store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y - (store.isMobile ? 40 : 0) });
                                                     store.setFullscreen(false)
-                                                } else {
-                                                    store.setValueRnd({ ...store.valueRnd, width: store.wp, height: store.hp, x: store.fX, y: store.fY });
+                                                }
+                                                else {
+                                                    store.setValueRnd({ ...store.valueRnd, width: store.sizeWindow.width, height: store.sizeWindow.height, x: store.fX, y: store.fY });
                                                     store.setFullscreen(true)
                                                 }
-                                                if (store.valueRnd.width < store.wp && store.valueRnd.width > store.pos.width || store.valueRnd.height < store.hp && store.valueRnd.height > store.pos.height) {
-                                                    store.setValueRnd({ ...store.valueRnd, width: store.wp, height: store.hp, x: store.fX, y: store.fY });
+                                                if (store.valueRnd.width < store.sizeWindow.width && store.valueRnd.width > store.pos.width || store.valueRnd.height < store.sizeWindow.height && store.valueRnd.height > store.pos.height) {
+                                                    store.setValueRnd({ ...store.valueRnd, width: store.sizeWindow.width, height: store.sizeWindow.height, x: store.fX, y: store.fY });
                                                     store.setFullscreen(true)
                                                 }
                                             }
@@ -301,6 +304,8 @@ export default observer(
                                 )}
                                 <Button
                                     icon={<CloseIcon />}
+                                    size={store.size}
+                                    type="text"
                                     title={gettext("Close")}
                                     className={store.response.featureCount > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                     onClick={() => {
@@ -310,7 +315,11 @@ export default observer(
                                             achecked: false,
                                         });
                                     }} />
-                                {store.valueRnd.buttonZoom["topRight"] && <div style={{ margin: "0 0 0 6px" }}><ButtonZoomComponent {...contentProps} /></div>}
+                                {store.valueRnd.buttonZoom["topRight"] && (
+                                    <div style={{ margin: "0 0 0 6px" }}>
+                                        <ButtonZoomComponent {...contentProps} />
+                                    </div>
+                                )}
                             </div>
                             {store.response.featureCount > 0 && store.selected && (
                                 <div className={store.selected.permission !== "Forbidden" ? "select-feature" : "select-feature-forbidden"} >
@@ -350,7 +359,7 @@ export default observer(
                         </div>
                     </Rnd >
                 </ConfigProvider>,
-                target
+                document.getElementById("portal-popup")
             )
         }
     )
