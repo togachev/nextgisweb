@@ -574,7 +574,7 @@ export class PopupStore extends Component {
         if (this.pointPopupClick) {
             const [lon, lat] = this.pointPopupClick?.lonlat?.map(number => parseFloat(number.toFixed(12)));
             const webmapId = this.display.config.webmapId;
-            const zoom = this.display.map.zoom;
+            const zoom = this.olmap.getView().getZoom();
 
             this.display.getVisibleItems()
                 .then((items) => {
@@ -695,7 +695,6 @@ export class PopupStore extends Component {
                         ],
                         type: "simulate"
                     };
-
                     store.overlayInfo(simulateEvent, { type: "simulate", p: p })
                 });
             });
