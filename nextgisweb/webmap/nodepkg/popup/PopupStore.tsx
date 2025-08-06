@@ -22,6 +22,7 @@ import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 
+import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Root as ReactRoot } from "react-dom/client";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { AttributeProps, DataProps, ControlUrlProps, ExtensionsProps, EventProps, OptionProps, ParamsProps, Position, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
@@ -473,6 +474,53 @@ export class PopupStore extends Component {
         })
     }
 
+    updateSelectFeatures(panel, props) {
+        const obj = { ...panel.selectedFeatures }
+        const [key] = getEntries(obj).filter(([_, val]) => val.styleId === props.styleId)[0];
+
+        const value = {
+            ...obj,
+            [key]: {
+                ...obj[key],
+                ...{
+                    items: {
+                        ...obj[key].items,
+                        [String(props.value)]: props
+                    }
+                }
+            }
+        }
+
+        getEntries(value)
+            .map(([key, _]) => {
+                if (Object.keys(value[key].items).length > 10) {
+                    delete value[key].items[Object.keys(value[key].items)[0]];
+                }
+            });
+        panel.setSelectedFeatures(value)
+    };
+
+    @computed
+    get propsCoords() {
+        const styles: string[] = [];
+        this.display.getVisibleItems()
+            .then((items) => {
+                items.forEach((i) => {
+                    const item = this.display.itemStore.dumpItem(i);
+                    if (item.visibility === true) {
+                        styles.push(item.styleId);
+                    }
+                });
+            })
+
+        return {
+            coordinate: this.pointPopupClick.coordinate,
+            lonlat: this.pointPopupClick.lonlat,
+            extent: this.display.map.olMap.getView().calculateExtent(),
+            styles: styles
+        };
+    };
+
     async contentGenerate() {
         if (this.response.featureCount > 0) {
             const selectVal = { ...this.selected };
@@ -480,6 +528,16 @@ export class PopupStore extends Component {
             this.getContent(selectVal, false);
             this.LinkToGeometry(selectVal);
             this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: true } });
+
+            const pm = this.display.panelManager;
+            const pkey = "selected-feature";
+            const panel = pm.getPanel<SelectedFeatureStore>(pkey);
+            
+            Object.assign(selectVal, this.propsCoords);
+            const selectedProps = { ...selectVal };
+            if (panel) {
+                this.updateSelectFeatures(panel, selectedProps);
+            }
         } else {
             this.generateUrl({ res: null, st: null, pn: null, disable: false });
             this.setSelected({});

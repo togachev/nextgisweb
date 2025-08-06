@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { Alert, Button, Descriptions, Popover } from "@nextgisweb/gui/antd";
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import { PanelContainer } from "../component";
 import Close from "@nextgisweb/icon/mdi/close";
 import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box-outline";
@@ -21,10 +21,10 @@ import "./SelectedFeature.less";
 const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
-        const imodule = display.popupStore;
+        const popupStore = display.popupStore;
 
         const deleteRow = ({ key, ckey, all }) => {
-            imodule?.pointDestroy();
+            popupStore?.pointDestroy();
             if (all) {
                 const obj = { ...store.selectedFeatures };
                 store.setSelectedFeatures({
@@ -43,7 +43,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
 
         const lOnChecked = useCallback((key, styleId) => {
             if (store.activeLayer.lckey !== key) {
-                imodule?.zoomToLayerExtent({ styleId });
+                popupStore?.zoomToLayerExtent({ styleId });
                 visibleItems({ value: [styleId] });
                 store.setActiveLayer({ lchecked: true, lckey: key, })
             } else {
@@ -57,9 +57,9 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             const { lchecked } = store.activeLayer;
             if (store.countLayers > 0 && store.activeChecked.achecked === false) {
                 if (lchecked) {
-                    imodule?.zoomToLayerExtent({ styleId });
+                    popupStore?.zoomToLayerExtent({ styleId });
                     visibleItems({ value: [styleId] });
-                    imodule?.popup_destroy();
+                    popupStore?.pointDestroy();
                 } else {
                     display._zoomToInitialExtent();
                     visibleItems({ value: undefined });
@@ -79,6 +79,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             });
 
             const { achecked, ackey, acvalue } = store.activeChecked;
+            
             if (achecked) {
                 if (acvalue.type === "vector") {
                     store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
@@ -87,7 +88,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                 }
                 visibleItems({ value: [acvalue.styleId] });
             } else {
-                imodule?.popup_destroy();
+                popupStore?.pointDestroy();
                 display._zoomToInitialExtent();
                 visibleItems({ value: undefined });
             }
@@ -125,7 +126,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                         icon={<CloseBoxOutline />}
                                         onClick={() => {
                                             deleteRow({ key: key, ckey: null, all: true })
-                                            imodule?.popup_destroy();
+                                            popupStore?.pointDestroy();
                                             display._zoomToInitialExtent();
                                             visibleItems({ value: undefined });
                                         }}
@@ -218,12 +219,12 @@ const InfoSelect = () => {
 const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
-        const imodule = display.popupStore;
+        const popupStore = display.popupStore;
 
         const onCheckedVisibleItems = useCallback(() => {
             store.setChecked(!store.checked);
             if (store.checked === false) {
-                imodule?.pointDestroy();
+                popupStore?.pointDestroy();
                 visibleItems({ value: undefined });
             }
             else {
@@ -242,7 +243,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         }, []);
 
         const deleteAllRow = () => {
-            imodule?.popup_destroy();
+            popupStore?.pointDestroy();
             const obj = { ...store.selectedFeatures };
             getEntries(obj).map(([_, value]) => value.items = {});
             store.setSelectedFeatures(obj);

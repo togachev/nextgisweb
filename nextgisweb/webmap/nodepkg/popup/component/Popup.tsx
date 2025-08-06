@@ -21,8 +21,8 @@ import Pin from "@nextgisweb/icon/mdi/pin";
 import PinOff from "@nextgisweb/icon/mdi/pin-off";
 import EditNote from "@nextgisweb/icon/material/edit_note";
 
-import type { Display } from "@nextgisweb/webmap/display";
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import "./Popup.less";
 
@@ -64,11 +64,9 @@ export default observer(
             const { display, store } = props;
             const innerRef = useRef<HTMLElement>(null);
             useImperativeHandle(ref, () => innerRef.current!, [store.mode]);
-
             const pm = display.panelManager;
             const pkey = "selected-feature";
             const panel = pm.getPanel<SelectedFeatureStore>(pkey);
-
             const contentProps = { store: store, display: display };
             const coordinateProps = { display: display, store: store, point: false };
 
@@ -94,11 +92,10 @@ export default observer(
                 topic.publish("visible.point", copy);
                 store.setValueRnd({ ...store.valueRnd, buttonZoom: { [Object.keys(store.valueRnd?.buttonZoom)[0]]: true } });
 
-                // const selectedProps = { ...selectedValue };
-                // Object.assign(selectedProps, propsCoords());
-                // if (panel) {
-                //     updateSelectFeatures(panel, selectedProps)
-                // }
+                Object.assign(copy, store.propsCoords);
+                if (panel) {
+                    store.updateSelectFeatures(panel, copy)
+                }
             }, []);
 
             const editFeature = useMemo(() => {

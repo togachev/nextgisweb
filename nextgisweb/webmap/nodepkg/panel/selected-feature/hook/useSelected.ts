@@ -6,7 +6,7 @@ import type SelectedFeatureStore from "./SelectedFeatureStore";
 export const useSelected = (display: Display, store: SelectedFeatureStore) => {
     const psizey = window.innerHeight;
     const psizex = 350;
-    
+
     const simulateEvent = (p, pixel) => ({
         coordinate: p && p.coordinate,
         map: display.map.olMap,
@@ -16,10 +16,10 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                 (pixel[0] + psizex + 40) :
                 (pixel[0] + psizey + 40), (pixel[1] + 40)
         ],
-        type: "click"
+        type: "simulate"
     });
 
-    const overlayInfo = (event, p) => display.imodule._overlayInfo(event, "popup", p, "selected");
+    const overlayInfo = (event, p) => display.popupStore.overlayInfo(event, { type: "simulate", p: p });
 
     const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
@@ -67,12 +67,12 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                         const _wkt = new WKT();
                         const geometry = _wkt.readGeometry(i.geom);
                         const extent = geometry.getExtent();
-                        display.imodule.zoomToExtent(extent);
+                        display.popupStore.zoomToExtent(extent);
                     });
-                display.imodule.root_point_click.render();
+                display.popupStore.renderPoint({ coordinate: value.coordinate });
                 vectorRender();
             } else if (type === "raster") {
-                display.imodule.zoomToPoint(value.coordinate);
+                display.popupStore.zoomToPoint(value.coordinate);
                 rasterRender();
             }
             display.map.olMap.renderSync();
