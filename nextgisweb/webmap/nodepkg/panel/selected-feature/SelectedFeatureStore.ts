@@ -1,6 +1,6 @@
 import { action, computed, observable } from "mobx";
 import { PanelStore } from "@nextgisweb/webmap/panel";
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import { route } from "@nextgisweb/pyramid/api";
 
 import type { DataProps } from "./type";

@@ -7,20 +7,6 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
     const psizey = window.innerHeight;
     const psizex = 350;
 
-    const simulateEvent = (p, pixel) => ({
-        coordinate: p && p.coordinate,
-        map: display.map.olMap,
-        target: "map",
-        pixel: [
-            display.panelManager.getActivePanelName() !== "none" ?
-                (pixel[0] + psizex + 40) :
-                (pixel[0] + psizey + 40), (pixel[1] + 40)
-        ],
-        type: "simulate"
-    });
-
-    const overlayInfo = (event, p) => display.popupStore.overlayInfo(event, { type: "simulate", p: p });
-
     const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
         const itemConfig = display.getItemConfig();
@@ -39,14 +25,28 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         display.webmapStore._updateLayersVisibility(visibleStyles);
     };
 
+    const simulateEvent = (p, pixel) => ({
+        coordinate: p && p.coordinate,
+        map: display.map.olMap,
+        target: "map",
+        pixel: [
+            display.panelManager.getActivePanelName() !== "none" ?
+                (pixel[0] + psizex + 40) :
+                (pixel[0] + psizey + 40), (pixel[1] + 40)
+        ],
+        type: "simulate"
+    });
+
+    const overlayInfo = (event, p) => display.popupStore.overlayInfo(event, { type: "simulate", p: p });
+
     const vectorRender = () => {
         const { key, value } = store.simulatePointZoom;
         const val = { params: [] };
-        const coordinate = display.map.olMap.getView().getCenter();
-        const p = { point: false, value: val, coordinate: coordinate, selected: key, data: value };
-        const pixel = display.map.olMap.getPixelFromCoordinate(coordinate);
+        const p = { point: false, value: val, coordinate: value.coordinate, selected: key, data: value };
+        const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
         const event = simulateEvent(p, pixel);
         overlayInfo(event, p);
+        console.log(p);
     };
 
     const rasterRender = () => {

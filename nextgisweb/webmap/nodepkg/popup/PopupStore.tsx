@@ -532,9 +532,10 @@ export class PopupStore extends Component {
             const pm = this.display.panelManager;
             const pkey = "selected-feature";
             const panel = pm.getPanel<SelectedFeatureStore>(pkey);
-            
+
             Object.assign(selectVal, this.propsCoords);
-            const selectedProps = { ...selectVal };
+            const zoom = this.olmap.getView().getZoom();
+            const selectedProps = { ...selectVal, ...{ zoom } };
             if (panel) {
                 this.updateSelectFeatures(panel, selectedProps);
             }
@@ -726,7 +727,9 @@ export class PopupStore extends Component {
                         ],
                         type: "simulate"
                     };
-                    store.overlayInfo(simulateEvent, { type: "simulate", p: p })
+                    store.overlayInfo(simulateEvent, { type: "simulate", p: p });
+                    console.log(p);
+                    
                 });
             });
     };

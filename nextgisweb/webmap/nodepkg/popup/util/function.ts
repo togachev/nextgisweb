@@ -140,7 +140,7 @@ async function getPosition(display, px, py, store) {
             py <= sizeWindow.height - offset - height
             && px <= sizeWindow.width - offset - width
         ) {
-            console.log("top left");
+            // console.log("top left");
             return {
                 pointClick: {
                     x: sizeWindow.width - width, y: sizeWindow.height - height - offHP
@@ -155,7 +155,7 @@ async function getPosition(display, px, py, store) {
             && px > sizeWindow.width - width - offset
             && px < width + offset
         ) {
-            console.log("top");
+            // console.log("top");
             return {
                 pointClick: {
                     x: 0, y: sizeWindow.height - height - offHP
@@ -170,7 +170,7 @@ async function getPosition(display, px, py, store) {
             py <= sizeWindow.height - offset - height
             && px >= width + offset
         ) {
-            console.log("top right");
+            // console.log("top right");
             return {
                 pointClick: {
                     x: 0, y: sizeWindow.height - height - offHP
@@ -184,7 +184,7 @@ async function getPosition(display, px, py, store) {
             py >= height + offset
             && px <= sizeWindow.width - offset - width
         ) {
-            console.log("bottom left");
+            // console.log("bottom left");
             return {
                 pointClick: {
                     x: sizeWindow.width - width, y: 0
@@ -199,7 +199,7 @@ async function getPosition(display, px, py, store) {
             && px > sizeWindow.width - width - offset
             && px < width + offset
         ) {
-            console.log("bottom");
+            // console.log("bottom");
             return {
                 pointClick: {
                     x: 0, y: 0 - offHP
@@ -213,7 +213,7 @@ async function getPosition(display, px, py, store) {
             py >= height + offset
             && px >= width + offset
         ) {
-            console.log("bottom right");
+            // console.log("bottom right");
             return {
                 pointClick: {
                     x: 0, y: 0,
@@ -228,7 +228,7 @@ async function getPosition(display, px, py, store) {
             && py < height + offset
             && px <= sizeWindow.width - offset - width
         ) {
-            console.log("left");
+            // console.log("left");
             return {
                 pointClick: {
                     x: sizeWindow.width - width, y: sizeWindow.height - height - offHP
@@ -244,7 +244,7 @@ async function getPosition(display, px, py, store) {
             && px > sizeWindow.width - offset - width
             && px < width + offset
         ) {
-            console.log("center top");
+            // console.log("center top");
             return {
                 pointClick: {
                     x: 0, y: sizeWindow.height - height - offHP
@@ -259,7 +259,7 @@ async function getPosition(display, px, py, store) {
             && py < height + offset
             && px >= width + offset
         ) {
-            console.log("right");
+            // console.log("right");
             return {
                 pointClick: {
                     x: sizeWindow.width - width, y: 0
@@ -280,7 +280,7 @@ async function getPositionContext(px, py, store) {
         py <= sizeWindow.height - height
         && px <= sizeWindow.width - width
     ) {
-        console.log("top left context");
+        // console.log("top left context");
         return {
             x: px + offset, y: py + offset, width: width, height: height
         }
@@ -290,7 +290,7 @@ async function getPositionContext(px, py, store) {
         py <= sizeWindow.height - height
         && px > sizeWindow.width - width
     ) {
-        console.log("top right context");
+        // console.log("top right context");
         return {
             x: px - offset - width, y: py + offset, width: width, height: height
         }
@@ -300,7 +300,7 @@ async function getPositionContext(px, py, store) {
         py > sizeWindow.height - height
         && px <= sizeWindow.width - width
     ) {
-        console.log("bottom left context");
+        // console.log("bottom left context");
         return {
             x: px + offset, y: py - offset - height, width: width, height: height
         }
@@ -310,7 +310,7 @@ async function getPositionContext(px, py, store) {
         py > sizeWindow.height - height
         && px > sizeWindow.width - width
     ) {
-        console.log("bottom right context");
+        // console.log("bottom right context");
         return {
             x: px - offset - width, y: py - offset - height, width: width, height: height
         }
