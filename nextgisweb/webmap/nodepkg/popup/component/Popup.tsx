@@ -79,6 +79,10 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
+            useEffect(() => {
+                store.generateUrl({ res: store.response.data[0], st: store.response.data, pn: store.fixPanel, disable: false })
+            }, [store.currentUrlParams]);
+
             topic.subscribe("update.point", (status) => {
                 store.setValueRnd({ ...store.valueRnd, x: store.valueRnd.pointClick.x, y: store.valueRnd.pointClick.y, buttonZoom: status && {} });
             });

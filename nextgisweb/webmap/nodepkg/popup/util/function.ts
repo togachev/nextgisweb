@@ -12,7 +12,8 @@ type Entry<T> = {
 
 const usePopup = (display: Display) => {
     const portalContext = useRef(document.createElement("div"));
-    useOutsideClick(portalContext, () => display.popupStore.setContextHidden(true));
+    const store = display.popupStore;
+    useOutsideClick(portalContext, () => store.setContextHidden(true));
 
     const olmap = display.map.olMap;
 
@@ -20,17 +21,17 @@ const usePopup = (display: Display) => {
         if (isM) return;
         if (e.dragging) return;
         e.preventDefault();
-        display.popupStore.overlayInfo(e, { type: "context" })
-        display.popupStore.setContextHidden(false);
+        store.overlayInfo(e, { type: "context" })
+        store.setContextHidden(false);
     }, []);
 
     const click = useCallback((e) => {
         if (isM) return;
         if (e.dragging) return;
-        display.popupStore.setMode("click");
+        store.setMode("click");
         e.preventDefault();
-        display.popupStore.overlayInfo(e, { type: "click" });
-    }, [display.popupStore.pointPopupClick]);
+        store.overlayInfo(e, { type: "click" });
+    }, [store.pointPopupClick]);
 
     useEffect(() => {
         if (display.panelManager.getActivePanelName() !== "custom-layer") {
@@ -38,7 +39,7 @@ const usePopup = (display: Display) => {
             olmap.on("contextmenu", contextMenu);
 
             const handleResize = () => {
-                display.popupStore.setSizeWindow({
+                store.setSizeWindow({
                     width: window.innerWidth,
                     height: window.innerHeight,
                 });
@@ -51,18 +52,18 @@ const usePopup = (display: Display) => {
                 window.removeEventListener("resize", handleResize);
             };
         } else {
-            display.popupStore.pointDestroy();
+            store.pointDestroy();
         }
     }, [display.panelManager.activePanel]);
 
     useEffect(() => {
-        if (display.popupStore.fixPopup) {
-            display.popupStore.setFixPos(display.popupStore.valueRnd);
-            display.popupStore.setFixPanel(display.popupStore.fixContentItem.key)
+        if (store.fixPopup) {
+            store.setFixPos(store.valueRnd);
+            store.setFixPanel(store.fixContentItem.key)
         } else {
-            display.popupStore.setFixPos(null);
+            store.setFixPos(null);
         }
-    }, [display.popupStore.fixPopup]);
+    }, [store.fixPopup]);
 };
 
 export const filterObject = <T extends object>(

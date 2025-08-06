@@ -110,7 +110,14 @@ export class PopupStore extends Component {
         super(display);
 
         this.display = display;
-        this.fixPanel = fixPanel;
+        const urlParams = display.getUrlParams()
+        const opts = display.config.options;
+        const attrs = opts["webmap.identification_attributes"];
+        const geoms = opts["webmap.identification_geometry"];
+        this.fixPanel = urlParams.pn ? urlParams.pn :
+            attrs === true ? "attributes" :
+                attrs === false && geoms === true ? "geom_info" :
+                    (attrs === false && geoms === false) && "description";
         this.control = {
             reset: {
                 icon: <LockReset />,
@@ -729,7 +736,7 @@ export class PopupStore extends Component {
                     };
                     store.overlayInfo(simulateEvent, { type: "simulate", p: p });
                     console.log(p);
-                    
+
                 });
             });
     };

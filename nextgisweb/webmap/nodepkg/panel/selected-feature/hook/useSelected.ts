@@ -29,11 +29,7 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         coordinate: p && p.coordinate,
         map: display.map.olMap,
         target: "map",
-        pixel: [
-            display.panelManager.getActivePanelName() !== "none" ?
-                (pixel[0] + psizex + 40) :
-                (pixel[0] + psizey + 40), (pixel[1] + 40)
-        ],
+        pixel: pixel,
         type: "simulate"
     });
 
@@ -42,8 +38,10 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
     const vectorRender = () => {
         const { key, value } = store.simulatePointZoom;
         const val = { params: [] };
-        const p = { point: false, value: val, coordinate: value.coordinate, selected: key, data: value };
+        const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
         const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
+        console.log(pixel);
+
         const event = simulateEvent(p, pixel);
         overlayInfo(event, p);
         console.log(p);
@@ -56,6 +54,7 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
         const event = simulateEvent(p, pixel);
         overlayInfo(event, p);
+        console.log(p);
     };
 
     useEffect(() => {
