@@ -16,22 +16,16 @@ const usePopup = (display: Display) => {
 
     const olmap = display.map.olMap;
 
-    const typeClick = isM ? "singleclick" : "click";
-
     const contextMenu = useCallback((e) => {
+        if (isM) return;
         if (e.dragging) return;
-
-        isM && olmap.un("singleclick", click);
         e.preventDefault();
         display.popupStore.overlayInfo(e, { type: "context" })
-
-        isM && setTimeout(() => {
-            olmap.on("singleclick", click);
-        }, 250);
         display.popupStore.setContextHidden(false);
     }, []);
 
     const click = useCallback((e) => {
+        if (isM) return;
         if (e.dragging) return;
         display.popupStore.setMode("click");
         e.preventDefault();
@@ -40,7 +34,7 @@ const usePopup = (display: Display) => {
 
     useEffect(() => {
         if (display.panelManager.getActivePanelName() !== "custom-layer") {
-            olmap.on(typeClick, click);
+            olmap.on("click", click);
             olmap.on("contextmenu", contextMenu);
 
             const handleResize = () => {
@@ -52,7 +46,7 @@ const usePopup = (display: Display) => {
             window.addEventListener("resize", handleResize);
 
             return () => {
-                olmap.un(typeClick, click);
+                olmap.un("click", click);
                 olmap.un("contextmenu", contextMenu);
                 window.removeEventListener("resize", handleResize);
             };
@@ -116,118 +110,14 @@ const configSize = (store, key) => {
             width: count > 0 ? sizeWindow.width : coords_not_count_w,
             height: count > 0 ? sizeWindow.height : coords_not_count_h,
         },
-        mobileLandscape: {
-            width: count > 0 ? sizeWindow.width / 2 : coords_not_count_w,
-            height: count > 0 ? sizeWindow.height : coords_not_count_h,
-        },
-        mobilePortrait: {
-            width: count > 0 ? sizeWindow.width : coords_not_count_w,
-            height: count > 0 ? sizeWindow.height / 2 : coords_not_count_h,
-        },
     };
     return size[key];
 };
 
 async function getPosition(display, px, py, store) {
-    const { activePanel, mode, olmap, offset, offHP, isMobile, isLandscape, response, popup_width, popup_height, sizeWindow } = store;
-    const count = response.featureCount;
+    const { offset, offHP, popup_width, popup_height, sizeWindow } = store;
 
-    if (isMobile && count > 0) {
-        if (isLandscape) {
-            const { width, height } = configSize(store, "mobileLandscape");
-
-            if (mode === "simulate") {
-                const cc = olmap.getView().getCenter();
-                const ext = olmap.getView().calculateExtent();
-                const offset = activePanel === "none" ? (ext[2] - ext[0]) / 4 : 0;
-                const newCenter = [cc[0] - offset, cc[1]];
-                olmap.getView().setCenter(newCenter);
-
-                // console.log("simulate");
-                return {
-                    pointClick: {
-                        x: offHP, y: sizeWindow.height - height
-                    },
-                    buttonZoom: { topLeft: false },
-                    x: 0, y: 0, width: width, height: height
-                }
-            }
-
-            if (
-                px > sizeWindow.width / 2
-            ) {
-                // console.log("left");
-                return {
-                    pointClick: {
-                        x: offHP, y: sizeWindow.height - height
-                    },
-                    buttonZoom: { topLeft: false },
-                    x: 0, y: 0, width: width, height: height
-                }
-            }
-
-            if (
-                px <= sizeWindow.width / 2
-            ) {
-                // console.log("right");
-                return {
-                    pointClick: {
-                        x: offHP, y: sizeWindow.height - height
-                    },
-                    buttonZoom: { topLeft: false },
-                    x: sizeWindow.width / 2, y: 0, width: width, height: height
-                }
-            }
-        } else {
-            const { width, height } = configSize(store, "mobilePortrait");
-
-            if (mode === "simulate") {
-
-                const cc = olmap.getView().getCenter();
-                const ext = olmap.getView().calculateExtent();
-                const offset = activePanel === "none" ? (ext[3] - ext[1]) / 4 : 0;
-                const newCenter = [cc[0], cc[1] - offset];
-                olmap.getView().setCenter(newCenter);
-
-                // console.log("simulate");
-                return {
-                    pointClick: {
-                        x: offHP, y: sizeWindow.height - height
-                    },
-                    buttonZoom: { topLeft: false },
-                    x: 0, y: sizeWindow.height / 2, width: width, height: height
-                }
-            }
-
-            if (
-                py <= sizeWindow.height / 2
-            ) {
-                // console.log("top");
-                return {
-                    pointClick: {
-                        x: offHP, y: sizeWindow.height - height
-                    },
-                    buttonZoom: { topLeft: false },
-                    x: 0, y: sizeWindow.height / 2, width: width, height: height
-                }
-            }
-
-            if (
-                py > sizeWindow.height / 2
-            ) {
-                // console.log("bottom");
-                return {
-                    pointClick: {
-                        x: offHP, y: sizeWindow.height - height
-                    },
-                    buttonZoom: { topLeft: false },
-                    x: 0, y: 0, width: width, height: height
-                }
-            }
-        }
-    }
-    else if (
-        !isMobile &&
+    if (
         popup_width > sizeWindow.width ||
         popup_height > sizeWindow.height
     ) {
@@ -241,7 +131,6 @@ async function getPosition(display, px, py, store) {
         }
     }
     else if (
-        !isMobile &&
         (popup_width <= sizeWindow.width) ||
         (popup_height <= sizeWindow.height)
     ) {
@@ -251,10 +140,10 @@ async function getPosition(display, px, py, store) {
             py <= sizeWindow.height - offset - height
             && px <= sizeWindow.width - offset - width
         ) {
-            // console.log("top left");
+            console.log("top left");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: sizeWindow.width - width, y: sizeWindow.height - height - offHP
                 },
                 buttonZoom: { topLeft: false },
                 x: px + offset, y: py + offset, width: width, height: height
@@ -266,10 +155,10 @@ async function getPosition(display, px, py, store) {
             && px > sizeWindow.width - width - offset
             && px < width + offset
         ) {
-            // console.log("top");
+            console.log("top");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: 0, y: sizeWindow.height - height - offHP
                 },
                 buttonZoom: { topLeft: false },
                 x: (sizeWindow.width + (display.isMobile ? 0 : offHP) - width) / 2,
@@ -281,10 +170,10 @@ async function getPosition(display, px, py, store) {
             py <= sizeWindow.height - offset - height
             && px >= width + offset
         ) {
-            // console.log("top right");
+            console.log("top right");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: 0, y: sizeWindow.height - height - offHP
                 },
                 buttonZoom: { topRight: false },
                 x: px - offset - width, y: py + offset, width: width, height: height
@@ -295,10 +184,10 @@ async function getPosition(display, px, py, store) {
             py >= height + offset
             && px <= sizeWindow.width - offset - width
         ) {
-            // console.log("bottom left");
+            console.log("bottom left");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: sizeWindow.width - width, y: 0
                 },
                 buttonZoom: { bottomLeft: false },
                 x: px + offset, y: py - height - offset, width: width, height: height
@@ -310,10 +199,10 @@ async function getPosition(display, px, py, store) {
             && px > sizeWindow.width - width - offset
             && px < width + offset
         ) {
-            // console.log("bottom");
+            console.log("bottom");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: 0, y: 0 - offHP
                 },
                 buttonZoom: { bottomLeft: false },
                 x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
@@ -324,10 +213,10 @@ async function getPosition(display, px, py, store) {
             py >= height + offset
             && px >= width + offset
         ) {
-            // console.log("bottom right");
+            console.log("bottom right");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: 0, y: 0,
                 },
                 buttonZoom: { bottomRight: false },
                 x: px - width - offset, y: py - height - offset, width: width, height: height
@@ -339,10 +228,10 @@ async function getPosition(display, px, py, store) {
             && py < height + offset
             && px <= sizeWindow.width - offset - width
         ) {
-            // console.log("left");
+            console.log("left");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: sizeWindow.width - width, y: sizeWindow.height - height - offHP
                 },
                 buttonZoom: { topLeft: false },
                 x: px + offset, y: (sizeWindow.height + (display.isMobile ? 0 : offHP) - height) / 2, width: width, height: height
@@ -355,10 +244,10 @@ async function getPosition(display, px, py, store) {
             && px > sizeWindow.width - offset - width
             && px < width + offset
         ) {
-            // console.log("center top");
+            console.log("center top");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: 0, y: sizeWindow.height - height - offHP
                 },
                 buttonZoom: { topLeft: false },
                 x: (sizeWindow.width - width) / 2, y: (sizeWindow.height - height) / 2, width: width, height: height
@@ -370,147 +259,12 @@ async function getPosition(display, px, py, store) {
             && py < height + offset
             && px >= width + offset
         ) {
-            // console.log("right");
+            console.log("right");
             return {
                 pointClick: {
-                    x: offHP, y: sizeWindow.height - height
+                    x: sizeWindow.width - width, y: 0
                 },
                 buttonZoom: { topRight: false },
-                x: px - offset - width, y: (sizeWindow.height - height) / 2, width: width, height: height
-            }
-        }
-    }
-    else if (isMobile && count === 0) {
-        const { width, height } = configSize(store, "full");
-
-        if (
-            py <= sizeWindow.height - offset - height
-            && px <= sizeWindow.width - offset - width
-        ) {
-            // console.log("top left");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { topLeft: false },
-                x: px + offset, y: py + offset, width: width, height: height
-            }
-        }
-
-        if (
-            py <= sizeWindow.height - offset - height
-            && px > sizeWindow.width - width - offset
-            && px < width + offset
-        ) {
-            // console.log("top");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { topLeft: false },
-                x: (sizeWindow.width - width) / 2, y: py + offset, width: width, height: height
-            }
-        }
-
-        if (
-            py <= sizeWindow.height - offset - height
-            && px >= width + offset
-        ) {
-            // console.log("top right");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { topRight: false },
-                x: px - offset - width, y: py + offset, width: width, height: height
-            }
-        }
-
-        if (
-            py >= height + offset
-            && px <= sizeWindow.width - offset - width
-        ) {
-            // console.log("bottom left");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { bottomLeft: false },
-                x: px + offset, y: py - height - offset, width: width, height: height
-            }
-        }
-
-        if (
-            py > height + offset
-            && px > sizeWindow.width - width - offset
-            && px < width + offset
-        ) {
-            // console.log("bottom");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { bottomLeft: false },
-                x: (sizeWindow.width - width) / 2, y: py - height - offset, width: width, height: height
-            }
-        }
-
-        if (
-            py >= height + offset
-            && px >= width + offset
-        ) {
-            // console.log("bottom right");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { bottomRight: false },
-                x: px - width - offset, y: py - height - offset, width: width, height: height
-            }
-        }
-
-        if (
-            py > sizeWindow.height - offset - height
-            && py < height + offset
-            && px <= sizeWindow.width - offset - width
-        ) {
-            // console.log("left");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { topLeft: false },
-                x: px + offset, y: (sizeWindow.height - height) / 2, width: width, height: height
-            }
-        }
-
-        if (
-            py > sizeWindow.height - offset - height
-            && py < height + offset
-            && px > sizeWindow.width - offset - width
-            && px < width + offset
-        ) {
-            // console.log("center top");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { topLeft: false },
-                x: (sizeWindow.width - width) / 2, y: (sizeWindow.height - height) / 2, width: width, height: height
-            }
-        }
-
-        if (
-            py > sizeWindow.height - offset - height
-            && py < height + offset
-            && px >= width + offset
-        ) {
-            // console.log("right");
-            return {
-                pointClick: {
-                    x: offHP, y: sizeWindow.height - height
-                },
-                buttonZoom: { topLeft: false },
                 x: px - offset - width, y: (sizeWindow.height - height) / 2, width: width, height: height
             }
         }
@@ -526,7 +280,7 @@ async function getPositionContext(px, py, store) {
         py <= sizeWindow.height - height
         && px <= sizeWindow.width - width
     ) {
-        // console.log("top left");
+        console.log("top left context");
         return {
             x: px + offset, y: py + offset, width: width, height: height
         }
@@ -536,7 +290,7 @@ async function getPositionContext(px, py, store) {
         py <= sizeWindow.height - height
         && px > sizeWindow.width - width
     ) {
-        // console.log("top right");
+        console.log("top right context");
         return {
             x: px - offset - width, y: py + offset, width: width, height: height
         }
@@ -546,7 +300,7 @@ async function getPositionContext(px, py, store) {
         py > sizeWindow.height - height
         && px <= sizeWindow.width - width
     ) {
-        // console.log("bottom left");
+        console.log("bottom left context");
         return {
             x: px + offset, y: py - offset - height, width: width, height: height
         }
@@ -556,7 +310,7 @@ async function getPositionContext(px, py, store) {
         py > sizeWindow.height - height
         && px > sizeWindow.width - width
     ) {
-        // console.log("bottom right");
+        console.log("bottom right context");
         return {
             x: px - offset - width, y: py - offset - height, width: width, height: height
         }

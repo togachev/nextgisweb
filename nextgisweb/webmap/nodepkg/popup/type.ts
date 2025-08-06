@@ -53,6 +53,7 @@ export type SourceProps = {
 export type PointClickProps = {
     x: number;
     y: number;
+    pos?: string;
 }
 
 export type ButtonZoomProps = {

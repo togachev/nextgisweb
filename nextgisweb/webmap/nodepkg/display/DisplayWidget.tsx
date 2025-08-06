@@ -8,8 +8,6 @@ import type { Orientation } from "@nextgisweb/pyramid/layout/useLayout";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
-import { isMobile as isM, useMobileOrientation } from "react-device-detect";
-
 import type { MapRefs, TinyConfig } from "../type";
 
 import { Display } from "./Display";
@@ -56,15 +54,6 @@ export const DisplayWidget = observer(
         );
 
         const { orientation, isPortrait, isMobile } = useLayout();
-        const { isLandscape: isL, isPortrait: isP } = useMobileOrientation();
-
-        useEffect(() => {
-            const store = display.popupStore;
-            store.setIsLandscape(isL);
-            store.setIsPortrait(isP);
-            store.setIsMobile(isM);
-            store.setSize(isM ? "small" : "small");
-        }, [isL, isP, isM]);
 
         useEffect(() => {
             display.setIsMobile(isMobile);

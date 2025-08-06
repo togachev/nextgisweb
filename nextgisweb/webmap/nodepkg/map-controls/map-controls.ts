@@ -5,7 +5,7 @@ import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";
 import Zoom from "ol/control/Zoom";
 import type { FC } from "react";
-
+import { isMobile as isM } from "react-device-detect";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
 
@@ -121,7 +121,7 @@ export const ControlsInfo: ControlInfo[] = [
     },
 ];
 
-if (!webmapSettings.imodule) {
+if (!webmapSettings.imodule || isM) {
     ControlsInfo.push(    {
         label: gettext("Identification"),
         ctor: (display) => {

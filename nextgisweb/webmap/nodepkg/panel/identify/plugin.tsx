@@ -4,6 +4,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
+import { isMobile as isM } from "react-device-detect";
 
 panelRegistry(COMP_ID, {
     widget: () => import("./IdentifyPanel"),
@@ -15,6 +16,6 @@ panelRegistry(COMP_ID, {
     applyToTinyMap: true,
 
     isEnabled: () => {
-        return !webmapSettings.imodule;
+        return !webmapSettings.imodule || isM;
     },
 });

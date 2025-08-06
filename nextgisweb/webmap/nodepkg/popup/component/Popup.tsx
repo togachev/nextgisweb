@@ -81,6 +81,10 @@ export default observer(
                 }
             }, [store.fixPopup]);
 
+            topic.subscribe("update.point", (status) => {
+                store.setValueRnd({ ...store.valueRnd, x: store.valueRnd.pointClick.x, y: store.valueRnd.pointClick.y, buttonZoom: status && {} });
+            });
+
             const onChangeSelect = useCallback((value) => {
                 const copy = { ...store.response.data.find(x => x.value === value.value) };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
@@ -152,7 +156,7 @@ export default observer(
                     return false
                 }
             };
-            
+
             return createPortal(
                 <ConfigProvider
                     theme={{
@@ -219,7 +223,7 @@ export default observer(
                             topLeft: "hover-angle-top-left",
                         }}
                         cancel=".icon-symbol,.select-feature,.content,.footer-popup"
-                        bounds={store.valueRnd?.width === store.sizeWindow.width ? undefined : "window"}
+                        bounds={store.valueRnd?.width === store.sizeWindow.width && store.valueRnd?.height === store.sizeWindow.height ? undefined : "window"}
                         minWidth={store.pos?.width}
                         minHeight={store.pos?.height}
                         allowAnyClick={true}
@@ -287,7 +291,7 @@ export default observer(
                                         onClick={() => {
                                             if (store.response.featureCount > 0 && store.fixPos === null) {
                                                 if (store.valueRnd.width > store.pos.width || store.valueRnd.height > store.pos.height) {
-                                                    store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y - (store.isMobile ? 40 : 0) });
+                                                    store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y });
                                                     store.setFullscreen(false)
                                                 }
                                                 else {

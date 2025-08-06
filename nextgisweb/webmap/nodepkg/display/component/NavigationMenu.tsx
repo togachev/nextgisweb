@@ -2,6 +2,7 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { isMobile as isM } from "react-device-detect";
 
 import type { PanelManager } from "../../panel/PanelManager";
 import type { Display } from "../Display";
@@ -69,7 +70,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                         </div>
                     ))}
                 </div>
-                <CustomMenu />
+                {!isM && <CustomMenu />}
             </div>
         );
     }

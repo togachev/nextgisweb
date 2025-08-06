@@ -2,6 +2,7 @@ import { action, computed, observable } from "mobx";
 import { Component, createRef } from "react";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
+
 import settings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { WKT } from "ol/format";
@@ -69,11 +70,8 @@ export class PopupStore extends Component {
     rootPointClick: ReactRoot | null = null;
     rootPopup: ReactRoot | null = null;
 
-    @observable accessor isLandscape: boolean;
-    @observable accessor isPortrait: boolean;
     @observable accessor popupHidden = true;
     @observable accessor contextHidden = true;
-    @observable accessor isMobile: boolean;
     @observable accessor fixPopup = false;
     @observable accessor update = false;
     @observable accessor fullscreen = false;
@@ -273,21 +271,6 @@ export class PopupStore extends Component {
     };
 
     @action
-    setIsLandscape(isLandscape: boolean) {
-        this.isLandscape = isLandscape;
-    };
-
-    @action
-    setIsPortrait(isPortrait: boolean) {
-        this.isPortrait = isPortrait;
-    };
-
-    @action
-    setIsMobile(isMobile: boolean) {
-        this.isMobile = isMobile;
-    };
-
-    @action
     setSizeWindow(sizeWindow: SizeWindowProps) {
         this.sizeWindow = sizeWindow;
     };
@@ -318,21 +301,11 @@ export class PopupStore extends Component {
     };
 
     addOverlay() {
-
-        // if (this.olmap.getOverlayById('point-click')) {
-        //     this.olmap.getOverlayById('point-click').getId() === "point-click"
-
-        //     this.olmap.addOverlay(this.overlayPoint);
-        //     this.overlayPoint.setElement(this.pointElement)
-        // } else {
-            this.overlayPoint = new Overlay({
-                id: "point-click",
-            });
-            this.olmap.addOverlay(this.overlayPoint);
-            this.overlayPoint.setElement(this.pointElement)
-        // }
-// 
-
+        this.overlayPoint = new Overlay({
+            id: "point-click",
+        });
+        this.olmap.addOverlay(this.overlayPoint);
+        this.overlayPoint.setElement(this.pointElement)
     };
 
     renderPoint(e) {
@@ -683,7 +656,7 @@ export class PopupStore extends Component {
 
                 const p = { point: true, value, coordinate: transformedCoord };
                 const panelSize = store.activePanel !== "none" ? (display.isMobile ? 0 : display.panelSize) : 0;
-                
+
                 this.olmap.once("postrender", function (e) {
                     const pixel = e.map.getPixelFromCoordinate(p.coordinate);
                     const simulateEvent: any = {

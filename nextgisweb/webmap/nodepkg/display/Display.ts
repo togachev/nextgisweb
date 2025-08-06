@@ -5,6 +5,8 @@ import type { Extent } from "ol/extent";
 import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
+import { isMobile as isM } from "react-device-detect";
+
 import { errorModal } from "@nextgisweb/gui/error";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
@@ -283,7 +285,7 @@ export class Display {
 
         const controlsReady = buildControls(this);
 
-        if (controlsReady.has("id")) {
+        if (controlsReady.has("id") && isM) {
             const controlObj = controlsReady.get("id");
             if (
                 controlObj &&
