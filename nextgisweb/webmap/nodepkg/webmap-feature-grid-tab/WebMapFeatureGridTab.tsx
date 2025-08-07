@@ -67,7 +67,7 @@ export function WebMapFeatureGridTab({
             content: content,
         });
     };
-
+    
     const [store] = useState(
         () =>
             new FeatureGridStore({
@@ -77,8 +77,7 @@ export function WebMapFeatureGridTab({
                 cleanSelectedOnFilter: false,
                 onDelete: reloadLayer,
                 onSave: () => {
-                    display.current.imodule?.identifyStore.setUpdate(true)
-                    display.current.identify?._popup.widget?.reset();
+                    display.current.popupStore.setUpdate(true)
                     reloadLayer();
                 },
                 onOpen: ({ featureId, resourceId }) => {

@@ -1,78 +1,90 @@
-import { forwardRef } from "react";
+import { observer } from "mobx-react-lite";
+import { forwardRef, useRef, useImperativeHandle } from "react";
 import { createPortal } from "react-dom";
-import { useOutsideClick } from "../useOutsideClick";
 import { useCopy } from "@nextgisweb/webmap/useCopy";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button, ConfigProvider } from "@nextgisweb/gui/antd";
-
+import { PopupStore } from "../PopupStore";
 import Location from "@nextgisweb/icon/material/my_location";
-import type { Params, Props } from "../type";
 
-export default forwardRef<Element>(
-    function ContextComponent(props, ref) {
-        const { params, visible, display, array_context } = props as Params;
-        const { op, position } = params as Props;
-        useOutsideClick(ref, true);
-        const { copyValue, contextHolder } = useCopy();
-        const imodule = display.imodule;
-        const [lon, lat] = imodule.lonlat;
+interface ContextProps {
+    store: PopupStore;
+}
 
-        const coordsValue = lon + ", " + lat;
-        const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
+export default observer(
+    forwardRef<HTMLDivElement, ContextProps>(
+        function ContextComponent(props, ref) {
+            const { mode, array_context, posContext, setContextHidden, pointContextClick } = props.store;
 
-        return (
-            createPortal(
-                <ConfigProvider
-                    theme={{
-                        token: {
-                            colorPrimary: "#106a90",
-                        },
-                        components: {
-                            Message: {
-                                colorSuccess: "var(--primary)",
+            const innerRef = useRef<HTMLDivElement>(null);
+            useImperativeHandle(ref, () => innerRef.current!, [mode]);
+
+            
+            const { copyValue, contextHolder } = useCopy();
+
+            const [lon, lat] = pointContextClick.lonlat;
+
+            const coordsValue = lon + ", " + lat;
+            const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);
+
+            return (
+                createPortal(
+                    <ConfigProvider
+                        theme={{
+                            token: {
+                                colorPrimary: "#106a90",
+                            },
+                            components: {
+                                Message: {
+                                    colorSuccess: "var(--primary)",
+                                }
                             }
-                        }
-                    }}>
-                    <div key={new Date} ref={ref as any} className="context-position" style={{
-                        width: position.width,
-                        left: position.x,
-                        top: position.y,
-                        position: "absolute",
-                        zIndex: 10,
-                    }}>
-                        {contextHolder}
-                        <span
-                            className="context-coord"
-                            onClick={() => {
-                                visible({ hidden: true, overlay: undefined, key: op });
-                            }}
-                        >
-                            <Button
-                                type="text"
-                                icon={<Location />}
-                                className="coordinate-value"
-                                title={gettext("Copy coordinates")}
-                                onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
+                        }}>
+                        <div
+                            ref={innerRef}
+                            className="context-position" style={{
+                                width: posContext.width,
+                                height: posContext.height,
+                                left: posContext.x,
+                                top: posContext.y,
+                                position: "absolute",
+                                zIndex: 11,
+                                overflow: "hidden",
+                            }}>
+                            {contextHolder}
+                            <span
+                                className="context-coord"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                }}
                             >
-                                {coordsVisible}
-                            </Button>
-                        </span>
-                        {array_context?.map(item => {
-                            if (item.visible) {
-                                return (
-                                    <div className="context-item" key={item.key} onClick={() => {
-                                        visible({ hidden: true, overlay: undefined, key: op });
-                                        alert(item.result)
-                                    }} >
-                                        <span>{item.title}</span>
-                                    </div>
-                                )
-                            }
-                        })}
-                    </div>
-                </ConfigProvider>,
-                document.body
+                                <Button
+                                    type="text"
+                                    icon={<Location />}
+                                    className="coordinate-value"
+                                    title={gettext("Copy coordinates")}
+                                    onClick={() => { copyValue(coordsValue, gettext("Coordinates copied")) }}
+                                >
+                                    {coordsVisible}
+                                </Button>
+                            </span>
+                            {array_context?.map(item => {
+                                if (item.visible) {
+                                    return (
+                                        <div className="context-item" key={item.key} onClick={() => {
+                                            console.log("test context menu");
+
+                                        }} >
+                                            <span>{item.title}</span>
+                                        </div>
+                                    )
+                                }
+                            })}
+                        </div>
+                    </ConfigProvider>,
+                    document.getElementById("portal-context")
+                )
             )
-        )
-    }
+        }
+    )
 );

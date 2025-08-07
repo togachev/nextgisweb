@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { route } from "@nextgisweb/pyramid/api";
 import { Empty, Tag } from "@nextgisweb/gui/antd";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 import { LineChartOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import { Scatter } from "react-chartjs-2";
@@ -37,7 +37,7 @@ export const GraphPanel = observer((props) => {
     const [resize, setResize] = useState();
 
     const chartRef = useRef(null);
-    const imodule = webmapSettings.imodule;
+    const isImodule = settings.imodule;
 
     const msgGraphs = item ? gettext("Graph") : gettext("Graphs");
 
@@ -96,7 +96,7 @@ export const GraphPanel = observer((props) => {
                 checked={hideLegend}
                 onChange={onChange}
                 className="legend-hide-button"
-                style={!imodule && !store?.fixPanel ? {} : { position: "absolute", right: 0 }}
+                style={!isImodule && !store?.fixPanel ? {} : { position: "absolute", right: 0 }}
             >
                 <span title={hideLegend ? msgShowLegend : msgHideLegend}>
                     {hideLegend ? <EyeOff /> : <Eye />}
@@ -182,8 +182,8 @@ export const GraphPanel = observer((props) => {
             { height: store?.valueRnd?.height - 76 }
 
         const styleGtaph = hideLegend ?
-            { height: webmapSettings.popup_size.height } :
-            { height: webmapSettings.popup_size.height * 1.5 };
+            { height: settings.popup_size.height } :
+            { height: settings.popup_size.height * 1.5 };
 
         return (
             <div style={!store ? styleGtaph : undefined}>
@@ -193,7 +193,7 @@ export const GraphPanel = observer((props) => {
                     options={options}
                     plugins={[plugin]}
                     data={value?.data}
-                    style={imodule ? resize ? styleResize : styleResize : undefined}
+                    style={isImodule ? resize ? styleResize : styleResize : undefined}
                 />
             </div>
         )
@@ -201,7 +201,7 @@ export const GraphPanel = observer((props) => {
 
     return (
         <>
-            {!imodule ?
+            {!isImodule ?
                 <div className="ngw-webmap-panel-section" style={{ color: "var(--primary)" }}>
                     <div className="title">
                         <div className="icon"><LineChartOutlined /></div>

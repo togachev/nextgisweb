@@ -21,10 +21,10 @@ import "./SelectedFeature.less";
 const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
-        const popupStore = display.popupStore;
+        const pstore = display.popupStore;
 
         const deleteRow = ({ key, ckey, all }) => {
-            popupStore?.pointDestroy();
+            pstore?.pointDestroy();
             if (all) {
                 const obj = { ...store.selectedFeatures };
                 store.setSelectedFeatures({
@@ -43,7 +43,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
 
         const lOnChecked = useCallback((key, styleId) => {
             if (store.activeLayer.lckey !== key) {
-                popupStore?.zoomToLayerExtent({ styleId });
+                pstore?.zoomToLayerExtent({ styleId });
                 visibleItems({ value: [styleId] });
                 store.setActiveLayer({ lchecked: true, lckey: key, })
             } else {
@@ -57,9 +57,9 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             const { lchecked } = store.activeLayer;
             if (store.countLayers > 0 && store.activeChecked.achecked === false) {
                 if (lchecked) {
-                    popupStore?.zoomToLayerExtent({ styleId });
+                    pstore?.zoomToLayerExtent({ styleId });
                     visibleItems({ value: [styleId] });
-                    popupStore?.pointDestroy();
+                    pstore?.pointDestroy();
                 } else {
                     display._zoomToInitialExtent();
                     visibleItems({ value: undefined });
@@ -79,16 +79,15 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             });
 
             const { achecked, ackey, acvalue } = store.activeChecked;
-            
             if (achecked) {
-                if (acvalue.type === "vector") {
+                if (acvalue.selected.type === "vector") {
                     store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "vector" });
-                } else if (acvalue.type === "raster") {
+                } else if (acvalue.selected.type === "raster") {
                     store.setSimulatePointZoom({ key: ackey, value: acvalue, type: "raster" });
                 }
-                visibleItems({ value: [acvalue.styleId] });
+                visibleItems({ value: [acvalue.selected.styleId] });
             } else {
-                popupStore?.pointDestroy();
+                pstore?.pointDestroy();
                 display._zoomToInitialExtent();
                 visibleItems({ value: undefined });
             }
@@ -126,7 +125,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                         icon={<CloseBoxOutline />}
                                         onClick={() => {
                                             deleteRow({ key: key, ckey: null, all: true })
-                                            popupStore?.pointDestroy();
+                                            pstore?.pointDestroy();
                                             display._zoomToInitialExtent();
                                             visibleItems({ value: undefined });
                                         }}
@@ -139,7 +138,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                             getEntries(value.items).map(([ckey, cvalue], fidx) => {
                                 const findex = fidx + 1;
                                 const obj = { ...store.activeChecked };
-                                const ftitle = cvalue.type === "vector" ? cvalue.label : msgValueRaster;
+                                const ftitle = cvalue.selected.type === "vector" ? cvalue.selected.label : msgValueRaster;
                                 return (
                                     <div key={ckey} className="label-child-element">
                                         <div className="index-lf">{lindex}.{findex}</div>
@@ -219,12 +218,12 @@ const InfoSelect = () => {
 const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
-        const popupStore = display.popupStore;
+        const pstore = display.popupStore;
 
         const onCheckedVisibleItems = useCallback(() => {
             store.setChecked(!store.checked);
             if (store.checked === false) {
-                popupStore?.pointDestroy();
+                pstore?.pointDestroy();
                 visibleItems({ value: undefined });
             }
             else {
@@ -243,7 +242,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         }, []);
 
         const deleteAllRow = () => {
-            popupStore?.pointDestroy();
+            pstore?.pointDestroy();
             const obj = { ...store.selectedFeatures };
             getEntries(obj).map(([_, value]) => value.items = {});
             store.setSelectedFeatures(obj);

@@ -21,7 +21,7 @@ const usePopup = (display: Display) => {
         if (isM) return;
         if (e.dragging) return;
         e.preventDefault();
-        store.overlayInfo(e, { type: "context" })
+        store.overlayInfo(e, { type: "contextmenu" })
         store.setContextHidden(false);
     }, []);
 
@@ -115,8 +115,8 @@ const configSize = (store, key) => {
     return size[key];
 };
 
-async function getPosition(display, px, py, store) {
-    const { offset, offHP, popup_width, popup_height, sizeWindow } = store;
+async function getPosition(px, py, store) {
+    const { display, offset, offHP, popup_width, popup_height, sizeWindow } = store;
 
     if (
         popup_width > sizeWindow.width ||
@@ -278,40 +278,40 @@ async function getPositionContext(px, py, store) {
     const height = context_height;
 
     if (
-        py <= sizeWindow.height - height
-        && px <= sizeWindow.width - width
+        py <= sizeWindow.height - offset - height
+        && px <= sizeWindow.width - offset - width
     ) {
-        // console.log("top left context");
+        console.log("top left contextmenu");
         return {
             x: px + offset, y: py + offset, width: width, height: height
         }
     }
 
     if (
-        py <= sizeWindow.height - height
-        && px > sizeWindow.width - width
+        py <= sizeWindow.height - offset - height
+        && px >= width + offset
     ) {
-        // console.log("top right context");
+        console.log("top right contextmenu");
         return {
             x: px - offset - width, y: py + offset, width: width, height: height
         }
     }
 
     if (
-        py > sizeWindow.height - height
-        && px <= sizeWindow.width - width
+        py >= height + offset
+        && px <= sizeWindow.width - offset - width
     ) {
-        // console.log("bottom left context");
+        console.log("bottom left contextmenu");
         return {
             x: px + offset, y: py - offset - height, width: width, height: height
         }
     }
 
     if (
-        py > sizeWindow.height - height
-        && px > sizeWindow.width - width
+        py >= height + offset
+        && px >= width + offset
     ) {
-        // console.log("bottom right context");
+        console.log("bottom right contextmenu");
         return {
             x: px - offset - width, y: py - offset - height, width: width, height: height
         }

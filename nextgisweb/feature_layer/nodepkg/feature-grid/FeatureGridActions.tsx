@@ -15,7 +15,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 
 import { FeatureDisplayModal } from "../feature-display-modal";
 import { FeatureEditorModal } from "../feature-editor-modal";
@@ -114,7 +114,7 @@ export const FeatureGridActions = observer(
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
                 <Space.Compact key="feature-item-open">
-                    {!webmapSettings.imodule && (<Tooltip title={!props.isFit && msgOpenTitle}>
+                    {!settings.imodule && (<Tooltip title={!props.isFit && msgOpenTitle}>
                         <Button
                             disabled={!selectedIds.length}
                             size={size}

@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Checkbox, Empty, message, Space, Typography, Upload } from "@nextgisweb/gui/antd";
 import "./UploadLayer.less";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 import DeleteForever from "@nextgisweb/icon/material/delete_forever/outline";
 import ZoomIn from "@nextgisweb/icon/material/zoom_in/outline";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -43,7 +43,7 @@ let id = 0;
 export function UploadLayer({ display }: Display) {
     const { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap } = useFeatures(display);
 
-    const maxCount = webmapSettings.max_count_file_upload;
+    const maxCount = settings.max_count_file_upload;
     const maxCountMesssage = MaxUploadFile + " " + maxCount;
     const [uploadkey, setUploadkey] = useState(Date.now())
 
@@ -135,9 +135,9 @@ export function UploadLayer({ display }: Display) {
 
             if (display.panelManager.getActivePanelName() === "custom-layer") {
                 setFeatures(displayFeatureInfo(e.pixel));
-                if (display.imodule?.iStore) {
+                if (settings.imodule) {
                     topic.publish("feature.unhighlight");
-                    display.imodule && display.imodule.popup_destroy();
+                    display.popupStore.pointDestroy();
                 }
             }
         });

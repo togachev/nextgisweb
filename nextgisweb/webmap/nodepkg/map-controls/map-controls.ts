@@ -22,7 +22,7 @@ import ZoomInIcon from "@nextgisweb/icon/material/add";
 import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
 import ZoomOutIcon from "@nextgisweb/icon/material/remove";
 
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 
 export const getLabel = (Icon: FC & { id: string }): HTMLElement => {
     const labelEl = document.createElement("span");
@@ -121,7 +121,7 @@ export const ControlsInfo: ControlInfo[] = [
     },
 ];
 
-if (!webmapSettings.imodule || isM) {
+if (!settings.imodule || isM) {
     ControlsInfo.push(    {
         label: gettext("Identification"),
         ctor: (display) => {

@@ -15,7 +15,7 @@ export const CoordinateComponent = observer((props) => {
 
     const { copyValue, contextHolder } = useCopy();
 
-    const [lon, lat] = store.pointPopupClick?.lonlat;
+    const [lon, lat] = store.pointPopupClick.lonlat;
 
     const coordsValue = lon + ", " + lat;
     const coordsVisible = lon.toFixed(6) + ", " + lat.toFixed(6);

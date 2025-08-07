@@ -59,10 +59,10 @@ const CheckOnlyOne = ({ store }) => {
 };
 
 export default observer(
-    forwardRef<HTMLElement, PopupProps>(
+    forwardRef<HTMLDivElement, PopupProps>(
         function Popup(props, ref) {
             const { display, store } = props;
-            const innerRef = useRef<HTMLElement>(null);
+            const innerRef = useRef<HTMLDivElement>(null);
             useImperativeHandle(ref, () => innerRef.current!, [store.mode]);
             const pm = display.panelManager;
             const pkey = "selected-feature";
@@ -211,7 +211,7 @@ export default observer(
                     }}
                 >
                     <Rnd
-                        ref={innerRef}
+                        ref={ref}
                         style={{ zIndex: 10, display: store.popupHidden ? "none" : "block", }}
                         resizeHandleClasses={{
                             right: "hover-right",
@@ -223,7 +223,7 @@ export default observer(
                             topRight: "hover-angle-top-right",
                             topLeft: "hover-angle-top-left",
                         }}
-                        cancel=".icon-symbol,.select-feature,.content,.footer-popup"
+                        cancel=".icon-symbol,.select-feature,.content,.coordinate-value,.link-block"
                         bounds={store.valueRnd?.width === store.sizeWindow.width && store.valueRnd?.height === store.sizeWindow.height ? undefined : "window"}
                         minWidth={store.pos?.width}
                         minHeight={store.pos?.height}

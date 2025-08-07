@@ -2,8 +2,10 @@
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 import FormatListBulleted from "@nextgisweb/icon/mdi/format-list-bulleted";
+import { isMobile as isM } from "react-device-detect";
+
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 panelRegistry(COMP_ID, {
@@ -16,6 +18,6 @@ panelRegistry(COMP_ID, {
     applyToTinyMap: false,
 
     isEnabled: ({ config }: { config: DisplayConfig }) => {
-        return webmapSettings.imodule && config.selectFeaturePanel;
+        return settings.imodule && config.selectFeaturePanel && !isM;
     },
 });

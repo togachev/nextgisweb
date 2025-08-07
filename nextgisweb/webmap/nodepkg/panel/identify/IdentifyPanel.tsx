@@ -10,14 +10,14 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { GraphPanel } from "@nextgisweb/webmap/imodule/component/GraphPanel";
+import { GraphPanel } from "@nextgisweb/webmap/popup/component/GraphPanel";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 
 import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
 import { FeatureEditButton } from "./FeatureEditButton";

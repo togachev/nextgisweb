@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { WKT } from "ol/format";
+
 import type { Display } from "@nextgisweb/webmap/display";
 import type SelectedFeatureStore from "./SelectedFeatureStore";
 
 export const useSelected = (display: Display, store: SelectedFeatureStore) => {
-    const psizey = window.innerHeight;
-    const psizex = 350;
+    const pstore = display.popupStore;
 
     const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
@@ -25,55 +24,37 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
         display.webmapStore._updateLayersVisibility(visibleStyles);
     };
 
-    const simulateEvent = (p, pixel) => ({
-        coordinate: p && p.coordinate,
-        map: display.map.olMap,
-        target: "map",
-        pixel: pixel,
-        type: "simulate"
-    });
-
-    const overlayInfo = (event, p) => display.popupStore.overlayInfo(event, { type: "simulate", p: p });
-
-    const vectorRender = () => {
+    const render = () => {
         const { key, value } = store.simulatePointZoom;
-        const val = { params: [] };
-        const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
-        const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
-        console.log(pixel);
+        const { coordinate } = value.pointPopupClick
+        const p = { point: true, value: value.props, coordinate: coordinate, selected: key };
+        const panelSize = pstore.activePanel !== "none" ? (display.isMobile ? 0 : display.panelSize) : 0;
 
-        const event = simulateEvent(p, pixel);
-        overlayInfo(event, p);
-        console.log(p);
-    };
+        display.map.olMap.once("postrender", function (e) {
+            const pixel = e.map.getPixelFromCoordinate(coordinate);
+            const simulateEvent: any = {
+                coordinate: p && p.coordinate,
+                map: e.map,
+                target: "map",
+                pixel: [
+                    pixel[0] + panelSize + pstore.offHP, pixel[1] + pstore.offHP
+                ],
+                type: "selected"
+            };
+            pstore.overlayInfo(simulateEvent, { type: "selected", p: p });
+        });
 
-    const rasterRender = () => {
-        const { key, value } = store.simulatePointZoom;
-        const val = { params: [] };
-        const p = { point: true, value: val, coordinate: value.coordinate, selected: key, data: value };
-        const pixel = display.map.olMap.getPixelFromCoordinate(value.coordinate);
-        const event = simulateEvent(p, pixel);
-        overlayInfo(event, p);
-        console.log(p);
     };
 
     useEffect(() => {
         if (store.simulatePointZoom) {
-            const { type, value } = store.simulatePointZoom;
-            if (type === "vector") {
-                store.getFeature(value)
-                    .then(i => {
-                        const _wkt = new WKT();
-                        const geometry = _wkt.readGeometry(i.geom);
-                        const extent = geometry.getExtent();
-                        display.popupStore.zoomToExtent(extent);
-                    });
-                display.popupStore.renderPoint({ coordinate: value.coordinate });
-                vectorRender();
-            } else if (type === "raster") {
-                display.popupStore.zoomToPoint(value.coordinate);
-                rasterRender();
-            }
+            const { value } = store.simulatePointZoom;
+            pstore.setPointPopupClick(value.pointPopupClick);
+
+            pstore.zoomToExtent(value.extent);
+            pstore.renderPoint({ coordinate: value.pointPopupClick.coordinate });
+            render();
+
             display.map.olMap.renderSync();
         }
     }, [store.simulatePointZoom]);

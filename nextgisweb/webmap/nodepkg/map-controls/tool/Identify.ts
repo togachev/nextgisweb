@@ -12,7 +12,7 @@ import i18n from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { getEntries } from "@nextgisweb/webmap/imodule/useSource";
+import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";

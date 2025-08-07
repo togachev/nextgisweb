@@ -41,7 +41,7 @@ type ActiveCheckedProps = {
 class SelectedFeatureStore extends PanelStore {
 
     display: Display;
-    @observable accessor checked: boolean = true;
+    @observable accessor checked: boolean = false;
     @observable accessor visibleLayerName: boolean = true;
     @observable.ref accessor activeLayer: ActiveLayerProps;
     @observable.ref accessor activeChecked: ActiveCheckedProps;

@@ -2,7 +2,7 @@
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 import { isMobile as isM } from "react-device-detect";
 
@@ -16,6 +16,6 @@ panelRegistry(COMP_ID, {
     applyToTinyMap: true,
 
     isEnabled: () => {
-        return !webmapSettings.imodule || isM;
+        return !settings.imodule || isM;
     },
 });

@@ -3,7 +3,7 @@ import type { Attrs } from "@nextgisweb/feature-layer/type";
 import type { FormatNumberFieldData } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
 import type { Display } from "@nextgisweb/webmap/display";
 import { PopupStore } from "./PopupStore";
-
+import { MapBrowserEvent } from "ol";
 export type ExtensionsProps = Record<string, unknown | null>;
 
 export type CoordinateProps = {
@@ -178,6 +178,17 @@ export interface Props {
     point?: boolean;
 }
 
+export interface ContextProps {
+    key: string;
+    title: string;
+    result: string;
+    visible: boolean;
+}
+export interface Visible {
+    hidden: boolean;
+    overlay: boolean | undefined;
+    key: string;
+}
 export interface Params {
     params: Props;
     visible: ({ hidden, overlay, key }: Visible) => void;
@@ -185,7 +196,6 @@ export interface Params {
     array_context?: ContextProps[] | [];
     countFeature: number;
     event: MapBrowserEvent;
-    replaceContent: boolean;
 }
 
 interface ControlProps {
