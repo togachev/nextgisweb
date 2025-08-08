@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useRef } from "react";
+import { RefObject, useCallback, useEffect } from "react";
 import { isMobile as isM } from "react-device-detect";
 import type { Display } from "@nextgisweb/webmap/display";
 
@@ -11,10 +11,7 @@ type Entry<T> = {
 }[keyof T];
 
 const usePopup = (display: Display) => {
-    const portalContext = useRef(document.createElement("div"));
     const store = display.popupStore;
-    useOutsideClick(portalContext, () => store.setContextHidden(true));
-
     const olmap = display.map.olMap;
 
     const contextMenu = useCallback((e) => {
@@ -88,7 +85,7 @@ export const filterObject = <T extends object>(
     return next;
 }
 
-const useOutsideClick = (ref: RefObject<HTMLDivElement>, handler: () => void) => {
+const useOutsideClick = (ref: RefObject<HTMLDivElement | null>, handler: () => void) => {
     useEffect(() => {
         const listener = (e: MouseEvent) => {
             if (!ref.current || ref.current.contains(e.target as Node)) return;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import topic from "@nextgisweb/webmap/compat/topic";

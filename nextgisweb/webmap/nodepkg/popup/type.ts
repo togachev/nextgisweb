@@ -14,6 +14,25 @@ export type CoordinateProps = {
     point?: boolean;
 }
 
+export type AxisProps = {
+    x: number;
+    y: number;
+}
+
+export type GraphPanelProps = {
+    store: PopupStore;
+    item: DataProps;
+}
+
+export type ContextItemProps = {
+    label?: string;
+    pointBorderColor?: string;
+    backgroundColor?: string;
+    borderColor?: string;
+    data: AxisProps[];
+    labels: string[];
+}
+
 export interface UrlParamsProps {
     lon?: number;
     lat?: number;
@@ -179,7 +198,7 @@ export interface Props {
 }
 
 export interface ContextProps {
-    key: string;
+    key: number;
     title: string;
     result: string;
     visible: boolean;

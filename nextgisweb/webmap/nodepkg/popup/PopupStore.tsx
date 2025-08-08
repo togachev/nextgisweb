@@ -1,5 +1,5 @@
 import { action, computed, observable } from "mobx";
-import { Component, createRef } from "react";
+import { Component } from "react";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 
@@ -16,8 +16,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 import OlGeomPoint from "ol/geom/Point";
 import PopupClick from "./component/PopupClick";
-import Popup from "./component/Popup";
-import ContextComponent from "./component/ContextComponent";
+import { Popup } from "./component/Popup";
+import { ContextComponent } from "./component/ContextComponent";
 import { getPositionContext, getPosition } from "./util/function";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
@@ -26,7 +26,7 @@ import LockReset from "@nextgisweb/icon/mdi/lock-reset";
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Root as ReactRoot } from "react-dom/client";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { AttributeProps, DataProps, ContextProps, ControlUrlProps, ExtensionsProps, EventProps, OptionProps, ParamsProps, Position, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
+import type { AttributeProps, ContextProps, ControlUrlProps, DataProps, EventProps, ExtensionsProps, OptionProps, ParamsProps, Position, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
 import type { SizeType } from "@nextgisweb/gui/antd";
 
 const forbidden = gettext("The data is not available for reading");
@@ -51,7 +51,7 @@ export class PopupStore extends Component {
     lonLatSrid: number;
     wgs84: string;
     overlayPoint: Overlay;
-    array_context:ContextProps[];
+    array_context: ContextProps[];
     olmap: olMap;
 
     offHP: number;
@@ -66,9 +66,6 @@ export class PopupStore extends Component {
     pointElement = document.createElement("div");
     popupElement = document.createElement("div");
     contextElement = document.createElement("div");
-
-    refPopup = createRef<HTMLDivElement>();
-    refContext = createRef<HTMLDivElement>();
 
     rootPointClick: ReactRoot | null = null;
     rootPopup: ReactRoot | null = null;
@@ -335,7 +332,6 @@ export class PopupStore extends Component {
         topic.publish("feature.unhighlight");
         this.overlayPoint.setPosition(undefined);
         this.rootPopup.render();
-        this.setValueRnd({ ...this.valueRnd, width: 0, height: 0, x: -9999, y: -9999 });
     };
 
     requestGeomString(pixel: number[]) {
@@ -372,7 +368,7 @@ export class PopupStore extends Component {
                 })
                 .then(() => {
                     const propsContext = { store: this };
-                    this.rootContext.render(<ContextComponent {...propsContext} ref={this.refContext} />);
+                    this.rootContext.render(<ContextComponent {...propsContext} />);
                     this.setContextHidden(false);
                 });
         } else {
@@ -409,12 +405,16 @@ export class PopupStore extends Component {
                         })
                 })
                 .then(() => {
-                    this.contentGenerate();
-                    this.renderPoint(e);
-                    const propsPopup = { display: this.display, store: this };
-                    this.rootPopup.render(<Popup {...propsPopup} ref={this.refPopup} />);
-                    this.setContextHidden(true);
-                    this.setPopupHidden(false);
+                    if (Object.keys(this.selected).length === 0) {
+                        this.pointDestroy();
+                    } else {
+                        this.contentGenerate();
+                        this.renderPoint(e);
+                        const propsPopup = { display: this.display, store: this };
+                        this.rootPopup.render(<Popup {...propsPopup} />);
+                        this.setContextHidden(true);
+                        this.setPopupHidden(false);
+                    }
                 });
         }
     }
@@ -512,9 +512,8 @@ export class PopupStore extends Component {
     }
 
     updateSelectFeatures(panel, data) {
-        const obj = { ...panel.selectedFeatures }
+        const obj = { ...panel.selectedFeatures };
         const [key] = getEntries(obj).filter(([_, val]) => val.styleId === data.styleId)[0];
-
         const value = {
             ...obj,
             [key]: {
@@ -559,6 +558,7 @@ export class PopupStore extends Component {
             });
         });
 
+
         const props = {
             attribute: true,
             pn: "attributes",
@@ -591,8 +591,6 @@ export class PopupStore extends Component {
             const pm = this.display.panelManager;
             const pkey = "selected-feature";
             const panel = pm.getPanel<SelectedFeatureStore>(pkey);
-
-            Object.assign(selectVal, this.propsCoords);
 
             if (panel) {
                 this.updateSelectFeatures(panel, this.propsCoords);
