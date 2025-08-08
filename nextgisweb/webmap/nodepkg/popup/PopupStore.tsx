@@ -834,7 +834,7 @@ export class PopupStore extends Component {
 
     checkPointExtent(p?: number[], e?: number[]) {
         const point = p ? p : this.pointPopupClick.coordinate
-        const ext = e ? e: this.display.map.olMap.getView().calculateExtent();
+        const ext = e ? e : this.display.map.olMap.getView().calculateExtent();
         const min_x = Math.min(ext[0], ext[2])
         const max_x = Math.max(ext[0], ext[2])
         const min_y = Math.min(ext[1], ext[3])
