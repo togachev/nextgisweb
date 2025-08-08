@@ -975,8 +975,8 @@ msgid "Button functions:"
 msgstr "Функции кнопок:"
 
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:209
-msgid "History of selection of objects of vector and raster layers of the web map"
-msgstr "История выделения объектов векторных и растровых слоев веб-карты"
+msgid "Web map objects viewing history"
+msgstr "История просмотра объектов веб-карты"
 
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:210
 msgid "Hide layer name"
@@ -993,8 +993,8 @@ msgstr "Очистить все выбранные функции"
 #: nodepkg/panel/selected-feature/plugin.tsx:13
 #: nodepkg/settings-widget/SettingsWidget.tsx:37
 #: nodepkg/settings-widget/SettingsWidget.tsx:54
-msgid "History of object selection"
-msgstr "История выбора объекта"
+msgid "Browsing history"
+msgstr "История просмотра"
 
 #: nodepkg/panel/share/SharePanel.tsx:47
 msgid ""

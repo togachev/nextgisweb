@@ -12,7 +12,7 @@ panelRegistry(COMP_ID, {
     widget: () => import("./SelectedFeature"),
     store: () => import("./SelectedFeatureStore"),
     name: "selected-feature",
-    title: gettext("History of object selection"),
+    title: gettext("Browsing history"),
     icon: <FormatListBulleted />,
     order: 11,
     applyToTinyMap: false,

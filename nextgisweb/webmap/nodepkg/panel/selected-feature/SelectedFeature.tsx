@@ -261,7 +261,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         const msgDefaultVisibleLayer = store.checked ? gettext("Turn on default layers visibility") : gettext("Turn off inactive layers");
         const msgFunction = gettext("Button functions:");
         const msgDescription = gettext("Description");
-        const msgSelectFeature = gettext("History of selection of objects of vector and raster layers of the web map");
+        const msgSelectFeature = gettext("Web map objects viewing history");
         const msgVisibleLayerName = store.visibleLayerName ? gettext("Hide layer name") : gettext("Show layer name");
 
         return (

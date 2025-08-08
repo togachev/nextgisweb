@@ -34,7 +34,7 @@ const msgLayersEditing = gettext("Layers editing");
 const msgAdditionalOptions = gettext("Additional options");
 const msgConfigure = gettext("Configure");
 const msgActivePanel = gettext("Active panel");
-const msgSelectFeaturePanel = gettext("History of object selection");
+const msgSelectFeaturePanel = gettext("Browsing history");
 
 const msgDefault = gettext("Default");
 
@@ -51,7 +51,7 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
 
 const activePanelOptions: { value: ActivePanelType; label: string }[] = [
     { value: "layers", label: gettext("Layers") },
-    { value: "selected-feature", label: gettext("History of object selection") },
+    { value: "selected-feature", label: msgSelectFeaturePanel },
     { value: "search", label: gettext("Search") },
     { value: "custom-layer", label: gettext("Custom layers") },
     { value: "print", label: gettext("Print map") },
