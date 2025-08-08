@@ -204,14 +204,17 @@ const InfoSelect = () => {
     ];
 
     return (
-        <Descriptions
-            styles={{ content: { padding: "5px" } }}
-            bordered
-            size="small"
-            column={1}
-            layout="horizontal"
-            items={items}
-        />
+        <>
+            <Descriptions
+                styles={{ content: { padding: "5px" } }}
+                bordered
+                size="small"
+                column={1}
+                layout="horizontal"
+                items={items}
+            />
+            {gettext("Maximum number of objects for one layer: 10")}
+        </>
     );
 };
 
