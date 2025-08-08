@@ -86,7 +86,7 @@ export const Popup = observer(
         });
 
         const onChangeSelect = useCallback((value) => {
-            if (store.checkPointExtent) {
+            if (store.checkPointExtent()) {
                 const copy = { ...store.response.data.find(x => x.value === value.value) };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
                 store.setSelected(copy);
