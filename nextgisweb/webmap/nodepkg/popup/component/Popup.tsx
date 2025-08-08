@@ -81,6 +81,12 @@ export const Popup = observer(
             store.generateUrl({ res: store.response.data[0], st: store.response.data, pn: store.fixPanel, disable: false })
         }, [store.currentUrlParams]);
 
+        useEffect(() => {
+            if (store.update === true) {
+                store.getContent(store.selected, true);
+            }
+        }, [store.update]);
+
         topic.subscribe("update.point", (status) => {
             store.setValueRnd({ ...store.valueRnd, x: store.valueRnd.pointClick.x, y: store.valueRnd.pointClick.y, buttonZoom: status && {} });
         });
