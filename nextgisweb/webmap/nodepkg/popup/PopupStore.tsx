@@ -405,16 +405,12 @@ export class PopupStore extends Component {
                         })
                 })
                 .then(() => {
-                    if (this.selected && Object.keys(this.selected).length === 0) {
-                        this.pointDestroy();
-                    } else {
-                        this.contentGenerate();
-                        this.renderPoint(e);
-                        const propsPopup = { display: this.display, store: this };
-                        this.rootPopup.render(<Popup {...propsPopup} />);
-                        this.setContextHidden(true);
-                        this.setPopupHidden(false);
-                    }
+                    this.contentGenerate();
+                    this.renderPoint(e);
+                    const propsPopup = { display: this.display, store: this };
+                    this.rootPopup.render(<Popup {...propsPopup} />);
+                    this.setContextHidden(true);
+                    this.setPopupHidden(false);
                 });
         }
     }
