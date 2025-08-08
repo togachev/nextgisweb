@@ -278,7 +278,7 @@ async function getPositionContext(px, py, store) {
         py <= sizeWindow.height - offset - height
         && px <= sizeWindow.width - offset - width
     ) {
-        console.log("top left contextmenu");
+        // console.log("top left contextmenu");
         return {
             x: px + offset, y: py + offset, width: width, height: height
         }
@@ -288,7 +288,7 @@ async function getPositionContext(px, py, store) {
         py <= sizeWindow.height - offset - height
         && px >= width + offset
     ) {
-        console.log("top right contextmenu");
+        // console.log("top right contextmenu");
         return {
             x: px - offset - width, y: py + offset, width: width, height: height
         }
@@ -298,7 +298,7 @@ async function getPositionContext(px, py, store) {
         py >= height + offset
         && px <= sizeWindow.width - offset - width
     ) {
-        console.log("bottom left contextmenu");
+        // console.log("bottom left contextmenu");
         return {
             x: px + offset, y: py - offset - height, width: width, height: height
         }
@@ -308,7 +308,7 @@ async function getPositionContext(px, py, store) {
         py >= height + offset
         && px >= width + offset
     ) {
-        console.log("bottom right contextmenu");
+        // console.log("bottom right contextmenu");
         return {
             x: px - offset - width, y: py - offset - height, width: width, height: height
         }

@@ -14,6 +14,7 @@ export const ButtonZoomComponent = ({ store }: ContentProps) => {
             type="text"
             size={store.size}
             onClick={() => {
+                store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height });
                 topic.publish("unvisible.point");
                 topic.publish("update.point", true);
                 if (store.selected?.type === "vector") {

@@ -405,7 +405,7 @@ export class PopupStore extends Component {
                         })
                 })
                 .then(() => {
-                    if (Object.keys(this.selected).length === 0) {
+                    if (this.selected && Object.keys(this.selected).length === 0) {
                         this.pointDestroy();
                     } else {
                         this.contentGenerate();
@@ -831,4 +831,21 @@ export class PopupStore extends Component {
         const readOnly = configLayerPlugin?.readonly;
         return !readOnly;
     };
+
+    @computed
+    get checkPointExtent() {
+        const point = this.pointPopupClick.coordinate
+        const ext = this.display.map.olMap.getView().calculateExtent();
+        const min_x = Math.min(ext[0], ext[2])
+        const max_x = Math.max(ext[0], ext[2])
+        const min_y = Math.min(ext[1], ext[3])
+        const max_y = Math.max(ext[1], ext[3])
+
+        return (
+            point[0] >= min_x &&
+            point[0] <= max_x &&
+            point[1] >= min_y &&
+            point[1] <= max_y
+        );
+    }
 }
