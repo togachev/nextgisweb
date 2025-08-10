@@ -285,7 +285,7 @@ export class Display {
 
         const controlsReady = buildControls(this);
 
-        if (controlsReady.has("id") && isM) {
+        if ((controlsReady.has("id") && isM) || (controlsReady.has("id") && !settings.imodule)) {
             const controlObj = controlsReady.get("id");
             if (
                 controlObj &&

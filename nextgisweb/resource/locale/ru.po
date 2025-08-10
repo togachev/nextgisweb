@@ -338,12 +338,12 @@ msgid "Links are active only in the open web map"
 msgstr ""
 
 #: nodepkg/description/DescComponent.tsx:18
-msgid "Tap to move closer to the object"
-msgstr ""
+msgid "Click to move closer to the object"
+msgstr "Нажмите, чтобы приблизиться к объекту"
 
 #: nodepkg/description/DescComponent.tsx:19
 msgid "Click to move closer to the raster layer"
-msgstr ""
+msgstr "Нажмите, чтобы приблизиться к растровому слою."
 
 #: nodepkg/editor-widget/EditorWidget.tsx:13
 msgid "Identifier for API integration (optional)"
