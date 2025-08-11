@@ -1,9 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { useRef } from "react";
 import { useEffect, useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import { DescriptionHtml } from "@nextgisweb/gui/description";
-import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -60,20 +57,6 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                 })
         }, [store.content]);
 
-        const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-            const href = e?.currentTarget.getAttribute("href");
-            e?.currentTarget.setAttribute("target", "_blank");
-
-            if (href && /^\d+:\d+$/.test(href)) {
-                e.preventDefault();
-                e.stopPropagation();
-                const [resourceId, featureId] = href.split(":");
-                zoomToFeature(display, Number(resourceId), Number(featureId));
-                return true;
-            }
-            return false;
-        };
-
         return (
             <PanelContainer
                 title={store.title}
@@ -84,13 +67,6 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                 }}
             >
                 { desc && <DescComponent display={display} content={desc} /> }
-                {/* <DescriptionHtml
-                    className="content"
-                    variant="compact"
-                    content={content ?? ""}
-                    elementRef={nodeRef}
-                    onLinkClick={handleOnLinkClick}
-                /> */}
             </PanelContainer >
         );
     }

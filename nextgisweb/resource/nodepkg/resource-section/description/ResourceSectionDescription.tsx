@@ -1,7 +1,3 @@
-import { FeatureDisplayModal } from "@nextgisweb/feature-layer/feature-display-modal";
-import { DescriptionHtml } from "@nextgisweb/gui/description";
-import showModal from "@nextgisweb/gui/showModal";
-import { assert } from "@nextgisweb/jsrealm/error";
 import { useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
 import { Collapse, Divider, Spin } from "@nextgisweb/gui/antd";
@@ -64,23 +60,6 @@ export const ResourceSectionDescription: ResourceSection = ({
         setCollapse(!collapse);
     }
 
-    const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        const href = e?.currentTarget.getAttribute("href");
-        e?.currentTarget.setAttribute("target", "_blank");
-
-        if (href && /^\d+:\d+$/.test(href)) {
-            e.preventDefault();
-            e.stopPropagation();
-            const [resourceId, featureId] = href.split(":").map(Number);
-            showModal(FeatureDisplayModal, {
-                featureId,
-                resourceId,
-            });
-            return true;
-        }
-        return false;
-    };
-
     return (
         <div className="description-panel">
             <Divider orientation="left" orientationMargin="0">{gettext("Description")}</Divider>
@@ -92,10 +71,6 @@ export const ResourceSectionDescription: ResourceSection = ({
                 onChange={!descValue ? showLoader : onChange}
             />
         </div>
-        // <DescriptionHtml
-        //     content={description}
-        //     onLinkClick={handleOnLinkClick}
-        // />
     );
 };
 

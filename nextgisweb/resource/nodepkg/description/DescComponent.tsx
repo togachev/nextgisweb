@@ -60,27 +60,27 @@ const zoomToRasterExtent = async (display, styleId, styles) => {
 };
 
 interface GetDataProps {
-    type: string;
+    type: string | null;
     item: Element;
     options: HTMLReactParserOptions;
-    layerId: number | string;
-    styleId?: number;
-    fid?: number | string;
+    lid: number | string | null;
+    styleId?: number | string | null;
+    fid?: number | string | null;
     styles: number[];
     display: Display;
 }
 
-const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }: GetDataProps) => {
-    const { data: data } = useRouteGet("resource.permission", { id: layerId }, { cache: true });
+const GetData = ({ type, item, options, lid, styleId, fid, styles, display }: GetDataProps) => {
+    const { data: data } = useRouteGet("resource.permission", { id: lid }, { cache: true });
 
-    if (type === "v") {
+    if (type === "vector") {
         if (data?.data.read) {
             return (
                 <div
                     className="link-type-active"
                     title={msgZoomToFeature}
                     onClick={() => {
-                        zoomToFeature(display, layerId, fid, styles);
+                        zoomToFeature(display, lid, fid, styles);
                         display.imodule && display.imodule.popup_destroy();
                     }}>
                     <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
@@ -91,7 +91,7 @@ const GetData = ({ type, item, options, layerId, styleId, fid, styles, display }
         } else {
             return <></>;
         }
-    } else if (type === "r") {
+    } else if (type === "raster") {
         if (data?.data.read) {
             return (
                 <div
@@ -167,24 +167,30 @@ export const DescComponent = (props) => {
                 return <div style={{ width: "100%" }} {...props} >{domToReact(item.children, options)}</div>;
             }
 
-            if (display) {
-                if (item instanceof Element && item.name === "a") {
-                    if (/^[a-z]:\d+:.*$/.test(item.attribs.href)) {
-                        const [type, layerId, val, styles] = item.attribs.href.split(":");
-                        const styles_ = Array.from(styles.split(","), Number)
-                        return <GetData type={type} item={item} options={options} layerId={layerId} fid={val} styleId={val} styles={styles_} display={display} />
-                    }
-                }
-            } else if (display === undefined) {
-                if (item instanceof Element && item.name === "a") {
-                    if (/^[a-z]:\d+:.*$/.test(item.attribs.href)) {
-                        const array = item.attribs.href.split(":");
-                        return <GetData item={item} options={options} layerId={array[1]} />
-                    }
-                }
+            if (item instanceof Element && item.name === "a") {
+                return checkUrl(display, item)
             }
         }
     };
+
+    const checkUrl = (display, item) => {
+        const urlParams = new URLSearchParams(item.attribs.href);
+        
+        const request = urlParams.get("request");
+        const lid = urlParams.get("lid");
+        const fid = urlParams.get("fid");
+        const styleId = urlParams.get("styleId");
+        const styles = urlParams.get("styles");
+        const type = urlParams.get("type");
+
+        if (request !== "feature") { return; }
+        if (display) {
+            const styles_ = Array.from(styles.split(","), Number)
+            return <GetData type={type} item={item} options={options} lid={lid} fid={fid} styleId={styleId} styles={styles_} display={display} />
+        } else if (display === undefined) {
+            return <GetData item={item} options={options} lid={lid} />
+        }
+    }
 
     let data_;
     if (content === undefined && type === "map") {

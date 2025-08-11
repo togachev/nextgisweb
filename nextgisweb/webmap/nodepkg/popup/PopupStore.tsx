@@ -494,9 +494,20 @@ export class PopupStore extends Component {
             styles.push(i.styleId);
         });
 
-        value.type === "vector" ?
-            this.setLinkToGeometry("v:" + value.layerId + ":" + value.id + ":" + styles) :
-            this.setLinkToGeometry("r:" + value.layerId + ":" + value.styleId + ":" + styles)
+        const paramsUrl = new URLSearchParams();
+        const obj = { request: "feature", lid: value.layerId, styles: styles };
+
+        if (value.type === "vector") {
+            Object.assign(obj, { fid: value.id, type: "vector" })
+        } else if (value.type === "raster") {
+            Object.assign(obj, { styleId: value.styleId, type: "raster" })
+        }
+
+        getEntries(obj)?.map(([key, value]) => {
+            paramsUrl.append(key, value);
+        })
+        const link = paramsUrl.toString();
+        this.setLinkToGeometry(link)
     }
     async updatePermalink() {
         const display = this.display
