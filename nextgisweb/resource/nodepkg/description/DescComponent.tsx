@@ -11,6 +11,17 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 import "./DescComponent.less";
 
+interface GetDataProps {
+    type: string | null;
+    item: Element;
+    options: HTMLReactParserOptions;
+    lid: number | string | null;
+    styleId?: number | string | null;
+    fid?: number | string | null;
+    styles: number[];
+    display: Display;
+}
+
 const msgWebmap = gettext("Webmap");
 const msgLayer = gettext("Layer");
 const msgStyle = gettext("Style");
@@ -59,63 +70,38 @@ const zoomToRasterExtent = async (display, styleId, styles) => {
     display.webmapStore._updateLayersVisibility(visibleStyles);
 };
 
-interface GetDataProps {
-    type: string | null;
-    item: Element;
-    options: HTMLReactParserOptions;
-    lid: number | string | null;
-    styleId?: number | string | null;
-    fid?: number | string | null;
-    styles: number[];
-    display: Display;
-}
-
 const GetData = ({ type, item, options, lid, styleId, fid, styles, display }: GetDataProps) => {
-    const { data: data } = useRouteGet("resource.permission", { id: lid }, { cache: true });
-
     if (type === "vector") {
-        if (data?.data.read) {
-            return (
-                <div
-                    className="link-type-active"
-                    title={msgZoomToFeature}
-                    onClick={() => {
-                        zoomToFeature(display, lid, fid, styles);
-                        display.imodule && display.imodule.popup_destroy();
-                    }}>
-                    <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
-                        <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
-                    </Space>
-                </div >
-            );
-        } else {
-            return <></>;
-        }
+        return (
+            <div
+                className="link-type-active"
+                title={msgZoomToFeature}
+                onClick={() => {
+                    zoomToFeature(display, lid, fid, styles);
+                    display.imodule && display.imodule.popup_destroy();
+                }}>
+                <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
+                    <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
+                </Space>
+            </div >
+        );
     } else if (type === "raster") {
-        if (data?.data.read) {
-            return (
-                <div
-                    className="link-type-active"
-                    title={msgZoomToRaster}
-                    onClick={() => {
-                        zoomToRasterExtent(display, styleId, styles);
-                        display.imodule && display.imodule.popup_destroy();
-                    }}
-                >
-                    <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
-                        <SvgIcon icon={`rescls-raster_layer`} />{domToReact(item.children, options)}
-                    </Space>
-                </div>
-            );
-        } else {
-            return <></>;
-        }
+        return (
+            <div
+                className="link-type-active"
+                title={msgZoomToRaster}
+                onClick={() => {
+                    zoomToRasterExtent(display, styleId, styles);
+                    display.imodule && display.imodule.popup_destroy();
+                }}
+            >
+                <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
+                    <SvgIcon icon={`rescls-raster_layer`} />{domToReact(item.children, options)}
+                </Space>
+            </div>
+        );
     } else {
-        if (!data?.data.read) {
-            return <></>
-        } else {
-            return (<Space className="link-type" title={msgActiveLink} direction="horizontal">{domToReact(item.children, options)}<Info /></Space>);
-        }
+        return (<Space className="link-type" title={msgActiveLink} direction="horizontal">{domToReact(item.children, options)}<Info /></Space>);
     }
 }
 
@@ -175,7 +161,7 @@ export const DescComponent = (props) => {
 
     const checkUrl = (display, item) => {
         const urlParams = new URLSearchParams(item.attribs.href);
-        
+
         const request = urlParams.get("request");
         const lid = urlParams.get("lid");
         const fid = urlParams.get("fid");
@@ -190,7 +176,7 @@ export const DescComponent = (props) => {
         } else if (display === undefined) {
             return <GetData item={item} options={options} lid={lid} />
         }
-    }
+    };
 
     let data_;
     if (content === undefined && type === "map") {

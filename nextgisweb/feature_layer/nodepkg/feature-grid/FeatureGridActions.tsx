@@ -100,7 +100,7 @@ export const FeatureGridActions = observer(
         const onOpenClick = useCallback(() => {
             if (selectedIds.length) {
                 const featureId = selectedIds[0];
-                if (onOpen) {
+                if (onOpen && !settings.imodule) {
                     onOpen({ featureId, resourceId: id });
                 } else {
                     showModal(FeatureDisplayModal, {
@@ -114,7 +114,7 @@ export const FeatureGridActions = observer(
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
                 <Space.Compact key="feature-item-open">
-                    {!settings.imodule && (<Tooltip title={!props.isFit && msgOpenTitle}>
+                    <Tooltip title={!props.isFit && msgOpenTitle}>
                         <Button
                             disabled={!selectedIds.length}
                             size={size}
@@ -122,7 +122,7 @@ export const FeatureGridActions = observer(
                         >
                             {props.isFit && msgOpenTitle}
                         </Button>
-                    </Tooltip>)}
+                    </Tooltip>
                     <Tooltip title={msgOpenOnNewPage} key="open-new-page">
                         <Button
                             disabled={!selectedIds.length}

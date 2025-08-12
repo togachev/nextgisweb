@@ -22,7 +22,7 @@ export const ResourceSectionDescription: ResourceSection = ({
     const showLoader = async () => {
         setCollapse(true)
         setSpinning(true);
-        let ptg = -10;
+        let ptg = -5;
         const value = await route("resource.item", resourceData.resource.id).get({
             cache: true,
             query: {
@@ -31,16 +31,16 @@ export const ResourceSectionDescription: ResourceSection = ({
         });
 
         const interval = setInterval(() => {
-            ptg += 5;
+            ptg += 3;
             setPercent(ptg);
 
-            if (ptg > 10) {
+            if (ptg > 5) {
                 clearInterval(interval);
                 setSpinning(false);
                 setPercent(0);
                 setDescValue(value.resource.description)
             }
-        }, 100);
+        }, 50);
     };
 
     if (!description_status) {
