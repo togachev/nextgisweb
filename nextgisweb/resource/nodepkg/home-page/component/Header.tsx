@@ -64,6 +64,7 @@ export const Header = observer(({ store }: HeaderProps) => {
 
     const urlResShow = routeURL("resource.show", 0);
     const items: MenuItem[] = [];
+    const itemsUser: MenuItem[] = [];
 
     store.valueHeader?.menu?.map((item, index) => items.push({
         key: index,
@@ -73,7 +74,7 @@ export const Header = observer(({ store }: HeaderProps) => {
         className: "menu-label"
     }));
 
-    items.push({
+    itemsUser.push({
         key: "auth",
         label: authenticated ?
             (<span className="auth-login"><Account /></span>) :
@@ -121,6 +122,18 @@ export const Header = observer(({ store }: HeaderProps) => {
                 mode="horizontal"
                 items={items}
                 overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
+                triggerSubMenuAction="click"
+            />)
+    };
+
+    const MenuUser = () => {
+        return (
+            <Menu
+                selectable={false}
+                mode="horizontal"
+                items={itemsUser}
+                overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
+                triggerSubMenuAction="click"
             />)
     };
 
@@ -258,11 +271,12 @@ export const Header = observer(({ store }: HeaderProps) => {
                     />)}
                 </div>
                 <div className="header-block">
-                    <div className="menus">
-                        <div className="menu-component">
-                            <div className="button-link">
-                                <MenuContainer />
-                            </div>
+                    <div className="menu-component">
+                        <div className="button-link">
+                            <MenuContainer />
+                        </div>
+                        <div className="user-menu">
+                            <MenuUser />
                         </div>
                     </div>
                     <div className="name-site">

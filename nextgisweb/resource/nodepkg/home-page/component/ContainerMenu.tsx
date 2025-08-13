@@ -36,6 +36,7 @@ const SortableMenu = (props) => {
         opacity: isDragging ? 0.3 : 1,
         cursor: disable ? "pointer" : "move",
         border: disable ? "none" : "1px solid var(--divider-color)",
+        touchAction: disable ? "auto" : "none",
     };
 
     const onClickGroupMapsGrid = (id) => {

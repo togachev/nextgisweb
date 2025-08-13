@@ -7,6 +7,7 @@ import { ContainerMenu, ContainerMaps, Footer, Header } from "./component";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
+import { useStyleMobile } from "./function";
 import GridLarge from "@nextgisweb/icon/mdi/grid-large";
 import Grid from "@nextgisweb/icon/mdi/grid";
 import "./Content.less";
@@ -65,8 +66,8 @@ const sizeTile = {
 
 export const Content = observer(({ config, ...rest }: ContentProps) => {
     const [store] = useState(() => new HomeStore({ config: config }));
-
-    const [minStatus, setMinStatus] = useState(window.innerWidth > 785 ? "large" : "small");
+    useStyleMobile()
+    const [minStatus, setMinStatus] = useState(window.innerWidth > 520 ? "large" : "small");
 
     const [size, setSize] = useState(minStatus === "large" ? sizeTile.large : sizeTile.small);
 
@@ -103,11 +104,13 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
         }
     );
 
-    useMemo(() => {
+    useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 785) {
+                // setMinStatus("small");
                 store.setWidthMenu(window.innerWidth - window.innerWidth / 100 * 20 - 328);
             } else {
+                // setMinStatus("large");
                 store.setWidthMenu(300);
             }
         };
