@@ -5,7 +5,10 @@ export const useStyleMobile = () => {
 
     const { isLandscape } = useMobileOrientation()
     useEffect(() => {
-        // if (window.innerWidth < 520) {
+        // const width = 440/100*20
+        // console.log(window.innerWidth - width);
+        
+        // if (window.innerWidth - width < 440) {
         //     const headerHomePage = document.querySelector(".header-home-page") as HTMLDivElement;
         //     headerHomePage.style.setProperty("padding", "0px");
 
@@ -45,26 +48,25 @@ export const useStyleMobile = () => {
         //     Object.assign(menuComponent.style, styles);
         // }
 
-        if (isM) {
-            const headerHomePage = document.querySelector(".header-home-page") as HTMLDivElement;
-            headerHomePage.style.setProperty("padding", "0px");
+        // if (isM) {
+        //     const headerHomePage = document.querySelector(".header-home-page") as HTMLDivElement;
+        //     headerHomePage.style.setProperty("padding", "0px");
 
-            const main = document.querySelector(".main") as HTMLDivElement;
-            main.style.setProperty("margin", "0px");
+        //     const main = document.querySelector(".main") as HTMLDivElement;
+        //     main.style.setProperty("margin", "0px");
 
-            const footerHomePage = document.querySelector(".footer-home-page") as HTMLDivElement;
-            footerHomePage.style.setProperty("padding", "0px");
+        //     const footerHomePage = document.querySelector(".footer-home-page") as HTMLDivElement;
+        //     footerHomePage.style.setProperty("padding", "0px");
 
-            const menuList = document.querySelector(".menu-list") as HTMLDivElement;
-            menuList.style.setProperty("max-width", "200px");
+        //     const menuList = document.querySelector(".menu-list") as HTMLDivElement;
+        //     menuList.style.setProperty("max-width", "200px");
 
-            const menuComponent = document.querySelector(".menu-component") as HTMLDivElement;
-            const styles = {
-                padding: 0,
-                right: 0
-            };
-            Object.assign(menuComponent.style, styles);
-            isLandscape ? document.body.style.setProperty("zoom", "100%") : document.body.style.setProperty("zoom", "200%");
-        }
+        //     const menuComponent = document.querySelector(".menu-component") as HTMLDivElement;
+        //     const styles = {
+        //         padding: 0,
+        //         right: 0
+        //     };
+        //     Object.assign(menuComponent.style, styles);
+        // }
     }, [isM, isLandscape, window.innerWidth]);
 };

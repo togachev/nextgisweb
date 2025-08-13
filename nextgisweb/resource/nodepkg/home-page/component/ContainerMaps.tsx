@@ -37,6 +37,9 @@ const SortableMaps = (props) => {
         zIndex: isDragging ? "100" : "auto",
         cursor: disable ? "pointer" : "move",
         touchAction: disable ? "auto" : "none",
+        boxSizing: "border-box",
+        border: "1px solid #b3b9be78",
+        borderRadius: "4px",
     };
     const preview = routeURL("maptile.preview", item.id);
 

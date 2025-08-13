@@ -182,7 +182,7 @@ export class HomeStore {
 
     @actionHandler
     getWidthMenu() {
-        const width = window.innerWidth < 785 ? "100%" : 300;
+        const width = window.innerWidth < 760 ? window.innerWidth - window.innerWidth / 100 * 20 - 328 : 280;
         this.setWidthMenu(width);
     };
 
