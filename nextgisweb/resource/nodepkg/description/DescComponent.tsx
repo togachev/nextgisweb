@@ -1,7 +1,6 @@
 import parse, { attributesToProps, Element, domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Image, Divider, Space } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { route } from "@nextgisweb/pyramid/api";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";

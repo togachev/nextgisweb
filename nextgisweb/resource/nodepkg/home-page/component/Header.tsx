@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
-import { Button, Form, Input, Menu, Space, Typography } from "@nextgisweb/gui/antd";
+import { Button, Col, Form, Input, Menu, Row, Space, Typography } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import MenuIcon from "@nextgisweb/icon/mdi/menu";
-import Login from "@nextgisweb/icon/mdi/login";
-import Logout from "@nextgisweb/icon/mdi/logout";
 import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
+import { LoginOutlined, LogoutOutlined, } from '@ant-design/icons';
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import type { HomeStore } from "../HeaderProps";
@@ -71,7 +70,7 @@ export const Header = observer(({ store }: HeaderProps) => {
         label: (<a href={item?.value} target="_blank" rel="noopener noreferrer">{item?.name}</a>),
         name: item?.name,
         value: item?.value,
-        className: "menu-label"
+        className: "menu-label",
     }));
 
     itemsUser.push({
@@ -79,7 +78,10 @@ export const Header = observer(({ store }: HeaderProps) => {
         label: authenticated ?
             (<span className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
-                (<a onClick={showLoginModal} href={ngwConfig.logoutUrl}>{signInText} <Login /></a>) :
+                (<a className="label-sign" onClick={showLoginModal} href={ngwConfig.logoutUrl}>
+                    {signInText}
+                    <LoginOutlined className="login-icon" />
+                </a>) :
                 (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
         children:
             authenticated && [
@@ -109,7 +111,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                 },
                 {
                     label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
-                    icon: <Logout />,
+                    icon: <LogoutOutlined className="logout-icon" />,
                     key: gettext("Sign out"),
                 },
             ],
@@ -132,7 +134,6 @@ export const Header = observer(({ store }: HeaderProps) => {
                 selectable={false}
                 mode="horizontal"
                 items={itemsUser}
-                overflowedIndicator={<span className="menu-indicator"><MenuIcon /></span>}
                 triggerSubMenuAction="click"
             />)
     };
@@ -272,12 +273,10 @@ export const Header = observer(({ store }: HeaderProps) => {
                 </div>
                 <div className="header-block">
                     <div className="menu-component">
-                        <div className="button-link">
-                            <MenuContainer />
-                        </div>
-                        <div className="user-menu">
-                            <MenuUser />
-                        </div>
+                        <Row wrap={false} justify="end">
+                            <Col flex="auto"><MenuContainer /></Col>
+                            <Col flex="none"><MenuUser /></Col>
+                        </Row>
                     </div>
                     <div className="name-site">
                         <div className="title">

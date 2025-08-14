@@ -7,7 +7,6 @@ import { ContainerMenu, ContainerMaps, Footer, Header } from "./component";
 import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { HomeStore } from "./HomeStore";
-import { useStyleMobile } from "./function";
 
 import "./Content.less";
 
@@ -60,9 +59,8 @@ const resourcesToOptions = (resourcesInfo) => {
 
 export const Content = observer(({ config, ...rest }: ContentProps) => {
     const [store] = useState(() => new HomeStore({ config: config }));
-    useStyleMobile()
 
-    const [size, setSize] = useState({ minW: 150, maxW: 300, minH: 150, maxH: 320, cardCoverH: 204, cardBodyH: 116, min: false });
+    const [size] = useState({ minW: 150, maxW: 300, minH: 150, maxH: 320, cardCoverH: 204, cardBodyH: 116, min: false });
 
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
