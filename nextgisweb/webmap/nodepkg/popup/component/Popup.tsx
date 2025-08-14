@@ -377,5 +377,4 @@ export const Popup = observer(
             document.getElementById("portal-popup")
         )
     }
-    // )
 );

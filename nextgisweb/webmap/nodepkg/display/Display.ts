@@ -296,6 +296,7 @@ export class Display {
                 this.mapStates.addState("identifying", this.identify);
                 this.mapStates.setDefaultState("identifying", true);
                 this._identifyFeatureByAttrValue();
+                isM && this.pModuleUrlParams();
             }
         } else {
             this.pModuleUrlParams();
@@ -700,7 +701,9 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn })
+        isM ?
+            console.log("mobile") :
+            await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn });
     }
 
     private _identifyFeatureByAttrValue() {
