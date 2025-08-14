@@ -317,31 +317,31 @@ msgstr[2] "Пожалуйста, подтвердите необратимое �
 
 #: nodepkg/description-editor/DescriptionEditorWidget.tsx:30
 #: nodepkg/resource-section/children/component/RenderActions.tsx:51
-#: nodepkg/resource-section/description/ResourceSectionDescription.tsx:64
+#: nodepkg/resource-section/description/ResourceSectionDescription.tsx:65
 msgid "Description"
 msgstr ""
 
-#: nodepkg/description/DescComponent.tsx:14
+#: nodepkg/description/DescComponent.tsx:24
 msgid "Webmap"
 msgstr ""
 
-#: nodepkg/description/DescComponent.tsx:15
+#: nodepkg/description/DescComponent.tsx:25
 msgid "Layer"
 msgstr ""
 
-#: nodepkg/description/DescComponent.tsx:16
+#: nodepkg/description/DescComponent.tsx:26
 msgid "Style"
 msgstr ""
 
-#: nodepkg/description/DescComponent.tsx:17
+#: nodepkg/description/DescComponent.tsx:27
 msgid "Links are active only in the open web map"
 msgstr ""
 
-#: nodepkg/description/DescComponent.tsx:18
+#: nodepkg/description/DescComponent.tsx:28
 msgid "Click to move closer to the object"
 msgstr "Нажмите, чтобы приблизиться к объекту"
 
-#: nodepkg/description/DescComponent.tsx:19
+#: nodepkg/description/DescComponent.tsx:29
 msgid "Click to move closer to the raster layer"
 msgstr "Нажмите, чтобы приблизиться к растровому слою."
 
@@ -354,7 +354,7 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: nodepkg/editor-widget/EditorWidget.tsx:53
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:120 view.py:312
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:120 view.py:314
 msgid "Owner"
 msgstr "Владелец"
 
@@ -362,13 +362,13 @@ msgstr "Владелец"
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/effective-permissions/EffectivePermissions.tsx:15
-msgid "No"
-msgstr "Нет"
-
-#: nodepkg/effective-permissions/EffectivePermissions.tsx:15
+#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:311
 msgid "Yes"
 msgstr "Да"
+
+#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:311
+msgid "No"
+msgstr "Нет"
 
 #: nodepkg/export-settings/ExportSettings.tsx:35
 msgid "The setting is saved."
@@ -422,31 +422,23 @@ msgstr "Добавлено в избранное"
 msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
-#: nodepkg/home-page/Content.tsx:203
+#: nodepkg/home-page/Content.tsx:187
 msgid "Webmap not found"
 msgstr ""
 
-#: nodepkg/home-page/Content.tsx:209
+#: nodepkg/home-page/Content.tsx:193
 msgid "Enter card name"
 msgstr "Введите название карты"
-
-#: nodepkg/home-page/Content.tsx:219
-msgid "Small tile"
-msgstr ""
-
-#: nodepkg/home-page/Content.tsx:220
-msgid "Large tile"
-msgstr ""
 
 #: nodepkg/home-page/component/ButtonSave.tsx:5
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: nodepkg/home-page/component/ContainerMaps.tsx:113
+#: nodepkg/home-page/component/ContainerMaps.tsx:117
 msgid "Edit grid maps"
 msgstr ""
 
-#: nodepkg/home-page/component/ContainerMenu.tsx:104
+#: nodepkg/home-page/component/ContainerMenu.tsx:105
 msgid "Edit group maps"
 msgstr ""
 
@@ -482,12 +474,12 @@ msgid "Add url menu"
 msgstr ""
 
 #: nodepkg/home-page/component/Footer.tsx:171
-#: nodepkg/home-page/component/Header.tsx:200
+#: nodepkg/home-page/component/Header.tsx:214
 msgid "Name url"
 msgstr "Название адреса"
 
 #: nodepkg/home-page/component/Footer.tsx:174
-#: nodepkg/home-page/component/Header.tsx:205
+#: nodepkg/home-page/component/Header.tsx:219
 msgid "Url"
 msgstr "Имя URL-адреса"
 
@@ -512,55 +504,55 @@ msgstr ""
 msgid "Footer setting"
 msgstr ""
 
-#: nodepkg/home-page/component/Header.tsx:28
+#: nodepkg/home-page/component/Header.tsx:27
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/home-page/component/Header.tsx:92
+#: nodepkg/home-page/component/Header.tsx:95
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/home-page/component/Header.tsx:98
+#: nodepkg/home-page/component/Header.tsx:101
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/home-page/component/Header.tsx:101
-#: nodepkg/home-page/component/Header.tsx:102
+#: nodepkg/home-page/component/Header.tsx:104
+#: nodepkg/home-page/component/Header.tsx:105
 msgid "Invitation session"
 msgstr "Приглашение на сессию"
 
-#: nodepkg/home-page/component/Header.tsx:105
-#: nodepkg/home-page/component/Header.tsx:107
+#: nodepkg/home-page/component/Header.tsx:108
+#: nodepkg/home-page/component/Header.tsx:110
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/home-page/component/Header.tsx:110
-#: nodepkg/home-page/component/Header.tsx:112
+#: nodepkg/home-page/component/Header.tsx:113
+#: nodepkg/home-page/component/Header.tsx:115
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/home-page/component/Header.tsx:189
-#: nodepkg/home-page/component/Header.tsx:192
+#: nodepkg/home-page/component/Header.tsx:203
+#: nodepkg/home-page/component/Header.tsx:206
 msgid "Add url"
 msgstr "Добавить URL"
 
-#: nodepkg/home-page/component/Header.tsx:211
+#: nodepkg/home-page/component/Header.tsx:225
 msgid "Delete url"
 msgstr "Удалить URL-адрес"
 
-#: nodepkg/home-page/component/Header.tsx:226
+#: nodepkg/home-page/component/Header.tsx:240
 msgid "First name site"
 msgstr "Имя сайта"
 
-#: nodepkg/home-page/component/Header.tsx:233
+#: nodepkg/home-page/component/Header.tsx:247
 msgid "Additional name"
 msgstr "Дополнительное имя"
 
-#: nodepkg/home-page/component/Header.tsx:254
+#: nodepkg/home-page/component/Header.tsx:268
 msgid "Setting header"
 msgstr ""
 
-#: nodepkg/home-page/component/Header.tsx:276
+#: nodepkg/home-page/component/Header.tsx:289
 msgid "Header setting"
 msgstr ""
 
@@ -616,7 +608,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:474
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:476
 msgid "Action"
 msgstr "Действие"
 
@@ -702,7 +694,7 @@ msgstr "Показать дату создания ресурса"
 
 #: nodepkg/resource-section/children/component/MenuDropdown.tsx:211
 #: nodepkg/resource-section/children/util/createResourceTableItemOptions.ts:8
-#: view.py:517
+#: view.py:519
 msgid "Delete"
 msgstr "Удалить"
 
@@ -753,11 +745,11 @@ msgstr[0] "Ресурс перемещен"
 msgstr[1] "Перемещено {} ресурса"
 msgstr[2] "Перемещено {} ресурсов"
 
-#: nodepkg/resource-section/description/ResourceSectionDescription.tsx:52
+#: nodepkg/resource-section/description/ResourceSectionDescription.tsx:53
 msgid "Collapse description"
 msgstr ""
 
-#: nodepkg/resource-section/description/ResourceSectionDescription.tsx:52
+#: nodepkg/resource-section/description/ResourceSectionDescription.tsx:53
 msgid "View resource description"
 msgstr ""
 
@@ -774,7 +766,7 @@ msgid "External access"
 msgstr "Внешний доступ"
 
 #: nodepkg/resource-section/main/CreateResourceButton.tsx:8
-#: nodepkg/resource-section/main/CreateResourceModal.tsx:20 view.py:206 view.py:473
+#: nodepkg/resource-section/main/CreateResourceModal.tsx:20 view.py:206 view.py:475
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -871,15 +863,15 @@ msgctxt "permission"
 msgid "Configure service"
 msgstr "Настройка сервиса"
 
-#: view.py:114 view.py:552
+#: view.py:114 view.py:554
 msgid "Groups of digital web maps"
 msgstr "Группы цифровых веб-карт"
 
-#: view.py:148 view.py:526
+#: view.py:148 view.py:528
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:159 view.py:533
+#: view.py:159 view.py:535
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -891,22 +883,22 @@ msgstr "Изменить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:239 view.py:546
+#: view.py:239 view.py:548
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:416
+#: view.py:418
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:475
+#: view.py:477
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:490
+#: view.py:492
 msgid "Update"
 msgstr "Изменить"
 
-#: view.py:504
+#: view.py:506
 msgid "Add/remove public files"
 msgstr "Добавить/удалить публичные файлы"

@@ -151,7 +151,13 @@ export const Popup = observer(
         }, [store.selected]);
 
         const handleDragStop = (e, d) => {
-            store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
+            if (store.valueRnd.x !== d.x || store.valueRnd.y !== d.y) {
+                store.setValueRnd({ ...store.valueRnd, x: d.x, y: d.y });
+                if (store.valueRnd.width === store.sizeWindow.width && store.valueRnd.height === store.sizeWindow.height) {
+                    store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y - store.offHP });
+                    store.setFullscreen(false);
+                }
+            }
         };
 
         const filterOption = (input, option?: { label: string; value: string; desc: string }) => {
@@ -264,7 +270,7 @@ export const Popup = observer(
                                     if (store.response.featureCount > 0 && e.detail === 2) {
                                         setTimeout(() => {
                                             if (store.valueRnd.width > store.pos.width || store.valueRnd.height > store.pos.height) {
-                                                store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y });
+                                                store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y - store.offHP });
                                                 store.setFullscreen(false)
                                             } else {
                                                 store.setValueRnd({ ...store.valueRnd, width: store.sizeWindow.width, height: store.sizeWindow.height, x: store.fX, y: store.fY });
@@ -296,7 +302,7 @@ export const Popup = observer(
                                     onClick={() => {
                                         if (store.response.featureCount > 0 && store.fixPos === null) {
                                             if (store.valueRnd.width > store.pos.width || store.valueRnd.height > store.pos.height) {
-                                                store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y });
+                                                store.setValueRnd({ ...store.valueRnd, width: store.pos.width, height: store.pos.height, x: store.pos.x, y: store.pos.y - store.offHP });
                                                 store.setFullscreen(false)
                                             }
                                             else {
