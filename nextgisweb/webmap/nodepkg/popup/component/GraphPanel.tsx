@@ -7,6 +7,7 @@ import { LineChartOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import { Scatter } from "react-chartjs-2";
 import { Chart, Title, registerables } from "chart.js";
+import { isMobile as isM } from "react-device-detect";
 
 import EyeOff from "@nextgisweb/icon/mdi/eye-off";
 import Eye from "@nextgisweb/icon/mdi/eye";
@@ -91,12 +92,22 @@ export const GraphPanel = observer((props) => {
         const onChange = (checked: boolean) => {
             setHideLegend(checked);
         };
+
+        let styleLegend;
+        if (isImodule && !isM) {
+            styleLegend = { position: "absolute", right: 0 }
+        } else if (isImodule && isM) {
+            styleLegend = {}
+        } else if (!isImodule) {
+            styleLegend = {}
+        }
+
         return (
             <Tag.CheckableTag
                 checked={hideLegend}
                 onChange={onChange}
                 className="legend-hide-button"
-                style={!isImodule && !store?.fixPanel ? {} : { position: "absolute", right: 0 }}
+                style={styleLegend}
             >
                 <span title={hideLegend ? msgShowLegend : msgHideLegend}>
                     {hideLegend ? <EyeOff /> : <Eye />}
@@ -193,30 +204,33 @@ export const GraphPanel = observer((props) => {
                     options={options}
                     plugins={[plugin]}
                     data={value?.data}
-                    style={isImodule ? resize ? styleResize : styleResize : undefined}
+                    style={isImodule && !isM ? resize ? styleResize : styleResize : undefined}
                 />
             </div>
         )
     }
 
+    const graphDefault = (<div className="ngw-webmap-panel-section" style={{ color: "var(--primary)" }}>
+        <div className="title">
+            <div className="icon"><LineChartOutlined /></div>
+            <div className="content">{msgGraphs}</div>
+            <div className="suffix">{result && <HideLegend />}</div>
+        </div>
+        <div className="content">
+            {result ? (<GraphComponent value={result} />) : emptyValue}
+        </div>
+    </div>)
+
+    const graphPopup = (<div className="relation-item">
+        {result && store?.fixPanel === "relation" && item?.relation && (<HideLegend />)}
+        {result ? (<GraphComponent value={result} />) : emptyValue}
+    </div>)
+
     return (
         <>
-            {!isImodule ?
-                <div className="ngw-webmap-panel-section" style={{ color: "var(--primary)" }}>
-                    <div className="title">
-                        <div className="icon"><LineChartOutlined /></div>
-                        <div className="content">{msgGraphs}</div>
-                        <div className="suffix">{result && <HideLegend />}</div>
-                    </div>
-                    <div className="content">
-                        {result ? (<GraphComponent value={result} />) : emptyValue}
-                    </div>
-                </div> :
-                <div className="relation-item">
-                    {result && store?.fixPanel === "relation" && item?.relation && (<HideLegend />)}
-                    {result ? (<GraphComponent value={result} />) : emptyValue}
-                </div>
-            }
+            {isImodule && !isM && graphPopup}
+            {isImodule && isM && graphDefault}
+            {!isImodule && graphDefault}
         </>
     );
 });

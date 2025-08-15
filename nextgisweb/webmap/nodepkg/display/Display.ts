@@ -707,7 +707,6 @@ export class Display {
     private async _identifyFeatureByValuePopup() {
         const urlParams = this.urlParams;
         if (
-            !isM ||
             !this.identify ||
             !(
                 (
