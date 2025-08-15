@@ -262,10 +262,10 @@ export const Popup = observer(
                                     <ButtonZoomComponent {...contentProps} />
                                 </div>
                             )}
-                            <Button
+                            <span
                                 className="title-name"
-                                size={store.size}
-                                type="text"
+                                // size={store.size}
+                                // type="text"
                                 onClick={(e) => {
                                     if (store.response.featureCount > 0 && e.detail === 2) {
                                         setTimeout(() => {
@@ -290,7 +290,7 @@ export const Popup = observer(
                                         {store.selected?.desc}
                                     </span>
                                 )}
-                            </Button>
+                            </span>
                             {store.response.featureCount > 0 && <CheckOnlyOne {...{ store }} />}
                             {store.response.featureCount > 0 && (
                                 <Button
