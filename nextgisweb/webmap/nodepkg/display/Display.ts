@@ -296,7 +296,7 @@ export class Display {
                 this.mapStates.addState("identifying", this.identify);
                 this.mapStates.setDefaultState("identifying", true);
                 this._identifyFeatureByAttrValue();
-                this._identifyFeatureByGeomString();
+                this._identifyFeatureByValuePopup();
             }
         } else {
             this.pModuleUrlParams();
@@ -704,7 +704,7 @@ export class Display {
         await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn });
     }
 
-    private async _identifyFeatureByGeomString() {
+    private async _identifyFeatureByValuePopup() {
         const urlParams = this.urlParams;
         if (
             !isM ||
@@ -725,7 +725,7 @@ export class Display {
         }
 
         const { lon, lat, st, slf } = urlParams;
-        this.identify.identifyFeatureByGeomString({ lon, lat, st, slf });
+        this.identify.identifyFeatureByValuePopup({ lon, lat, st, slf });
     }
 
     private _identifyFeatureByAttrValue() {

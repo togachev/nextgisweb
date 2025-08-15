@@ -157,7 +157,7 @@ export class Identify extends ToolBase {
         }
     }
 
-    async identifyFeatureByGeomString(val): Promise<boolean> {
+    async identifyFeatureByValuePopup(val): Promise<boolean> {
         const { lon, lat, st, slf } = val as UrlProps;
         const identify = this;
         const olMap = this.map.olMap;
