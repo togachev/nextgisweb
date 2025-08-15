@@ -147,9 +147,24 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     display
                 );
                 if (options.length) {
-                    const first = options[0];
+                    let first;
+                    if (identifyInfo.selected) {
+                        const selected = identifyInfo.selected;
+                        function isFloat(num) {
+                            return typeof num === 'number' && num % 1 !== 0;
+                        }
+                        const value = String(
+                            isFloat(selected.fid) ?
+                            "R-" + selected.layerId :
+                            selected.layerId + "-" + selected.fid
+                        )
+                        first = options.find(item => item.value === value);
+                    } else {
+                        first = options[0];
+                    }
                     onFeatureChange(first);
                 }
+
                 setFeaturesInfoList(options);
             }
         }, [identifyInfo, display, onFeatureChange, abort]);

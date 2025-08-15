@@ -296,7 +296,7 @@ export class Display {
                 this.mapStates.addState("identifying", this.identify);
                 this.mapStates.setDefaultState("identifying", true);
                 this._identifyFeatureByAttrValue();
-                isM && this.pModuleUrlParams();
+                this._identifyFeatureByGeomString();
             }
         } else {
             this.pModuleUrlParams();
@@ -701,9 +701,31 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        isM ?
-            console.log("mobile") :
-            await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn });
+        await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn });
+    }
+
+    private async _identifyFeatureByGeomString() {
+        const urlParams = this.urlParams;
+        if (
+            !isM ||
+            !this.identify ||
+            !(
+                (
+                    "lon" in urlParams &&
+                    "lat" in urlParams &&
+                    "zoom" in urlParams &&
+                    "attribute" in urlParams
+                ) ||
+                (
+                    "st" in urlParams && "slf" in urlParams
+                )
+            )
+        ) {
+            return;
+        }
+
+        const { lon, lat, st, slf } = urlParams;
+        this.identify.identifyFeatureByGeomString({ lon, lat, st, slf });
     }
 
     private _identifyFeatureByAttrValue() {

@@ -5,6 +5,7 @@ import { boundingExtent, getCenter } from "ol/extent";
 import { WKT } from "ol/format";
 import { fromExtent } from "ol/geom/Polygon";
 import Interaction from "ol/interaction/Interaction";
+import { transform } from "ol/proj";
 
 import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
@@ -31,6 +32,22 @@ const wkt = new WKT();
 
 interface ControlOptions {
     tool: Identify;
+}
+
+interface UrlProps {
+    lon: number;
+    lat: number;
+    st: string;
+    slf: string;
+}
+
+interface SelectedProps {
+    lonlat: number[];
+    coordinate: number[];
+    visibleStyles: number[];
+    styleId: number;
+    layerId: number;
+    fid: number | string;
 }
 
 class Control extends Interaction {
@@ -140,6 +157,28 @@ export class Identify extends ToolBase {
         }
     }
 
+    async identifyFeatureByGeomString(val): Promise<boolean> {
+        const { lon, lat, st, slf } = val as UrlProps;
+        const identify = this;
+        const olMap = this.map.olMap;
+        const _slf = slf.split(":").map(i => Number(i));
+        const selected: SelectedProps = {
+            lonlat: [Number(lon), Number(lat)],
+            coordinate: transform([Number(lon), Number(lat)], "EPSG:4326", "EPSG:3857"),
+            visibleStyles: st.split(",").map(i => Number(i)),
+            styleId: _slf[0],
+            layerId: _slf[1],
+            fid: _slf[2],
+        }
+
+        olMap.once("postrender", (e) => {
+            const pixel = e.map.getPixelFromCoordinate(selected.coordinate);
+            identify.execute(pixel, selected);
+        })
+
+        return true;
+    }
+
     async identifyFeatureByAttrValue(
         layerId: number,
         attrName: string,
@@ -207,10 +246,10 @@ export class Identify extends ToolBase {
         return true;
     }
 
-    async execute(pixel: number[]): Promise<void> {
+    async execute(pixel: number[], selected?: SelectedProps): Promise<void> {
         const olMap = this.display.map.olMap;
         const point = olMap.getCoordinateFromPixel(pixel);
-
+        
         const request: Request = {
             srs: 3857,
             geom: this._requestGeomString(pixel),
@@ -267,8 +306,8 @@ export class Identify extends ToolBase {
                 query: { resources: rasterLayers, x, y },
             });
         }
-
-        this.openIdentifyPanel({ features, point, layerLabels, raster });
+        
+        this.openIdentifyPanel({ features, point, layerLabels, raster, selected });
     }
 
     private _bindEvents(): void {
@@ -303,12 +342,14 @@ export class Identify extends ToolBase {
         point,
         layerLabels,
         raster,
+        selected,
     }: {
         features?: FeatureResponse;
 
         point: Coordinate;
         layerLabels: Record<string, string | null>;
         raster?: RasterLayerIdentifyResponse;
+        selected?: SelectedProps;
     }): void {
         this.highlightedFeature = null;
 
@@ -330,6 +371,7 @@ export class Identify extends ToolBase {
             point,
             response,
             layerLabels,
+            selected,
         };
 
         this.identifyInfo = identifyInfo;

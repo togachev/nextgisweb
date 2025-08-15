@@ -109,7 +109,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
         const newLayer = this.layers[basemapLayerKey];
         newLayer.olLayer.setVisible(true);
-        this.baseLayer = newLayer;
+        this.setBaseLayer(newLayer);
 
         return true;
     };

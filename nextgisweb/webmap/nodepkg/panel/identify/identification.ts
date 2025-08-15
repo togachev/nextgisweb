@@ -21,10 +21,20 @@ export type FeatureResponse = Record<"featureCount", number> &
 export type IdentifyResponse = Record<"featureCount", number> &
     Record<number, LayerResponse | RasterLayerIdentifyItem>;
 
+interface SelectedProps {
+    lonlat: number[];
+    coordinate: number[];
+    visibleStyles: number[];
+    styleId: number;
+    layerId: number;
+    fid: number | string;
+}
+
 export interface IdentifyInfo {
     response: IdentifyResponse;
     layerLabels: Record<string, string | null>;
     point: number[];
+    selected: SelectedProps;
 }
 
 
