@@ -61,7 +61,7 @@ const CheckOnlyOne = ({ store }) => {
 export const Popup = observer(
     (props: PopupProps) => {
         const { display, store } = props;
-
+        
         const pm = display.panelManager;
         const pkey = "selected-feature";
         const panel = pm.getPanel<SelectedFeatureStore>(pkey);

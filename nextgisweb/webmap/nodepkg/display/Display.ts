@@ -5,7 +5,7 @@ import type { Extent } from "ol/extent";
 import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
-import { isMobile as isM } from "react-device-detect";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { assert } from "@nextgisweb/jsrealm/error";

@@ -159,7 +159,7 @@ export class Identify extends ToolBase {
 
     async identifyFeatureByValuePopup(val): Promise<boolean> {
         const { lon, lat, st, slf } = val as UrlProps;
-        const identify = this;
+
         const olMap = this.map.olMap;
         const _slf = slf.split(":").map(i => Number(i));
         const selected: SelectedProps = {
@@ -173,7 +173,7 @@ export class Identify extends ToolBase {
 
         olMap.once("postrender", (e) => {
             const pixel = e.map.getPixelFromCoordinate(selected.coordinate);
-            identify.execute(pixel, selected);
+            this.execute(pixel, selected);
         })
 
         return true;
@@ -249,7 +249,7 @@ export class Identify extends ToolBase {
     async execute(pixel: number[], selected?: SelectedProps): Promise<void> {
         const olMap = this.display.map.olMap;
         const point = olMap.getCoordinateFromPixel(pixel);
-        
+
         const request: Request = {
             srs: 3857,
             geom: this._requestGeomString(pixel),
@@ -306,7 +306,7 @@ export class Identify extends ToolBase {
                 query: { resources: rasterLayers, x, y },
             });
         }
-        
+
         this.openIdentifyPanel({ features, point, layerLabels, raster, selected });
     }
 

@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { isMobile as isM } from "react-device-detect";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import type { PanelManager } from "../../panel/PanelManager";
 import type { Display } from "../Display";

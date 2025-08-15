@@ -7,7 +7,7 @@ import { LineChartOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import { Scatter } from "react-chartjs-2";
 import { Chart, Title, registerables } from "chart.js";
-import { isMobile as isM } from "react-device-detect";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import EyeOff from "@nextgisweb/icon/mdi/eye-off";
 import Eye from "@nextgisweb/icon/mdi/eye";

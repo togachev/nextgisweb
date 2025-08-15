@@ -60,6 +60,10 @@ const loadFeatureItem = async (
     }
 };
 
+const isFloat = (num) => {
+    return typeof num === 'number' && num % 1 !== 0;
+}
+
 const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
     ({ display, store }) => {
         const [featureInfo, setFeatureInfo] = useState<IdentifyInfoItem>();
@@ -150,13 +154,10 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     let first;
                     if (identifyInfo.selected) {
                         const selected = identifyInfo.selected;
-                        function isFloat(num) {
-                            return typeof num === 'number' && num % 1 !== 0;
-                        }
                         const value = String(
                             isFloat(selected.fid) ?
-                            "R-" + selected.layerId :
-                            selected.layerId + "-" + selected.fid
+                                "R-" + selected.layerId :
+                                selected.layerId + "-" + selected.fid
                         )
                         first = options.find(item => item.value === value);
                     } else {

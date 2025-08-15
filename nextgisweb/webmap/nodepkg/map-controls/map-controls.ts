@@ -5,7 +5,7 @@ import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";
 import Zoom from "ol/control/Zoom";
 import type { FC } from "react";
-import { isMobile as isM } from "react-device-detect";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
 

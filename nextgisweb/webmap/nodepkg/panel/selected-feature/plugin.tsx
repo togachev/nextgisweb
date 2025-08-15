@@ -4,7 +4,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
 import settings from "@nextgisweb/webmap/client-settings";
 import FormatListBulleted from "@nextgisweb/icon/mdi/format-list-bulleted";
-import { isMobile as isM } from "react-device-detect";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 

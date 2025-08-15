@@ -1,5 +1,5 @@
 import { RefObject, useCallback, useEffect } from "react";
-import { isMobile as isM } from "react-device-detect";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 import type { Display } from "@nextgisweb/webmap/display";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
