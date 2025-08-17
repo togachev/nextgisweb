@@ -385,6 +385,7 @@ export class ResourcePickerStore
             wfs_service: ["wfsclient_connection"],
             tms_service: ["tmsclient_connection"],
             postgis_service: ["postgis_connection"],
+            tablenogeom_service: ["tablenogeom_connection"],
             style: ["raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
             layer_webmap: ["vector_layer", "postgis_layer", "raster_layer", "wfsclient_layer", "wmsclient_layer", "tmsclient_layer", "wmsclient_layer", "tileset", "raster_style", "mapserver_style", "qgis_raster_style", "qgis_vector_style"],
         };

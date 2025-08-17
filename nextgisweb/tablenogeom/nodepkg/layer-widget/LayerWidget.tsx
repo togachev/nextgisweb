@@ -132,6 +132,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                     pickerOptions: {
                         requireClass: "tablenogeom_connection",
                         initParentId: store.composite.parent,
+                        clsFilter: "tablenogeom_service",
                     },
                     style: { width: "100%" },
                 }}
