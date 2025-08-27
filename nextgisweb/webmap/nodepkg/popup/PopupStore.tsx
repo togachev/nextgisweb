@@ -636,19 +636,11 @@ export class PopupStore extends Component {
             Object.assign(query, { fields: attrs })
         }
 
-        let cache;
-        if (!key) {
-            cache = true
-        } else {
-            cache = false
-        }
-
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: resourceId,
             fid: res.id,
         })
             .get({
-                cache: cache,
                 query,
             })
             .then(item => {

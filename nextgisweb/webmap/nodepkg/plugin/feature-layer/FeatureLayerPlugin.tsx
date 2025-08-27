@@ -21,7 +21,7 @@ export class FeatureLayerPlugin extends PluginBase {
             extra:
                 <span
                     className="show-resource"
-                    title={gettext("Layer show")}
+                    title={gettext("Open table in new page")}
                     onClick={() => {
                         window.open(routeURL("feature_layer.feature.browse", { id: nodeData.layerId }), "_blank");
                     }}

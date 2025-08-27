@@ -61,6 +61,7 @@ const CheckOnlyOne = ({ store }) => {
 export const Popup = observer(
     (props: PopupProps) => {
         const { display, store } = props;
+        const { id, layerId, styleId } = store.selected;
 
         const pm = display.panelManager;
         const pkey = "selected-feature";
@@ -107,9 +108,22 @@ export const Popup = observer(
             }
         }, []);
 
+        const reloadLayer = useCallback(async () => {
+            // It is possible to have few webmap layers for one resource id
+            const layers = await display.current?.webmapStore.filterLayers({
+                query: { layerId },
+            });
+
+            layers?.forEach((item) => {
+                const layer = display.current?.webmapStore.getLayer(item.id);
+                layer?.reload();
+            });
+            console.log("update");
+            
+        }, [layerId]);
+
         const editFeature = useMemo(() => {
             if (store.response?.featureCount > 0 && store.selected && store.selected.type === "vector") {
-                const { id, layerId, styleId } = store.selected;
                 const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
 
                 if (display.isTinyMode() && !display.isTinyModePlugin("@nextgisweb/webmap/plugin/feature-layer")) {
@@ -137,6 +151,7 @@ export const Popup = observer(
                                         onSave: () => {
                                             store.setUpdate(true);
                                             topic.publish("feature.updated", { resourceId: layerId, featureId: id });
+                                            reloadLayer()
                                         },
                                     },
                                 });

@@ -6,7 +6,7 @@ import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import { PluginBase } from "../PluginBase";
 
 import LayersEdit from "@nextgisweb/icon/mdi/layers-edit";
-import EyeOoutline from "@nextgisweb/icon/mdi/eye-outline";
+import OpenInNew from "@nextgisweb/icon/material/open_in_new";
 
 export class LayerSettingsPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
@@ -33,7 +33,7 @@ export class LayerSettingsPlugin extends PluginBase {
                         window.open(routeURL("resource.show", { id: nodeData.layerId }), "_blank");
                     }}
                 >
-                    <EyeOoutline />
+                    <OpenInNew />
                 </span >,
         };
     }
