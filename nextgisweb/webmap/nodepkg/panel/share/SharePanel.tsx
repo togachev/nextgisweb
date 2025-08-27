@@ -1,7 +1,6 @@
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type React from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 import {
     Alert,
@@ -159,7 +158,7 @@ const PanelTitle = ({ panel }: { panel: PanelStore }) => {
 };
 
 interface PanelOption {
-    label: React.ReactNode;
+    label: ReactNode;
     title: string;
     value: string;
 }

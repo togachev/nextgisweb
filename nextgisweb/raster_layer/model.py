@@ -1,22 +1,25 @@
 import glob
 import os
 import subprocess
+from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Union
+from typing import List, Literal, Union
 from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from affine import Affine
-from msgspec import UNSET
+from msgspec import UNSET, Struct
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf, ngettextf
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
+from nextgisweb.lib.saext import Msgspec
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.core.util import format_size
@@ -36,7 +39,7 @@ from nextgisweb.resource import (
 )
 
 from .kind_of_data import RasterLayerData
-from .util import calc_overviews_levels, raster_size
+from .util import band_color_interp, calc_overviews_levels, raster_size
 
 Base.depends_on("resource")
 
@@ -44,25 +47,17 @@ PYRAMID_TARGET_SIZE = 512
 
 SUPPORTED_DRIVERS = ("GTiff", "PNG", "JPEG")
 
-COLOR_INTERPRETATION = {
-    gdal.GCI_Undefined: "Undefined",
-    gdal.GCI_GrayIndex: "GrayIndex",
-    gdal.GCI_PaletteIndex: "PaletteIndex",
-    gdal.GCI_RedBand: "Red",
-    gdal.GCI_GreenBand: "Green",
-    gdal.GCI_BlueBand: "Blue",
-    gdal.GCI_AlphaBand: "Alpha",
-    gdal.GCI_HueBand: "Hue",
-    gdal.GCI_SaturationBand: "Saturation",
-    gdal.GCI_LightnessBand: "Lightness",
-    gdal.GCI_CyanBand: "Cyan",
-    gdal.GCI_MagentaBand: "Magenta",
-    gdal.GCI_YellowBand: "Yellow",
-    gdal.GCI_BlackBand: "Black",
-    gdal.GCI_YCbCr_YBand: "YCbCr_Y",
-    gdal.GCI_YCbCr_CbBand: "YCbCr_Cb",
-    gdal.GCI_YCbCr_CrBand: "YCbCr_Cr",
-}
+
+class RasterBand(Struct):
+    color_interp: str
+    min: float
+    max: float
+    rat: bool
+    no_data: float | Literal["NaN"] | None = None
+
+
+class RasterLayerMeta(Struct):
+    bands: list[RasterBand]
 
 
 @implementer(IBboxLayer)
@@ -80,7 +75,13 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     ysize = sa.Column(sa.Integer, nullable=False)
     dtype = sa.Column(sa.Unicode, nullable=False)
     band_count = sa.Column(sa.Integer, nullable=False)
+    geo_transform = sa.Column(
+        sa_pg.ARRAY(sa.FLOAT, dimensions=1, zero_indexes=True),
+        nullable=True,
+    )
     cog = sa.Column(sa.Boolean, nullable=False, default=False)
+
+    meta = sa.Column(Msgspec(RasterLayerMeta), nullable=True)
 
     fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
     fileobj_pam = orm.relationship(FileObj, foreign_keys=fileobj_pam_id, cascade="all")
@@ -197,9 +198,15 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         try:
             src_osr = sr_from_wkt(dsproj)
+            if src_osr.IsLocal() and (code := src_osr.GetAuthorityCode(None)) is not None:
+                # The coordinate system may be interpreted as 'local' when the
+                # definitions from EPSG code and GeoTIFF keys are inconsistent.
+                # Starting with GDAL 3.5, the GTIFF_SRS_SOURCE configuration
+                # option can be used to control this behavior.
+                src_osr = sr_from_epsg(int(code))
         except SpatialReferenceError:
             raise ValidationError(
-                gettext("GDAL was uanble to parse the raster coordinate system.")
+                gettext("GDAL was unable to parse the raster coordinate system.")
             )
 
         if src_osr.IsLocal():
@@ -321,6 +328,22 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
+        self.geo_transform = list(ds.GetGeoTransform())
+
+        bands = []
+        for bidx in range(1, ds.RasterCount + 1):
+            band = ds.GetRasterBand(bidx)
+            minval, maxval = band.ComputeRasterMinMax(True)
+            bands.append(
+                RasterBand(
+                    color_interp=band_color_interp(band),
+                    no_data=band.GetNoDataValue(),
+                    rat=band.GetDefaultRAT() is not None,
+                    min=minval,
+                    max=maxval,
+                )
+            )
+        self.meta = RasterLayerMeta(bands=bands)
 
     def gdal_dataset(self):
         fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
@@ -491,15 +514,36 @@ class CogAttr(SColumn):
         )
 
 
+class GeoTransform(SAttribute):
+    ctypes = CRUTypes(List[str], List[str], List[str])
+
+    def get(self, srlzr: Serializer) -> List[str]:
+        return (
+            srlzr.obj.geo_transform
+            if srlzr.obj.geo_transform is not None
+            else list(srlzr._gdal_dataset.GetGeoTransform())
+        )
+
+
+class Bands(SAttribute):
+    ctypes = CRUTypes(List[str], List[str], List[str])
+
+    def get(self, srlzr: Serializer) -> List[str]:
+        return srlzr.obj.meta.bands if srlzr.obj.meta is not None else []
+
+
 class ColorInterpretation(SAttribute):
     ctypes = CRUTypes(List[str], List[str], List[str])
 
     def get(self, srlzr: Serializer) -> List[str]:
-        ds = srlzr.obj.gdal_dataset()
-        return [
-            COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
-            for bidx in range(1, srlzr.obj.band_count + 1)
-        ]
+        return (
+            [band.color_interp for band in srlzr.obj.meta.bands]
+            if srlzr.obj.meta is not None
+            else [
+                band_color_interp(srlzr._gdal_dataset.GetRasterBand(bidx))
+                for bidx in range(1, srlzr._gdal_dataset.RasterCount + 1)
+            ]
+        )
 
 
 class RasterLayerSerializer(Serializer, resource=RasterLayer):
@@ -509,7 +553,21 @@ class RasterLayerSerializer(Serializer, resource=RasterLayer):
     ysize = SColumn(read=ResourceScope.read)
     band_count = SColumn(read=ResourceScope.read)
     dtype = SColumn(read=ResourceScope.read)
-    color_interpretation = ColorInterpretation(read=ResourceScope.read)
+    geo_transform = GeoTransform(read=ResourceScope.read)
+
+    bands = Bands(read=ResourceScope.read)
 
     source = SourceAttr(write=DataScope.write, required=True)
     cog = CogAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+    # TODO: After the maintenance process completes and the 'meta' column
+    # is populated, update the frontend to use the 'bands' property
+    # and remove 'color_interpretation' from the API
+    color_interpretation = ColorInterpretation(read=ResourceScope.read)
+
+    # TODO: Remove when metadata columns are consistently populated
+    @cached_property
+    def _gdal_dataset(self):
+        obj = self.obj
+        assert obj.meta is None and obj.geo_transform is None
+        return obj.gdal_dataset()

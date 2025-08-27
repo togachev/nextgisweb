@@ -4,7 +4,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { DeletePage } from "./DeletePage";
 import type { DeleteConfirmModalProps } from "./type";
 
-export function DeleteConfirmModal({
+function DeleteConfirmModal({
     resources,
     onOkDelete,
     onCancelDelete,
@@ -16,7 +16,7 @@ export function DeleteConfirmModal({
             maskTransitionName=""
             footer={null}
             closable={false}
-            destroyOnClose
+            destroyOnHidden
             title={gettext("Confirmation required")}
             {...props}
         >
@@ -29,3 +29,5 @@ export function DeleteConfirmModal({
         </Modal>
     );
 }
+
+export default DeleteConfirmModal;

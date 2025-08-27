@@ -38,7 +38,7 @@ export function FeatureInfoSection({
     attributePanelAction,
     highlights,
 }: FeatureInfoSectionProps) {
-    const [extComps, setExtComps] = useState<JSX.Element[]>([]);
+    const [extComps, setExtComps] = useState<React.ReactElement[]>([]);
 
     useEffect(() => {
         if (!featureItem.extensions) {
@@ -46,7 +46,7 @@ export function FeatureInfoSection({
         }
 
         const makeExtensionComps = async () => {
-            const newExtComps: JSX.Element[] = [];
+            const newExtComps: React.ReactElement[] = [];
             const extensionsComp = await getExtensionsComps();
             extensionsComp.forEach((comp, key) => {
                 const ExtensionComponent = lazy(comp);

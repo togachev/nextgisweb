@@ -39,6 +39,7 @@ export function ModelLogoForm({
     );
     const [logo, setLogo] = useState<string>();
     const [fileMeta, setFileMeta] = useState<UploaderMeta | null>(null);
+    const [messageApi, contextHolder] = message.useMessage();
 
     const msg = { ...defaultMessages, ...messages };
 
@@ -58,7 +59,7 @@ export function ModelLogoForm({
                 } else {
                     throw new Error("The logo is not set");
                 }
-            } catch (err) {
+            } catch {
                 // ignore error
             } finally {
                 setStatus(null);
@@ -76,7 +77,7 @@ export function ModelLogoForm({
                     },
                 },
             });
-            message.success(msg.saveSuccess);
+            messageApi.success(msg.saveSuccess);
         } catch (err) {
             errorModal(err);
         } finally {
@@ -90,6 +91,7 @@ export function ModelLogoForm({
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
+            {contextHolder}
             <ImageUploader
                 helpText={msg.helpText}
                 uploadText={msg.uploadText}

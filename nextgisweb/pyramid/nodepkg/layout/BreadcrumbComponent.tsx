@@ -54,9 +54,13 @@ export function BreadcrumbComponent({ items, current_id }: BreadcrumbComponentPr
                     icon: icon,
                     title: title,
                 }
-                itm.length > 1 && Object.assign(obj, {
-                    items: itm.filter(i => i.key !== current_id)
-                });
+
+                if (itm.length > 1) {
+                    Object.assign(obj, {
+                        items: itm.filter(i => i.key !== current_id)
+                    });
+                }
+
                 setValue(prev => ({
                     ...prev,
                     [String(idx)]: obj

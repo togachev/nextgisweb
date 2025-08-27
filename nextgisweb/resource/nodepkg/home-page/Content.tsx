@@ -1,3 +1,4 @@
+import { debounce } from "lodash-es";
 import { useEffect, useState, useMemo, useRef } from "react";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/magnify";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -64,6 +65,7 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
 
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [acStatus, setAcStatus] = useState<AutoProps["status"]>("");
 
@@ -82,17 +84,19 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
     }, [search]);
 
     const makeSearchRequest = useRef(
-        async ({ query: q }) => {
+        debounce(async ({ query: q }) => {
             try {
                 abort();
                 const resources = await route("resource.search").get({ query: q, signal: makeSignal() })
                 const options = resourcesToOptions(resources);
                 setOptions(options);
                 setAcStatus("");
-            } catch (er) {
+            } catch {
                 setAcStatus("error");
+            } finally {
+                setLoading(false);
             }
-        }
+        }, 1000)
     );
 
     useEffect(() => {
@@ -187,13 +191,14 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                                     notFoundContent={search.length > 0 && gettext("Webmap not found")}
                                     {...rest}
                                 >
-                                    <Input
+                                    <Input.Search
                                         prefix={<DeleteOffOutline />}
                                         size="middle"
                                         placeholder={gettext("Enter card name")}
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         allowClear
+                                        loading={loading}
                                     />
                                 </AutoComplete>
                             </div>

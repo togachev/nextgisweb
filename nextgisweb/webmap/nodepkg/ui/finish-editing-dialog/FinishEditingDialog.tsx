@@ -25,7 +25,7 @@ export function FinishEditingModal({
             open={true}
             footer={null}
             centered
-            destroyOnClose
+            destroyOnHidden
             {...rest}
         >
             <div>

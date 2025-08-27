@@ -1,12 +1,12 @@
-#: api.py:107 api_identify.py:27
+#: api.py:109 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:365
+#: api.py:367
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:440 api_export.py:206
+#: api.py:442 api_export.py:206
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -14,7 +14,7 @@ msgstr "Параметр 'intersects' содержит невалидную ге
 msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
-#: api_export.py:245
+#: api_export.py:246
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
@@ -22,17 +22,9 @@ msgstr "Лимит экспорта составляет {limit} объекто�
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:428
+#: api_export.py:424
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
-
-#: biutil.py:25
-msgid "Got an invalid BIGINT value: {}."
-msgstr "Получено некорректное значение BIGINT: {}."
-
-#: biutil.py:26
-msgid "The value must be within the inclusive range of {min} to {max}."
-msgstr "Значение должно находиться в диапазоне от {min} до {max} включительно."
 
 #: dtutil.py:28
 msgid "Got an invalid date-time value in the legacy format: {}."
@@ -72,7 +64,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:40
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:39
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -121,8 +113,8 @@ msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
 #: nodepkg/export-form/ExportForm.tsx:267
-#: nodepkg/fields-widget/FieldsWidget.tsx:202
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:101
+#: nodepkg/fields-widget/FieldsWidget.tsx:213
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
@@ -139,75 +131,75 @@ msgid "Zip archive"
 msgstr "Zip архив"
 
 #: nodepkg/export-form/ExportForm.tsx:326
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:39
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:19
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:20
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:21
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:22
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:22
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:23
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:38
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:40
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:40
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:42
 msgid "OK"
 msgstr "OK"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
 msgid "Reset"
 msgstr "Сбросить"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:45
 msgid "Feature saved"
 msgstr "Объект сохранен"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:44
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:46
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:22
+#: nodepkg/feature-grid/FeatureGrid.tsx:24
 msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:23
-msgid "Number of objects"
-msgstr "Количество объектов"
-
-#: nodepkg/feature-grid/FeatureGrid.tsx:24
+#: nodepkg/feature-grid/FeatureGrid.tsx:25
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:28
+#: nodepkg/feature-grid/FeatureGridActions.tsx:31
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:29
+#: nodepkg/feature-grid/FeatureGridActions.tsx:32
 msgid "Open on a new page"
 msgstr "Открывать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:30
+#: nodepkg/feature-grid/FeatureGridActions.tsx:33
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:31
+#: nodepkg/feature-grid/FeatureGridActions.tsx:34
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:32
+#: nodepkg/feature-grid/FeatureGridActions.tsx:35
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:34
+#: nodepkg/feature-grid/FeatureGridActions.tsx:36
+msgid "Create"
+msgstr "Создать"
+
+#: nodepkg/feature-grid/FeatureGridActions.tsx:38
 msgid "Search..."
 msgstr "Поиск..."
 
@@ -233,77 +225,68 @@ msgstr "Быстрый экспорт"
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:23
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:54
+#: nodepkg/fields-widget/FieldsWidget.tsx:22
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:31
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:24
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:60
+#: nodepkg/fields-widget/FieldsWidget.tsx:23
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:19
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:25
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:67
+#: nodepkg/fields-widget/FieldsWidget.tsx:24
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:25
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:26
+#: nodepkg/fields-widget/FieldsWidget.tsx:25
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:28
+#: nodepkg/fields-widget/FieldsWidget.tsx:27
 msgid "Text search"
 msgstr "Текстовый поиск"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:29
+#: nodepkg/fields-widget/FieldsWidget.tsx:28
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:31
+#: nodepkg/fields-widget/FieldsWidget.tsx:30
 msgid "Please select"
 msgstr "Выберите тип"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:32
+#: nodepkg/fields-widget/FieldsWidget.tsx:31
 msgid "Not used"
 msgstr "Не используется"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:126
+#: nodepkg/fields-widget/FieldsWidget.tsx:97
+msgid "Delete field?"
+msgstr "Удалить поле?"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:98
+msgid ""
+"Deleting this field will permanently erase all its version history from this "
+"layer."
+msgstr "Удаление этого поля навсегда сотрёт всю его историю версий в этом слое."
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:123
 msgid "Field"
 msgstr "Поле"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:150
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:33
-msgid "Formatted value"
-msgstr ""
+#: nodepkg/geometry-editor/GeometryEditor.tsx:145
+msgid "Clear"
+msgstr "Очистить"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:153
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:31
-msgid "Reference book added"
-msgstr ""
+#: nodepkg/geometry-editor/plugin.ts:10
+msgid "Geometry"
+msgstr "Геометрия"
 
-#: nodepkg/fields-widget/FormattedDecimalForm.tsx:18
-msgid "Setting up value formatting"
-msgstr ""
+#: nodepkg/geometry-editor/util/component/ZoomToResourceBtn.tsx:36
+msgid "Zoom to layer extent"
+msgstr "Перейти к охвату слоя"
 
-#: nodepkg/fields-widget/FormattedDecimalForm.tsx:20
-msgid "Disable"
-msgstr ""
-
-#: nodepkg/fields-widget/FormattedDecimalForm.tsx:20
-msgid "Enable"
-msgstr ""
-
-#: nodepkg/fields-widget/FormattedDecimalForm.tsx:26
-msgid "Rounding off a number"
-msgstr ""
-
-#: nodepkg/fields-widget/FormattedDecimalForm.tsx:36
-msgid "Value prefix"
-msgstr ""
-
-#: nodepkg/geometry-info/GeometryInfo.tsx:47
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:99
+#: nodepkg/geometry-info/GeometryInfo.tsx:46
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
@@ -337,38 +320,7 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:73
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:74
-msgid "Perimeter"
-msgstr "Периметр"
-
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:73
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:74
-msgid "Length"
-msgstr "Длина"
-
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:79
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:80
-msgid "Area"
-msgstr "Площадь"
-
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:47
-msgid "Yes"
-msgstr ""
-
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:47
-msgid "No"
-msgstr ""
-
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:74
-msgid "Visibility in the table"
-msgstr ""
-
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:81
-msgid "Additional properties"
-msgstr ""
-
-#: nodepkg/settings-widget/SettingsWidget.tsx:11
+#: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:94
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -388,6 +340,18 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
+#: numutil.py:28
+msgid "The value must be within the inclusive range of {min} to {max}."
+msgstr "Значение должно находиться в диапазоне от {min} до {max} включительно."
+
+#: numutil.py:43
+msgid "Got an invalid INTEGER value: {}."
+msgstr "Получено некорректное значение INTEGER: {}."
+
+#: numutil.py:49
+msgid "Got an invalid BIGINT value: {}."
+msgstr "Получено некорректное значение BIGINT: {}."
+
 #: transaction/exception.py:7
 msgid "Transaction not found"
 msgstr "Транзакция не найдена"
@@ -404,7 +368,7 @@ msgstr "Транзакция не зафиксирована"
 msgid "Not implemented for feature versioning"
 msgstr "Не реализовано для версионирования объектов"
 
-#: versioning/exception.py:18
+#: versioning/exception.py:19
 msgid ""
 "This operation cannot be performed on a resource with feature versioning "
 "enabled. Disable feature versioning for the resource first, and then try "
@@ -449,7 +413,7 @@ msgstr "Объект #%d"
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:114
+#: view.py:101
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."

@@ -632,14 +632,23 @@ export class PopupStore extends Component {
         const geom = item && item.itemConfig.layerHighligh === true ? true : false;
         const query = { geom: geom, dt_format: "iso" };
 
-        attrs === false && Object.assign(query, { fields: attrs })
+        if (attrs === false) {
+            Object.assign(query, { fields: attrs })
+        }
+
+        let cache;
+        if (!key) {
+            cache = true
+        } else {
+            cache = false
+        }
 
         const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
             id: resourceId,
             fid: res.id,
         })
             .get({
-                cache: !key ? true : false,
+                cache: cache,
                 query,
             })
             .then(item => {
@@ -686,13 +695,20 @@ export class PopupStore extends Component {
 
                     const panel = this.display.panelManager.getActivePanelName();
 
-                    const obj = disable ?
-                        { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
-                        res ?
-                            { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name } :
-                            { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
+                    let obj;
+                    if (disable) {
+                        obj = { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name };
+                    } else {
+                        if (res) {
+                            obj = { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name };
+                        } else {
+                            obj = { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
+                        }
+                    }
 
-                    panel !== "share" && Object.assign(obj, { panel: panel });
+                    if (panel !== "share") {
+                        Object.assign(obj, { panel: panel });
+                    }
 
                     const paramsUrl = new URLSearchParams();
 
@@ -719,13 +735,15 @@ export class PopupStore extends Component {
 
             const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
 
-            highlights === true ?
+            if (highlights === true) {
                 topic.publish("feature.highlight", {
                     geom: res.feature.geom,
                     featureId: res.feature.id,
                     layerId: res.resourceId,
-                }) :
+                })
+            } else {
                 topic.publish("feature.unhighlight")
+            }
 
             this.generateUrl({ res: val, st: this.response.data, pn: this.fixPanel, disable: false });
 

@@ -92,7 +92,7 @@ export function ResourcesFilter({
                 const options = resourcesToOptions(resources);
                 setOptions(options);
                 setAcSatus("");
-            } catch (err) {
+            } catch {
                 setAcSatus("error");
             } finally {
                 setLoading(false);
@@ -118,7 +118,9 @@ export function ResourcesFilter({
         <>
             <AutoCompleteHoneypot />
             <AutoComplete
-                popupClassName="ngw-resource-resource-filter-dropdown"
+                classNames={{
+                    popup: { root: "ngw-resource-resource-filter-dropdown" },
+                }}
                 popupMatchSelectWidth={290}
                 style={{ width: "100%" }}
                 onSelect={onSelect}

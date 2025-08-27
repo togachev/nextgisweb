@@ -439,6 +439,15 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         AbortControllerHelper | undefined
     >(undefined);
 
+    const clearResults = () => {
+        if (searchController) {
+            searchController.abort();
+            setSearchController(undefined);
+        }
+        setSearchResults(undefined);
+        setLoading(false);
+    };
+
     const _search = useCallback(
         debounce(async (searchText: string) => {
             clearResults();
@@ -519,15 +528,6 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         results = <Spin className="loading" indicator={indicator} />;
     }
 
-    const clearResults = () => {
-        if (searchController) {
-            searchController.abort();
-            setSearchController(undefined);
-        }
-        setSearchResults(undefined);
-        setLoading(false);
-    };
-
     const clearSearchText = () => {
         setSearchText(undefined);
         clearResults();
@@ -579,7 +579,9 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                                                 title={exampleCoordTitle}
                                                 size="small"
                                                 onClick={() => {
-                                                    !searchText && setSearchText(coordExample)
+                                                    if (!searchText) {
+                                                        setSearchText(coordExample);
+                                                    }
                                                     _search(coordExample);
                                                 }}
                                             >{coordExample}</Button>

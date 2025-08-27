@@ -13,6 +13,8 @@ export function CustomCSSForm() {
     const [initial, setInitial] = useState<string>();
     const [data, setData] = useState<string>();
 
+    const [messageApi, contextHolder] = message.useMessage();
+
     const { data: initialData, isLoading } = useRouteGet({
         name: "pyramid.csettings",
         options: { query: { pyramid: ["custom_css"] } },
@@ -37,7 +39,7 @@ export function CustomCSSForm() {
             errorModal(err);
         } finally {
             // prettier-ignore
-            message.success(gettext("Custom styles saved. Reload the page to get them applied."));
+            messageApi.success(gettext("Custom styles saved. Reload the page to get them applied."));
             setSaving(false);
         }
     };
@@ -48,6 +50,7 @@ export function CustomCSSForm() {
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
+            {contextHolder}
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>
                     <Code

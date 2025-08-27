@@ -20,10 +20,10 @@ export class LayerInfoPlugin extends PluginBase {
         const infoConfig = this.display.itemConfig;
         const data = infoConfig?.plugin[
             this.identity
-        ] as DescriptionWebMapPluginConfig;
+        ] as DescriptionWebMapPluginConfig | null;
         return {
             ...state,
-            enabled: !!(state.enabled && data.style_id) || !!(state.enabled && data.layer_id),
+            enabled: !!(state.enabled && data?.style_id) || !!(state.enabled && data?.layer_id),
         };
     }
 
@@ -72,14 +72,17 @@ export class LayerInfoPlugin extends PluginBase {
         if (Object.values(data).length > 0) {
             const { layer_id, style_id } = data;
             try {
-                vectorType.includes(nodeData.layerCls) && layer_id &&
+                if (vectorType.includes(nodeData.layerCls) && layer_id) {
                     await this.loadDescripton(layer_id, "layer").then(i => content.push(i));
+                }
 
-                style_id &&
+                if (style_id) {
                     await this.loadDescripton(style_id, "style").then(i => content.push(i));
+                }
 
-                this.display.config.webmapDescription &&
+                if (this.display.config.webmapDescription) {
                     await this.loadDescripton(this.display.config.webmapId, "webmap_desc").then(i => content.push(i));
+                }
 
                 let panel = pm.getPanel<DescriptionStore>(pkey);
                 if (!panel) {

@@ -11,8 +11,7 @@ import type { ResourcePickerModalProps, SelectValue } from "./type";
 import "./ResourcePickerModal.less";
 
 function ResourcePickerModal<V extends SelectValue = SelectValue>({
-    open: open_,
-    visible: visible_,
+    open: openProp,
     store: storeProp,
     onSelect,
     onPick: onPickProp,
@@ -22,7 +21,7 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
     height: height_,
     ...rest
 }: ResourcePickerModalProps<V>) {
-    const [open, setOpen] = useState(open_ ?? visible_ ?? true);
+    const [open, setOpen] = useState(openProp ?? true);
 
     const [store] = useState(
         () => storeProp || new ResourcePickerStore(pickerOptions)
@@ -68,8 +67,8 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
     );
 
     useEffect(() => {
-        setOpen(open_ ?? visible_ ?? true);
-    }, [open_, visible_]);
+        setOpen(openProp ?? true);
+    }, [openProp]);
 
     return (
         <Modal
@@ -77,7 +76,7 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
             maskTransitionName=""
             className="resource-picker-modal"
             open={open}
-            destroyOnClose
+            destroyOnHidden
             footer={null}
             closable={false}
             onCancel={() => setOpen(false)}

@@ -98,6 +98,9 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     collectionOptions,
     ...tableProps
 }: ModelBrowseProps<Data>) {
+    const [modal, modalContextHolder] = Modal.useModal();
+    const [messageApi, messageContextHolder] = message.useMessage();
+
     const model: Model =
         typeof m === "string"
             ? ({
@@ -156,7 +159,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             const newSelectedRows = selected.filter((row) => row !== id);
             setRows(newRows);
             setSelected(newSelectedRows);
-            message.success(deleteSuccess);
+            messageApi.success(deleteSuccess);
             if (callbacks && callbacks.deleteModelItem) {
                 callbacks.deleteModelItem();
             }
@@ -179,7 +182,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                 }
             }
             if (deleteError.length) {
-                Modal.confirm({
+                modal.confirm({
                     type: "error",
                     title: gettext("The errors occurred during execution"),
                     content: (
@@ -195,7 +198,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             const newRows = rows.filter((row) => !deleted.includes(row.id));
             setSelected([]);
             setRows(newRows);
-            message.success(deleteBatchSuccess);
+            messageApi.success(deleteBatchSuccess);
             if (callbacks && callbacks.deleteSelected) {
                 callbacks.deleteSelected();
             }
@@ -207,7 +210,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     };
 
     const onDeleteSelectedBtnClick = async () => {
-        Modal.confirm({
+        modal.confirm({
             title: gettext("Do you want to delete these items?"),
             onOk() {
                 deleteSelected();
@@ -356,6 +359,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             style={{ width: "100%" }}
             className="ngw-gui-model-browse"
         >
+            {modalContextHolder}
+            {messageContextHolder}
             {headSection}
             <Table
                 size="middle"

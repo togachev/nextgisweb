@@ -15,8 +15,13 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceExport } from "@nextgisweb/resource/type/api";
 
+// prettier-ignore
+const msgNote = gettext("* This will not affect REST API use which will continue to be governed by permissions.")
+
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
+
+    const [messageApi, contextHolder] = message.useMessage();
 
     const { data, isLoading } = useRouteGet({
         name: "pyramid.csettings",
@@ -32,7 +37,7 @@ export function ExportSettings() {
             await route("pyramid.csettings").put({
                 json: { resource: { resource_export: value } },
             });
-            message.success(gettext("The setting is saved."));
+            messageApi.success(gettext("The setting is saved."));
         } catch (err) {
             errorModal(err);
         } finally {
@@ -52,6 +57,7 @@ export function ExportSettings() {
 
     return (
         <Space direction="vertical">
+            {contextHolder}
             <Typography.Text>
                 {gettext(
                     'Select the category of users who can use the "Save as" link to download resource data.'
@@ -84,9 +90,7 @@ export function ExportSettings() {
                         type="secondary"
                         style={{ marginTop: "8em" }}
                     >
-                        {gettext(
-                            "* This will not affect REST API use which will continue to be governed by permissions."
-                        )}
+                        {msgNote}
                     </Typography.Text>
                 </Col>
             </Row>

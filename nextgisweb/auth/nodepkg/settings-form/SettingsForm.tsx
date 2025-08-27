@@ -44,6 +44,8 @@ export function SettingsForm() {
     const [isSaving, setSaving] = useState(false);
     const { data: profile, isLoading } = useRouteGet("auth.profile");
 
+    const [messageApi, contextHolder] = message.useMessage();
+
     const fields = useMemo<FormField[]>(() => {
         const result = [];
 
@@ -73,7 +75,7 @@ export function SettingsForm() {
         setSaving(true);
         try {
             await route("auth.profile").put({ json });
-            message.success(gettext("Saved"));
+            messageApi.success(gettext("Saved"));
         } catch (err) {
             errorModal(err);
         } finally {
@@ -86,6 +88,7 @@ export function SettingsForm() {
     };
     return (
         <LoadingWrapper loading={isLoading} rows={fields.length} title={false}>
+            {contextHolder}
             <FieldsForm
                 fields={fields}
                 onChange={onChange}

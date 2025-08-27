@@ -3,19 +3,18 @@ import { useEffect, useMemo, useRef } from "react";
 
 import type { ControlPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 
-import type { MapAdapterRef } from "../context/useMapContext";
+import type { MapContextValue } from "../context/useMapContext";
 
 export function useMapControl({
     context,
     instance,
     position = "top-left",
 }: {
-    context: MapAdapterRef | null;
+    context: MapContextValue | null;
     instance?: Control;
     position?: ControlPosition;
 }) {
-    // const [container, setContainer] = useState<HTMLElement>();
-    const added = useRef<Control>();
+    const added = useRef<Control>(null);
     const mapStore = useMemo(() => {
         return context?.mapStore;
     }, [context?.mapStore]);
@@ -25,8 +24,6 @@ export function useMapControl({
                 const control = mapStore.addControl(instance, position);
                 if (control) {
                     added.current = control;
-                    // if (control.getContainer)
-                    //     setContainer(control.getContainer());
                 }
             }
 
@@ -36,10 +33,6 @@ export function useMapControl({
                 }
             };
         },
-        [context, mapStore, instance, position]
+        [mapStore, instance, position]
     );
-
-    // return {
-    //     container,
-    // };
 }

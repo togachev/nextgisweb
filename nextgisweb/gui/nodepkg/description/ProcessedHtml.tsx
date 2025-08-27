@@ -5,8 +5,7 @@ import type {
     Element,
     HTMLReactParserOptions,
 } from "html-react-parser";
-import type { FC } from "react";
-import type React from "react";
+import { FC, MouseEvent } from "react";
 
 type ChildNode = DOMNode["nextSibling"] & DOMNode["previousSibling"];
 
@@ -27,7 +26,7 @@ const isAdjacentToNonHollowText = (el: Element): boolean => {
 
 interface ProcessedHtmlProps {
     htmlString: string;
-    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
+    onLinkClick?: ((e: MouseEvent<HTMLAnchorElement>) => boolean) | null;
 }
 
 export const ProcessedHtml: FC<ProcessedHtmlProps> = ({
@@ -40,11 +39,26 @@ export const ProcessedHtml: FC<ProcessedHtmlProps> = ({
                 const el = node;
 
                 if (el.name === "img") {
-                    const { src, alt } = el.attribs;
+                    const { src, alt, width, height } = el.attribs;
+
                     if (isAdjacentToNonHollowText(el)) {
-                        return <img src={src} alt={alt} />;
+                        return (
+                            <img
+                                src={src}
+                                alt={alt}
+                                width={`${width}px`}
+                                height={`${height}px`}
+                            />
+                        );
                     } else {
-                        return <Image src={src} alt={alt} />;
+                        return (
+                            <Image
+                                src={src}
+                                alt={alt}
+                                width={`${width}px`}
+                                height={`${height}px`}
+                            />
+                        );
                     }
                 }
 

@@ -5,13 +5,21 @@ import { LotMV } from "@nextgisweb/gui/arm";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
+import type { ConnectionCreate } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientConnectionStore } from "./WmsClientConnectionStore";
 
-const capcacheOptions = [
+export type UICapcache = NonNullable<ConnectionCreate["capcache"]> | "";
+
+export interface Option {
+    label: string;
+    value: UICapcache;
+}
+
+const capcacheOptions: Option[] = [
     { label: gettext("Query"), value: "query" },
     { label: gettext("Clear"), value: "clear" },
-    { label: gettext("Do not query"), value: undefined },
+    { label: gettext("Do not query"), value: "" },
 ];
 
 const versionOptions = [
@@ -37,6 +45,9 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
                     span={1}
                     label={gettext("Username")}
                     component={InputValue}
+                    props={{
+                        autoComplete: "new-password",
+                    }}
                     value={store.username}
                 />
 
@@ -44,6 +55,9 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
                     span={1}
                     label={gettext("Password")}
                     component={PasswordValue}
+                    props={{
+                        autoComplete: "new-password",
+                    }}
                     value={store.password}
                 />
 

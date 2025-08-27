@@ -12,7 +12,7 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import { getEntries } from "../util/function";
 import { PopupStore } from "../PopupStore";
 import showModal from "@nextgisweb/gui/showModal";
-import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
+import FeatureEditorModal from "@nextgisweb/feature-layer/feature-editor-modal";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
 import OpenInFull from "@nextgisweb/icon/material/open_in_full";
@@ -61,7 +61,7 @@ const CheckOnlyOne = ({ store }) => {
 export const Popup = observer(
     (props: PopupProps) => {
         const { display, store } = props;
-        
+
         const pm = display.panelManager;
         const pkey = "selected-feature";
         const panel = pm.getPanel<SelectedFeatureStore>(pkey);
@@ -71,7 +71,7 @@ export const Popup = observer(
         useEffect(() => {
             if (store.fixPopup) {
                 store.setFixPos(store.valueRnd);
-                store.setFixPanel(store.fixContentItem.key)
+                store.setFixPanel(store.fixContentItem?.key)
             } else {
                 store.setFixPos(null);
             }
@@ -325,10 +325,12 @@ export const Popup = observer(
                                 className={store.response.featureCount > 0 && store.fixPos !== null ? "icon-disabled" : "icon-symbol"}
                                 onClick={() => {
                                     store.pointDestroy();
-                                    panel && panel.setActiveChecked({
-                                        ...panel.activeChecked,
-                                        achecked: false,
-                                    });
+                                    if (panel) {
+                                        panel.setActiveChecked({
+                                            ...panel.activeChecked,
+                                            achecked: false,
+                                        });
+                                    }
                                 }} />
                             {store.valueRnd.buttonZoom["topRight"] && (
                                 <div style={{ margin: "0 0 0 6px" }}>

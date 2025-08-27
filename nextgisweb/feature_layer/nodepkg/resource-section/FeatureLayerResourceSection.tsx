@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { Key, useMemo } from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { Space, Table } from "@nextgisweb/gui/antd";
 import type { TableColumnsType } from "@nextgisweb/gui/antd";
@@ -9,7 +9,7 @@ import type { ResourceSection } from "@nextgisweb/resource/resource-section";
 import { FormattedDecimalForm } from "@nextgisweb/feature-layer/fields-widget/FieldsStore";
 
 interface DataType {
-    key: React.Key;
+    key: Key;
     keyname: string;
     type: string;
     display_name: string;
@@ -26,11 +26,15 @@ export const FeatureLayerResourceSection: ResourceSection = ({
     assert(fields);
 
     const AdditionalProps = ({ item }) => {
-        const items: any = []
-        item.lookup_table !== null &&
+        const items: any = [];
+
+        if (item.lookup_table !== null) {
             items.push(<a href={routeURL("resource.show", { id: item?.lookup_table?.id })}>{gettext("Reference book added")}</a>);
-        item.format_field !== null && item.format_field.checked &&
+        }
+
+        if (item.format_field !== null && item.format_field.checked) {
             items.push(<span title={gettext("Formatted value")} className="formatted-icon">{gettext("Formatted value")}</span>);
+        }
 
         return (
             <Space>{items.map((i, index) => {

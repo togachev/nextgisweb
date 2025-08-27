@@ -79,7 +79,11 @@ export const GraphPanel = observer((props) => {
             data.push(copy)
         })
         const obj = { props: item, data: { datasets: data } };
-        feature.length > 0 ? setResult(obj) : setResult(undefined);
+        if (feature.length > 0) {
+            setResult(obj)
+        } else {
+            setResult(undefined)
+        }
     }
 
     useEffect(() => {

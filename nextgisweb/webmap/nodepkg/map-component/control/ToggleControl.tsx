@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type React from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useObjectState } from "@nextgisweb/gui/hook";
@@ -18,22 +17,24 @@ export type ToggleControlProps = Omit<
     ControlProps<ToggleControlOptions>,
     "html"
 > & {
-    children?: React.ReactNode;
-    render?: (status: boolean) => React.ReactNode;
+    children?: ReactNode;
+    render?: (status: boolean) => ReactNode;
 };
 
 export function ToggleControl({
     position,
     children,
     render,
+    status: statusProp,
     style,
     ...toggleOptions
 }: ToggleControlProps) {
+    const statusRef = useRef(statusProp);
+
     const [options] = useObjectState(toggleOptions);
     const context = useMapContext();
     const [instance, setInstance] = useState<IToggleControl>();
-    const [status, setStatus] = useState(options.status ?? false);
-    const prevOptionsRef = useRef<ToggleControlOptions>();
+    const [status, setStatus] = useState(statusProp ?? false);
 
     useMapControl({ context, instance, position });
 
@@ -42,6 +43,7 @@ export function ToggleControl({
     const createControl = useCallback(() => {
         return createToggleControl({
             ...options,
+            status: statusRef.current,
             html: portal.current,
             onClick: async (newStatus) => {
                 setStatus(newStatus);
@@ -62,11 +64,10 @@ export function ToggleControl({
     }, [createControl]);
 
     useEffect(() => {
-        if (!instance || !options) return;
-
-        instance.changeStatus(options.status);
-        prevOptionsRef.current = options;
-    }, [instance, options]);
+        statusRef.current = status;
+        if (!instance) return;
+        instance.changeStatus(status);
+    }, [instance, status]);
 
     useEffect(() => {
         if (!instance) return;

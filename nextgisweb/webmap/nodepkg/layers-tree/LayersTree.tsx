@@ -145,11 +145,14 @@ export const LayersTree = observer(
             store.handleCheckChanged(updatedCheckedKeys);
         };
 
-        const _onSelect = (selectedKeysValue: React.Key[]) => {
-            const val = selectedKeysValue.map(Number);
-            setSelectedKeys(val);
-            if (onSelect) onSelect(val);
-        };
+        const _onSelect = useCallback(
+            (selectedKeysValue: React.Key[]) => {
+                const val = selectedKeysValue.map(Number);
+                setSelectedKeys(val);
+                if (onSelect) onSelect(val);
+            },
+            [onSelect]
+        );
 
         const titleRender = useCallback(
             (nodeData: TreeWebmapItem) => {
@@ -177,7 +180,12 @@ export const LayersTree = observer(
                         <DropdownActions
                             nodeData={nodeData.treeItem}
                             getWebmapPlugins={getWebmapPlugins}
-                            setMoreClickId={setMoreClickId}
+                            setMoreClickId={(id) => {
+                                if (id !== undefined) {
+                                    _onSelect([id]);
+                                }
+                                setMoreClickId(id);
+                            }}
                             moreClickId={moreClickId}
                             update={update}
                             setUpdate={setUpdate}
@@ -219,6 +227,7 @@ export const LayersTree = observer(
                 );
             },
             [
+                _onSelect,
                 checkable,
                 getWebmapPlugins,
                 moreClickId,

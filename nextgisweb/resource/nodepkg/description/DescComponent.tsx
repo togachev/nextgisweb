@@ -77,7 +77,7 @@ const GetData = ({ type, item, options, lid, styleId, fid, styles, display }: Ge
                 title={msgZoomToFeature}
                 onClick={() => {
                     zoomToFeature(display, lid, fid, styles);
-                    display.imodule && display.imodule.popup_destroy();
+                    if (display.imodule) { display.imodule.popup_destroy(); }
                 }}>
                 <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
                     <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
@@ -91,7 +91,7 @@ const GetData = ({ type, item, options, lid, styleId, fid, styles, display }: Ge
                 title={msgZoomToRaster}
                 onClick={() => {
                     zoomToRasterExtent(display, styleId, styles);
-                    display.imodule && display.imodule.popup_destroy();
+                    if (display.imodule) { display.imodule.popup_destroy(); }
                 }}
             >
                 <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>

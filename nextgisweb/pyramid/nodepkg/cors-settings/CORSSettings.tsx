@@ -31,6 +31,8 @@ export function CORSSettings(props: { readonly: boolean }) {
     const [form] = Form.useForm<CORSSettingsForm>();
     const [status, setStatus] = useState<string>();
 
+    const [messageApi, contextHolder] = message.useMessage();
+
     const corsRoute = useRouteGet({
         name: "pyramid.csettings",
         options: { "query": { pyramid: ["allow_origin"] } },
@@ -54,12 +56,12 @@ export function CORSSettings(props: { readonly: boolean }) {
                 await route("pyramid.csettings").put({
                     json: { pyramid: { allow_origin: list || null } },
                 });
-                message.success(gettext("CORS settings updated"));
+                messageApi.success(gettext("CORS settings updated"));
             } catch (err) {
                 errorModal(err);
             }
         } catch {
-            message.error(gettext("Fix the form errors first"));
+            messageApi.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(undefined);
         }
@@ -89,6 +91,7 @@ export function CORSSettings(props: { readonly: boolean }) {
 
     return (
         <>
+            {contextHolder}
             <Row gutter={[16, 16]}>
                 <Col flex="auto">
                     <Form

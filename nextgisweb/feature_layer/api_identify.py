@@ -9,7 +9,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceRef, ResourceScope
-from nextgisweb.raster_layer.model import COLOR_INTERPRETATION
+# from nextgisweb.raster_layer.model import COLOR_INTERPRETATION
 
 from .interface import IFeatureLayer
 
@@ -200,33 +200,33 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
                     )
                 )
-            else:
-                if (values := val_at_coord(ds, body.point)) is None:
-                    continue
+            # else:
+            #     if (values := val_at_coord(ds, body.point)) is None:
+            #         continue
 
-                color_interpretation = [
-                    COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
-                    for bidx in range(1, layer.band_count + 1)
-                ]
+            #     color_interpretation = [
+            #         COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
+            #         for bidx in range(1, layer.band_count + 1)
+            #     ]
 
-                value_channel = ["{} ({:02})".format(b_, a_) for a_, b_ in zip(color_interpretation, values.flatten().tolist())]
+            #     value_channel = ["{} ({:02})".format(b_, a_) for a_, b_ in zip(color_interpretation, values.flatten().tolist())]
 
-                for i, value in enumerate(value_channel):
-                    attr.append(dict(key=i, attr=i, value=value, datatype="STRING", format_field=dict()))
+            #     for i, value in enumerate(value_channel):
+            #         attr.append(dict(key=i, attr=i, value=value, datatype="STRING", format_field=dict()))
 
-                options.append(
-                    dict(
-                        desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
-                        layerId=layer.id,
-                        styleId=style.id,
-                        dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
-                        label=[x["label"] for x in body.styles if x["id"] == style.id][0],
-                        permission="Read",
-                        type="raster",
-                        attr=attr,
-                        value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
-                    )
-                )
+            #     options.append(
+            #         dict(
+            #             desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
+            #             layerId=layer.id,
+            #             styleId=style.id,
+            #             dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
+            #             label=[x["label"] for x in body.styles if x["id"] == style.id][0],
+            #             permission="Read",
+            #             type="raster",
+            #             attr=attr,
+            #             value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
+            #         )
+            #     )
 
     result["data"] = options
     result["featureCount"] = len(options)

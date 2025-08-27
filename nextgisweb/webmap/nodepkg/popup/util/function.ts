@@ -56,7 +56,7 @@ const usePopup = (display: Display) => {
     useEffect(() => {
         if (store.fixPopup) {
             store.setFixPos(store.valueRnd);
-            store.setFixPanel(store.fixContentItem.key)
+            store.setFixPanel(store.fixContentItem?.key)
         } else {
             store.setFixPos(null);
         }

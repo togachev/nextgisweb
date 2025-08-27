@@ -62,15 +62,15 @@ export const CoordinateComponent = observer((props) => {
         const updateUrl = store.activeControlKey && store.control[store.activeControlKey].checked;
         switch (store.activeControlKey && store.control[store.activeControlKey].status) {
             case true:
-                updateUrl && (
-                    window.history.pushState({}, "", store.control[store.activeControlKey].url), // link update
+                if (updateUrl) {
+                    window.history.pushState({}, "", store.control[store.activeControlKey].url); // link update
                     copyValue(store.control[store.activeControlKey].url, msgCopyActive(store.activeControlKey)) // link copying
-                );
+                };
                 break;
             case false:
-                updateUrl && (
-                    window.history.pushState({}, "", ngwConfig.applicationUrl + routeURL("webmap.display", display.config.webmapId)) // reset link to original value
-                );
+                if (updateUrl) {
+                    window.history.pushState({}, "", ngwConfig.applicationUrl + routeURL("webmap.display", display.config.webmapId)); // reset link to original value
+                };
                 break;
         }
     }, [store.control]);
@@ -133,7 +133,7 @@ export const CoordinateComponent = observer((props) => {
             disabled: value.disable && point === false && true,
         }
     };
-    
+
     return (
         <div className="footer-coordinate-component">
             {contextHolder}

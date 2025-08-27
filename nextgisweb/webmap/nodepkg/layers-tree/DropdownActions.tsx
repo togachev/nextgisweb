@@ -34,7 +34,9 @@ export function DropdownActions({
         return (
             <span
                 className="more"
-                onClick={() => {
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setMoreClickId(id);
                 }}
             >
@@ -44,7 +46,7 @@ export function DropdownActions({
     }
 
     const menuItems: MenuProps["items"] = [];
-    const customMenuItems: JSX.Element[] = [];
+    const customMenuItems: React.ReactElement[] = [];
     const plugins = getWebmapPlugins();
     for (const keyPlugin in plugins) {
         const plugin = plugins[keyPlugin];
@@ -95,16 +97,26 @@ export function DropdownActions({
 
     return (
         <Dropdown
-            menu={{ items: menuItems.sort((a, b) => (a.label > b.label) ? 1 : -1) }}
+            menu={{
+                items: menuItems.sort((a, b) => (a.label > b.label) ? 1 : -1),
+                onClick: ({ domEvent }) => {
+                    domEvent.stopPropagation();
+                },
+            }}
             onOpenChange={() => {
                 setMoreClickId(undefined);
             }}
             trigger={["click"]}
-            destroyPopupOnHide
+            destroyOnHidden
             open
             placement="bottomRight"
-            dropdownRender={(menu) => (
-                <div className="dropdown-content">
+            popupRender={(menu) => (
+                <div
+                    className="dropdown-content"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
                     {menu}
                     {customMenuItems.length && (
                         <>
@@ -117,7 +129,13 @@ export function DropdownActions({
                 </div>
             )}
         >
-            <span className="more">
+            <span
+                className="more"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
+            >
                 <MoreVertIcon />
             </span>
         </Dropdown>

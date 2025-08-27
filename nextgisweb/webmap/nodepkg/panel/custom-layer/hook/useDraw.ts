@@ -216,7 +216,11 @@ export const useDraw = (display: DojoDisplay) => {
 
     const visibleLayer = (checked: boolean, key: number) => {
         const layer = getLayer(key);
-        checked ? layer.setVisible(true) : layer.setVisible(false);
+        if (checked) {
+            layer.setVisible(true);
+        } else {
+            layer.setVisible(false);
+        }
     };
 
     const zoomToLayer = (key: number) => {

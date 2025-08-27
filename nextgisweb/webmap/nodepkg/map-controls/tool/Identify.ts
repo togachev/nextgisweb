@@ -9,7 +9,7 @@ import { transform } from "ol/proj";
 
 import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -84,7 +84,7 @@ interface Request {
 }
 
 export class Identify extends ToolBase {
-    label = i18n.gettext("Identify");
+    label = gettext("Identify");
     iconClass = "iconIdentify";
     pixelRadius: number = webmapSettings.identify_radius || 10;
     map: MapStore;
@@ -130,7 +130,11 @@ export class Identify extends ToolBase {
             const featureResponse = layerResponse.features[featureInfo.idx];
             this.setHighlightedFeature(null);
             const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureResponse.layerId)?.[1].itemConfig.layerHighligh;
-            highlights === false && Object.assign(opt, { query: { geom: false } })
+
+            if (highlights === false) {
+                Object.assign(opt, { query: { geom: false } })
+            }
+
             const featureItem = await route("feature_layer.feature.item", {
                 id: featureResponse.layerId,
                 fid: featureResponse.id,
@@ -146,12 +150,14 @@ export class Identify extends ToolBase {
             };
             this.setHighlightedFeature(featureHightlight);
 
-            highlights === true ?
+            if (highlights === true) {
                 topic.publish<FeatureHighlightEvent>(
                     "feature.highlight",
                     featureHightlight
-                ) :
+                )
+            } else {
                 topic.publish("feature.unhighlight")
+            }
 
             return featureItem;
         }

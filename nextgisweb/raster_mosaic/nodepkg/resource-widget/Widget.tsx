@@ -1,3 +1,4 @@
+import type { MessageInstance } from "antd/es/message/interface";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
@@ -10,10 +11,12 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { File, Store } from "./Store";
-
 import "./Widget.less";
 
-function showError([status, msg]: [boolean, string | null]) {
+function showError(
+    [status, msg]: [boolean, string | null],
+    message: MessageInstance
+) {
     if (!status) message.error(msg);
 }
 
@@ -27,6 +30,7 @@ const columns: EdiTableColumn<File>[] = [
 ];
 
 export const Widget: EditorWidget<Store> = observer(({ store }) => {
+    const [messageApi, contextHolder] = message.useMessage();
     const actions = useMemo(
         () => [
             <FileUploaderButton
@@ -35,16 +39,17 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                 accept=".tiff,.tif"
                 onChange={(value) => {
                     if (!value) return;
-                    showError(store.appendFiles(value));
+                    showError(store.appendFiles(value), messageApi);
                 }}
                 uploadText={gettext("Upload")}
             />,
         ],
-        [store]
+        [messageApi, store]
     );
 
     return (
         <div className="ngw-raster-mosaic-resource-widget">
+            {contextHolder}
             <ActionToolbar pad borderBlockEnd actions={actions} />
             <EdiTable
                 columns={columns}

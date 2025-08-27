@@ -157,9 +157,12 @@ export const Header = observer(({ store }: HeaderProps) => {
                 form.resetFields();
                 store.setValueHeader(store.initialHeader);
                 store.updateStatusFile("done", "img", "initialHeader", "valueHeader", "setValueHeader");
-                store.initialHeader?.img && store.initialHeader?.img[0]?.status === "done" ?
-                    store.setUrlImg({ ...store.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) }) :
+
+                if (store.initialHeader?.img && store.initialHeader?.img[0]?.status === "done") {
+                    store.setUrlImg({ ...store.ulrImg, header: routeURL("pyramid.asset.himg", { ikey: "home_page_header" }) })
+                } else {
                     store.setUrlImg({ ...store.ulrImg, header: "" });
+                }
             }
         } finally {
             setStatus(false);

@@ -248,7 +248,10 @@ export class HomeStore {
                         }
 
                         this.setValueHeader(data.pyramid.home_page_header);
-                        status === "loading" && this.setInitialHeader(data.pyramid.home_page_header);
+
+                        if (status === "loading") {
+                            this.setInitialHeader(data.pyramid.home_page_header);
+                        }
                     }
                 }
             })
@@ -267,7 +270,10 @@ export class HomeStore {
                         }
 
                         this.setValueFooter(data.pyramid.home_page_footer);
-                        status === "loading" && this.setInitialFooter(data.pyramid.home_page_footer);
+
+                        if (status === "loading") {
+                            this.setInitialFooter(data.pyramid.home_page_footer);
+                        }
                     }
                 }
             });

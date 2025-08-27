@@ -1,15 +1,17 @@
 import classNames from "classnames";
-import { Suspense, lazy, useMemo } from "react";
+import { useEffect } from "react";
 
-import { Flex, Spin } from "@nextgisweb/gui/antd";
+import { Modal } from "@nextgisweb/gui/antd";
+import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
+
+import { EntrypointSuspense } from "../component/EntrypointSuspense";
 
 import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
-
-import { LoadingOutlined } from "@ant-design/icons";
+import { layoutStore } from "./store";
 
 interface BaseProps {
     title: string;
@@ -25,14 +27,6 @@ interface BaseProps {
     hideResourceFilter?: boolean;
 }
 
-function EntrypointFallback() {
-    return (
-        <Flex style={{ padding: "4em 8em" }} vertical>
-            <Spin size="large" indicator={<LoadingOutlined spin />} />
-        </Flex>
-    );
-}
-
 export function Base({
     hideResourceFilter = false,
     entrypointProps,
@@ -46,21 +40,21 @@ export function Base({
     header,
     title,
 }: BaseProps) {
-    const LazyBody = useMemo(() => {
-        return lazy(() => window.ngwEntry(entrypoint));
-    }, [entrypoint]);
+    const [modalApi, modalContextHolder] = Modal.useModal();
+
+    const { modalHolder } = useShowModal({
+        modalStore: layoutStore.modalStore,
+    });
+
+    useEffect(() => {
+        layoutStore.setModalApi(modalApi);
+    }, [modalApi]);
 
     const renderBody = (
-        <Suspense fallback={<EntrypointFallback />}>
-            <LazyBody {...entrypointProps} />
-        </Suspense>
+        <EntrypointSuspense entrypoint={entrypoint} props={entrypointProps} />
     );
 
-    if (layoutMode === "nullSpace") {
-        return renderBody;
-    }
-
-    return (
+    const PyramidLayout = () => (
         <div
             className={classNames("ngw-pyramid-layout", {
                 "ngw-pyramid-layout-hstretch": maxwidth,
@@ -86,14 +80,12 @@ export function Base({
                                     {breadcrumbs.length > 0 && (
                                         <Breadcrumbs items={breadcrumbs} />
                                     )}
-
                                     <h1
                                         id="title"
                                         className="ngw-pyramid-layout-title"
                                     >
                                         {title}
-                                    </h1>
-
+                                    </h1>{" "}
                                     <div
                                         id="content"
                                         className="content"
@@ -114,5 +106,15 @@ export function Base({
                 </div>
             )}
         </div>
+    );
+
+    return (
+        <>
+            <title>{title}</title>
+
+            {modalContextHolder}
+            {modalHolder}
+            {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
+        </>
     );
 }

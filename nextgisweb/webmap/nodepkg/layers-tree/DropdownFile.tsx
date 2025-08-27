@@ -48,20 +48,22 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
     const { data: data } = useRouteGet("file_resource.group_show", { id: nodeData.styleId });
 
     const items: MenuProps["items"] = [];
-    data && getEntries(data).map(([_, itm]) => {
-        itm.map((i: FileProps) => {
-            items.push({
-                key: i.id,
-                label: (
-                    <Link title={i.name} className="linkFile" target="_blank" href={i.link}>
-                        <span className="fileTitle">{i.res_name}</span>
-                        <span className="fileName">{i.name}</span>
-                    </Link>
-                ),
-                extra: <Link title={gettext("Download")} className="dowload-file-icon" target="_blank" href={i.link} download><Download /></Link>
+    if (data) {
+        getEntries(data).map(([_, itm]) => {
+            itm.map((i: FileProps) => {
+                items.push({
+                    key: i.id,
+                    label: (
+                        <Link title={i.name} className="linkFile" target="_blank" href={i.link}>
+                            <span className="fileTitle">{i.res_name}</span>
+                            <span className="fileName">{i.name}</span>
+                        </Link>
+                    ),
+                    extra: <Link title={gettext("Download")} className="dowload-file-icon" target="_blank" href={i.link} download><Download /></Link>
+                })
             })
         })
-    })
+    }
 
     return items.length > 0 && (
         <Dropdown

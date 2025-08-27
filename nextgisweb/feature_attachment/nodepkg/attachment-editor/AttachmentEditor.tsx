@@ -6,15 +6,12 @@ import { useFileUploader } from "@nextgisweb/file-upload";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Input, Table, Upload } from "@nextgisweb/gui/antd";
+import { Button, Input, Table, Upload, message } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
-import showModal from "@nextgisweb/gui/showModal";
 import { formatSize } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { ImageThumbnail } from "../image-thumbnail/ImageThumbnail";
-import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
-
+import { AttachmentEditorPreview } from "./AttachmentEditorPreview";
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
 import { isFileImage } from "./util/isFileImage";
@@ -23,7 +20,7 @@ import "./AttachmentEditor.less";
 const AttachmentEditor = observer(
     ({ store }: EditorWidgetProps<AttachmentEditorStore>) => {
         const multiple = true;
-
+        const [messageApi, contextHolder] = message.useMessage();
         const [width] = useState(80);
         const previewRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +52,7 @@ const AttachmentEditor = observer(
         const { props } = useFileUploader({
             openFileDialogOnClick: false,
             onChange,
+            onError: messageApi.error,
             multiple,
         });
 
@@ -101,6 +99,7 @@ const AttachmentEditor = observer(
 
         return (
             <div className="ngw-feature-attachment-editor">
+                {contextHolder}
                 <ActionToolbar pad borderBlockEnd actions={actions} />
                 <Upload {...props}>
                     <Table
@@ -122,31 +121,13 @@ const AttachmentEditor = observer(
                                             isFileImage(r._file))
                                     ) {
                                         return (
-                                            <ImageThumbnail
+                                            <AttachmentEditorPreview
                                                 attachment={r}
+                                                attachments={dataSource}
                                                 resourceId={store_.resourceId}
                                                 featureId={store_.featureId}
                                                 width={width}
                                                 height={width}
-                                                onClick={() => {
-                                                    const container =
-                                                        previewRef.current;
-                                                    if (container) {
-                                                        showModal(
-                                                            CarouselModal,
-                                                            {
-                                                                dataSource,
-                                                                attachment: r,
-                                                                featureId:
-                                                                    store_.featureId,
-                                                                resourceId:
-                                                                    store_.resourceId,
-                                                                getContainer:
-                                                                    container,
-                                                            }
-                                                        );
-                                                    }
-                                                }}
                                             />
                                         );
                                     }

@@ -184,7 +184,9 @@ export const DrawFeatures = observer(({ display }: Display) => {
                 deselectOnClick({ status: false, value: editableLayerKey })
                 onChangeSelect({ item: currentItem, value: layer.ol_uid })
             } else {
-                startEdit && onChangeSelect({ item: currentItem, value: layer.ol_uid })
+                if (startEdit) {
+                    onChangeSelect({ item: currentItem, value: layer.ol_uid })
+                }
             }
 
         } else {
@@ -279,15 +281,13 @@ export const DrawFeatures = observer(({ display }: Display) => {
             return { ...item, disabled: false }
         });
 
-        store.itemModal?.geomType === "Polygon" ?
-            (
-                setDefaultOp(store.options.find(item => item.value !== "application/gpx+xml")),
-                store.setOptions(val1)
-            ) :
-            (
-                setDefaultOp(store.options[0]),
-                store.setOptions(val2)
-            )
+        if (store.itemModal?.geomType === "Polygon") {
+            setDefaultOp(store.options.find(item => item.value !== "application/gpx+xml"));
+            store.setOptions(val1);
+        } else {
+            setDefaultOp(store.options[0]);
+            store.setOptions(val2);
+        }
     }, [store.itemModal])
 
     const showModal = () => {
@@ -371,6 +371,12 @@ export const DrawFeatures = observer(({ display }: Display) => {
                 {item &&
                     iconControlSnap.map((i, index) => {
                         const titleEnable = item.allLayer ? i.titleDisable : i.titleEnable;
+                        let title;
+                        if (i.keyname === "allLayer") {
+                            title = titleEnable
+                        } else {
+                            title = i.title
+                        }
                         return (
                             <div
                                 key={index}
@@ -380,10 +386,12 @@ export const DrawFeatures = observer(({ display }: Display) => {
                                         "button-disable"
                                 }
                                 onClick={() => {
-                                    !store.readonly && !item.change ? toggleChecked(i.keyname) : undefined
+                                    if (!store.readonly && !item.change) {
+                                        toggleChecked(i.keyname)
+                                    }
                                 }}>
                                 <div className={item[i.keyname] ? "icon-symbol-yes" : "icon-symbol-no"}
-                                    title={i.keyname === "allLayer" ? titleEnable : i.title}>
+                                    title={title}>
                                     {i.comp}
                                 </div>
                             </div>

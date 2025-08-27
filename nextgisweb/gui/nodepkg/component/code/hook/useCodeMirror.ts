@@ -40,7 +40,7 @@ const getLang = async (lang: Lang): Promise<() => LanguageSupport> => {
     try {
         const module = await importers[fullLang]();
         return module;
-    } catch (err) {
+    } catch {
         throw new Error(
             `CodeMirror language for '${fullLang}' is not installed`
         );
@@ -61,7 +61,7 @@ export function useCodeMirror({
 }: CodeOptions) {
     const [editor, setEditor] = useState<Editor | null>(null);
 
-    const destroy = useRef<() => void>();
+    const destroy = useRef<() => void>(null);
 
     const getExtensions = useCallback(async () => {
         const langExtension = await getLang(lang);

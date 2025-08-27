@@ -43,9 +43,11 @@ export function WebMapFeatureGridTab({
     const itemConfig = useRef<LayerItemConfig>(display.current.itemConfig);
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current?.plugin[
-            plugin.identity as string
+        plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
+
+    const [editorProps] = useState(() => ({ showGeometryTab: false }));
 
     const reloadLayer = useCallback(async () => {
         // It is possible to have few webmap layers for one resource id
@@ -67,7 +69,7 @@ export function WebMapFeatureGridTab({
             content: content,
         });
     };
-    
+
     const [store] = useState(
         () =>
             new FeatureGridStore({
@@ -75,6 +77,7 @@ export function WebMapFeatureGridTab({
                 readonly: data.current?.readonly ?? true,
                 size: "small",
                 cleanSelectedOnFilter: false,
+                canCreate: false,
                 onDelete: reloadLayer,
                 onSave: () => {
                     display.current.popupStore.setUpdate(true)
@@ -186,12 +189,14 @@ export function WebMapFeatureGridTab({
                                 {...props}
                                 display={display.current}
                                 onGeomChange={(_, geomWKT) => {
-                                    geomWKT ?
+                                    if (geomWKT) {
                                         store.setQueryParams((prev) => ({
                                             ...prev,
                                             intersects: geomWKT,
-                                        })) :
+                                        }))
+                                    } else {
                                         store.setQueryParams(null)
+                                    }
                                 }}
                             />
                         );
@@ -261,5 +266,5 @@ export function WebMapFeatureGridTab({
         return unsubscribe;
     }, [subscribe, layerId, store]);
 
-    return <FeatureGrid id={layerId} store={store} />;
+    return <FeatureGrid id={layerId} store={store} editorProps={editorProps} />;
 }

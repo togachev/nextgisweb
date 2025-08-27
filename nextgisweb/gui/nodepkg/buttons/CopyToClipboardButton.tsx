@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import type { MouseEventHandler } from "react";
+
 import { Button, message } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -11,6 +14,31 @@ interface CopyToClipboardButtonProps extends ButtonProps {
     getTextToCopy: () => string;
 }
 
+interface CopyCallbacks {
+    onSuccess?: () => void;
+    onError?: (error: unknown) => void;
+}
+
+interface ConditionalEventProps {
+    onMouseDown?: MouseEventHandler<HTMLButtonElement>;
+    onClick?: MouseEventHandler<HTMLButtonElement>;
+}
+
+const _copyToClipboard = async (
+    textToCopy: string,
+    callbacks?: CopyCallbacks
+): Promise<void> => {
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        callbacks?.onSuccess?.();
+    } catch (err: unknown) {
+        console.error("Failed to copy to clipboard:", err);
+        callbacks?.onError?.(err);
+    }
+};
+
+const IsTouchDevice = typeof window !== "undefined" && "ontouchstart" in window;
+
 export function CopyToClipboardButton({
     children,
     messageInfo: text,
@@ -18,20 +46,27 @@ export function CopyToClipboardButton({
     iconOnly,
     ...restParams
 }: CopyToClipboardButtonProps) {
-
     const [messageApi, contextHolder] = message.useMessage();
+    const isMounted = useRef(true);
 
-    const messageInfo = (text) => {
-        messageApi.open({
-            type: "success",
-            content: text,
-            duration: 2,
-        });
-    };
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
 
     const copyToClipboard = async () => {
-        await navigator.clipboard.writeText(getTextToCopy());
-        messageInfo(text || gettext("Copied to clipboard"));
+        await _copyToClipboard(getTextToCopy(), {
+            onSuccess: () => {
+                if (!isMounted.current) return;
+                messageApi.info(messageInfo || gettext("Copied to clipboard"));
+            },
+            onError: () => {
+                if (!isMounted.current) return;
+                messageApi.error(gettext("Failed to copy to clipboard"));
+            },
+        });
     };
 
     let buttonContent: React.ReactNode | null = null;
@@ -39,16 +74,23 @@ export function CopyToClipboardButton({
         buttonContent = children || gettext("Copy to clipboard");
     }
 
+    const eventProps: ConditionalEventProps = {};
+    if (IsTouchDevice) {
+        // Using onMouseDown because onClick doesn't fire on mobile
+        // inside a Tooltip
+        eventProps.onMouseDown = copyToClipboard;
+    } else {
+        eventProps.onClick = copyToClipboard;
+    }
+
     return (
-        <Button
-            icon={<ContentCopyIcon />}
-            onClick={() => {
-                copyToClipboard();
-            }}
-            {...restParams}
-        >
+        <>
             {contextHolder}
-            {buttonContent}
-        </Button>
+            <Button icon={<ContentCopyIcon />} {...eventProps} {...restParams}>
+                {buttonContent}
+            </Button>
+        </>
     );
 }
+
+CopyToClipboardButton.displayName = "CopyToClipboardButton";

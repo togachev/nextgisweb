@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { message } from "@nextgisweb/gui/antd";
 import type { UploadFile } from "@nextgisweb/gui/antd";
 import { errorModalUnlessAbort } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
@@ -19,15 +18,16 @@ const msgProgressFmt = gettextf("{} uploaded...");
 
 export function useFileUploader<M extends boolean = false>({
     accept,
-    fileMeta: initMeta,
     multiple = false as M,
-    onChange,
+    fileMeta: initMeta,
     inputProps = {},
+    afterUpload = [],
     setFileMeta: setInitMeta,
     showUploadList = false,
     openFileDialogOnClick = true,
     showProgressInDocTitle = false,
-    afterUpload = [],
+    onChange,
+    onError,
 }: UseFileUploaderProps<M>) {
     const { makeSignal, abort } = useAbortController();
 
@@ -164,12 +164,13 @@ export function useFileUploader<M extends boolean = false>({
                     upload(info.fileList.map((f) => f.originFileObj as File));
                     setFileList([]);
                 } else if (error) {
-                    message.error(`${info.file.name} file upload failed.`);
+                    onError?.(`${info.file.name} file upload failed.`);
                 }
             },
             ...restInputProps,
         }),
         [
+            onError,
             upload,
             accept,
             multiple,

@@ -20,12 +20,13 @@ export const useFeatures = (display: Display) => {
         customLayer.setStyle(customStyle);
         customLayer.set("name", file.uid + "__upload-layer");
         olmap.addLayer(customLayer);
-        length <= 1 &&
+        if (length <= 1) {
             customSource.once("change", function () {
                 if (customSource.getState() === "ready") {
                     olmap.getView().fit(customSource.getExtent(), olmap.getSize());
                 }
             });
+        }
     }
 
     const zoomfeature = (item: OlFeature) => {
@@ -69,7 +70,11 @@ export const useFeatures = (display: Display) => {
             const uid = layer.get("name")?.split("__")[0]
             const pref = layer.get("name")?.split("__")[1]
             if (pref === "upload-layer" && uid === value) {
-                checked ? layer.setVisible(true) : layer.setVisible(false);
+                if (checked) {
+                    layer.setVisible(true)
+                } else {
+                    layer.setVisible(false);
+                }
             }
         });
     };

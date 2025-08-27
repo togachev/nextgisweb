@@ -69,17 +69,21 @@ export function GeometryInfoTable({
             },
         ];
 
-        geometryInfo?.length !== null && items.splice(1, 0, {
-            key: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
-            label: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
-            children: formatLength(geometryInfo?.length),
-        });
+        if (geometryInfo?.length !== null) {
+            items.splice(1, 0, {
+                key: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
+                label: geometryInfo?.type.toLowerCase().includes("polygon") ? gettext("Perimeter") : gettext("Length"),
+                children: formatLength(geometryInfo?.length),
+            });
+        }
 
-        geometryInfo?.area !== null && items.splice(1, 0, {
-            key: gettext("Area"),
-            label: gettext("Area"),
-            children: formatArea(geometryInfo?.area),
-        })
+        if (geometryInfo?.area !== null) {
+            items.splice(1, 0, {
+                key: gettext("Area"),
+                label: gettext("Area"),
+                children: formatArea(geometryInfo?.area),
+            })
+        }
 
         return items;
     }, [featureId, resourceId, geometryInfo]);

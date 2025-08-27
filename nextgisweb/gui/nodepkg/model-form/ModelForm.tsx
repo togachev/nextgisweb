@@ -59,6 +59,8 @@ export function ModelForm(props: ModelFormProps) {
         ...formProps
     } = props;
 
+    const [messageApi, contextHolder] = message.useMessage();
+
     const allowDelete = allowDelete_ ?? true;
     const operation = id !== undefined ? "edit" : "create";
 
@@ -100,8 +102,8 @@ export function ModelForm(props: ModelFormProps) {
             } catch (err) {
                 errorModal(err);
             }
-        } catch (err) {
-            message.error(gettext("Fix the form errors first"));
+        } catch {
+            messageApi.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(null);
         }
@@ -163,6 +165,7 @@ export function ModelForm(props: ModelFormProps) {
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
+            {contextHolder}
             <FieldsForm
                 initialValues={value}
                 fields={fields}

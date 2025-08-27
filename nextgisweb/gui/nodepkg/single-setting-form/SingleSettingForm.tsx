@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Input, Space, message } from "@nextgisweb/gui/antd";
+import { Input, message, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
@@ -36,6 +36,7 @@ export function SingleSettingForm({
         "loading"
     );
     const [value, setValue] = useState<any>();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const { data } = useRouteGet<Record<string, Record<string, unknown>>>({
         name: model,
@@ -66,7 +67,7 @@ export function SingleSettingForm({
                 json: { [component]: json },
             });
             if (saveSuccesText) {
-                message.success(
+                messageApi.success(
                     [saveSuccesText, saveSuccesReloadText]
                         .filter(Boolean)
                         .join(" ")
@@ -85,6 +86,7 @@ export function SingleSettingForm({
 
     return (
         <Space.Compact style={{ "width": "100%" }}>
+            {contextHolder}
             <Input
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
