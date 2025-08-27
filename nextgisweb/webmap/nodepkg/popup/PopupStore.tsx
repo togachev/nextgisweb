@@ -623,7 +623,7 @@ export class PopupStore extends Component {
         }
     }
 
-    async getAttribute(res: DataProps, key) {
+    async getAttribute(res: DataProps) {
         const opts = this.display.config.options;
         const attrs = opts["webmap.identification_attributes"];
 
@@ -718,7 +718,7 @@ export class PopupStore extends Component {
 
     async getContent(val: DataProps, key: boolean) {
         if (val.type === "vector") {
-            const res = await this.getAttribute(val, key);
+            const res = await this.getAttribute(val);
             this.setExtensions(res.feature.extensions);
 
             res?.dataSource?.then(i => {

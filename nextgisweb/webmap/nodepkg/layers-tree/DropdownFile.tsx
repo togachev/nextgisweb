@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dropdown, Typography } from "@nextgisweb/gui/antd";
+import { Button, Dropdown } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import Paperclip from "@nextgisweb/icon/mdi/paperclip";
@@ -30,7 +30,6 @@ interface FileProps {
 interface DropdownFileProps {
     nodeData: TreeItemConfig | RootItemConfig;
 }
-const { Link } = Typography;
 
 export function DropdownFile({ nodeData }: DropdownFileProps) {
     const [open, setOpen] = useState(false);
@@ -54,12 +53,14 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
                 items.push({
                     key: i.id,
                     label: (
-                        <Link title={i.name} className="linkFile" target="_blank" href={i.link}>
-                            <span className="fileTitle">{i.res_name}</span>
-                            <span className="fileName">{i.name}</span>
-                        </Link>
+                        <Button block title={i.name} target="_blank" href={i.link} type="text">
+                            <span className="linkFile">
+                                <span className="fileTitle">{i.res_name}</span>
+                                <span className="fileName">{i.name}</span>
+                            </span>
+                        </Button>
                     ),
-                    extra: <Link title={gettext("Download")} className="dowload-file-icon" target="_blank" href={i.link} download><Download /></Link>
+                    extra: <Button icon={<Download />} title={gettext("Download")} className="dowload-file-icon" target="_blank" href={i.link} type="text" download />
                 })
             })
         })
@@ -74,8 +75,8 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
             trigger={["click"]}
             onOpenChange={handleOpenChange}
             open={open}
-            destroyPopupOnHide
-            dropdownRender={(menu) => (
+            destroyOnHidden
+            popupRender={(menu) => (
                 <div className="dropdown-file">
                     {menu}
                 </div>

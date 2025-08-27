@@ -258,7 +258,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                 <Row className="footer-info">
                     <Col className="logo-col" flex={1}>
                         <span className="uriit-logo">
-                            <img src={reloading ? null : store.ulrImg?.footer ? store.ulrImg.footer : ""} />
+                            <img src={reloading ? null : store.ulrImg?.footer ? store.ulrImg.footer : null} />
                         </span>
                     </Col>
                     <Col flex={4} >

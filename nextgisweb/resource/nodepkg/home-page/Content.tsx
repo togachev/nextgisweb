@@ -65,7 +65,6 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
 
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [acStatus, setAcStatus] = useState<AutoProps["status"]>("");
 
@@ -93,8 +92,6 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                 setAcStatus("");
             } catch {
                 setAcStatus("error");
-            } finally {
-                setLoading(false);
             }
         }, 1000)
     );
@@ -183,7 +180,9 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                         <div className="search-block">
                             <div className="search">
                                 <AutoComplete
-                                    popupClassName="home-page-map-filter-dropdown"
+                                    classNames={{
+                                        popup: { root: "home-page-map-filter-dropdown" },
+                                    }}
                                     style={{ width: "100%" }}
                                     onSelect={onSelect}
                                     options={options}
@@ -191,14 +190,13 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                                     notFoundContent={search.length > 0 && gettext("Webmap not found")}
                                     {...rest}
                                 >
-                                    <Input.Search
+                                    <Input
                                         prefix={<DeleteOffOutline />}
                                         size="middle"
                                         placeholder={gettext("Enter card name")}
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         allowClear
-                                        loading={loading}
                                     />
                                 </AutoComplete>
                             </div>
