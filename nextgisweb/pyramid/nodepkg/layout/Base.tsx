@@ -107,8 +107,7 @@ export function Base({
             )}
         </div>
     );
-    console.log(layoutMode);
-    
+
     return (
         <>
             <title>{title}</title>
