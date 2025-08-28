@@ -393,12 +393,13 @@ def resource_section_external_access(obj, *, request, **kwargs):
 def home_page(request):
     return dict(
         layout_mode="nullSpace",
-        title=gettext("Home page"),
+        title=request.env.core.system_full_name(),
         props=dict(
             config=dict(
                 isAdministrator=request.user.is_administrator,
                 upath_info=request.upath_info,
                 type= "home_page",
+                title=request.env.core.system_full_name(),
             )
         ),
     )

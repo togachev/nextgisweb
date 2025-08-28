@@ -70,9 +70,10 @@ export const Header = observer(({ store }: HeaderProps) => {
         key: index,
         label: (<a href={item?.value} target="_blank" rel="noopener noreferrer">{item?.name}</a>),
         name: item?.name,
-        value: gettext(item?.value),
+        value: item?.value,
         className: "menu-label",
     }));
+
 
     itemsUser.push({
         key: "auth",
@@ -284,7 +285,9 @@ export const Header = observer(({ store }: HeaderProps) => {
                     </div>
                     <div className="name-site">
                         <div className="title">
-                            <Title className="name-site-a" style={colorText} level={1} >{store.valueHeader?.first_name}</Title>
+                            <Title className="name-site-a" style={colorText} level={1} >
+                                {store.valueHeader?.first_name ? store.valueHeader?.first_name : store.config.title}
+                            </Title>
                             <Title className="name-site-b" style={colorText} level={5} >{store.valueHeader?.last_name}</Title>
                         </div>
                     </div>
