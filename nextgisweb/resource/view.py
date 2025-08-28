@@ -393,6 +393,7 @@ def resource_section_external_access(obj, *, request, **kwargs):
 def home_page(request):
     return dict(
         layout_mode="nullSpace",
+        title=gettext("Home page"),
         props=dict(
             config=dict(
                 isAdministrator=request.user.is_administrator,
