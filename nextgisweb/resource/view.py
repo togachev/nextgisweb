@@ -30,9 +30,6 @@ from .permission import Permission, Scope
 from .psection import PageSections
 from .scope import ResourceScope
 
-RESOURCE_FILTER_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
-HOME_PAGE_JSENTRY = jsentry("@nextgisweb/resource/home-page")
-
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
 
@@ -392,10 +389,17 @@ def resource_section_external_access(obj, *, request, **kwargs):
     return {"links": links} if len(links) > 0 else None
 
 
-@viewargs(renderer="home_page.mako")
+@react_renderer("@nextgisweb/resource/home-page")
 def home_page(request):
     return dict(
-        custom_layout=True
+        layout_mode="nullSpace",
+        props=dict(
+            config=dict(
+                isAdministrator=request.user.is_administrator,
+                upath_info=request.upath_info,
+                type= "home_page",
+            )
+        ),
     )
 
 

@@ -1,4 +1,40 @@
-#: component.py:13
+#: api_import.py:26
+msgid "Invalid ZIP archive."
+msgstr "Некорректный ZIP-архив."
+
+#: api_import.py:55
+msgid "File '{}' isn't found in metadata."
+msgstr "Файл '{}' не найден в метаданных."
+
+#: api_import.py:61
+msgid "Invalid feature ID for file '{}'."
+msgstr "Некорректный идентификатор объекта для файла '{}'."
+
+#: api_import.py:68
+msgid "Invalid keyname for file '{}'."
+msgstr "Некорректный ключ для файла '{}'."
+
+#: api_import.py:74
+msgid "Invalid name for file '{}'."
+msgstr "Некорректное имя для файла '{}'."
+
+#: api_import.py:80
+msgid "Invalid MIME type for file '{}'."
+msgstr "Некорректный MIME-тип для файла '{}'."
+
+#: api_import.py:87
+msgid "Invalid description for file '{}'."
+msgstr "Некорректное описание для файла '{}'."
+
+#: api_import.py:100
+msgid "Could not determine feature ID for file '{}'."
+msgstr "Не удалось определить идентификатор объекта для файла '{}'."
+
+#: api_import.py:118
+msgid "File '{}' isn't found in the archive."
+msgstr "Файл '{}' не найден в архиве."
+
+#: component.py:14
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
 
@@ -46,18 +82,18 @@ msgstr "Нет вложений"
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:139
-#: nodepkg/attachment-table/AttachmentTable.tsx:40
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:141
+#: nodepkg/attachment-table/AttachmentTable.tsx:41
 msgid "File name"
 msgstr "Имя файла"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:145
-#: nodepkg/attachment-table/AttachmentTable.tsx:58
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:147
+#: nodepkg/attachment-table/AttachmentTable.tsx:59
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:151
-#: nodepkg/attachment-table/AttachmentTable.tsx:73
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:153
+#: nodepkg/attachment-table/AttachmentTable.tsx:74
 msgid "Description"
 msgstr "Описание"
 
@@ -77,23 +113,23 @@ msgstr ""
 msgid "Export attachments to ZIP archive"
 msgstr "Экспортировать вложения в ZIP-архив"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:82
+#: nodepkg/attachment-form/AttachmentForm.tsx:84
 msgid "Back to resource"
 msgstr "Назад к ресурсу"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:84
+#: nodepkg/attachment-form/AttachmentForm.tsx:86
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:87
+#: nodepkg/attachment-form/AttachmentForm.tsx:89
 msgid "The archive has been successfully imported."
 msgstr "Импорт архива выполнен успешно."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:89
+#: nodepkg/attachment-form/AttachmentForm.tsx:91
 msgid "Attachments imported - {i}, skipped - {s}."
 msgstr "Импортировано вложений - {i}, пропущено - {s}."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:124
+#: nodepkg/attachment-form/AttachmentForm.tsx:126
 msgid ""
 "Upload a ZIP archive to batch append attachments to existing features. An "
 "archive must contain directories named after feature IDs. Each folder can "
@@ -104,81 +140,43 @@ msgstr ""
 "объектов. Каждая директория может содержать одно или несколько вложений. "
 "Дубликаты будут пропущены."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:133
+#: nodepkg/attachment-form/AttachmentForm.tsx:135
 msgid "Delete existing attachments"
 msgstr "Удалить существующие вложения"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:158
+#: nodepkg/attachment-form/AttachmentForm.tsx:160
 msgid "Import attachments from ZIP archive"
 msgstr "Импортировать вложения из ZIP-архива."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:170
+#: nodepkg/attachment-form/AttachmentForm.tsx:172
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:175
+#: nodepkg/attachment-form/AttachmentForm.tsx:177
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:50
+#: nodepkg/attachment-table/AttachmentTable.tsx:51
 msgid "Unnamed"
 msgstr "Безымянный"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:67
+#: nodepkg/attachment-table/AttachmentTable.tsx:68
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:28
+#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:34
 msgid "Toggle panorama viewer"
 msgstr "Переключить просмотр панорам"
 
-#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:92
-msgid "Show less"
-msgstr "Скрыть"
-
-#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:92
-msgid "Show more"
-msgstr "Показать полностью"
-
-#: util.py:26
-msgid "Invalid ZIP archive."
-msgstr "Некорректный ZIP-архив."
-
-#: util.py:55
-msgid "File '{}' isn't found in metadata."
-msgstr "Файл '{}' не найден в метаданных."
-
-#: util.py:61
-msgid "Invalid feature ID for file '{}'."
-msgstr "Некорректный идентификатор объекта для файла '{}'."
-
-#: util.py:68
-msgid "Invalid keyname for file '{}'."
-msgstr "Некорректный ключ для файла '{}'."
-
-#: util.py:74
-msgid "Invalid name for file '{}'."
-msgstr "Некорректное имя для файла '{}'."
-
-#: util.py:80
-msgid "Invalid MIME type for file '{}'."
-msgstr "Некорректный MIME-тип для файла '{}'."
-
-#: util.py:87
-msgid "Invalid description for file '{}'."
-msgstr "Некорректное описание для файла '{}'."
-
-#: util.py:100
-msgid "Could not determine feature ID for file '{}'."
-msgstr "Не удалось определить идентификатор объекта для файла '{}'."
-
-#: util.py:118
-msgid "File '{}' isn't found in the archive."
-msgstr "Файл '{}' не найден в архиве."
-
-#: view.py:21 view.py:45
+#: view.py:21 view.py:46
 msgid "Manage attachments"
 msgstr "Управление вложениями"
 
 #~ msgid "Failed to upload image"
 #~ msgstr "Не удалось загрузить изображение"
+
+#~ msgid "Show less"
+#~ msgstr "Скрыть"
+
+#~ msgid "Show more"
+#~ msgstr "Показать полностью"

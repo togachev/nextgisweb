@@ -14,7 +14,7 @@ import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
-import { LoginOutlined, LogoutOutlined, } from '@ant-design/icons';
+import { LoginOutlined, LogoutOutlined, } from "@ant-design/icons";
 
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import type { HomeStore } from "../HeaderProps";
@@ -25,6 +25,7 @@ type MenuItem = Required<MenuProps>["items"][number];
 
 const { Title } = Typography;
 const signInText = gettext("Sign in");
+const signOutText = gettext("Sign out");
 
 type HeaderProps = {
     store: HomeStore;
@@ -69,7 +70,7 @@ export const Header = observer(({ store }: HeaderProps) => {
         key: index,
         label: (<a href={item?.value} target="_blank" rel="noopener noreferrer">{item?.name}</a>),
         name: item?.name,
-        value: item?.value,
+        value: gettext(item?.value),
         className: "menu-label",
     }));
 
@@ -79,14 +80,13 @@ export const Header = observer(({ store }: HeaderProps) => {
             (<span className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
                 (<a className="label-sign" onClick={showLoginModal} href={ngwConfig.logoutUrl}>
-                    {signInText}
-                    <LoginOutlined className="login-icon" />
+                    <span className="label">{signInText}</span><LoginOutlined />
                 </a>) :
-                (<a href={ngwConfig.logoutUrl}>{signInText}</a>),
+                (<a href={ngwConfig.logoutUrl}><span className="label">{signInText}</span></a>),
         children:
             authenticated && [
                 {
-                    key: "user-name",
+                    key: "user_name",
                     label: <span className="account-name">{userDisplayName}</span>,
                     type: "group",
                 },
@@ -96,23 +96,23 @@ export const Header = observer(({ store }: HeaderProps) => {
                     icon: <FolderOutline />,
                 },
                 store.config.isAdministrator === true && {
-                    key: "control-panel",
+                    key: "control_panel",
                     icon: <Cog />,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
                     label: (<div className="warning">{gettext("Invitation session")}</div>),
-                    key: gettext("Invitation session"),
+                    key: "invitation_session",
                 },
                 {
                     label: (<a target="_blank" rel="noopener noreferrer" href={routeURL("auth.settings")}>{gettext("Settings")}</a>),
                     icon: <AccountCogOutline />,
-                    key: gettext("Settings"),
+                    key: "settings",
                 },
                 {
-                    label: (<a onClick={() => authStore.logout()} className="auth-login">{gettext("Sign out")}</a>),
+                    label: (<a onClick={() => authStore.logout()} className="auth-login">{signOutText}</a>),
                     icon: <LogoutOutlined className="logout-icon" />,
-                    key: gettext("Sign out"),
+                    key: "sign_out",
                 },
             ],
     })
@@ -132,9 +132,10 @@ export const Header = observer(({ store }: HeaderProps) => {
         return (
             <Menu
                 selectable={false}
-                mode="horizontal"
                 items={itemsUser}
+                mode="horizontal"
                 triggerSubMenuAction="click"
+                disabledOverflow={!authenticated}
             />)
     };
 

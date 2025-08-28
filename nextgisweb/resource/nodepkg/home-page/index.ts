@@ -1,2 +1,3 @@
-/** @entrypoint */
-export { Content } from "./Content";
+import { Content } from "./Content";
+
+export default Content;

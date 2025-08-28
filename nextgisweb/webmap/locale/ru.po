@@ -10,7 +10,7 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:184
+#: favorite.py:6 view.py:212
 msgid "Display"
 msgstr "Открыть"
 
@@ -18,7 +18,11 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:47 model.py:65 view.py:179 view.py:206
+#: favorite.py:23
+msgid "Resource webmap"
+msgstr ""
+
+#: model.py:49 model.py:67 view.py:207 view.py:242
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -37,7 +41,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:194
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:222
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -75,11 +79,11 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:695
+#: nodepkg/display/Display.ts:758
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:696
+#: nodepkg/display/Display.ts:759
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -255,7 +259,7 @@ msgstr "Моя приватная аннотация"
 msgid "Download attached files"
 msgstr "Скачать прикрепленные файлы"
 
-#: nodepkg/layers-tree/DropdownFile.tsx:61
+#: nodepkg/layers-tree/DropdownFile.tsx:63
 msgid "Download"
 msgstr "Скачать"
 
@@ -343,7 +347,7 @@ msgstr "Вертикальная шторка"
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
-#: nodepkg/map-controls/tool/Identify.ts:70 nodepkg/panel/identify/plugin.tsx:13
+#: nodepkg/map-controls/tool/Identify.ts:87 nodepkg/panel/identify/plugin.tsx:13
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -426,7 +430,8 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:136
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:137
+#: nodepkg/popup/component/Popup.tsx:138
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -700,10 +705,6 @@ msgstr "Увеличить до всех слоев"
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:152
-msgid "Save as"
-msgstr "Сохранить как"
-
 #: nodepkg/panel/print/PrintPanel.tsx:133
 msgid "Elements"
 msgstr "Элементы"
@@ -838,11 +839,11 @@ msgstr "Градусы и десятичные минуты (подписи к �
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:459
+#: nodepkg/panel/search/SearchPanel.tsx:513
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:464
+#: nodepkg/panel/search/SearchPanel.tsx:518
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -923,94 +924,94 @@ msgstr "Очистить все выбранные функции"
 msgid "Browsing history"
 msgstr "История просмотра"
 
-#: nodepkg/panel/share/SharePanel.tsx:47
+#: nodepkg/panel/share/SharePanel.tsx:46
 msgid ""
 "<a>CORS</a> must be enabled for the target origin when embedding a web map on"
 " a different domain."
 msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
 
-#: nodepkg/panel/share/SharePanel.tsx:48
+#: nodepkg/panel/share/SharePanel.tsx:47
 msgid "Add web map fragment to favorites"
 msgstr "Добавить фрагмент веб-карты в избранное"
 
-#: nodepkg/panel/share/SharePanel.tsx:101
+#: nodepkg/panel/share/SharePanel.tsx:100
 msgid "Select tools"
 msgstr "Выберите инструменты"
 
-#: nodepkg/panel/share/SharePanel.tsx:118
+#: nodepkg/panel/share/SharePanel.tsx:117
 msgid "Select panels"
 msgstr "Выберите панели"
 
-#: nodepkg/panel/share/SharePanel.tsx:135
+#: nodepkg/panel/share/SharePanel.tsx:134
 msgid "None"
 msgstr "Нет"
 
-#: nodepkg/panel/share/SharePanel.tsx:310
+#: nodepkg/panel/share/SharePanel.tsx:309
 #: nodepkg/settings-widget/SettingsWidget.tsx:36
 msgid "Active panel"
 msgstr "Активная панель"
 
-#: nodepkg/panel/share/SharePanel.tsx:350
+#: nodepkg/panel/share/SharePanel.tsx:349
 msgid "The map link copied to clipboard."
 msgstr "Ссылка на карту скопирована в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.tsx:353
+#: nodepkg/panel/share/SharePanel.tsx:352
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
-#: nodepkg/panel/share/SharePanel.tsx:396
+#: nodepkg/panel/share/SharePanel.tsx:395
 msgid "Optional fragment label"
 msgstr "Необязательное название фрагмента"
 
-#: nodepkg/panel/share/SharePanel.tsx:404
+#: nodepkg/panel/share/SharePanel.tsx:403
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: nodepkg/panel/share/SharePanel.tsx:406
+#: nodepkg/panel/share/SharePanel.tsx:405
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.tsx:408 nodepkg/settings/SettingsForm.tsx:192
+#: nodepkg/panel/share/SharePanel.tsx:407 nodepkg/settings/SettingsForm.tsx:192
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.tsx:416 nodepkg/settings/SettingsForm.tsx:205
+#: nodepkg/panel/share/SharePanel.tsx:415 nodepkg/settings/SettingsForm.tsx:205
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: nodepkg/panel/share/SharePanel.tsx:422
+#: nodepkg/panel/share/SharePanel.tsx:421
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.tsx:425
+#: nodepkg/panel/share/SharePanel.tsx:424
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.tsx:429 option/base.py:31
+#: nodepkg/panel/share/SharePanel.tsx:428 option/base.py:31
 msgid "Panels"
 msgstr "Панели"
 
-#: nodepkg/panel/share/SharePanel.tsx:445
+#: nodepkg/panel/share/SharePanel.tsx:444
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: nodepkg/panel/share/SharePanel.tsx:455
+#: nodepkg/panel/share/SharePanel.tsx:454
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: nodepkg/panel/share/SharePanel.tsx:459
+#: nodepkg/panel/share/SharePanel.tsx:458
 msgid "Embed code"
 msgstr "Код для встраивания"
 
-#: nodepkg/panel/share/SharePanel.tsx:471
+#: nodepkg/panel/share/SharePanel.tsx:470
 msgid "The embed code copied to clipboard."
 msgstr "Код для встраивания скопирован в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.tsx:475
+#: nodepkg/panel/share/SharePanel.tsx:474
 msgid "Copy code"
 msgstr "Копировать код"
 
-#: nodepkg/panel/share/SharePanel.tsx:478
+#: nodepkg/panel/share/SharePanel.tsx:477
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -1042,11 +1043,15 @@ msgstr "Сбросить текущее значение"
 msgid "Share"
 msgstr "Поделиться"
 
-#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:12
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:16
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:136
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:24
+msgid "Open table in new page"
+msgstr ""
+
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:137
 msgid "Stop editing"
 msgstr "Завершить редактирование"
 
@@ -1108,17 +1113,17 @@ msgid "Attachments"
 msgstr "Вложения"
 
 #: nodepkg/popup/component/ContentComponent.tsx:192
-#: nodepkg/popup/component/GraphPanel.tsx:42
+#: nodepkg/popup/component/GraphPanel.tsx:43
 msgid "Graphs"
 msgstr "Графики"
 
 #: nodepkg/popup/component/ContextComponent.tsx:65
-#: nodepkg/popup/component/CoordinateComponent.tsx:147
+#: nodepkg/popup/component/CoordinateComponent.tsx:145
 msgid "Copy coordinates"
 msgstr "Скопировать координаты"
 
 #: nodepkg/popup/component/ContextComponent.tsx:66
-#: nodepkg/popup/component/CoordinateComponent.tsx:148
+#: nodepkg/popup/component/CoordinateComponent.tsx:146
 msgid "Coordinates copied"
 msgstr "Координаты скопированы"
 
@@ -1134,15 +1139,15 @@ msgstr "Ссылка на местоположение скопирована"
 msgid "Current web map coverage copied"
 msgstr "Текущее покрытие веб-карты скопировано"
 
-#: nodepkg/popup/component/GraphPanel.tsx:42
+#: nodepkg/popup/component/GraphPanel.tsx:43
 msgid "Graph"
 msgstr "График"
 
-#: nodepkg/popup/component/GraphPanel.tsx:89
+#: nodepkg/popup/component/GraphPanel.tsx:94
 msgid "Hide chart legend"
 msgstr "Скрыть легенду диаграммы"
 
-#: nodepkg/popup/component/GraphPanel.tsx:90
+#: nodepkg/popup/component/GraphPanel.tsx:95
 msgid "Show chart legend"
 msgstr "Показать легенду диаграммы"
 
@@ -1154,37 +1159,17 @@ msgstr "Заблокировать позицию всплывающего ок�
 msgid "Disable lock popup position"
 msgstr "Отключить блокировку всплывающего окна"
 
-#: nodepkg/popup/component/Popup.tsx:288
+#: nodepkg/popup/component/Popup.tsx:315
 msgid "Сollapse fullscreen popup"
 msgstr "Свернуть полноэкранное всплывающее окно"
 
-#: nodepkg/popup/component/Popup.tsx:288
+#: nodepkg/popup/component/Popup.tsx:315
 msgid "Open fullscreen popup"
 msgstr "Открыть полноэкранное всплывающее окно"
 
-#: nodepkg/popup/component/Popup.tsx:312
+#: nodepkg/popup/component/Popup.tsx:339
 msgid "Close"
 msgstr "Закрыть"
-
-#: nodepkg/preview-embedded/PreviewEmbedded.tsx:9
-msgid "This page is for a preview of the web map to be embedded on the site."
-msgstr ""
-"Эта страница предназначена для предпросмотра веб карты, которую необходимо "
-"встроить на сайт."
-
-#: nodepkg/preview-embedded/PreviewEmbedded.tsx:10
-msgid ""
-"Most likely, you went from the \"Share\" section of the web map and refreshed"
-" the page."
-msgstr ""
-"Скорее всего, вы перешли из секции \"Поделиться\" веб карты и обновили "
-"страницу."
-
-#: nodepkg/preview-embedded/PreviewEmbedded.tsx:11
-msgid "To generate a preview, go back to the web map page and click \"Preview\"."
-msgstr ""
-"Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
-"\"Предпросмотр\"."
 
 #: nodepkg/preview-embedded/PreviewEmbedded.tsx:9
 msgid "This page is for a preview of the web map to be embedded on the site."
@@ -1539,7 +1524,7 @@ msgstr "Коллекция геометрий"
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:151
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:157
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
@@ -1567,23 +1552,23 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:96
+#: view.py:99
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:108
+#: view.py:111
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:119
+#: view.py:122
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:143
+#: view.py:144
 msgid "Setting up a web map group"
 msgstr "Настройка группы веб-карт"
 
-#: view.py:230
+#: view.py:231
 msgid "Group setting"
 msgstr "Настройка группы"
 

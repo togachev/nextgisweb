@@ -58,11 +58,11 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-export const Content = observer(({ config, ...rest }: ContentProps) => {
+export const Content = observer(({ config }: ContentProps) => {
     const [store] = useState(() => new HomeStore({ config: config }));
 
     const [size] = useState({ minW: 150, maxW: 300, minH: 150, maxH: 320, cardCoverH: 204, cardBodyH: 116, min: false });
-
+    
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
@@ -131,7 +131,7 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
     };
 
     return (
-        <>
+        <div className="wrapper-home-page">
             <ConfigProvider
                 theme={{
                     token: {
@@ -147,6 +147,7 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                         },
                         Menu: {
                             lineWidth: 1,
+                            itemActiveBg: "var(--primary-color)",
                             itemBg: "transparent",
                             groupTitleColor: `${store.valueFooter?.colorBackground}`,
                             itemColor: `${store.valueFooter?.colorBackground}`,
@@ -188,7 +189,6 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                                     options={options}
                                     status={acStatus}
                                     notFoundContent={search.length > 0 && gettext("Webmap not found")}
-                                    {...rest}
                                 >
                                     <Input
                                         prefix={<DeleteOffOutline />}
@@ -214,6 +214,6 @@ export const Content = observer(({ config, ...rest }: ContentProps) => {
                 </div>
                 <Footer store={store} />
             </ConfigProvider >
-        </>
+        </div>
     )
 });
