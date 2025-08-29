@@ -62,7 +62,7 @@ export const Content = observer(({ config }: ContentProps) => {
     const [store] = useState(() => new HomeStore({ config: config }));
 
     const [size] = useState({ minW: 150, maxW: 300, minH: 150, maxH: 320, cardCoverH: 204, cardBodyH: 116, min: false });
-    
+
     const { makeSignal, abort } = useAbortController();
     const [options, setOptions] = useState([]);
     const [search, setSearch] = useState("");
@@ -139,6 +139,9 @@ export const Content = observer(({ config }: ContentProps) => {
                         colorPrimaryBorder: "#106a90",
                     },
                     components: {
+                        Divider: {
+                            marginXS: 0,
+                        },
                         Modal: {
                             colorBgMask: "var(--divider-color)",
                         },
