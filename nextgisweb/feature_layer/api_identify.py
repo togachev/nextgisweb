@@ -1,4 +1,4 @@
-from typing import Annotated, Any, List
+from typing import Any, List
 
 from msgspec import Struct
 from osgeo import gdal, ogr, osr
@@ -9,7 +9,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceRef, ResourceScope
-# from nextgisweb.raster_layer.model import COLOR_INTERPRETATION
+from nextgisweb.raster_layer.util import band_color_interp
 
 from .interface import IFeatureLayer
 
@@ -22,6 +22,7 @@ class Point(Struct, kw_only=True):
 class RasterLayerIdentifyItem(Struct, kw_only=True):
     resource: ResourceRef
     color_interpretation: list[str]
+    pixel_class: list[str]
     values: list[Any]
 
 
@@ -200,33 +201,47 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
                     )
                 )
-            # else:
-            #     if (values := val_at_coord(ds, body.point)) is None:
-            #         continue
+            else:
+                if (values := val_at_coord(ds, body.point)) is None:
+                    continue
 
-            #     color_interpretation = [
-            #         COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
-            #         for bidx in range(1, layer.band_count + 1)
-            #     ]
+                color_interpretation = []
+                pixel_class = []
 
-            #     value_channel = ["{} ({:02})".format(b_, a_) for a_, b_ in zip(color_interpretation, values.flatten().tolist())]
+                for bidx in range(1, layer.band_count + 1):
+                    band = ds.GetRasterBand(bidx)
+                    color_interpretation.append(band_color_interp(band))
+                    rat = band.GetDefaultRAT()
+                    if (rat) is not None and rat.GetTableType() == gdal.GRTT_THEMATIC:
+                        rat_col = rat.GetColOfUsage(gdal.GFU_Name)
+                        rat_row = rat.GetRowOfValue(values[bidx - 1].item())
+                        if rat_col == -1 or rat_row == -1:
+                            pixel_class.append(None)
+                            continue
+                        pixel_class_value = rat.GetValueAsString(rat_row, rat_col)
+                        pixel_class.append(pixel_class_value)
+                    else:
+                        pixel_class.append(None)
 
-            #     for i, value in enumerate(value_channel):
-            #         attr.append(dict(key=i, attr=i, value=value, datatype="STRING", format_field=dict()))
+                value_channel = ["{} ({:02})".format(b_, a_) for a_, b_ in zip(color_interpretation, values.flatten().tolist())]
 
-            #     options.append(
-            #         dict(
-            #             desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
-            #             layerId=layer.id,
-            #             styleId=style.id,
-            #             dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
-            #             label=[x["label"] for x in body.styles if x["id"] == style.id][0],
-            #             permission="Read",
-            #             type="raster",
-            #             attr=attr,
-            #             value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
-            #         )
-            #     )
+                for i, value in enumerate(value_channel):
+                    attr.append(dict(key=i, attr=i, value=value, datatype="STRING", format_field=dict()))
+
+                options.append(
+                    dict(
+                        desc=[x["label"] for x in body.styles if x["id"] == style.id][0],
+                        layerId=layer.id,
+                        styleId=style.id,
+                        dop=[x["dop"] for x in body.styles if x["id"] == style.id][0],
+                        label=[x["label"] for x in body.styles if x["id"] == style.id][0],
+                        permission="Read",
+                        type="raster",
+                        attr=attr,
+                        value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
+                        test=rat,
+                    )
+                )
 
     result["data"] = options
     result["featureCount"] = len(options)

@@ -25,7 +25,6 @@ export function PreviewLayer({
             cache: true,
             query: {
                 description: false,
-                serialization: "resource",
             }
         }
     );
