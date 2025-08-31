@@ -105,7 +105,7 @@ export type StylesRequest = {
 
 export interface ParamsProps {
     id: number;
-    label: string;
+    label: string | undefined;
     dop: number | null;
 }
 

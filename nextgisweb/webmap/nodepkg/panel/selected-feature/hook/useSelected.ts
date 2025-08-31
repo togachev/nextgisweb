@@ -9,11 +9,25 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
     const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
         const itemConfig = display.getItemConfig();
+        const itemStore = display.itemStore;
+
         if (value && store.checked === true) {
             Object.keys(itemConfig).forEach(function (key) {
                 if (value.includes(itemConfig[key].styleId)) {
                     visibleStyles.push(itemConfig[key].id);
                 }
+            });
+        } else if (value && store.checked === false) {
+            return new Promise(() => {
+                itemStore.fetch({
+                    query: { type: "layer" },
+                    queryOptions: { deep: true },
+                    onItem: (item) => {
+                        if (item.styleId === value[0] && item.visibility === false) {
+                            itemStore.setValue(item, "checked", true);
+                        }
+                    }
+                });
             });
         } else {
             display.config.checkedItems.forEach(function (key) {

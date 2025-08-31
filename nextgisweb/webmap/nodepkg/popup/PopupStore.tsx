@@ -458,32 +458,37 @@ export class PopupStore extends Component {
             this.renderPopup(e);
         }
         else if (e.type === "simulate" || e.type === "selected") {
-            await this.display.getVisibleItems()
-                .then((items) => {
-                    const itemConfig = this.display.getItemConfig();
-                    props.p.value.params.map(itm => {
-                        items.some(x => {
-                            if (itemConfig[x.id].styleId === itm.id) {
-                                const label = items.find(x => itemConfig[x.id].styleId === itm.id).label;
-                                const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position;
-                                itm.label = label;
-                                itm.dop = dop;
-                            }
+            const itemStore = this.display.itemStore;
+            return new Promise((resolve) => {
+                itemStore.fetch({
+                    query: { type: "layer" },
+                    onComplete: (items) => {
+                        const itemConfig = this.display.getItemConfig()
+                        props.p.value.params.map(itm => {
+                            items.some(x => {
+                                if (itemConfig[x.id].styleId === itm.id) {
+                                    const label = items.find(x => itemConfig[x.id].styleId === itm.id).label;
+                                    const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position;
+                                    itm.label = label;
+                                    itm.dop = dop;
+                                }
+                            });
                         });
-                    })
-                    this.setParams({
-                        point: e.coordinate,
-                        request: {
-                            srs: this.displaySrid,
-                            geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(props.p.coordinate)),
-                            styles: props.p.value.params,
-                            point: props.p.coordinate,
-                            status: attr,
-                            p: props.p,
-                        },
-                    });
-                    return this.renderPopup(e);
+                        this.setParams({
+                            point: e.coordinate,
+                            request: {
+                                srs: this.displaySrid,
+                                geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(props.p.coordinate)),
+                                styles: props.p.value.params,
+                                point: props.p.coordinate,
+                                status: attr,
+                                p: props.p,
+                            },
+                        });
+                        resolve(this.renderPopup(e));
+                    },
                 });
+            });
         }
     };
 
@@ -507,7 +512,7 @@ export class PopupStore extends Component {
             paramsUrl.append(key, value);
         })
         const link = paramsUrl.toString();
-        this.setLinkToGeometry(link)
+        this.setLinkToGeometry(decodeURIComponent(link))
     }
     async updatePermalink() {
         const display = this.display
@@ -555,16 +560,15 @@ export class PopupStore extends Component {
                     }
                 });
             })
-        const result = [...new Set(this.response.data.map(a => a.styleId))].sort();
+        const result = [...new Set(this.response.data.map(a => ({ styleId: a.styleId, desc: a.desc })))].sort();
         const params: ParamsProps[] = [];
         result.map(i => {
             params.push({
-                id: Number(i),
-                label: "",
+                id: Number(i.styleId),
+                label: i.desc,
                 dop: null,
             });
         });
-
 
         const props = {
             attribute: true,
@@ -584,6 +588,7 @@ export class PopupStore extends Component {
             props,
             styleId: this.selected.styleId,
             selected: this.selected,
+            geom: ",",
         };
     };
 
@@ -591,7 +596,10 @@ export class PopupStore extends Component {
         if (this.response.featureCount > 0) {
             const selectVal = { ...this.selected };
             selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
-            this.getContent(selectVal, false);
+            this.getContent(selectVal, false)
+                .then(i => {
+                    console.log(i?.feature.geom);
+                })
             this.LinkToGeometry(selectVal);
             this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: true } });
 
@@ -612,12 +620,17 @@ export class PopupStore extends Component {
     }
 
     async getResponse() {
-        if (["click", "simulate", "selected"].includes(this.mode)) {
+        const pm = this.display.panelManager;
+        const pkey = "selected-feature";
+        const panel = pm.getPanel<SelectedFeatureStore>(pkey);
+        if (["click", "simulate"].includes(this.mode)) {
             const feature = await route("feature_layer.imodule")
                 .post({
                     body: JSON.stringify(this.params.request),
                 })
             return new Promise<Response>(resolve => resolve(feature));
+        } else if (this.mode === "selected") {
+            return new Promise<Response>(resolve => resolve({ data: [panel.activeChecked.acvalue.selected], featureCount: 1 }));
         } else {
             return new Promise<Response>(resolve => resolve({ data: [], featureCount: 0 }));
         }
@@ -742,6 +755,7 @@ export class PopupStore extends Component {
             if (key === true) {
                 this.setUpdate(false);
             }
+            return res;
         }
         else if (val.type === "raster") {
             this.setAttribute(val.attr);
