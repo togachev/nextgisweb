@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
-import { Alert, Button, Descriptions, Popover, Space } from "@nextgisweb/gui/antd";
+import { Alert, Button, Descriptions, Popover } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import { PanelContainer } from "../component";
 import Close from "@nextgisweb/icon/mdi/close";
