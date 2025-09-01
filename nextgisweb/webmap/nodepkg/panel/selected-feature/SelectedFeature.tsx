@@ -119,7 +119,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 </Button>
                                 <div className="control-item">
                                     <Button
-                                        title={gettext("Clear selection of objects from current layer")}
+                                        title={gettext("Deselect Objects for Layer.")}
                                         type="text"
                                         size="small"
                                         icon={<CloseBoxOutline />}
@@ -163,7 +163,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                         </Button>
                                         <div className="control-item">
                                             <Button
-                                                title={gettext("Delete selected feature")}
+                                                title={gettext("Deselect Object.")}
                                                 type="text"
                                                 size="small"
                                                 icon={<Close />}
@@ -195,17 +195,17 @@ const InfoSelect = () => {
         {
             key: "3",
             label: <div className="icon-description"><CloseBoxMultiple /></div>,
-            children: gettext("Delete all selected objects.")
+            children: gettext("Deselect Objects for All Layers.")
         },
         {
             key: "4",
             label: <div className="icon-description"><CloseBoxOutline /></div>,
-            children: gettext("Delete a portion of the selected objects for each layer.")
+            children: gettext("Deselect Objects for Layer.")
         },
         {
             key: "5",
             label: <div className="icon-description"><Close /></div>,
-            children: gettext("Delete a single object.")
+            children: gettext("Deselect Object.")
         },
     ];
 
@@ -315,7 +315,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                         </div>
                         <div className="control-item">
                             <Button
-                                title={gettext("Clear all selected feature")}
+                                title={gettext("Deselect Objects for All Layers.")}
                                 type="text"
                                 size="small"
                                 icon={<CloseBoxMultiple />}
