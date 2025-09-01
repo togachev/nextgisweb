@@ -7,7 +7,7 @@ import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
 
-import { Breadcrumbs } from "./Breadcrumbs";
+import { BreadcrumbComponent } from "./BreadcrumbComponent";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
@@ -78,7 +78,7 @@ export function Base({
                             ) : (
                                 <>
                                     {breadcrumbs.length > 0 && (
-                                        <Breadcrumbs items={breadcrumbs} />
+                                        <BreadcrumbComponent current_id={entrypointProps.resourceId} items={breadcrumbs} />
                                     )}
                                     <h1
                                         id="title"
