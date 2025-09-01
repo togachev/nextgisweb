@@ -92,6 +92,7 @@ export class PopupStore extends Component {
     @observable.ref accessor fixPanel: string | null = null;
     @observable.ref accessor selected: DataProps;
     @observable.ref accessor contextUrl: string | null = null;
+    @observable.ref accessor activeFeatureData: string | null = null;
     @observable.ref accessor extensions: ExtensionsProps | null = null;
     @observable.ref accessor attribute: AttributeProps[] = [];
     @observable.ref accessor linkToGeometry: string | null = null;
@@ -232,6 +233,11 @@ export class PopupStore extends Component {
     @action
     setContextUrl(contextUrl: string) {
         this.contextUrl = contextUrl;
+    };
+
+    @action
+    setActiveFeatureData(activeFeatureData) {
+        this.activeFeatureData = activeFeatureData;
     };
 
     @action
@@ -523,9 +529,10 @@ export class PopupStore extends Component {
         })
     }
 
-    updateSelectFeatures(panel, data) {
+    updateSelectFeatures(panel, data, res) {
         const obj = { ...panel.selectedFeatures };
         const [key] = getEntries(obj).filter(([_, val]) => val.styleId === data.styleId)[0];
+        Object.assign(data, { feature: res });
         const value = {
             ...obj,
             [key]: {
@@ -588,7 +595,6 @@ export class PopupStore extends Component {
             props,
             styleId: this.selected.styleId,
             selected: this.selected,
-            geom: ",",
         };
     };
 
@@ -597,19 +603,18 @@ export class PopupStore extends Component {
             const selectVal = { ...this.selected };
             selectVal.label = selectVal.permission === "Forbidden" ? forbidden : selectVal.label;
             this.getContent(selectVal, false)
-                .then(i => {
-                    console.log(i?.feature.geom);
+                .then((res) => {
+                    this.LinkToGeometry(selectVal);
+                    this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: true } });
+
+                    const pm = this.display.panelManager;
+                    const pkey = "selected-feature";
+                    const panel = pm.getPanel<SelectedFeatureStore>(pkey);
+
+                    if (panel) {
+                        this.updateSelectFeatures(panel, this.propsCoords, res);
+                    }
                 })
-            this.LinkToGeometry(selectVal);
-            this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: true } });
-
-            const pm = this.display.panelManager;
-            const pkey = "selected-feature";
-            const panel = pm.getPanel<SelectedFeatureStore>(pkey);
-
-            if (panel) {
-                this.updateSelectFeatures(panel, this.propsCoords);
-            }
         } else {
             this.generateUrl({ res: null, st: null, pn: null, disable: false });
             this.setSelected({});
@@ -639,7 +644,6 @@ export class PopupStore extends Component {
     async getAttribute(res: DataProps) {
         const opts = this.display.config.options;
         const attrs = opts["webmap.identification_attributes"];
-
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
         const item = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
         const geom = item && item.itemConfig.layerHighligh === true ? true : false;
@@ -649,16 +653,17 @@ export class PopupStore extends Component {
             Object.assign(query, { fields: attrs })
         }
 
-        const feature = res.permission !== "Forbidden" ? await route("feature_layer.feature.item", {
-            id: resourceId,
-            fid: res.id,
-        })
-            .get({
-                query,
+        const feature = res.permission !== "Forbidden" ?
+            await route("feature_layer.feature.item", {
+                id: resourceId,
+                fid: res.id,
             })
-            .then(item => {
-                return item;
-            }) :
+                .get({
+                    query,
+                })
+                .then(item => {
+                    return item;
+                }) :
             {
                 id: -1,
                 geom: "POINT EMPTY",
@@ -673,6 +678,7 @@ export class PopupStore extends Component {
             const dataSource = fieldValuesToDataSource(fields, fieldsInfo, {
                 signal: abortController.signal,
             });
+            this.setActiveFeatureData({ dataSource, feature, resourceId })
             return { dataSource, feature, resourceId };
         } else {
             return { updateName: undefined, feature: feature, resourceId: -1 };
@@ -731,7 +737,13 @@ export class PopupStore extends Component {
 
     async getContent(val: DataProps, key: boolean) {
         if (val.type === "vector") {
-            const res = await this.getAttribute(val);
+            const pm = this.display.panelManager;
+            const pkey = "selected-feature";
+            const panel = pm.getPanel<SelectedFeatureStore>(pkey);
+            const res = this.mode === "selected" ?
+                panel.activeChecked.acvalue.feature :
+                await this.getAttribute(val);
+
             this.setExtensions(res.feature.extensions);
 
             res?.dataSource?.then(i => {
@@ -755,7 +767,7 @@ export class PopupStore extends Component {
             if (key === true) {
                 this.setUpdate(false);
             }
-            return res;
+            return res
         }
         else if (val.type === "raster") {
             this.setAttribute(val.attr);
