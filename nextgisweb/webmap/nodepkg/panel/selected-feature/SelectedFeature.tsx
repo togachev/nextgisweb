@@ -99,23 +99,23 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         return (<div>{
             getEntries(store.selectedFeatures).map(([key, value], lidx) => {
                 const { title, styleId } = value.value;
-                const lindex = lidx + 1;
                 const objLayer = { ...store.activeLayer };
+                const lchecked = objLayer.lchecked && objLayer.lckey === key;
 
                 return Object.keys(value.items).length > 0 && (
-                    <div key={key} className="row-selected">
+                    <div key={lidx} className="row-selected">
                         {store.visibleLayerName &&
                             <div className="item-label">
                                 <Button
                                     title={objLayer.lchecked ? [title, gettext("Initial extent")].join(" \n") : [title, msgZoomToLayer].join(" \n")}
-                                    className="label"
+                                    className={lchecked ? "label checked" : "label"}
                                     size="small"
                                     type="text"
                                     onClick={() => lOnChecked(key, styleId)}
-                                    color={objLayer.lchecked && objLayer.lckey === key && "default"}
+                                    color={objLayer.lchecked && objLayer.lckey === key && "primary"}
                                     variant="filled"
                                 >
-                                    {title}
+                                    <div className={lchecked ? "checked" : ""} >{title}</div>
                                 </Button>
                                 <div className="control-item">
                                     <Button
@@ -136,24 +136,23 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                         {
                             Object.keys(value.items).length > 0 &&
                             getEntries(value.items).map(([ckey, cvalue], fidx) => {
-                                const findex = fidx + 1;
                                 const obj = { ...store.activeChecked };
                                 const ftitle = cvalue.selected.type === "vector" ? cvalue.selected.label : msgValueRaster;
                                 const checked = obj.achecked && obj.ackey === ckey;
-
+                                const ltitle = !store.visibleLayerName ? title : null;
                                 return (
                                     <div key={fidx} className="label-child-element">
-                                        <div className="index-lf">{lindex}.{findex}</div>
+                                        <div className="index-lf"></div>
                                         <Button
                                             title={checked ?
-                                                [ftitle, gettext("Initial extent"), !store.visibleLayerName && title].join(" \n") :
-                                                [ftitle, gettext("View information about the object"), !store.visibleLayerName && title].join(" \n")}
+                                                [ftitle, gettext("Initial extent"), ltitle].join(" \n") :
+                                                [ftitle, gettext("View information about the object"), ltitle].join(" \n")}
                                             onClick={() => acOnChecked(ckey, cvalue)}
                                             className="label-child"
                                             style={!store.visibleLayerName && { height: 40, padding: "2px 5px" }}
                                             type="text"
                                             size="small"
-                                            color={checked && "default"}
+                                            color={checked && "primary"}
                                             variant="filled"
                                         >
                                             <div className={!store.visibleLayerName ? "label-group label" : "label-group"}>
@@ -287,7 +286,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 size="small"
                                 icon={<Visibility />}
                                 onClick={onCheckedVisibleItems}
-                                color={store.checked && "default"}
+                                color={store.checked && "primary"}
                                 variant="filled"
                                 disabled={store.countItems === 0}
                             />
@@ -297,7 +296,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 size="small"
                                 icon={<PlaylistRemove />}
                                 onClick={onVisibleLayerName}
-                                color={!store.visibleLayerName && "default"}
+                                color={!store.visibleLayerName && "primary"}
                                 variant="filled"
                                 disabled={
                                     store.countItems === 0

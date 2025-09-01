@@ -15,6 +15,11 @@
         padding: 0 5px;
         flex-direction: column;
 
+        .checked {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
         .item-label {
             display: flex;
             justify-content: space-between;
@@ -43,10 +48,10 @@
             justify-content: space-between;
 
             .index-lf {
-                color: var(--text-secondary);
-                font-size: 12px;
-                user-select: none;
-                padding: 0 0 0 5px;
+                width: 10px;
+                height: 10px;
+                background-color: var(--text-secondary);
+                clip-path: circle(2px);
             }
 
             .label {
@@ -57,6 +62,7 @@
             }
 
             .label-group {
+
                 .feature-name,
                 .sub-feature-name {
                     overflow: hidden;
@@ -71,10 +77,7 @@
                     color: var(--text-secondary);
                 }
 
-                .checked {
-                    color: var(--primary);
-                    font-weight: bold;
-                }
+
 
                 .sub-checked {
                     color: var(--text-base);
@@ -107,7 +110,7 @@
             font-size: 18px;
 
             svg {
-                color: var(--text-secondary);
+                color: var(--text-base);
             }
         }
     }
