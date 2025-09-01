@@ -49,6 +49,38 @@
                 padding: 0 0 0 5px;
             }
 
+            .label {
+                display: flex;
+                flex-direction: column;
+                height: 32px;
+                justify-content: space-between;
+            }
+
+            .label-group {
+                .feature-name,
+                .sub-feature-name {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    display: block;
+                    text-align: start;
+                    width: 100%;
+                }
+
+                .sub-feature-name {
+                    color: var(--text-secondary);
+                }
+
+                .checked {
+                    color: var(--primary);
+                    font-weight: bold;
+                }
+
+                .sub-checked {
+                    color: var(--text-base);
+                }
+            }
+
             .label-child {
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -73,6 +105,10 @@
 
         button {
             font-size: 18px;
+
+            svg {
+                color: var(--text-secondary);
+            }
         }
     }
 }

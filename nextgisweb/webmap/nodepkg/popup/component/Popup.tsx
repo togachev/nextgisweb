@@ -97,14 +97,16 @@ export const Popup = observer(
                 const copy = { ...store.response.data.find(x => x.value === value.value) };
                 copy.label = copy.permission === "Forbidden" ? forbidden : copy.label;
                 store.setSelected(copy);
-                store.getContent(copy, false);
-                store.LinkToGeometry(copy);
-                topic.publish("visible.point", copy);
-                store.setValueRnd({ ...store.valueRnd, buttonZoom: { [Object.keys(store.valueRnd?.buttonZoom)[0]]: true } });
+                store.getContent(copy, false)
+                    .then((res) => {
+                        store.LinkToGeometry(copy);
+                        topic.publish("visible.point", copy);
+                        store.setValueRnd({ ...store.valueRnd, buttonZoom: { [Object.keys(store.valueRnd?.buttonZoom)[0]]: true } });
 
-                if (panel) {
-                    store.updateSelectFeatures(panel, store.propsCoords)
-                }
+                        if (panel) {
+                            store.updateSelectFeatures(panel, store.propsCoords, res)
+                        }
+                    })
             }
         }, []);
 
@@ -119,7 +121,7 @@ export const Popup = observer(
                 layer?.reload();
             });
             console.log("update");
-            
+
         }, [layerId]);
 
         const editFeature = useMemo(() => {
