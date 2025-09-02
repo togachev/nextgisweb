@@ -110,10 +110,10 @@ export const Popup = observer(
             }
         }, []);
 
-        const reloadLayer = useCallback(async () => {
+        const reloadLayer = useCallback(async (layerId) => {
             // It is possible to have few webmap layers for one resource id
             const layers = await display.current?.webmapStore.filterLayers({
-                query: { layerId: store.selected.layerId },
+                query: { layerId },
             });
 
             layers?.forEach((item) => {
