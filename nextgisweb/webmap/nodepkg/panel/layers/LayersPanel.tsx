@@ -5,8 +5,7 @@ import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
-import { usePopup } from "@nextgisweb/webmap/popup/util/function";
-import settings from "@nextgisweb/webmap/client-settings";
+
 
 import type { PanelPluginWidgetProps } from "../registry";
 
@@ -17,10 +16,6 @@ import "./LayersPanel.less";
 
 const LayersPanel = observer<PanelPluginWidgetProps>(
     ({ store, display, ...props }) => {
-
-        if (settings.imodule) {
-            usePopup(display);
-        }
 
         const zoomToAllLayers = () => {
             const plugin =
@@ -59,6 +54,7 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                 }}
             >
                 <LayersTree
+                    display={display}
                     store={display.webmapStore}
                     onSelect={onSelect}
                     setLayerZIndex={display.map.setLayerZIndex.bind(display)}

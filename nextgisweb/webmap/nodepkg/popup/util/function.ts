@@ -22,12 +22,23 @@ const usePopup = (display: Display) => {
         store.setContextHidden(false);
     }, []);
 
+    const editableItem = () => {
+        if (display.item && display._itemConfigById[display.item.id].editable) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     const click = useCallback((e) => {
         if (isM) return;
         if (e.dragging) return;
         store.setMode("click");
         e.preventDefault();
-        store.overlayInfo(e, { type: "click" });
+
+        editableItem() ?
+            store.overlayInfo(e, { type: "click" }) :
+            store.pointDestroy();
     }, [store.pointPopupClick]);
 
     useEffect(() => {
