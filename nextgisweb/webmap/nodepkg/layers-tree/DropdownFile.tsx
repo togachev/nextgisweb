@@ -53,7 +53,7 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
                 items.push({
                     key: i.id,
                     label: (
-                        <Button block title={i.name} target="_blank" href={i.link} type="text">
+                        <Button className="more" block title={i.name} target="_blank" href={i.link} type="text">
                             <span className="linkFile">
                                 <span className="fileTitle">{i.res_name}</span>
                                 <span className="fileName">{i.name}</span>
@@ -82,13 +82,14 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
                 </div>
             )}
         >
-            <span
+            <Button
                 title={DownloadAttachedFiles}
                 className="more"
+                size="small"
+                type="text"
+                icon={<Paperclip style={{ rotate: "45deg" }} />}
                 onClick={(e) => { e.stopPropagation(); }}
-            >
-                <Paperclip style={{ rotate: "45deg" }} />
-            </span>
+            />
         </Dropdown>
     );
 }

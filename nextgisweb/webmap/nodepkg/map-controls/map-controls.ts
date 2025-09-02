@@ -15,6 +15,7 @@ import { InitialExtent } from "./control/InitialExtent";
 import { MyLocation } from "./control/MyLocation";
 import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
 import { Identify } from "./tool/Identify";
+import { PopupStore } from "@nextgisweb/webmap/popup/PopupStore";
 import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
@@ -129,6 +130,19 @@ if (!settings.imodule || isM) {
         },
         key: "id",
         mapStateKey: "identifying",
+        embeddedShowMode: "customize",
+        olMapControl: false,
+    })
+}
+
+if (settings.imodule || !isM) {
+    ControlsInfo.push(    {
+        label: gettext("PopupStore"),
+        ctor: (display) => {
+            return new PopupStore({ display });
+        },
+        key: "ps",
+        mapStateKey: "popupStore",
         embeddedShowMode: "customize",
         olMapControl: false,
     })

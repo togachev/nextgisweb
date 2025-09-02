@@ -7,6 +7,7 @@ import settings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { WKT } from "ol/format";
 import { fromExtent } from "ol/geom/Polygon";
+import Interaction from "ol/interaction/Interaction";
 import { boundingExtent } from "ol/extent";
 import { transform } from "ol/proj";
 import { getEntries } from "./util/function";
@@ -14,6 +15,7 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
+import { ToolBase } from "@nextgisweb/webmap/map-controls/tool/ToolBase";
 import OlGeomPoint from "ol/geom/Point";
 import PopupClick from "./component/PopupClick";
 import { Popup } from "./component/Popup";
@@ -22,9 +24,11 @@ import { getPositionContext, getPosition } from "./util/function";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Root as ReactRoot } from "react-dom/client";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { AttributeProps, ContextProps, ControlUrlProps, DataProps, EventProps, ExtensionsProps, OptionProps, ParamsProps, Position, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
 import type { SizeType } from "@nextgisweb/gui/antd";
@@ -41,8 +45,44 @@ const array_context = [
 const context_item = 34;
 const length = array_context.filter(item => item.visible === true).length
 
+interface ControlOptions {
+    tool: PopupStore;
+}
 
-export class PopupStore extends Component {
+class Control extends Interaction {
+    private tool: PopupStore;
+
+    constructor(options: ControlOptions) {
+        super({
+            handleEvent: (e) => this.handleClickEvent(e),
+        });
+        this.tool = options.tool;
+    }
+
+    handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
+        if (e.type === "click" && !isM) {
+            if (this.tool.display.panelManager.getActivePanelName() !== "custom-layer") {
+                this.tool.overlayInfo(e, { type: "click" });
+                this.tool.setMode("click");
+                e.preventDefault();
+            } else {
+                topic.publish("feature.unhighlight");
+            }
+        } else if (e.type === "contextmenu") {
+            this.tool.overlayInfo(e, { type: "contextmenu" });
+            this.tool.setContextHidden(false);
+            e.preventDefault();
+        }
+        return true;
+    }
+}
+
+export class PopupStore extends ToolBase {
+    label = gettext("PopupStore");
+
+    map: MapStore;
+    control: Control;
+
     display: Display;
     context_height: number;
     context_width: number;
@@ -97,19 +137,21 @@ export class PopupStore extends Component {
     @observable.ref accessor attribute: AttributeProps[] = [];
     @observable.ref accessor linkToGeometry: string | null = null;
     @observable.ref accessor fixContentItem: OptionProps;
-    @observable.ref accessor control: ControlUrlProps;
+    @observable.ref accessor controls: ControlUrlProps;
     @observable.ref accessor permalink: string | null = null;
     @observable.ref accessor activeControlKey: string;
     @observable.ref accessor mode: string;
     @observable.ref accessor size: SizeType = "default";
     @observable.ref accessor currentUrlParams: string | null = null;
 
-    constructor({
-        display,
-    }) {
+    constructor({ display }: Display) {
         super(display);
 
-        this.display = display;
+        this.display = display
+        this.control = new Control({ tool: this });
+        this.control.setActive(false);
+        this.display.map.olMap.addInteraction(this.control);
+
         const urlParams = display.getUrlParams()
         const opts = display.config.options;
         const attrs = opts["webmap.identification_attributes"];
@@ -118,7 +160,7 @@ export class PopupStore extends Component {
             attrs === true ? "attributes" :
                 attrs === false && geoms === true ? "geom_info" :
                     (attrs === false && geoms === false) && "description";
-        this.control = {
+        this.controls = {
             reset: {
                 icon: <LockReset />,
                 title: gettext("Reset url"),
@@ -170,6 +212,14 @@ export class PopupStore extends Component {
         this.addOverlay();
     }
 
+    activate(): void {
+        this.control.setActive(true);
+    }
+
+    deactivate(): void {
+        this.control.setActive(false);
+    }
+
     @computed
     get activePanel() {
         return this.display.panelManager.getActivePanelName();
@@ -201,8 +251,8 @@ export class PopupStore extends Component {
     };
 
     @action
-    setControl(control: ControlUrlProps) {
-        this.control = control;
+    setControls(controls: ControlUrlProps) {
+        this.controls = controls;
     };
 
     @action
@@ -457,6 +507,7 @@ export class PopupStore extends Component {
                             p: props.p,
                         },
                     });
+
                     return this.renderPopup(e);
                 })
         }

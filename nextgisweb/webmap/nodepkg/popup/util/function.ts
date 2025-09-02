@@ -1,6 +1,4 @@
-import { RefObject, useCallback, useEffect } from "react";
-import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
-import type { Display } from "@nextgisweb/webmap/display";
+import { RefObject, useEffect } from "react";
 
 type Entries<T> = { [K in keyof T]: [K, T[K]]; }[keyof T][];
 
@@ -9,70 +7,6 @@ const getEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<
 type Entry<T> = {
     [K in keyof T]: [K, T[K]];
 }[keyof T];
-
-const usePopup = (display: Display) => {
-    const store = display.popupStore;
-    const olmap = display.map.olMap;
-
-    const contextMenu = useCallback((e) => {
-        if (isM) return;
-        if (e.dragging) return;
-        e.preventDefault();
-        store.overlayInfo(e, { type: "contextmenu" })
-        store.setContextHidden(false);
-    }, []);
-
-    const editableItem = () => {
-        if (display.item && display._itemConfigById[display.item.id].editable) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    const click = useCallback((e) => {
-        if (isM) return;
-        if (e.dragging) return;
-        store.setMode("click");
-        e.preventDefault();
-
-        editableItem() ?
-            store.overlayInfo(e, { type: "click" }) :
-            store.pointDestroy();
-    }, [store.pointPopupClick]);
-
-    useEffect(() => {
-        if (display.panelManager.getActivePanelName() !== "custom-layer") {
-            olmap.on("click", click);
-            olmap.on("contextmenu", contextMenu);
-
-            const handleResize = () => {
-                store.setSizeWindow({
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                });
-            }
-            window.addEventListener("resize", handleResize);
-
-            return () => {
-                olmap.un("click", click);
-                olmap.un("contextmenu", contextMenu);
-                window.removeEventListener("resize", handleResize);
-            };
-        } else {
-            store.pointDestroy();
-        }
-    }, [display.panelManager.activePanel]);
-
-    useEffect(() => {
-        if (store.fixPopup) {
-            store.setFixPos(store.valueRnd);
-            store.setFixPanel(store.fixContentItem?.key)
-        } else {
-            store.setFixPos(null);
-        }
-    }, [store.fixPopup]);
-};
 
 export const filterObject = <T extends object>(
     obj: T,
@@ -326,4 +260,4 @@ async function getPositionContext(px, py, store) {
     }
 };
 
-export { getEntries, getPosition, getPositionContext, useOutsideClick, usePopup };
+export { getEntries, getPosition, getPositionContext, useOutsideClick };

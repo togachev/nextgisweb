@@ -9,11 +9,6 @@ import type { PluginBase } from "../plugin/PluginBase";
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
 
-import type { Display } from "@nextgisweb/webmap/display";
-
-import { usePopup } from "@nextgisweb/webmap/popup/util/function";
-import settings from "@nextgisweb/webmap/client-settings";
-
 import { DropdownActions } from "./DropdownActions";
 import { DropdownFile } from "./DropdownFile";
 import { Legend } from "./Legend";
@@ -56,7 +51,6 @@ interface LayersTreeProps {
     draggable?: boolean;
     selectable?: boolean;
     showLine?: boolean;
-    display: Display;
 }
 
 export const LayersTree = observer(
@@ -74,16 +68,11 @@ export const LayersTree = observer(
         draggable = true,
         selectable = true,
         showLine = true,
-        display,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const { webmapItems, checked, layersWithoutLegendInfo } = store;
-
-        if (settings.imodule) {
-            usePopup(display);
-        }
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 

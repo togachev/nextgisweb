@@ -198,10 +198,6 @@ export class Display {
             itemStore: this.itemStore,
         });
 
-        this.popupStore = new PopupStore({
-            display: this,
-        });
-
         this.mapDeferred.then(() => {
             this._itemStorePrepare();
         });
@@ -298,8 +294,19 @@ export class Display {
                 this._identifyFeatureByAttrValue();
                 this._identifyFeatureByValuePopup();
             }
-        } else {
-            this.pModuleUrlParams();
+        } else if ((controlsReady.has("ps") && !isM) || (controlsReady.has("ps") && settings.imodule)) {
+            const controlObj = controlsReady.get("ps");
+            if (
+                controlObj &&
+                controlObj.control &&
+                controlObj.control instanceof PopupStore
+            ) {
+                this.popupStore = controlObj.control;
+                this.mapStates.addState("popupStore", this.popupStore);
+                this.mapStates.setDefaultState("popupStore", true);
+                this.pModuleUrlParams();
+                this._identifyFeatureByValuePopup();
+            }
         }
 
         topic.publish("/webmap/tools/initialized", true);

@@ -59,12 +59,12 @@ export const CoordinateComponent = observer((props) => {
     }
 
     useEffect(() => {
-        const updateUrl = store.activeControlKey && store.control[store.activeControlKey].checked;
-        switch (store.activeControlKey && store.control[store.activeControlKey].status) {
+        const updateUrl = store.activeControlKey && store.controls[store.activeControlKey].checked;
+        switch (store.activeControlKey && store.controls[store.activeControlKey].status) {
             case true:
                 if (updateUrl) {
-                    window.history.pushState({}, "", store.control[store.activeControlKey].url); // link update
-                    copyValue(store.control[store.activeControlKey].url, msgCopyActive(store.activeControlKey)) // link copying
+                    window.history.pushState({}, "", store.controls[store.activeControlKey].url); // link update
+                    copyValue(store.controls[store.activeControlKey].url, msgCopyActive(store.activeControlKey)) // link copying
                 };
                 break;
             case false:
@@ -73,10 +73,10 @@ export const CoordinateComponent = observer((props) => {
                 };
                 break;
         }
-    }, [store.control]);
+    }, [store.controls]);
 
     useEffect(() => {
-        const values = { ...store.control }
+        const values = { ...store.controls }
         Object.keys(values).forEach((key) => {
             if (key === "popup") {
                 values[key].url = store.contextUrl;
@@ -87,14 +87,14 @@ export const CoordinateComponent = observer((props) => {
                 values[key].checked = false;
             }
         })
-        store.setControl(values);
+        store.setControls(values);
     }, [store.permalink, store.contextUrl]);
 
     const onClick = useCallback((e, name) => {
         e.preventDefault();
         store.setActiveControlKey(name);
         store.setMode("click");
-        const values = { ...store.control }
+        const values = { ...store.controls }
 
         if (name === "reset") {
             ["popup", "fixedscreen"].map((key) => {
@@ -102,7 +102,7 @@ export const CoordinateComponent = observer((props) => {
                 values[key].checked = false;
                 values["reset"].disable = true;
             })
-            store.setControl(values);
+            store.setControls(values);
             window.history.pushState({}, "", ngwConfig.applicationUrl + routeURL("webmap.display", display.config.webmapId));
 
         } else {
@@ -116,7 +116,7 @@ export const CoordinateComponent = observer((props) => {
                     values[key].checked = false;
                 }
             })
-            store.setControl(values);
+            store.setControls(values);
         }
     }, []);
 
@@ -150,8 +150,8 @@ export const CoordinateComponent = observer((props) => {
                 {!display.tinyConfig && store.contextUrl !== null && (
                     <div className="link-block">
                         {
-                            store.control &&
-                            getEntries(store.control).map(([name, value], index) => {
+                            store.controls &&
+                            getEntries(store.controls).map(([name, value], index) => {
                                 return (
                                     <div key={index}>
                                         <Button

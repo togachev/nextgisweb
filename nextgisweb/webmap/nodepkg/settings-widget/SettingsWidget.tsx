@@ -78,6 +78,8 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                         <ExtentRow
                             pickerOptions={{
                                 parentId: store.composite.parent || undefined,
+                                requireClass: ["vector_layer", "postgis_layer"],
+                                clsFilter: "layer",
                             }}
                             value={store.initialExtent}
                             onChange={(value) => {
@@ -89,6 +91,8 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                         <ExtentRow
                             pickerOptions={{
                                 parentId: store.composite.parent ?? undefined,
+                                requireClass: ["vector_layer", "postgis_layer"],
+                                clsFilter: "layer",
                             }}
                             value={store.constrainingExtent}
                             onChange={(value) => {
