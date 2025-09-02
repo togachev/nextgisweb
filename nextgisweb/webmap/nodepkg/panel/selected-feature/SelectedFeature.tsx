@@ -9,6 +9,7 @@ import CloseBoxMultiple from "@nextgisweb/icon/mdi/close-box-multiple";
 import PlaylistRemove from "@nextgisweb/icon/mdi/playlist-remove";
 import Visibility from "@nextgisweb/icon/mdi/cancel";
 import InformationOutline from "@nextgisweb/icon/mdi/information-variant-circle-outline";
+import CircleSmall from "@nextgisweb/icon/mdi/circle-small";
 import { useSelected } from "./hook/useSelected";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -108,14 +109,14 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                             <div className="item-label">
                                 <Button
                                     title={objLayer.lchecked ? [title, gettext("Initial extent")].join(" \n") : [title, msgZoomToLayer].join(" \n")}
-                                    className={lchecked ? "label checked" : "label"}
+                                    className={lchecked ? "checked" : ""}
                                     size="small"
                                     type="text"
                                     onClick={() => lOnChecked(key, styleId)}
                                     color={objLayer.lchecked && objLayer.lckey === key && "primary"}
                                     variant="filled"
                                 >
-                                    <div className={lchecked ? "checked" : ""} >{title}</div>
+                                    <div className="label" >{title}</div>
                                 </Button>
                                 <div className="control-item">
                                     <Button
@@ -142,7 +143,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 const ltitle = !store.visibleLayerName ? title : null;
                                 return (
                                     <div key={fidx} className="label-child-element">
-                                        <div className="index-lf"></div>
+                                        <CircleSmall className="index-lf" />
                                         <Button
                                             title={checked ?
                                                 [ftitle, gettext("Initial extent"), ltitle].join(" \n") :

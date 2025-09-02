@@ -15,6 +15,10 @@
         padding: 0 5px;
         flex-direction: column;
 
+        button {
+            padding: 0;
+        }
+
         .checked {
             color: var(--primary);
             font-weight: bold;
@@ -27,14 +31,18 @@
             width: 100%;
             padding: 10px 0 0 0;
 
-            .label {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+            button {
                 font-weight: 500;
                 display: block;
                 text-align: start;
                 width: 100%;
+            }
+
+            .label {
+                padding: 2px 4px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
 
@@ -42,8 +50,6 @@
             display: flex;
             align-items: center;
             margin: 5px 0;
-            color: #50575d;
-            gap: 5px;
             width: 100%;
             justify-content: space-between;
 
@@ -71,13 +77,12 @@
                     display: block;
                     text-align: start;
                     width: 100%;
+                    padding: 2px 4px;
                 }
 
                 .sub-feature-name {
                     color: var(--text-secondary);
                 }
-
-
 
                 .sub-checked {
                     color: var(--text-base);

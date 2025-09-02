@@ -47,7 +47,6 @@ from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewar
 ICON_JSENTRY = jsentry("@nextgisweb/pyramid/icon")
 UPDATE_JSENTRY = jsentry("@nextgisweb/pyramid/update")
 LAYOUT_JSENTRY = jsentry("@nextgisweb/pyramid/layout")
-BREADCRUMB_JSENTRY = jsentry("@nextgisweb/pyramid/breadcrumb")
 
 class ModelFactory:
     def __init__(self, context, *, key="id", tdef=int):
