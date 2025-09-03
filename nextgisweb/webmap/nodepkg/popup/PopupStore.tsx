@@ -1,5 +1,4 @@
 import { action, computed, observable } from "mobx";
-import { Component } from "react";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 
