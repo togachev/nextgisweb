@@ -239,13 +239,13 @@ export const LayersTree = observer(
             const edit = item.type === "layer" && item.editable === true ? true : false;
             return (
                 <Row className="item-title">
+                    {edit && (<Col className="edit-icon"><EditIcon /></Col>)}
                     <Col className={edit ? "legend-title edit-title" : "legend-title"}>
                         {iconResources.includes(item.cls) && <span className="icon-resources">
                             <SvgIcon icon={`rescls-${item.cls}`} />
                         </span>}
                         {title}
                     </Col>
-                    {edit && (<Col className="edit-icon"><EditIcon /></Col>)}
                 </Row>
             )
         }
