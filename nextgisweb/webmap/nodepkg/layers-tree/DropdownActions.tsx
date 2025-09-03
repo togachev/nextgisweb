@@ -1,4 +1,4 @@
-import { Divider, Dropdown } from "@nextgisweb/gui/antd";
+import { Button, Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import type { RootItemConfig } from "@nextgisweb/webmap/type/api";
@@ -32,16 +32,17 @@ export function DropdownActions({
     }
     if (moreClickId === undefined || moreClickId !== id) {
         return (
-            <span
+            <Button
                 className="more"
+                size="small"
+                type="text"
+                icon={<MoreVertIcon />}
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     setMoreClickId(id);
                 }}
-            >
-                <MoreVertIcon />
-            </span>
+            />
         );
     }
 
@@ -129,15 +130,13 @@ export function DropdownActions({
                 </div>
             )}
         >
-            <span
+            <Button
                 className="more"
-                onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }}
-            >
-                <MoreVertIcon />
-            </span>
+                size="small"
+                type="text"
+                icon={<MoreVertIcon />}
+                onClick={(e) => { e.stopPropagation(); }}
+            />
         </Dropdown>
     );
 }
