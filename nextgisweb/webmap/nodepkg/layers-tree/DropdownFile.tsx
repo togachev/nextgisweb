@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Dropdown } from "@nextgisweb/gui/antd";
+import { Button, Col, Dropdown, Row } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import Paperclip from "@nextgisweb/icon/mdi/paperclip";
@@ -53,18 +53,26 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
                 items.push({
                     key: i.id,
                     label: (
-                        <Button className="more" block title={i.name} target="_blank" href={i.link} type="text">
-                            <span className="linkFile">
-                                <span className="fileTitle">{i.res_name}</span>
-                                <span className="fileName">{i.name}</span>
-                            </span>
-                        </Button>
+                        <Row>
+                            <Col flex="auto">
+                                <Button className="more" block title={i.name} target="_blank" href={i.link} type="text">
+                                    <span className="linkFile">
+                                        <sub className="fileTitle">{i.res_name}</sub>
+                                        <span className="fileName">{i.name}</span>
+                                    </span>
+                                </Button>
+                            </Col>
+                            <Col flex="24px">
+                                <Button icon={<Download />} title={gettext("Download")} className="more" target="_blank" href={i.link} type="text" download />
+                            </Col>
+                        </Row>
                     ),
-                    extra: <Button icon={<Download />} title={gettext("Download")} className="dowload-file-icon" target="_blank" href={i.link} type="text" download />
                 })
             })
         })
     }
+
+
 
     return items.length > 0 && (
         <Dropdown
