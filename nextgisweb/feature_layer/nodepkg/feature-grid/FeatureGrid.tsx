@@ -8,6 +8,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
@@ -21,6 +22,10 @@ import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
 
+interface ResourceProps {
+    data: CompositeRead;
+    isLoading: boolean
+}
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -57,7 +62,7 @@ export const FeatureGrid = observer(
             "feature_layer.feature.count",
             { id }
         );
-        const { data: resourceData, isLoading } = useRouteGet(
+        const { data: resourceData, isLoading }: ResourceProps = useRouteGet(
             "resource.item",
             { id },
             {
@@ -96,9 +101,9 @@ export const FeatureGrid = observer(
         }, [resourceData, store]);
 
         const geometryType = () => {
-            if (resourceData && resourceData.hasOwnProperty("vector_layer")) {
+            if (resourceData && "vector_layer" in resourceData) {
                 return resourceData.vector_layer.geometry_type_parent;
-            } else if (resourceData && resourceData.hasOwnProperty("postgis_layer")) {
+            } else if (resourceData && "postgis_layer" in resourceData) {
                 return resourceData.postgis_layer.geometry_type_parent;
             }
         }
