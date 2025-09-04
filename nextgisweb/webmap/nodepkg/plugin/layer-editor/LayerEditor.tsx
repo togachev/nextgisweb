@@ -12,7 +12,7 @@ import { Vector as VectorSource } from "ol/source";
 import FeatureEditorModal from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
-import { EditIcon } from "@nextgisweb/gui/icon";
+
 import showModal from "@nextgisweb/gui/showModal";
 import { findNode } from "@nextgisweb/gui/util/tree";
 import { assert } from "@nextgisweb/jsrealm/error";
@@ -47,6 +47,20 @@ import type {
     FeatureToSave,
     FeaturesToSave,
 } from "./type";
+
+import VectorPointEdit from "@nextgisweb/icon/mdi/vector-point-edit";
+import VectorPolylineEdit from "@nextgisweb/icon/mdi/vector-polyline-edit";
+import VectorSquareEdit from "@nextgisweb/icon/mdi/vector-square-edit";
+
+export const GeometryIcon = ({ type }) => {
+    if (type === "polygon") {
+        return (<VectorSquareEdit />)
+    } else if (type === "line") {
+        return (<VectorPolylineEdit />)
+    } else if (type === "point") {
+        return (<VectorPointEdit />)
+    }
+}
 
 export class LayerEditor extends PluginBase {
     private static readonly CREATING_STATE_KEY = "creatingFeatures";
@@ -137,7 +151,7 @@ export class LayerEditor extends PluginBase {
         const title = active ? gettext("Stop editing") : gettext("Edit");
 
         return {
-            icon: <EditIcon />,
+            icon: <GeometryIcon type={nodeData.geometryType} />,
             title,
             onClick: async () => {
                 await this.run(nodeData);

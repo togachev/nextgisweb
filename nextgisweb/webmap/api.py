@@ -16,6 +16,7 @@ from nextgisweb.lib.apitype.util import EmptyObject
 from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer.interface import GEOM_TYPE
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import AsJSON, JSONType
@@ -581,6 +582,14 @@ def display_config(obj, request) -> DisplayConfig:
     checked_items: Set[int] = set()
     expanded_items: Set[int] = set()
 
+    def check_geometry_type(geometry_type):
+        if geometry_type in GEOM_TYPE.polygons:
+            return "polygon"
+        elif geometry_type in GEOM_TYPE.linestrings:
+            return "line"
+        elif geometry_type in GEOM_TYPE.points:
+            return "point"
+
     def traverse(item):
         data = dict(
             id=item.id,
@@ -593,6 +602,10 @@ def display_config(obj, request) -> DisplayConfig:
         if item.item_type == "layer":
             style = item.style
             layer = style.parent if style.cls.endswith("_style") else style
+
+            geometry_type = None
+            if hasattr(layer, "geometry_type"):
+                geometry_type = layer.geometry_type
 
             if not style.has_permission(DataScope.read, request.user):
                 # Skip webmap item if there are no necessary permissions, so it
@@ -615,6 +628,7 @@ def display_config(obj, request) -> DisplayConfig:
                 styleId=style.id,
                 cls=style.cls,
                 layerCls=layer.cls,
+                geometryType=check_geometry_type(geometry_type),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,

@@ -20,6 +20,7 @@ import {
     updateKeysForGroup,
     updateKeysForMutualExclusivity,
 } from "./util/treeItems";
+import { GeometryIcon } from "@nextgisweb/webmap/plugin/layer-editor/LayerEditor";
 
 import "./LayersTree.less";
 
@@ -152,7 +153,7 @@ export const LayersTree = observer(
         );
 
         const titleRender = useCallback(
-            (nodeData: TreeWebmapItem) => {
+            (nodeData: TreeWebmapItem, selectedKeys) => {
                 const { title, fileResourceVisible } = nodeData.treeItem;
                 const shouldActions = showLegend || showDropdown;
 
@@ -209,7 +210,7 @@ export const LayersTree = observer(
                         <Row wrap={false}>
                             <Col flex="auto" className="tree-item-title">
                                 {legendAction}
-                                <TitleComponent title={title} item={nodeData.treeItem} />
+                                <TitleComponent selectedKeys={selectedKeys} title={title} item={nodeData.treeItem} />
                             </Col>
                             {actions}
                         </Row>
@@ -235,12 +236,14 @@ export const LayersTree = observer(
             ]
         );
 
-        const TitleComponent = ({ title, item }) => {
+        const TitleComponent = ({ selectedKeys, title, item }) => {
             const edit = item.type === "layer" && item.editable === true ? true : false;
+            const selected = selectedKeys.length > 0 && selectedKeys.includes(item.id) ? true : false;
             return (
                 <Row className="item-title">
-                    {edit && (<Col className="edit-icon"><EditIcon /></Col>)}
-                    <Col className={edit ? "legend-title edit-title" : "legend-title"}>
+                    {edit && (<Col className={selected ? "edit-icon checked-edit" : "edit-icon"}><GeometryIcon type={item.geometryType} /></Col>)}
+                    <Col className={edit && selected ? "legend-title edit-title" :
+                        "legend-title"}>
                         {iconResources.includes(item.cls) && <span className="icon-resources">
                             <SvgIcon icon={`rescls-${item.cls}`} />
                         </span>}
@@ -278,7 +281,7 @@ export const LayersTree = observer(
                 onSelect={_onSelect}
                 selectedKeys={selectedKeys}
                 treeData={treeItems}
-                titleRender={titleRender}
+                titleRender={(nodeData) => titleRender(nodeData, selectedKeys)}
                 allowDrop={allowDrop}
                 draggable={draggable && { icon: false }}
                 onDrop={onDrop}

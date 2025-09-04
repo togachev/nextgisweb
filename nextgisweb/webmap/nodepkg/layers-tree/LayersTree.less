@@ -40,7 +40,9 @@
         }
 
         &.ant-tree-treenode-selected {
+            // background-color: transparent;
             background-color: rgb(217 217 217 / 15%);
+            font-weight: bold;
         }
     }
 
@@ -99,18 +101,34 @@
                     .icon-resources {
                         margin: 0 10px;
                     }
-                }
 
-                .legend-title {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+                    .edit-icon {
+                        font-size: 14px;
+                        color: var(--primary);
+                        width: 24px;
+                        height: 24px;
+                        display: flex;
+                        justify-items: center;
+                        justify-content: center;
+                        align-items: center;
+                        flex: 0 0 auto;
+                    }
 
-                .edit-title {
-                    font-weight: bold;
-                    color: var(--danger);
-                    padding: 0 2px 0 0;
+                    .checked-edit {
+                        color: var(--danger);
+                    }
+
+                    .legend-title {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    .edit-title {
+                        font-weight: bold;
+                        color: var(--danger);
+                        padding: 0 2px 0 0;
+                    }
                 }
             }
 
@@ -178,17 +196,7 @@
     flex: 0 0 auto;
 }
 
-.edit-icon {
-    font-size: 14px;
-    color: var(--danger);
-    width: 24px;
-    height: 24px;
-    display: flex;
-    justify-items: center;
-    justify-content: center;
-    align-items: center;
-    flex: 0 0 auto;
-}
+
 
 .ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle,
 .ant-tree .ant-tree-checkbox+span .ant-tree-iconEle {
