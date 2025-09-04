@@ -240,7 +240,7 @@ export const LayersTree = observer(
             const selected = selectedKeys.length > 0 && selectedKeys.includes(item.id) ? true : false;
             return (
                 <Row className="item-title">
-                    {edit && (<Col className={selected ? "edit-icon checked-edit" : "edit-icon"}><GeometryIcon type={item.geometryType} /></Col>)}
+                    {edit && (<Col className="edit-icon checked-edit"><GeometryIcon type={item.geometryType} /></Col>)}
                     <Col className={edit && selected ? "legend-title edit-title" :
                         "legend-title"}>
                         {iconResources.includes(item.cls) && <span className="icon-resources">
