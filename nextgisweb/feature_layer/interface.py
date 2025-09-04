@@ -85,6 +85,13 @@ class GEOM_TYPE:
         MULTIPOLYGONZ,
     )
 
+    def check_geometry_type(geometry_type):
+        if geometry_type in GEOM_TYPE.polygons:
+            return "polygon"
+        elif geometry_type in GEOM_TYPE.linestrings:
+            return "line"
+        elif geometry_type in GEOM_TYPE.points:
+            return "point"
 
 GEOM_TYPE_OGR_2_GEOM_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
 GEOM_TYPE_2_WKB_TYPE = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_OGR))

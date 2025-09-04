@@ -801,6 +801,17 @@ class GeometryTypeAttr(SAttribute):
         else:
             srlzr.obj.geometry_type_change(value)
 
+class GeometryTypeAttrStr(SAttribute):
+    def get(self, srlzr: Serializer) -> FeaureLayerGeometryType:
+        return super().get(srlzr)
+
+    def set(self, srlzr: Serializer, value: FeaureLayerGeometryType, *, create: bool):
+        if srlzr.obj.id is None:
+            srlzr.obj.geometry_type = value
+        elif srlzr.obj.geometry_type == value:
+            pass
+        else:
+            srlzr.obj.geometry_type_change(value)
 
 class FieldsAttr(SAttribute):
     def set(self, srlzr: Serializer, value: List[Dict[str, Any]], *, create: bool):
@@ -813,6 +824,11 @@ class DeleteAllFeaturesAttr(SAttribute):
         if value:
             srlzr.obj.feature_delete_all()
 
+
+class GeometryTypeParent(SAttribute):
+    def get(self, srlzr) -> bool:
+        return GEOM_TYPE.check_geometry_type(srlzr.obj.geometry_type)
+        
 
 class VectorLayerSerializer(Serializer, resource=VectorLayer):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
@@ -829,6 +845,7 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer):
     fid_field = LoaderAttr(Union[List[str], str])
 
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
+    geometry_type_parent = GeometryTypeParent(read=ResourceScope.read, write=None)
     fields = FieldsAttr(write=DataScope.write)
 
     delete_all_features = DeleteAllFeaturesAttr(write=DataScope.write)

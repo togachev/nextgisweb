@@ -12,9 +12,9 @@ import { useConfirm } from "@nextgisweb/gui/hook/useConfirm";
 import {
     AddIcon,
     DeleteIcon,
-    EditIcon,
     OpenInNewIcon,
 } from "@nextgisweb/gui/icon";
+import { GeometryIcon } from "@nextgisweb/webmap/plugin/layer-editor/LayerEditor";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import settings from "@nextgisweb/webmap/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -43,10 +43,12 @@ export const FeatureGridActions = observer(
         store,
         children,
         editorProps,
+        geometryType,
     }: {
         store: FeatureGridStore;
         children?: React.ReactNode;
         editorProps?: FeatureEditorWidgetProps;
+        geometryType: string;
     }) => {
         const {
             id,
@@ -194,7 +196,7 @@ export const FeatureGridActions = observer(
                                 <Button
                                     disabled={!selectedIds.length}
                                     size={size}
-                                    icon={<EditIcon />}
+                                    icon={<GeometryIcon type={geometryType} />}
                                     onClick={() => {
                                         if (selectedIds.length) {
                                             const featureId = selectedIds[0];

@@ -35,7 +35,7 @@ export class FeatureLayerPlugin extends PluginBase {
         const item = this.display.dumpItem();
         if ("layerId" in item) {
             const layerId = item.layerId;
-
+            
             this.display.tabsManager.addTab({
                 key: String(layerId),
                 label: item.label,

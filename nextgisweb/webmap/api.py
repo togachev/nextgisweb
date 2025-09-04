@@ -582,13 +582,7 @@ def display_config(obj, request) -> DisplayConfig:
     checked_items: Set[int] = set()
     expanded_items: Set[int] = set()
 
-    def check_geometry_type(geometry_type):
-        if geometry_type in GEOM_TYPE.polygons:
-            return "polygon"
-        elif geometry_type in GEOM_TYPE.linestrings:
-            return "line"
-        elif geometry_type in GEOM_TYPE.points:
-            return "point"
+
 
     def traverse(item):
         data = dict(
@@ -628,7 +622,7 @@ def display_config(obj, request) -> DisplayConfig:
                 styleId=style.id,
                 cls=style.cls,
                 layerCls=layer.cls,
-                geometryType=check_geometry_type(geometry_type),
+                geometryType=GEOM_TYPE.check_geometry_type(geometry_type),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,

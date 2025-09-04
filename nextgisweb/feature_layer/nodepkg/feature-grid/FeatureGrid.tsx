@@ -95,6 +95,14 @@ export const FeatureGrid = observer(
             }
         }, [resourceData, store]);
 
+        const geometryType = () => {
+            if (resourceData && resourceData.hasOwnProperty("vector_layer")) {
+                return resourceData.vector_layer.geometry_type_parent;
+            } else if (resourceData && resourceData.hasOwnProperty("postgis_layer")) {
+                return resourceData.postgis_layer.geometry_type_parent;
+            }
+        }
+
         const prevSelectedIds = useRef(selectedIds);
         useEffect(() => {
             if (onSelect) {
@@ -111,7 +119,7 @@ export const FeatureGrid = observer(
 
         return (
             <div className="ngw-feature-layer-feature-grid">
-                <FeatureGridActions store={store} editorProps={editorProps}>
+                <FeatureGridActions geometryType={geometryType()} store={store} editorProps={editorProps}>
                     <Tooltip title={msgRefreshTitle}>
                         <Button
                             type="text"

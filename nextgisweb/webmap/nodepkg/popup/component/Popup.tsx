@@ -149,10 +149,11 @@ export const Popup = observer(
                                     editorOptions: {
                                         featureId,
                                         resourceId: resourceId,
+                                        showGeometryTab: false,
                                         onSave: () => {
                                             store.setUpdate(true);
                                             topic.publish("feature.updated", { resourceId: layerId, featureId: id });
-                                            reloadLayer()
+                                            reloadLayer(layerId)
                                         },
                                     },
                                 });

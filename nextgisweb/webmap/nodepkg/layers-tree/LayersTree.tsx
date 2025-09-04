@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { EditIcon } from "@nextgisweb/gui/icon";
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { findNode } from "@nextgisweb/gui/util/tree";
