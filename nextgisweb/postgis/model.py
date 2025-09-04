@@ -588,6 +588,11 @@ class FieldsAttr(SAttribute):
                 raise ForbiddenError()
 
 
+class GeometryTypeParent(SAttribute):
+    def get(self, srlzr) -> bool:
+        return GEOM_TYPE.check_geometry_type(srlzr.obj.geometry_type)
+
+
 class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     connection_relation = SResource(read=ResourceScope.read, write=ResourceScope.update)
@@ -600,6 +605,7 @@ class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     external_resource_id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     column_geom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
+    geometry_type_parent = GeometryTypeParent(read=ResourceScope.read, write=None)
     geometry_srid = GeometrySridAttr(read=ResourceScope.read, write=ResourceScope.update)
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 

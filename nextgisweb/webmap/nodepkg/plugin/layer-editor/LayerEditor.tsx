@@ -119,7 +119,7 @@ export class LayerEditor extends PluginBase {
                 nodeData.editGeom === true &&
                 (
                     nodeData.plugin[
-                        this.identity
+                    this.identity
                     ] as LayerEditorWebMapPluginConfig
                 )?.writable,
             active: nodeData.editable === true,

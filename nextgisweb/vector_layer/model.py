@@ -801,17 +801,6 @@ class GeometryTypeAttr(SAttribute):
         else:
             srlzr.obj.geometry_type_change(value)
 
-class GeometryTypeAttrStr(SAttribute):
-    def get(self, srlzr: Serializer) -> FeaureLayerGeometryType:
-        return super().get(srlzr)
-
-    def set(self, srlzr: Serializer, value: FeaureLayerGeometryType, *, create: bool):
-        if srlzr.obj.id is None:
-            srlzr.obj.geometry_type = value
-        elif srlzr.obj.geometry_type == value:
-            pass
-        else:
-            srlzr.obj.geometry_type_change(value)
 
 class FieldsAttr(SAttribute):
     def set(self, srlzr: Serializer, value: List[Dict[str, Any]], *, create: bool):

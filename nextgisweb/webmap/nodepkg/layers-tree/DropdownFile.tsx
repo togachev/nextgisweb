@@ -53,9 +53,9 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
                 items.push({
                     key: i.id,
                     label: (
-                        <Row>
+                        <Row align="middle">
                             <Col flex="auto">
-                                <Button className="more" block title={i.name} target="_blank" href={i.link} type="text">
+                                <Button className="title-file" title={i.name} target="_blank" href={i.link} type="text">
                                     <span className="linkFile">
                                         <sub className="fileTitle">{i.res_name}</sub>
                                         <span className="fileName">{i.name}</span>
@@ -63,7 +63,7 @@ export function DropdownFile({ nodeData }: DropdownFileProps) {
                                 </Button>
                             </Col>
                             <Col flex="24px">
-                                <Button icon={<Download />} title={gettext("Download")} className="more" target="_blank" href={i.link} type="text" download />
+                                <Button className="dowload-file" icon={<Download />} title={gettext("Download")} target="_blank" href={i.link} type="text" download />
                             </Col>
                         </Row>
                     ),
