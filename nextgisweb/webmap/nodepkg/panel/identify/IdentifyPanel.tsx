@@ -102,6 +102,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                         const [x, y] = identifyInfo.point;
                         const highlightEvent: HighlightEvent = {
                             coordinates: [x, y],
+                            colorsSelectedFeature: display.config.colorsSelectedFeature,
                         };
                         topic.publish("feature.highlight", highlightEvent);
                     } else {

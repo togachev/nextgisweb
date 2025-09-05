@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { Suspense, lazy, useCallback, useState } from "react";
 
 import { Badge, Button, CheckboxValue, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
@@ -15,6 +15,8 @@ import { SelectLegendSymbols } from "../component";
 
 import { OptionsWidget } from "./OptionsWidget";
 import type { SettingStore } from "./SettingStore";
+
+const ColorSelectedFeature = lazy(() => import("@nextgisweb/webmap/color-selected-feature/ColorSelectedFeature"));
 
 const { annotation } = settings;
 
@@ -35,6 +37,8 @@ const msgAdditionalOptions = gettext("Additional options");
 const msgConfigure = gettext("Configure");
 const msgActivePanel = gettext("Active panel");
 const msgSelectFeaturePanel = gettext("Browsing history");
+const msgChangeColors = gettext("Change colors");
+const msgColorSelectedFeature = gettext("Setting the highlight color");
 
 const msgDefault = gettext("Default");
 
@@ -71,6 +75,15 @@ const editingOptions = [
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
     ({ store }) => {
         const [optionsModal, setOptionsModal] = useState(false);
+        const [showColorSF, setShowColorSF] = useState(false);
+
+        const openColorFH = useCallback(
+            () => {
+                setShowColorSF(true);
+            },
+            []
+        );
+
         return (
             <>
                 <Area pad cols={["1fr", "1fr"]}>
@@ -186,6 +199,16 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             options={activePanelOptions}
                             allowClear
                         />
+                    </Lot>
+                    <Lot row label={msgColorSelectedFeature}>
+                        {!showColorSF &&
+                            <Button onClick={openColorFH}>
+                                {msgChangeColors}
+                            </Button>
+                        }
+                        <Suspense>
+                            {showColorSF && <ColorSelectedFeature store={store} />}
+                        </Suspense>
                     </Lot>
                     <Lot label={msgAdditionalOptions}>
                         <Button

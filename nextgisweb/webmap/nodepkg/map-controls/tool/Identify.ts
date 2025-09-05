@@ -147,6 +147,7 @@ export class Identify extends ToolBase {
                 featureId: featureItem.id,
                 layerId: featureInfo.layerId,
                 featureInfo: { ...featureItem, labelWithLayer: label },
+                colorsSelectedFeature: this.display.config.colorsSelectedFeature,
             };
             this.setHighlightedFeature(featureHightlight);
 

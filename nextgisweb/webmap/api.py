@@ -530,6 +530,7 @@ class DisplayConfig(Struct, kw_only=True):
     webmapId: int
     webmapTitle: str
     activePanel: str
+    colorsSelectedFeature: Dict[str, Any]
     selectFeaturePanel: bool
     infomap: InfoMapConfig
     webmapPlugin: Dict[str, Any]
@@ -742,6 +743,7 @@ def display_config(obj, request) -> DisplayConfig:
         checkedItems=checked_items,
         expandedItems=expanded_items,
         activePanel=obj.active_panel,
+        colorsSelectedFeature=obj.colors_selected_feature,
         selectFeaturePanel=obj.select_feature_panel,
         infomap=dict(
             resource=request.route_url("resource.show", id=0),

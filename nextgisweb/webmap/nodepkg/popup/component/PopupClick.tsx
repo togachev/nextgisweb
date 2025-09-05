@@ -49,6 +49,7 @@ export default function PopupClick({ store, event, params }: Params) {
                         store.zoomToPoint(event.coordinate)
                         const highlightEvent: HighlightEvent = {
                             coordinates: event.coordinate,
+                            colorsSelectedFeature: store.display.config.colorsSelectedFeature,
                         };
                         topic.publish("feature.highlight", highlightEvent);
                     }

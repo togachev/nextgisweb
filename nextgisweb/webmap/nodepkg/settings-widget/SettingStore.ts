@@ -15,13 +15,19 @@ import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
 
+interface ColorsSelectedFeatureProps {
+    stroke_primary: string;
+    stroke_secondary: string;
+    fill: string;
+}
+
 export class SettingStore
-    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>>
-{
+    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>> {
     readonly identity = "webmap";
     readonly composite: CompositeStore;
 
-    @observable accessor activePanel: WebMapRead["active_panel"] = "layers";    
+    @observable accessor activePanel: WebMapRead["active_panel"] = "layers";
+    @observable.ref accessor colorsSelectedFeature: ColorsSelectedFeatureProps | null = null;
     @observable.ref accessor editable = false;
     @observable.ref accessor selectFeaturePanel = false;
     @observable.ref accessor annotationEnabled = false;
@@ -77,6 +83,7 @@ export class SettingStore
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
         this.activePanel = value.active_panel;
+        this.colorsSelectedFeature = value.colors_selected_feature;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
         this.initialExtent = extractExtentFromArray(value.initial_extent);
         this.constrainingExtent = extractExtentFromArray(
@@ -95,6 +102,7 @@ export class SettingStore
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
             active_panel: this.activePanel,
+            colors_selected_feature: this.colorsSelectedFeature,
             select_feature_panel: this.selectFeaturePanel,
             initial_extent: convertExtentToArray(this.initialExtent),
             constraining_extent: convertExtentToArray(this.constrainingExtent),
@@ -141,5 +149,10 @@ export class SettingStore
     @action
     update(source: Partial<this>) {
         Object.assign(this, source);
+    }
+
+    @action
+    setColorsSelectedFeature(value) {
+        this.colorsSelectedFeature = value;
     }
 }

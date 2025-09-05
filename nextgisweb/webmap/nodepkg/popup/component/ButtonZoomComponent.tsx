@@ -23,6 +23,7 @@ export const ButtonZoomComponent = ({ store }: ContentProps) => {
                     store.zoomToPoint(store.pointPopupClick.coordinate);
                     const highlightEvent: HighlightEvent = {
                         coordinates: store.pointPopupClick.coordinate,
+                        colorsSelectedFeature: store.display.config.colorsSelectedFeature,
                     };
                     topic.publish("feature.highlight", highlightEvent);
                 }

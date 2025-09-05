@@ -22,21 +22,21 @@ msgstr "Фрагмент"
 msgid "Resource webmap"
 msgstr ""
 
-#: model.py:49 model.py:67 view.py:207 view.py:242
+#: model.py:50 model.py:68 view.py:207 view.py:242
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:51
+#: model.py:52
 msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: model.py:52
+#: model.py:53
 msgctxt "permission"
 msgid "Draw annotations"
 msgstr "Рисование аннотаций"
 
-#: model.py:53
+#: model.py:54
 msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
@@ -53,8 +53,24 @@ msgstr "Группа ресурсов"
 msgid "Display name"
 msgstr "Наименование"
 
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:12
+msgid "Highlight color"
+msgstr "Цвет выделения"
+
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:13
+msgid "Highlight color secondary(raster layer)"
+msgstr "Дополнительный цвет выделения (растровый слой)"
+
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:14
+msgid "Background color"
+msgstr "Цвет фона"
+
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:68
+msgid "Set default value"
+msgstr "Установить значение по умолчанию"
+
 #: nodepkg/component/SelectLegendSymbols.tsx:5
-#: nodepkg/settings-widget/SettingsWidget.tsx:39
+#: nodepkg/settings-widget/SettingsWidget.tsx:43
 #: nodepkg/settings/select-options.ts:94
 msgid "Default"
 msgstr "По умолчанию"
@@ -70,7 +86,7 @@ msgid "Collapse"
 msgstr "Свернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:10
-#: nodepkg/settings-widget/SettingsWidget.tsx:67
+#: nodepkg/settings-widget/SettingsWidget.tsx:71
 #: nodepkg/settings/select-options.ts:97
 msgid "Disable"
 msgstr "Отключить"
@@ -79,11 +95,11 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:758
+#: nodepkg/display/Display.ts:766
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:759
+#: nodepkg/display/Display.ts:767
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -209,7 +225,7 @@ msgstr "Макс. масштаб"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:42
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:28
-#: nodepkg/settings-widget/SettingsWidget.tsx:27
+#: nodepkg/settings-widget/SettingsWidget.tsx:29
 #: nodepkg/settings/SettingsForm.tsx:345
 msgid "Legend"
 msgstr "Легенда"
@@ -235,7 +251,7 @@ msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:261 nodepkg/panel/layers/plugin.tsx:10
-#: nodepkg/settings-widget/SettingsWidget.tsx:53
+#: nodepkg/settings-widget/SettingsWidget.tsx:57
 msgid "Layers"
 msgstr "Слои"
 
@@ -259,7 +275,7 @@ msgstr "Моя приватная аннотация"
 msgid "Download attached files"
 msgstr "Скачать прикрепленные файлы"
 
-#: nodepkg/layers-tree/DropdownFile.tsx:63
+#: nodepkg/layers-tree/DropdownFile.tsx:66
 msgid "Download"
 msgstr "Скачать"
 
@@ -287,49 +303,53 @@ msgstr "Определить местоположение не удалось"
 msgid "Rotate swipe"
 msgstr "Повернуть шторку"
 
-#: nodepkg/map-controls/map-controls.ts:41 nodepkg/map-controls/map-tools.ts:15
+#: nodepkg/map-controls/map-controls.ts:42 nodepkg/map-controls/map-tools.ts:15
 #: nodepkg/map-controls/tool/Zoom.ts:29
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: nodepkg/map-controls/map-controls.ts:42 nodepkg/map-controls/map-tools.ts:24
+#: nodepkg/map-controls/map-controls.ts:43 nodepkg/map-controls/map-tools.ts:24
 #: nodepkg/map-controls/tool/Zoom.ts:29
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: nodepkg/map-controls/map-controls.ts:53
+#: nodepkg/map-controls/map-controls.ts:54
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: nodepkg/map-controls/map-controls.ts:65 nodepkg/print-map/utils.ts:54
+#: nodepkg/map-controls/map-controls.ts:66 nodepkg/print-map/utils.ts:54
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: nodepkg/map-controls/map-controls.ts:80
+#: nodepkg/map-controls/map-controls.ts:81
 msgid "Scale line"
 msgstr "Линейка масштаба"
 
-#: nodepkg/map-controls/map-controls.ts:92
+#: nodepkg/map-controls/map-controls.ts:93
 msgid "Info scale"
 msgstr "Числовой масштаб"
 
-#: nodepkg/map-controls/map-controls.ts:102
-#: nodepkg/map-controls/map-controls.ts:105
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:110
+#: nodepkg/map-controls/map-controls.ts:103
+#: nodepkg/map-controls/map-controls.ts:106
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:111
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:149
-#: nodepkg/settings-widget/SettingsWidget.tsx:24
+#: nodepkg/settings-widget/SettingsWidget.tsx:26
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: nodepkg/map-controls/map-controls.ts:115
-#: nodepkg/map-controls/map-controls.ts:118
+#: nodepkg/map-controls/map-controls.ts:116
+#: nodepkg/map-controls/map-controls.ts:119
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: nodepkg/map-controls/map-controls.ts:126 nodepkg/settings/SettingsForm.tsx:95
+#: nodepkg/map-controls/map-controls.ts:127 nodepkg/settings/SettingsForm.tsx:95
 #: option/base.py:41
 msgid "Identification"
 msgstr "Идентификация"
+
+#: nodepkg/map-controls/map-controls.ts:140 nodepkg/popup/PopupStore.tsx:80
+msgid "PopupStore"
+msgstr ""
 
 #: nodepkg/map-controls/map-tools.ts:33 nodepkg/map-controls/tool/Measure.ts:52
 msgid "Measure distance"
@@ -430,8 +450,8 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:137
-#: nodepkg/popup/component/Popup.tsx:140
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:151
+#: nodepkg/popup/component/Popup.tsx:139
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -465,14 +485,14 @@ msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
 #: nodepkg/panel/annotations/plugin.tsx:13
-#: nodepkg/settings-widget/SettingsWidget.tsx:28
-#: nodepkg/settings-widget/SettingsWidget.tsx:61
+#: nodepkg/settings-widget/SettingsWidget.tsx:30
+#: nodepkg/settings-widget/SettingsWidget.tsx:65
 msgid "Annotations"
 msgstr "Аннотации"
 
 #: nodepkg/panel/bookmarks/plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:30
-#: nodepkg/settings-widget/SettingsWidget.tsx:58
+#: nodepkg/settings-widget/SettingsWidget.tsx:32
+#: nodepkg/settings-widget/SettingsWidget.tsx:62
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -508,7 +528,7 @@ msgstr "Удалить слой"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:35
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:35
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:96
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:97
 #: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:18
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -616,7 +636,7 @@ msgid "Maximum files/loaded:"
 msgstr "Максимальное количество файлов/загружено:"
 
 #: nodepkg/panel/custom-layer/plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:56
+#: nodepkg/settings-widget/SettingsWidget.tsx:60
 msgid "Custom layers"
 msgstr "Пользовательские слои"
 
@@ -624,7 +644,7 @@ msgstr "Пользовательские слои"
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:272
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:38
 #: nodepkg/popup/component/ContentComponent.tsx:172
-#: nodepkg/settings-widget/SettingsWidget.tsx:59
+#: nodepkg/settings-widget/SettingsWidget.tsx:63
 msgid "Description"
 msgstr "Описание"
 
@@ -679,7 +699,7 @@ msgstr "Геометрия"
 
 #: nodepkg/panel/identify/component/FeatureSelector.tsx:54
 #: nodepkg/popup/component/ButtonZoomComponent.tsx:13
-#: nodepkg/popup/component/PopupClick.tsx:61
+#: nodepkg/popup/component/PopupClick.tsx:62
 msgid "Zoom to feature"
 msgstr "Приблизить к объекту"
 
@@ -692,7 +712,7 @@ msgstr "Канал {}"
 msgid "Raster"
 msgstr "Растр"
 
-#: nodepkg/panel/identify/lookup.ts:30 nodepkg/popup/PopupStore.tsx:32
+#: nodepkg/panel/identify/lookup.ts:30 nodepkg/popup/PopupStore.tsx:35
 #: nodepkg/popup/component/Popup.tsx:35
 msgid "The data is not available for reading"
 msgstr "Данные недоступны для чтения"
@@ -723,7 +743,7 @@ msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:49
-#: nodepkg/settings-widget/SettingsWidget.tsx:26
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
 msgid "Title"
 msgstr "Заголовок"
 
@@ -791,7 +811,7 @@ msgstr "TIFF"
 msgid "PDF"
 msgstr "PDF"
 
-#: nodepkg/panel/print/plugin.tsx:10 nodepkg/settings-widget/SettingsWidget.tsx:57
+#: nodepkg/panel/print/plugin.tsx:10 nodepkg/settings-widget/SettingsWidget.tsx:61
 msgid "Print map"
 msgstr "Распечатать карту"
 
@@ -847,15 +867,15 @@ msgstr "Не найдено"
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
-#: nodepkg/panel/search/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:55
+#: nodepkg/panel/search/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:59
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:97
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:98
 msgid "Value raster layer"
 msgstr "Значение растрового слоя"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:122
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:123
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:203
 msgid "Deselect Objects for Layer."
 msgstr "Отменить выбор объектов для слоя."
@@ -911,7 +931,7 @@ msgid "Show layer name"
 msgstr "Показать имя слоя"
 
 #: nodepkg/panel/selected-feature/plugin.tsx:15
-#: nodepkg/settings-widget/SettingsWidget.tsx:37
+#: nodepkg/settings-widget/SettingsWidget.tsx:39
 msgid "Browsing history"
 msgstr "История просмотра"
 
@@ -938,7 +958,7 @@ msgid "None"
 msgstr "Нет"
 
 #: nodepkg/panel/share/SharePanel.tsx:309
-#: nodepkg/settings-widget/SettingsWidget.tsx:36
+#: nodepkg/settings-widget/SettingsWidget.tsx:38
 msgid "Active panel"
 msgstr "Активная панель"
 
@@ -1030,7 +1050,7 @@ msgstr "Значение набора"
 msgid "Reset current value"
 msgstr "Сбросить текущее значение"
 
-#: nodepkg/panel/share/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:60
+#: nodepkg/panel/share/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:64
 msgid "Share"
 msgstr "Поделиться"
 
@@ -1040,9 +1060,9 @@ msgstr "Таблица объектов"
 
 #: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:24
 msgid "Open table in new page"
-msgstr ""
+msgstr "Открыть таблицу на новой странице"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:137
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:151
 msgid "Stop editing"
 msgstr "Завершить редактирование"
 
@@ -1062,20 +1082,20 @@ msgstr "Настройки стиля"
 msgid "Style show"
 msgstr "Показать свойства стиля"
 
-#: nodepkg/popup/PopupStore.tsx:124
+#: nodepkg/popup/PopupStore.tsx:165
 msgid "Reset url"
 msgstr "Сбросить URL-адрес"
 
-#: nodepkg/popup/PopupStore.tsx:130
+#: nodepkg/popup/PopupStore.tsx:171
 msgid "Update current web map address"
 msgstr "Обновить текущий адрес веб-карты"
 
-#: nodepkg/popup/PopupStore.tsx:138
+#: nodepkg/popup/PopupStore.tsx:179
 msgid "Set current map coverage"
 msgstr "Установить текущее покрытие карты"
 
 #: nodepkg/popup/component/ButtonZoomComponent.tsx:13
-#: nodepkg/popup/component/PopupClick.tsx:62
+#: nodepkg/popup/component/PopupClick.tsx:63
 msgid "Zoom to raster layer"
 msgstr "Масштабировать до растрового слоя"
 
@@ -1186,65 +1206,73 @@ msgstr ""
 msgid "Auto"
 msgstr "Авто"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:25
+#: nodepkg/settings-widget/SettingsWidget.tsx:27
 msgid "Constraining extent"
 msgstr "Ограничивающий охват"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:29
+#: nodepkg/settings-widget/SettingsWidget.tsx:31
 msgid "Select mode"
 msgstr "Выберите режим"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:31
+#: nodepkg/settings-widget/SettingsWidget.tsx:33
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:32
+#: nodepkg/settings-widget/SettingsWidget.tsx:34
 #: nodepkg/settings/SettingsForm.tsx:256
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:33
+#: nodepkg/settings-widget/SettingsWidget.tsx:35
 msgid "Layers editing"
 msgstr "Редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:34
+#: nodepkg/settings-widget/SettingsWidget.tsx:36
 msgid "Additional options"
 msgstr "Дополнительные опции"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:35
+#: nodepkg/settings-widget/SettingsWidget.tsx:37
 msgid "Configure"
 msgstr "Настроить"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:42
+#: nodepkg/settings-widget/SettingsWidget.tsx:40
+msgid "Change colors"
+msgstr "Изменить цвета"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:41
+msgid "Setting the highlight color"
+msgstr "Настройка цвета выделения"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:46
 msgid "Web map will start at this extent"
 msgstr "Веб-карта будет показана с этим охватом"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:43
+#: nodepkg/settings-widget/SettingsWidget.tsx:47
 msgid "Web map will not allow to move outside of this extent"
 msgstr "Веб-карта не позволит выйти за пределы этого охвата"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:47
+#: nodepkg/settings-widget/SettingsWidget.tsx:51
 msgid "Hide by default"
 msgstr "Скрыть по умолчанию"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:48
+#: nodepkg/settings-widget/SettingsWidget.tsx:52
 msgid "Show without messages"
 msgstr "Показать без сообщений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:49
+#: nodepkg/settings-widget/SettingsWidget.tsx:53
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:62
+#: nodepkg/settings-widget/SettingsWidget.tsx:66
 msgid "Panel disabled"
 msgstr "Панель отключена"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:68
+#: nodepkg/settings-widget/SettingsWidget.tsx:72
 #: nodepkg/settings/SettingsForm.tsx:279
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:223
+#: nodepkg/settings-widget/SettingsWidget.tsx:250
 msgid "Settings"
 msgstr "Настройки"
 
@@ -1562,15 +1590,3 @@ msgstr "Настройка группы веб-карт"
 #: view.py:231
 msgid "Group setting"
 msgstr "Настройка группы"
-
-#~ msgid "Imodule"
-#~ msgstr "Модуль идентификации"
-
-#~ msgid "Clear selection of objects from current layer"
-#~ msgstr "Очистить выбор объектов из текущего слоя"
-
-#~ msgid "Delete selected feature"
-#~ msgstr "Удалить выбранную функцию"
-
-#~ msgid "Clear all selected feature"
-#~ msgstr "Очистить все выбранные функции"

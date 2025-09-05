@@ -671,6 +671,7 @@ export class Display {
         this.map.zoomToFeature(new Feature({ geometry }));
         topic.publish("feature.highlight", {
             olGeometry: geometry,
+            colorsSelectedFeature: this.config.colorsSelectedFeature,
         });
     }
     handleSelect(selectedKeys: number[]) {

@@ -807,6 +807,7 @@ export class PopupStore extends ToolBase {
                     geom: res.feature.geom,
                     featureId: res.feature.id,
                     layerId: res.resourceId,
+                    colorsSelectedFeature: this.display.config.colorsSelectedFeature,
                 })
             } else {
                 topic.publish("feature.unhighlight")

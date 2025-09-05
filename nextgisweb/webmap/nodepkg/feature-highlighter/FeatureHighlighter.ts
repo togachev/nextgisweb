@@ -1,3 +1,4 @@
+import { action, observable } from "mobx";
 import { Feature } from "ol";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
@@ -8,9 +9,15 @@ import { Circle, Fill, RegularShape, Stroke, Style } from "ol/style";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 
 import type { MapStore } from "../ol/MapStore";
+
+interface ColorsSelectedFeatureProps {
+    stroke_primary: string;
+    stroke_secondary: string;
+    fill: string;
+}
 
 export interface HighlightEvent {
     geom?: string;
@@ -19,6 +26,7 @@ export interface HighlightEvent {
     featureId?: number;
     feature?: Feature;
     coordinates?: [number, number];
+    colorsSelectedFeature: ColorsSelectedFeatureProps;
 }
 
 interface FeatureFilterFn {
@@ -31,8 +39,8 @@ export class FeatureHighlighter {
     private _overlay: Vector;
     private _wkt: WKT;
     private _zIndex = 1000;
-    private _strokeColor = "rgba(255,255,0,1)";
-    private _strokeColorBlack = "rgb(0, 0, 0)";
+
+    @observable.ref accessor colorsSelectedFeature: ColorsSelectedFeatureProps;
 
     private _highlightStyle?: Style;
 
@@ -58,20 +66,25 @@ export class FeatureHighlighter {
         this._map.addLayer(this._overlay);
     }
 
+    @action
+    setColorsSelectedFeature(colorsSelectedFeature: ColorsSelectedFeatureProps) {
+        this.colorsSelectedFeature = colorsSelectedFeature;
+    }
+
     private _getDefaultStyle(): Style {
         const strokeStyle = new Stroke({
             width: 3,
-            color: this._strokeColor,
+            color: this.colorsSelectedFeature.stroke_primary,
         });
         const fill = new Fill({
-            color: "rgba(255, 255, 255, 0.1)",
+            color: this.colorsSelectedFeature.fill,
         });
         return new Style({
             stroke: strokeStyle,
             fill: fill,
             image: new Circle({
                 stroke: strokeStyle,
-                radius: webmapSettings.identify_radius,
+                radius: settings.identify_radius,
                 fill: fill,
             }),
         });
@@ -81,7 +94,7 @@ export class FeatureHighlighter {
         const stroke =
             this._highlightStyle?.getStroke() ||
             new Stroke({
-                color: this._strokeColor,
+                color: this.colorsSelectedFeature.stroke_primary,
                 width: 3,
             })
 
@@ -99,7 +112,7 @@ export class FeatureHighlighter {
         const stroke =
             this._highlightStyle?.getStroke() ||
             new Stroke({
-                color: this._strokeColorBlack,
+                color: this.colorsSelectedFeature.stroke_secondary,
                 width: 1,
             })
 
@@ -113,10 +126,19 @@ export class FeatureHighlighter {
         });
     }
 
+
+    async colorsValue(e) {
+        this.setColorsSelectedFeature(e.colorsSelectedFeature)
+        return new Promise<Response>((resolve) => resolve(e));
+    }
+
     private _bindEvents(): void {
-        topic.subscribe("feature.highlight", (e: HighlightEvent) =>
-            this._highlightFeature(e)
-        );
+        topic.subscribe("feature.highlight", (e: HighlightEvent) => {
+            this.colorsValue(e)
+                .then(e => {
+                    this._highlightFeature(e)
+                })
+        });
         topic.subscribe("feature.unhighlight", (filter?: FeatureFilterFn) =>
             this._unhighlightFeature(filter)
         );
@@ -125,7 +147,6 @@ export class FeatureHighlighter {
     private _highlightFeature(e: HighlightEvent): Feature {
         let geometry: Geometry;
         this._source.clear();
-
         let feature: Feature;
         if (e.coordinates) {
             const geometry = new Point(e.coordinates);

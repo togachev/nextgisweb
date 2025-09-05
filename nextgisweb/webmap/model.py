@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Dict, List, Literal, Type, Union
+from typing import Annotated, Any, Dict, List, Literal, Type, Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -15,6 +15,7 @@ from sqlalchemy.orm.attributes import set_committed_value
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.msext import DEPRECATED
+from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import ValidationError
@@ -88,6 +89,7 @@ class WebMap(Base, Resource):
 
     title = sa.Column(sa.Unicode)
     active_panel = sa.Column(saext.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
+    colors_selected_feature = sa.Column(sa_pg.JSONB, nullable=True)
     select_feature_panel = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_enabled = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_default = sa.Column(
@@ -507,6 +509,20 @@ class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
     north: Annotated[Lat, Meta(title="North")]
 
 
+class ColorSF(Struct, kw_only=True):
+    stroke_primary: str
+    stroke_secondary: str
+    fill: str
+
+
+class ColorSFAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> AsJSON[ColorSF]:
+        return srlzr.obj.colors_selected_feature
+
+    def set(self, srlzr: Serializer, value: AsJSON[ColorSF], *, create: bool):
+        srlzr.obj.colors_selected_feature = value
+
+
 class ExtentAttr(SAttribute):
     def bind(self, srlzrcls: Type[Serializer], attrname: str):
         super().bind(srlzrcls, attrname)
@@ -561,8 +577,8 @@ class WebMapSerializer(Serializer, resource=WebMap):
     bookmark_resource = SResource(read=ResourceScope.read, write=ResourceScope.update)
 
     root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
-    test = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
     active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    colors_selected_feature = ColorSFAttr(read=ResourceScope.read, write=ResourceScope.update)
     select_feature_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     extent_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
