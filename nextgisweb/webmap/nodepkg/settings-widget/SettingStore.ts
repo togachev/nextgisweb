@@ -15,13 +15,29 @@ import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
 
+interface ColorsSelectedFeatureProps {
+    strokePolygon: string;
+    strokePoint: string;
+    strokeLine: string;
+    colorsFillPolygon: string;
+    colorsFillPoint: string;
+    colorsFillLine: string;
+}
+
 export class SettingStore
-    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>>
-{
+    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>> {
     readonly identity = "webmap";
     readonly composite: CompositeStore;
 
-    @observable accessor activePanel: WebMapRead["active_panel"] = "layers";    
+    @observable accessor activePanel: WebMapRead["active_panel"] = "layers";
+    @observable accessor colorsSelectedFeature: ColorsSelectedFeatureProps = {
+        strokePolygon: "rgba(255,255,0,1)",
+        strokePoint: "rgba(255,255,0,1)",
+        strokeLine: "rgba(255,255,0,1)",
+        colorsFillPolygon: "rgba(255,255,255,0.1)",
+        colorsFillPoint: "rgba(255,255,255,0.1)",
+        colorsFillLine: "rgba(255,255,0,1)",
+    };
     @observable.ref accessor editable = false;
     @observable.ref accessor selectFeaturePanel = false;
     @observable.ref accessor annotationEnabled = false;
@@ -77,6 +93,7 @@ export class SettingStore
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
         this.activePanel = value.active_panel;
+        this.colorsSelectedFeature = value.colors_selected_feature;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
         this.initialExtent = extractExtentFromArray(value.initial_extent);
         this.constrainingExtent = extractExtentFromArray(
@@ -95,6 +112,7 @@ export class SettingStore
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
             active_panel: this.activePanel,
+            colors_selected_feature: this.colorsSelectedFeature,
             select_feature_panel: this.selectFeaturePanel,
             initial_extent: convertExtentToArray(this.initialExtent),
             constraining_extent: convertExtentToArray(this.constrainingExtent),

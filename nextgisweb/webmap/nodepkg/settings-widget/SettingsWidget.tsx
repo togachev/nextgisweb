@@ -71,6 +71,8 @@ const editingOptions = [
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
     ({ store }) => {
         const [optionsModal, setOptionsModal] = useState(false);
+        console.log(store);
+        
         return (
             <>
                 <Area pad cols={["1fr", "1fr"]}>
@@ -185,6 +187,12 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             }}
                             options={activePanelOptions}
                             allowClear
+                        />
+                    </Lot>
+                    <Lot row label="color selected feature">
+                        <InputValue
+                            value={store.colorsSelectedFeature || ""}
+                            onChange={(v) => store.update({ colorsSelectedFeature: v })}
                         />
                     </Lot>
                     <Lot label={msgAdditionalOptions}>

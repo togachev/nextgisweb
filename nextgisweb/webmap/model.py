@@ -88,6 +88,7 @@ class WebMap(Base, Resource):
 
     title = sa.Column(sa.Unicode)
     active_panel = sa.Column(saext.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
+    colors_selected_feature = sa.Column(sa_pg.JSONB, nullable=True)
     select_feature_panel = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_enabled = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_default = sa.Column(
@@ -507,6 +508,23 @@ class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
     north: Annotated[Lat, Meta(title="North")]
 
 
+class ColorSF(Struct):
+    strokePolygon: str
+    strokePoint: str
+    strokeLine: str
+    colorsFillPolygon: str
+    colorsFillPoint: str
+    colorsFillLine: str
+
+# class ColorSFAttr(SAttribute):
+#     def get(self, srlzr: Serializer) -> Union[ColorSF, None]:
+#         return srlzr.obj
+
+#     def set(self, srlzr: Serializer, value: Union[ColorSF, None], *, create: bool):
+#         super().set(srlzr, value, create=create)
+
+
+
 class ExtentAttr(SAttribute):
     def bind(self, srlzrcls: Type[Serializer], attrname: str):
         super().bind(srlzrcls, attrname)
@@ -561,8 +579,8 @@ class WebMapSerializer(Serializer, resource=WebMap):
     bookmark_resource = SResource(read=ResourceScope.read, write=ResourceScope.update)
 
     root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
-    test = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
     active_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    # colors_selected_feature = ColorSFAttr(read=ResourceScope.read, write=ResourceScope.update)
     select_feature_panel = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     extent_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)

@@ -8,7 +8,7 @@ import { Circle, Fill, RegularShape, Stroke, Style } from "ol/style";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 
 import type { MapStore } from "../ol/MapStore";
 
@@ -32,7 +32,14 @@ export class FeatureHighlighter {
     private _wkt: WKT;
     private _zIndex = 1000;
     private _strokeColor = "rgba(255,255,0,1)";
-    private _strokeColorBlack = "rgb(0, 0, 0)";
+    private _colorFill = "rgba(255,255,255,0.1)";
+    private _strokeColorBlack = "rgba(177, 30, 30, 1)";
+    private _strokePolygon: "rgba(81, 255, 0, 1)";
+    private _strokePoint: "rgba(255,255,0,1)";
+    private _strokeLine: "rgba(255,255,0,1)";
+    private _colorsFillPolygon: "rgba(255,255,255,0.1)";
+    private _colorsFillPoint: "rgba(255,255,255,0.1)";
+    private _colorsFillLine: "rgba(255,255,0,1)";
 
     private _highlightStyle?: Style;
 
@@ -54,7 +61,7 @@ export class FeatureHighlighter {
         this._source = source;
 
         this._bindEvents();
-
+        
         this._map.addLayer(this._overlay);
     }
 
@@ -64,14 +71,14 @@ export class FeatureHighlighter {
             color: this._strokeColor,
         });
         const fill = new Fill({
-            color: "rgba(255, 255, 255, 0.1)",
+            color: this._colorFill,
         });
         return new Style({
             stroke: strokeStyle,
             fill: fill,
             image: new Circle({
                 stroke: strokeStyle,
-                radius: webmapSettings.identify_radius,
+                radius: settings.identify_radius,
                 fill: fill,
             }),
         });
