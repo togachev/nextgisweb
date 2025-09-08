@@ -54,6 +54,7 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
                                     }}
                                 >
                                     <ColorPicker
+                                        style={{ margin: "8px 0px" }}
                                         allowClear={true}
                                         value={store.colorsSelectedFeature?.[key]}
                                         showText={(color) => <span>{defaultValueColor[key].label} ({color.toHexString()})</span>}
@@ -70,11 +71,11 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
                             }
 
                         </Row>
-                        <Divider variant="dotted" style={{ margin: 2 }} />
+                        {defaultValueColor[key].value !== value && <Divider variant="solid" style={{ margin: 0 }} />}
                     </div>
                 )
             })}
-        </Form>
+        </Form >
     )
 
     return (

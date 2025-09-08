@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useCallback, useState } from "react";
-
-import { Badge, Button, CheckboxValue, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
+import { Badge, Button, CheckboxValue, Collapse, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -10,7 +9,7 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
 import settings from "@nextgisweb/webmap/client-settings";
 import type { WebMapRead } from "@nextgisweb/webmap/type/api";
-
+import type { CollapseProps } from "@nextgisweb/gui/antd";
 import { SelectLegendSymbols } from "../component";
 
 import { OptionsWidget } from "./OptionsWidget";
@@ -37,8 +36,8 @@ const msgAdditionalOptions = gettext("Additional options");
 const msgConfigure = gettext("Configure");
 const msgActivePanel = gettext("Active panel");
 const msgSelectFeaturePanel = gettext("Browsing history");
-const msgChangeColors = gettext("Change colors");
 const msgColorSelectedFeature = gettext("Setting the highlight color");
+const msgEdit = gettext("Edit");
 
 const msgDefault = gettext("Default");
 
@@ -75,14 +74,18 @@ const editingOptions = [
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
     ({ store }) => {
         const [optionsModal, setOptionsModal] = useState(false);
-        const [showColorSF, setShowColorSF] = useState(false);
 
-        const openColorFH = useCallback(
-            () => {
-                setShowColorSF(true);
+        const items: CollapseProps['items'] = [
+            {
+                key: "csf",
+                label: msgEdit,
+                children: <Suspense>
+                    <ColorSelectedFeature store={store} />
+                </Suspense>,
+                showArrow: false,
+                styles: { header: { padding: "4px 12px" } }
             },
-            []
-        );
+        ];
 
         return (
             <>
@@ -189,27 +192,6 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             style={{ width: "100%" }}
                         />
                     </Lot>
-                    <Lot row label={msgActivePanel}>
-                        <Select<ActivePanelType>
-                            style={{ width: "100%" }}
-                            value={store.activePanel}
-                            onChange={(activePanel) => {
-                                store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
-                            }}
-                            options={activePanelOptions}
-                            allowClear
-                        />
-                    </Lot>
-                    <Lot row label={msgColorSelectedFeature}>
-                        {!showColorSF &&
-                            <Button onClick={openColorFH}>
-                                {msgChangeColors}
-                            </Button>
-                        }
-                        <Suspense>
-                            {showColorSF && <ColorSelectedFeature store={store} />}
-                        </Suspense>
-                    </Lot>
                     <Lot label={msgAdditionalOptions}>
                         <Button
                             onClick={() => setOptionsModal(true)}
@@ -221,6 +203,20 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                                 count={Object.keys(store.options).length}
                             />
                         </Button>
+                    </Lot>
+                    <Lot row label={msgActivePanel}>
+                        <Select<ActivePanelType>
+                            style={{ width: "50%" }}
+                            value={store.activePanel}
+                            onChange={(activePanel) => {
+                                store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
+                            }}
+                            options={activePanelOptions}
+                            allowClear
+                        />
+                    </Lot>
+                    <Lot row label={msgColorSelectedFeature}>
+                        <Collapse  style={{ backgroundColor: "transparent" }} size="small" items={items} />
                     </Lot>
                     <Lot row label={msgSelectFeaturePanel}>
                         <CheckboxValue<boolean>
