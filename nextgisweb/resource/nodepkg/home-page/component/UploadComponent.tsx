@@ -127,8 +127,8 @@ export const UploadComponent = observer(({ store, params }) => {
 
     const msgInfo = [
         gettext("Select File"),
-        gettext(`Supported file format ${formatName}.`),
-        gettext(`Maximum file size ${size}KB.`),
+        gettext("Supported file format ") + formatName,
+        gettext("Maximum file size (KB) ") + size,
     ];
 
     const normFile = (e) => {
