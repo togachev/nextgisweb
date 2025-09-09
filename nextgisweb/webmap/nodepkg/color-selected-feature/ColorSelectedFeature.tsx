@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
-import { Button, Col, ColorPicker, Divider, Form, Row } from "@nextgisweb/gui/antd";
+import { Button, Col, ColorPicker, Form, Row } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 
 import BackspaceOutline from "@nextgisweb/icon/mdi/backspace-outline";
 
 import type { SettingStore } from "@nextgisweb/webmap/settings-widget/SettingStore";
+
+import "./ColorSelectedFeature.less"
 
 const defaultValueColor = {
     stroke_primary: { label: gettext("Highlight color"), value: "rgba(255,255,0,1)" },
@@ -43,8 +45,8 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
         >
             {getEntries(store.colorsSelectedFeature)?.map(([key, value]) => {
                 return (
-                    <div key={key}>
-                        <Row justify="space-between" wrap={false}>
+                    <div key={key} className="color-item">
+                        <Row justify="space-between" wrap={false} className={defaultValueColor[key].value !== value ? "change-item" : "default-item"}>
                             <Col flex="auto">
                                 <Form.Item
                                     noStyle
@@ -54,12 +56,11 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
                                     }}
                                 >
                                     <ColorPicker
-                                        style={{ margin: "8px 0px" }}
+                                        className="color-picker-item"
                                         allowClear={true}
                                         value={store.colorsSelectedFeature?.[key]}
                                         showText={(color) => <span>{defaultValueColor[key].label} ({color.toHexString()})</span>}
                                     />
-
                                 </Form.Item>
                             </Col>
                             {defaultValueColor[key].value !== value &&
@@ -71,7 +72,6 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
                             }
 
                         </Row>
-                        {defaultValueColor[key].value !== value && <Divider variant="solid" style={{ margin: 0 }} />}
                     </div>
                 )
             })}

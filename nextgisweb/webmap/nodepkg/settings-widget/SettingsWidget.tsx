@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useCallback, useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { Badge, Button, CheckboxValue, Collapse, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
@@ -37,7 +37,6 @@ const msgConfigure = gettext("Configure");
 const msgActivePanel = gettext("Active panel");
 const msgSelectFeaturePanel = gettext("Browsing history");
 const msgColorSelectedFeature = gettext("Setting the highlight color");
-const msgEdit = gettext("Edit");
 
 const msgDefault = gettext("Default");
 
@@ -77,13 +76,13 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
 
         const items: CollapseProps['items'] = [
             {
-                key: "csf",
-                label: msgEdit,
+                key: "1",
+                label: msgColorSelectedFeature,
                 children: <Suspense>
                     <ColorSelectedFeature store={store} />
                 </Suspense>,
                 showArrow: false,
-                styles: { header: { padding: "4px 12px" } }
+                styles: { header: { padding: "4px 12px" }, body: { padding: 0 } },
             },
         ];
 
@@ -215,15 +214,15 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             allowClear
                         />
                     </Lot>
-                    <Lot row label={msgColorSelectedFeature}>
-                        <Collapse  style={{ backgroundColor: "transparent" }} size="small" items={items} />
-                    </Lot>
                     <Lot row label={msgSelectFeaturePanel}>
                         <CheckboxValue<boolean>
                             style={{ width: "100%" }}
                             checked={store.selectFeaturePanel}
                             onChange={(v) => store.update({ selectFeaturePanel: v })}
                         />
+                    </Lot>
+                    <Lot span={2} label={false}>
+                        <Collapse style={{ width: "100%", backgroundColor: "transparent" }} size="small" items={items} />
                     </Lot>
                 </Area>
                 <Modal

@@ -1587,6 +1587,3 @@ msgstr "Настройка группы веб-карт"
 #: view.py:231
 msgid "Group setting"
 msgstr "Настройка группы"
-
-#~ msgid "Change colors"
-#~ msgstr "Изменить цвета"
