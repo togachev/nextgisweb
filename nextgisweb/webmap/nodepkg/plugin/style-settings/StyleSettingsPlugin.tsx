@@ -31,7 +31,7 @@ export class StyleSettingsPlugin extends PluginBase {
                 className="show-resource"
                 title={gettext("Style show")}
                     onClick={() => {
-                        window.open(routeURL("resource.show", { id: nodeData.layerId }), "_blank");
+                        window.open(routeURL("resource.show", { id: nodeData.styleId }), "_blank");
                     }}
                 >
                     <OpenInNew />
