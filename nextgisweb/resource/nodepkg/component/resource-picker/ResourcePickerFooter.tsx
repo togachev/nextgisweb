@@ -158,7 +158,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
         );
     };
 
-    const titleVisibleResource = visibleResource ? gettext("Show all resources") : ("Hide unused resources")
+    const titleVisibleResource = visibleResource ? gettext("Show all resources") : gettext("Hide unused resources")
 
     return (
         <Row justify="space-between">
