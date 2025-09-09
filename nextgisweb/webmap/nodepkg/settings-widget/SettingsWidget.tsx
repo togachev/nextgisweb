@@ -203,9 +203,9 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             />
                         </Button>
                     </Lot>
-                    <Lot row label={msgActivePanel}>
+                    <Lot label={msgActivePanel}>
                         <Select<ActivePanelType>
-                            style={{ width: "50%" }}
+                            style={{ width: "100%" }}
                             value={store.activePanel}
                             onChange={(activePanel) => {
                                 store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
@@ -214,9 +214,9 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             allowClear
                         />
                     </Lot>
-                    <Lot row label={msgSelectFeaturePanel}>
+                    <Lot label={msgSelectFeaturePanel}>
                         <CheckboxValue<boolean>
-                            style={{ width: "100%" }}
+                            style={{ height: "100%" }}
                             checked={store.selectFeaturePanel}
                             onChange={(v) => store.update({ selectFeaturePanel: v })}
                         />
