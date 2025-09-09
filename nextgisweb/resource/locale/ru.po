@@ -198,6 +198,10 @@ msgstr "Очистить выделение"
 msgid "Show all resources"
 msgstr "Показать все ресурсы"
 
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:161
+msgid "Hide unused resources"
+msgstr "Скрыть неиспользуемые ресурсы"
+
 #: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:18
 msgid "Go to initial group"
 msgstr "Вернуться в исходную группу"
