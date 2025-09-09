@@ -19,26 +19,41 @@ export class EditorStore
     @observable.ref accessor imageUpdated: UploaderMeta | null = null;
     @observable.ref accessor description: string | null = null;
 
-    @observable.ref accessor dirty = false;
+    @observable accessor dirty = false;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
+    }
+
+    @action
+    setImageExisting(imageExisting: Blob) {
+        this.imageExisting = imageExisting;
+    }
+
+    @action
+    setDirty(dirty: boolean) {
+        this.dirty = dirty;
+    }
+
+    @action
+    setDescription(description: string | null) {
+        this.description = description;
     }
 
     load(value: apitype.SocialRead) {
         this.imageUpdated = null;
         if (value.image_exists && this.composite.resourceId !== null) {
             this.imageExisting = null;
-            const url = routeURL("resource.preview", this.composite.resourceId);
+            const url = routeURL("maptile.preview", this.composite.resourceId);
             fetch(url).then((resp) => {
                 resp.blob().then((data) => {
-                    this.imageExisting = data;
+                    this.setImageExisting(data);
                 });
             });
         }
 
-        this.description = value.description;
-        this.dirty = false;
+        this.setDescription(value.description);
+        this.setDirty(false);
     }
 
     dump() {
@@ -69,7 +84,7 @@ export class EditorStore
         for (const [k, v] of Object.entries(data)) {
             if (k in this && this[k as keyof this] !== (v ?? null)) {
                 (this as any)[k] = v;
-                if (!this.dirty) this.dirty = true;
+                if (!this.dirty) this.setDirty(true);
             }
         }
     }
