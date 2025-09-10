@@ -19,7 +19,7 @@ export function FeatureSelector({
     const zoomTo = () => {
         if (!featureItem) return;
         display.featureHighlighter
-            .highlightFeatureById(featureItem.id, featureInfo.layerId)
+            .highlightFeatureById(featureItem.id, featureInfo.layerId, display.config.colorsSelectedFeature)
             .then((feature) => {
                 display.map.zoomToFeature(feature);
             });

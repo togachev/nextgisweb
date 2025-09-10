@@ -26,7 +26,7 @@ export interface HighlightEvent {
     featureId?: number;
     feature?: Feature;
     coordinates?: [number, number];
-    colorsSelectedFeature: ColorsSelectedFeatureProps;
+    colorsSelectedFeature?: ColorsSelectedFeatureProps;
 }
 
 interface FeatureFilterFn {
@@ -228,18 +228,17 @@ export class FeatureHighlighter {
     async highlightFeatureById(
         featureId: number,
         layerId: number,
-        colorsSelectedFeature
+        colorsSelectedFeature: ColorsSelectedFeatureProps,
     ): Promise<Feature> {
         const feature = await route("feature_layer.feature.item", {
             id: layerId,
             fid: featureId,
         }).get({ query: { dt_format: "iso", fields: [], extensions: [] } });
-
+        this.setColorsSelectedFeature(colorsSelectedFeature);
         return this._highlightFeature({
             geom: feature.geom,
             featureId: featureId,
             layerId: layerId,
-            colorsSelectedFeature: colorsSelectedFeature,
         });
     }
 }

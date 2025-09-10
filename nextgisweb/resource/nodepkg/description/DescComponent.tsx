@@ -30,7 +30,7 @@ const msgZoomToRaster = gettext("Click to move closer to the raster layer");
 
 const zoomToFeature = (display, layerId, featureId, styles) => {
     display.featureHighlighter
-        .highlightFeatureById(featureId, layerId, display.config.colorsSelectedFeature,)
+        .highlightFeatureById(featureId, layerId, display.config.colorsSelectedFeature)
         .then((feature) => {
             const visibleStyles: number[] = [];
             const itemConfig = display.getItemConfig();

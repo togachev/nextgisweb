@@ -885,7 +885,7 @@ export class PopupStore extends ToolBase {
     zoomTo(val) {
         if (!val) return;
         this.display.featureHighlighter
-            .highlightFeatureById(val.id, val.layerId)
+            .highlightFeatureById(val.id, val.layerId, this.display.config.colorsSelectedFeature)
             .then((feature) => {
                 this.display.map.zoomToFeature(feature);
             });
