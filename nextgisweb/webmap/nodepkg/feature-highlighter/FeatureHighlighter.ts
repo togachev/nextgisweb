@@ -227,7 +227,8 @@ export class FeatureHighlighter {
 
     async highlightFeatureById(
         featureId: number,
-        layerId: number
+        layerId: number,
+        colorsSelectedFeature
     ): Promise<Feature> {
         const feature = await route("feature_layer.feature.item", {
             id: layerId,
@@ -238,6 +239,7 @@ export class FeatureHighlighter {
             geom: feature.geom,
             featureId: featureId,
             layerId: layerId,
+            colorsSelectedFeature: colorsSelectedFeature,
         });
     }
 }
