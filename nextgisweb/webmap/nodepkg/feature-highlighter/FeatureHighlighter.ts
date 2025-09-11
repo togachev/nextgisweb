@@ -129,7 +129,7 @@ export class FeatureHighlighter {
 
     async colorsValue(e) {
         this.setColorsSelectedFeature(e.colorsSelectedFeature)
-        return new Promise<Response>((resolve) => resolve(e));
+        return new Promise<HighlightEvent>((resolve) => resolve(e));
     }
 
     private _bindEvents(): void {
