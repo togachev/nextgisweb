@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { CSSProperties, ReactNode, Ref, RefObject } from "react";
 import {
     InteractionMode,
@@ -58,8 +59,7 @@ export interface ComplexTreeEnvironment<I extends FocusTableItem> {
 }
 
 class EnvironmentAdapter<I extends FocusTableItem>
-    implements ComplexTreeEnvironment<I>
-{
+    implements ComplexTreeEnvironment<I> {
     readonly target: TreeEnvironmentRef<I>;
     readonly store: FocusTableStore<I>;
     readonly provider: DataProvider<I>;
@@ -241,9 +241,9 @@ export function ComplexTree<
         (value: TreeEnvironmentRef<I> | null) => {
             const newValue = value
                 ? new EnvironmentAdapter(value, {
-                      store,
-                      provider,
-                  })
+                    store,
+                    provider,
+                })
                 : undefined;
             setRefCurrent(environmentRef, newValue);
             setRefCurrent(propsEnvironment, newValue);
@@ -367,6 +367,13 @@ export function ComplexTree<
                 ? renderColumns(storeItem)
                 : [0, undefined];
 
+            let msgGroupStatus;
+            let expandedText;
+            if (storeItem.itemType === "group") {
+                msgGroupStatus = gettext("Group status: ");
+                expandedText = storeItem.groupExpanded.value ? gettext("еxpanded") : gettext("сollapsed");
+            }
+
             return (
                 <tr
                     key={treeItem.index}
@@ -386,8 +393,9 @@ export function ComplexTree<
                     >
                         <div>
                             {!provider.isFlat && props.arrow}
-                            <div className="title">
+                            <div className={storeItem.itemType === "group" ? "title expanded-group" : "title"}>
                                 {title?.(storeItem) || <>&nbsp;</>}
+                                {storeItem.itemType === "group" && <div>{msgGroupStatus}<span>{expandedText}</span></div>}
                             </div>
                             {props.showErrors && error && (
                                 <div className="error">
@@ -400,7 +408,7 @@ export function ComplexTree<
                     </td>
                     {columnsElement}
                     {props.showActions && renderActions(storeItem)}
-                </tr>
+                </tr >
             );
         };
         return observer(Base);

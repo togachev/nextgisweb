@@ -25,7 +25,8 @@ import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
-
+import ExpandAll from "@nextgisweb/icon/mdi/expand-all";
+import CollapseAll from "@nextgisweb/icon/mdi/collapse-all";
 const { adapters } = settings;
 
 const msgDisplayName = gettext("Display name");
@@ -171,6 +172,7 @@ LayerWidget.displayName = "LayerWidget";
 export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
     const { makeSignal } = useAbortController();
     const [drawOrderEdit, setDrawOrderEdit] = useState(false);
+    const [expanded, setExpanded] = useState(false)
 
     const { pickToFocusTable } = useFocusTablePicker({
         initParentId: store.composite.parent || undefined,
@@ -180,6 +182,17 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
     const { tableActions, itemActions } = useMemo(
         () => ({
             tableActions: [
+                () => {
+                    return [
+                        {
+                            key: !expanded ? gettext("Expand") : gettext("Collapse"),
+                            title: !expanded ? gettext("Expand") : gettext("Collapse"),
+                            icon: !expanded ? <ExpandAll /> : <CollapseAll />,
+                            placement: "left",
+                            callback: () => setExpanded(!expanded),
+                        },
+                    ];
+                },
                 pickToFocusTable<ItemObject>(
                     async (res) => {
                         const resourceId = res.resource.id;
@@ -235,7 +248,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             ],
             itemActions: [action.deleteItem<ItemObject>()],
         }),
-        [drawOrderEnabled, makeSignal, pickToFocusTable, store]
+        [drawOrderEnabled, makeSignal, pickToFocusTable, store, expanded]
     );
 
     return drawOrderEdit ? (
@@ -246,6 +259,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             title={(item) => item.displayName.value}
             tableActions={tableActions}
             itemActions={itemActions}
+            expanded={expanded}
             renderDetail={({ item }) =>
                 item instanceof Group ? (
                     <GroupWidget item={item} />

@@ -49,44 +49,46 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:31
+#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:32
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:12
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:14
 msgid "Highlight color"
 msgstr "Цвет выделения"
 
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:13
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:15
 msgid "Highlight color secondary(raster layer)"
 msgstr "Дополнительный цвет выделения (растровый слой)"
 
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:14
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:16
 msgid "Background color"
 msgstr "Цвет фона"
 
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:68
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:69
 msgid "Set default value"
 msgstr "Установить значение по умолчанию"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:5
-#: nodepkg/settings-widget/SettingsWidget.tsx:43
+#: nodepkg/settings-widget/SettingsWidget.tsx:41
 #: nodepkg/settings/select-options.ts:94
 msgid "Default"
 msgstr "По умолчанию"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:8
-#: nodepkg/settings/select-options.ts:95
+#: nodepkg/items-widget/ItemsWidget.tsx:188
+#: nodepkg/items-widget/ItemsWidget.tsx:189 nodepkg/settings/select-options.ts:95
 msgid "Expand"
 msgstr "Развернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:9
-#: nodepkg/settings/select-options.ts:96
+#: nodepkg/items-widget/ItemsWidget.tsx:188
+#: nodepkg/items-widget/ItemsWidget.tsx:189 nodepkg/settings/select-options.ts:96
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:10
-#: nodepkg/settings-widget/SettingsWidget.tsx:71
+#: nodepkg/settings-widget/SettingsWidget.tsx:69
 #: nodepkg/settings/select-options.ts:97
 msgid "Disable"
 msgstr "Отключить"
@@ -183,75 +185,75 @@ msgstr "Порядок рисования по умолчанию"
 msgid "Group members have errors"
 msgstr "Ошибка в участниках группы"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:32
+#: nodepkg/items-widget/ItemsWidget.tsx:33
 msgid "Expanded"
 msgstr "Развернута"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:33
+#: nodepkg/items-widget/ItemsWidget.tsx:34
 msgid "Exclusive"
 msgstr "Взаимоисключающая"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/items-widget/ItemsWidget.tsx:35
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:35
+#: nodepkg/items-widget/ItemsWidget.tsx:36
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:36
+#: nodepkg/items-widget/ItemsWidget.tsx:37
 msgid "Layer highligh"
 msgstr "Выделение слоя"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:37
+#: nodepkg/items-widget/ItemsWidget.tsx:38
 msgid "Edit geometry"
 msgstr "Редактировать геометрию"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:38
+#: nodepkg/items-widget/ItemsWidget.tsx:39
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:39
+#: nodepkg/items-widget/ItemsWidget.tsx:40
 msgid "Transparency"
 msgstr "Прозрачность"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40
+#: nodepkg/items-widget/ItemsWidget.tsx:41
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:41
+#: nodepkg/items-widget/ItemsWidget.tsx:42
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:42
+#: nodepkg/items-widget/ItemsWidget.tsx:43
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:28
-#: nodepkg/settings-widget/SettingsWidget.tsx:29
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
 #: nodepkg/settings/SettingsForm.tsx:345
 msgid "Legend"
 msgstr "Легенда"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:43
+#: nodepkg/items-widget/ItemsWidget.tsx:44
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:44
+#: nodepkg/items-widget/ItemsWidget.tsx:45
 msgid "Layer"
 msgstr "Слой"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:45
+#: nodepkg/items-widget/ItemsWidget.tsx:46
 msgid "Group"
 msgstr "Группа"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:46
+#: nodepkg/items-widget/ItemsWidget.tsx:47
 msgid "Edit draw order"
 msgstr "Изменить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:47
+#: nodepkg/items-widget/ItemsWidget.tsx:48
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:261 nodepkg/panel/layers/plugin.tsx:10
-#: nodepkg/settings-widget/SettingsWidget.tsx:57
+#: nodepkg/items-widget/ItemsWidget.tsx:275 nodepkg/panel/layers/plugin.tsx:10
+#: nodepkg/settings-widget/SettingsWidget.tsx:55
 msgid "Layers"
 msgstr "Слои"
 
@@ -333,7 +335,7 @@ msgstr "Числовой масштаб"
 #: nodepkg/map-controls/map-controls.ts:106
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:111
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:149
-#: nodepkg/settings-widget/SettingsWidget.tsx:26
+#: nodepkg/settings-widget/SettingsWidget.tsx:25
 msgid "Initial extent"
 msgstr "Начальный охват"
 
@@ -485,14 +487,14 @@ msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
 #: nodepkg/panel/annotations/plugin.tsx:13
-#: nodepkg/settings-widget/SettingsWidget.tsx:30
-#: nodepkg/settings-widget/SettingsWidget.tsx:65
+#: nodepkg/settings-widget/SettingsWidget.tsx:29
+#: nodepkg/settings-widget/SettingsWidget.tsx:63
 msgid "Annotations"
 msgstr "Аннотации"
 
 #: nodepkg/panel/bookmarks/plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:32
-#: nodepkg/settings-widget/SettingsWidget.tsx:62
+#: nodepkg/settings-widget/SettingsWidget.tsx:31
+#: nodepkg/settings-widget/SettingsWidget.tsx:60
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -636,7 +638,7 @@ msgid "Maximum files/loaded:"
 msgstr "Максимальное количество файлов/загружено:"
 
 #: nodepkg/panel/custom-layer/plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:60
+#: nodepkg/settings-widget/SettingsWidget.tsx:58
 msgid "Custom layers"
 msgstr "Пользовательские слои"
 
@@ -644,7 +646,7 @@ msgstr "Пользовательские слои"
 #: nodepkg/panel/selected-feature/SelectedFeature.tsx:272
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:38
 #: nodepkg/popup/component/ContentComponent.tsx:172
-#: nodepkg/settings-widget/SettingsWidget.tsx:63
+#: nodepkg/settings-widget/SettingsWidget.tsx:61
 msgid "Description"
 msgstr "Описание"
 
@@ -743,7 +745,7 @@ msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:49
-#: nodepkg/settings-widget/SettingsWidget.tsx:28
+#: nodepkg/settings-widget/SettingsWidget.tsx:27
 msgid "Title"
 msgstr "Заголовок"
 
@@ -811,7 +813,7 @@ msgstr "TIFF"
 msgid "PDF"
 msgstr "PDF"
 
-#: nodepkg/panel/print/plugin.tsx:10 nodepkg/settings-widget/SettingsWidget.tsx:61
+#: nodepkg/panel/print/plugin.tsx:10 nodepkg/settings-widget/SettingsWidget.tsx:59
 msgid "Print map"
 msgstr "Распечатать карту"
 
@@ -867,7 +869,7 @@ msgstr "Не найдено"
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
-#: nodepkg/panel/search/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:59
+#: nodepkg/panel/search/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:57
 msgid "Search"
 msgstr "Поиск"
 
@@ -931,7 +933,7 @@ msgid "Show layer name"
 msgstr "Показать имя слоя"
 
 #: nodepkg/panel/selected-feature/plugin.tsx:15
-#: nodepkg/settings-widget/SettingsWidget.tsx:39
+#: nodepkg/settings-widget/SettingsWidget.tsx:38
 msgid "Browsing history"
 msgstr "История просмотра"
 
@@ -958,7 +960,7 @@ msgid "None"
 msgstr "Нет"
 
 #: nodepkg/panel/share/SharePanel.tsx:309
-#: nodepkg/settings-widget/SettingsWidget.tsx:38
+#: nodepkg/settings-widget/SettingsWidget.tsx:37
 msgid "Active panel"
 msgstr "Активная панель"
 
@@ -1050,7 +1052,7 @@ msgstr "Значение набора"
 msgid "Reset current value"
 msgstr "Сбросить текущее значение"
 
-#: nodepkg/panel/share/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:64
+#: nodepkg/panel/share/plugin.tsx:11 nodepkg/settings-widget/SettingsWidget.tsx:62
 msgid "Share"
 msgstr "Поделиться"
 
@@ -1206,73 +1208,69 @@ msgstr ""
 msgid "Auto"
 msgstr "Авто"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:27
+#: nodepkg/settings-widget/SettingsWidget.tsx:26
 msgid "Constraining extent"
 msgstr "Ограничивающий охват"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:31
+#: nodepkg/settings-widget/SettingsWidget.tsx:30
 msgid "Select mode"
 msgstr "Выберите режим"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:33
+#: nodepkg/settings-widget/SettingsWidget.tsx:32
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:34
+#: nodepkg/settings-widget/SettingsWidget.tsx:33
 #: nodepkg/settings/SettingsForm.tsx:256
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:35
+#: nodepkg/settings-widget/SettingsWidget.tsx:34
 msgid "Layers editing"
 msgstr "Редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:36
+#: nodepkg/settings-widget/SettingsWidget.tsx:35
 msgid "Additional options"
 msgstr "Дополнительные опции"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:37
+#: nodepkg/settings-widget/SettingsWidget.tsx:36
 msgid "Configure"
 msgstr "Настроить"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:40
-msgid "Change colors"
-msgstr "Изменить цвета"
-
-#: nodepkg/settings-widget/SettingsWidget.tsx:41
+#: nodepkg/settings-widget/SettingsWidget.tsx:39
 msgid "Setting the highlight color"
 msgstr "Настройка цвета выделения"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:46
+#: nodepkg/settings-widget/SettingsWidget.tsx:44
 msgid "Web map will start at this extent"
 msgstr "Веб-карта будет показана с этим охватом"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:47
+#: nodepkg/settings-widget/SettingsWidget.tsx:45
 msgid "Web map will not allow to move outside of this extent"
 msgstr "Веб-карта не позволит выйти за пределы этого охвата"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:51
+#: nodepkg/settings-widget/SettingsWidget.tsx:49
 msgid "Hide by default"
 msgstr "Скрыть по умолчанию"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:52
+#: nodepkg/settings-widget/SettingsWidget.tsx:50
 msgid "Show without messages"
 msgstr "Показать без сообщений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:53
+#: nodepkg/settings-widget/SettingsWidget.tsx:51
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:66
+#: nodepkg/settings-widget/SettingsWidget.tsx:64
 msgid "Panel disabled"
 msgstr "Панель отключена"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:72
+#: nodepkg/settings-widget/SettingsWidget.tsx:70
 #: nodepkg/settings/SettingsForm.tsx:279
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:250
+#: nodepkg/settings-widget/SettingsWidget.tsx:245
 msgid "Settings"
 msgstr "Настройки"
 
@@ -1590,3 +1588,6 @@ msgstr "Настройка группы веб-карт"
 #: view.py:231
 msgid "Group setting"
 msgstr "Настройка группы"
+
+#~ msgid "Change colors"
+#~ msgstr "Изменить цвета"

@@ -19,6 +19,7 @@ import type {
 import HideDetailsIcon from "@nextgisweb/icon/material/right_panel_close";
 
 import "./FocusTable.less";
+import { useEffect } from "react";
 
 const msgHideDetails = gettext("Hide details");
 
@@ -33,14 +34,15 @@ export interface FocusTablePropsActions<I extends FocusTableItem> {
         ComplexTreeEnvironment<I>,
         "detail" | "tree"
     >;
+    expanded?: boolean;
 }
 
 export interface FocusTableProps<I extends FocusTableItem, C extends string, S>
     extends Pick<
-            ComplexTreeProps<I, C, S>,
-            "store" | "root" | "title" | "columns"
-        >,
-        FocusTablePropsActions<I> {
+        ComplexTreeProps<I, C, S>,
+        "store" | "root" | "title" | "columns"
+    >,
+    FocusTablePropsActions<I> {
     renderDetail: React.ComponentType<{ item: I }>;
     rootClassName?: string;
 }
@@ -58,10 +60,21 @@ export function FocusTable<
     itemActions,
     renderDetail: Detail,
     rootClassName,
+    expanded
 }: FocusTableProps<I, C, S>) {
     const environmentRef = useRef<ComplexTreeEnvironment<I>>(null!);
     const [selected, setSelected] = useState<I | null>(null);
     const [showDetails, setShowDetails] = useState(false);
+
+    useEffect(() => {
+        if (environmentRef.current) {
+            if (expanded) {
+                environmentRef.current.target.expandAll("main");
+            } else {
+                environmentRef.current.target.collapseAll("main");
+            }
+        }
+    }, [expanded]);
 
     const hideDetail = useMemo((): FocusTableAction<
         I | null,

@@ -88,11 +88,11 @@ msgstr "Восток"
 msgid "North"
 msgstr "Север"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:121
+#: nodepkg/component/extent-row/ExtentRow.tsx:120
 msgid "From layer"
 msgstr "По слою"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:124
+#: nodepkg/component/extent-row/ExtentRow.tsx:123
 msgid "Clean"
 msgstr "Очистить"
 
@@ -158,7 +158,19 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/FocusTable.tsx:23
+#: nodepkg/focus-table/ComplexTree.tsx:370
+msgid "Group status: "
+msgstr "Состояние группы: "
+
+#: nodepkg/focus-table/ComplexTree.tsx:373
+msgid "еxpanded"
+msgstr "развернута"
+
+#: nodepkg/focus-table/ComplexTree.tsx:373
+msgid "сollapsed"
+msgstr "свернута"
+
+#: nodepkg/focus-table/FocusTable.tsx:24
 msgid "Hide details"
 msgstr "Скрыть детали"
 
