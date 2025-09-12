@@ -26,6 +26,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
 
         const deleteRow = ({ key, ckey, all }) => {
             pstore?.pointDestroy();
+            pstore?.setFixPopup(false);
             if (all) {
                 const obj = { ...store.selectedFeatures };
                 store.setSelectedFeatures({
@@ -252,6 +253,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
 
         const deleteAllRow = () => {
             pstore?.pointDestroy();
+            pstore?.setFixPopup(false);
             const obj = { ...store.selectedFeatures };
             getEntries(obj).map(([_, value]) => value.items = {});
             store.setSelectedFeatures(obj);

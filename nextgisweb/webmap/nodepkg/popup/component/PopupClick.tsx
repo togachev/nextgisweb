@@ -42,7 +42,7 @@ export default function PopupClick({ store, event, params }: Params) {
                     response.featureCount > 0
                 ) {
                     setVisible(false);
-                    topic.publish("update.point", true);
+                    topic.publish("update.point", false);
                     if (selected?.type === "vector") {
                         store.zoomTo(selected);
                     } else if (selected?.type === "raster") {

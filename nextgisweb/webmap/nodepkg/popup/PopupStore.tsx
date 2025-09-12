@@ -905,7 +905,7 @@ export class PopupStore extends ToolBase {
         this.display.map.zoomToNgwExtent(extent, {
             displayProjection: this.display.displayProjection,
         });
-        topic.publish("update.point", true);
+        topic.publish("update.point", false);
     };
 
     zoomToPoint(val) {

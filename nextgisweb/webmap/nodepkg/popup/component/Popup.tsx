@@ -61,7 +61,7 @@ const CheckOnlyOne = ({ store }) => {
 export const Popup = observer(
     (props: PopupProps) => {
         const { display, store } = props;
-        
+
 
         const pm = display.panelManager;
         const pkey = "selected-feature";
@@ -89,7 +89,15 @@ export const Popup = observer(
         }, [store.update]);
 
         topic.subscribe("update.point", (status) => {
-            store.setValueRnd({ ...store.valueRnd, x: store.valueRnd.pointClick.x, y: store.valueRnd.pointClick.y, buttonZoom: status && {} });
+            const value = {
+                ...store.valueRnd,
+                x: store.valueRnd.pointClick.x,
+                y: store.valueRnd.pointClick.y,
+            }
+            if (status === true) {
+                Object.assign(value, { buttonZoom: {} })
+            }
+            store.setValueRnd(value);
         });
 
         const onChangeSelect = useCallback((value) => {
