@@ -2,7 +2,7 @@ import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 
-import { CheckboxValue, InputValue, Select, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { InputOpacity, InputScaleDenom } from "@nextgisweb/gui/component";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
@@ -187,12 +187,9 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                 () => {
                     return [
                         {
-                            key: !expanded ? gettext("Expand") : gettext("Collapse"),
-                            icon: (
-                                <Tooltip {...{ title: !expanded ? gettext("Expand") : gettext("Collapse") }}>
-                                    {!expanded ? <ExpandAll /> : <CollapseAll />}
-                                </Tooltip>
-                            ),
+                            key: expanded ? gettext("Collapse") : gettext("Expand"),
+                            title: expanded ? gettext("Collapse") : gettext("Expand"),
+                            icon: expanded ? <CollapseAll /> : <ExpandAll />,
                             placement: "left",
                             callback: () => setExpanded(!expanded),
                         },
@@ -256,7 +253,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                     context: ItemObject,
                     status: "detail" | "tree"
                 ) => {
-                    if (context.itemType == "group" && status === "tree") {
+                    if (context.itemType === "group" && status === "tree") {
                         const value = context.groupExpanded.value;
                         return [
                             {
