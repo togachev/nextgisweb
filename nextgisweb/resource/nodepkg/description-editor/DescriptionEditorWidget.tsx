@@ -1,29 +1,44 @@
 import { observer } from "mobx-react-lite";
-import { useCallback } from "react";
+import { Suspense, lazy, useCallback } from "react";
 
-import { TextEditor } from "@nextgisweb/gui/component/text-editor";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { EditorWidget } from "../type";
 
 import type { DescriptionEditorStore } from "./DescriptionEditorStore";
 
+const TextEditor = lazy(() => import("@nextgisweb/gui/component/text-editor"));
+
 export const DescriptionEditorWidget: EditorWidget<DescriptionEditorStore> =
     observer(({ store }) => {
+        const { id } = ngwConfig.resourceFavorite.resource;
+        const { data: resourceData } = useRouteGet(
+            "resource.item",
+            { id },
+            {
+                query: {
+                    serialization: "resource",
+                }
+            }
+        );
+
         const onChange = useCallback(
             (value: string) => {
-                store.setValue(value ? value : null);
+                store.setValue(value);
             },
             [store]
         );
 
         return (
-            <TextEditor
-                value={store.value ? store.value : ""}
-                onChange={onChange}
-                border={false}
-            />
-        );
+            <Suspense>
+                <TextEditor
+                    value={resourceData?.resource.description}
+                    onChange={onChange}
+                    border={false}
+                />
+            </Suspense>
+        )
     });
 
 DescriptionEditorWidget.displayName = "DescriptionEditorWidget";

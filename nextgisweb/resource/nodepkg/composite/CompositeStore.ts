@@ -183,7 +183,11 @@ export class CompositeStore {
 
         const item = await route("resource.item", {
             id: this.resourceId,
-        }).get();
+        }).get({
+            query: {
+                description: false
+            }
+        });
 
         runInAction(() => {
             this.#initialValue = item;
