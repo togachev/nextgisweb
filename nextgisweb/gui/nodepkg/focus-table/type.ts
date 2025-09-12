@@ -17,11 +17,12 @@ export interface FocusTableAction<
     E = ComplexTreeEnvironment<NonNullable<C>>,
 > {
     key: string;
-    title: string;
+    title?: string;
     icon?: ReactNode;
     placement?: "left" | "right";
     danger?: boolean;
     callback: (ctx: C, env: E) => void;
+    label?: string;
 }
 
 export type FocusTableActions<

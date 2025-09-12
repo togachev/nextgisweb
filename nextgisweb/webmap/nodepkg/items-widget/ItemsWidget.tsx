@@ -2,7 +2,7 @@ import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 
-import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, Select, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { InputOpacity, InputScaleDenom } from "@nextgisweb/gui/component";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
@@ -27,6 +27,8 @@ import type { ItemsStore } from "./ItemsStore";
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
 import ExpandAll from "@nextgisweb/icon/mdi/expand-all";
 import CollapseAll from "@nextgisweb/icon/mdi/collapse-all";
+import CheckCircle from "@nextgisweb/icon/mdi/check-circle";
+import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
 const { adapters } = settings;
 
 const msgDisplayName = gettext("Display name");
@@ -186,8 +188,11 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                     return [
                         {
                             key: !expanded ? gettext("Expand") : gettext("Collapse"),
-                            title: !expanded ? gettext("Expand") : gettext("Collapse"),
-                            icon: !expanded ? <ExpandAll /> : <CollapseAll />,
+                            icon: (
+                                <Tooltip {...{ title: !expanded ? gettext("Expand") : gettext("Collapse") }}>
+                                    {!expanded ? <ExpandAll /> : <CollapseAll />}
+                                </Tooltip>
+                            ),
                             placement: "left",
                             callback: () => setExpanded(!expanded),
                         },
@@ -246,7 +251,28 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                     ];
                 },
             ],
-            itemActions: [action.deleteItem<ItemObject>()],
+            itemActions: [
+                (
+                    context: ItemObject,
+                    status: "detail" | "tree"
+                ) => {
+                    if (context.itemType == "group" && status === "tree") {
+                        const value = context.groupExpanded.value;
+                        return [
+                            {
+                                key: value ? gettext("collapsed") : gettext("expanded"),
+                                title: value ? gettext("Collapse") : gettext("Expand"),
+                                icon: value ? <CheckCircle /> : <RadioboxBlank />,
+                                callback: () => context.groupExpanded.value = !value,
+                                label: value ? gettext("expanded") : gettext("collapsed"),
+                            },
+                        ];
+                    } else {
+                        return []
+                    }
+                },
+                action.deleteItem<ItemObject>(),
+            ],
         }),
         [drawOrderEnabled, makeSignal, pickToFocusTable, store, expanded]
     );

@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { CSSProperties, ReactNode, Ref, RefObject } from "react";
 import {
     InteractionMode,
@@ -41,10 +40,10 @@ const arrowCollapsed = <ArrowIcon />;
 const arrowExpanded = <ArrowIcon style={{ transform: "rotate(90deg)" }} />;
 const arrowItem = <span style={{ display: "inline-block", width: "18px" }} />;
 
-function ActionButton({ title, ...buttonProps }: ButtonProps) {
+function ActionButton({ title, label, ...buttonProps }: ButtonProps) {
     return (
         <Tooltip {...{ title }}>
-            <Button type="text" shape="circle" size="small" {...buttonProps} />
+            <Button type="text" shape={label ? "default" : "circle"} size="small" {...buttonProps}>{label}</Button>
         </Tooltip>
     );
 }
@@ -327,11 +326,12 @@ export function ComplexTree<
             if (!getActions) return;
             return (
                 <td className="actions">
-                    {getActions(item).map(({ key, title, icon, callback }) => (
+                    {getActions(item).map(({ key, title, icon, callback, label }) => (
                         <ActionButton
                             key={key}
                             title={title}
                             icon={icon}
+                            label={label}
                             onClick={(event) => {
                                 callback(item, environmentRef.current!);
                                 event.stopPropagation();
@@ -367,13 +367,6 @@ export function ComplexTree<
                 ? renderColumns(storeItem)
                 : [0, undefined];
 
-            let msgGroupStatus;
-            let expandedText;
-            if (storeItem.itemType === "group") {
-                msgGroupStatus = gettext("Group status: ");
-                expandedText = storeItem.groupExpanded.value ? gettext("еxpanded") : gettext("сollapsed");
-            }
-
             return (
                 <tr
                     key={treeItem.index}
@@ -393,9 +386,8 @@ export function ComplexTree<
                     >
                         <div>
                             {!provider.isFlat && props.arrow}
-                            <div className={storeItem.itemType === "group" ? "title expanded-group" : "title"}>
+                            <div className="title">
                                 {title?.(storeItem) || <>&nbsp;</>}
-                                {storeItem.itemType === "group" && <div>{msgGroupStatus}<span>{expandedText}</span></div>}
                             </div>
                             {props.showErrors && error && (
                                 <div className="error">

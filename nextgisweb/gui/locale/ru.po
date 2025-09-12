@@ -158,18 +158,6 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/ComplexTree.tsx:370
-msgid "Group status: "
-msgstr "Состояние группы: "
-
-#: nodepkg/focus-table/ComplexTree.tsx:373
-msgid "еxpanded"
-msgstr "развернута"
-
-#: nodepkg/focus-table/ComplexTree.tsx:373
-msgid "сollapsed"
-msgstr "свернута"
-
 #: nodepkg/focus-table/FocusTable.tsx:24
 msgid "Hide details"
 msgstr "Скрыть детали"
@@ -257,3 +245,6 @@ msgstr "Настройка сохранена."
 #: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
+
+#~ msgid "Expanded"
+#~ msgstr "Развернута"
