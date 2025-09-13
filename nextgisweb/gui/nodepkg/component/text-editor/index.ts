@@ -1,3 +1,1 @@
-import { TextEditor } from "./TextEditor";
-
-export default TextEditor;
+export { TextEditor, TextEditor as default } from "./TextEditor";

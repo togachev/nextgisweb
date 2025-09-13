@@ -13,16 +13,12 @@ import type { AnnotationSettings } from "./AnnotationsSettings";
 
 const DEFAULTS = {
     centered: true,
-    width: "400px",
+    width: "500px",
     transitionName: "",
     maskTransitionName: "",
 };
 
-const TextEditor = lazy(() =>
-    import("@nextgisweb/gui/component/text-editor").then((module) => ({
-        default: module.TextEditor,
-    }))
-);
+const TextEditor = lazy(() => import("@nextgisweb/gui/component/text-editor"));
 
 export interface AnnotationsModalProps {
     open?: boolean;
@@ -193,7 +189,7 @@ export function AnnotationsModal({
                     </div>
                 )}
 
-                <div style={{ marginBottom: "16px", height: "200px" }}>
+                <div style={{ marginBottom: "16px", height: "350px" }}>
                     <Suspense
                         fallback={<Skeleton active paragraph={{ rows: 4 }} />}
                     >
