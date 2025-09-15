@@ -187,7 +187,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                 () => {
                     return [
                         {
-                            key: expanded ? gettext("Collapse") : gettext("Expand"),
+                            key: "expand_tree",
                             title: expanded ? gettext("Collapse") : gettext("Expand"),
                             icon: expanded ? <CollapseAll /> : <ExpandAll />,
                             placement: "left",
@@ -257,11 +257,30 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                         const value = context.groupExpanded.value;
                         return [
                             {
-                                key: value ? gettext("collapsed") : gettext("expanded"),
+                                key: "expanded",
                                 title: value ? gettext("Collapse") : gettext("Expand"),
                                 icon: value ? <CheckCircle /> : <RadioboxBlank />,
                                 callback: () => context.groupExpanded.value = !value,
                                 label: value ? gettext("expanded") : gettext("collapsed"),
+                            },
+                        ];
+                    } else {
+                        return []
+                    }
+                },
+                (
+                    context: ItemObject,
+                    status: "detail" | "tree"
+                ) => {
+                    if (context.itemType === "group" && status === "tree") {
+                        const value = context.groupExclusive.value;
+                        return [
+                            {
+                                key: "mutually_exclusive",
+                                title: value ? gettext("turn off mutual exclusion") : gettext("turn on mutual exclusion"),
+                                icon: value ? <CheckCircle /> : <RadioboxBlank />,
+                                callback: () => context.groupExclusive.value = !value,
+                                label: value ? gettext("mutually exclusive") : gettext("not mutually exclusive"),
                             },
                         ];
                     } else {

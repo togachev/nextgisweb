@@ -76,16 +76,14 @@ msgid "Default"
 msgstr "По умолчанию"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:8
-#: nodepkg/items-widget/ItemsWidget.tsx:190
-#: nodepkg/items-widget/ItemsWidget.tsx:192
-#: nodepkg/items-widget/ItemsWidget.tsx:264 nodepkg/settings/select-options.ts:95
+#: nodepkg/items-widget/ItemsWidget.tsx:191
+#: nodepkg/items-widget/ItemsWidget.tsx:261 nodepkg/settings/select-options.ts:95
 msgid "Expand"
 msgstr "Развернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:9
-#: nodepkg/items-widget/ItemsWidget.tsx:190
-#: nodepkg/items-widget/ItemsWidget.tsx:192
-#: nodepkg/items-widget/ItemsWidget.tsx:264 nodepkg/settings/select-options.ts:96
+#: nodepkg/items-widget/ItemsWidget.tsx:191
+#: nodepkg/items-widget/ItemsWidget.tsx:261 nodepkg/settings/select-options.ts:96
 msgid "Collapse"
 msgstr "Свернуть"
 
@@ -254,17 +252,31 @@ msgstr "Изменить порядок рисования"
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:263
-#: nodepkg/items-widget/ItemsWidget.tsx:267
-msgid "collapsed"
-msgstr "свернута"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:263
-#: nodepkg/items-widget/ItemsWidget.tsx:267
+#: nodepkg/items-widget/ItemsWidget.tsx:264
 msgid "expanded"
 msgstr "развернута"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:302 nodepkg/panel/layers/plugin.tsx:10
+#: nodepkg/items-widget/ItemsWidget.tsx:264
+msgid "collapsed"
+msgstr "свернута"
+
+#: nodepkg/items-widget/ItemsWidget.tsx:280
+msgid "turn off mutual exclusion"
+msgstr "выключить взаимоисключение"
+
+#: nodepkg/items-widget/ItemsWidget.tsx:280
+msgid "turn on mutual exclusion"
+msgstr "включить взаимоисключение"
+
+#: nodepkg/items-widget/ItemsWidget.tsx:283
+msgid "mutually exclusive"
+msgstr "взаимоисключающая"
+
+#: nodepkg/items-widget/ItemsWidget.tsx:283
+msgid "not mutually exclusive"
+msgstr "не взаимоисключающая"
+
+#: nodepkg/items-widget/ItemsWidget.tsx:317 nodepkg/panel/layers/plugin.tsx:10
 #: nodepkg/settings-widget/SettingsWidget.tsx:55
 msgid "Layers"
 msgstr "Слои"
@@ -345,8 +357,8 @@ msgstr "Числовой масштаб"
 
 #: nodepkg/map-controls/map-controls.ts:103
 #: nodepkg/map-controls/map-controls.ts:106
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:111
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:149
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:112
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:150
 #: nodepkg/settings-widget/SettingsWidget.tsx:25
 msgid "Initial extent"
 msgstr "Начальный охват"
@@ -465,7 +477,7 @@ msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
 #: nodepkg/plugin/layer-editor/LayerEditor.tsx:151
-#: nodepkg/popup/component/Popup.tsx:139
+#: nodepkg/popup/component/Popup.tsx:147
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -524,13 +536,13 @@ msgid "When the panel is active, layer identification is disabled."
 msgstr "Когда панель активна, идентификация слоев отключена."
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:32
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:175
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:171
 msgid "Create"
 msgstr "Создать"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:33
 #: nodepkg/settings/SettingsForm.tsx:371 nodepkg/settings/SettingsForm.tsx:382
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:165
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:161
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
 msgid "Save"
 msgstr "Сохранить"
@@ -542,7 +554,7 @@ msgstr "Удалить слой"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:35
 #: nodepkg/panel/custom-layer/UploadLayer.tsx:35
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:97
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:98
 #: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:18
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -655,7 +667,7 @@ msgid "Custom layers"
 msgstr "Пользовательские слои"
 
 #: nodepkg/panel/description/plugin.tsx:10
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:272
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:274
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:38
 #: nodepkg/popup/component/ContentComponent.tsx:172
 #: nodepkg/settings-widget/SettingsWidget.tsx:61
@@ -885,62 +897,62 @@ msgstr "Уточните критерий поиска. Отображены п�
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:98
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:99
 msgid "Value raster layer"
 msgstr "Значение растрового слоя"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:123
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:203
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:124
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:204
 msgid "Deselect Objects for Layer."
 msgstr "Отменить выбор объектов для слоя."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:150
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:151
 msgid "View information about the object"
 msgstr "Посмотреть информацию об объекте"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:166
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:208
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:167
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:209
 msgid "Deselect Object."
 msgstr "Отменить выбор объекта."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:188
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:189
 msgid "Turn layers on/off by default when viewing object information."
 msgstr "Включение/выключение слоев по умолчанию при просмотре информации об объекте."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:193
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:194
 msgid "Hide layer names."
 msgstr "Скрытие наименований слоев."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:198
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:318
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:199
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:320
 msgid "Deselect Objects for All Layers."
 msgstr "Отмените выбор объектов для всех слоев."
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:222
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:223
 msgid "Maximum number of objects for one layer: 10"
 msgstr "Максимальное количество объектов для одного слоя: 10"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:270
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:272
 msgid "Turn on default layers visibility"
 msgstr "Включить видимость слоев по умолчанию"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:270
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:272
 msgid "Turn off inactive layers"
 msgstr "Отключить неактивные слои"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:271
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:273
 msgid "Button functions:"
 msgstr "Функции кнопок:"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:273
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:275
 msgid "Web map objects viewing history"
 msgstr "История просмотра объектов веб-карты"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:274
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:276
 msgid "Hide layer name"
 msgstr "Скрыть имя слоя"
 
-#: nodepkg/panel/selected-feature/SelectedFeature.tsx:274
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:276
 msgid "Show layer name"
 msgstr "Показать имя слоя"
 
@@ -1184,15 +1196,15 @@ msgstr "Заблокировать позицию всплывающего ок�
 msgid "Disable lock popup position"
 msgstr "Отключить блокировку всплывающего окна"
 
-#: nodepkg/popup/component/Popup.tsx:317
+#: nodepkg/popup/component/Popup.tsx:325
 msgid "Сollapse fullscreen popup"
 msgstr "Свернуть полноэкранное всплывающее окно"
 
-#: nodepkg/popup/component/Popup.tsx:317
+#: nodepkg/popup/component/Popup.tsx:325
 msgid "Open fullscreen popup"
 msgstr "Открыть полноэкранное всплывающее окно"
 
-#: nodepkg/popup/component/Popup.tsx:341
+#: nodepkg/popup/component/Popup.tsx:349
 msgid "Close"
 msgstr "Закрыть"
 
@@ -1450,28 +1462,28 @@ msgstr "Nominatim (OSM)"
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:121
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:117
 msgid "Create as public"
 msgstr "Создать как публичную"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:128
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:124
 msgid "Create as private"
 msgstr "Создать как приватную"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:136
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:132
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:137
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:133
 msgid "Create annotation"
 msgstr "Создать аннотацию"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:159
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:155
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:162
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:171
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:158
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:167
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:50
 msgid "Cancel"
 msgstr "Отменить"

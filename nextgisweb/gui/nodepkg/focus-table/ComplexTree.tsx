@@ -30,7 +30,7 @@ import type {
 } from "./type";
 
 import ArrowIcon from "@nextgisweb/icon/material/arrow_forward_ios";
-import CheckCircle from "@nextgisweb/icon/mdi/check-circle";
+import Circle from "@nextgisweb/icon/mdi/circle";
 import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
 
 import "./ComplexTree.less";
@@ -368,7 +368,8 @@ export function ComplexTree<
             const [columnCount, columnsElement] = props.showColumns
                 ? renderColumns(storeItem)
                 : [0, undefined];
-            const titleExpanded = !props.showActions && storeItem.itemType === "group" ? storeItem.groupExpanded.value ? gettext("expanded") : gettext("collapsed") : null
+            const titleExpanded = !props.showActions && storeItem.itemType === "group" ? storeItem.groupExpanded.value ? gettext("Expanded") : gettext("Collapsed") : null
+            const titleGroupExclusive = !props.showActions && storeItem.itemType === "group" ? storeItem.groupExclusive.value ? gettext("Mutually exclusive") : gettext("Not mutually exclusive") : null
 
             return (
                 <tr
@@ -392,8 +393,19 @@ export function ComplexTree<
                             <div className="title">
                                 {title?.(storeItem) || <>&nbsp;</>}
                             </div>
-                            <span className="expanded-detail" title={titleExpanded}>
-                                {!props.showActions && storeItem.itemType === "group" ? storeItem.groupExpanded.value ? <CheckCircle /> : <RadioboxBlank /> : null}
+                            <span className="custom-detail" title={titleExpanded}>
+                                {
+                                    !props.showActions && storeItem.itemType === "group" ? storeItem.groupExpanded.value ?
+                                        <span className="color"><Circle /></span> :
+                                        <RadioboxBlank /> : null
+                                }
+                            </span>
+                            <span className="custom-detail" title={titleGroupExclusive}>
+                                {
+                                    !props.showActions && storeItem.itemType === "group" ? storeItem.groupExclusive.value ?
+                                        <span className="color"><Circle /></span> :
+                                        <RadioboxBlank /> : null
+                                }
                             </span>
                             {props.showErrors && error && (
                                 <div className="error">
