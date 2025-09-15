@@ -144,7 +144,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 const ltitle = !store.visibleLayerName ? title : null;
                                 return (
                                     <div key={fidx} className="label-child-element">
-                                        <CircleSmall className="index-lf" />
+                                        {store.visibleLayerName ? <CircleSmall className="index-lf" /> : null}
                                         <Button
                                             title={checked ?
                                                 [ftitle, gettext("Initial extent"), ltitle].join(" \n") :
