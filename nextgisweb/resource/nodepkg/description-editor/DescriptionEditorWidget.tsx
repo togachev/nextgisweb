@@ -12,8 +12,9 @@ const TextEditor = lazy(() => import("@nextgisweb/gui/component/text-editor"));
 
 export const DescriptionEditorWidget: EditorWidget<DescriptionEditorStore> =
     observer(({ store }) => {
-        const { id } = ngwConfig.resourceFavorite.resource;
-        const { data: resourceData } = useRouteGet(
+        const id = ngwConfig.resourceFavorite !== null ? ngwConfig.resourceFavorite.resource.id : null;
+        
+        const loadValue = id !== null ? useRouteGet(
             "resource.item",
             { id },
             {
@@ -21,8 +22,8 @@ export const DescriptionEditorWidget: EditorWidget<DescriptionEditorStore> =
                     serialization: "resource",
                 }
             }
-        );
-
+        ) : null;
+        
         const onChange = useCallback(
             (value: string) => {
                 store.setValue(value);
@@ -33,7 +34,7 @@ export const DescriptionEditorWidget: EditorWidget<DescriptionEditorStore> =
         return (
             <Suspense>
                 <TextEditor
-                    value={resourceData?.resource.description}
+                    value={loadValue !== null ? loadValue.data?.resource.description : null}
                     onChange={onChange}
                     border={false}
                 />

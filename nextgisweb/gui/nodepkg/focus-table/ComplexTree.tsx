@@ -32,7 +32,7 @@ import type {
 import ArrowIcon from "@nextgisweb/icon/material/arrow_forward_ios";
 import Circle from "@nextgisweb/icon/mdi/circle";
 import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
-import GroupIcon from "@nextgisweb/icon/mdi/group";
+import GroupIcon from "@nextgisweb/icon/mdi/arrow-expand";
 import SwapHorizontal from "@nextgisweb/icon/mdi/swap-horizontal";
 
 import "./ComplexTree.less";
