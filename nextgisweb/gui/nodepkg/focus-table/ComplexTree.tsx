@@ -32,6 +32,8 @@ import type {
 import ArrowIcon from "@nextgisweb/icon/material/arrow_forward_ios";
 import Circle from "@nextgisweb/icon/mdi/circle";
 import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
+import GroupIcon from "@nextgisweb/icon/mdi/group";
+import SwapHorizontal from "@nextgisweb/icon/mdi/swap-horizontal";
 
 import "./ComplexTree.less";
 
@@ -42,10 +44,10 @@ const arrowCollapsed = <ArrowIcon />;
 const arrowExpanded = <ArrowIcon style={{ transform: "rotate(90deg)" }} />;
 const arrowItem = <span style={{ display: "inline-block", width: "18px" }} />;
 
-function ActionButton({ title, label, ...buttonProps }: ButtonProps) {
+function ActionButton({ title, ...buttonProps }: ButtonProps) {
     return (
         <Tooltip {...{ title }}>
-            <Button type="text" shape={label ? "default" : "circle"} size="small" {...buttonProps}>{label}</Button>
+            <Button type="text" shape="circle" size="small" {...buttonProps} />
         </Tooltip>
     );
 }
@@ -213,6 +215,59 @@ export interface ComplexTreeProps<
     rootClassName?: string;
 }
 
+interface GroupControlProps {
+    item: any;
+    actions: boolean;
+    type: string;
+}
+
+const GroupControl = observer(({ item, actions, type }: GroupControlProps) => {
+    const value = type === "expand" ? item.groupExpanded.value : item.groupExclusive.value
+    const titleExpanded = value ? gettext("Collapse") : gettext("Expand")
+    const titleGroupExclusive = value ? gettext("Turn off mutual exclusion") : gettext("Turn on mutual exclusion")
+
+    return (
+        <span
+            className="custom-detail"
+        >
+            {!actions ?
+                <Tooltip
+                    title={type === "expand" ?
+                        value ? gettext("expanded") : gettext("collapsed") :
+                        value ? gettext("mutually exclusive") : gettext("not mutually exclusive")}
+                >
+                    {value ? <span className="color"><Circle /></span> : <RadioboxBlank />}
+                </Tooltip> :
+                <Tooltip
+                    title={type === "expand" ? titleExpanded : titleGroupExclusive}
+                >
+                    <span className="checkbox-control" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                            type="text"
+                            size="small"
+                            icon={
+                                type === "expand" ?
+                                    value ? <GroupIcon /> : <GroupIcon /> :
+                                    value ? <SwapHorizontal /> : <SwapHorizontal />
+                            }
+                            onClick={() => {
+                                if (type === "expand") {
+                                    item.groupExpanded.value = !value
+                                } else {
+                                    item.groupExclusive.value = !value
+                                }
+                            }}
+                            color={value && "primary"}
+                            variant="filled"
+                            shape="circle"
+                        />
+                    </span>
+                </Tooltip>
+            }
+        </span >
+    )
+})
+
 export function ComplexTree<
     I extends FocusTableItem,
     C extends string = string,
@@ -328,12 +383,11 @@ export function ComplexTree<
             if (!getActions) return;
             return (
                 <td className="actions">
-                    {getActions(item).map(({ key, title, icon, callback, label }) => (
+                    {getActions(item).map(({ key, title, icon, callback }) => (
                         <ActionButton
                             key={key}
                             title={title}
                             icon={icon}
-                            label={label}
                             onClick={(event) => {
                                 callback(item, environmentRef.current!);
                                 event.stopPropagation();
@@ -368,8 +422,6 @@ export function ComplexTree<
             const [columnCount, columnsElement] = props.showColumns
                 ? renderColumns(storeItem)
                 : [0, undefined];
-            const titleExpanded = !props.showActions && storeItem.itemType === "group" ? storeItem.groupExpanded.value ? gettext("Expanded") : gettext("Collapsed") : null
-            const titleGroupExclusive = !props.showActions && storeItem.itemType === "group" ? storeItem.groupExclusive.value ? gettext("Mutually exclusive") : gettext("Not mutually exclusive") : null
 
             return (
                 <tr
@@ -393,20 +445,12 @@ export function ComplexTree<
                             <div className="title">
                                 {title?.(storeItem) || <>&nbsp;</>}
                             </div>
-                            <span className="custom-detail" title={titleExpanded}>
-                                {
-                                    !props.showActions && storeItem.itemType === "group" ? storeItem.groupExpanded.value ?
-                                        <span className="color"><Circle /></span> :
-                                        <RadioboxBlank /> : null
-                                }
-                            </span>
-                            <span className="custom-detail" title={titleGroupExclusive}>
-                                {
-                                    !props.showActions && storeItem.itemType === "group" ? storeItem.groupExclusive.value ?
-                                        <span className="color"><Circle /></span> :
-                                        <RadioboxBlank /> : null
-                                }
-                            </span>
+                            {storeItem.itemType === "group" &&
+                                <>
+                                    <GroupControl item={storeItem} actions={props.showActions} type="expand" />
+                                    <GroupControl item={storeItem} actions={props.showActions} type="mutually" />
+                                </>
+                            }
                             {props.showErrors && error && (
                                 <div className="error">
                                     <Tooltip title={String(error)}>

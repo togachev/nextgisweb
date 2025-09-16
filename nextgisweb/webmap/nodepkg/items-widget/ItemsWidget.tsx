@@ -27,8 +27,7 @@ import type { ItemsStore } from "./ItemsStore";
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
 import ExpandAll from "@nextgisweb/icon/mdi/expand-all";
 import CollapseAll from "@nextgisweb/icon/mdi/collapse-all";
-import CheckCircle from "@nextgisweb/icon/mdi/check-circle";
-import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
+
 const { adapters } = settings;
 
 const msgDisplayName = gettext("Display name");
@@ -248,47 +247,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                     ];
                 },
             ],
-            itemActions: [
-                (
-                    context: ItemObject,
-                    status: "detail" | "tree"
-                ) => {
-                    if (context.itemType === "group" && status === "tree") {
-                        const value = context.groupExpanded.value;
-                        return [
-                            {
-                                key: "expanded",
-                                title: value ? gettext("Collapse") : gettext("Expand"),
-                                icon: value ? <CheckCircle /> : <RadioboxBlank />,
-                                callback: () => context.groupExpanded.value = !value,
-                                label: value ? gettext("expanded") : gettext("collapsed"),
-                            },
-                        ];
-                    } else {
-                        return []
-                    }
-                },
-                (
-                    context: ItemObject,
-                    status: "detail" | "tree"
-                ) => {
-                    if (context.itemType === "group" && status === "tree") {
-                        const value = context.groupExclusive.value;
-                        return [
-                            {
-                                key: "mutually_exclusive",
-                                title: value ? gettext("turn off mutual exclusion") : gettext("turn on mutual exclusion"),
-                                icon: value ? <CheckCircle /> : <RadioboxBlank />,
-                                callback: () => context.groupExclusive.value = !value,
-                                label: value ? gettext("mutually exclusive") : gettext("not mutually exclusive"),
-                            },
-                        ];
-                    } else {
-                        return []
-                    }
-                },
-                action.deleteItem<ItemObject>(),
-            ],
+            itemActions: [action.deleteItem<ItemObject>()],
         }),
         [drawOrderEnabled, makeSignal, pickToFocusTable, store, expanded]
     );

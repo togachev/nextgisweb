@@ -49,7 +49,7 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:33
 msgid "Display name"
 msgstr "Наименование"
 
@@ -76,14 +76,12 @@ msgid "Default"
 msgstr "По умолчанию"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:8
-#: nodepkg/items-widget/ItemsWidget.tsx:191
-#: nodepkg/items-widget/ItemsWidget.tsx:261 nodepkg/settings/select-options.ts:95
+#: nodepkg/items-widget/ItemsWidget.tsx:190 nodepkg/settings/select-options.ts:95
 msgid "Expand"
 msgstr "Развернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:9
-#: nodepkg/items-widget/ItemsWidget.tsx:191
-#: nodepkg/items-widget/ItemsWidget.tsx:261 nodepkg/settings/select-options.ts:96
+#: nodepkg/items-widget/ItemsWidget.tsx:190 nodepkg/settings/select-options.ts:96
 msgid "Collapse"
 msgstr "Свернуть"
 
@@ -185,98 +183,74 @@ msgstr "Порядок рисования по умолчанию"
 msgid "Group members have errors"
 msgstr "Ошибка в участниках группы"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:35
+#: nodepkg/items-widget/ItemsWidget.tsx:34
 msgid "Expanded"
 msgstr "Развернута"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:36
+#: nodepkg/items-widget/ItemsWidget.tsx:35
 msgid "Exclusive"
 msgstr "Взаимоисключающая"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:37
+#: nodepkg/items-widget/ItemsWidget.tsx:36
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:38
+#: nodepkg/items-widget/ItemsWidget.tsx:37
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:39
+#: nodepkg/items-widget/ItemsWidget.tsx:38
 msgid "Layer highligh"
 msgstr "Выделение слоя"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40
+#: nodepkg/items-widget/ItemsWidget.tsx:39
 msgid "Edit geometry"
 msgstr "Редактировать геометрию"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:41
+#: nodepkg/items-widget/ItemsWidget.tsx:40
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:42
+#: nodepkg/items-widget/ItemsWidget.tsx:41
 msgid "Transparency"
 msgstr "Прозрачность"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:43
+#: nodepkg/items-widget/ItemsWidget.tsx:42
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:44
+#: nodepkg/items-widget/ItemsWidget.tsx:43
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:45
+#: nodepkg/items-widget/ItemsWidget.tsx:44
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:28
 #: nodepkg/settings-widget/SettingsWidget.tsx:28
 #: nodepkg/settings/SettingsForm.tsx:345
 msgid "Legend"
 msgstr "Легенда"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:46
+#: nodepkg/items-widget/ItemsWidget.tsx:45
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:47
+#: nodepkg/items-widget/ItemsWidget.tsx:46
 msgid "Layer"
 msgstr "Слой"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:48
+#: nodepkg/items-widget/ItemsWidget.tsx:47
 msgid "Group"
 msgstr "Группа"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:49
+#: nodepkg/items-widget/ItemsWidget.tsx:48
 msgid "Edit draw order"
 msgstr "Изменить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:50
+#: nodepkg/items-widget/ItemsWidget.tsx:49
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:264
-msgid "expanded"
-msgstr "развернута"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:264
-msgid "collapsed"
-msgstr "свернута"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:280
-msgid "turn off mutual exclusion"
-msgstr "выключить взаимоисключение"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:280
-msgid "turn on mutual exclusion"
-msgstr "включить взаимоисключение"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:283
-msgid "mutually exclusive"
-msgstr "взаимоисключающая"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:283
-msgid "not mutually exclusive"
-msgstr "не взаимоисключающая"
-
-#: nodepkg/items-widget/ItemsWidget.tsx:317 nodepkg/panel/layers/plugin.tsx:10
+#: nodepkg/items-widget/ItemsWidget.tsx:276 nodepkg/panel/layers/plugin.tsx:10
 #: nodepkg/settings-widget/SettingsWidget.tsx:55
 msgid "Layers"
 msgstr "Слои"

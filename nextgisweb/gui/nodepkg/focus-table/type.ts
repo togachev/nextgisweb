@@ -22,7 +22,6 @@ export interface FocusTableAction<
     placement?: "left" | "right";
     danger?: boolean;
     callback: (ctx: C, env: E) => void;
-    label?: string;
 }
 
 export type FocusTableActions<
