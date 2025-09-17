@@ -29,6 +29,7 @@ from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, Resourc
 
 from .adapter import WebMapAdapter
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
+from nextgisweb.mapgroup.model import MapgroupGroup, MapgroupWebMap
 from .option import WebMapOption
 from .plugin import WebmapLayerPlugin, WebmapPlugin
 
@@ -772,8 +773,22 @@ def display_config(obj, request) -> DisplayConfig:
     )
 
 
+def group_get(resource, request) -> JSONType:
+    if resource.has_permission(ResourceScope.read, request.user):
+        query = MapgroupWebMap.filter_by(webmap_id=resource.id)
+        result = [itm.to_dict() for itm in query]
+        return result
+
+
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
+
+    config.add_route(
+        "webmap.mapgroup.collection",
+        "/api/mapgroup/{id}/collection",
+        factory=ResourceFactory(context=WebMap),
+        get=group_get,
+    )
 
     config.add_route(
         "webmap.annotation.collection",

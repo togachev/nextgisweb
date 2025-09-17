@@ -51,6 +51,7 @@ def pkginfo():
         "audit",
         "tileset",
         "basemap",
+        "mapgroup",
         "sld",
     )
     optional = {"raster_mosaic"}

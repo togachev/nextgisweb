@@ -45,6 +45,7 @@ export interface FocusTableProps<I extends FocusTableItem, C extends string, S>
     FocusTablePropsActions<I> {
     renderDetail: React.ComponentType<{ item: I }>;
     rootClassName?: string;
+    canDragAndDrop?: boolean;
 }
 
 export function FocusTable<
@@ -59,6 +60,7 @@ export function FocusTable<
     tableActions,
     itemActions,
     renderDetail: Detail,
+    canDragAndDrop,
     rootClassName,
     expanded
 }: FocusTableProps<I, C, S>) {
@@ -120,6 +122,7 @@ export function FocusTable<
                         showErrors={true}
                         onSelect={setSelected}
                         onPrimaryAction={() => setShowDetails(true)}
+                        canDragAndDrop={canDragAndDrop}
                     />
                 </div>
             </Splitter.Panel>

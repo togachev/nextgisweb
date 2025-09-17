@@ -268,6 +268,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                     <LayerWidget item={item} />
                 )
             }
+            canDragAndDrop={true}
         />
     );
 });

@@ -1,0 +1,19 @@
+#: model.py:24 nodepkg/group-widget/GroupWidget.tsx:40
+msgid "Mapgroup"
+msgstr ""
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:23
+msgid "Display name"
+msgstr ""
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:30
+msgid "Default mapgroup"
+msgstr ""
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:33
+msgid "Resource"
+msgstr ""
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:97
+msgid "Mapgroups"
+msgstr ""

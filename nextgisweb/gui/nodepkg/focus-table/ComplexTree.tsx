@@ -213,6 +213,7 @@ export interface ComplexTreeProps<
     onSelect?: (item: I | null) => void;
     onPrimaryAction?: (item: I) => void;
     rootClassName?: string;
+    canDragAndDrop?: boolean
 }
 
 interface GroupControlProps {
@@ -285,6 +286,7 @@ export function ComplexTree<
     onSelect,
     onPrimaryAction,
     rootClassName,
+    canDragAndDrop,
 }: ComplexTreeProps<I, C, S>) {
     type EnvType = typeof UncontrolledTreeEnvironment<I | typeof ROOT_DATA>;
     type EnvProps = Required<Parameters<EnvType>[0]>;
@@ -537,7 +539,7 @@ export function ComplexTree<
             onSelectItems={onSelectItems}
             onPrimaryAction={onPrimaryActionCallback}
             viewState={{}}
-            canDragAndDrop
+            canDragAndDrop={canDragAndDrop}
             canDropOnFolder
             canReorderItems
             canSearch={false}
