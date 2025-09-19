@@ -29,7 +29,7 @@ from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, Resourc
 
 from .adapter import WebMapAdapter
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
-from nextgisweb.mapgroup.model import MapgroupGroup, MapgroupWebMap
+from nextgisweb.mapgroup.model import Mapgroup, MapgroupWebMap
 from .option import WebMapOption
 from .plugin import WebmapLayerPlugin, WebmapPlugin
 

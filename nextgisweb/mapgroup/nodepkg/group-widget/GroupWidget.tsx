@@ -25,7 +25,7 @@ const GroupmapWidget = observer<{
                 component={InputValue}
             />
             <LotMV
-                value={item.enabled}
+                value={item.enabledWebmap}
                 component={CheckboxValue}
                 props={{ children: gettext("Default mapgroup") }}
             />
@@ -62,7 +62,7 @@ export const GroupWidget: EditorWidget<GroupStore> = observer(({ store }) => {
                         return new Groupmap(store, {
                             webmap_id: res.resource.id,
                             display_name: res.resource.display_name,
-                            enabled: true,
+                            enabled_webmap: true,
                         });
                     },
                     {

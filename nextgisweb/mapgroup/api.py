@@ -1,5 +1,5 @@
 from nextgisweb.resource import ResourceScope, ResourceFactory
-from .model import MapgroupGroup, WebMapGroup
+from .model import Mapgroup, WebMapGroup
 from nextgisweb.lib.apitype import AsJSON, EmptyObject
 from typing import Annotated, Any, List, Literal, Union
 from msgspec import UNSET, Meta, Struct, UnsetType
@@ -13,11 +13,12 @@ def webmap_get(resource, request) -> JSONType:
         result = [itm.to_dict() for itm in query]
         return result
 
+
 def setup_pyramid(comp, config):
 
     config.add_route(
         "mapgroup.webmap.collection",
         "/api/webmap/{id}/collection",
-        factory=ResourceFactory(context=MapgroupGroup),
+        factory=ResourceFactory(context=Mapgroup),
         get=webmap_get,
     )

@@ -381,7 +381,7 @@ export class ResourcePickerStore
         const clsObject = {
             layer: ["vector_layer", "postgis_layer"],
             basemap_layer: ["basemap_layer"],
-            webmap_group: ["mapgroup_group"],
+            webmap_group: ["mapgroup"],
             group_webmap: ["webmap"],
             wms_service: ["wmsclient_connection"],
             wfs_service: ["wfsclient_connection"],

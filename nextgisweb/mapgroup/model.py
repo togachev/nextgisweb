@@ -19,39 +19,34 @@ from nextgisweb.resource import (
 from nextgisweb.webmap import WebMap
 
 
-class MapgroupGroup(Base, Resource):
-    identity = "mapgroup_group"
+class Mapgroup(Base, Resource):
+    identity = "mapgroup"
     cls_display_name = gettext("Mapgroup")
 
     __scope__ = DataScope
 
-    # position = sa.Column(sa.Integer)
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
 
-# class MapgroupGroupSerializer(Serializer, resource=MapgroupGroup):
-#     position = SColumn(read=DataScope.read, write=DataScope.write)
-
-
 class MapgroupWebMap(Base):
-    __tablename__ = "mapgroup_webmap"
+    __tablename__ = "group_webmap"
 
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    position = sa.Column(sa.Integer)
+    id_pos_group = sa.Column(sa.Integer)
     display_name = sa.Column(sa.Unicode, nullable=False)
-    enabled = sa.Column(sa.Boolean)
+    enabled_group = sa.Column(sa.Boolean)
 
     webmap = orm.relationship(
         WebMap,
         foreign_keys=webmap_id,
         backref=orm.backref(
-            "mapgroups",
+            "groups",
             cascade="all, delete-orphan",
-            order_by=position,
-            collection_class=ordering_list("position"),
+            order_by=id_pos_group,
+            collection_class=ordering_list("id_pos_group"),
         ),
     )
 
@@ -59,7 +54,7 @@ class MapgroupWebMap(Base):
         Resource,
         foreign_keys=resource_id,
         backref=orm.backref(
-            "_backref_mapgroup_webmap",
+            "_backref_group_webmap",
             cascade="all",
             cascade_backrefs=False,
         ),
@@ -68,43 +63,43 @@ class MapgroupWebMap(Base):
     def to_dict(self):
         return dict(
             resource_id=self.resource_id,
-            position=self.position,
+            id_pos_group=self.id_pos_group,
             display_name=self.display_name,
-            enabled=self.enabled,
+            enabled_group=self.enabled_group,
         )
 
 
 class MapgroupWebMapItemRead(Struct, kw_only=True):
     resource_id: int
     display_name: Annotated[str, Meta(min_length=1)]
-    enabled: bool
+    enabled_group: bool
 
 
 class MapgroupWebMapItemWrite(Struct, kw_only=True):
     resource_id: int
     display_name: Annotated[str, Meta(min_length=1)]
-    enabled: Union[bool, UnsetType] = UNSET
+    enabled_group: Union[bool, UnsetType] = UNSET
 
 
-class MapgroupsAttr(SAttribute):
+class GroupsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[MapgroupWebMapItemRead]:
         return [
             MapgroupWebMapItemRead(
                 resource_id=i.resource_id,
                 display_name=i.display_name,
-                enabled=i.enabled,
+                enabled_group=i.enabled_group,
             )
-            for i in srlzr.obj.mapgroups
+            for i in srlzr.obj.groups
         ]
 
     def set(self, srlzr: Serializer, value: List[MapgroupWebMapItemWrite], *, create: bool):
-        srlzr.obj.mapgroups = [MapgroupWebMap(**to_builtins(i)) for i in value]
+        srlzr.obj.groups = [MapgroupWebMap(**to_builtins(i)) for i in value]
 
 
-class MapgroupWebMapSerializer(Serializer, resource=WebMap):
+class GroupWebMapSerializer(Serializer, resource=WebMap):
     identity = MapgroupWebMap.__tablename__
 
-    mapgroups = MapgroupsAttr(read=ResourceScope.read, write=ResourceScope.update)
+    groups = GroupsAttr(read=ResourceScope.read, write=ResourceScope.update)
 
 
 class WebMapGroup(Base):
@@ -112,18 +107,18 @@ class WebMapGroup(Base):
 
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    position = sa.Column(sa.Integer)
+    id_pos_webmap = sa.Column(sa.Integer)
     display_name = sa.Column(sa.Unicode, nullable=False)
-    enabled = sa.Column(sa.Boolean)
+    enabled_webmap = sa.Column(sa.Boolean)
 
     resource = orm.relationship(
         Resource,
         foreign_keys=resource_id,
         backref=orm.backref(
-            "groupmaps",
+            "maps",
             cascade="all, delete-orphan",
-            order_by=position,
-            collection_class=ordering_list("position"),
+            order_by=id_pos_webmap,
+            collection_class=ordering_list("id_pos_webmap"),
         ),
     )
 
@@ -140,40 +135,40 @@ class WebMapGroup(Base):
     def to_dict(self):
         return dict(
             webmap_id=self.webmap_id,
-            position=self.position,
+            id_pos_webmap=self.id_pos_webmap,
             display_name=self.display_name,
-            enabled=self.enabled,
+            enabled_webmap=self.enabled_webmap,
         )
 
 
 class WebMapGroupItemRead(Struct, kw_only=True):
     webmap_id: int
     display_name: Annotated[str, Meta(min_length=1)]
-    enabled: bool
+    enabled_webmap: bool
 
 
 class WebMapGroupItemWrite(Struct, kw_only=True):
     webmap_id: int
     display_name: Annotated[str, Meta(min_length=1)]
-    enabled: Union[bool, UnsetType] = UNSET
+    enabled_webmap: Union[bool, UnsetType] = UNSET
 
 
-class GroupmapsAttr(SAttribute):
+class MapsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[WebMapGroupItemRead]:
         return [
             WebMapGroupItemRead(
                 webmap_id=i.webmap_id,
                 display_name=i.display_name,
-                enabled=i.enabled,
+                enabled_webmap=i.enabled_webmap,
             )
-            for i in srlzr.obj.groupmaps
+            for i in srlzr.obj.maps
         ]
 
     def set(self, srlzr: Serializer, value: List[WebMapGroupItemWrite], *, create: bool):
-        srlzr.obj.groupmaps = [WebMapGroup(**to_builtins(i)) for i in value]
+        srlzr.obj.maps = [WebMapGroup(**to_builtins(i)) for i in value]
 
 
-class WebMapGroupSerializer(Serializer, resource=MapgroupGroup):
+class WebMapGroupSerializer(Serializer, resource=Mapgroup):
     identity = WebMapGroup.__tablename__
 
-    groupmaps = GroupmapsAttr(read=ResourceScope.read, write=ResourceScope.update)
+    maps = MapsAttr(read=ResourceScope.read, write=ResourceScope.update)

@@ -15,28 +15,28 @@ type Value = apitype.MapgroupWebMapRead;
 export class WebMapStore
     implements EditorStore<Value>, FocusTableStore<Mapgroup>
 {
-    readonly identity = "mapgroup_webmap";
+    readonly identity = "group_webmap";
     readonly composite: CompositeStore;
 
     @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
 
-    readonly mapgroups = observable.array<Mapgroup>([], { deep: false });
+    readonly groups = observable.array<Mapgroup>([], { deep: false });
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        observe(this.mapgroups, () => this.markDirty());
+        observe(this.groups, () => this.markDirty());
     }
 
     @action
-    load({ mapgroups }: Value) {
-        this.mapgroups.replace(mapgroups.map((v) => new Mapgroup(this, v)));
+    load({ groups }: Value) {
+        this.groups.replace(groups.map((v) => new Mapgroup(this, v)));
         this.dirty = false;
     }
 
     dump() {
         if (!this.dirty) return undefined;
-        return { mapgroups: this.mapgroups.map((i) => i.json()) };
+        return { groups: this.groups.map((i) => i.json()) };
     }
 
     @action
@@ -46,22 +46,22 @@ export class WebMapStore
 
     @computed
     get isValid(): boolean {
-        return this.mapgroups.every((i) => i.error === false);
+        return this.groups.every((i) => i.error === false);
     }
 
     @computed
     get counter() {
-        return this.mapgroups.length;
+        return this.groups.length;
     }
 
     // FocusTableStore
 
     getItemChildren(item: Mapgroup | null) {
-        return item === null ? this.mapgroups : undefined;
+        return item === null ? this.groups : undefined;
     }
 
     getItemContainer(item: Mapgroup) {
-        return item && this.mapgroups;
+        return item && this.groups;
     }
 
     getItemParent() {

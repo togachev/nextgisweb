@@ -1,5 +1,3 @@
-import { observe } from "mobx";
-
 import type * as apitype from "@nextgisweb/mapgroup/type/api";
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
@@ -9,7 +7,7 @@ import type { GroupStore } from "./GroupStore";
 const {
     webmap_id: webmapId,
     display_name: displayName,
-    enabled: enabled,
+    enabled_webmap: enabledWebmap,
     $load: mapperLoad,
     $error: mapperError,
 } = mapper<Groupmap, apitype.WebMapMapgroupItemRead>({
@@ -19,7 +17,7 @@ const {
 
 displayName.validate(
     validate.string({ minLength: 1 }),
-    validate.unique((o) => o.store.groupmaps, "displayName")
+    validate.unique((o) => o.store.maps, "displayName")
 );
 
 export class Groupmap {
@@ -27,7 +25,7 @@ export class Groupmap {
 
     webmapId = webmapId.init(-1, this);
     displayName = displayName.init("", this);
-    enabled = enabled.init(false, this);
+    enabledWebmap = enabledWebmap.init(false, this);
 
     constructor(store: GroupStore, data: apitype.WebMapMapgroupItemRead) {
         this.store = store;
@@ -38,7 +36,7 @@ export class Groupmap {
         return {
             ...this.webmapId.jsonPart(),
             ...this.displayName.jsonPart(),
-            ...this.enabled.jsonPart(),
+            ...this.enabledWebmap.jsonPart(),
         };
     }
 

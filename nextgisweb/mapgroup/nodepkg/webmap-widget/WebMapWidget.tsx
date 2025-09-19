@@ -25,7 +25,7 @@ const MapgroupWidget = observer<{
                 component={InputValue}
             />
             <LotMV
-                value={item.enabled}
+                value={item.enabledGroup}
                 component={CheckboxValue}
                 props={{ children: gettext("Default mapgroup") }}
             />
@@ -62,12 +62,12 @@ export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
                         return new Mapgroup(store, {
                             resource_id: res.resource.id,
                             display_name: res.resource.display_name,
-                            enabled: true,
+                            enabled_group: true,
                         });
                     },
                     {
                         pickerOptions: {
-                            requireClass: "mapgroup_group",
+                            requireClass: "mapgroup",
                             multiple: true,
                             clsFilter: "webmap_group",
                         },

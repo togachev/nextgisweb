@@ -1,2 +1,2 @@
 from .component import MapgroupComponent
-from .model import MapgroupGroup, MapgroupWebMap, WebMapGroup
+from .model import Mapgroup, MapgroupWebMap, WebMapGroup

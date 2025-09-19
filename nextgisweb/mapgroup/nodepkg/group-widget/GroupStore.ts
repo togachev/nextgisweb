@@ -21,22 +21,22 @@ export class GroupStore
     @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
 
-    readonly groupmaps = observable.array<Groupmap>([], { deep: false });
+    readonly maps = observable.array<Groupmap>([], { deep: false });
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        observe(this.groupmaps, () => this.markDirty());
+        observe(this.maps, () => this.markDirty());
     }
 
     @action
-    load({ groupmaps }: Value) {
-        this.groupmaps.replace(groupmaps.map((v) => new Groupmap(this, v)));
+    load({ maps }: Value) {
+        this.maps.replace(maps.map((v) => new Groupmap(this, v)));
         this.dirty = false;
     }
 
     dump() {
         if (!this.dirty) return undefined;
-        return { groupmaps: this.groupmaps.map((i) => i.json()) };
+        return { maps: this.maps.map((i) => i.json()) };
     }
 
     @action
@@ -46,22 +46,22 @@ export class GroupStore
 
     @computed
     get isValid(): boolean {
-        return this.groupmaps.every((i) => i.error === false);
+        return this.maps.every((i) => i.error === false);
     }
 
     @computed
     get counter() {
-        return this.groupmaps.length;
+        return this.maps.length;
     }
 
     // FocusTableStore
 
     getItemChildren(item: Groupmap | null) {
-        return item === null ? this.groupmaps : undefined;
+        return item === null ? this.maps : undefined;
     }
 
     getItemContainer(item: Groupmap) {
-        return item && this.groupmaps;
+        return item && this.maps;
     }
 
     getItemParent() {
