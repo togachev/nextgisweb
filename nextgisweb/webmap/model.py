@@ -45,6 +45,8 @@ ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
 LAYER_GEOM_EXISTS = ("mapserver_style", "qgis_vector_style")
 
+COLOR_DEFAULT = dict(fill= "rgba(255,255,255,0.1)", stroke_primary= "rgba(255,255,0,1)", stroke_secondary= "rgba(0, 0, 0, 1)")
+
 class WebMapScope(Scope):
     identity = "webmap"
     label = gettext("Web map")
@@ -89,7 +91,7 @@ class WebMap(Base, Resource):
 
     title = sa.Column(sa.Unicode)
     active_panel = sa.Column(saext.Enum(*ACTIVE_PANEL_VALUES), nullable=False, default="layers")
-    colors_selected_feature = sa.Column(sa_pg.JSONB, nullable=True)
+    colors_selected_feature = sa.Column(sa_pg.JSONB, nullable=True, default=COLOR_DEFAULT)
     select_feature_panel = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_enabled = sa.Column(sa.Boolean, nullable=False, default=False)
     annotation_default = sa.Column(
