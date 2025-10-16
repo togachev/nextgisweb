@@ -35,6 +35,7 @@ export interface WebmapSettings {
     measurement_srid: number;
     legend_symbols: unknown;
     hide_nav_menu: boolean;
+    nonimatim_url: string;
     offset_point: number;
     imodule: boolean;
     popup_size: PopupSize;

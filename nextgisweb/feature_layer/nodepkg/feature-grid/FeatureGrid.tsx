@@ -44,7 +44,7 @@ export const FeatureGrid = observer(
         const [store] = useState(
             () => storeProp || new FeatureGridStore(restProps)
         );
-
+        const [geometryType, setGeometryType] = useState();
         const {
             id,
             size,
@@ -66,7 +66,6 @@ export const FeatureGrid = observer(
             "resource.item",
             { id },
             {
-                cache: true,
                 query: {
                     description: false,
                 }
@@ -97,16 +96,14 @@ export const FeatureGrid = observer(
                             .map((f) => f.id),
                     ]);
                 }
+
+                if ("vector_layer" in resourceData) {
+                    setGeometryType(resourceData.vector_layer.geometry_type_parent);
+                } else if ("postgis_layer" in resourceData) {
+                    setGeometryType(resourceData.postgis_layer.geometry_type_parent);
+                }
             }
         }, [resourceData, store]);
-
-        const geometryType = () => {
-            if (resourceData && "vector_layer" in resourceData) {
-                return resourceData.vector_layer.geometry_type_parent;
-            } else if (resourceData && "postgis_layer" in resourceData) {
-                return resourceData.postgis_layer.geometry_type_parent;
-            }
-        }
 
         const prevSelectedIds = useRef(selectedIds);
         useEffect(() => {
@@ -124,7 +121,7 @@ export const FeatureGrid = observer(
 
         return (
             <div className="ngw-feature-layer-feature-grid">
-                <FeatureGridActions geometryType={geometryType()} store={store} editorProps={editorProps}>
+                <FeatureGridActions geometryType={geometryType} store={store} editorProps={editorProps}>
                     <Tooltip title={msgRefreshTitle}>
                         <Button
                             type="text"

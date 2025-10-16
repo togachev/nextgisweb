@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, reaction } from "mobx";
 import { createRoot } from "react-dom/client";
 import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
 
@@ -14,7 +14,6 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { fieldValuesToDataSource, getFieldsInfo } from "@nextgisweb/webmap/panel/identify/fields";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
-import { ToolBase } from "@nextgisweb/webmap/map-controls/tool/ToolBase";
 import OlGeomPoint from "ol/geom/Point";
 import PopupClick from "./component/PopupClick";
 import { Popup } from "./component/Popup";
@@ -23,7 +22,6 @@ import { getPositionContext, getPosition } from "./util/function";
 import UpdateLink from "@nextgisweb/icon/mdi/update";
 import FitToScreenOutline from "@nextgisweb/icon/mdi/fit-to-screen-outline";
 import LockReset from "@nextgisweb/icon/mdi/lock-reset";
-import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import type SelectedFeatureStore from "@nextgisweb/webmap/panel/selected-feature/SelectedFeatureStore";
 import type { Root as ReactRoot } from "react-dom/client";
@@ -44,43 +42,10 @@ const array_context = [
 const context_item = 34;
 const length = array_context.filter(item => item.visible === true).length
 
-interface ControlOptions {
-    tool: PopupStore;
-}
-
-class Control extends Interaction {
-    private tool: PopupStore;
-
-    constructor(options: ControlOptions) {
-        super({
-            handleEvent: (e) => this.handleClickEvent(e),
-        });
-        this.tool = options.tool;
-    }
-
-    handleClickEvent(e: MapBrowserEvent<UIEvent>): boolean {
-        if (e.type === "click" && !isM) {
-            if (this.tool.display.panelManager.getActivePanelName() !== "custom-layer") {
-                this.tool.overlayInfo(e, { type: "click" });
-                this.tool.setMode("click");
-                e.preventDefault();
-            } else {
-                topic.publish("feature.unhighlight");
-            }
-        } else if (e.type === "contextmenu") {
-            this.tool.overlayInfo(e, { type: "contextmenu" });
-            this.tool.setContextHidden(false);
-            e.preventDefault();
-        }
-        return true;
-    }
-}
-
-export class PopupStore extends ToolBase {
+export class PopupStore {
     label = gettext("PopupStore");
 
     map: MapStore;
-    control: Control;
 
     display: Display;
     context_height: number;
@@ -136,6 +101,10 @@ export class PopupStore extends ToolBase {
     @observable.ref accessor attribute: AttributeProps[] = [];
     @observable.ref accessor linkToGeometry: string | null = null;
     @observable.ref accessor fixContentItem: OptionProps;
+    
+    @observable.ref accessor active = true;
+    @observable.ref accessor control: Interaction | null = null;
+
     @observable.ref accessor controls: ControlUrlProps;
     @observable.ref accessor permalink: string | null = null;
     @observable.ref accessor activeControlKey: string;
@@ -144,12 +113,7 @@ export class PopupStore extends ToolBase {
     @observable.ref accessor currentUrlParams: string | null = null;
 
     constructor({ display }: Display) {
-        super(display);
-
-        this.display = display
-        this.control = new Control({ tool: this });
-        this.control.setActive(false);
-        this.display.map.olMap.addInteraction(this.control);
+        this.display = display;
 
         const urlParams = display.getUrlParams()
         const opts = display.config.options;
@@ -208,15 +172,45 @@ export class PopupStore extends ToolBase {
         this.fX = 0;
         this.fY = -40;
 
-        this.addOverlay();
+                this.addOverlay();
+
+        reaction(
+            () => this.control,
+            (ctrl, prev) => {
+                const olMap = this.display.map.olMap;
+                if (prev) {
+                    olMap.removeInteraction(prev);
+                }
+                if (ctrl) {
+                    olMap.addInteraction(ctrl);
+                    ctrl.setActive(this.active);
+                }
+            },
+            { fireImmediately: false }
+        );
+
+        reaction(
+            () => this.active,
+            (isActive) => {
+                if (this.control) {
+                    this.control.setActive(isActive);
+                }
+            }
+        );
     }
 
+    @action.bound
+    setControl(control: Interaction | null) {
+        this.control = control;
+    }
+
+    @action.bound
     activate(): void {
-        this.control.setActive(true);
+        this.active = true;
     }
 
     deactivate(): void {
-        this.control.setActive(false);
+        this.active = false;
     }
 
     @computed
@@ -917,7 +911,7 @@ export class PopupStore extends ToolBase {
     isEditEnabled(display: Display, item) {
         const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
 
-        if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
+        if (display.isTinyMode && !display.isTinyModePlugin(pluginName)) {
             return false;
         }
 

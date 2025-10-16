@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { Feature } from "ol";
 import type { Control } from "ol/control";
 import type { Extent } from "ol/extent";
@@ -8,15 +8,12 @@ import { fromLonLat, transformExtent } from "ol/proj";
 import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import { errorModal } from "@nextgisweb/gui/error";
-import { assert } from "@nextgisweb/jsrealm/error";
-import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { buildControls } from "@nextgisweb/webmap/map-controls";
-import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import type {
     DisplayConfig,
+    GroupItemConfig,
     LayerItemConfig,
     MidConfig,
 } from "@nextgisweb/webmap/type/api";
@@ -33,25 +30,20 @@ import { LoggedDeferred } from "../compat/LoggedDeferred";
 import type { StoreGroupConfig, StoreItemConfig } from "../compat/type";
 import { entrypointsLoader } from "../compat/util/entrypointLoader";
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
-import { Identify } from "../map-controls/tool/Identify";
-import { PopupStore } from "@nextgisweb/webmap/popup/PopupStore";
-import MapStatesObserver from "../map-state-observer";
-import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { MapStore } from "../ol/MapStore";
 import type { PanelStore } from "../panel";
 import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
-import WebmapStore from "../store";
+import { Identify, WebmapStore } from "../store";
+import { PopupStore } from "@nextgisweb/webmap/popup/PopupStore";
 import type {
     DisplayURLParams,
     Entrypoint,
     MapPlugin,
-    MapRefs,
     Mid,
     TinyConfig,
 } from "../type";
-import type { TreeItemConfig } from "../type/TreeItems";
-
+import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
 import { setURLParam } from "../utils/URL";
 import { normalizeExtent } from "../utils/normalizeExtent";
 
@@ -60,7 +52,10 @@ import { displayURLParams } from "./displayURLParams";
 export class Display {
     private readonly emptyModeURLValue = "none";
     readonly _itemConfigById: Record<string, TreeItemConfig> = {};
+
+    /** @deprecated - use {@link MapStore.displayProjection} instead */
     displayProjection = "EPSG:3857";
+    /** @deprecated - use {@link MapStore.lonlatProjection} instead */
     lonlatProjection = "EPSG:4326";
 
     config: DisplayConfig;
@@ -69,20 +64,17 @@ export class Display {
     tiny?: boolean;
 
     readonly map: MapStore;
-    mapNode?: HTMLElement;
     private _extent: Extent;
     private _extentConst: Extent | null;
     private readonly _layerOrder: number[] = []; // Layers from back to front
 
+    identify: Identify;
     itemStore: CustomItemFileWriteStore;
     webmapStore: WebmapStore;
     popupStore: PopupStore;
     tabsManager: WebMapTabsStore;
     panelManager: PanelManager;
-    mapStates: IMapStatesObserver;
-    mapToolbar?: MapToolbar;
 
-    identify?: Identify;
     featureHighlighter: FeatureHighlighter;
     readonly plugins: Record<string, PluginBase> = {};
     readonly _adapters: Record<string, LayerDisplayAdapter> = {};
@@ -107,14 +99,11 @@ export class Display {
     private _startupDeferred: LoggedDeferred;
     private _itemStoreDeferred: LoggedDeferred;
 
-    // UI Control Panes
-    leftTopControlPane?: HTMLElement;
-    leftBottomControlPane?: HTMLElement;
-    rightTopControlPane?: HTMLElement;
-    rightBottomControlPane?: HTMLElement;
-
-    @observable.shallow accessor item: StoreItem | null = null;
-    @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
+    @observable.ref accessor item: StoreItem | null = null;
+    @observable.ref accessor itemConfig:
+        | GroupItemConfig
+        | LayerItemConfig
+        | null = null;
 
     @observable.ref accessor isMobile = false;
     @observable.ref accessor panelSize: string | number;
@@ -137,7 +126,6 @@ export class Display {
         this._postCreateDeferred = new LoggedDeferred("_postCreateDeferred");
         this._startupDeferred = new LoggedDeferred("_startupDeferred");
         this.tabsManager = new WebMapTabsStore();
-        this.mapStates = MapStatesObserver.getInstance();
 
         this.config.initialExtent = normalizeExtent(this.config.initialExtent);
         this._extent = transformExtent(
@@ -161,8 +149,14 @@ export class Display {
         this.map = new MapStore({
             logo: false,
             controls: [],
+            initialExtent: this._extent,
             extent: this._extentConst || undefined,
+            measureSrsId: this.config.measureSrsId,
+            displayProjection: this.displayProjection,
+            lonlatProjection: this.lonlatProjection,
         });
+        this.identify = new Identify({ display: this });
+        this.popupStore = new PopupStore({ display: this });
 
         this.featureHighlighter = new FeatureHighlighter(this.map);
 
@@ -233,30 +227,18 @@ export class Display {
             }
         );
     }
-
-    @action
-    setPanelSize(panelSize: string | number) {
-        this.panelSize = panelSize;
-    }
-
-    startup({
-        target,
-        leftTopControlPane,
-        leftBottomControlPane,
-        rightTopControlPane,
-        rightBottomControlPane,
-    }: MapRefs) {
-        this.mapNode = target;
-        this.leftTopControlPane = leftTopControlPane;
-        this.leftBottomControlPane = leftBottomControlPane;
-        this.rightTopControlPane = rightTopControlPane;
-        this.rightBottomControlPane = rightBottomControlPane;
+    startup() {
         this._hideNavMenuForGuest();
         this._startupDeferred.resolve(true);
         this._postCreate();
     }
     _postCreate() {
         this._postCreateDeferred.resolve(true);
+    }
+
+    @action
+    setPanelSize(panelSize: string | number) {
+        this.panelSize = panelSize;
     }
 
     @action.bound
@@ -268,62 +250,28 @@ export class Display {
 
     @action
     _mapSetup() {
-        assert(this.mapNode);
 
-        this.mapToolbar = new MapToolbar({
-            display: this,
-            target: this.leftBottomControlPane,
-        });
-
-        this.map.startup(this.mapNode).then(() => {
-            this.setMapReady(true);
-        });
-
-        const controlsReady = buildControls(this);
-
-        if ((controlsReady.has("id") && isM) || (controlsReady.has("id") && !settings.imodule)) {
-            const controlObj = controlsReady.get("id");
-            if (
-                controlObj &&
-                controlObj.control &&
-                controlObj.control instanceof Identify
-            ) {
-                this.identify = controlObj.control;
-                this.mapStates.addState("identifying", this.identify);
-                this.mapStates.setDefaultState("identifying", true);
-                this._identifyFeatureByAttrValue();
-                this._identifyFeatureByValuePopup();
-            }
-        } else if ((controlsReady.has("ps") && !isM) || (controlsReady.has("ps") && settings.imodule)) {
-            const controlObj = controlsReady.get("ps");
-            if (
-                controlObj &&
-                controlObj.control &&
-                controlObj.control instanceof PopupStore
-            ) {
-                this.popupStore = controlObj.control;
-                this.mapStates.addState("popupStore", this.popupStore);
-                this.mapStates.setDefaultState("popupStore", true);
-                this.pModuleUrlParams();
-                this._identifyFeatureByValuePopup();
-            }
+        if (isM || !this.clientSettings.imodule) {
+            this._identifyFeatureByValuePopup();
+            this._identifyFeatureByAttrValue();
+        } else if (!isM || this.clientSettings.imodule) {
+            this.pModuleUrlParams();
         }
 
         topic.publish("/webmap/tools/initialized", true);
 
-        appendTo(this.mapNode);
         this.mapDeferred.resolve(true);
     }
 
-    @action
-    private setMapReady(status: boolean) {
+    @action.bound
+    setMapReady(status: boolean) {
         this.mapReady = status;
     }
 
-    _mapAddControls(controls: Control[]) {
-        controls.forEach((control) => {
-            this.map?.olMap.addControl(control);
-        });
+    _mapAddControls(_controls: Control[]) {
+        // controls.forEach((control) => {
+        //     this.map?.olMap.addControl(control);
+        // });
     }
     _mapAddLayer(id: number) {
         const layer = this.webmapStore.getLayer(id);
@@ -520,28 +468,21 @@ export class Display {
         const data = this._itemConfigById[store.getValue(item, "id")];
         if (data.type === "layer") {
             const adapter = this._adapters[data.adapter];
-            const metersPerUnit = this.map.olMap
-                .getView()
-                .getProjection()
-                .getMetersPerUnit();
-            if (metersPerUnit !== undefined) {
-                if (data.maxScaleDenom !== null) {
-                    const minResolution = this.map.getResolutionForScale(
-                        data.maxScaleDenom,
-                        metersPerUnit
-                    );
-                    if (minResolution !== undefined) {
-                        data.minResolution = minResolution;
-                    }
+
+            if (data.maxScaleDenom !== null) {
+                const minResolution = this.map.resolutionForScale(
+                    data.maxScaleDenom
+                );
+                if (minResolution !== undefined) {
+                    data.minResolution = minResolution;
                 }
-                if (data.minScaleDenom !== null) {
-                    const maxResolution = this.map.getResolutionForScale(
-                        data.minScaleDenom,
-                        metersPerUnit
-                    );
-                    if (maxResolution !== undefined) {
-                        data.maxResolution = maxResolution;
-                    }
+            }
+            if (data.minScaleDenom !== null) {
+                const maxResolution = this.map.resolutionForScale(
+                    data.minScaleDenom
+                );
+                if (maxResolution !== undefined) {
+                    data.maxResolution = maxResolution;
                 }
             }
 
@@ -596,11 +537,11 @@ export class Display {
         plugins: Record<string, MapPlugin | { default: MapPlugin }>
     ) {
         Object.keys(plugins).forEach((key) => {
-            if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+            if (this.isTinyMode && !this.isTinyModePlugin(key)) {
                 return;
             }
 
-            if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+            if (this.isTinyMode && !this.isTinyModePlugin(key)) {
                 return;
             }
 
@@ -659,7 +600,7 @@ export class Display {
 
     // FEATURE
     @action
-    setItemConfig(itemConfig: LayerItemConfig | null) {
+    setItemConfig(itemConfig: TreeChildrenItemConfig | null) {
         this.itemConfig = itemConfig;
     }
     @action
@@ -684,11 +625,15 @@ export class Display {
         this.itemStore.fetchItemByIdentity({
             identity: itemId,
             onItem: (item) => {
-                this.setItemConfig(
-                    this._itemConfigById[itemId] as LayerItemConfig
-                );
-
-                this.setItem(item as StoreItem);
+                if (item) {
+                    const itemConfig = this._itemConfigById[itemId];
+                    this.setItemConfig(
+                        itemConfig.type !== "root" ? itemConfig : null
+                    );
+                } else {
+                    this.setItemConfig(null);
+                }
+                this.setItem(item);
             },
         });
     }
@@ -770,8 +715,8 @@ export class Display {
     }
 
     //  UI
-
-    isTinyMode() {
+    @computed
+    get isTinyMode() {
         return this.tinyConfig !== undefined;
     }
 
@@ -798,7 +743,7 @@ export class Display {
         };
 
         let allowPanels;
-        if (this.isTinyMode()) {
+        if (this.isTinyMode) {
             allowPanels = this.urlParams.panels || [];
         }
 

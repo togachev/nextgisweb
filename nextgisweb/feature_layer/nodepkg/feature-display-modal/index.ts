@@ -1,1 +1,3 @@
-export { FeatureDisplayModal as default } from "./FeatureDisplayModal";
+import { FeatureDisplayModal } from "./FeatureDisplayModal";
+
+export default FeatureDisplayModal;

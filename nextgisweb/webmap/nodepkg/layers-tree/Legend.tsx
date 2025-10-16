@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type WebmapStore from "../store";
+import type { WebmapStore } from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
 import { restoreSymbols } from "../utils/symbolsIntervals";
 import "./Legend.less";

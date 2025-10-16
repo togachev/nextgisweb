@@ -134,8 +134,8 @@ export const Popup = observer(
             if (store.response?.featureCount > 0 && store.selected && store.selected.type === "vector") {
                 const { id, layerId, styleId } = store.selected;
                 const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
-
-                if (display.isTinyMode() && !display.isTinyModePlugin("@nextgisweb/webmap/plugin/feature-layer")) {
+                const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
+                if (display.isTinyMode && !display.isTinyModePlugin(pluginName)) {
                     return false;
                 } else if (!store.isEditEnabled(display, item)) {
                     return false;

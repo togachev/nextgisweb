@@ -15,12 +15,13 @@ interface DescriptionContentProps {
 }
 
 export class LayerInfoPlugin extends PluginBase {
+    data: DescriptionWebMapPluginConfig | null = null;
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
-        const infoConfig = this.display.itemConfig;
-        const data = infoConfig?.plugin[
-            this.identity
-        ] as DescriptionWebMapPluginConfig | null;
+        const data = this.getPlugin<DescriptionWebMapPluginConfig>(
+            nodeData.layerId
+        );
+        this.data = data;
         return {
             ...state,
             enabled: !!(state.enabled && data?.style_id) || !!(state.enabled && data?.layer_id),
@@ -62,9 +63,7 @@ export class LayerInfoPlugin extends PluginBase {
     private async openLayerInfo(nodeData) {
         const pm = this.display.panelManager;
         const pkey = "info";
-        const data = this.display.itemConfig?.plugin[
-            this.identity
-        ] as DescriptionWebMapPluginConfig;
+        const data = this.data;
 
         const content: DescriptionContentProps[] = [];
         const vectorType = ["postgis_layer", "vector_layer", "raster_layer"];

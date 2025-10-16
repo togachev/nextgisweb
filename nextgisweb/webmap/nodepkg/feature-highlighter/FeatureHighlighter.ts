@@ -40,7 +40,7 @@ export class FeatureHighlighter {
     private _wkt: WKT;
     private _zIndex = 1000;
 
-    @observable.ref accessor colorsSelectedFeature: ColorsSelectedFeatureProps;
+    @observable.ref accessor colorsSelectedFeature: ColorsSelectedFeatureProps | null = null;
 
     private _highlightStyle?: Style;
 
@@ -74,10 +74,10 @@ export class FeatureHighlighter {
     private _getDefaultStyle(): Style {
         const strokeStyle = new Stroke({
             width: 3,
-            color: this.colorsSelectedFeature.stroke_primary,
+            color: this.colorsSelectedFeature?.stroke_primary,
         });
         const fill = new Fill({
-            color: this.colorsSelectedFeature.fill,
+            color: this.colorsSelectedFeature?.fill,
         });
         return new Style({
             stroke: strokeStyle,
@@ -94,7 +94,7 @@ export class FeatureHighlighter {
         const stroke =
             this._highlightStyle?.getStroke() ||
             new Stroke({
-                color: this.colorsSelectedFeature.stroke_primary,
+                color: this.colorsSelectedFeature?.stroke_primary,
                 width: 3,
             })
 
@@ -112,7 +112,7 @@ export class FeatureHighlighter {
         const stroke =
             this._highlightStyle?.getStroke() ||
             new Stroke({
-                color: this.colorsSelectedFeature.stroke_secondary,
+                color: this.colorsSelectedFeature?.stroke_secondary,
                 width: 1,
             })
 
@@ -145,7 +145,11 @@ export class FeatureHighlighter {
     }
 
     private _highlightFeature(e: HighlightEvent): Feature {
-        let geometry: Geometry;
+        if (e.colorsSelectedFeature) {
+            this.setColorsSelectedFeature(e.colorsSelectedFeature);
+        }
+        
+        let geometry: Geometry | undefined;
         this._source.clear();
         let feature: Feature;
         if (e.coordinates) {
@@ -164,8 +168,6 @@ export class FeatureHighlighter {
                     geometry = this._wkt.readGeometry(e.geom);
                 } else if (e.olGeometry) {
                     geometry = e.olGeometry;
-                } else {
-                    throw new Error("No geometry provided");
                 }
 
                 feature = new Feature({

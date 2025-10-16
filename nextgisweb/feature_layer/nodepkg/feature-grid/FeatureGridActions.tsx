@@ -1,5 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo } from "react";
+import FeatureDisplayModal from "../feature-display-modal";
+import showModal from "@nextgisweb/gui/showModal";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
@@ -116,9 +118,13 @@ export const FeatureGridActions = observer(
                 if (onOpen && !settings.imodule) {
                     onOpen({ featureId, resourceId: id });
                 } else {
-                    lazyModal(() => import("../feature-display-modal"), {
-                        featureId,
-                        resourceId: id,
+                    showModal(FeatureDisplayModal, {
+                        transitionName: "",
+                        maskTransitionName: "",
+                        ...{
+                            featureId,
+                            resourceId: id,
+                        },
                     });
                 }
             }

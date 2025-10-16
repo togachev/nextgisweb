@@ -84,12 +84,12 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             identifyInfo && identifyInfo.response.featureCount === 0;
 
         useEffect(() => {
-            if (isNotFound) {
+            if (isNotFound || identifyInfo === undefined) {
                 setFeatureInfo(undefined);
                 setFeatureItem(undefined);
                 setRelationInfo(undefined);
             }
-        }, [isNotFound]);
+        }, [isNotFound, identifyInfo]);
 
         const updateFeatureItem = useCallback(
             async (featureInfo: IdentifyInfoItem | undefined) => {

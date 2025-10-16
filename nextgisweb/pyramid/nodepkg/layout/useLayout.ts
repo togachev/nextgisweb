@@ -11,6 +11,7 @@ export function useLayout() {
 
     return {
         isMobile,
+        screenReady: Object.keys(screens).length,
         orientation,
         isPortrait: orientation === "portrait",
         isLandscape: orientation === "landscape",
