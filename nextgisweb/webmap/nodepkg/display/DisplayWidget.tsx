@@ -110,7 +110,7 @@ export const DisplayWidget = observer(
                 showPanels.push(
                     <Panel
                         key="menu"
-                        size={isPortrait ? "40px" : "50px"}
+                        size="40px"
                         resizable={false}
                         style={{ flexGrow: 0, flexShrink: 0 }}
                     >
@@ -135,7 +135,6 @@ export const DisplayWidget = observer(
                     key="main"
                     min={isPortrait ? 200 : 400}
                     resizable={!!activePanel}
-                    style={{ flexGrow: 0, flexShrink: 0 }}
                 >
                     <Splitter layout="vertical">
                         <Panel key="map" min={isPortrait ? 200 : 400}>
@@ -177,9 +176,9 @@ export const DisplayWidget = observer(
                     >
                         {panelsToShow}
                     </Splitter>
+                    <div id="portal-popup"></div>
+                    <div id="portal-context"></div>
                 </div>
-                <div id="portal-popup"></div>
-                <div id="portal-context"></div>
             </DisplayContext>
         );
     }

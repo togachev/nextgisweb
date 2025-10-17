@@ -248,22 +248,37 @@ export const Popup = observer(
             >
                 <Rnd
                     style={{ zIndex: 10 }}
-                    resizeHandleClasses={{
-                        right: "hover-right",
-                        left: "hover-left",
-                        top: "hover-top",
-                        bottom: "hover-bottom",
-                        bottomRight: "hover-angle-bottom-right",
-                        bottomLeft: "hover-angle-bottom-left",
-                        topRight: "hover-angle-top-right",
-                        topLeft: "hover-angle-top-left",
-                    }}
+                    resizeHandleClasses={store.popup_width > store.sizeWindow.width ||
+                        store.popup_height > store.sizeWindow.height ?
+                        {
+                            right: "hover-right-disable",
+                            left: "hover-left-disable",
+                            top: "hover-top-disable",
+                            bottom: "hover-bottom-disable",
+                            bottomRight: "hover-angle-bottom-right-disable",
+                            bottomLeft: "hover-angle-bottom-left-disable",
+                            topRight: "hover-angle-top-right-disable",
+                            topLeft: "hover-angle-top-left-disable",
+                        } :
+                        {
+                            right: "hover-right",
+                            left: "hover-left",
+                            top: "hover-top",
+                            bottom: "hover-bottom",
+                            bottomRight: "hover-angle-bottom-right",
+                            bottomLeft: "hover-angle-bottom-left",
+                            topRight: "hover-angle-top-right",
+                            topLeft: "hover-angle-top-left",
+                        }
+                    }
                     cancel=".icon-symbol,.select-feature,.content,.coordinate-value,.link-block"
                     bounds={store.valueRnd?.width === store.sizeWindow.width && store.valueRnd?.height === store.sizeWindow.height ? undefined : "window"}
                     minWidth={store.pos?.width}
                     minHeight={store.pos?.height}
                     allowAnyClick={true}
-                    enableResizing={store.response.featureCount > 0 ?
+                    enableResizing={store.response.featureCount > 0 &&
+                        (store.popup_width <= store.sizeWindow.width ||
+                            store.popup_height <= store.sizeWindow.height) ?
                         (store.fixPos === null ? true : false) :
                         false}
                     disableDragging={store.response.featureCount > 0 && store.fixPos !== null ?

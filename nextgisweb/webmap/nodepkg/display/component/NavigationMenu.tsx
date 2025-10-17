@@ -35,28 +35,64 @@ export const NavigationMenu = observer<NavigationMenuProps>(
         const infomap = display.config.infomap;
         const active = store.activePanel;
 
+        const customMenu = [
+            {
+                title: gettext("Resources"),
+                target: "_blank",
+                href: infomap.resource,
+                className: "item",
+                icon: <Home />,
+            },
+            {
+                title: gettext("Map properties"),
+                target: "_blank",
+                href: infomap.link,
+                className: "item",
+                icon: <Information />,
+            },
+            {
+                title: gettext("Map settings"),
+                target: "_blank",
+                href: infomap.update,
+                className: "item",
+                icon: <Cogs />,
+            }
+        ]
+
         const CustomMenu = () => {
             if (display.tinyConfig && !infomap.scope) return;
             return (
                 <div className={classNames("info-block", layout)}>
-                    <a title={gettext("Resources")} target="_blank" href={infomap.resource} className="iconLinks"><Home /></a>
-                    <a title={gettext("Map properties")} target="_blank" href={infomap.link} className="iconLinks"><Information /></a>
-                    <a title={gettext("Map settings")} target="_blank" href={infomap.update} className="iconLinks"><Cogs /></a>
+                    {customMenu.map(({ title, target, href, className, icon }, index) => (
+                        <a key={index} title={title} target={target} href={href} className={className}>{icon}</a>
+                    ))}
                 </div>
             )
         }
 
         return (
-            <div className={classNames(
-                "custom-menu",
-                layout
-            )}>
-                <div
-                    className={classNames(
-                        "ngw-webmap-display-navigation-menu",
-                        layout
-                    )}
-                >
+            <div className={classNames("navigation-menu", layout)}>
+                <div style={
+                    !isM ?
+                        layout === "vertical" ?
+                            {
+                                width: 40,
+                                height: "calc(100 % - 116px)",
+                            } :
+                            {
+                                width: "calc(100% - 116px)",
+                                height: 40,
+                            } :
+                        layout === "vertical" ?
+                            {
+                                width: 40,
+                                height: "100%",
+                            } :
+                            {
+                                width: "100%",
+                                height: 40,
+                            }
+                } className={classNames("ngw-webmap-display-navigation-menu", layout)}>
                     {store.visiblePanels.map(({ name, title, plugin }) => (
                         <div
                             key={name}

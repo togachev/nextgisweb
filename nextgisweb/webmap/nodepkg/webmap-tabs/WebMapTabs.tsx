@@ -1,11 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useMemo } from "react";
 
-import { Tabs } from "@nextgisweb/gui/antd";
+import { Tabs, Tooltip } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { WebMapTabsStore } from "./WebMapTabsStore";
+import "./WebMapTabs.less";
 
 type TabItems = NonNullable<TabsProps["items"]>;
 
@@ -26,6 +27,13 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
                     closable: true,
                     ...rest,
                 };
+
+                tab.label = (
+                    <Tooltip placement="topLeft" title={tab.label}>
+                        <span>{tab.label}</span>
+                    </Tooltip>
+                )
+
                 if (component) {
                     const ChildrenComponent = lazy(() => component());
                     Object.assign(tab, {
@@ -46,10 +54,11 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
     if (!items.length) {
         return <></>;
     }
-
+    
     return (
         <Tabs
             type="editable-card"
+            className="custom-tab-style"
             hideAdd
             items={items}
             activeKey={activeKey || undefined}

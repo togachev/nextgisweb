@@ -70,7 +70,7 @@ async function getPosition(px, py, store) {
                 x: offHP, y: sizeWindow.height - height
             },
             buttonZoom: { topLeft: false },
-            x: 0, y: 0, width: width, height: height
+            x: 5, y: 5, width: width-10, height: height-10
         }
     }
     else if (
