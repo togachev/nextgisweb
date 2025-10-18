@@ -145,15 +145,15 @@ export class Identify {
             const featureResponse = layerResponse.features[featureInfo.idx];
             this.setHighlightedFeature(null);
             const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureResponse.layerId)?.[1].itemConfig.layerHighligh;
-
+            let custom = {};
             if (highlights === false) {
-                Object.assign(opt, { query: { geom: false } })
+                Object.assign(custom, { geom: false })
             }
 
             const featureItem = await route("feature_layer.feature.item", {
                 id: featureResponse.layerId,
                 fid: featureResponse.id,
-            }).get({ query: { dt_format: "iso" }, ...opt });
+            }).get({ query: { dt_format: "iso", ...custom }, ...opt });
 
             const { label } = featureInfo;
 

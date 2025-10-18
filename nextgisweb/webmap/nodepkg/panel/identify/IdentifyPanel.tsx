@@ -52,7 +52,7 @@ const loadFeatureItem = async (
         const featureItem = await executeWithMinDelay(
             display.identify?.highlightFeature(identifyInfo, featureInfo, opt),
             {
-                minDelay: 250,
+                minDelay: 0,
                 signal: opt?.signal,
             }
         );

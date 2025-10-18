@@ -29,15 +29,11 @@ const formatArea = (area: number) =>
 export function GeometryInfoTable({
     geometryInfo,
     isLoading,
-    error,
-    resourceId,
-    featureId,
+    error
 }: {
     geometryInfo: GeometryInfo;
     isLoading: boolean;
     error: boolean;
-    resourceId: number;
-    featureId: number;
 }) {
 
     const geometryInfoColumns = useMemo(() => {
@@ -86,7 +82,7 @@ export function GeometryInfoTable({
         }
 
         return items;
-    }, [featureId, resourceId, geometryInfo]);
+    }, [geometryInfo]);
 
     return (
         <ConfigProvider

@@ -1,6 +1,7 @@
 import { Spin } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
+import { useEffect, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { route } from "@nextgisweb/pyramid/api/route";
 
 import { GeometryInfoPreview } from "./component/GeometryInfoPreview";
 import { GeometryInfoTable } from "./component/GeometryInfoTable";
@@ -22,25 +23,25 @@ export function GeometryInfo({
     showInfo,
     srid = 4326,
 }: GeometryInfoProps) {
-    const {
-        data: geometryInfo,
-        isLoading,
-        error,
-    } = useRouteGet({
-        name: "feature_layer.feature.geometry_info",
-        params: {
-            id: resourceId,
-            fid: featureId,
-        },
-        options: {
-            cache: true,
-            query: {
-                srs: srid,
-            },
-        },
-    });
+    const [geometryInfo, setGeometryInfo] = useState()
 
-    if (isLoading) {
+    useEffect(() => {
+        let active = true
+        loadGeometryInfo()
+        return () => { active = false }
+
+        async function loadGeometryInfo() {
+            setGeometryInfo(undefined)
+            const value = await route("feature_layer.feature.geometry_info", {
+                id: resourceId,
+                fid: featureId,
+            }).get({ query: { srs: srid }, cache: true });
+            if (!active) { return }
+            setGeometryInfo(value)
+        }
+    }, [resourceId, featureId])
+
+    if (!geometryInfo) {
         return (
             <div className="ngw-feature-layer-geometry-info-loading">
                 <Spin />
@@ -49,7 +50,7 @@ export function GeometryInfo({
         );
     }
 
-    if (error || !geometryInfo) {
+    if (!geometryInfo) {
         return (
             <div className="ngw-feature-layer-geometry-info-error">
                 <div>
@@ -61,7 +62,6 @@ export function GeometryInfo({
 
     return (
         <>
-            {showInfo && <GeometryInfoTable geometryInfo={geometryInfo} isLoading={isLoading} error={error} resourceId={resourceId} featureId={featureId} />}
             {geometryInfo && showPreview && (
                 <GeometryInfoPreview
                     geometryInfo={geometryInfo}
@@ -70,6 +70,7 @@ export function GeometryInfo({
                     srid={srid}
                 />
             )}
+            {showInfo && <GeometryInfoTable geometryInfo={geometryInfo} />}
         </>
     );
 }
