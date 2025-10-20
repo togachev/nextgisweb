@@ -440,9 +440,9 @@ export function ComplexTree<
                                 : undefined
                         }
                     >
-                        <div>
+                        <div title={title?.(storeItem)}>
                             {!provider.isFlat && props.arrow}
-                            <div className="title">
+                            <div className={storeItem.itemType === "layer" ? "title layer-color" : "title"} >
                                 {title?.(storeItem) || <>&nbsp;</>}
                             </div>
                             {storeItem.itemType === "group" &&
