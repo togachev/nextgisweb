@@ -107,17 +107,17 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                 return Object.keys(value.items).length > 0 && (
                     <div key={lidx} className="row-selected">
                         {store.visibleLayerName &&
-                            <div className="item-label">
+                            <div className="label-child-element">
                                 <Button
                                     title={objLayer.lchecked ? [title, gettext("Initial extent")].join(" \n") : [title, msgZoomToLayer].join(" \n")}
-                                    className={lchecked ? "checked" : ""}
+                                    className={lchecked ? "checked label-child" : "label-child"}
                                     size="small"
                                     type="text"
                                     onClick={() => lOnChecked(key, styleId)}
                                     color={objLayer.lchecked && objLayer.lckey === key && "primary"}
                                     variant="filled"
                                 >
-                                    <div className="label" >{title}</div>
+                                    <div className="label-group label-layer" >{title}</div>
                                 </Button>
                                 <div className="control-item">
                                     <Button

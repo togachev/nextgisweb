@@ -8,6 +8,20 @@
         padding-block: 0;
     }
 
+    .control-item {
+        display: flex;
+        gap: 6px;
+
+        button {
+            font-size: 18px;
+            width: 24px !important;
+
+            svg {
+                color: var(--text-base);
+            }
+        }
+    }
+
     .row-selected {
         display: flex;
         justify-content: space-between;
@@ -22,28 +36,6 @@
         .checked {
             color: var(--primary);
             font-weight: bold;
-        }
-
-        .item-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 10px 0 0 0;
-
-            button {
-                font-weight: 500;
-                display: block;
-                text-align: start;
-                width: 100%;
-            }
-
-            .label {
-                padding: 2px 4px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
         }
 
         .label-child-element {
@@ -68,7 +60,10 @@
             }
 
             .label-group {
-                margin: 0 5px 0 0;
+                margin: 0 5px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
 
                 .feature-name,
                 .sub-feature-name {
@@ -78,7 +73,6 @@
                     display: block;
                     text-align: start;
                     width: 100%;
-                    padding: 2px 4px;
                 }
 
                 .sub-feature-name {
@@ -98,6 +92,10 @@
                 text-align: start;
                 width: 100%;
             }
+
+            .label-layer {
+                font-weight: 500;
+            }
         }
     }
 
@@ -106,20 +104,12 @@
         align-items: center;
         justify-content: space-between;
         padding: 5px;
-    }
-
-    .control-item {
-        display: flex;
         gap: 6px;
-
-        button {
-            font-size: 18px;
-
-            svg {
-                color: var(--text-base);
-            }
-        }
+        overflow: auto;
+        scrollbar-width: thin;
     }
+
+
 }
 
 .popover-class {
