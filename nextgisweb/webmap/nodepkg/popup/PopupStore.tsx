@@ -101,7 +101,7 @@ export class PopupStore {
     @observable.ref accessor attribute: AttributeProps[] = [];
     @observable.ref accessor linkToGeometry: string | null = null;
     @observable.ref accessor fixContentItem: OptionProps;
-    
+
     @observable.ref accessor active = true;
     @observable.ref accessor control: Interaction | null = null;
 
@@ -172,7 +172,7 @@ export class PopupStore {
         this.fX = 0;
         this.fY = -40;
 
-                this.addOverlay();
+        this.addOverlay();
 
         reaction(
             () => this.control,

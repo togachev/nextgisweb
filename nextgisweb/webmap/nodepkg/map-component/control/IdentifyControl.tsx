@@ -44,7 +44,12 @@ const IdentifyControl = observer(
             const handleEvent = (evt: MapBrowserEvent<any>) => {
                 if (evt.type === "singleclick") {
                     if (display.panelManager.getActivePanelName() !== "custom-layer") {
-                        display.identify.execute(evt.pixel);
+                        display.identify.execute(
+                            evt.pixel,
+                            evt.originalEvent.pointerType === "touch"
+                                ? 2
+                                : undefined
+                        );
                         evt.preventDefault?.();
                     } else {
                         topic.publish("feature.unhighlight");
