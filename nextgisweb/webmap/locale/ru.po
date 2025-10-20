@@ -22,21 +22,21 @@ msgstr "Фрагмент"
 msgid "Resource webmap"
 msgstr ""
 
-#: model.py:50 model.py:68 view.py:207 view.py:242
+#: model.py:52 model.py:70 view.py:207 view.py:242
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:52
+#: model.py:54
 msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: model.py:53
+#: model.py:55
 msgctxt "permission"
 msgid "Draw annotations"
 msgstr "Рисование аннотаций"
 
-#: model.py:54
+#: model.py:56
 msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
@@ -95,13 +95,25 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:644
+#: nodepkg/display/Display.ts:711
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:645
+#: nodepkg/display/Display.ts:712
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
+
+#: nodepkg/display/component/NavigationMenu.tsx:40
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: nodepkg/display/component/NavigationMenu.tsx:47
+msgid "Map properties"
+msgstr "Свойства карты"
+
+#: nodepkg/display/component/NavigationMenu.tsx:54
+msgid "Map settings"
+msgstr "Настройки карты"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:60
 msgid "Radius:"
@@ -211,10 +223,10 @@ msgstr "Мин. масштаб"
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:39
+#: nodepkg/items-widget/ItemsWidget.tsx:44
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:25
-#: nodepkg/settings-widget/SettingsWidget.tsx:26
-#: nodepkg/settings/SettingsForm.tsx:261
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
+#: nodepkg/settings/SettingsForm.tsx:345
 msgid "Legend"
 msgstr "Легенда"
 
@@ -283,47 +295,47 @@ msgstr "Скрывать легенду"
 msgid "Unable to load tile"
 msgstr "Ошибка загрузки тайла"
 
-#: nodepkg/map-component/control/IdentifyControl.tsx:86
+#: nodepkg/map-component/control/IdentifyControl.tsx:91
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
-#: nodepkg/map-component/control/MyLocationControl.tsx:42
+#: nodepkg/map-component/control/MyLocationControl.tsx:41
 msgid "Show my location"
 msgstr "Показать мое местоположение"
 
-#: nodepkg/map-component/control/MyLocationControl.tsx:122
+#: nodepkg/map-component/control/MyLocationControl.tsx:121
 msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
 
-#: nodepkg/map-component/control/RotateControl.tsx:31
+#: nodepkg/map-component/control/RotateControl.tsx:30
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:68
+#: nodepkg/map-component/control/ZoomControl.tsx:66
 msgid "Current zoom level"
 msgstr "Текущий зум"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:88
+#: nodepkg/map-component/control/ZoomControl.tsx:86
 #: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:12
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:89
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:21
+#: nodepkg/map-component/control/ZoomControl.tsx:87
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:22
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:193
+#: nodepkg/map-component/control/ZoomControl.tsx:186
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:73
-#: nodepkg/map-controls/map-tools.ts:30
+#: nodepkg/map-controls/map-tools.ts:32
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:74
-#: nodepkg/map-controls/map-tools.ts:39
+#: nodepkg/map-controls/map-tools.ts:42
 msgid "Measure area"
 msgstr "Измерение площади"
 
@@ -356,7 +368,7 @@ msgid "Layer is not visible"
 msgstr "Слой не включен"
 
 #: nodepkg/map-component/tool/ToolSwipe/ToolSwipe.tsx:48
-#: nodepkg/map-controls/map-tools.ts:48
+#: nodepkg/map-controls/map-tools.ts:52
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -364,49 +376,54 @@ msgstr "Вертикальная шторка"
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
-#: nodepkg/map-controls/map-controls.ts:9
+#: nodepkg/map-controls/map-controls.ts:11
 msgid "Attibution Toolbar"
 msgstr "Панель атрибутов"
 
-#: nodepkg/map-controls/map-controls.ts:23
+#: nodepkg/map-controls/map-controls.ts:26
 msgid "Map Toolbar"
 msgstr "Панель инструментов карты"
 
-#: nodepkg/map-controls/map-controls.ts:56
+#: nodepkg/map-controls/map-controls.ts:62
 msgid "Info scale"
 msgstr "Числовой масштаб"
 
-#: nodepkg/map-controls/map-controls.ts:65
+#: nodepkg/map-controls/map-controls.ts:72
 msgid "Scale line"
 msgstr "Линейка масштаба"
 
-#: nodepkg/map-controls/map-controls.ts:75
-#: nodepkg/settings-widget/SettingsWidget.tsx:23
+#: nodepkg/map-controls/map-controls.ts:83
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:112
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:150
+#: nodepkg/settings-widget/SettingsWidget.tsx:25
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: nodepkg/map-controls/map-controls.ts:84
+#: nodepkg/map-controls/map-controls.ts:92
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: nodepkg/map-controls/map-controls.ts:92 nodepkg/map-controls/map-controls.ts:97
-#: nodepkg/settings/SettingsForm.tsx:84 option/base.py:41
+#: nodepkg/map-controls/map-controls.ts:102
+#: nodepkg/map-controls/map-controls.ts:107
+#: nodepkg/map-controls/map-controls.ts:127
+#: nodepkg/map-controls/map-controls.ts:132 nodepkg/settings/SettingsForm.tsx:95
+#: option/base.py:41
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:58
+#: nodepkg/map-controls/map-tools.ts:63
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
-#: nodepkg/map-controls/map-tools.ts:67
+#: nodepkg/map-controls/map-tools.ts:74
 msgid "Editor"
 msgstr "Редактор"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:86
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:81
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:87
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:82
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
@@ -429,7 +446,8 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:133
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:66
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:80
+#: nodepkg/popup/component/Popup.tsx:147
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -475,7 +493,7 @@ msgid "Bookmarks"
 msgstr "Закладки"
 
 #: nodepkg/panel/custom-layer/CustomLayer.tsx:14
-#: nodepkg/webmap-tabs/WebMapTabs.tsx:16
+#: nodepkg/webmap-tabs/WebMapTabs.tsx:17
 msgid "Loading"
 msgstr "Загрузка"
 
@@ -488,6 +506,7 @@ msgid "When the panel is active, layer identification is disabled."
 msgstr "Когда панель активна, идентификация слоев отключена."
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:32
+#: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:76
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:171
 msgid "Create"
 msgstr "Создать"
@@ -495,7 +514,7 @@ msgstr "Создать"
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:33
 #: nodepkg/settings/SettingsForm.tsx:371 nodepkg/settings/SettingsForm.tsx:382
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:161
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:68
 msgid "Save"
 msgstr "Сохранить"
 
@@ -516,7 +535,7 @@ msgid "Edit layer"
 msgstr "Редактировать слой"
 
 #: nodepkg/panel/custom-layer/DrawFeatures.tsx:37
-#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:152
+#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:157
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -619,7 +638,10 @@ msgid "Custom layers"
 msgstr "Пользовательские слои"
 
 #: nodepkg/panel/description/plugin.tsx:10
-#: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:33
+#: nodepkg/panel/selected-feature/SelectedFeature.tsx:274
+#: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:39
+#: nodepkg/popup/component/ContentComponent.tsx:172
+#: nodepkg/settings-widget/SettingsWidget.tsx:61
 msgid "Description"
 msgstr "Описание"
 
@@ -659,16 +681,12 @@ msgstr "Атрибут"
 msgid "Value"
 msgstr "Значение"
 
-#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:16
-msgid "Loading..."
-msgstr "Загрузка..."
-
-#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:80
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:73
 #: nodepkg/popup/component/ContentComponent.tsx:148
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:97
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:90
 msgid "Geometry"
 msgstr "Геометрия"
 
@@ -687,12 +705,12 @@ msgstr "Канал {}"
 msgid "Raster"
 msgstr "Растр"
 
-#: nodepkg/panel/identify/lookup.ts:30 nodepkg/popup/PopupStore.tsx:35
+#: nodepkg/panel/identify/lookup.ts:30 nodepkg/popup/PopupStore.tsx:33
 #: nodepkg/popup/component/Popup.tsx:35
 msgid "The data is not available for reading"
 msgstr "Данные недоступны для чтения"
 
-#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:41
+#: nodepkg/panel/identify/plugin.tsx:13 nodepkg/store/Identify.ts:61
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -703,10 +721,6 @@ msgstr "Увеличить до всех слоев"
 #: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:152
 msgid "Print"
 msgstr "Печать"
-
-#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:157
-msgid "Save as"
-msgstr "Сохранить как"
 
 #: nodepkg/panel/print/PrintPanel.tsx:101
 msgid "Elements"
@@ -726,7 +740,7 @@ msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:48
-#: nodepkg/settings-widget/SettingsWidget.tsx:25
+#: nodepkg/settings-widget/SettingsWidget.tsx:27
 msgid "Title"
 msgstr "Заголовок"
 
@@ -798,15 +812,55 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:363
+#: nodepkg/panel/search/SearchPanel.tsx:30
+msgid "To search, enter coordinates in decimal format"
+msgstr "Для поиска введите координаты в десятичном формате."
+
+#: nodepkg/panel/search/SearchPanel.tsx:31
+msgid "Examples of supported formats"
+msgstr "Примеры поддерживаемых форматов"
+
+#: nodepkg/panel/search/SearchPanel.tsx:32
+msgid ""
+"The separator of the integer and fractional parts is a dot, the separator of "
+"coordinates is a space or a comma"
+msgstr ""
+"Разделитель целой и дробной частей - точка, разделитель координат - пробел "
+"или запятая."
+
+#: nodepkg/panel/search/SearchPanel.tsx:38 nodepkg/panel/search/SearchPanel.tsx:39
+msgid "Decimal degrees:"
+msgstr "Десятичные градусы:"
+
+#: nodepkg/panel/search/SearchPanel.tsx:43 nodepkg/panel/search/SearchPanel.tsx:44
+msgid "Degrees, minutes and seconds:"
+msgstr "Градусы, минуты и секунды:"
+
+#: nodepkg/panel/search/SearchPanel.tsx:48 nodepkg/panel/search/SearchPanel.tsx:49
+msgid "Degrees and decimal minutes:"
+msgstr "Градусы и десятичные минуты:"
+
+#: nodepkg/panel/search/SearchPanel.tsx:53 nodepkg/panel/search/SearchPanel.tsx:54
+msgid "Decimal degrees (coordinate labels):"
+msgstr "Десятичные градусы (обозначения координат):"
+
+#: nodepkg/panel/search/SearchPanel.tsx:58 nodepkg/panel/search/SearchPanel.tsx:59
+msgid "Degrees, minutes and seconds (coordinate labels):"
+msgstr "Градусы, минуты и секунды (метки координат):"
+
+#: nodepkg/panel/search/SearchPanel.tsx:62 nodepkg/panel/search/SearchPanel.tsx:63
+msgid "Degrees and decimal minutes (coordinate captions):"
+msgstr "Градусы и десятичные минуты (подписи к координатам):"
+
+#: nodepkg/panel/search/SearchPanel.tsx:418
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:461
+#: nodepkg/panel/search/SearchPanel.tsx:516
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:466
+#: nodepkg/panel/search/SearchPanel.tsx:521
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -888,83 +942,84 @@ msgstr "<a>CORS</a> должен быть включен при встраива
 msgid "Add web map fragment to favorites"
 msgstr "Добавить фрагмент веб-карты в избранное"
 
-#: nodepkg/panel/share/SharePanel.tsx:99
+#: nodepkg/panel/share/SharePanel.tsx:101
 msgid "Select tools"
 msgstr "Выберите инструменты"
 
-#: nodepkg/panel/share/SharePanel.tsx:115
+#: nodepkg/panel/share/SharePanel.tsx:118
 msgid "Select panels"
 msgstr "Выберите панели"
 
-#: nodepkg/panel/share/SharePanel.tsx:131
+#: nodepkg/panel/share/SharePanel.tsx:135
 msgid "None"
 msgstr "Нет"
 
-#: nodepkg/panel/share/SharePanel.tsx:306
+#: nodepkg/panel/share/SharePanel.tsx:310
+#: nodepkg/settings-widget/SettingsWidget.tsx:37
 msgid "Active panel"
 msgstr "Активная панель"
 
-#: nodepkg/panel/share/SharePanel.tsx:338
+#: nodepkg/panel/share/SharePanel.tsx:350
 msgid "The map link copied to clipboard."
 msgstr "Ссылка на карту скопирована в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.tsx:341
+#: nodepkg/panel/share/SharePanel.tsx:353
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
-#: nodepkg/panel/share/SharePanel.tsx:375
+#: nodepkg/panel/share/SharePanel.tsx:396
 msgid "Optional fragment label"
 msgstr "Необязательное название фрагмента"
 
-#: nodepkg/panel/share/SharePanel.tsx:383
+#: nodepkg/panel/share/SharePanel.tsx:404
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: nodepkg/panel/share/SharePanel.tsx:385
+#: nodepkg/panel/share/SharePanel.tsx:406
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.tsx:387
+#: nodepkg/panel/share/SharePanel.tsx:408 nodepkg/settings/SettingsForm.tsx:192
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.tsx:395
+#: nodepkg/panel/share/SharePanel.tsx:416 nodepkg/settings/SettingsForm.tsx:205
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: nodepkg/panel/share/SharePanel.tsx:401
+#: nodepkg/panel/share/SharePanel.tsx:422
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.tsx:404
+#: nodepkg/panel/share/SharePanel.tsx:425
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.tsx:408 option/base.py:31
+#: nodepkg/panel/share/SharePanel.tsx:429 option/base.py:31
 msgid "Panels"
 msgstr "Панели"
 
-#: nodepkg/panel/share/SharePanel.tsx:424
+#: nodepkg/panel/share/SharePanel.tsx:445
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: nodepkg/panel/share/SharePanel.tsx:434
+#: nodepkg/panel/share/SharePanel.tsx:455
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: nodepkg/panel/share/SharePanel.tsx:438
+#: nodepkg/panel/share/SharePanel.tsx:459
 msgid "Embed code"
 msgstr "Код для встраивания"
 
-#: nodepkg/panel/share/SharePanel.tsx:450
+#: nodepkg/panel/share/SharePanel.tsx:471
 msgid "The embed code copied to clipboard."
 msgstr "Код для встраивания скопирован в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.tsx:454
+#: nodepkg/panel/share/SharePanel.tsx:475
 msgid "Copy code"
 msgstr "Копировать код"
 
-#: nodepkg/panel/share/SharePanel.tsx:457
+#: nodepkg/panel/share/SharePanel.tsx:478
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -1000,12 +1055,16 @@ msgstr "Поделиться"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: nodepkg/plugin/layer-editor/EditableItem.tsx:142
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:24
+msgid "Open table in new page"
+msgstr ""
+
+#: nodepkg/plugin/layer-editor/EditableItem.tsx:147
 msgid "Undo the last change"
 msgstr "Отменить последнее изменение"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:66
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:32
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:80
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:34
 msgid "Stop editing"
 msgstr "Завершить редактирование"
 
@@ -1017,7 +1076,7 @@ msgstr "Отключить привязку"
 msgid "Enable snapping"
 msgstr "Включить привязку"
 
-#: nodepkg/plugin/layer-editor/ToolEditor.tsx:167
+#: nodepkg/plugin/layer-editor/ToolEditor.tsx:166
 msgid "Stop editing layer: {layer}"
 msgstr "Завершить редактирование слоя: {layer}"
 
@@ -1026,20 +1085,15 @@ msgid "Edit attributes"
 msgstr "Редактировать атрибуты"
 
 #: nodepkg/plugin/layer-editor/modes/DeleteMode.tsx:70
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:159
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:155
 msgid "Delete"
 msgstr "Удалить"
-
-#: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:76
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:175
-msgid "Create"
-msgstr "Создать"
 
 #: nodepkg/plugin/layer-editor/modes/HoleMode.tsx:26
 msgid "Click inside a polygon to start cutting a hole"
 msgstr "Щёлкните внутри полигона, чтобы начать вырезать отверстие"
 
-#: nodepkg/plugin/layer-editor/modes/HoleMode.tsx:222
+#: nodepkg/plugin/layer-editor/modes/HoleMode.tsx:220
 msgid "Cut hole"
 msgstr "Вырезать отверстие"
 
@@ -1051,9 +1105,125 @@ msgstr "Изменить"
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:18
-msgid "Zoom to layer"
-msgstr "Увеличить до слоя"
+#: nodepkg/plugin/layer-settings/LayerSettingsPlugin.tsx:24
+msgid "Layer settings"
+msgstr ""
+
+#: nodepkg/plugin/layer-settings/LayerSettingsPlugin.tsx:31
+msgid "Layer show"
+msgstr ""
+
+#: nodepkg/plugin/style-settings/StyleSettingsPlugin.tsx:25
+msgid "Style settings"
+msgstr ""
+
+#: nodepkg/plugin/style-settings/StyleSettingsPlugin.tsx:32
+msgid "Style show"
+msgstr ""
+
+#: nodepkg/popup/PopupStore.tsx:46
+msgid "PopupStore"
+msgstr ""
+
+#: nodepkg/popup/PopupStore.tsx:129
+msgid "Reset url"
+msgstr "Сбросить URL-адрес"
+
+#: nodepkg/popup/PopupStore.tsx:135
+msgid "Update current web map address"
+msgstr "Обновить текущий адрес веб-карты"
+
+#: nodepkg/popup/PopupStore.tsx:143
+msgid "Set current map coverage"
+msgstr "Установить текущее покрытие карты"
+
+#: nodepkg/popup/component/ButtonZoomComponent.tsx:13
+#: nodepkg/popup/component/PopupClick.tsx:63
+msgid "Zoom to raster layer"
+msgstr "Масштабировать до растрового слоя"
+
+#: nodepkg/popup/component/ContentComponent.tsx:26
+msgid "HTML code of the geometry link, for insertion into the description"
+msgstr "HTML-код ссылки на геометрию для вставки в описание"
+
+#: nodepkg/popup/component/ContentComponent.tsx:27
+msgid "HTML code link of the raster layer extent, for insertion into the description"
+msgstr "HTML-код ссылки на экстент растрового слоя, для вставки в описание"
+
+#: nodepkg/popup/component/ContentComponent.tsx:44
+msgid "HTML code copied"
+msgstr "HTML-код скопирован"
+
+#: nodepkg/popup/component/ContentComponent.tsx:84
+msgid "Email address copied"
+msgstr "Адрес электронной почты скопирован"
+
+#: nodepkg/popup/component/ContentComponent.tsx:162 option/__init__.py:24
+msgid "Geometry info"
+msgstr "Информация о геометрии"
+
+#: nodepkg/popup/component/ContentComponent.tsx:181
+msgid "Attachments"
+msgstr "Вложения"
+
+#: nodepkg/popup/component/ContentComponent.tsx:192
+#: nodepkg/popup/component/GraphPanel.tsx:43
+msgid "Graphs"
+msgstr "Графики"
+
+#: nodepkg/popup/component/ContextComponent.tsx:65
+#: nodepkg/popup/component/CoordinateComponent.tsx:145
+msgid "Copy coordinates"
+msgstr "Скопировать координаты"
+
+#: nodepkg/popup/component/ContextComponent.tsx:66
+#: nodepkg/popup/component/CoordinateComponent.tsx:146
+msgid "Coordinates copied"
+msgstr "Координаты скопированы"
+
+#: nodepkg/popup/component/CoordinateComponent.tsx:53
+msgid "Object reference copied"
+msgstr "Ссылка на объект скопирована"
+
+#: nodepkg/popup/component/CoordinateComponent.tsx:53
+msgid "Location link copied"
+msgstr "Ссылка на местоположение скопирована"
+
+#: nodepkg/popup/component/CoordinateComponent.tsx:54
+msgid "Current web map coverage copied"
+msgstr "Текущее покрытие веб-карты скопировано"
+
+#: nodepkg/popup/component/GraphPanel.tsx:43
+msgid "Graph"
+msgstr "График"
+
+#: nodepkg/popup/component/GraphPanel.tsx:94
+msgid "Hide chart legend"
+msgstr "Скрыть легенду диаграммы"
+
+#: nodepkg/popup/component/GraphPanel.tsx:95
+msgid "Show chart legend"
+msgstr ""
+
+#: nodepkg/popup/component/Popup.tsx:38
+msgid "Lock popup position"
+msgstr ""
+
+#: nodepkg/popup/component/Popup.tsx:39
+msgid "Disable lock popup position"
+msgstr ""
+
+#: nodepkg/popup/component/Popup.tsx:340
+msgid "Сollapse fullscreen popup"
+msgstr ""
+
+#: nodepkg/popup/component/Popup.tsx:340
+msgid "Open fullscreen popup"
+msgstr ""
+
+#: nodepkg/popup/component/Popup.tsx:364
+msgid "Close"
+msgstr ""
 
 #: nodepkg/preview-embedded/PreviewEmbedded.tsx:9
 msgid "This page is for a preview of the web map to be embedded on the site."
@@ -1233,12 +1403,6 @@ msgstr "Ключ геокодера API Яндекс.Карт"
 msgid "Visibility"
 msgstr "Видимость"
 
-#: nodepkg/settings/SettingsForm.tsx:299
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:165
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:66
-msgid "Save"
-msgstr "Сохранить"
-
 #: nodepkg/settings/select-options.ts:7
 msgid "Meters"
 msgstr "Метры"
@@ -1331,9 +1495,9 @@ msgstr "Редактировать аннотацию"
 msgid "Create annotation"
 msgstr "Создать аннотацию"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:162
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:171
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:158
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:167
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:61
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -1354,11 +1518,11 @@ msgstr "Цвет заливки"
 msgid "Circle size, px"
 msgstr "Размер пунсона, пикс"
 
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:41
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:43
 msgid "Do you want to save changes?"
 msgstr "Вы хотите сохранить изменения?"
 
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:51
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:53
 msgid "Don't save"
 msgstr "Не сохранять"
 
@@ -1410,7 +1574,7 @@ msgstr "Коллекция геометрий"
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:155
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:163
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
