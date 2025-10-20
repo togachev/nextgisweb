@@ -145,7 +145,7 @@ export class Identify {
             const featureResponse = layerResponse.features[featureInfo.idx];
             this.setHighlightedFeature(null);
             const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureResponse.layerId)?.[1].itemConfig.layerHighligh;
-            let custom = {};
+            const custom = {};
             if (highlights === false) {
                 Object.assign(custom, { geom: false })
             }

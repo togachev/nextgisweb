@@ -3,8 +3,7 @@ import type { MapEvent } from "ol";
 import type { ViewStateLayerStateExtent } from "ol/View";
 import { equals } from "ol/array";
 import { toPromise } from "ol/functions";
-import { useCallback, useEffect,  useState } from "react";
-import type React from "react";
+import { ReactNode, useCallback, useEffect,  useState } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
 
@@ -18,7 +17,7 @@ import InfoIcon from "@nextgisweb/icon/material/info";
 export interface AttributionControlProps extends MapControlProps {
     className?: string;
     tipLabel?: string;
-    label?: React.ReactNode;
+    label?: ReactNode;
     expandClassName?: string;
     attributions?: string | string[];
     smallBreakpointPx?: number;

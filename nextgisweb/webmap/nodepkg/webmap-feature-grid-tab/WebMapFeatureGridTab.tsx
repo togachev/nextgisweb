@@ -29,8 +29,6 @@ interface WebMapFeatureGridTabProps {
     topic: typeof topic;
 }
 
-const wkt = new WKT();
-
 export function WebMapFeatureGridTab({
     topic,
     plugin,

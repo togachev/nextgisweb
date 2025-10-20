@@ -1,11 +1,11 @@
 import {
+    CSSProperties,
     createContext,
     useCallback,
     useContext,
     useEffect,
     useMemo,
 } from "react";
-import type React from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -25,9 +25,9 @@ export type ControlProps<P = unknown> = P & {
 
 export type ControlOptions = CreateControlOptions &
     ControlProps<{
-        style?: React.CSSProperties;
+        style?: CSSProperties;
         className?: string;
-        targetStyle?: React.CSSProperties;
+        targetStyle?: CSSProperties;
     }>;
 
 export interface MapControlProps extends ControlOptions {

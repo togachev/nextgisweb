@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useCallback, useMemo } from "react";
-import type React from "react";
+import { ReactNode, Suspense, lazy, useCallback, useMemo } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { useContainerWidth } from "@nextgisweb/gui/hook/useContainerWidth";
@@ -63,7 +62,7 @@ export const MapPane = observer(
         children,
     }: {
         display: Display;
-        children: React.ReactNode;
+        children: ReactNode;
     }) => {
         const themeVariables = useThemeVariables({
             "theme-color-primary": "colorPrimary",

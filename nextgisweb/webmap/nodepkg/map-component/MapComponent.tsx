@@ -13,10 +13,10 @@ import "ol/ol.css";
 import "./MapComponent.less";
 
 export interface MapComponentProps extends ViewOptions {
-    style?: React.CSSProperties;
+    style?: CSSProperties;
     target?: string;
     basemap?: boolean;
-    children?: React.ReactNode;
+    children?: ReactNode;
     mapStore?: MapStore;
     className?: string;
     mapExtent?: MapExtent;
