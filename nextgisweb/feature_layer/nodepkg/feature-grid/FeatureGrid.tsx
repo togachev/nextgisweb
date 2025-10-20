@@ -8,7 +8,6 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
@@ -22,10 +21,6 @@ import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
 
-interface ResourceProps {
-    data: CompositeRead;
-    isLoading: boolean
-}
 const msgSettingsTitle = gettext("Open table settings");
 const msgNumberOfObjects = gettext("Number of objects");
 const msgRefreshTitle = gettext("Refresh table");
@@ -58,19 +53,18 @@ export const FeatureGrid = observer(
             onSelect,
         } = store;
 
-        const { data: totalData, refresh: refreshTotal } = useRouteGet(
-            "feature_layer.feature.count",
-            { id }
-        );
-        const { data: resourceData, isLoading }: ResourceProps = useRouteGet(
-            "resource.item",
-            { id },
-            {
-                query: {
-                    description: false,
-                }
-            }
-        );
+        const { data: totalData, refresh: refreshTotal } = useRouteGet({
+            name: "feature_layer.feature.count",
+            params: { id: id },
+        });
+
+        const { data: resourceData, isLoading } = useRouteGet({
+            name: "resource.item",
+            params: { id: id },
+            options: {
+                query: { description: false }
+            },
+        });
 
         useEffect(() => {
             // Do not refresh on init version
