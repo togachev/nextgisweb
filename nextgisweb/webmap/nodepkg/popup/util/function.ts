@@ -253,7 +253,7 @@ async function getPositionContext(px, py, store) {
         py >= height + offset
         && px >= width + offset
     ) {
-        console.log("bottom right contextmenu");
+        // console.log("bottom right contextmenu");
         return {
             x: px - offset - width, y: py - offset - height - offHP, width: width, height: height
         }
