@@ -52,6 +52,7 @@ export const EditableItem = observer(
         const { olMap } = mapStore;
 
         const interactionsRef = useRef<Map<string, Interaction>>(new Map());
+        const [interactionsVersion, setInteractionsVersion] = useState(0);
 
         const [undo, setUndo] = useState<UndoAction[]>([]);
         const addUndo = (fn: UndoAction) => setUndo((prev) => [...prev, fn]);
@@ -89,11 +90,13 @@ export const EditableItem = observer(
 
         useEffect(() => {
             const interactions = interactionsRef.current;
+            setInteractionsVersion((old) => old + 1);
             olMap.addLayer(layer);
             return () => {
                 interactions.forEach((interaction) => {
                     interaction.dispose();
                 });
+                interactions.clear();
                 olMap.removeLayer(layer);
             };
         }, [olMap, layer]);
@@ -128,6 +131,7 @@ export const EditableItem = observer(
                     selectStyle: style.selectStyle,
                     interactionsRef,
                     selectStyleOptions: style.selectStyleOptions,
+                    interactionsVersion,
                     addUndo,
                 }}
             >

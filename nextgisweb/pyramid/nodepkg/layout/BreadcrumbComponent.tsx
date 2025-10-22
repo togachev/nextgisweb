@@ -89,7 +89,7 @@ export function BreadcrumbComponent({ items, current_id }: BreadcrumbComponentPr
                             }
                         }}
                     >
-                        <span title={gettext("Вложенные ресурсы")}>
+                        <span title={gettext("Nested resources")}>
                             <MenuIcon />
                         </span>
                     </Dropdown>
