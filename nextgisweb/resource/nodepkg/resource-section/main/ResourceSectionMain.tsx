@@ -14,6 +14,7 @@ import "./ResourceSectionMain.less";
 interface ResourceSectionMainProps extends ResourceSectionProps {
     summary: [string, string][];
     groupMap: string[];
+    groupmaps: string[];
     creatable?: ResourceCls[];
     cls?: string;
     social?: boolean;
@@ -25,12 +26,15 @@ const { Link } = Typography;
 const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
     resourceId,
     groupMap,
+    groupmaps,
     summary,
     creatable,
     cls,
     social,
     read,
 }) => {
+    console.log();
+
     const preview = routeURL("webmap_main.preview", resourceId);
     const urlWebmap = routeURL("webmap.display", resourceId);
     return (
@@ -58,15 +62,17 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                 </Col>
                 {cls === "webmap" && social &&
                     <Col flex="0 0 116px">
-                        <Link className="preview-link" style={{ background: `url(${preview}) center center / cover no-repeat` }} href={urlWebmap} target="_self"/>
+                        <Link className="preview-link" style={{ background: `url(${preview}) center center / cover no-repeat` }} href={urlWebmap} target="_self" />
                     </Col>
                 }
             </Row>
-            {read && cls === "webmap" && groupMap.length > 0 && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
-            {read && cls === "webmap" && groupMap.length > 0 && (
+            {read && cls === "webmap" && groupmaps.length > 0 && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
+            {read && cls === "webmap" && groupmaps.length > 0 && (
                 <Flex gap="4px 0" wrap>
-                    {groupMap.map((k, idx) => (
-                        <Tag key={idx}>{k}</Tag>
+                    {groupmaps.sort((a, b) => b.enabled - a.enabled).map((k, idx) => (
+                        <Tag color={k.enabled ? "success" : "default"} key={idx}>
+                            {k.display_name}: {k.enabled ? gettext("enabled") : gettext("disabled")}
+                        </Tag>
                     ))}
                 </Flex>
             )}
