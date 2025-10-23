@@ -9,7 +9,7 @@ class MapgroupConfig(Struct):
     keyname: str
     display_name: str
     enabled: Union[bool, None]
-    position: int
+    position_group: int
 
 class MapgroupComponent(Component):
     def setup_pyramid(self, config):

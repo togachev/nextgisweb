@@ -8,15 +8,15 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession, gettext
 
 
-def maps(resource, request) -> JSONType:
+def maps_group(resource, request) -> JSONType:
     if resource.has_permission(ResourceScope.read, request.user):
-        query = MapgroupWebMap.filter_by(resource_id=resource.id)
+        query = MapgroupWebMap.query().filter_by(resource_id=resource.id)
         result = [itm.to_dict() for itm in query]
         return result
 
 
 def groups(request) -> JSONType:
-    query = DBSession.query(MapgroupWebMap)
+    query = MapgroupResource.query()
     result = [itm.to_dict() for itm in query]
     return result
 
@@ -26,11 +26,11 @@ def setup_pyramid(comp, config):
         "mapgroup.maps",
         "/api/mapgroup/{id}/maps",
         factory=ResourceFactory(context=MapgroupResource),
-        get=maps,
+        get=maps_group,
     )
 
     config.add_route(
         "mapgroup.groups",
-        "/api/mapgroup/groups/",
+        "/api/mapgroup/groups",
         get=groups,
     )

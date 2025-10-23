@@ -19,3 +19,4 @@ from .serialize import SAttribute, Serializer
 from .serialize import SAttribute as SerializedProperty
 from .view import ResourceFactory, resource_factory
 from .widget import Widget
+from .composite import CompositeSerializer

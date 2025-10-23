@@ -25,20 +25,24 @@ class MapgroupResource(Base, Resource):
 
     __scope__ = DataScope
 
+    position_map = sa.Column(sa.Integer, nullable=True)
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-
-
-
+    def to_dict(self):
+        return dict(
+            position_map=self.position_map,
+            display_name=self.display_name,
+        )
 
 class MapgroupWebMap(Base):
     __tablename__ = "mapgroup_webmap"
 
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    position = sa.Column(sa.Integer)
+    position_group = sa.Column(sa.Integer, nullable=True)
     display_name = sa.Column(sa.Unicode, nullable=False)
     enabled = sa.Column(sa.Boolean)
     
@@ -48,8 +52,6 @@ class MapgroupWebMap(Base):
         backref=orm.backref(
             "mapgroups",
             cascade="all, delete-orphan",
-            order_by=position,
-            collection_class=ordering_list("position"),
         ),
     )
 
@@ -73,7 +75,7 @@ class MapgroupWebMap(Base):
         return dict(
             webmap_id=self.webmap_id,
             resource_id=self.resource_id,
-            position=self.position,
+            position_group=self.position_group,
             display_name=self.display_name,
             enabled=self.enabled,
             webmap_name=self.webmap_name,
