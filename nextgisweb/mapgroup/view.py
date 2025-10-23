@@ -2,10 +2,8 @@ from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 from nextgisweb.webmap import WebMap
 
-from .model import MapgroupResource
 
-
-class MapgroupResourceWidget(Widget):
-    resource = MapgroupResource
+class MapgroupWebMapWidget(Widget):
+    resource = WebMap
     operation = ("create", "update")
-    amdmod = jsentry("@nextgisweb/mapgroup/group-widget")
+    amdmod = jsentry("@nextgisweb/mapgroup/webmap-widget")

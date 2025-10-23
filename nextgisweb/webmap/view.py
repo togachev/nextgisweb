@@ -196,6 +196,7 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).add_view(wmg_settings, context=WebMap)
 
+
     icon_display = icon("display")
     icon_clone = icon("material/content_copy")
 
@@ -234,6 +235,7 @@ def setup_pyramid(comp, config):
                 target="_self",
                 icon="material-edit",
             )
+
     @comp.env.pyramid.control_panel.add
     def _control_panel(args):
         if args.request.user.is_administrator:

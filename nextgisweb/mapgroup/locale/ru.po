@@ -1,19 +1,19 @@
 #: model.py:24
-msgid "Map groups"
-msgstr "Группы карт"
+msgid "Web Map Group"
+msgstr "Группа веб-карты"
 
-#: nodepkg/group-widget/GroupWidget.tsx:23
+#: nodepkg/webmap-widget/WebMapWidget.tsx:23
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/group-widget/GroupWidget.tsx:30
-msgid "Enable webmap"
-msgstr "Включить веб-карту"
+#: nodepkg/webmap-widget/WebMapWidget.tsx:30
+msgid "Enable mapgroup"
+msgstr "Включить группу"
 
-#: nodepkg/group-widget/GroupWidget.tsx:33
+#: nodepkg/webmap-widget/WebMapWidget.tsx:33
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/group-widget/GroupWidget.tsx:96
-msgid "Map groups"
-msgstr "Группы карт"
+#: nodepkg/webmap-widget/WebMapWidget.tsx:96
+msgid "Web Map Groups"
+msgstr "Группы веб-карты"

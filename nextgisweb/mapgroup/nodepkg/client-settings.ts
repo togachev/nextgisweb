@@ -1,9 +1,9 @@
 import { fetchSettings } from "@nextgisweb/pyramid/settings";
 
-import type { MapgroupConfig } from "./group-widget/type";
+import type { MapgroupConfig } from "./webmap-widget/type";
 
 export interface MapgroupSettings {
-    groups: MapgroupConfig[];
+    mapgroups: MapgroupConfig[];
 }
 
 export default await fetchSettings<MapgroupSettings>(COMP_ID);

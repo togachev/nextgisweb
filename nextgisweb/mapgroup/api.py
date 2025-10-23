@@ -1,5 +1,5 @@
 from nextgisweb.resource import ResourceScope, ResourceFactory
-from .model import MapgroupResource, WebMapGroup
+from .model import MapgroupResource, MapgroupWebMap
 from nextgisweb.webmap import WebMap
 from nextgisweb.lib.apitype import AsJSON, EmptyObject
 from typing import Annotated, Any, List, Literal, Union
@@ -8,18 +8,29 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession, gettext
 
 
-def webmap_get(resource, request) -> JSONType:
+def maps(resource, request) -> JSONType:
     if resource.has_permission(ResourceScope.read, request.user):
-        query = WebMapGroup.filter_by(resource_id=resource.id)
+        query = MapgroupWebMap.filter_by(resource_id=resource.id)
         result = [itm.to_dict() for itm in query]
         return result
 
 
+def groups(request) -> JSONType:
+    query = DBSession.query(MapgroupWebMap)
+    result = [itm.to_dict() for itm in query]
+    return result
+
 def setup_pyramid(comp, config):
 
     config.add_route(
-        "mapgroup.maps.collection",
-        "/api/maps/{id}/collection",
+        "mapgroup.maps",
+        "/api/mapgroup/{id}/maps",
         factory=ResourceFactory(context=MapgroupResource),
-        get=webmap_get,
+        get=maps,
+    )
+
+    config.add_route(
+        "mapgroup.groups",
+        "/api/mapgroup/groups/",
+        get=groups,
     )

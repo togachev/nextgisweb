@@ -8,35 +8,35 @@ import type {
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 
-import { Groupmap } from "./Groupmap";
+import { WebMap } from "./WebMap";
 
-type Value = apitype.WebMapGroupRead;
+type Value = apitype.MapgroupWebMapRead;
 
-export class GroupStore
-    implements EditorStore<Value>, FocusTableStore<Groupmap>
+export class WebMapStore
+    implements EditorStore<Value>, FocusTableStore<WebMap>
 {
-    readonly identity = "webmap_group";
+    readonly identity = "mapgroup_webmap";
     readonly composite: CompositeStore;
 
     @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
 
-    readonly maps = observable.array<Groupmap>([], { deep: false });
+    readonly mapgroups = observable.array<WebMap>([], { deep: false });
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        observe(this.maps, () => this.markDirty());
+        observe(this.mapgroups, () => this.markDirty());
     }
 
     @action
-    load({ maps }: Value) {
-        this.maps.replace(maps.map((v) => new Groupmap(this, v)));
+    load({ mapgroups }: Value) {
+        this.mapgroups.replace(mapgroups.map((v) => new WebMap(this, v)));
         this.dirty = false;
     }
 
     dump() {
         if (!this.dirty) return undefined;
-        return { maps: this.maps.map((i) => i.json()) };
+        return { mapgroups: this.mapgroups.map((i) => i.json()) };
     }
 
     @action
@@ -46,29 +46,29 @@ export class GroupStore
 
     @computed
     get isValid(): boolean {
-        return this.maps.every((i) => i.error === false);
+        return this.mapgroups.every((i) => i.error === false);
     }
 
     @computed
     get counter() {
-        return this.maps.length;
+        return this.mapgroups.length;
     }
 
     // FocusTableStore
 
-    getItemChildren(item: Groupmap | null) {
-        return item === null ? this.maps : undefined;
+    getItemChildren(item: WebMap | null) {
+        return item === null ? this.mapgroups : undefined;
     }
 
-    getItemContainer(item: Groupmap) {
-        return item && this.maps;
+    getItemContainer(item: WebMap) {
+        return item && this.mapgroups;
     }
 
     getItemParent() {
         return null;
     }
 
-    getItemError(item: Groupmap) {
+    getItemError(item: WebMap) {
         return item.error;
     }
 }

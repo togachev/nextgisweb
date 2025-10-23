@@ -2,39 +2,39 @@ import type * as apitype from "@nextgisweb/mapgroup/type/api";
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 
-import type { GroupStore } from "./GroupStore";
+import type { WebMapStore } from "./WebMapStore";
 
 const {
-    webmap_id: webmapId,
+    resource_id: resourceId,
     display_name: displayName,
     enabled: enabled,
     $load: mapperLoad,
     $error: mapperError,
-} = mapper<Groupmap, apitype.WebMapMapgroupItemRead>({
+} = mapper<WebMap, apitype.MapgroupWebMapItemRead>({
     validateIf: (o) => o.store.validate,
     onChange: (o) => o.store.markDirty(),
 });
 
 displayName.validate(
     validate.string({ minLength: 1 }),
-    validate.unique((o) => o.store.maps, "displayName")
+    validate.unique((o) => o.store.mapgroups, "displayName")
 );
 
-export class Groupmap {
-    readonly store: GroupStore;
+export class WebMap {
+    readonly store: WebMapStore;
 
-    webmapId = webmapId.init(-1, this);
+    resourceId = resourceId.init(-1, this);
     displayName = displayName.init("", this);
     enabled = enabled.init(false, this);
 
-    constructor(store: GroupStore, data: apitype.WebMapMapgroupItemRead) {
+    constructor(store: WebMapStore, data: apitype.MapgroupWebMapItemRead) {
         this.store = store;
         mapperLoad(this, data);
     }
 
-    json(): apitype.WebMapMapgroupItemRead {
+    json(): apitype.MapgroupWebMapItemRead {
         return {
-            ...this.webmapId.jsonPart(),
+            ...this.resourceId.jsonPart(),
             ...this.displayName.jsonPart(),
             ...this.enabled.jsonPart(),
         };
