@@ -11,10 +11,16 @@ import { CreateResourceButton } from "./CreateResourceButton";
 
 import "./ResourceSectionMain.less";
 
+interface Groupmaps {
+    display_name: string;
+    webmap_name: string;
+    enabled: boolean;
+}
+
 interface ResourceSectionMainProps extends ResourceSectionProps {
     summary: [string, string][];
     groupMap: string[];
-    groupmaps: string[];
+    groupmaps: Groupmaps[];
     creatable?: ResourceCls[];
     cls?: string;
     social?: boolean;
@@ -33,8 +39,6 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
     social,
     read,
 }) => {
-    console.log();
-
     const preview = routeURL("webmap_main.preview", resourceId);
     const urlWebmap = routeURL("webmap.display", resourceId);
     return (
@@ -69,7 +73,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
             {read && cls === "webmap" && groupmaps.length > 0 && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
             {read && cls === "webmap" && groupmaps.length > 0 && (
                 <Flex gap="4px 0" wrap>
-                    {groupmaps.sort((a, b) => b.enabled - a.enabled).map((k, idx) => (
+                    {groupmaps.sort((a, b) => Number(b.enabled) - Number(a.enabled)).map((k, idx) => (
                         <Tag color={k.enabled ? "success" : "default"} key={idx}>
                             {k.display_name}: {k.enabled ? gettext("enabled") : gettext("disabled")}
                         </Tag>
