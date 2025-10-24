@@ -422,6 +422,7 @@ class ResourceACLRule(Base):
         backref=orm.backref(
             "__resource_acl_rule",
             cascade="all, delete-orphan",
+            cascade_backrefs=False,
         ),
     )
 
