@@ -33,13 +33,15 @@ class MapgroupResource(Base, Resource):
 
     def to_dict(self):
         return dict(
-            position_map=self.position_map,
-            display_name=self.display_name,
+            id=self.id,
+            id_pos=self.position_map,
+            webmap_group_name=self.display_name,
         )
 
 class MapgroupWebMap(Base):
     __tablename__ = "mapgroup_webmap"
 
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
     position_group = sa.Column(sa.Integer, nullable=True)
@@ -65,20 +67,39 @@ class MapgroupWebMap(Base):
         ),
     )
 
-    webmap_name = orm.column_property(
-        sa.select(WebMap.display_name)
-        .where(WebMap.id == webmap_id)
-        .scalar_subquery()
-    )
+    @property
+    def webmap_name(self):
+        return self.webmap.display_name
+
+    @property
+    def preview_fileobj_id(self):
+        social = self.webmap.social
+        return None if social == None else social.preview_fileobj_id
+
+    @property
+    def preview_description(self):
+        social = self.webmap.social
+        return None if social == None else social.preview_description
+
+    @property
+    def description_status(self):
+        return self.webmap.description_status(self.webmap)
 
     def to_dict(self):
         return dict(
-            webmap_id=self.webmap_id,
-            resource_id=self.resource_id,
-            position_group=self.position_group,
-            display_name=self.display_name,
-            enabled=self.enabled,
-            webmap_name=self.webmap_name,
+            id=self.webmap_id,
+            value=self.webmap_id,
+            owner=True,
+            display_name=self.webmap_name,
+            label=self.webmap_name,
+            description_status=self.description_status,
+            webmap_group_name=self.display_name,
+            webmap_group_id=self.resource_id,
+            idx=self.id,
+            id_pos=self.position_group,
+            action_map=self.enabled,
+            preview_fileobj_id=self.preview_fileobj_id,
+            preview_description=self.preview_description,
         )
 
 

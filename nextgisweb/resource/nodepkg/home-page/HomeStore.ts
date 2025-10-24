@@ -218,12 +218,14 @@ export class HomeStore {
     };
 
     private async maplist() {
-        const resp = await route("resource.maplist").get();
-        return resp.result;
+        const resp = await route("mapgroup.groupmaps").get();
+        return resp;
+        // const resp = await route("resource.maplist").get();
+        // return resp.result;
     };
 
     private async groupMaps() {
-        const resp = await route("resource.mapgroup").get();
+        const resp = await route("mapgroup.groups").get();
         return resp;
     };
 
@@ -283,11 +285,13 @@ export class HomeStore {
     async getMapValues(key) {
         this.maplist()
             .then(maps => {
-                this.setListMaps(maps);
+                this.setListMaps(maps);                
                 if (key === "all") {
                     this.groupMaps()
                         .then(group => {
-                            const maps_filter = maps.filter(item => item.action_map === true);
+                            console.log(group);
+                            const maps_filter = maps;
+                            // const maps_filter = maps.filter(item => item.action_map === true);
                             const result = group.filter(({ id }) => [...new Set(maps_filter.map(g => g.webmap_group_id))].includes(id));
                             this.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
                             const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0]?.id

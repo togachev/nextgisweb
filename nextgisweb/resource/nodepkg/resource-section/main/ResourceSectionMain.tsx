@@ -74,7 +74,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
             {read && cls === "webmap" && groupmaps.length > 0 && (
                 <Flex gap="4px 0" wrap>
                     {groupmaps.sort((a, b) => Number(b.enabled) - Number(a.enabled)).map((k, idx) => (
-                        <Tag color={k.enabled ? "success" : "default"} key={idx}>
+                        <Tag color={k.enabled ? "var(--primary)" : "default"} key={idx}>
                             {k.display_name}: {k.enabled ? gettext("enabled") : gettext("disabled")}
                         </Tag>
                     ))}

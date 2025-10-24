@@ -1177,15 +1177,23 @@ def getMaplist(request) -> JSONType:
     for res, res_wmg, wmg, res_social in query:
         if res_wmg.id != 0:
             if res.has_permission(ResourceScope.read, request.user):
-                result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
-                description_status=False if res.description == None else True,
-                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id,
-                idx=wmg.id,
-                id_pos=wmg.id_pos,
-                action_map=res_wmg.action_map,
-                update=res.has_permission(ResourceScope.update, request.user),
-                preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
-                preview_description=None if res_social == None else res_social.preview_description))
+                result.append(
+                    dict(
+                        id=res.id,
+                        value=res.id,
+                        owner=True,
+                        display_name=res.display_name,
+                        label=res.display_name,
+                        description_status=False if res.description == None else True,
+                        webmap_group_name=res_wmg.webmap_group_name,
+                        webmap_group_id=wmg.webmap_group_id,
+                        idx=wmg.id,
+                        id_pos=wmg.id_pos,
+                        action_map=res_wmg.action_map,
+                        update=res.has_permission(ResourceScope.update, request.user),
+                        preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+                        preview_description=None if res_social == None else res_social.preview_description)
+                )
 
     is_adm = request.user.is_administrator
 
