@@ -15,7 +15,7 @@ export interface LayoutProps {
 }
 
 export interface ListMapProps {
-    action_map: boolean;
+    enabled: boolean;
     display_name: string;
     id: number;
     idx: number;
@@ -32,7 +32,7 @@ export interface ListMapProps {
 export interface GroupMapsGridProps {
     id: number;
     webmap_group_name: string;
-    action_map: boolean;
+    enabled: boolean;
     position_group: LayoutProps;
 };
 
@@ -108,6 +108,8 @@ export class HomeStore {
     @observable.shallow accessor ulrImg: ImgUrlKey;
 
     constructor({ config }) {
+        console.log(config);
+        
         this.config = config
         this.getWidthMenu();
         this.getMapValues("all");
@@ -285,17 +287,14 @@ export class HomeStore {
     async getMapValues(key) {
         this.maplist()
             .then(maps => {
-                this.setListMaps(maps);                
+                this.setListMaps(maps);
                 if (key === "all") {
                     this.groupMaps()
                         .then(group => {
-                            console.log(group);
-                            const maps_filter = maps;
-                            // const maps_filter = maps.filter(item => item.action_map === true);
-                            const result = group.filter(({ id }) => [...new Set(maps_filter.map(g => g.webmap_group_id))].includes(id));
+                            const result = group.filter(({ id }) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
                             this.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
                             const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0]?.id
-                            this.setItemsMapsGroup(maps_filter.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
+                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
                         })
                 }
             });

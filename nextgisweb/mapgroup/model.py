@@ -26,6 +26,7 @@ class MapgroupResource(Base, Resource):
     __scope__ = DataScope
 
     position_map = sa.Column(sa.Integer, nullable=True)
+    enabled = sa.Column(sa.Boolean, default=True)
 
     @classmethod
     def check_parent(cls, parent):
@@ -35,8 +36,30 @@ class MapgroupResource(Base, Resource):
         return dict(
             id=self.id,
             id_pos=self.position_map,
+            enabled=self.enabled,
             webmap_group_name=self.display_name,
         )
+
+
+class MapgroupResourceItemRead(Struct, kw_only=True):
+    position_map: int
+
+
+class MapgroupResourceItemWrite(Struct, kw_only=True):
+    position_map: int
+
+
+class MapgroupResourceAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> MapgroupResourceItemRead:
+        return srlzr.obj.position_map
+
+    def set(self, srlzr: Serializer, value: MapgroupResourceItemWrite, *, create: bool):
+        srlzr.obj.position_map = value
+
+
+class MapgroupResourceSerializer(Serializer, resource=MapgroupResource):
+    enabled = SColumn(read=DataScope.read, write=DataScope.write)
+    position_map = MapgroupResourceAttr(read=ResourceScope.read, write=ResourceScope.update)
 
 class MapgroupWebMap(Base):
     __tablename__ = "mapgroup_webmap"
@@ -97,7 +120,7 @@ class MapgroupWebMap(Base):
             webmap_group_id=self.resource_id,
             idx=self.id,
             id_pos=self.position_group,
-            action_map=self.enabled,
+            enabled=self.enabled,
             preview_fileobj_id=self.preview_fileobj_id,
             preview_description=self.preview_description,
         )

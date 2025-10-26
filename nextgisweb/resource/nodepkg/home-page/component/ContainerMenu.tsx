@@ -67,7 +67,15 @@ export const ContainerMenu = (props) => {
     const [radioValue, setRadioValue] = useState(itemIds[0]);
 
     const updatePosition = async (id, id_pos) => {
-        await route("resource.wmgroup.update_position", id, id_pos).get();
+        const payload = {
+            id: id,
+            mapgroup_resource: {
+                position_map: id_pos
+            }
+        };
+        return await route("mapgroup.groups").post({
+            json: payload,
+        });
     };
 
     const handleDragEnd = (event) => {
@@ -87,6 +95,8 @@ export const ContainerMenu = (props) => {
 
     useEffect(() => {
         if (disable === true && store.sourceGroup === true) {
+            console.log(disable, store.sourceGroup);
+            
             store.groupMapsGrid.map((item, index) => {
                 updatePosition(item.id, index)
             })

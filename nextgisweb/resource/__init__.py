@@ -11,7 +11,7 @@ from .model import (
     ResourceScopeIdentity,
 )
 from .permission import Permission, Scope
-from .sattribute import CRUTypes, ResourceRef, SColumn, SRelationship, SResource
+from .sattribute import ResourceRefWithParent, ResourceRefOptional, CRUTypes, ResourceRef, SColumn, SRelationship, SResource
 from .sattribute import SRelationship as SerializedRelationship
 from .sattribute import SResource as SerializedResourceRelationship
 from .scope import ConnectionScope, DataScope, ResourceScope, ServiceScope
@@ -20,3 +20,4 @@ from .serialize import SAttribute as SerializedProperty
 from .view import ResourceFactory, resource_factory
 from .widget import Widget
 from .composite import CompositeSerializer
+from .event import AfterResourceCollectionPost
