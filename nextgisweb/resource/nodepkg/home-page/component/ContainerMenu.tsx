@@ -68,7 +68,6 @@ export const ContainerMenu = (props) => {
 
     const updatePosition = async (id, id_pos) => {
         const payload = {
-            id: id,
             mapgroup_resource: {
                 position_map: id_pos
             }
@@ -96,7 +95,7 @@ export const ContainerMenu = (props) => {
     useEffect(() => {
         if (disable === true && store.sourceGroup === true) {
             console.log(disable, store.sourceGroup);
-            
+
             store.groupMapsGrid.map((item, index) => {
                 updatePosition(item.id, index)
             })

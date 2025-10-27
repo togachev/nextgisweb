@@ -2,7 +2,7 @@ from nextgisweb.resource import CompositeSerializer, Resource, ResourceScope, Re
 from .model import MapgroupResource, MapgroupWebMap
 from nextgisweb.webmap import WebMap
 from nextgisweb.lib.apitype import AsJSON, EmptyObject
-from typing import TYPE_CHECKING, Annotated, Any, List, Literal, Union
+from typing import Dict, TYPE_CHECKING, Annotated, Any, List, Literal, Union
 from msgspec import UNSET, Meta, Struct, UnsetType
 from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession, gettext
@@ -57,8 +57,26 @@ def mapgroup_get(request) -> JSONType:
     return result
 
 
-def mapgroup_post(body) -> JSONType:
-    raise ValueError(body)
+class MapgroupPositionBody(Struct):
+    position_map: int
+
+class MapgroupBody(Struct):
+    id: int
+    mapgroup_resource: Union[MapgroupPositionBody, UnsetType] = UNSET
+
+
+def mapgroup_post(request, body: MapgroupBody) -> JSONType:
+    id = body.id
+    resource = Resource.registry["mapgroup_resource"](owner_user=request.user)
+    serializer = CompositeSerializer(user=request.user)
+    resource.persist()
+    body.resource = resource
+    body.resource.mapgroup_resource = body.mapgroup_resource
+    with DBSession.no_autoflush:
+        serializer.deserialize(resource, body)
+
+    DBSession.flush()
+    raise ValueError(dir(body))
 
 
 def groupmaps(request) -> JSONType:
