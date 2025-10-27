@@ -38,7 +38,7 @@ const SortableMaps = (props) => {
         cursor: disable ? "pointer" : "move",
         touchAction: disable ? "auto" : "none",
         boxSizing: "border-box",
-        border: "1px solid #b3b9be78",
+        border: "1px solid rgb(179 185 190 / 65%)",
         borderRadius: "4px",
     };
     const preview = routeURL("maptile.preview", item.id);

@@ -308,19 +308,29 @@ input {
 
 									.ant-card-head {
 										margin-bottom: -1px;
-										padding: 0px 16px;
-										color: #000000;
-										font-weight: 500;
+										padding: 0;
+										color: #ff0000;
+										font-weight: 600;
 										font-size: 18px;
-										background: #fffffff2;
-										border-radius: 4px 4px 0 0;
+										background: rgba(255, 255, 255, 0.9);
+										border-radius: 3px 3px 0 0;
 										position: absolute;
 										width: 100%;
+										min-height: 32px;
+										pointer-events: none;
+
+										.ant-card-head-title {
+											display: flex;
+											flex: 1;
+											overflow: hidden;
+											white-space: nowrap;
+											text-overflow: ellipsis;
+											justify-content: center;
+										}
 									}
 
 									.ant-card-cover {
 										margin: 0;
-										border-bottom: 1px solid #b3b9be78;
 
 										.link-map {
 											display: inline-grid;

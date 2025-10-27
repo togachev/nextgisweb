@@ -69,7 +69,7 @@ export const MapTile = (props) => {
             }}
         >
             <Card
-                title={!enabled ? gettext("The web map is disabled") : null}
+                title={!enabled ? gettext("Disabled webmap") : null}
                 styles={{ cover: { height: size.cardCoverH }, body: { height: size.cardBodyH } }}
                 hoverable
                 cover={
