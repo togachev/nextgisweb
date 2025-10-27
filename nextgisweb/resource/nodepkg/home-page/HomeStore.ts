@@ -21,7 +21,7 @@ export interface ListMapProps {
     idx: number;
     label: string;
     owner: boolean;
-    position_map_group: LayoutProps;
+    position: LayoutProps;
     preview_description: string;
     preview_fileobj_id: number;
     value: number;
@@ -33,7 +33,7 @@ export interface GroupMapsGridProps {
     id: number;
     webmap_group_name: string;
     enabled: boolean;
-    position_group: LayoutProps;
+    position: LayoutProps;
 };
 
 export interface UrlPhoneProps {
@@ -220,10 +220,8 @@ export class HomeStore {
     };
 
     private async maplist() {
-        const resp = await route("mapgroup.groupmaps").get();
+        const resp = await route("mapgroup.maps").get();
         return resp;
-        // const resp = await route("resource.maplist").get();
-        // return resp.result;
     };
 
     private async groupMaps() {
@@ -292,9 +290,9 @@ export class HomeStore {
                     this.groupMaps()
                         .then(group => {
                             const result = group.filter(({ id }) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
-                            this.setGroupMapsGrid(result.sort((a, b) => a.id_pos - b.id_pos));
-                            const groupId = result.sort((a, b) => a.id_pos - b.id_pos)[0]?.id
-                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.id_pos - b.id_pos));
+                            this.setGroupMapsGrid(result.sort((a, b) => a.position - b.position));
+                            const groupId = result.sort((a, b) => a.position - b.position)[0]?.id
+                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.position - b.position));
                         })
                 }
             });

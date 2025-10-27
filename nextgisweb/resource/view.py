@@ -306,6 +306,7 @@ def resource_section_main(obj, *, request, **kwargs):
                 display_name=item.display_name,
                 webmap_name=item.webmap_name,
                 enabled=item.enabled,
+                resource_id=item.resource_id,
             )
         )
 

@@ -23,9 +23,9 @@ class MapgroupResource(Base, Resource):
     identity = "mapgroup_resource"
     cls_display_name = gettext("Web Map Group")
 
-    __scope__ = DataScope
+    __scope__ = ResourceScope
 
-    position_map = sa.Column(sa.Integer, nullable=True)
+    position = sa.Column(sa.Integer, nullable=True)
     enabled = sa.Column(sa.Boolean, default=True)
 
     @classmethod
@@ -35,31 +35,15 @@ class MapgroupResource(Base, Resource):
     def to_dict(self):
         return dict(
             id=self.id,
-            id_pos=self.position_map,
+            position=self.position,
             enabled=self.enabled,
             webmap_group_name=self.display_name,
         )
 
 
-class MapgroupResourceItemRead(Struct, kw_only=True):
-    position_map: int
-
-
-class MapgroupResourceItemWrite(Struct, kw_only=True):
-    position_map: int
-
-
-class MapgroupResourceAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> MapgroupResourceItemRead:
-        return srlzr.obj.position_map
-
-    def set(self, srlzr: Serializer, value: MapgroupResourceItemWrite, *, create: bool):
-        srlzr.obj.position_map = value
-
-
 class MapgroupResourceSerializer(Serializer, resource=MapgroupResource):
-    enabled = SColumn(read=DataScope.read, write=DataScope.write)
-    position_map = MapgroupResourceAttr(read=ResourceScope.read, write=ResourceScope.update)
+    enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+
 
 class MapgroupWebMap(Base):
     __tablename__ = "mapgroup_webmap"
@@ -67,7 +51,7 @@ class MapgroupWebMap(Base):
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    position_group = sa.Column(sa.Integer, nullable=True)
+    position = sa.Column(sa.Integer, nullable=True)
     display_name = sa.Column(sa.Unicode, nullable=False)
     enabled = sa.Column(sa.Boolean)
     
@@ -119,7 +103,7 @@ class MapgroupWebMap(Base):
             webmap_group_name=self.display_name,
             webmap_group_id=self.resource_id,
             idx=self.id,
-            id_pos=self.position_group,
+            position=self.position,
             enabled=self.enabled,
             preview_fileobj_id=self.preview_fileobj_id,
             preview_description=self.preview_description,

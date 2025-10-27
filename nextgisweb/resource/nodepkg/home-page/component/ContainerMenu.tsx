@@ -40,7 +40,7 @@ const SortableMenu = (props) => {
     };
 
     const onClickGroupMapsGrid = (id) => {
-        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.id_pos - b.id_pos));
+        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.position - b.position));
     };
 
     return (
@@ -66,11 +66,10 @@ export const ContainerMenu = (props) => {
 
     const [radioValue, setRadioValue] = useState(itemIds[0]);
 
-    const updatePosition = async (id, id_pos) => {
+    const updatePosition = async (id, position) => {
         const payload = {
-            mapgroup_resource: {
-                position_map: id_pos
-            }
+            id: id,
+            position: position
         };
         return await route("mapgroup.groups").post({
             json: payload,

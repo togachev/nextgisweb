@@ -20,7 +20,7 @@ export const MapTile = (props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
 
-    const { id, display_name, preview_fileobj_id, description_status, update } = props.item;
+    const { id, display_name, preview_fileobj_id, description_status, update, enabled } = props.item;
     const { store, size } = props;
     const { upath_info } = store.config;
 
@@ -69,6 +69,7 @@ export const MapTile = (props) => {
             }}
         >
             <Card
+                title={!enabled ? gettext("The web map is disabled") : null}
                 styles={{ cover: { height: size.cardCoverH }, body: { height: size.cardBodyH } }}
                 hoverable
                 cover={

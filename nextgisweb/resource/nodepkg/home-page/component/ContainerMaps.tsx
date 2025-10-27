@@ -75,8 +75,14 @@ export const ContainerMaps = (props) => {
     const [activeId, setActiveId] = useState(null);
     const itemIds = useMemo(() => store.itemsMapsGroup.map((item) => item.idx), [store.itemsMapsGroup]);
 
-    const updatePosition = async (id, id_pos) => {
-        await route("wmgroup.update", id, id_pos).get();
+    const updatePosition = async (id, position) => {
+        const payload = {
+            id: id,
+            position: position
+        };
+        return await route("mapgroup.maps").post({
+            json: payload,
+        });
     };
     const handleDragStart = (event) => {
         setActiveId(event.active.id);

@@ -1,39 +1,13 @@
-from nextgisweb.resource import CompositeSerializer, Resource, ResourceScope, ResourceFactory
+from nextgisweb.resource import DataScope, Resource, ResourceScope, ResourceFactory
 from .model import MapgroupResource, MapgroupWebMap
-from nextgisweb.webmap import WebMap
-from nextgisweb.lib.apitype import AsJSON, EmptyObject
-from typing import Dict, TYPE_CHECKING, Annotated, Any, List, Literal, Union
-from msgspec import UNSET, Meta, Struct, UnsetType
+from msgspec import Struct
 from nextgisweb.pyramid import JSONType
-from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
-from nextgisweb.lib.msext import DEPRECATED
-
-if TYPE_CHECKING:
-    CompositeCreate = Struct
-    CompositeRead = Struct
-    CompositeUpdate = Struct
-else:
-    composite = CompositeSerializer.types()
-    CompositeCreate = composite.create
-    CompositeRead = composite.read
-    CompositeUpdate = composite.update
+from nextgisweb.env import DBSession
 
 
-class RelationshipRef(Struct, kw_only=True):
+class MapgroupBody(Struct):
     id: int
-
-
-class ResourceRef(RelationshipRef, kw_only=True):
-    id: int
-
-
-class ResourceRefOptional(Struct, kw_only=True):
-    id: Union[int, None]
-
-
-class ResourceRefWithParent(ResourceRef, kw_only=True):
-    parent: Annotated[ResourceRefOptional, DEPRECATED]
+    position: int
 
 
 def maps_group(resource, request) -> JSONType:
@@ -48,38 +22,33 @@ def mapgroup_get(request) -> JSONType:
     query = MapgroupResource.query()
     result = [itm.to_dict() for itm in query]
     result = list()
-    for item in query:
-        itm = item.to_dict()
-        if itm["enabled"]:
-            result.append(itm)
-        elif itm["enabled"] == False and is_administrator:
-            result.append(itm)
+    for resource in query:
+        if resource.has_permission(ResourceScope.read, request.user):
+            itm = resource.to_dict()
+            if itm["enabled"]:
+                result.append(itm)
+            elif itm["enabled"] == False and is_administrator:
+                result.append(itm)
     return result
-
-
-class MapgroupPositionBody(Struct):
-    position_map: int
-
-class MapgroupBody(Struct):
-    id: int
-    mapgroup_resource: Union[MapgroupPositionBody, UnsetType] = UNSET
 
 
 def mapgroup_post(request, body: MapgroupBody) -> JSONType:
     id = body.id
-    resource = Resource.registry["mapgroup_resource"](owner_user=request.user)
-    serializer = CompositeSerializer(user=request.user)
-    resource.persist()
-    body.resource = resource
-    body.resource.mapgroup_resource = body.mapgroup_resource
+    position = body.position
+
+    def update(id, position):
+        resource = MapgroupResource.query().filter(MapgroupResource.id==id).one()
+        if resource.has_permission(ResourceScope.update, request.user):
+            resource.position = position
+
     with DBSession.no_autoflush:
-        serializer.deserialize(resource, body)
-
+        update(id, position)
     DBSession.flush()
-    raise ValueError(dir(body))
+
+    return(dict(id=id, position=body.position))
 
 
-def groupmaps(request) -> JSONType:
+def maps_get(request) -> JSONType:
     query = MapgroupWebMap.query()
     result = list()
     for item in query:
@@ -97,24 +66,40 @@ def groupmaps(request) -> JSONType:
     return result
 
 
+def maps_post(request, body: MapgroupBody) -> JSONType:
+    id = body.id
+    position = body.position
+
+    def update(id, position):
+        resource = MapgroupWebMap.query().filter(MapgroupWebMap.id==id).one()
+        resource.position = position
+
+    with DBSession.no_autoflush:
+        update(id, position)
+    DBSession.flush()
+
+    return(dict(id=id, position=body.position))
+
+
 def setup_pyramid(comp, config):
 
     config.add_route(
-        "mapgroup.maps",
-        "/api/mapgroup/{id}/maps",
+        "mapgroup.item",
+        "/api/mapgroup/{id}",
         factory=ResourceFactory(context=MapgroupResource),
         get=maps_group,
     )
 
     config.add_route(
         "mapgroup.groups",
-        "/api/mapgroup",
+        "/api/groups",
         get=mapgroup_get,
         post=mapgroup_post,
     )
 
     config.add_route(
-        "mapgroup.groupmaps",
-        "/api/groupmaps",
-        get=groupmaps,
+        "mapgroup.maps",
+        "/api/maps",
+        get=maps_get,
+        post=maps_post,
     )

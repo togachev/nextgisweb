@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Col, Divider, Flex, Tag, Typography, Row } from "@nextgisweb/gui/antd";
+import { Button, Col, Divider, Flex, Tag, Typography, Row } from "@nextgisweb/gui/antd";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -15,6 +15,7 @@ interface Groupmaps {
     display_name: string;
     webmap_name: string;
     enabled: boolean;
+    resource_id: number;
 }
 
 interface ResourceSectionMainProps extends ResourceSectionProps {
@@ -72,12 +73,22 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
             </Row>
             {read && cls === "webmap" && groupmaps.length > 0 && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
             {read && cls === "webmap" && groupmaps.length > 0 && (
-                <Flex gap="4px 0" wrap>
-                    {groupmaps.sort((a, b) => Number(b.enabled) - Number(a.enabled)).map((k, idx) => (
-                        <Tag color={k.enabled ? "var(--primary)" : "default"} key={idx}>
-                            {k.display_name}: {k.enabled ? gettext("enabled") : gettext("disabled")}
-                        </Tag>
-                    ))}
+                <Flex gap="small" align="flex-start" vertical>
+                    <Flex gap="small" wrap>
+                        {groupmaps.sort((a, b) => Number(a.resource_id) - Number(b.resource_id)).map((k) => (
+                            <Button
+                                variant="filled"
+                                size="small"
+                                type={k.enabled ? "primary" : "default"}
+                                color={k.enabled ? "primary" : "default"}
+                                key={k.resource_id}
+                                href={routeURL("resource.show", k.resource_id)}
+                                target="_self"
+                            >
+                                {k.display_name}: {k.enabled ? gettext("enabled") : gettext("disabled")}
+                            </Button>
+                        ))}
+                    </Flex>
                 </Flex>
             )}
         </>
