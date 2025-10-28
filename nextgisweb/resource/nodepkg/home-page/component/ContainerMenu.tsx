@@ -3,7 +3,8 @@ import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import Pencil from "@nextgisweb/icon/mdi/pencil";
+import Cog from "@nextgisweb/icon/mdi/cog";
+import Cogs from "@nextgisweb/icon/mdi/cogs";
 import { Button, Radio } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -16,6 +17,8 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+
+const settingsGroup = gettext("Group settings");
 
 const SortableMenu = (props) => {
     const { id, name, store, disable } = props;
@@ -58,13 +61,18 @@ const SortableMenu = (props) => {
                     {name}
                 </div>
             </Radio.Button>
-            {store.edit && (<Button
-                className="button-update"
-                href={routeURL("resource.update", id)}
-                icon={<Pencil />}
-                target="_blank"
-                type="text"
-            />)}
+            {store.edit && store.groupMapsGrid.some((item) => item.update) && (
+                <div >
+                    <Button
+                        title={settingsGroup}
+                        className="button-update"
+                        href={routeURL("resource.update", id)}
+                        icon={<Cogs />}
+                        target="_blank"
+                        type="text"
+                    />
+                </div>
+            )}
         </div>
     );
 };
@@ -119,8 +127,8 @@ export const ContainerMenu = observer((props) => {
 
     return (
         <div className="dnd-container-menu">
-            {store.edit && store.config.isAdministrator === true &&
-                (<ButtonSave icon={<Pencil />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+            {store.edit && store.groupMapsGrid.some((item) => item.update) &&
+                (<ButtonSave icon={<Cog />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="menu-group"

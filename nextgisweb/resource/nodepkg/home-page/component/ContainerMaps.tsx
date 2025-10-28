@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import Pencil from "@nextgisweb/icon/mdi/pencil";
+import Cog from "@nextgisweb/icon/mdi/cog";
 import { Empty } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -125,8 +125,8 @@ export const ContainerMaps = observer((props) => {
     
     return (
         <div className="dnd-container-maps">
-            {store.edit && store.config.isAdministrator === true &&
-                (<ButtonSave icon={<Pencil />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+            {store.edit && store.itemsMapsGroup.some((item) => item.update) &&
+                (<ButtonSave icon={<Cog />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="maps-group"

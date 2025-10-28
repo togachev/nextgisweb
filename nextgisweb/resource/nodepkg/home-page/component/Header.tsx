@@ -11,8 +11,9 @@ import MenuIcon from "@nextgisweb/icon/mdi/menu";
 import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
-import Pencil from "@nextgisweb/icon/mdi/pencil";
+import Cog from "@nextgisweb/icon/mdi/cog";
 import PencilOff from "@nextgisweb/icon/mdi/pencil-off-outline";
+import Pencil from "@nextgisweb/icon/mdi/pencil";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
 import { LoginOutlined, LogoutOutlined, } from "@ant-design/icons";
@@ -27,6 +28,7 @@ type MenuItem = Required<MenuProps>["items"][number];
 const { Title } = Typography;
 const signInText = gettext("Sign in");
 const signOutText = gettext("Sign out");
+const editPage = gettext("Edit page");
 
 type HeaderProps = {
     store: HomeStore;
@@ -105,7 +107,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                 },
                 store.edit && store.config.isAdministrator === true && {
                     key: "control_panel",
-                    icon: <Pencil />,
+                    icon: <Cog />,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
@@ -121,6 +123,11 @@ export const Header = observer(({ store }: HeaderProps) => {
                     label: (<a onClick={() => authStore.logout()} className="auth-login">{signOutText}</a>),
                     icon: <LogoutOutlined className="logout-icon" />,
                     key: "sign_out",
+                },
+                {
+                    label: store.config.isAdministrator === true && (<a onClick={() => store.setEdit(!store.edit)} className="icon-pensil">{editPage}</a>),
+                    icon: !store.edit ? <Pencil /> : <PencilOff />,
+                    key: "edit_page",
                 },
             ],
     })
@@ -276,18 +283,12 @@ export const Header = observer(({ store }: HeaderProps) => {
             >
 
                 <div className="control-button">
-                    {store.config.isAdministrator === true && (<Button
-                        className="icon-pensil"
-                        title={!store.edit ? gettext("Edit page") : gettext("Disable page editing")}
-                        icon={!store.edit ? <Pencil /> : <PencilOff />}
-                        onClick={() => store.setEdit(!store.edit)}
-                        type="text"
-                    />)}
+
                     {store.edit && store.config.isAdministrator === true && !open && (<Button
                         className="icon-pensil"
                         title={gettext("Setting header")}
                         type="text"
-                        icon={<Pencil />}
+                        icon={<Cog />}
                         onClick={openForm}
                     />)}
                 </div>
