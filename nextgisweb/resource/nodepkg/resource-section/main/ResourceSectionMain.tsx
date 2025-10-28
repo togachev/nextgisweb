@@ -1,8 +1,9 @@
 import { Fragment } from "react";
-import { Button, Col, Divider, Flex, Typography, Row } from "@nextgisweb/gui/antd";
+import { Button, Col, Divider, Flex, Typography, Row, Space } from "@nextgisweb/gui/antd";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import type { ResourceSection, ResourceSectionProps } from "../type";
@@ -40,6 +41,13 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
 }) => {
     const preview = routeURL("webmap_main.preview", resourceId);
     const urlWebmap = routeURL("webmap.display", resourceId);
+
+    const { data: groupData } = useRouteGet({
+        name: "mapgroup.item",
+        params: { id: resourceId },
+    });
+    console.log(groupData);
+
     return (
         <>
             <PageTitle pullRight>
@@ -89,6 +97,9 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                     </Flex>
                 </Flex>
             )}
+            <Space size="small" direction="horizontal">{read && cls === "mapgroup_resource" && groupData && groupData.map((item) => (
+                <Link key={item.idx} className="map-link" href={routeURL("resource.show", item.id)} target="_self">{item.display_name}</Link>
+            ))}</Space>
         </>
     );
 };
