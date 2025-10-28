@@ -1,5 +1,5 @@
-from nextgisweb.resource import DataScope, Resource, ResourceScope, ResourceFactory
-from .model import MapgroupResource, MapgroupWebMap
+from nextgisweb.resource import Resource, ResourceScope, ResourceFactory
+from .model import MapgroupResource, MapgroupGroup
 from msgspec import Struct
 from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession
@@ -12,7 +12,7 @@ class MapgroupBody(Struct):
 
 def maps_group(resource, request) -> JSONType:
     if resource.has_permission(ResourceScope.read, request.user):
-        query = MapgroupWebMap.query().filter_by(resource_id=resource.id)
+        query = MapgroupGroup.query().filter_by(resource_id=resource.id)
         result = [itm.to_dict() for itm in query]
         return result
 
@@ -23,8 +23,10 @@ def mapgroup_get(request) -> JSONType:
     result = [itm.to_dict() for itm in query]
     result = list()
     for resource in query:
+        update = resource.has_permission(ResourceScope.update, request.user)
         if resource.has_permission(ResourceScope.read, request.user):
             itm = resource.to_dict()
+            itm["update"] = update
             if itm["enabled"]:
                 result.append(itm)
             elif itm["enabled"] == False and is_administrator:
@@ -49,7 +51,7 @@ def mapgroup_post(request, body: MapgroupBody) -> JSONType:
 
 
 def maps_get(request) -> JSONType:
-    query = MapgroupWebMap.query()
+    query = MapgroupGroup.query()
     result = list()
     for item in query:
         itm = item.to_dict()
@@ -71,7 +73,7 @@ def maps_post(request, body: MapgroupBody) -> JSONType:
     position = body.position
 
     def update(id, position):
-        resource = MapgroupWebMap.query().filter(MapgroupWebMap.id==id).one()
+        resource = MapgroupGroup.query().filter(MapgroupGroup.id==id).one()
         resource.position = position
 
     with DBSession.no_autoflush:

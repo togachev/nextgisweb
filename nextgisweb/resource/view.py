@@ -26,7 +26,7 @@ from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
 from .model import Resource, ResourceWebMapGroup, WebMapGroupResource
-from nextgisweb.mapgroup import MapgroupWebMap
+from nextgisweb.mapgroup import MapgroupGroup
 from .permission import Permission, Scope
 from .psection import PageSections
 from .scope import ResourceScope
@@ -290,20 +290,14 @@ def resource_section_main(obj, *, request, **kwargs):
 
     result = {"resourceId": obj.id}
 
-    query = DBSession.query(ResourceWebMapGroup, WebMapGroupResource) \
-        .join(WebMapGroupResource, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id).filter(WebMapGroupResource.resource_id == request.context.id)
-
-    groupMap = result["groupMap"] = []
     result["read"] = request.context.has_permission(ResourceScope.create, request.user)
-    for resource_wmg, wmg_resource in query:
-        groupMap.append((tr(resource_wmg.webmap_group_name)))
 
-    groupquery = MapgroupWebMap.query().filter_by(webmap_id=request.context.id)
+    groupquery = MapgroupGroup.query().filter_by(webmap_id=request.context.id)
     groupmaps = result["groupmaps"] = []
     for item in groupquery:
         groupmaps.append(
             dict(
-                display_name=item.display_name,
+                display_name=item.webmap_group_name,
                 webmap_name=item.webmap_name,
                 enabled=item.enabled,
                 resource_id=item.resource_id,

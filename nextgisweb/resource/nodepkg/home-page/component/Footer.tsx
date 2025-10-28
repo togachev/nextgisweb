@@ -3,7 +3,7 @@ import { Col, ColorPicker, Row, Button, Form, Divider, Input, Space } from "@nex
 import { observer } from "mobx-react-lite";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
-import Cog from "@nextgisweb/icon/mdi/cog";
+import Pencil from "@nextgisweb/icon/mdi/pencil";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -244,12 +244,12 @@ export const Footer = observer(({ store }: FooterProps) => {
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground ? store.valueFooter?.colorBackground : "var(--icon-color)", color: store.valueFooter?.colorText, fontWeight: 500 }}>
             <div className="control-button">
-                {store.config.isAdministrator === true && !open && (
+                {store.edit && store.config.isAdministrator === true && !open && (
                     <Button
                         className="icon-pensil"
                         title={gettext("Setting footer")}
                         type="text"
-                        icon={<Cog />}
+                        icon={<Pencil />}
                         onClick={openForm}
                     />)}
             </div>

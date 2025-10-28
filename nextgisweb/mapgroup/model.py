@@ -45,34 +45,40 @@ class MapgroupResourceSerializer(Serializer, resource=MapgroupResource):
     enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
 
-class MapgroupWebMap(Base):
-    __tablename__ = "mapgroup_webmap"
+class MapgroupGroup(Base):
+    __tablename__ = "mapgroup_group"
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    position = sa.Column(sa.Integer, nullable=True)
+    position = sa.Column(sa.Integer)
     display_name = sa.Column(sa.Unicode, nullable=False)
     enabled = sa.Column(sa.Boolean)
-    
-    webmap = orm.relationship(
-        WebMap,
-        foreign_keys=webmap_id,
-        backref=orm.backref(
-            "mapgroups",
-            cascade="all, delete-orphan",
-        ),
-    )
 
     resource = orm.relationship(
         Resource,
         foreign_keys=resource_id,
         backref=orm.backref(
-            "mapgroup_webmap",
+            "groupmaps",
+            cascade="all, delete-orphan",
+            order_by=position,
+            collection_class=ordering_list("position"),
+        ),
+    )
+
+    webmap = orm.relationship(
+        WebMap,
+        foreign_keys=webmap_id,
+        backref=orm.backref(
+            "_backref_mapgroup_group",
             cascade="all",
             cascade_backrefs=False,
         ),
     )
+
+    @property
+    def webmap_group_name(self):
+        return self.resource.display_name
 
     @property
     def webmap_name(self):
@@ -100,7 +106,7 @@ class MapgroupWebMap(Base):
             display_name=self.webmap_name,
             label=self.webmap_name,
             description_status=self.description_status,
-            webmap_group_name=self.display_name,
+            webmap_group_name=self.webmap_group_name,
             webmap_group_id=self.resource_id,
             idx=self.id,
             position=self.position,
@@ -110,34 +116,35 @@ class MapgroupWebMap(Base):
         )
 
 
-class MapgroupWebMapItemRead(Struct, kw_only=True):
-    resource_id: int
+class MapgroupGroupItemRead(Struct, kw_only=True):
+    webmap_id: int
     display_name: Annotated[str, Meta(min_length=1)]
     enabled: bool
 
 
-class MapgroupWebMapItemWrite(Struct, kw_only=True):
-    resource_id: int
+class MapgroupGroupItemWrite(Struct, kw_only=True):
+    webmap_id: int
     display_name: Annotated[str, Meta(min_length=1)]
     enabled: Union[bool, UnsetType] = UNSET
 
 
-class MapgroupAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> List[MapgroupWebMapItemRead]:
+class GroupmapsAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> List[MapgroupGroupItemRead]:
         return [
-            MapgroupWebMapItemRead(
-                resource_id=i.resource_id,
+            dict(
+                webmap_id=i.webmap_id,
                 display_name=i.display_name,
                 enabled=i.enabled,
             )
-            for i in srlzr.obj.mapgroups
+            for i in srlzr.obj.groupmaps
+            if Resource.filter_by(id=i.webmap_id).one().has_permission(ResourceScope.update, srlzr.user)
         ]
 
-    def set(self, srlzr: Serializer, value: List[MapgroupWebMapItemWrite], *, create: bool):
-        srlzr.obj.mapgroups = [MapgroupWebMap(**to_builtins(i)) for i in value]
+    def set(self, srlzr: Serializer, value: List[MapgroupGroupItemWrite], *, create: bool):
+        srlzr.obj.groupmaps = [MapgroupGroup(**to_builtins(i)) for i in value]
 
 
-class MapgroupWebMapSerializer(Serializer, resource=WebMap):
-    identity = MapgroupWebMap.__tablename__
+class MapgroupGroupSerializer(Serializer, resource=MapgroupResource):
+    identity = MapgroupGroup.__tablename__
 
-    mapgroups = MapgroupAttr(read=ResourceScope.read, write=ResourceScope.update)
+    groupmaps = GroupmapsAttr(read=ResourceScope.read, write=ResourceScope.update, required=True)

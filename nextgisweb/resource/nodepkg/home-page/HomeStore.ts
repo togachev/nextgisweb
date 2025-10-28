@@ -89,6 +89,7 @@ export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
+    @observable accessor edit = false;
 
     @observable.ref accessor config: ConfigProps;
 
@@ -108,8 +109,6 @@ export class HomeStore {
     @observable.shallow accessor ulrImg: ImgUrlKey;
 
     constructor({ config }) {
-        console.log(config);
-        
         this.config = config
         this.getWidthMenu();
         this.getMapValues("all");
@@ -135,6 +134,11 @@ export class HomeStore {
     @action
     setSourceGroup(sourceGroup: boolean): void {
         this.sourceGroup = sourceGroup;
+    };
+
+    @action
+    setEdit(edit: boolean): void {
+        this.edit = edit;
     };
 
     @action

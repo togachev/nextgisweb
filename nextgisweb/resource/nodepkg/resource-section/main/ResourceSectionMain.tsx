@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Button, Col, Divider, Flex, Tag, Typography, Row } from "@nextgisweb/gui/antd";
+import { Button, Col, Divider, Flex, Typography, Row } from "@nextgisweb/gui/antd";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -20,7 +20,6 @@ interface Groupmaps {
 
 interface ResourceSectionMainProps extends ResourceSectionProps {
     summary: [string, string][];
-    groupMap: string[];
     groupmaps: Groupmaps[];
     creatable?: ResourceCls[];
     cls?: string;
@@ -32,7 +31,6 @@ const { Link } = Typography;
 
 const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
     resourceId,
-    groupMap,
     groupmaps,
     summary,
     creatable,

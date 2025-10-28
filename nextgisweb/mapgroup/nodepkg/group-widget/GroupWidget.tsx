@@ -11,11 +11,11 @@ import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
-import { WebMap } from "./WebMap";
-import type { WebMapStore } from "./WebMapStore";
+import { Groupmap } from "./Groupmap";
+import type { GroupStore } from "./GroupStore";
 
-const MapgroupWidget = observer<{
-    item: WebMap;
+const GroupmapWidget = observer<{
+    item: Groupmap;
 }>(({ item }) => {
     return (
         <Area pad>
@@ -27,11 +27,11 @@ const MapgroupWidget = observer<{
             <LotMV
                 value={item.enabled}
                 component={CheckboxValue}
-                props={{ children: gettext("Enable mapgroup") }}
+                props={{ children: gettext("Enable webmap") }}
             />
             <LotMV
                 label={gettext("Resource")}
-                value={item.resourceId}
+                value={item.webmapId}
                 component={ResourceSelect}
                 props={{
                     readOnly: true,
@@ -45,31 +45,31 @@ const MapgroupWidget = observer<{
     );
 });
 
-MapgroupWidget.displayName = "MapgroupWidget";
+GroupmapWidget.displayName = "GroupmapWidget";
 
-export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
+export const GroupWidget: EditorWidget<GroupStore> = observer(({ store }) => {
     const { pickToFocusTable } = useFocusTablePicker({
         initParentId: store.composite.parent || undefined,
     });
 
     const { tableActions, itemActions } = useMemo<
-        FocusTablePropsActions<WebMap>
+        FocusTablePropsActions<Groupmap>
     >(
         () => ({
             tableActions: [
                 pickToFocusTable(
                     (res) => {
-                        return new WebMap(store, {
-                            resource_id: res.resource.id,
+                        return new Groupmap(store, {
+                            webmap_id: res.resource.id,
                             display_name: res.resource.display_name,
                             enabled: true,
                         });
                     },
                     {
                         pickerOptions: {
-                            requireClass: "mapgroup_resource",
+                            requireClass: "webmap",
                             multiple: true,
-                            clsFilter: "mapgroup_webmap",
+                            clsFilter: "mapgroup_group",
                         },
                     }
                 ),
@@ -80,17 +80,17 @@ export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
     );
 
     return (
-        <FocusTable<WebMap>
+        <FocusTable<Groupmap>
             store={store}
             title={(item) => item.displayName.value}
             columns={[]}
             canDragAndDrop={false}
             tableActions={tableActions}
             itemActions={itemActions}
-            renderDetail={({ item }) => <MapgroupWidget item={item} />}
+            renderDetail={({ item }) => <GroupmapWidget item={item} />}
         />
     );
 });
 
-WebMapWidget.displayName = "WebMapWidget";
-WebMapWidget.title = gettext("Web Map Groups");
+GroupWidget.displayName = "GroupWidget";
+GroupWidget.title = gettext("Webmaps");

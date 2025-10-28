@@ -32,24 +32,29 @@ input {
 		}
 	}
 
-
-
 	.icon-pensil {
-		color: var(--text-secondary);
+		color: var(--icon-color);
 		display: flex;
 		align-items: center;
 		margin: 5px 0 0 5px;
 		z-index: 1000;
-		width: 28px;
-		height: 28px;
-		font-size: 16px;
+		width: 24px;
+		height: 24px;
+	}
+
+	.button-update {
+		color: var(--icon-color) !important;
+		display: flex;
+		align-items: center;
+		width: 24px !important;
+		height: 24px !important;
+		margin: 0 0 0 5px;
 	}
 
 	.button-edit-save {
-		color: var(--text-secondary) !important;
+		color: var(--icon-color) !important;
 		display: flex;
 		align-items: center;
-		font-size: 16px;
 		position: relative;
 		top: -21px;
 		width: 24px !important;
@@ -57,6 +62,7 @@ input {
 	}
 
 	.button-edit-save,
+	.button-update,
 	.icon-pensil {
 		&:hover {
 			color: #000000 !important;
@@ -219,6 +225,7 @@ input {
 								display: flex;
 								justify-content: center;
 								box-sizing: border-box;
+								align-items: center;
 
 								.menu-content {
 									border: #00000000 solid 1px;
@@ -244,6 +251,10 @@ input {
 										font-weight: 500;
 										user-select: none;
 									}
+								}
+
+								.edit-group {
+									padding: 5px;
 								}
 							}
 						}
@@ -272,6 +283,7 @@ input {
 								height: 100%;
 								background: #b3b9be14;
 								box-shadow: 0 0 3px 0;
+								position: relative;
 
 								.content-drag {
 									margin: 0;
@@ -291,6 +303,14 @@ input {
 								.ant-empty-normal {
 									margin-block: 0;
 									color: rgba(0, 0, 0, 0.25);
+								}
+
+								.disabled-title {
+									position: absolute;
+									bottom: 0;
+									color: #ff0000;
+									font-weight: 600;
+									background: rgba(255, 255, 255, 0.9);
 								}
 							}
 

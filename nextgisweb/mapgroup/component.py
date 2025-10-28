@@ -16,3 +16,8 @@ class MapgroupComponent(Component):
         from . import api, view # noqa: F401
 
         api.setup_pyramid(self, config)
+
+    def client_settings(self, request):
+        return dict(
+            groupmaps=self.groupmaps,
+        )

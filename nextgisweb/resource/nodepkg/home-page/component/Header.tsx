@@ -11,7 +11,8 @@ import MenuIcon from "@nextgisweb/icon/mdi/menu";
 import Account from "@nextgisweb/icon/mdi/account";
 import AccountCogOutline from "@nextgisweb/icon/mdi/account-cog-outline";
 import FolderOutline from "@nextgisweb/icon/mdi/folder-outline";
-import Cog from "@nextgisweb/icon/mdi/cog";
+import Pencil from "@nextgisweb/icon/mdi/pencil";
+import PencilOff from "@nextgisweb/icon/mdi/pencil-off-outline";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
 import { LoginOutlined, LogoutOutlined, } from "@ant-design/icons";
@@ -102,9 +103,9 @@ export const Header = observer(({ store }: HeaderProps) => {
                     label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
                     icon: <FolderOutline />,
                 },
-                store.config.isAdministrator === true && {
+                store.edit && store.config.isAdministrator === true && {
                     key: "control_panel",
-                    icon: <Cog />,
+                    icon: <Pencil />,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
                 },
                 invitationSession && {
@@ -273,12 +274,20 @@ export const Header = observer(({ store }: HeaderProps) => {
                 className="header-home-page"
                 style={reloading ? null : { backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${store.ulrImg?.header ? store.ulrImg.header : ""})` }}
             >
+
                 <div className="control-button">
-                    {store.config.isAdministrator === true && !open && (<Button
+                    {store.config.isAdministrator === true && (<Button
+                        className="icon-pensil"
+                        title={!store.edit ? gettext("Edit page") : gettext("Disable page editing")}
+                        icon={!store.edit ? <Pencil /> : <PencilOff />}
+                        onClick={() => store.setEdit(!store.edit)}
+                        type="text"
+                    />)}
+                    {store.edit && store.config.isAdministrator === true && !open && (<Button
                         className="icon-pensil"
                         title={gettext("Setting header")}
                         type="text"
-                        icon={<Cog />}
+                        icon={<Pencil />}
                         onClick={openForm}
                     />)}
                 </div>

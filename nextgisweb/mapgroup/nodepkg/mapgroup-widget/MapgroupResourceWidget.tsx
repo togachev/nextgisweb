@@ -37,6 +37,6 @@ export const MapgroupResourceWidget: EditorWidget<MapgroupResourceStore> = obser
 });
 
 MapgroupResourceWidget.displayName = "MapgroupResourceWidget";
-MapgroupResourceWidget.title = gettext("Basemap");
+MapgroupResourceWidget.title = gettext("Mapgroup resource");
 MapgroupResourceWidget.activateOn = { create: true };
 MapgroupResourceWidget.activateOn = { update: true };

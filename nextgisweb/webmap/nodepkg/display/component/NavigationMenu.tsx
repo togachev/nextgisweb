@@ -34,7 +34,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
 
         const infomap = display.config.infomap;
         const active = store.activePanel;
-
+        
         const customMenu = [
             {
                 title: gettext("Resources"),
@@ -50,7 +50,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                 className: "item",
                 icon: <Information />,
             },
-            {
+            infomap.scope && {
                 title: gettext("Map settings"),
                 target: "_blank",
                 href: infomap.update,
@@ -77,10 +77,10 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                         layout === "vertical" ?
                             {
                                 width: 40,
-                                height: "calc(100 % - 116px)",
+                                height: infomap.scope ? "calc(100% - 116px)" : "calc(100% - 84px)",
                             } :
                             {
-                                width: "calc(100% - 116px)",
+                                width: infomap.scope ? "calc(100% - 116px)" : "calc(100% - 84px)",
                                 height: 40,
                             } :
                         layout === "vertical" ?

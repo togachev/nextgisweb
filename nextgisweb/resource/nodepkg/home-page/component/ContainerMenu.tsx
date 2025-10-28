@@ -1,10 +1,11 @@
 import { useMemo, useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import CogTransfer from "@nextgisweb/icon/mdi/cog-transfer";
-import { Radio } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
+import Pencil from "@nextgisweb/icon/mdi/pencil";
+import { Button, Radio } from "@nextgisweb/gui/antd";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import {
     DndContext,
@@ -53,13 +54,22 @@ const SortableMenu = (props) => {
                 value={id}
                 checked={id === 0}
                 onClick={() => onClickGroupMapsGrid(id)}>
-                <div className="menu-item-content">{name}</div>
+                <div className="menu-item-content">
+                    {name}
+                </div>
             </Radio.Button>
+            {store.edit && (<Button
+                className="button-update"
+                href={routeURL("resource.update", id)}
+                icon={<Pencil />}
+                target="_blank"
+                type="text"
+            />)}
         </div>
     );
 };
 
-export const ContainerMenu = (props) => {
+export const ContainerMenu = observer((props) => {
     const { store } = props;
     const [disable, setDisable] = useState(true);
     const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
@@ -109,8 +119,8 @@ export const ContainerMenu = (props) => {
 
     return (
         <div className="dnd-container-menu">
-            {store.config.isAdministrator === true &&
-                (<ButtonSave icon={<CogTransfer />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+            {store.edit && store.config.isAdministrator === true &&
+                (<ButtonSave icon={<Pencil />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="menu-group"
@@ -144,4 +154,4 @@ export const ContainerMenu = (props) => {
             </div>
         </div>
     );
-};
+});

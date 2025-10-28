@@ -1,8 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import CogTransfer from "@nextgisweb/icon/mdi/cog-transfer";
+import Pencil from "@nextgisweb/icon/mdi/pencil";
 import { Empty } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -50,26 +51,31 @@ const SortableMaps = (props) => {
                 style={style}
             >
                 {disable ? (<MapTile item={item} store={store} size={size} />) :
-                    (<div className="drag-item"><div className="content-drag">
-                        {item?.display_name}
-                    </div>
-                        {item.preview_fileobj_id ?
-                            (<div
-                                style={{
-                                    bottom: 0,
-                                    borderRadius: 3,
-                                    height: 95,
-                                    background: `url(${preview}) center center / cover no-repeat`,
-                                }}
-                            ></div>) :
-                            (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)}
-                    </div>)}
+                    (
+                        <div className="drag-item">
+                            <div className="content-drag">
+                                {item?.display_name}
+                            </div>
+                            {item.preview_fileobj_id ?
+                                (<div
+                                    style={{
+                                        bottom: 0,
+                                        borderRadius: 3,
+                                        height: 95,
+                                        background: `url(${preview}) center center / cover no-repeat`,
+                                    }}
+                                ></div>) :
+                                (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
+                            }
+                            <div className="disabled-title">{!item.enabled ? gettext("Disabled webmap") : null}</div>
+                        </div>
+                    )}
             </div>
         </div>
     );
 };
 
-export const ContainerMaps = (props) => {
+export const ContainerMaps = observer((props) => {
     const { store, size } = props;
     const [disable, setDisable] = useState(true);
     const [activeId, setActiveId] = useState(null);
@@ -116,11 +122,11 @@ export const ContainerMaps = (props) => {
             store.setSourceMaps(true);
         }
     }, [disable]);
-
+    
     return (
         <div className="dnd-container-maps">
-            {store.config.isAdministrator === true &&
-                (<ButtonSave icon={<CogTransfer />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+            {store.edit && store.config.isAdministrator === true &&
+                (<ButtonSave icon={<Pencil />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="maps-group"
@@ -167,4 +173,4 @@ export const ContainerMaps = (props) => {
             </div>
         </div>
     );
-};
+});
