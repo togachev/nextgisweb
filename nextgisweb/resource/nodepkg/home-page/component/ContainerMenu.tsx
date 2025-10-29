@@ -3,8 +3,8 @@ import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import Cog from "@nextgisweb/icon/mdi/cog";
-import Cogs from "@nextgisweb/icon/mdi/cogs";
+import SwapVertical from "@nextgisweb/icon/mdi/swap-vertical";
+import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
 import { Button, Radio } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -20,7 +20,7 @@ import {
 
 const settingsGroup = gettext("Group settings");
 
-const SortableMenu = (props) => {
+const SortableMenu = observer((props) => {
     const { id, name, store, disable } = props;
     const {
         attributes,
@@ -34,7 +34,7 @@ const SortableMenu = (props) => {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        width: store.widthMenu,
+        width: store.edit ? store.widthMenu - 29 : store.widthMenu,
         height: 40,
         zIndex: isDragging ? "100" : "auto",
         opacity: isDragging ? 0.3 : 1,
@@ -67,7 +67,7 @@ const SortableMenu = (props) => {
                         title={settingsGroup}
                         className="button-update"
                         href={routeURL("resource.update", id)}
-                        icon={<Cogs />}
+                        icon={<OpenInNew />}
                         target="_blank"
                         type="text"
                     />
@@ -75,7 +75,7 @@ const SortableMenu = (props) => {
             )}
         </div>
     );
-};
+});
 
 export const ContainerMenu = observer((props) => {
     const { store } = props;
@@ -128,7 +128,7 @@ export const ContainerMenu = observer((props) => {
     return (
         <div className="dnd-container-menu">
             {store.edit && store.groupMapsGrid.some((item) => item.update) &&
-                (<ButtonSave icon={<Cog />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="menu-group"

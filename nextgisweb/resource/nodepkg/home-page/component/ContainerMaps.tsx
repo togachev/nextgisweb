@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
-import Cog from "@nextgisweb/icon/mdi/cog";
+import SwapVertical from "@nextgisweb/icon/mdi/arrow-all";
 import { Empty } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -18,7 +18,7 @@ import {
     rectSortingStrategy,
 } from "@dnd-kit/sortable";
 
-const SortableMaps = (props) => {
+const SortableMaps = observer((props) => {
     const { item, disable, size, store } = props;
 
     const {
@@ -73,7 +73,7 @@ const SortableMaps = (props) => {
             </div>
         </div>
     );
-};
+});
 
 export const ContainerMaps = observer((props) => {
     const { store, size } = props;
@@ -126,7 +126,7 @@ export const ContainerMaps = observer((props) => {
     return (
         <div className="dnd-container-maps">
             {store.edit && store.itemsMapsGroup.some((item) => item.update) &&
-                (<ButtonSave icon={<Cog />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<SwapVertical />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
             }
             <div
                 className="maps-group"

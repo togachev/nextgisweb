@@ -12,6 +12,10 @@ input {
 	--primary: #2a388c;
 }
 
+.ngw-gui-react-boot {
+	height: 100% !important;
+}
+
 .wrapper-home-page {
 	min-height: 100%;
 	display: grid;
@@ -33,7 +37,8 @@ input {
 	}
 
 	.icon-pensil {
-		color: var(--icon-color);
+		color: var(--on-primary-text) !important;
+		background-color: #ffffff20 !important;
 		display: flex;
 		align-items: center;
 		margin: 5px 0 0 5px;
@@ -43,7 +48,8 @@ input {
 	}
 
 	.button-update {
-		color: var(--icon-color) !important;
+		color: var(--text-base) !important;
+		// background-color: #ffffff80 !important;
 		display: flex;
 		align-items: center;
 		width: 24px !important;
@@ -52,7 +58,8 @@ input {
 	}
 
 	.button-edit-save {
-		color: var(--icon-color) !important;
+		color: var(--text-base) !important;
+		// background-color: #ffffff80 !important;
 		display: flex;
 		align-items: center;
 		position: relative;
@@ -65,8 +72,8 @@ input {
 	.button-update,
 	.icon-pensil {
 		&:hover {
-			color: #000000 !important;
-			background-color: var(--icon-color) !important;
+			color: #ff0000 !important;
+			background-color: var(--input-border-color) !important;
 		}
 	}
 

@@ -29,6 +29,7 @@ const { Title } = Typography;
 const signInText = gettext("Sign in");
 const signOutText = gettext("Sign out");
 const editPage = gettext("Edit page");
+const disableEditPage = gettext("Disable edit page");
 
 type HeaderProps = {
     store: HomeStore;
@@ -124,8 +125,8 @@ export const Header = observer(({ store }: HeaderProps) => {
                     icon: <LogoutOutlined className="logout-icon" />,
                     key: "sign_out",
                 },
-                {
-                    label: store.config.isAdministrator === true && (<a onClick={() => store.setEdit(!store.edit)} className="icon-pensil">{editPage}</a>),
+                store.groupMapsGrid.some((item) => item.update) && store.itemsMapsGroup.some((item) => item.update) && {
+                    label: (<a onClick={() => store.setEdit(!store.edit)} className="icon-pensil">{!store.edit ? editPage : disableEditPage}</a>),
                     icon: !store.edit ? <Pencil /> : <PencilOff />,
                     key: "edit_page",
                 },
@@ -281,9 +282,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                 className="header-home-page"
                 style={reloading ? null : { backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${store.ulrImg?.header ? store.ulrImg.header : ""})` }}
             >
-
                 <div className="control-button">
-
                     {store.edit && store.config.isAdministrator === true && !open && (<Button
                         className="icon-pensil"
                         title={gettext("Setting header")}
