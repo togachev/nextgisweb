@@ -29,7 +29,9 @@ import type {
     FocusTableStore,
 } from "./type";
 
-import ArrowIcon from "@nextgisweb/icon/material/arrow_forward_ios";
+import Folder from "@nextgisweb/icon/mdi/folder";
+import FolderOpen from "@nextgisweb/icon/mdi/folder-open";
+import File from "@nextgisweb/icon/mdi/file-outline";
 import Circle from "@nextgisweb/icon/mdi/circle";
 import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
 import GroupIcon from "@nextgisweb/icon/mdi/arrow-expand";
@@ -40,9 +42,9 @@ import "./ComplexTree.less";
 const TREE_ID = "main";
 const getItemTitleStub = () => "STUB";
 
-const arrowCollapsed = <ArrowIcon />;
-const arrowExpanded = <ArrowIcon style={{ transform: "rotate(90deg)" }} />;
-const arrowItem = <span style={{ display: "inline-block", width: "18px" }} />;
+const arrowCollapsed = <Folder style={{ width: "16px" }} />;
+const arrowExpanded = <FolderOpen style={{ width: "16px" }} />;
+const arrowItem = <File style={{ width: "16px" }} />;
 
 function ActionButton({ title, ...buttonProps }: ButtonProps) {
     return (
