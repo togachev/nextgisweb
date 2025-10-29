@@ -72,7 +72,7 @@ export function RenderActions({
                     return createActionBtn({
                         onClick: () => {
                             const { destroy } = lazyModal(
-                                () => import("./PreviewModal"),
+                                () => import("./PreviewLayerModal"),
                                 {
                                     resourceId: id,
                                     href: href,

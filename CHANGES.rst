@@ -1,6 +1,13 @@
 Changes
 =======
 
+5.3.0
+-----
+
+- Advanced feature filtering capabilities.
+- Enhanced extent selector widget.
+
+
 5.2.0
 -----
 

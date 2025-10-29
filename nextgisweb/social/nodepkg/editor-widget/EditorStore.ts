@@ -31,15 +31,11 @@ export class EditorStore
     }
 
     @action
-    setDirty(dirty: boolean) {
-        this.dirty = dirty;
-    }
-
-    @action
     setDescription(description: string | null) {
         this.description = description;
     }
 
+    @action.bound
     load(value: apitype.SocialRead) {
         this.imageUpdated = null;
         if (value.image_exists && this.composite.resourceId !== null) {

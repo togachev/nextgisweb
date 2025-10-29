@@ -25,6 +25,7 @@ from .interface import (
     IFeatureLayer,
     IFeatureQueryIlike,
     IFeatureQueryLike,
+    IFilterableFeatureLayer,
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
@@ -433,6 +434,18 @@ def apply_fields_filter(query, request):
         query.ilike(request.GET["ilike"])
 
 
+def apply_filter_expression(query, resource, filter):
+    if filter in (None, ""):
+        return
+
+    if not IFilterableFeatureLayer.providedBy(resource):
+        return
+
+    filter_parser = resource.filter_parser
+    filter_program = filter_parser.parse(filter)
+    query.set_filter_program(filter_program)
+
+
 def apply_intersect_filter(query, request, resource):
     # Filtering by extent
     if "intersects" in request.GET:
@@ -461,6 +474,9 @@ def cget(
     order_by: Union[str, None] = None,
     limit: Union[Annotated[int, Meta(ge=0)], None] = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
+    filter: Annotated[
+        Union[str, None], Meta(description="Filter expression (JSON string)")
+    ] = None,
 ) -> JSONType:
     """Read features"""
     request.resource_permission(DataScope.read)
@@ -474,6 +490,7 @@ def cget(
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
+    apply_filter_expression(query, resource, filter)
 
     # Ordering
     order_by_ = []
@@ -617,6 +634,7 @@ def cextent(resource, request) -> NgwExtent:
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
+    apply_filter_expression(query, resource, request.GET.get("filter"))
 
     extent = query().extent
     return NgwExtent(**extent)

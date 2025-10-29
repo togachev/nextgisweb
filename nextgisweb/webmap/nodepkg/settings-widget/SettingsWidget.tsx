@@ -14,6 +14,7 @@ import { SelectLegendSymbols } from "../component";
 
 import { OptionsWidget } from "./OptionsWidget";
 import type { SettingStore } from "./SettingStore";
+import { ComputeWebmapExtent } from "./component/ComputeWebmapExtent";
 
 const ColorSelectedFeature = lazy(() => import("@nextgisweb/webmap/color-selected-feature/ColorSelectedFeature"));
 
@@ -74,7 +75,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
     ({ store }) => {
         const [optionsModal, setOptionsModal] = useState(false);
 
-        const items: CollapseProps['items'] = [
+        const items: CollapseProps["items"] = [
             {
                 key: "1",
                 label: msgColorSelectedFeature,
@@ -100,6 +101,14 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             onChange={(value) => {
                                 store.setExtent(value);
                             }}
+                            extraButton={
+                                <ComputeWebmapExtent
+                                    store={store}
+                                    onDone={(extent) => {
+                                        store.setExtent(extent);
+                                    }}
+                                />
+                            }
                         />
                     </Lot>
                     <Lot row label={msgConstrExtent} help={msgConstrExtentHelp}>
@@ -113,6 +122,14 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             onChange={(value) => {
                                 store.setConstrainedExtent(value);
                             }}
+                            extraButton={
+                                <ComputeWebmapExtent
+                                    store={store}
+                                    onDone={(extent) => {
+                                        store.setConstrainedExtent(extent);
+                                    }}
+                                />
+                            }
                         />
                     </Lot>
                     <Lot row label={msgTitle}>

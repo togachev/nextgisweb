@@ -1,6 +1,6 @@
 import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -51,6 +51,7 @@ export const FeatureGrid = observer(
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
+            filterExpression,
         } = store;
 
         const { data: totalData, refresh: refreshTotal } = useRouteGet({
@@ -109,6 +110,14 @@ export const FeatureGrid = observer(
             }
         }, [onSelect, selectedIds]);
 
+        const stableQueryParams = useMemo(
+            () => ({
+                ...queryParams,
+                filter: filterExpression,
+            }),
+            [queryParams, filterExpression]
+        );
+
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }
@@ -149,7 +158,7 @@ export const FeatureGrid = observer(
                     selectedIds={selectedIds}
                     loadingCol={loadingCol}
                     setSelectedIds={store.setSelectedIds}
-                    queryParams={queryParams || undefined}
+                    queryParams={stableQueryParams}
                     visibleFields={visibleFields}
                     cleanSelectedOnFilter={cleanSelectedOnFilter}
                 />
