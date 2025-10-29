@@ -31,6 +31,8 @@ import type {
 
 import Folder from "@nextgisweb/icon/mdi/folder";
 import FolderOpen from "@nextgisweb/icon/mdi/folder-open";
+import PlusBox from "@nextgisweb/icon/mdi/plus-box-outline";
+import MinusBox from "@nextgisweb/icon/mdi/minus-box-outline";
 import File from "@nextgisweb/icon/mdi/file-outline";
 import Circle from "@nextgisweb/icon/mdi/circle";
 import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
@@ -42,9 +44,9 @@ import "./ComplexTree.less";
 const TREE_ID = "main";
 const getItemTitleStub = () => "STUB";
 
-const arrowCollapsed = <Folder style={{ width: "16px" }} />;
-const arrowExpanded = <FolderOpen style={{ width: "16px" }} />;
-const arrowItem = <File style={{ width: "16px" }} />;
+const arrowCollapsed = <div className="arrow-style"><PlusBox /><Folder /></div>;
+const arrowExpanded = <div className="arrow-style"><MinusBox /><FolderOpen /></div>;
+const arrowItem = <div className="arrow-style"><File /></div>;
 
 function ActionButton({ title, ...buttonProps }: ButtonProps) {
     return (
