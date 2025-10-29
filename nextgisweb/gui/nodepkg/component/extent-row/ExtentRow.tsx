@@ -132,9 +132,8 @@ export const ExtentRow = observer(
                             loading={loading}
                             icon={<LayersIconOutlined />}
                             onClick={onSetFromLayerClick}
-                        >
-                            {gettext("From layers")}
-                        </Button>
+                            title={gettext("From layer")}
+                        />
                         {extraButton}
                     </Space.Compact>
                 )}

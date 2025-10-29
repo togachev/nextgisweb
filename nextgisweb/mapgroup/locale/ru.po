@@ -2,18 +2,54 @@
 msgid "Web Map Group"
 msgstr "Группа веб-карты"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:23
+#: nodepkg/component/MapgroupComponent.tsx:32
+msgid "Webmap name"
+msgstr "Имя веб-карты"
+
+#: nodepkg/component/MapgroupComponent.tsx:32
+msgid "Group name"
+msgstr "Название группы"
+
+#: nodepkg/component/MapgroupComponent.tsx:48
+msgid "Status"
+msgstr "Статус"
+
+#: nodepkg/component/MapgroupComponent.tsx:52
+msgid "enabled"
+msgstr "включено"
+
+#: nodepkg/component/MapgroupComponent.tsx:52
+msgid "disabled"
+msgstr "отключено"
+
+#: nodepkg/component/MapgroupComponent.tsx:76
+msgid "Enabled web map groups"
+msgstr "Включены группы веб-карт"
+
+#: nodepkg/component/MapgroupComponent.tsx:76
+msgid "Enabled web maps"
+msgstr "Включены веб-карты"
+
+#: nodepkg/group-widget/GroupWidget.tsx:23
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:30
-msgid "Enable mapgroup"
-msgstr "Включить группу"
+#: nodepkg/group-widget/GroupWidget.tsx:30
+msgid "Enable webmap"
+msgstr "Включить веб-карту"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:33
+#: nodepkg/group-widget/GroupWidget.tsx:33
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:96
-msgid "Web Map Groups"
-msgstr "Группы веб-карты"
+#: nodepkg/group-widget/GroupWidget.tsx:96
+msgid "Webmaps"
+msgstr "Веб-карты"
+
+#: nodepkg/mapgroup-widget/MapgroupResourceWidget.tsx:28
+msgid "Enable mapgroup"
+msgstr "Включить группу"
+
+#: nodepkg/mapgroup-widget/MapgroupResourceWidget.tsx:40
+msgid "Mapgroup resource"
+msgstr "Ресурс группы карт"

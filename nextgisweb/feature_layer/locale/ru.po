@@ -1,12 +1,12 @@
-#: api.py:110 api_identify.py:27
+#: api.py:110 api_identify.py:49 api_identify.py:106
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:368
+#: api.py:379
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:455 api_export.py:212
+#: api.py:465 api_export.py:212
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -76,7 +76,7 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:172
+#: model.py:178
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
@@ -121,8 +121,8 @@ msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
 #: nodepkg/export-form/ExportForm.tsx:316
-#: nodepkg/fields-widget/FieldsWidget.tsx:213
-#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
+#: nodepkg/fields-widget/FieldsWidget.tsx:249
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:105
 msgid "Fields"
 msgstr "Поля"
 
@@ -201,7 +201,6 @@ msgid "Apply"
 msgstr "Применить"
 
 #: nodepkg/feature-filter/FeatureFilterEditor.tsx:25
-#: nodepkg/geometry-editor/GeometryEditor.tsx:150
 msgid "Clear"
 msgstr "Очистить"
 
@@ -449,35 +448,35 @@ msgstr ""
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:34
+#: nodepkg/feature-grid/FeatureGridActions.tsx:37
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:35
+#: nodepkg/feature-grid/FeatureGridActions.tsx:38
 msgid "Open on a new page"
 msgstr "Открывать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:36
+#: nodepkg/feature-grid/FeatureGridActions.tsx:39
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:37
+#: nodepkg/feature-grid/FeatureGridActions.tsx:40
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:38
+#: nodepkg/feature-grid/FeatureGridActions.tsx:41
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:39
+#: nodepkg/feature-grid/FeatureGridActions.tsx:42
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:41
+#: nodepkg/feature-grid/FeatureGridActions.tsx:44
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:42
+#: nodepkg/feature-grid/FeatureGridActions.tsx:45
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
@@ -552,6 +551,36 @@ msgstr "Удаление этого поля навсегда сотрёт вс�
 msgid "Field"
 msgstr "Поле"
 
+#: nodepkg/fields-widget/FieldsWidget.tsx:160
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:36
+msgid "Formatted value"
+msgstr "Форматированное значение"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:163
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:32
+msgid "Reference book added"
+msgstr "Справочник добавлен"
+
+#: nodepkg/fields-widget/FormattedDecimalForm.tsx:18
+msgid "Setting up value formatting"
+msgstr "Настройка форматирования значений"
+
+#: nodepkg/fields-widget/FormattedDecimalForm.tsx:20
+msgid "Disable"
+msgstr "Отключить"
+
+#: nodepkg/fields-widget/FormattedDecimalForm.tsx:20
+msgid "Enable"
+msgstr "Включить"
+
+#: nodepkg/fields-widget/FormattedDecimalForm.tsx:26
+msgid "Rounding off a number"
+msgstr "Округление числа"
+
+#: nodepkg/fields-widget/FormattedDecimalForm.tsx:36
+msgid "Value prefix"
+msgstr "Префикс значения"
+
 #: nodepkg/geometry-editor/plugin.ts:10
 msgid "Geometry"
 msgstr "Геометрия"
@@ -560,71 +589,71 @@ msgstr "Геометрия"
 msgid "Zoom to layer extent"
 msgstr "Перейти к охвату слоя"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:47
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:103
+#: nodepkg/geometry-info/GeometryInfo.tsx:48
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:99
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:56
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:105
+#: nodepkg/geometry-info/GeometryInfo.tsx:57
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:101
 msgid "Failed to get information about the geometry"
 msgstr "Не удалось получить информацию о геометрии"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:46
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:47
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:42
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:43
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:51
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:52
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:47
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:48
 msgid "Extent (xMin)"
 msgstr "Охват (xMin)"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:56
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:57
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:52
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:53
 msgid "Extent (yMin)"
 msgstr "Охват (yMin)"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:61
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:62
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:57
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:58
 msgid "Extent (xMax)"
 msgstr "Охват (xMax)"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:66
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:67
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:62
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:63
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:74
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:75
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:70
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:71
 msgid "Perimeter"
-msgstr ""
+msgstr "Периметр"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:74
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:75
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:70
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:71
 msgid "Length"
-msgstr ""
+msgstr "Длина"
 
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:82
-#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:83
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:78
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:79
 msgid "Area"
-msgstr ""
+msgstr "Площадь"
 
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Yes"
-msgstr ""
+msgstr "Да"
 
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "No"
-msgstr ""
+msgstr "Нет"
 
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:78
 msgid "Visibility in the table"
-msgstr ""
+msgstr "Видимость в таблице"
 
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:85
 msgid "Additional properties"
-msgstr ""
+msgstr "Дополнительные свойства"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:94
 msgid "Feature versioning"
