@@ -31,6 +31,11 @@ export class EditorStore
     }
 
     @action
+    setDirty(dirty: boolean) {
+        this.dirty = dirty;
+    }
+
+    @action
     setDescription(description: string | null) {
         this.description = description;
     }

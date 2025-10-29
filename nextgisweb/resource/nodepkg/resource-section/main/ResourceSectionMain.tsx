@@ -1,27 +1,27 @@
 import { Fragment } from "react";
-import { Button, Col, Divider, Flex, Typography, Row, Space } from "@nextgisweb/gui/antd";
+import { Col, Empty, Typography, Row } from "@nextgisweb/gui/antd";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import type { ResourceSection, ResourceSectionProps } from "../type";
 
 import { CreateResourceButton } from "./CreateResourceButton";
+import { MapgroupComponent } from "@nextgisweb/mapgroup/component/MapgroupComponent";
 
 import "./ResourceSectionMain.less";
 
 interface Groupmaps {
     display_name: string;
-    webmap_name: string;
     enabled: boolean;
-    resource_id: number;
+    id: number;
 }
 
 interface ResourceSectionMainProps extends ResourceSectionProps {
     summary: [string, string][];
-    groupmaps: Groupmaps[];
+    mapgroupdata: Groupmaps[];
     creatable?: ResourceCls[];
     cls?: string;
     social?: boolean;
@@ -32,7 +32,7 @@ const { Link } = Typography;
 
 const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
     resourceId,
-    groupmaps,
+    mapgroupdata,
     summary,
     creatable,
     cls,
@@ -41,12 +41,6 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
 }) => {
     const preview = routeURL("webmap_main.preview", resourceId);
     const urlWebmap = routeURL("webmap.display", resourceId);
-
-    const { data: groupData } = useRouteGet({
-        name: "mapgroup.item",
-        params: { id: resourceId },
-    });
-    console.log(groupData);
 
     return (
         <>
@@ -71,35 +65,21 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                         </dl>
                     )}
                 </Col>
-                {cls === "webmap" && social &&
+                {cls === "webmap" &&
                     <Col flex="0 0 116px">
-                        <Link className="preview-link" style={{ background: `url(${preview}) center center / cover no-repeat` }} href={urlWebmap} target="_self" />
+                        {social ? <Link className="preview-link" style={{ background: `url(${preview}) center center / cover no-repeat` }} href={urlWebmap} target="_self" /> :
+                            <Link className="preview-link" href={urlWebmap} target="_self">
+                                <Empty
+                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                    styles={{ image: { height: 24, fontSize: 24 } }}
+                                    description={gettext("Open webmap in new page")}
+                                />
+                            </Link>
+                        }
                     </Col>
                 }
             </Row>
-            {read && cls === "webmap" && groupmaps.length > 0 && (<Divider orientation="left" orientationMargin="0">{gettext("Web Map Groups")}</Divider>)}
-            {read && cls === "webmap" && groupmaps.length > 0 && (
-                <Flex gap="small" align="flex-start" vertical>
-                    <Flex gap="small" wrap>
-                        {groupmaps.sort((a, b) => Number(a.resource_id) - Number(b.resource_id)).map((k) => (
-                            <Button
-                                variant="filled"
-                                size="small"
-                                type={k.enabled ? "primary" : "default"}
-                                color={k.enabled ? "primary" : "default"}
-                                key={k.resource_id}
-                                href={routeURL("resource.show", k.resource_id)}
-                                target="_self"
-                            >
-                                {k.display_name}: {k.enabled ? gettext("enabled") : gettext("disabled")}
-                            </Button>
-                        ))}
-                    </Flex>
-                </Flex>
-            )}
-            <Space size="small" direction="horizontal">{read && cls === "mapgroup_resource" && groupData && groupData.map((item) => (
-                <Link key={item.idx} className="map-link" href={routeURL("resource.show", item.id)} target="_self">{item.display_name}</Link>
-            ))}</Space>
+            {read && mapgroupdata && mapgroupdata.length > 0 && <MapgroupComponent array={mapgroupdata} cls={cls} />}
         </>
     );
 };

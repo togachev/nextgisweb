@@ -1,12 +1,11 @@
-import type React from "react";
-
+import { ReactNode } from "react";
 import { Modal } from "@nextgisweb/gui/antd";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 
 import "./PreviewMapModal.less";
 
 export type PreviewMapModalProps = ShowModalOptions & {
-    children?: React.ReactNode;
+    children?: ReactNode;
 };
 
 export function PreviewMapModal({

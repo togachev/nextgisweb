@@ -26,7 +26,7 @@ export interface EditableItemProps {
     source?: VectorSource;
 
     enabled?: boolean;
-    children?: React.ReactNode;
+    children?: ReactNode;
 
     editingMode?: string | null;
 

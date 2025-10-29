@@ -292,17 +292,21 @@ def resource_section_main(obj, *, request, **kwargs):
 
     result["read"] = request.context.has_permission(ResourceScope.create, request.user)
 
-    groupquery = MapgroupGroup.query().filter_by(webmap_id=request.context.id)
-    groupmaps = result["groupmaps"] = []
-    for item in groupquery:
-        groupmaps.append(
-            dict(
-                display_name=item.webmap_group_name,
-                webmap_name=item.webmap_name,
-                enabled=item.enabled,
-                resource_id=item.resource_id,
+    column_name = "webmap_id" if obj.cls == "webmap" else ("resource_id" if obj.cls == "mapgroup_resource" else obj.cls)
+    display_name = "webmap_group_name" if obj.cls == "webmap" else ("display_name" if obj.cls == "mapgroup_resource" else "display_name")
+    resource_id = "resource_id" if obj.cls == "webmap" else ("webmap_id" if obj.cls == "mapgroup_resource" else "resource_id")
+
+    if obj.cls == "webmap" or obj.cls == "mapgroup_resource":
+        mapgroupquery = MapgroupGroup.query().filter_by(**{column_name: request.context.id})
+        mapgroupdata = result["mapgroupdata"] = []
+        for item in mapgroupquery:
+            mapgroupdata.append(
+                dict(
+                    display_name=getattr(item, display_name),
+                    enabled=item.enabled,
+                    id=getattr(item, resource_id),
+                )
             )
-        )
 
     summary = result["summary"] = []
     summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
