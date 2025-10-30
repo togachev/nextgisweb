@@ -3,8 +3,8 @@ import { useCallback, useMemo } from "react";
 import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
-import FolderClosedIcon from "../icons/folder.svg";
-import FolderOpenIcon from "../icons/folder_open.svg";
+import Folder from "@nextgisweb/icon/mdi/folder-outline";
+import FolderOpen from "@nextgisweb/icon/mdi/folder-open-outline";
 
 export function useWebmapItems({
     webmapItems,
@@ -19,7 +19,7 @@ export function useWebmapItems({
             if (item.treeItem.type === "root" || item.treeItem.type === "group") {
                 item.icon = ({ expanded }) =>
                 (<span className="legend">
-                    {expanded ? <FolderOpenIcon /> : <FolderClosedIcon />}
+                    {expanded ? <FolderOpen /> : <Folder />}
                 </span>)
 
             } else if (item.treeItem.type === "layer") {
