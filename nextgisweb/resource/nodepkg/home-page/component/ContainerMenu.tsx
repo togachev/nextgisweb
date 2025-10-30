@@ -67,7 +67,7 @@ const SortableMenu = observer((props) => {
                         <Button
                             title={settingsGroup}
                             className="button-update"
-                            href={routeURL("resource.update", id)}
+                            href={routeURL("resource.update_mapgroup", id, "group")}
                             icon={<OpenInNew />}
                             target="_blank"
                             type="text"

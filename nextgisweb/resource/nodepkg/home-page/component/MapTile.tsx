@@ -108,7 +108,7 @@ export const MapTile = observer((props) => {
                                         <Button
                                             title={settingsWebMapsGroup}
                                             className="button-update"
-                                            href={routeURL("resource.update", webmap_group_id)}
+                                            href={routeURL("resource.update_mapgroup", webmap_group_id, "map")}
                                             icon={<OpenInNew />}
                                             target="_blank"
                                             type="text"

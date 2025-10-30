@@ -218,6 +218,19 @@ def update(request):
     )
 
 
+@react_renderer("@nextgisweb/resource/composite")
+def update_mapgroup(request):
+    request.resource_permission(ResourceScope.update)
+    tab = str(request.matchdict["tab"])
+    setup = dict(operation="update", id=request.context.id, tab=tab)
+    return dict(
+        props=dict(setup=setup),
+        obj=request.context,
+        title=gettext("Update resource"),
+        maxheight=True,
+    )
+
+
 @react_renderer("@nextgisweb/resource/delete-page")
 def delete(request):
     request.resource_permission(ResourceScope.read)
@@ -484,6 +497,7 @@ def setup_pyramid(comp, config):
 
     _resource_route("create", r"{id:uint}/create", get=create)
     _resource_route("update", r"{id:uint}/update", get=update)
+    _resource_route("update_mapgroup", r"{id:uint}/update/{tab:str}", get=update_mapgroup)
     _resource_route("delete", r"{id:uint}/delete", get=delete)
 
     # Actions
