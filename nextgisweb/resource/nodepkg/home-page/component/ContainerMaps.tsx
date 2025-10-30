@@ -122,7 +122,7 @@ export const ContainerMaps = observer((props) => {
             store.setSourceMaps(true);
         }
     }, [disable]);
-    
+
     return (
         <div className="dnd-container-maps">
             {store.edit && store.itemsMapsGroup.some((item) => item.update) &&

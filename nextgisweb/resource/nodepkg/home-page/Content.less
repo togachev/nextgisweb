@@ -48,18 +48,15 @@ input {
 	}
 
 	.button-update {
-		color: var(--text-base) !important;
-		// background-color: #ffffff80 !important;
 		display: flex;
 		align-items: center;
 		width: 24px !important;
 		height: 24px !important;
-		margin: 0 0 0 5px;
+		margin: 0;
 	}
 
 	.button-edit-save {
 		color: var(--text-base) !important;
-		// background-color: #ffffff80 !important;
 		display: flex;
 		align-items: center;
 		position: relative;
@@ -103,6 +100,13 @@ input {
 		cursor: pointer;
 		z-index: 1000;
 		color: var(--text-base);
+	}
+
+	.icon-disable {
+		display: flex;
+		font-size: 14px;
+		align-items: center;
+		justify-content: center;
 	}
 
 	a {
@@ -263,6 +267,13 @@ input {
 								.edit-group {
 									padding: 5px;
 								}
+
+								.ant-radio-button-label {
+									display: flex;
+									align-items: center;
+									justify-content: space-between;
+									width: 100%;
+								}
 							}
 						}
 					}
@@ -332,29 +343,6 @@ input {
 									flex-direction: column;
 									justify-content: space-between;
 									border-radius: 3px;
-
-									.ant-card-head {
-										margin-bottom: -1px;
-										padding: 0;
-										color: #ff0000;
-										font-weight: 600;
-										font-size: 18px;
-										background: rgba(255, 255, 255, 0.9);
-										border-radius: 3px 3px 0 0;
-										position: absolute;
-										width: 100%;
-										min-height: 32px;
-										pointer-events: none;
-
-										.ant-card-head-title {
-											display: flex;
-											flex: 1;
-											overflow: hidden;
-											white-space: nowrap;
-											text-overflow: ellipsis;
-											justify-content: center;
-										}
-									}
 
 									.ant-card-cover {
 										margin: 0;
@@ -445,7 +433,6 @@ input {
 													justify-content: center;
 
 													.content-title {
-														color: #000000;
 														font-size: 16px;
 														overflow: hidden;
 														white-space: initial;

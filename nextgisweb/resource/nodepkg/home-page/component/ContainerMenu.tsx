@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
 import SwapVertical from "@nextgisweb/icon/mdi/swap-vertical";
 import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
+import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 import { Button, Radio } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -21,7 +22,7 @@ import {
 const settingsGroup = gettext("Group settings");
 
 const SortableMenu = observer((props) => {
-    const { id, name, store, disable } = props;
+    const { id, name, store, disable, update, enabled } = props;
     const {
         attributes,
         listeners,
@@ -41,6 +42,7 @@ const SortableMenu = observer((props) => {
         cursor: disable ? "pointer" : "move",
         border: disable ? "none" : "1px solid var(--divider-color)",
         touchAction: disable ? "auto" : "none",
+        color: enabled ? "var(--primary)" : "var(--danger)",
     };
 
     const onClickGroupMapsGrid = (id) => {
@@ -60,19 +62,21 @@ const SortableMenu = observer((props) => {
                 <div className="menu-item-content">
                     {name}
                 </div>
+                <span className="icon-disable" title={gettext("Disabled group")}>
+                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && update && (
+                        <Button
+                            title={settingsGroup}
+                            className="button-update"
+                            href={routeURL("resource.update", id)}
+                            icon={<OpenInNew />}
+                            target="_blank"
+                            type="text"
+                            color={!enabled ? "danger" : "default"}
+                            variant="link"
+                        />
+                    )}
+                </span>
             </Radio.Button>
-            {store.edit && store.groupMapsGrid.some((item) => item.update) && (
-                <div >
-                    <Button
-                        title={settingsGroup}
-                        className="button-update"
-                        href={routeURL("resource.update", id)}
-                        icon={<OpenInNew />}
-                        target="_blank"
-                        type="text"
-                    />
-                </div>
-            )}
         </div>
     );
 });
@@ -111,8 +115,6 @@ export const ContainerMenu = observer((props) => {
 
     useEffect(() => {
         if (disable === true && store.sourceGroup === true) {
-            console.log(disable, store.sourceGroup);
-
             store.groupMapsGrid.map((item, index) => {
                 updatePosition(item.id, index)
             })
@@ -154,6 +156,8 @@ export const ContainerMenu = observer((props) => {
                                     handle={true}
                                     disable={disable}
                                     store={store}
+                                    update={item.update}
+                                    enabled={item.enabled}
                                 />
                             ))}
                         </Radio.Group>

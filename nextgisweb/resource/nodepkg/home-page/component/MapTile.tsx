@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { Button, Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -7,20 +8,23 @@ import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
 import MapIcon from "@nextgisweb/icon/material/map";
+import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
+import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 import "./MapTile.less";
 
 const openMap = gettext("Open map");
 const descTitle = gettext("Map description");
 const settingsTitle = gettext("Map settings");
+const settingsWebMapsGroup = gettext("Setting up a web map in a group");
 
 const { Meta } = Card;
 const { Text, Link } = Typography;
 
-export const MapTile = (props) => {
+export const MapTile = observer((props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
 
-    const { id, display_name, preview_fileobj_id, description_status, update, enabled } = props.item;
+    const { id, display_name, preview_fileobj_id, description_status, update, enabled, webmap_group_id } = props.item;
     const { store, size } = props;
     const { upath_info } = store.config;
 
@@ -69,7 +73,6 @@ export const MapTile = (props) => {
             }}
         >
             <Card
-                title={!enabled ? gettext("Disabled webmap") : null}
                 styles={{ cover: { height: size.cardCoverH }, body: { height: size.cardBodyH } }}
                 hoverable
                 cover={
@@ -96,10 +99,24 @@ export const MapTile = (props) => {
                     className="meta-card"
                     title={
                         <div className="title-map">
-                            <span title={display_name} className="title">
+                            <span style={!enabled ? { color: "var(--danger)" } : {color: "default"}} title={display_name} className="title">
                                 <div className="content-title">
                                     {!size.min && display_name}
                                 </div>
+                                <span className="icon-disable" title={gettext("Disabled webmap")}>
+                                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && update &&
+                                        <Button
+                                            title={settingsWebMapsGroup}
+                                            className="button-update"
+                                            href={routeURL("resource.update", webmap_group_id)}
+                                            icon={<OpenInNew />}
+                                            target="_blank"
+                                            type="text"
+                                            color={!enabled ? "danger" : "default"}
+                                            variant="link"
+                                        />
+                                    }
+                                </span>
                             </span>
                             <div className={size.min ? "button-min control-button" : "control-button"} >
                                 <Button
@@ -132,6 +149,6 @@ export const MapTile = (props) => {
                 />
             </Card>
             <ModalComponent title={display_name} form={contentDesc} open={isModalOpen} handleCancel={handleCancel} />
-        </ConfigProvider>
+        </ConfigProvider >
     )
-}
+})
