@@ -222,9 +222,9 @@ def update(request):
 def update_mapgroup(request):
     request.resource_permission(ResourceScope.update)
     tab = str(request.matchdict["tab"])
-    setup = dict(operation="update", id=request.context.id, tab=tab)
+    setup = dict(operation="update", id=request.context.id)
     return dict(
-        props=dict(setup=setup),
+        props=dict(setup=setup, tab=tab),
         obj=request.context,
         title=gettext("Update resource"),
         maxheight=True,
@@ -303,7 +303,7 @@ def resource_section_main(obj, *, request, **kwargs):
 
     result = {"resourceId": obj.id}
 
-    result["read"] = request.context.has_permission(ResourceScope.create, request.user)
+    result["read"] = request.context.has_permission(ResourceScope.update, request.user)
 
     column_name = "webmap_id" if obj.cls == "webmap" else ("resource_id" if obj.cls == "mapgroup_resource" else obj.cls)
     display_name = "webmap_group_name" if obj.cls == "webmap" else ("display_name" if obj.cls == "mapgroup_resource" else "display_name")
@@ -497,8 +497,10 @@ def setup_pyramid(comp, config):
 
     _resource_route("create", r"{id:uint}/create", get=create)
     _resource_route("update", r"{id:uint}/update", get=update)
-    _resource_route("update_mapgroup", r"{id:uint}/update/{tab:str}", get=update_mapgroup)
     _resource_route("delete", r"{id:uint}/delete", get=delete)
+
+    # Mapgroup
+    _resource_route("update_mapgroup", r"{id:uint}/update/{tab:str}", get=update_mapgroup)
 
     # Actions
 

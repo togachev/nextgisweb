@@ -38,5 +38,4 @@ export const MapgroupResourceWidget: EditorWidget<MapgroupResourceStore> = obser
 
 MapgroupResourceWidget.displayName = "MapgroupResourceWidget";
 MapgroupResourceWidget.title = gettext("Group");
-MapgroupResourceWidget.activateOn = { create: true };
-MapgroupResourceWidget.activateOn = { update: true };
+MapgroupResourceWidget.tabOn = { tab: "group" };

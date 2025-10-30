@@ -55,9 +55,15 @@ TabsLabel.displayName = "TabsLabel";
 
 export interface CompositeWidgetProps {
     setup: CompositeSetup;
+    tab?: string;
 }
 
-const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
+export type tabOnOptions = {
+    tab?: string;
+};
+
+
+const CompositeWidget = observer(({ setup, tab }: CompositeWidgetProps) => {
     const [activeKey, setActiveKey] = useState<string>();
     const [composite] = useState(() => new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
@@ -90,7 +96,8 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
     useEffect(() => {
         const selected = members?.find((member) => {
             const activateOn: ActiveOnOptions = member.widget.activateOn || {};
-            if (activateOn[operation]) {
+            const tabOn: tabOnOptions = member.widget.tabOn || {};
+            if (activateOn[operation] || tabOn.tab === tab) {
                 return true;
             }
         });
