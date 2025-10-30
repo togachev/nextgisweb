@@ -73,7 +73,7 @@ export const MapgroupComponent = ({
 
     return (
         <>
-            <h2>{cls === "webmap" ? gettext("Enabled web map groups") : cls === "mapgroup_resource" ? gettext("Enabled web maps") : null}</h2>
+            <h2>{cls === "webmap" ? gettext("Web Map Groups") : cls === "mapgroup_resource" ? gettext("Web maps") : null}</h2>
             <Table <GroupDataType>  {...params} />
         </>
     );

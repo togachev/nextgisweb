@@ -23,12 +23,12 @@ msgid "disabled"
 msgstr "отключено"
 
 #: nodepkg/component/MapgroupComponent.tsx:76
-msgid "Enabled web map groups"
-msgstr "Включены группы веб-карт"
+msgid "Web Map Groups"
+msgstr "Группы веб-карты"
 
 #: nodepkg/component/MapgroupComponent.tsx:76
-msgid "Enabled web maps"
-msgstr "Включены веб-карты"
+msgid "Web maps"
+msgstr "Веб-карты"
 
 #: nodepkg/group-widget/GroupWidget.tsx:23
 msgid "Display name"
@@ -51,5 +51,5 @@ msgid "Enable mapgroup"
 msgstr "Включить группу"
 
 #: nodepkg/mapgroup-widget/MapgroupResourceWidget.tsx:40
-msgid "Mapgroup resource"
-msgstr "Ресурс группы карт"
+msgid "Group"
+msgstr "Группа"
