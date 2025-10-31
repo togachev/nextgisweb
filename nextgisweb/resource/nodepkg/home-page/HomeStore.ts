@@ -89,6 +89,8 @@ export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
+    @observable accessor editGroup = true;
+    @observable accessor editMap = true;
     @observable accessor edit = false;
     @observable accessor update = false;
 
@@ -140,6 +142,16 @@ export class HomeStore {
     @action
     setSourceGroup(sourceGroup: boolean): void {
         this.sourceGroup = sourceGroup;
+    };
+
+    @action
+    setEditGroup(editGroup: boolean): void {
+        this.editGroup = editGroup;
+    };
+
+    @action
+    setEditMap(editMap: boolean): void {
+        this.editMap = editMap;
     };
 
     @action
@@ -312,11 +324,9 @@ export class HomeStore {
     };
 
     async updatePosition(payload, route_name) {
-        await payload.map(item =>
-             route(route_name).post({
-                json: item,
-            })
-        )
+        await route(route_name).post({
+            json: payload,
+        })
     };
 };
 

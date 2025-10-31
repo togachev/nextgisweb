@@ -1,13 +1,9 @@
 from nextgisweb.resource import Resource, ResourceScope, ResourceFactory
 from .model import MapgroupResource, MapgroupGroup
-from msgspec import Struct
+from msgspec import Struct, UNSET, UnsetType
 from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession
-
-
-class MapgroupBody(Struct):
-    id: int
-    position: int
+from typing import List, Dict, Any, Annotated, Union
 
 
 def maps_group(resource, request) -> JSONType:
@@ -30,20 +26,29 @@ def mapgroup_get(request) -> JSONType:
     return result
 
 
-def mapgroup_post(request, body: MapgroupBody) -> JSONType:
-    id = body.id
-    position = body.position
+class MapgroupItem(Struct, kw_only=True):
+    id: int
+    position: int
 
+
+class MapgroupBody(Struct, kw_only=True):
+    params: List[MapgroupItem]
+
+
+def mapgroup_post(request, body: MapgroupBody) -> JSONType:
     def update(id, position):
         resource = MapgroupResource.query().filter(MapgroupResource.id==id).one()
         if resource.has_permission(ResourceScope.update, request.user):
             resource.position = position
 
     with DBSession.no_autoflush:
-        update(id, position)
+        for item in body.params:
+            id = item.id
+            position = item.position
+            update(id, position)
     DBSession.flush()
 
-    return(dict(id=id, position=body.position))
+    return body.params
 
 
 def maps_get(request) -> JSONType:
@@ -61,18 +66,18 @@ def maps_get(request) -> JSONType:
 
 
 def maps_post(request, body: MapgroupBody) -> JSONType:
-    id = body.id
-    position = body.position
-
     def update(id, position):
         resource = MapgroupGroup.query().filter(MapgroupGroup.id==id).one()
         resource.position = position
 
     with DBSession.no_autoflush:
-        update(id, position)
+        for item in body.params:
+            id = item.id
+            position = item.position
+            update(id, position)
     DBSession.flush()
 
-    return(dict(id=id, position=body.position))
+    return body.params
 
 
 def setup_pyramid(comp, config):

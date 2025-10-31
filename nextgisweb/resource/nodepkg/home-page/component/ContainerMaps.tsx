@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 
 const SortableMaps = observer((props) => {
-    const { item, disable, size, store } = props;
+    const { item, size, store } = props;
 
     const {
         attributes,
@@ -28,16 +28,16 @@ const SortableMaps = observer((props) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: item.idx, disabled: disable });
+    } = useSortable({ id: item.idx, disabled: store.editMap });
 
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        width: disable ? size.maxW : size.minW,
-        height: disable ? size.maxH : size.minH,
+        width: store.editMap ? size.maxW : size.minW,
+        height: store.editMap ? size.maxH : size.minH,
         zIndex: isDragging ? "100" : "auto",
-        cursor: disable ? "pointer" : "move",
-        touchAction: disable ? "auto" : "none",
+        cursor: store.editMap ? "pointer" : "move",
+        touchAction: store.editMap ? "auto" : "none",
         boxSizing: "border-box",
         border: "1px solid rgb(179 185 190 / 65%)",
         borderRadius: "4px",
@@ -50,7 +50,7 @@ const SortableMaps = observer((props) => {
                 title={item.display_name}
                 style={style}
             >
-                {disable ? (<MapTile item={item} store={store} size={size} />) :
+                {store.editMap ? (<MapTile item={item} store={store} size={size} />) :
                     (
                         <div className="drag-item">
                             <div className={!item.enabled ? "content-drag disabled-title" : "content-drag"}>
@@ -76,7 +76,7 @@ const SortableMaps = observer((props) => {
 
 export const ContainerMaps = observer((props) => {
     const { store, size } = props;
-    const [disable, setDisable] = useState(true);
+
     const [activeId, setActiveId] = useState(null);
     const itemIds = useMemo(() => store.itemsMapsGroup.map((item) => item.idx), [store.itemsMapsGroup]);
 
@@ -98,30 +98,30 @@ export const ContainerMaps = observer((props) => {
     }, []);
 
     const savePositionMap = useCallback(() => {
-        setDisable(!disable);
-        store.updatePosition(
-            store.itemsMapsGroup.map((item, index) => ({ id: item.idx, position: index })),
-            "mapgroup.maps"
-        )
-    }, [disable]);
+        store.setEditMap(!store.editMap);
+        if (store.editMap) {
+            const value = store.itemsMapsGroup.map((item, index) => ({ id: item.idx, position: index }))
+            store.updatePosition({ params: value }, "mapgroup.maps");
+        }
+    }, []);
 
     // useEffect(() => {
-    //     if (disable === true) {
+    //     if (store.editMap === true) {
     //         store.updatePosition(
     //             store.itemsMapsGroup.map((item, index) => ({ id: item.idx, position: index })),
     //             "mapgroup.maps"
     //         )
     //     }
-    // }, [disable, store.edit]);
+    // }, [store.editMap, store.edit]);
 
     return (
         <div className="dnd-container-maps">
             {store.edit && store.itemsMapsGroup.some((item) => item.update) &&
-                (<ButtonSave icon={<SwapVertical />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<SwapVertical />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />)
             }
             <div
                 className="maps-group"
-                style={disable ?
+                style={store.editMap ?
                     { gridTemplateColumns: `repeat(auto-fill, minmax(${size.maxW}px, 1fr))` } :
                     {
                         gridTemplateColumns: `repeat(auto-fill, minmax(${size.minW}px, 1fr))`, boxShadow: "inset 0 0 3px 0",
@@ -132,7 +132,7 @@ export const ContainerMaps = observer((props) => {
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                     onDragStart={handleDragStart}
-                    style={disable ?
+                    style={store.editMap ?
                         {
                             width: size.minW,
                             height: size.minH
@@ -152,7 +152,6 @@ export const ContainerMaps = observer((props) => {
                                     key={item.idx}
                                     item={item}
                                     handle={true}
-                                    disable={disable}
                                     store={store}
                                     activeId={activeId}
                                     size={size}

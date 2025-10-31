@@ -23,7 +23,7 @@ import { useCallback } from "react";
 const settingsGroup = gettext("Group settings");
 
 const SortableMenu = observer((props) => {
-    const { id, name, store, disable, update, enabled } = props;
+    const { id, name, store, update, enabled } = props;
     const {
         attributes,
         listeners,
@@ -31,7 +31,7 @@ const SortableMenu = observer((props) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: id, disabled: disable });
+    } = useSortable({ id: id, disabled: store.editGroup });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -40,9 +40,9 @@ const SortableMenu = observer((props) => {
         height: 40,
         zIndex: isDragging ? "100" : "auto",
         opacity: isDragging ? 0.3 : 1,
-        cursor: disable ? "pointer" : "move",
-        border: disable ? "none" : "1px solid var(--divider-color)",
-        touchAction: disable ? "auto" : "none",
+        cursor: store.editGroup ? "pointer" : "move",
+        border: store.editGroup ? "none" : "1px solid var(--divider-color)",
+        touchAction: store.editGroup ? "auto" : "none",
         color: enabled ? "var(--primary)" : "var(--danger)",
     };
 
@@ -88,7 +88,7 @@ const SortableMenu = observer((props) => {
 
 export const ContainerMenu = observer((props) => {
     const { store } = props;
-    const [disable, setDisable] = useState(true);
+
     const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
 
     const [radioValue, setRadioValue] = useState(itemIds[0]);
@@ -105,16 +105,16 @@ export const ContainerMenu = observer((props) => {
     }, []);
 
     const savePositionMap = useCallback(() => {
-        setDisable(!disable);
-        store.updatePosition(
-            store.groupMapsGrid.map((item, index) => ({ id: item.id, position: index })),
-            "mapgroup.groups"
-        )
-        setRadioValue(itemIds[0]);
-    }, [disable]);
+        store.setEditGroup(!store.editGroup);
+        if (store.editGroup) {
+            const value = store.groupMapsGrid.map((item, index) => ({ id: item.id, position: index }))
+            store.updatePosition({ params: value }, "mapgroup.groups");
+            setRadioValue(itemIds[0]);
+        }
+    }, []);
 
     // useEffect(() => {
-    //     if (disable === true /*&& store.sourceGroup === true*/) {
+    //     if (store.editGroup === true /*&& store.sourceGroup === true*/) {
     //         store.updatePosition(
     //             store.groupMapsGrid.map((item, index) => ({ id: item.id, position: index })),
     //             "mapgroup.groups"
@@ -128,16 +128,16 @@ export const ContainerMenu = observer((props) => {
     //     //     store.setSourceGroup(true);
     //     //     // store.getMapValues("all");
     //     // }
-    // }, [disable, store.edit]);
+    // }, [store.editGroup, store.edit]);
 
     return (
         <div className="dnd-container-menu">
             {store.edit && store.groupMapsGrid.some((item) => item.update) &&
-                (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+                (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={store.editGroup} onClickSave={savePositionMap} />)
             }
             <div
                 className="menu-group"
-                style={disable ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
+                style={store.editGroup ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
             >
                 <DndContext
                     collisionDetection={closestCenter}
@@ -157,7 +157,6 @@ export const ContainerMenu = observer((props) => {
                                     id={item.id}
                                     name={item.webmap_group_name}
                                     handle={true}
-                                    disable={disable}
                                     store={store}
                                     update={item.update}
                                     enabled={item.enabled}
