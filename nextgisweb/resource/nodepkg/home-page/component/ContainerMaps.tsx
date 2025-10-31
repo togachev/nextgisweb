@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -53,7 +53,7 @@ const SortableMaps = observer((props) => {
                 {disable ? (<MapTile item={item} store={store} size={size} />) :
                     (
                         <div className="drag-item">
-                            <div className={!item.enabled ? "content-drag disabled-title": "content-drag"}>
+                            <div className={!item.enabled ? "content-drag disabled-title" : "content-drag"}>
                                 {item?.display_name}
                             </div>
                             {item.preview_fileobj_id ?
@@ -80,19 +80,11 @@ export const ContainerMaps = observer((props) => {
     const [activeId, setActiveId] = useState(null);
     const itemIds = useMemo(() => store.itemsMapsGroup.map((item) => item.idx), [store.itemsMapsGroup]);
 
-    const updatePosition = async (id, position) => {
-        const payload = {
-            id: id,
-            position: position
-        };
-        return await route("mapgroup.maps").post({
-            json: payload,
-        });
-    };
-    const handleDragStart = (event) => {
+    const handleDragStart = useCallback((event) => {
         setActiveId(event.active.id);
-    };
-    const handleDragEnd = (event) => {
+    }, []);
+
+    const handleDragEnd = useCallback((event) => {
         setActiveId(null);
         const { active, over } = event;
 
@@ -103,25 +95,24 @@ export const ContainerMaps = observer((props) => {
             const value = arrayMove(items, oldIndex, newIndex);
             store.setItemsMapsGroup(value);
         }
-    };
+    }, []);
 
-    const savePositionMap = () => {
+    const savePositionMap = useCallback(() => {
         setDisable(!disable);
-    };
+        store.updatePosition(
+            store.itemsMapsGroup.map((item, index) => ({ id: item.idx, position: index })),
+            "mapgroup.maps"
+        )
+    }, [disable]);
 
-    useEffect(() => {
-        if (store.edit === true && disable === true && store.sourceMaps === true) {
-            store.itemsMapsGroup.map((item, index) => {
-                updatePosition(item.idx, index);
-            })
-            store.setSourceMaps(false);
-            store.getMapValues("maps");
-        }
-        else {
-            store.setSourceMaps(true);
-            store.getMapValues("maps");
-        }
-    }, [disable, store.edit]);
+    // useEffect(() => {
+    //     if (disable === true) {
+    //         store.updatePosition(
+    //             store.itemsMapsGroup.map((item, index) => ({ id: item.idx, position: index })),
+    //             "mapgroup.maps"
+    //         )
+    //     }
+    // }, [disable, store.edit]);
 
     return (
         <div className="dnd-container-maps">

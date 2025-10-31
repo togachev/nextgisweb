@@ -18,6 +18,7 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useCallback } from "react";
 
 const settingsGroup = gettext("Group settings");
 
@@ -92,17 +93,7 @@ export const ContainerMenu = observer((props) => {
 
     const [radioValue, setRadioValue] = useState(itemIds[0]);
 
-    const updatePosition = async (id, position) => {
-        const payload = {
-            id: id,
-            position: position
-        };
-        return await route("mapgroup.groups").post({
-            json: payload,
-        });
-    };
-
-    const handleDragEnd = (event) => {
+    const handleDragEnd = useCallback((event) => {
         const { active, over } = event;
         if (active.id !== over.id) {
             const items = store.groupMapsGrid
@@ -111,26 +102,33 @@ export const ContainerMenu = observer((props) => {
             const value = arrayMove(items, oldIndex, newIndex);
             store.setGroupMapsGrid(value);
         }
-    };
+    }, []);
 
-    const savePositionMap = () => {
+    const savePositionMap = useCallback(() => {
         setDisable(!disable);
-    };
+        store.updatePosition(
+            store.groupMapsGrid.map((item, index) => ({ id: item.id, position: index })),
+            "mapgroup.groups"
+        )
+        setRadioValue(itemIds[0]);
+    }, [disable]);
 
-    useEffect(() => {
-        if (disable === true && store.sourceGroup === true) {
-            store.groupMapsGrid.map((item, index) => {
-                updatePosition(item.id, index)
-            })
-            store.setSourceGroup(false);
-            setRadioValue(itemIds[0]);
-            store.getMapValues("all");
-        }
-        else {
-            store.setSourceGroup(true);
-            store.getMapValues("all");
-        }
-    }, [disable, store.edit]);
+    // useEffect(() => {
+    //     if (disable === true /*&& store.sourceGroup === true*/) {
+    //         store.updatePosition(
+    //             store.groupMapsGrid.map((item, index) => ({ id: item.id, position: index })),
+    //             "mapgroup.groups"
+    //         )
+
+    //         // store.setSourceGroup(false);
+    //         setRadioValue(itemIds[0]);
+    //         // store.getMapValues("all");
+    //     }
+    //     // else {
+    //     //     store.setSourceGroup(true);
+    //     //     // store.getMapValues("all");
+    //     // }
+    // }, [disable, store.edit]);
 
     return (
         <div className="dnd-container-menu">

@@ -125,8 +125,10 @@ export const Header = observer(({ store }: HeaderProps) => {
                     icon: <LogoutOutlined className="logout-icon" />,
                     key: "sign_out",
                 },
-                store.groupMapsGrid.some((item) => item.update) && store.itemsMapsGroup.some((item) => item.update) && {
-                    label: (<a onClick={() => store.setEdit(!store.edit)} className="icon-pensil">{!store.edit ? editPage : disableEditPage}</a>),
+                store.update && {
+                    label: (<a onClick={() => {
+                        store.setEdit(!store.edit)
+                    }} className="icon-pensil">{!store.edit ? editPage : disableEditPage}</a>),
                     icon: !store.edit ? <Pencil /> : <PencilOff />,
                     key: "edit_page",
                 },

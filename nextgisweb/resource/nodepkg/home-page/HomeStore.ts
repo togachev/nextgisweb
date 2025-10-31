@@ -90,6 +90,7 @@ export class HomeStore {
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
     @observable accessor edit = false;
+    @observable accessor update = false;
 
     @observable.ref accessor config: ConfigProps;
 
@@ -119,6 +120,11 @@ export class HomeStore {
     @action
     setUrlImg(ulrImg: ImgUrlKey) {
         this.ulrImg = ulrImg;
+    };
+
+    @action
+    setUpdate(update: boolean) {
+        this.update = update;
     };
 
     @action
@@ -289,29 +295,28 @@ export class HomeStore {
     async getMapValues(key) {
         this.maplist()
             .then(maps => {
-                let maps_filter;
-                if (!this.edit) {
-                    maps_filter = maps.filter(item => item.enabled === true)
-                } else {
-                    maps_filter = maps
-                }
                 this.setListMaps(maps);
                 if (key === "all") {
                     this.groupMaps()
                         .then(group => {
-                            let group_filter;
-                            if (!this.edit) {
-                                group_filter = group.filter(item => item.enabled === true)
+                            this.setGroupMapsGrid(group.sort((a, b) => a.position - b.position));
+                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === group[0]?.id).sort((a, b) => a.position - b.position));
+                            if (this.groupMapsGrid.length > 0 && this.itemsMapsGroup.length > 0) {
+                                this.setUpdate(true)
                             } else {
-                                group_filter = group
+                                this.setUpdate(false)
                             }
-                            const result = group_filter.filter(({ id }) => [...new Set(maps_filter.map(g => g.webmap_group_id))].includes(id));
-                            this.setGroupMapsGrid(result.sort((a, b) => a.position - b.position));
-                            const groupId = result.sort((a, b) => a.position - b.position)[0]?.id
-                            this.setItemsMapsGroup(maps_filter.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.position - b.position));
                         })
                 }
             });
+    };
+
+    async updatePosition(payload, route_name) {
+        await payload.map(item =>
+             route(route_name).post({
+                json: item,
+            })
+        )
     };
 };
 
