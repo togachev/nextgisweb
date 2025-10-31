@@ -29,7 +29,7 @@ const { Title } = Typography;
 const signInText = gettext("Sign in");
 const signOutText = gettext("Sign out");
 const editPage = gettext("Edit page");
-const disableEditPage = gettext("Disable edit page");
+const disableEditPage = gettext("Disable edit");
 
 type HeaderProps = {
     store: HomeStore;

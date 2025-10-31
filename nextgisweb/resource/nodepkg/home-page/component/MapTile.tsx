@@ -103,8 +103,7 @@ export const MapTile = observer((props) => {
                                 <div className="content-title">
                                     {!size.min && display_name}
                                 </div>
-                                {/* {store.edit && (<span className={!enabled ? "icon-disable" : ""} title={gettext("Disabled webmap")}> */}
-                                    {store.edit && update &&
+                                {store.edit && update &&
                                     <div className="icon-disable">
                                         <Button
                                             title={settingsWebMapsGroup}
@@ -116,10 +115,9 @@ export const MapTile = observer((props) => {
                                             color={!enabled ? "danger" : "default"}
                                             variant="link"
                                         />
-                                        </div>
-                                    }
-                                    {!store.edit && !enabled && <DisabledVisible />}
-                                {/* </span>)} */}
+                                    </div>
+                                }
+                                {!store.edit && !enabled && <DisabledVisible />}
                             </span>
                             <div className={size.min ? "button-min control-button" : "control-button"} >
                                 <Button
@@ -130,7 +128,7 @@ export const MapTile = observer((props) => {
                                 >
                                     {!size.min && <Text >{openMap}</Text>}
                                 </Button>
-                                {update && (
+                                {store.edit && update && (
                                     <Button
                                         title={settingsTitle}
                                         href={urlWebmapSettings}
