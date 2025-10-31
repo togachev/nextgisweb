@@ -512,9 +512,9 @@ class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
 
 
 class ColorSF(Struct, kw_only=True):
-    stroke_primary: str
-    stroke_secondary: str
-    fill: str
+    stroke_primary: Union[str, UnsetType] = UNSET
+    stroke_secondary: Union[str, UnsetType] = UNSET
+    fill: Union[str, UnsetType] = UNSET
 
 
 class ColorSFAttr(SAttribute):

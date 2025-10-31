@@ -317,6 +317,7 @@ def resource_section_main(obj, *, request, **kwargs):
                 dict(
                     display_name=getattr(item, display_name),
                     enabled=item.enabled,
+                    position=item.position,
                     id=getattr(item, resource_id),
                 )
             )

@@ -1,5 +1,6 @@
 import { isEqual } from "lodash-es";
 import { action, computed, observable } from "mobx";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ExtentRowValue } from "@nextgisweb/gui/component";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -15,10 +16,21 @@ import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
 
+interface ColorProps {
+    label: string;
+    value: string;
+}
+
 interface ColorsSelectedFeatureProps {
-    stroke_primary: string;
-    stroke_secondary: string;
-    fill: string;
+    stroke_primary: ColorProps;
+    stroke_secondary: ColorProps;
+    fill: ColorProps;
+}
+
+const defaultValueColor = {
+    stroke_primary: { label: gettext("Highlight color"), value: "rgba(255,255,0,1)" },
+    stroke_secondary: { label: gettext("Highlight color secondary(raster layer)"), value: "rgba(0, 0, 0, 1)" },
+    fill: { label: gettext("Background color"), value: "rgba(255,255,255,0.1)" }
 }
 
 export class SettingStore
@@ -54,6 +66,7 @@ export class SettingStore
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
+        this.colorsSelectedFeature = defaultValueColor
         this.initialValue = this.deserializedValue;
     }
 

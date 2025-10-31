@@ -97,7 +97,9 @@ const CompositeWidget = observer(({ setup, tab }: CompositeWidgetProps) => {
         const selected = members?.find((member) => {
             const activateOn: ActiveOnOptions = member.widget.activateOn || {};
             const tabOn: tabOnOptions = member.widget.tabOn || {};
-            if (activateOn[operation] || tabOn.tab === tab) {
+            if (tabOn.tab && tabOn.tab === tab) {
+                return true;
+            } else if (activateOn[operation]) {
                 return true;
             }
         });

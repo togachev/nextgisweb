@@ -94,4 +94,4 @@ export const GroupWidget: EditorWidget<GroupStore> = observer(({ store }) => {
 
 GroupWidget.displayName = "GroupWidget";
 GroupWidget.title = gettext("Webmaps");
-GroupWidget.tabOn = { tab: "map" };
+GroupWidget.tabOn = { tab: "maps" };

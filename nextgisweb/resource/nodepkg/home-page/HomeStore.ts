@@ -4,6 +4,7 @@ import { extractError } from "@nextgisweb/gui/error";
 
 import type { UploadFile } from "@nextgisweb/gui/antd";
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 export interface LayoutProps {
     i: string;
@@ -18,7 +19,6 @@ export interface ListMapProps {
     enabled: boolean;
     display_name: string;
     id: number;
-    idx: number;
     label: string;
     owner: boolean;
     position: LayoutProps;
@@ -79,7 +79,6 @@ interface ImgUrlKey {
 
 type Action = keyof Pick<HomeStore,
     | "getWidthMenu"
-    | "getMapValues"
     | "getValuesHeader"
     | "getValuesFooter"
     | "saveSetting"
@@ -89,14 +88,29 @@ export class HomeStore {
     @observable accessor widthMenu: number | string | null = null;
     @observable accessor sourceMaps = false;
     @observable accessor sourceGroup = false;
+    @observable accessor editGroup = true;
+    @observable accessor editMap = true;
     @observable accessor edit = false;
+    @observable accessor update = false;
+    @observable accessor radioValue: number = 0;
+
+    @observable.shallow accessor resources: CompositeRead[] | null = null;
+    @observable.shallow accessor allLoadedResources: Map<
+        number,
+        CompositeRead
+    > = new Map();
+
+    @observable.shallow accessor allMapsGroup: Map<
+        number,
+        ListMapProps
+    > = new Map();
 
     @observable.ref accessor config: ConfigProps;
 
-    @observable.shallow accessor listMaps: ListMapProps[] = [];
-    @observable.shallow accessor groupMapsGrid: GroupMapsGridProps[] = [];
     @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
 
+    @observable.ref accessor activeMapId: string | null = null;
+    @observable.ref accessor activeGroupId: string | null = null;
     @observable.shallow accessor initialFooter: FooterProps;
     @observable.shallow accessor initialHeader: HeaderProps;
 
@@ -111,14 +125,62 @@ export class HomeStore {
     constructor({ config }) {
         this.config = config
         this.getWidthMenu();
-        this.getMapValues("all");
+        this.mapgroup();
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
     };
 
     @action
+    updateLoadedResources(resources: CompositeRead[]) {
+        const allResources = new Map(this.allLoadedResources);
+
+        resources.forEach((resource) => {
+            allResources.set(resource.resource.id, resource);
+        });
+        this.allLoadedResources = allResources;
+    }
+
+    @action
+    updateMapsGroup(itemsMapsGroup: ListMapProps[]) {
+        const allMaps = new Map(this.allMapsGroup);
+
+        itemsMapsGroup.forEach((item) => {
+            allMaps.set(item.id, item);
+        });
+        this.allMapsGroup = allMaps;
+    }
+
+
+    @action
+    setActiveMapId(activeMapId: string | null) {
+        this.activeMapId = activeMapId;
+    }
+
+    @action
+    setActiveGroupId(activeGroupId: string | null) {
+        this.activeGroupId = activeGroupId;
+    }
+
+
+    @action
+    setResources(resources: CompositeRead[]) {
+        this.resources = resources;
+        this.updateLoadedResources(resources);
+    }
+
+    @action
+    setRadioValue(radioValue: number) {
+        this.radioValue = radioValue;
+    }
+
+    @action
     setUrlImg(ulrImg: ImgUrlKey) {
         this.ulrImg = ulrImg;
+    };
+
+    @action
+    setUpdate(update: boolean) {
+        this.update = update;
     };
 
     @action
@@ -137,23 +199,24 @@ export class HomeStore {
     };
 
     @action
+    setEditGroup(editGroup: boolean): void {
+        this.editGroup = editGroup;
+    };
+
+    @action
+    setEditMap(editMap: boolean): void {
+        this.editMap = editMap;
+    };
+
+    @action
     setEdit(edit: boolean): void {
         this.edit = edit;
     };
 
     @action
-    setListMaps(listMaps: ListMapProps[]) {
-        this.listMaps = listMaps
-    };
-
-    @action
-    setGroupMapsGrid(groupMapsGrid: GroupMapsGridProps[]) {
-        this.groupMapsGrid = groupMapsGrid
-    };
-
-    @action
     setItemsMapsGroup(itemsMapsGroup: ListMapProps[]) {
         this.itemsMapsGroup = itemsMapsGroup
+        this.updateMapsGroup(itemsMapsGroup);
     };
 
     @action
@@ -223,16 +286,6 @@ export class HomeStore {
         });
     };
 
-    private async maplist() {
-        const resp = await route("mapgroup.maps").get();
-        return resp;
-    };
-
-    private async groupMaps() {
-        const resp = await route("mapgroup.groups").get();
-        return resp;
-    };
-
     private async getFilterSetting(key, nkey, ekey) {
         const resp = await route("pyramid.csettings").get({
             query: { pyramid: [key], nkey: nkey, ekey: ekey },
@@ -285,21 +338,32 @@ export class HomeStore {
             });
     };
 
-    @actionHandler
-    async getMapValues(key) {
-        this.maplist()
-            .then(maps => {
-                this.setListMaps(maps);
-                if (key === "all") {
-                    this.groupMaps()
-                        .then(group => {
-                            const result = group.filter(({ id }) => [...new Set(maps.map(g => g.webmap_group_id))].includes(id));
-                            this.setGroupMapsGrid(result.sort((a, b) => a.position - b.position));
-                            const groupId = result.sort((a, b) => a.position - b.position)[0]?.id
-                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === groupId).sort((a, b) => a.position - b.position));
-                        })
-                }
-            });
+    private async mapgroup() {
+        const resp = await route("mapgroup.collection").get({
+            query: {
+                description: false,
+            },
+            cache: true,
+        });
+
+        const { res, update } = resp;
+
+        this.setUpdate(update)
+
+        if (res.length > 0) {
+            const activeResource = res
+                .filter(item => item.mapgroup_resource.enabled)
+                .reduce((min, current) => ((current.mapgroup_resource.position < min.mapgroup_resource.position) ? current : min));
+            this.setRadioValue(activeResource.resource.id);
+            this.setItemsMapsGroup(activeResource.mapgroup_group.groupmaps);
+            this.setResources(res.sort((a, b) => (a.mapgroup_resource.position - b.mapgroup_resource.position)));
+        }
+    };
+
+    async updatePosition(payload, route_name) {
+        await route(route_name).post({
+            json: payload,
+        })
     };
 };
 

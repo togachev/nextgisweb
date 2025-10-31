@@ -19,7 +19,6 @@ import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { ErrorIcon } from "@nextgisweb/gui/icon";
-import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 
 import { ROOT_DATA, ROOT_ITEM, useDataProvider } from "./DataProvider";
 import type { DataProvider } from "./DataProvider";
@@ -39,6 +38,7 @@ import Circle from "@nextgisweb/icon/mdi/circle";
 import RadioboxBlank from "@nextgisweb/icon/mdi/radiobox-blank";
 import GroupIcon from "@nextgisweb/icon/mdi/arrow-expand";
 import SwapHorizontal from "@nextgisweb/icon/mdi/swap-horizontal";
+import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 
 import "./ComplexTree.less";
 
@@ -428,6 +428,7 @@ export function ComplexTree<
                 ? renderColumns(storeItem)
                 : [0, undefined];
             const enabled = storeItem?.enabled?.value;
+
             return (
                 <tr
                     key={treeItem.index}
@@ -447,16 +448,8 @@ export function ComplexTree<
                     >
                         <div title={title?.(storeItem)}>
                             {!provider.isFlat && props.arrow}
-                            <div className={storeItem.itemType === "layer" ? "title layer-color" : enabled !== true ? "title title-webmap-disable" : "title title-webmap"} >
+                            <div className="title" >
                                 {title?.(storeItem) || <>&nbsp;</>}
-                                {enabled === false ?
-                                    <span className="icon-disable" title={gettext("Disabled webmap")}>
-                                        <Circle />
-                                    </span> : enabled === true ?
-                                        <span className="icon-enable" title={gettext("Enabled webmap")}>
-                                            <Circle />
-                                        </span> : <></>
-                                }
                             </div>
                             {storeItem.itemType === "group" &&
                                 <>
@@ -471,11 +464,16 @@ export function ComplexTree<
                                     </Tooltip>
                                 </div>
                             )}
+                            {enabled === false &&
+                                <div className="icon-disable" title={gettext("Disabled webmap")}>
+                                    <DisabledVisible />
+                                </div>
+                            }
                         </div>
                     </td>
                     {columnsElement}
                     {props.showActions && renderActions(storeItem)}
-                </tr >
+                </tr>
             );
         };
         return observer(Base);

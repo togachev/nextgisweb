@@ -9,6 +9,7 @@ interface Groupmaps {
     display_name: string;
     enabled: boolean;
     id: number;
+    position: number;
 }
 
 interface MapgroupComponentProps {
@@ -33,14 +34,14 @@ export const MapgroupComponent = ({
                 dataIndex: "name",
                 key: "name",
                 render: (value: string, { key, name, status }: GroupDataType) => (
-                        <a
-                            style={{color: status ? "var(--primary)" : "var(--danger)"}}
-                            className="ellipsis"
-                            href={routeURL("resource.show", { id: key })}
-                            target="_blank"
-                        >
-                            {name}
-                        </a>
+                    <a
+                        style={{ color: status ? "var(--primary)" : "var(--danger)" }}
+                        className="ellipsis"
+                        href={routeURL("resource.show", { id: key })}
+                        target="_blank"
+                    >
+                        {name}
+                    </a>
                 ),
                 ellipsis: true,
             },
@@ -55,7 +56,7 @@ export const MapgroupComponent = ({
         ]
         const data: GroupDataType[] = [];
 
-        array.sort((a, b) => Number(a.id) - Number(b.id))
+        array.sort((a, b) => a.position - b.position)
             .map((item) => {
                 data.push({
                     key: item.id,

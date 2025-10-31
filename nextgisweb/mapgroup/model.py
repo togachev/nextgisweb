@@ -43,6 +43,9 @@ class MapgroupResource(Base, Resource):
 
 class MapgroupResourceSerializer(Serializer, resource=MapgroupResource):
     enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    position = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
 
 class MapgroupGroup(Base):
@@ -100,7 +103,7 @@ class MapgroupGroup(Base):
 
     def to_dict(self):
         return dict(
-            id=self.webmap_id,
+            webmap_id=self.webmap_id,
             value=self.webmap_id,
             owner=True,
             display_name=self.webmap_name,
@@ -108,7 +111,7 @@ class MapgroupGroup(Base):
             description_status=self.description_status,
             webmap_group_name=self.webmap_group_name,
             webmap_group_id=self.resource_id,
-            idx=self.id,
+            id=self.id,
             position=self.position,
             enabled=self.enabled,
             preview_fileobj_id=self.preview_fileobj_id,
@@ -118,8 +121,17 @@ class MapgroupGroup(Base):
 
 class MapgroupGroupItemRead(Struct, kw_only=True):
     webmap_id: int
+    value: int
     display_name: Annotated[str, Meta(min_length=1)]
-    enabled: bool
+    label: Annotated[str, Meta(min_length=1)]
+    description_status: Union[bool, UnsetType] = UNSET
+    webmap_group_name: Annotated[str, Meta(min_length=1)]
+    webmap_group_id: int
+    id: int
+    position: int
+    enabled: Union[bool, UnsetType] = UNSET
+    preview_fileobj_id: int
+    preview_description: Annotated[str, Meta(min_length=1)]
 
 
 class MapgroupGroupItemWrite(Struct, kw_only=True):
@@ -130,15 +142,30 @@ class MapgroupGroupItemWrite(Struct, kw_only=True):
 
 class GroupmapsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[MapgroupGroupItemRead]:
-        return [
-            dict(
+        def value(i):
+            return MapgroupGroupItemRead(
                 webmap_id=i.webmap_id,
-                display_name=i.display_name,
+                value=i.webmap_id,
+                display_name=i.webmap_name,
+                label=i.webmap_name,
+                description_status=i.description_status,
+                webmap_group_name=i.webmap_group_name,
+                webmap_group_id=i.resource_id,
+                id=i.id,
+                position=i.position,
                 enabled=i.enabled,
+                preview_fileobj_id=i.preview_fileobj_id,
+                preview_description=i.preview_description,
             )
-            for i in srlzr.obj.groupmaps
-            if Resource.filter_by(id=i.webmap_id).one().has_permission(ResourceScope.update, srlzr.user)
-        ]
+
+        result = list()
+        for i in srlzr.obj.groupmaps:
+            if Resource.filter_by(id=i.webmap_id).one().has_permission(ResourceScope.read, srlzr.user) and i.enabled == True:
+                result.append(value(i))
+            elif Resource.filter_by(id=i.webmap_id).one().has_permission(ResourceScope.update, srlzr.user):
+                result.append(value(i))
+
+        return result
 
     def set(self, srlzr: Serializer, value: List[MapgroupGroupItemWrite], *, create: bool):
         srlzr.obj.groupmaps = [MapgroupGroup(**to_builtins(i)) for i in value]

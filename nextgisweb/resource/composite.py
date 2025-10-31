@@ -12,9 +12,17 @@ from .serialize import CRUTypes, Serializer
 
 
 class CompositeSerializer:
-    def __init__(self, *, keys: Union[Tuple[str, ...], None] = None, description: bool = True, user: User):
+    def __init__(
+            self,
+            *,
+            keys: Union[Tuple[str, ...], None] = None,
+            description: bool = True,
+            mapgroup: bool = True,
+            user: User
+    ):
         self.user = user
         self.description = description
+        self.mapgroup = mapgroup
         self.members: Tuple[Tuple[str, Type[Serializer]], ...] = tuple(
             (identity, srlzrcls)
             for identity, srlzrcls in Serializer.registry.items()
@@ -34,6 +42,8 @@ class CompositeSerializer:
                     raise
         if self.description == False:
             result["resource"]["description"] = None
+        if self.mapgroup == False:
+            result["mapgroup_group"] = None
         return cls(**result)
 
     def deserialize(self, obj: Resource, value: Struct):

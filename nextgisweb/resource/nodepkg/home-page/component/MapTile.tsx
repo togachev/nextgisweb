@@ -24,17 +24,17 @@ export const MapTile = observer((props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
 
-    const { id, display_name, preview_fileobj_id, description_status, update, enabled, webmap_group_id } = props.item;
+    const { webmap_id, display_name, preview_fileobj_id, description_status, enabled, webmap_group_id } = props.item;
     const { store, size } = props;
     const { upath_info } = store.config;
 
-    const preview = routeURL("maptile.preview", id);
-    const urlWebmap = routeURL("webmap.display", id);
+    const preview = routeURL("maptile.preview", { id: webmap_id });
+    const urlWebmap = routeURL("webmap.display", { id: webmap_id });
 
-    const urlWebmapSettings = routeURL("resource.update", id);
+    const urlWebmapSettings = routeURL("resource.update", { id: webmap_id });
 
     const showDescription = async () => {
-        const value = await route("resource.item", id).get({
+        const value = await route("resource.item", { id: webmap_id }).get({
             cache: true,
             query: {
                 serialization: "resource",
@@ -99,24 +99,24 @@ export const MapTile = observer((props) => {
                     className="meta-card"
                     title={
                         <div className="title-map">
-                            <span style={!enabled ? { color: "var(--danger)" } : {color: "default"}} title={display_name} className="title">
+                            <span style={!enabled ? { color: "var(--danger)" } : { color: "default" }} title={display_name} className="title">
                                 <div className="content-title">
                                     {!size.min && display_name}
                                 </div>
-                                <span className="icon-disable" title={gettext("Disabled webmap")}>
-                                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && update &&
+                                {!store.edit && !enabled ? <DisabledVisible /> : store.edit && (
+                                    <div className="icon-disable">
                                         <Button
                                             title={settingsWebMapsGroup}
                                             className="button-update"
-                                            href={routeURL("resource.update_mapgroup", webmap_group_id, "map")}
+                                            href={routeURL("resource.update_mapgroup", webmap_group_id, "maps")}
                                             icon={<OpenInNew />}
                                             target="_blank"
                                             type="text"
                                             color={!enabled ? "danger" : "default"}
                                             variant="link"
                                         />
-                                    }
-                                </span>
+                                    </div>
+                                )}
                             </span>
                             <div className={size.min ? "button-min control-button" : "control-button"} >
                                 <Button
@@ -127,7 +127,7 @@ export const MapTile = observer((props) => {
                                 >
                                     {!size.min && <Text >{openMap}</Text>}
                                 </Button>
-                                {update && (
+                                {store.update && (
                                     <Button
                                         title={settingsTitle}
                                         href={urlWebmapSettings}

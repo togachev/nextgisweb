@@ -358,21 +358,21 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: nodepkg/editor-widget/EditorWidget.tsx:53
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:120 view.py:322
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:120 view.py:335
 msgid "Owner"
 msgstr "Владелец"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:67 view.py:314
+#: nodepkg/editor-widget/EditorWidget.tsx:67 view.py:327
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:319
-msgid "No"
-msgstr "Нет"
-
-#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:319
+#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:332
 msgid "Yes"
 msgstr "Да"
+
+#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:332
+msgid "No"
+msgstr "Нет"
 
 #: nodepkg/export-settings/ExportSettings.tsx:19
 msgid ""
@@ -438,20 +438,19 @@ msgstr "Введите название карты"
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: nodepkg/home-page/component/ContainerMaps.tsx:70
-#: nodepkg/home-page/component/MapTile.tsx:72
-msgid "Disabled webmap"
-msgstr "Отключенная веб-карта"
-
 #: nodepkg/home-page/component/ContainerMaps.tsx:129
 msgid "Edit grid maps"
 msgstr "Редактировать сетку карт"
 
-#: nodepkg/home-page/component/ContainerMenu.tsx:21
+#: nodepkg/home-page/component/ContainerMenu.tsx:22
 msgid "Group settings"
 msgstr "Настройки группы"
 
-#: nodepkg/home-page/component/ContainerMenu.tsx:131
+#: nodepkg/home-page/component/ContainerMenu.tsx:69
+msgid "Disabled group"
+msgstr ""
+
+#: nodepkg/home-page/component/ContainerMenu.tsx:138
 msgid "Edit group maps"
 msgstr "Редактировать группы карт"
 
@@ -530,8 +529,8 @@ msgid "Edit page"
 msgstr "Редактировать страницу"
 
 #: nodepkg/home-page/component/Header.tsx:32
-msgid "Disable edit page"
-msgstr "Отключить редактирование страницы"
+msgid "Disable edit"
+msgstr "Отключить редактирование"
 
 #: nodepkg/home-page/component/Header.tsx:106
 msgid "Resources"
@@ -574,17 +573,21 @@ msgstr ""
 msgid "Header setting"
 msgstr "Настройка верхнего колонтитула"
 
-#: nodepkg/home-page/component/MapTile.tsx:12
+#: nodepkg/home-page/component/MapTile.tsx:15
 msgid "Open map"
 msgstr "Открыть карту"
 
-#: nodepkg/home-page/component/MapTile.tsx:13
+#: nodepkg/home-page/component/MapTile.tsx:16
 msgid "Map description"
 msgstr "Описание карты"
 
-#: nodepkg/home-page/component/MapTile.tsx:14
+#: nodepkg/home-page/component/MapTile.tsx:17
 msgid "Map settings"
 msgstr "Настройки карты"
+
+#: nodepkg/home-page/component/MapTile.tsx:18
+msgid "Setting up a web map in a group"
+msgstr ""
 
 #: nodepkg/home-page/component/UploadComponent.tsx:112
 msgid "Preview file"
@@ -644,7 +647,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:493
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:509
 msgid "Action"
 msgstr "Действие"
 
@@ -684,7 +687,7 @@ msgstr "Все права"
 msgid "Permissions"
 msgstr "Права доступа"
 
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:113 view.py:312
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:113 view.py:325
 msgid "Type"
 msgstr "Тип"
 
@@ -730,7 +733,7 @@ msgstr "Показать дату создания ресурса"
 
 #: nodepkg/resource-section/children/component/MenuDropdown.tsx:222
 #: nodepkg/resource-section/children/util/createResourceTableItemOptions.ts:8
-#: view.py:536
+#: view.py:552
 msgid "Delete"
 msgstr "Удалить"
 
@@ -783,7 +786,7 @@ msgid "External access"
 msgstr "Внешний доступ"
 
 #: nodepkg/resource-section/main/CreateResourceButton.tsx:7
-#: nodepkg/resource-section/main/CreateResourceModal.tsx:20 view.py:204 view.py:492
+#: nodepkg/resource-section/main/CreateResourceModal.tsx:20 view.py:204 view.py:508
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -880,42 +883,45 @@ msgctxt "permission"
 msgid "Configure service"
 msgstr "Настройка сервиса"
 
-#: view.py:112 view.py:571
+#: view.py:112 view.py:587
 msgid "Groups of digital web maps"
 msgstr "Группы цифровых веб-карт"
 
-#: view.py:146 view.py:545
+#: view.py:146 view.py:561
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:157 view.py:552
+#: view.py:157 view.py:568
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:216
+#: view.py:216 view.py:229
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:227
+#: view.py:240
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:237 view.py:565
+#: view.py:250 view.py:581
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:435
+#: view.py:448
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:494
+#: view.py:510
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:509
+#: view.py:525
 msgid "Update"
 msgstr "Изменить"
 
-#: view.py:523
+#: view.py:539
 msgid "Add/remove public files"
 msgstr "Добавить/удалить публичные файлы"
+
+#~ msgid "Disabled webmap"
+#~ msgstr "Отключенная веб-карта"

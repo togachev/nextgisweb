@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { FC, useCallback, HTMLAttributes } from "react";
 import { observer } from "mobx-react-lite";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -7,11 +7,19 @@ import SwapVertical from "@nextgisweb/icon/mdi/swap-vertical";
 import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
 import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 import { Button, Radio } from "@nextgisweb/gui/antd";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { DragItem } from "./DragItem";
 import {
     DndContext,
     closestCenter,
+    useSensor,
+    useSensors,
+    MouseSensor,
+    TouchSensor,
+    DragOverlay,
+    DragStartEvent,
+    DragEndEvent,
 } from "@dnd-kit/core";
 import {
     arrayMove,
@@ -21,8 +29,16 @@ import {
 
 const settingsGroup = gettext("Group settings");
 
-const SortableMenu = observer((props) => {
-    const { id, name, store, disable, update, enabled } = props;
+export type ItemProps = HTMLAttributes<HTMLDivElement> & {
+    id: string;
+    isDragging?: boolean;
+};
+
+const SortableMenu: FC<ItemProps> = observer((props) => {
+    const { store, item } = props;
+    const { id, display_name } = item.resource;
+    const { enabled } = item.mapgroup_resource;
+
     const {
         attributes,
         listeners,
@@ -30,7 +46,7 @@ const SortableMenu = observer((props) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: id, disabled: disable });
+    } = useSortable({ id: id, disabled: store.editGroup });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -38,32 +54,34 @@ const SortableMenu = observer((props) => {
         width: store.edit ? store.widthMenu - 29 : store.widthMenu,
         height: 40,
         zIndex: isDragging ? "100" : "auto",
-        opacity: isDragging ? 0.3 : 1,
-        cursor: disable ? "pointer" : "move",
-        border: disable ? "none" : "1px solid var(--divider-color)",
-        touchAction: disable ? "auto" : "none",
+        cursor: store.editGroup ? "pointer" : "move",
+        border: store.editGroup ? "none" : "1px solid var(--divider-color)",
+        touchAction: store.editGroup ? "auto" : "none",
         color: enabled ? "var(--primary)" : "var(--danger)",
+        opacity: isDragging ? "0" : "1",
     };
 
-    const onClickGroupMapsGrid = (id) => {
-        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.position - b.position));
-    };
+    const onClickGroupMenu = useCallback((id) => {
+        store.setRadioValue(id);
+        store.setItemsMapsGroup(store.allLoadedResources.get(id).mapgroup_group.groupmaps);
+    }, []);
 
     return (
         <div className="menu-item" {...listeners} {...attributes} ref={setNodeRef}>
             <Radio.Button
-                title={name}
+                title={display_name}
                 className="menu-content"
+                disabled={store.editMap === false}
                 style={style}
                 key={id}
                 value={id}
                 checked={id === 0}
-                onClick={() => onClickGroupMapsGrid(id)}>
+                onClick={() => onClickGroupMenu(id)}>
                 <div className="menu-item-content">
-                    {name}
+                    {display_name}
                 </div>
-                <span className="icon-disable" title={gettext("Disabled group")}>
-                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && update && (
+                <span className="icon-disable-menu" title={gettext("Disabled group")}>
+                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && (
                         <Button
                             title={settingsGroup}
                             className="button-update"
@@ -83,85 +101,86 @@ const SortableMenu = observer((props) => {
 
 export const ContainerMenu = observer((props) => {
     const { store } = props;
-    const [disable, setDisable] = useState(true);
-    const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
 
-    const [radioValue, setRadioValue] = useState(itemIds[0]);
+    const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-    const updatePosition = async (id, position) => {
-        const payload = {
-            id: id,
-            position: position
-        };
-        return await route("mapgroup.groups").post({
-            json: payload,
-        });
-    };
+    const handleDragStart = useCallback((e: DragStartEvent) => {
+        store.setActiveGroupId(e.active.id);
+    }, []);
 
-    const handleDragEnd = (event) => {
-        const { active, over } = event;
-        if (active.id !== over.id) {
-            const items = store.groupMapsGrid
-            const oldIndex = items.findIndex((item) => item.id === active.id);
-            const newIndex = items.findIndex((item) => item.id === over.id);
-            const value = arrayMove(items, oldIndex, newIndex);
-            store.setGroupMapsGrid(value);
+    const handleDragEnd = useCallback((e: DragEndEvent) => {
+        const { active, over } = e;
+        if (active.id !== over?.id) {
+            const resourceItems = store.resources
+            const oldIndex = resourceItems.findIndex((item) => item.resource.id === active.id);
+            const newIndex = resourceItems.findIndex((item) => item.resource.id === over.id);
+            const value = arrayMove(resourceItems, oldIndex, newIndex);
+            store.setResources(value);
         }
-    };
 
-    const savePositionMap = () => {
-        setDisable(!disable);
-    };
+        store.setActiveGroupId(null);
+    }, []);
 
-    useEffect(() => {
-        if (disable === true && store.sourceGroup === true) {
-            store.groupMapsGrid.map((item, index) => {
-                updatePosition(item.id, index)
-            })
-            store.setSourceGroup(false);
-            setRadioValue(itemIds[0]);
-            store.getMapValues("all");
+    const handleDragCancel = useCallback(() => {
+        store.setActiveGroupId(null);
+    }, []);
+
+    const savePositionMap = useCallback(() => {
+        store.setEditGroup(!store.editGroup);
+        if (store.editGroup) {
+            const value = store.resources.map((item, index) => ({ id: item.resource.id, position: index }))
+            store.updatePosition({ params: value }, "mapgroup.groups");
         }
-        else {
-            store.setSourceGroup(true);
-        }
-    }, [disable]);
+    }, []);
 
     return (
         <div className="dnd-container-menu">
-            {store.edit && store.groupMapsGrid.some((item) => item.update) &&
-                (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={disable} onClickSave={savePositionMap} />)
+            {store.edit && store.editMap && store.update &&
+                (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={store.editGroup} onClickSave={savePositionMap} />)
             }
             <div
                 className="menu-group"
-                style={disable ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
+                style={store.editGroup ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
             >
                 <DndContext
+                    sensors={sensors}
                     collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
+                    onDragCancel={handleDragCancel}
                 >
                     <SortableContext
-                        items={itemIds}
+                        items={store.resources.map((item) => item.resource.id)}
                         strategy={verticalListSortingStrategy}
                     >
-                        <Radio.Group
-                            onChange={(e) => { setRadioValue(e.target.value) }}
-                            value={radioValue}
-                        >
-                            {store.groupMapsGrid.map((item) => (
-                                <SortableMenu
-                                    key={item.id}
-                                    id={item.id}
-                                    name={item.webmap_group_name}
-                                    handle={true}
-                                    disable={disable}
-                                    store={store}
-                                    update={item.update}
-                                    enabled={item.enabled}
-                                />
-                            ))}
+                        <Radio.Group defaultValue={store.radioValue}>
+                            {store.resources.map((item, key) => {
+                                if (item.mapgroup_resource.enabled === false && store.edit === false) return;
+                                
+                                return (
+                                    <SortableMenu
+                                        key={key}
+                                        handle={true}
+                                        store={store}
+                                        item={item}
+                                    />
+                                )
+                            })}
                         </Radio.Group>
                     </SortableContext>
+                    <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
+                        {store.activeGroupId ?
+                            <DragItem
+                                id={store.activeGroupId}
+                                store={store}
+                                width={store.edit ? store.widthMenu - 29 : store.widthMenu}
+                                height={40}
+                                name={store.allLoadedResources.get(store.activeGroupId).resource.display_name}
+                                isDragging
+                            /> :
+                            null
+                        }
+                    </DragOverlay>
                 </DndContext>
             </div>
         </div>

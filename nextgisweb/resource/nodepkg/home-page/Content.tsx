@@ -206,10 +206,10 @@ export const Content = observer(({ config }: ContentProps) => {
                         </div>
                         <div className="menu-maps">
                             <div className="menu-list">
-                                {store.groupMapsGrid.length > 0 && <ContainerMenu store={store} />}
+                                {store.resources && <ContainerMenu store={store} />}
                             </div>
                             <div className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 && <ContainerMaps size={size} store={store} />}
+                                {store.itemsMapsGroup && <ContainerMaps size={size} store={store} />}
                             </div>
                         </div>
                     </div>
