@@ -53,7 +53,7 @@ const SortableMaps = observer((props) => {
                 {disable ? (<MapTile item={item} store={store} size={size} />) :
                     (
                         <div className="drag-item">
-                            <div className="content-drag">
+                            <div className={!item.enabled ? "content-drag disabled-title": "content-drag"}>
                                 {item?.display_name}
                             </div>
                             {item.preview_fileobj_id ?
@@ -67,7 +67,6 @@ const SortableMaps = observer((props) => {
                                 ></div>) :
                                 (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
                             }
-                            <div className="disabled-title">{!item.enabled ? gettext("Disabled webmap") : null}</div>
                         </div>
                     )}
             </div>
@@ -111,7 +110,7 @@ export const ContainerMaps = observer((props) => {
     };
 
     useEffect(() => {
-        if (disable === true && store.sourceMaps === true) {
+        if (store.edit === true && disable === true && store.sourceMaps === true) {
             store.itemsMapsGroup.map((item, index) => {
                 updatePosition(item.idx, index);
             })
@@ -120,8 +119,9 @@ export const ContainerMaps = observer((props) => {
         }
         else {
             store.setSourceMaps(true);
+            store.getMapValues("maps");
         }
-    }, [disable]);
+    }, [disable, store.edit]);
 
     return (
         <div className="dnd-container-maps">

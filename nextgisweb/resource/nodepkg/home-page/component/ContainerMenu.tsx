@@ -46,7 +46,11 @@ const SortableMenu = observer((props) => {
     };
 
     const onClickGroupMapsGrid = (id) => {
-        store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.position - b.position));
+        if (!store.edit) {
+            store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id && item.enabled).sort((a, b) => a.position - b.position))
+        } else {
+            store.setItemsMapsGroup(store.listMaps.filter(item => item.webmap_group_id === id).sort((a, b) => a.position - b.position))
+        }
     };
 
     return (
@@ -62,7 +66,7 @@ const SortableMenu = observer((props) => {
                 <div className="menu-item-content">
                     {name}
                 </div>
-                <span className="icon-disable" title={gettext("Disabled group")}>
+                <span className="icon-disable-menu" title={gettext("Disabled group")}>
                     {!store.edit && !enabled ? <DisabledVisible /> : store.edit && update && (
                         <Button
                             title={settingsGroup}
@@ -124,8 +128,9 @@ export const ContainerMenu = observer((props) => {
         }
         else {
             store.setSourceGroup(true);
+            store.getMapValues("all");
         }
-    }, [disable]);
+    }, [disable, store.edit]);
 
     return (
         <div className="dnd-container-menu">

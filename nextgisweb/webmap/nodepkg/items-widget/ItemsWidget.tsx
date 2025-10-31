@@ -171,6 +171,8 @@ GroupWidget.displayName = "GroupWidget";
 LayerWidget.displayName = "LayerWidget";
 
 export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
+    console.log(store);
+    
     const { makeSignal } = useAbortController();
     const [drawOrderEdit, setDrawOrderEdit] = useState(false);
     const [expanded, setExpanded] = useState(false)

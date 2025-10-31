@@ -18,19 +18,15 @@ def maps_group(resource, request) -> JSONType:
 
 
 def mapgroup_get(request) -> JSONType:
-    is_administrator = request.user.is_administrator
     query = MapgroupResource.query()
     result = [itm.to_dict() for itm in query]
     result = list()
     for resource in query:
+        itm = resource.to_dict()
         update = resource.has_permission(ResourceScope.update, request.user)
-        if resource.has_permission(ResourceScope.read, request.user):
-            itm = resource.to_dict()
-            itm["update"] = update
-            if itm["enabled"]:
-                result.append(itm)
-            elif itm["enabled"] == False and is_administrator:
-                result.append(itm)
+        itm["update"] = update
+        if update:
+            result.append(itm)
     return result
 
 
@@ -56,15 +52,11 @@ def maps_get(request) -> JSONType:
     for item in query:
         itm = item.to_dict()
         id = itm["id"]
-        is_administrator = request.user.is_administrator
         resource = Resource.filter_by(id=id).one()
         update = resource.has_permission(ResourceScope.update, request.user)
         itm["update"] = update
-        if resource.has_permission(ResourceScope.read, request.user):
-            if itm["enabled"]:
-                result.append(itm)
-            elif itm["enabled"] == False and is_administrator:
-                result.append(itm)
+        if update :
+            result.append(itm)
     return result
 
 
