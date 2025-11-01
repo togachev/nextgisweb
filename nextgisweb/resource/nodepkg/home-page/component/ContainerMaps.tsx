@@ -8,6 +8,7 @@ import { Empty } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MapTile } from "./MapTile";
+import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import {
     DndContext,
     closestCenter,
@@ -42,7 +43,8 @@ const SortableMaps = observer((props) => {
         border: "1px solid rgb(179 185 190 / 65%)",
         borderRadius: "4px",
     };
-    const preview = routeURL("maptile.preview", item.id);
+
+    const preview = routeURL("maptile.preview", { id: item.webmap_id });
 
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
@@ -114,11 +116,17 @@ export const ContainerMaps = observer((props) => {
     //     }
     // }, [store.editMap, store.edit]);
 
+
+    const allValues = store.allLoadedResources;
+    getEntries(allValues).map(([key, value]) => {
+        console.log(value);
+    })
+
     return (
         <div className="dnd-container-maps">
-            {store.edit && store.itemsMapsGroup.some((item) => item.update) &&
+            {/* {store.edit && store.itemsMapsGroup.some((item) => item.update) &&
                 (<ButtonSave icon={<SwapVertical />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />)
-            }
+            } */}
             <div
                 className="maps-group"
                 style={store.editMap ?
@@ -146,10 +154,10 @@ export const ContainerMaps = observer((props) => {
                         items={itemIds}
                         strategy={rectSortingStrategy}
                     >
-                        {store.itemsMapsGroup.map((item) => {
+                        {store.allLoadedResources.get(store.radioValue).mapgroup_group.groupmaps.map((item, index) => {
                             return (
                                 <SortableMaps
-                                    key={item.idx}
+                                    key={index}
                                     item={item}
                                     handle={true}
                                     store={store}

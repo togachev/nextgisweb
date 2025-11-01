@@ -9,6 +9,7 @@ import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 import { Button, Radio } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import {
     DndContext,
     closestCenter,
@@ -23,7 +24,10 @@ import { useCallback } from "react";
 const settingsGroup = gettext("Group settings");
 
 const SortableMenu = observer((props) => {
-    const { id, name, store, update, enabled } = props;
+    const { store, item } = props;
+    const { id, display_name } = item.resource;
+    const { enabled } = item.mapgroup_resource;
+
     const {
         attributes,
         listeners,
@@ -57,7 +61,7 @@ const SortableMenu = observer((props) => {
     return (
         <div className="menu-item" {...listeners} {...attributes} ref={setNodeRef}>
             <Radio.Button
-                title={name}
+                title={display_name}
                 className="menu-content"
                 style={style}
                 key={id}
@@ -65,10 +69,10 @@ const SortableMenu = observer((props) => {
                 checked={id === 0}
                 onClick={() => onClickGroupMapsGrid(id)}>
                 <div className="menu-item-content">
-                    {name}
+                    {display_name}
                 </div>
                 <span className="icon-disable-menu" title={gettext("Disabled group")}>
-                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && update && (
+                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && (
                         <Button
                             title={settingsGroup}
                             className="button-update"
@@ -89,9 +93,7 @@ const SortableMenu = observer((props) => {
 export const ContainerMenu = observer((props) => {
     const { store } = props;
 
-    const itemIds = useMemo(() => store.groupMapsGrid.map((item) => item.id), [store.groupMapsGrid]);
-
-    const [radioValue, setRadioValue] = useState(itemIds[0]);
+    const itemIds = useMemo(() => store.resources.map((item) => item.resource.id), [store.resources]);
 
     const handleDragEnd = useCallback((event) => {
         const { active, over } = event;
@@ -109,7 +111,7 @@ export const ContainerMenu = observer((props) => {
         if (store.editGroup) {
             const value = store.groupMapsGrid.map((item, index) => ({ id: item.id, position: index }))
             store.updatePosition({ params: value }, "mapgroup.groups");
-            setRadioValue(itemIds[0]);
+            store.setRadioValue(itemIds[0]);
         }
     }, []);
 
@@ -121,7 +123,7 @@ export const ContainerMenu = observer((props) => {
     //         )
 
     //         // store.setSourceGroup(false);
-    //         setRadioValue(itemIds[0]);
+    //         store.setRadioValue(itemIds[0]);
     //         // store.getMapValues("all");
     //     }
     //     // else {
@@ -129,12 +131,13 @@ export const ContainerMenu = observer((props) => {
     //     //     // store.getMapValues("all");
     //     // }
     // }, [store.editGroup, store.edit]);
-
+    console.log(store.itemGroup);
+    
     return (
         <div className="dnd-container-menu">
-            {store.edit && store.groupMapsGrid.some((item) => item.update) &&
+            {/* {store.edit && store.groupMapsGrid.some((item) => item.update) &&
                 (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={store.editGroup} onClickSave={savePositionMap} />)
-            }
+            } */}
             <div
                 className="menu-group"
                 style={store.editGroup ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
@@ -148,20 +151,19 @@ export const ContainerMenu = observer((props) => {
                         strategy={verticalListSortingStrategy}
                     >
                         <Radio.Group
-                            onChange={(e) => { setRadioValue(e.target.value) }}
-                            value={radioValue}
+                            onChange={(e) => { store.setRadioValue(e.target.value) }}
+                            value={store.radioValue}
                         >
-                            {store.groupMapsGrid.map((item) => (
-                                <SortableMenu
-                                    key={item.id}
-                                    id={item.id}
-                                    name={item.webmap_group_name}
-                                    handle={true}
-                                    store={store}
-                                    update={item.update}
-                                    enabled={item.enabled}
-                                />
-                            ))}
+                            {store.resources.map((item,key) => {
+                                return (
+                                    <SortableMenu
+                                        key={key}
+                                        handle={true}
+                                        store={store}
+                                        item={item}
+                                    />
+                                )
+                            })}
                         </Radio.Group>
                     </SortableContext>
                 </DndContext>

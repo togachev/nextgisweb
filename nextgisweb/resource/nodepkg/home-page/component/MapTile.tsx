@@ -24,17 +24,17 @@ export const MapTile = observer((props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
 
-    const { id, display_name, preview_fileobj_id, description_status, update, enabled, webmap_group_id } = props.item;
+    const { webmap_id, display_name, preview_fileobj_id, description_status, update, enabled, webmap_group_id } = props.item;
     const { store, size } = props;
     const { upath_info } = store.config;
 
-    const preview = routeURL("maptile.preview", id);
-    const urlWebmap = routeURL("webmap.display", id);
+    const preview = routeURL("maptile.preview", { id: webmap_id });
+    const urlWebmap = routeURL("webmap.display", { id: webmap_id });
 
-    const urlWebmapSettings = routeURL("resource.update", id);
+    const urlWebmapSettings = routeURL("resource.update", { id: webmap_id });
 
     const showDescription = async () => {
-        const value = await route("resource.item", id).get({
+        const value = await route("resource.item", { id: webmap_id }).get({
             cache: true,
             query: {
                 serialization: "resource",

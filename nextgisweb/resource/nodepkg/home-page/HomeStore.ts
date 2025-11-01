@@ -1,9 +1,10 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { extractError } from "@nextgisweb/gui/error";
 
-import type { UploadFile } from "@nextgisweb/gui/antd";
+import type { Descriptions, UploadFile } from "@nextgisweb/gui/antd";
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 export interface LayoutProps {
     i: string;
@@ -93,6 +94,13 @@ export class HomeStore {
     @observable accessor editMap = true;
     @observable accessor edit = false;
     @observable accessor update = false;
+    @observable accessor radioValue: number = 0;
+
+    @observable.shallow accessor resources: CompositeRead[] | null = null;
+    @observable.shallow accessor allLoadedResources: Map<
+        number,
+        CompositeRead
+    > = new Map();
 
     @observable.ref accessor config: ConfigProps;
 
@@ -118,6 +126,32 @@ export class HomeStore {
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
     };
+
+    @computed
+    get itemGroup() {
+        return this.allLoadedResources.get(this.radioValue);
+    }
+
+    @action
+    updateLoadedResources(resources: CompositeRead[]) {
+        const allResources = new Map(this.allLoadedResources);
+
+        resources.forEach((resource) => {
+            allResources.set(resource.resource.id, resource);
+        });
+        this.allLoadedResources = allResources;
+    }
+
+    @action
+    setResources(resources: CompositeRead[]) {
+        this.resources = resources;
+        this.updateLoadedResources(resources);
+    }
+
+    @action
+    setRadioValue(radioValue: number) {
+        this.radioValue = radioValue;
+    }
 
     @action
     setUrlImg(ulrImg: ImgUrlKey) {
@@ -241,8 +275,14 @@ export class HomeStore {
         });
     };
 
-    private async maplist() {
-        const resp = await route("mapgroup.maps").get();
+    private async mapgroup() {
+        const resp = await route("mapgroup.collection").get({
+            query: {
+                mapgroup: true,
+                description: false,
+            },
+            cache: true,
+        });
         return resp;
     };
 
@@ -305,21 +345,25 @@ export class HomeStore {
 
     @actionHandler
     async getMapValues(key) {
-        this.maplist()
-            .then(maps => {
-                this.setListMaps(maps);
-                if (key === "all") {
-                    this.groupMaps()
-                        .then(group => {
-                            this.setGroupMapsGrid(group.sort((a, b) => a.position - b.position));
-                            this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === group[0]?.id).sort((a, b) => a.position - b.position));
-                            if (this.groupMapsGrid.length > 0 && this.itemsMapsGroup.length > 0) {
-                                this.setUpdate(true)
-                            } else {
-                                this.setUpdate(false)
-                            }
-                        })
-                }
+        this.mapgroup()
+            .then(res => {
+                console.log(res,res.find(item => Math.min(item.mapgroup_resource.position)));
+                
+                this.setRadioValue(res.find(item => item.mapgroup_resource.position <= 1).resource.id)
+                this.setResources(res.sort((a, b) => a.mapgroup_resource.position - b.mapgroup_resource.position));
+                // this.setListMaps(maps);
+                // if (key === "all") {
+                //     this.groupMaps()
+                //         .then(group => {
+                //             this.setGroupMapsGrid(group.sort((a, b) => a.position - b.position));
+                //             this.setItemsMapsGroup(maps.filter(u => u.webmap_group_id === group[0]?.id).sort((a, b) => a.position - b.position));
+                //             if (this.groupMapsGrid.length > 0 && this.itemsMapsGroup.length > 0) {
+                //                 this.setUpdate(true)
+                //             } else {
+                //                 this.setUpdate(false)
+                //             }
+                //         })
+                // }
             });
     };
 

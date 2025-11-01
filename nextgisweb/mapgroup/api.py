@@ -1,29 +1,12 @@
-from nextgisweb.resource import Resource, ResourceScope, ResourceFactory
+from nextgisweb.resource import CompositeSerializer, Resource, ResourceScope, ResourceFactory
 from .model import MapgroupResource, MapgroupGroup
-from msgspec import Struct, UNSET, UnsetType
+from msgspec import Meta, Struct, UNSET, UnsetType
 from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession
-from typing import List, Dict, Any, Annotated, Union
+from typing import Annotated, Any, Dict, List, Union
 
 
-def maps_group(resource, request) -> JSONType:
-    if resource.has_permission(ResourceScope.read, request.user):
-        query = MapgroupGroup.query().filter_by(resource_id=resource.id)
-        result = [itm.to_dict() for itm in query]
-        return result
-
-
-def mapgroup_get(request) -> JSONType:
-    query = MapgroupResource.query()
-    result = [itm.to_dict() for itm in query]
-    result = list()
-    for resource in query:
-        itm = resource.to_dict()
-        update = resource.has_permission(ResourceScope.update, request.user)
-        itm["update"] = update
-        if update:
-            result.append(itm)
-    return result
+CompositeRead = CompositeSerializer.types().update
 
 
 class MapgroupItem(Struct, kw_only=True):
@@ -35,7 +18,26 @@ class MapgroupBody(Struct, kw_only=True):
     params: List[MapgroupItem]
 
 
-def mapgroup_post(request, body: MapgroupBody) -> JSONType:
+def maps_group(resource, request) -> JSONType:
+    if resource.has_permission(ResourceScope.read, request.user):
+        query = MapgroupGroup.query().filter_by(resource_id=resource.id)
+        result = [itm.to_dict() for itm in query]
+        return result
+
+
+def group_get(request) -> JSONType:
+    query = MapgroupResource.query()
+    result = list()
+    for resource in query:
+        itm = resource.to_dict()
+        update = resource.has_permission(ResourceScope.update, request.user)
+        itm["update"] = update
+        if update:
+            result.append(itm)
+    return result
+
+
+def group_post(request, body: MapgroupBody) -> JSONType:
     def update(id, position):
         resource = MapgroupResource.query().filter(MapgroupResource.id==id).one()
         if resource.has_permission(ResourceScope.update, request.user):
@@ -80,7 +82,40 @@ def maps_post(request, body: MapgroupBody) -> JSONType:
     return body.params
 
 
+def mapgroup_collection(
+        request,
+        *,
+        description: Annotated[
+            bool,
+            Meta(description="Description resources"),
+        ] = False,
+        mapgroup: Annotated[
+            bool,
+            Meta(description="Mapgroup resources"),
+        ] = False,
+) -> JSONType:
+    query = MapgroupResource.query()
+    serializer = CompositeSerializer(
+        description=description,
+        mapgroup=mapgroup,
+        user=request.user
+    )
+    result = list()
+    for mres in query:
+        if mres.has_permission(ResourceScope.read, request.user) and mres.enabled:
+            result.append(serializer.serialize(mres, CompositeRead))
+        elif mres.has_permission(ResourceScope.update, request.user):
+            result.append(serializer.serialize(mres, CompositeRead))
+    return result
+
+
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        "mapgroup.collection",
+        "/api/mapgroup/collection",
+        get=mapgroup_collection,
+    )
 
     config.add_route(
         "mapgroup.item",
@@ -92,8 +127,8 @@ def setup_pyramid(comp, config):
     config.add_route(
         "mapgroup.groups",
         "/api/groups",
-        get=mapgroup_get,
-        post=mapgroup_post,
+        get=group_get,
+        post=group_post,
     )
 
     config.add_route(
