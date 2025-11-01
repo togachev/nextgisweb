@@ -347,9 +347,9 @@ export class HomeStore {
     async getMapValues(key) {
         this.mapgroup()
             .then(res => {
-                console.log(res,res.find(item => Math.min(item.mapgroup_resource.position)));
+                console.log();
                 
-                this.setRadioValue(res.find(item => item.mapgroup_resource.position <= 1).resource.id)
+                this.setRadioValue(res.reduce((min, current) => { return (current.mapgroup_resource.position < min.mapgroup_resource.position) ? current : min; }).resource.id)
                 this.setResources(res.sort((a, b) => a.mapgroup_resource.position - b.mapgroup_resource.position));
                 // this.setListMaps(maps);
                 // if (key === "all") {
