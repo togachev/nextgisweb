@@ -7,13 +7,13 @@ import type VectorSource from "ol/source/Vector";
 import { Circle, Fill, RegularShape, Stroke, Style } from "ol/style";
 
 import { route } from "@nextgisweb/pyramid/api";
+import settings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
-import settings from "@nextgisweb/webmap/client-settings";
 
 import type { MapStore } from "../ol/MapStore";
 
-interface ColorsSelectedFeatureProps {
+interface ColorSF {
     stroke_primary: string;
     stroke_secondary: string;
     fill: string;
@@ -26,7 +26,7 @@ export interface HighlightEvent {
     featureId?: number;
     feature?: Feature;
     coordinates?: [number, number];
-    colorsSelectedFeature?: ColorsSelectedFeatureProps;
+    colorsSelectedFeature?: ColorSF;
 }
 
 interface FeatureFilterFn {
@@ -40,7 +40,7 @@ export class FeatureHighlighter {
     private _wkt: WKT;
     private _zIndex = 1000;
 
-    @observable.ref accessor colorsSelectedFeature: ColorsSelectedFeatureProps | null = null;
+    @observable.ref accessor colorsSelectedFeature: ColorSF | null = null;
 
     private _highlightStyle?: Style;
 
@@ -67,7 +67,7 @@ export class FeatureHighlighter {
     }
 
     @action
-    setColorsSelectedFeature(colorsSelectedFeature: ColorsSelectedFeatureProps) {
+    setColorsSelectedFeature(colorsSelectedFeature: ColorSF) {
         this.colorsSelectedFeature = colorsSelectedFeature;
     }
 
@@ -230,7 +230,7 @@ export class FeatureHighlighter {
     async highlightFeatureById(
         featureId: number,
         layerId: number,
-        colorsSelectedFeature: ColorsSelectedFeatureProps,
+        colorsSelectedFeature: ColorSF,
     ): Promise<Feature> {
         const feature = await route("feature_layer.feature.item", {
             id: layerId,

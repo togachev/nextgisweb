@@ -1,16 +1,16 @@
-import { observer } from "mobx-react-lite";
-import { useCallback } from "react";
 import { Button, Col, ColorPicker, Form, Row } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
+import { observer } from "mobx-react-lite";
+import { useCallback } from "react";
 
 import BackspaceOutline from "@nextgisweb/icon/mdi/backspace-outline";
 
-import type { SettingStore } from "@nextgisweb/webmap/settings-widget/SettingStore";
+import type { ColorSF, SettingStore } from "@nextgisweb/webmap/settings-widget/SettingStore";
 
-import "./ColorSelectedFeature.less"
+import "./ColorSelectedFeature.less";
 
-const defaultValueColor = {
+const defaultValueColor: ColorSF = {
     stroke_primary: "rgba(255,255,0,1)",
     stroke_secondary: "rgba(0, 0, 0, 1)",
     fill: "rgba(255,255,255,0.1)",
@@ -24,7 +24,7 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
         store.setColorsSelectedFeature(values);
     };
 
-    const clearColor = useCallback((name) => {
+    const clearColor = useCallback((name: string) => {
         form.setFieldsValue({ [name]: defaultValueColor[name] });
         store.setColorsSelectedFeature({
             ...store.colorsSelectedFeature,
@@ -76,10 +76,6 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
         </Form >
     )
 
-    return (
-        <>
-            {formComponent}
-        </>
-    );
+    return formComponent;
 });
 export default ColorSelectedFeature;

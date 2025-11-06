@@ -1,6 +1,5 @@
 import { isEqual } from "lodash-es";
 import { action, computed, observable } from "mobx";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ExtentRowValue } from "@nextgisweb/gui/component";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -16,16 +15,10 @@ import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
 
-interface ColorsSelectedFeatureProps {
-    stroke_primary: string;
-    stroke_secondary: string;
-    fill: string;
-}
-
-const defaultValueColor = {
-    stroke_primary: "rgba(255,255,0,1)",
-    stroke_secondary: "rgba(0, 0, 0, 1)",
-    fill: "rgba(255,255,255,0.1)",
+export interface ColorSF {
+    stroke_primary?: string;
+    stroke_secondary?: string;
+    fill?: string;
 }
 
 export class SettingStore
@@ -34,7 +27,11 @@ export class SettingStore
     readonly composite: CompositeStore;
 
     @observable accessor activePanel: WebMapRead["active_panel"] = "layers";
-    @observable.ref accessor colorsSelectedFeature: ColorsSelectedFeatureProps | null = null;
+    @observable.ref accessor colorsSelectedFeature: ColorSF = {
+        stroke_primary: "rgba(255,255,0,1)",
+        stroke_secondary: "rgba(0, 0, 0, 1)",
+        fill: "rgba(255,255,255,0.1)",
+    };
     @observable.ref accessor editable = false;
     @observable.ref accessor selectFeaturePanel = false;
     @observable.ref accessor annotationEnabled = false;
@@ -61,7 +58,6 @@ export class SettingStore
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        this.colorsSelectedFeature = defaultValueColor
         this.initialValue = this.deserializedValue;
     }
 
@@ -160,7 +156,7 @@ export class SettingStore
     }
 
     @action
-    setColorsSelectedFeature(colorsSelectedFeature: ColorsSelectedFeatureProps) {
+    setColorsSelectedFeature(colorsSelectedFeature: ColorSF) {
         this.colorsSelectedFeature = colorsSelectedFeature;
     }
 }
