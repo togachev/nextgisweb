@@ -258,13 +258,10 @@ input {
 
 									.menu-item-content {
 										overflow: hidden;
-										white-space: initial;
 										text-overflow: ellipsis;
+										white-space: nowrap;
 										text-align: left;
 										letter-spacing: normal;
-										-webkit-line-clamp: 1;
-										display: -webkit-box;
-										-webkit-box-orient: vertical;
 										box-sizing: border-box;
 										border-radius: 3px;
 										padding: 5px;
@@ -279,9 +276,10 @@ input {
 
 								.ant-radio-button-label {
 									display: flex;
-									align-items: center;
 									justify-content: space-between;
 									width: 100%;
+									flex-wrap: nowrap;
+									overflow: hidden;
 								}
 							}
 						}
