@@ -1,7 +1,6 @@
-import { ReactNode, useCallback, useMemo, useState } from "react";
+import { ReactNode, useCallback, useState } from "react";
 
 import { ToggleGroupContext } from "./ToggleGroupContext";
-import type { ToggleGroupContextValue } from "./ToggleGroupContext";
 
 export interface ToggleGroupProps {
     allowToggleOff?: boolean;
@@ -50,15 +49,16 @@ export function ToggleGroup({
         [isControlled, nonEmpty, onChange]
     );
 
-    const ctx = useMemo<ToggleGroupContextValue>(() => {
-        return {
-            present: true,
-            activeId: activeId,
-            isActive: (id: string) => activeId === id,
-            setActiveId,
-            setDefaultId: onDefaultChange,
-        };
-    }, [activeId, onDefaultChange, setActiveId]);
-
-    return <ToggleGroupContext value={ctx}>{children}</ToggleGroupContext>;
+    return (
+        <ToggleGroupContext
+            value={{
+                activeId: activeId,
+                isActive: (id: string) => activeId === id,
+                setActiveId,
+                setDefaultId: onDefaultChange,
+            }}
+        >
+            {children}
+        </ToggleGroupContext>
+    );
 }

@@ -20,7 +20,7 @@
                 padding: 0 12px 0 0;
             }
 
-            .name {
+            .label {
                 display: flex;
                 width: 100%;
                 align-items: center;
@@ -29,7 +29,7 @@
                     width: 75%;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    -webkit-line-clamp: 2;
+                    -webkit-line-clamp: 1;
                     -webkit-box-orient: vertical;
                     padding: 0 5px 0px 0;
                     display: -webkit-inline-box;
@@ -37,8 +37,12 @@
 
                 .cls {
                     width: 25%;
-                    text-align: center;
-                    color: var(--text-secondary)
+                    text-align: end;
+                    color: var(--text-secondary);
+
+                    a {
+                        padding: 0 5px;
+                    }
                 }
             }
         }

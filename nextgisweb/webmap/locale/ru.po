@@ -54,14 +54,17 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:14
+#: nodepkg/settings-widget/SettingStore.ts:31
 msgid "Highlight color"
 msgstr "Цвет выделения"
 
 #: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:15
+#: nodepkg/settings-widget/SettingStore.ts:32
 msgid "Highlight color secondary(raster layer)"
 msgstr "Дополнительный цвет выделения (растровый слой)"
 
 #: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:16
+#: nodepkg/settings-widget/SettingStore.ts:33
 msgid "Background color"
 msgstr "Цвет фона"
 
@@ -1077,7 +1080,7 @@ msgstr "Отключить привязку"
 msgid "Enable snapping"
 msgstr "Включить привязку"
 
-#: nodepkg/plugin/layer-editor/ToolEditor.tsx:166
+#: nodepkg/plugin/layer-editor/ToolEditor.tsx:164
 msgid "Stop editing layer: {layer}"
 msgstr "Завершить редактирование слоя: {layer}"
 
@@ -1309,7 +1312,7 @@ msgstr "Показать с сообщениями"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:65
 msgid "Panel disabled"
-msgstr "Панель отключена"
+msgstr ""
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:71
 #: nodepkg/settings/SettingsForm.tsx:279
@@ -1322,7 +1325,7 @@ msgstr "Настройки"
 
 #: nodepkg/settings-widget/component/ComputeWebmapExtent.tsx:20
 msgid "Compute extent from all added layers"
-msgstr "Вычислить экстент из всех добавленных слоев"
+msgstr "Вычислить охват из всех слоев"
 
 #: nodepkg/settings/Settings.tsx:62
 msgid "Settings saved"
@@ -1630,3 +1633,6 @@ msgstr "Настройка группы веб-карт"
 #: view.py:232
 msgid "Group setting"
 msgstr "Настройка группы"
+
+#~ msgid "N/A"
+#~ msgstr "Н/Д"

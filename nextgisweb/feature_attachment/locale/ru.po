@@ -50,9 +50,8 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
-#: nodepkg/attachment-bundle/ol-control/control.ts:22
-#: nodepkg/attachment-bundle/ol-control/control.ts:38
-#: nodepkg/attachment-bundle/plugin/plugin.ts:16
+#: nodepkg/attachment-bundle/ol-control/plugin.ts:10
+#: nodepkg/attachment-bundle/ol-control/plugin.ts:12
 #: nodepkg/attachment-editor/plugin.ts:8
 #: nodepkg/attachment-table-view/AttachmentTableView.tsx:23
 msgid "Attachments"
@@ -62,23 +61,23 @@ msgstr "Вложения"
 msgid "Draw the geometry on the map to visualize the attachments to the objects"
 msgstr "Нарисуйте геометрию на карте, чтобы отобразить вложения к объектам."
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:132
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:131
 msgid "Object: "
 msgstr "Объект: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:141
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:140
 msgid "Identify object"
 msgstr "Идентифицировать объект"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:162
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:161
 msgid "Attachments: "
 msgstr "Вложений: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:189
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:188
 msgid "No attachments"
 msgstr "Нет вложений"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:255
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:254
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
@@ -168,15 +167,6 @@ msgstr "Тип MIME"
 msgid "Toggle panorama viewer"
 msgstr "Переключить просмотр панорам"
 
-#: view.py:21 view.py:46
+#: view.py:21 view.py:45
 msgid "Manage attachments"
 msgstr "Управление вложениями"
-
-#~ msgid "Failed to upload image"
-#~ msgstr "Не удалось загрузить изображение"
-
-#~ msgid "Show less"
-#~ msgstr "Скрыть"
-
-#~ msgid "Show more"
-#~ msgstr "Показать полностью"

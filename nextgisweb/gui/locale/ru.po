@@ -56,11 +56,11 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:129
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:110
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:138
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:119
 msgid "Apply"
 msgstr "Применить"
 
@@ -98,7 +98,7 @@ msgstr "Север"
 
 #: nodepkg/component/extent-row/ExtentRow.tsx:135
 msgid "From layer"
-msgstr "По слою"
+msgstr ""
 
 #: nodepkg/component/extent-row/ExtentRow.tsx:160
 msgid "Edit on map"
@@ -293,3 +293,6 @@ msgstr "Настройка сохранена."
 #: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
+
+#~ msgid "From layers"
+#~ msgstr "Из слоев"
