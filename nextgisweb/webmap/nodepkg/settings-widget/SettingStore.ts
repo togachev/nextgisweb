@@ -16,21 +16,16 @@ import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
 
-interface ColorProps {
-    label: string;
-    value: string;
-}
-
 interface ColorsSelectedFeatureProps {
-    stroke_primary: ColorProps;
-    stroke_secondary: ColorProps;
-    fill: ColorProps;
+    stroke_primary: string;
+    stroke_secondary: string;
+    fill: string;
 }
 
 const defaultValueColor = {
-    stroke_primary: { label: gettext("Highlight color"), value: "rgba(255,255,0,1)" },
-    stroke_secondary: { label: gettext("Highlight color secondary(raster layer)"), value: "rgba(0, 0, 0, 1)" },
-    fill: { label: gettext("Background color"), value: "rgba(255,255,255,0.1)" }
+    stroke_primary: "rgba(255,255,0,1)",
+    stroke_secondary: "rgba(0, 0, 0, 1)",
+    fill: "rgba(255,255,255,0.1)",
 }
 
 export class SettingStore
@@ -165,7 +160,7 @@ export class SettingStore
     }
 
     @action
-    setColorsSelectedFeature(value) {
-        this.colorsSelectedFeature = value;
+    setColorsSelectedFeature(colorsSelectedFeature: ColorsSelectedFeatureProps) {
+        this.colorsSelectedFeature = colorsSelectedFeature;
     }
 }
