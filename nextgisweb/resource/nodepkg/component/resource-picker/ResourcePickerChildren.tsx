@@ -197,9 +197,11 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                 title: msgDislpayName,
                 className: "displayName",
                 sorter: sorterFactory("display_name"),
-                render: (value, { cls, id }: PickerResource) => (
-                    <ResourceLabel label={value.display_name} resourceId={id} cls={cls} cls_display_name={value.cls_display_name} />
-                ),
+                render: (value, { cls, id }: PickerResource) => {
+                    return (
+                        <ResourceLabel label={value.display_name} resourceId={id} cls={cls} cls_display_name={value.cls_display_name} />
+                    )
+                },
             },
             {
                 className: "actions",
