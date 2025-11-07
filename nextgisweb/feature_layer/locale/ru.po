@@ -1,12 +1,12 @@
-#: api.py:111 api_identify.py:27
+#: api.py:111 api_identify.py:49 api_identify.py:106
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:369
+#: api.py:380
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:456 api_export.py:212
+#: api.py:466 api_export.py:212
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -441,42 +441,38 @@ msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
 #: nodepkg/feature-grid/FeatureGrid.tsx:25
-msgid "Number of objects"
-msgstr ""
-
-#: nodepkg/feature-grid/FeatureGrid.tsx:26
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:35
+#: nodepkg/feature-grid/FeatureGridActions.tsx:38
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:36
+#: nodepkg/feature-grid/FeatureGridActions.tsx:39
 msgid "Open on a new page"
 msgstr "Открывать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:37
+#: nodepkg/feature-grid/FeatureGridActions.tsx:40
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:38
+#: nodepkg/feature-grid/FeatureGridActions.tsx:41
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:39
+#: nodepkg/feature-grid/FeatureGridActions.tsx:42
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:40
+#: nodepkg/feature-grid/FeatureGridActions.tsx:43
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:42
+#: nodepkg/feature-grid/FeatureGridActions.tsx:45
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:43
+#: nodepkg/feature-grid/FeatureGridActions.tsx:46
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
@@ -581,14 +577,14 @@ msgstr "Округление числа"
 msgid "Value prefix"
 msgstr "Префикс значения"
 
-#: nodepkg/filtered-count/FilteredCount.tsx:67
-#: nodepkg/filtered-count/FilteredCount.tsx:109
-msgid "Feature count"
-msgstr "Количество объектов"
-
-#: nodepkg/filtered-count/FilteredCount.tsx:72
+#: nodepkg/filtered-count/FilteredCount.tsx:66
 msgid "{filtered_count} of {total_count}"
 msgstr "{filtered_count} из {total_count}"
+
+#: nodepkg/filtered-count/FilteredCount.tsx:72
+#: nodepkg/filtered-count/FilteredCount.tsx:103
+msgid "Feature count"
+msgstr "Количество объектов"
 
 #: nodepkg/geometry-editor/plugin.ts:10
 msgid "Geometry"

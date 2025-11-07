@@ -1,12 +1,12 @@
-import { debounce } from "lodash-es";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { AutoComplete, ConfigProvider, FloatButton, Input } from "@nextgisweb/gui/antd";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/magnify";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { Input, AutoComplete, FloatButton, ConfigProvider } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { ContainerMenu, ContainerMaps, Footer, Header } from "./component";
-import { observer } from "mobx-react-lite";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { debounce } from "lodash-es";
+import { observer } from "mobx-react-lite";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ContainerMaps, ContainerMenu, Footer, Header } from "./component";
 import { HomeStore } from "./HomeStore";
 
 import "./Content.less";

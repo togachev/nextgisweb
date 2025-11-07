@@ -34,6 +34,7 @@ export interface GroupMapsGridProps {
     webmap_group_name: string;
     enabled: boolean;
     position: LayoutProps;
+    update: boolean;
 };
 
 export interface UrlPhoneProps {

@@ -98,13 +98,13 @@ def clone(request):
     )
 
 
-@react_renderer("@nextgisweb/mapgroup/group-setting")
-def group_setting(request):
-    request.resource_permission(ResourceScope.read)
+@react_renderer("@nextgisweb/mapgroup/group-management")
+def group_management(request):
+    request.resource_permission(ResourceScope.update)
     return dict(
         props=dict(id=request.context.id),
         obj=request.context,
-        title=gettext("Group setting"),
+        title=gettext("Managing web map groups"),
     )
 
 
@@ -167,10 +167,10 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "webmap.group-setting",
-        r"/resource/{id:uint}/group-setting",
+        "webmap.group-management",
+        r"/resource/{id:uint}/group-management",
         factory=resource_factory,
-        get=group_setting,
+        get=group_management,
     )
 
     config.add_route(
@@ -219,9 +219,9 @@ def setup_pyramid(comp, config):
 
         if args.obj.has_permission(ResourceScope.read, args.request.user):
             yield Link(
-                "webmap/group-setting",
-                gettext("Group setting"),
-                lambda args: args.request.route_url("webmap.group-setting", id=args.obj.id),
+                "webmap/group-management",
+                gettext("Managing web map groups"),
+                lambda args: args.request.route_url("webmap.group-management", id=args.obj.id),
                 important=False,
                 target="_self",
                 icon="material-edit",

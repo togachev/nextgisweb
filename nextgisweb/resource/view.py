@@ -421,6 +421,7 @@ def home_page(request):
     )
 
 
+
 def setup_pyramid(comp, config):
     def resource_permission(request, permission, resource=None):
         if isinstance(resource, Permission):

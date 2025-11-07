@@ -10,7 +10,7 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:213
+#: favorite.py:6 view.py:203
 msgid "Display"
 msgstr "Открыть"
 
@@ -22,7 +22,7 @@ msgstr "Фрагмент"
 msgid "Resource webmap"
 msgstr ""
 
-#: model.py:52 model.py:70 view.py:208 view.py:244
+#: model.py:52 model.py:70 view.py:198 view.py:235
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -41,7 +41,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:223
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:213
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -53,22 +53,7 @@ msgstr "Группа ресурсов"
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:14
-#: nodepkg/settings-widget/SettingStore.ts:31
-msgid "Highlight color"
-msgstr "Цвет выделения"
-
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:15
-#: nodepkg/settings-widget/SettingStore.ts:32
-msgid "Highlight color secondary(raster layer)"
-msgstr "Дополнительный цвет выделения (растровый слой)"
-
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:16
-#: nodepkg/settings-widget/SettingStore.ts:33
-msgid "Background color"
-msgstr "Цвет фона"
-
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:69
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:68
 msgid "Set default value"
 msgstr "Установить значение по умолчанию"
 
@@ -1614,25 +1599,18 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:99
+#: view.py:97
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:111
+#: view.py:107 view.py:223
+msgid "Managing web map groups"
+msgstr "Управление группами веб-карт"
+
+#: view.py:119
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:122
+#: view.py:130
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
-
-#: view.py:144
-msgid "Setting up a web map group"
-msgstr "Настройка группы веб-карт"
-
-#: view.py:232
-msgid "Group setting"
-msgstr "Настройка группы"
-
-#~ msgid "N/A"
-#~ msgstr "Н/Д"

@@ -13,5 +13,3 @@ class MapgroupGroupWidget(Widget):
     resource = MapgroupResource
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/mapgroup/group-widget")
-
-

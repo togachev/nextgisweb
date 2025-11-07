@@ -2,22 +2,6 @@
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
-#: api.py:1044
-msgid "ERROR: Error not create."
-msgstr ""
-
-#: api.py:1072
-msgid "ERROR: Error not delete."
-msgstr ""
-
-#: api.py:1134 exception.py:63
-msgid "Root resource could not be deleted."
-msgstr "Корневой ресурс удалить невозможно."
-
-#: api.py:1152
-msgid "ERROR: duplicate key violates unique constraint."
-msgstr ""
-
 #: category.py:37
 msgid "Layers and styles"
 msgstr "Слои и стили"
@@ -94,6 +78,10 @@ msgstr ""
 msgid "Hierarchy error"
 msgstr "Ошибка иерархии"
 
+#: exception.py:63
+msgid "Root resource could not be deleted."
+msgstr "Корневой ресурс удалить невозможно."
+
 #: exception.py:67
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
@@ -146,23 +134,23 @@ msgstr "Ключ ресурса не уникален."
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:497
+#: model.py:476
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:500
+#: model.py:479
 msgid "You are not allowed to create or move a resource of type '{}' here."
 msgstr "Вам не разрешено создавать или перемещать ресурс типа '{}' сюда."
 
-#: model.py:508
+#: model.py:487
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:520
+#: model.py:499
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:596
+#: model.py:575
 msgid ""
 "Unable to revoke '{permission}' permission for '{user}' as the user belongs "
 "to the administrators group. Administrators must always have ability to "
@@ -172,17 +160,17 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:708
+#: model.py:687
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:32
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:31
 #: nodepkg/editor-widget/EditorWidget.tsx:19
 #: nodepkg/resource-section/children/ResourceSectionChildren.tsx:89
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:34
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:33
 msgid "Select first eligible child resource"
 msgstr "Выбрать первый подходящий дочерний ресурс"
 
@@ -358,19 +346,19 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: nodepkg/editor-widget/EditorWidget.tsx:53
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:120 view.py:335
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:120 view.py:327
 msgid "Owner"
 msgstr "Владелец"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:67 view.py:327
+#: nodepkg/editor-widget/EditorWidget.tsx:67 view.py:319
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:332
+#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:324
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:332
+#: nodepkg/effective-permissions/EffectivePermissions.tsx:15 view.py:324
 msgid "No"
 msgstr "Нет"
 
@@ -438,19 +426,19 @@ msgstr "Введите название карты"
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: nodepkg/home-page/component/ContainerMaps.tsx:129
+#: nodepkg/home-page/component/ContainerMaps.tsx:131
 msgid "Edit grid maps"
 msgstr "Редактировать сетку карт"
 
-#: nodepkg/home-page/component/ContainerMenu.tsx:22
+#: nodepkg/home-page/component/ContainerMenu.tsx:30
 msgid "Group settings"
 msgstr "Настройки группы"
 
-#: nodepkg/home-page/component/ContainerMenu.tsx:69
+#: nodepkg/home-page/component/ContainerMenu.tsx:83
 msgid "Disabled group"
 msgstr ""
 
-#: nodepkg/home-page/component/ContainerMenu.tsx:138
+#: nodepkg/home-page/component/ContainerMenu.tsx:139
 msgid "Edit group maps"
 msgstr "Редактировать группы карт"
 
@@ -486,12 +474,12 @@ msgid "Add url menu"
 msgstr "Добавить URL-меню"
 
 #: nodepkg/home-page/component/Footer.tsx:174
-#: nodepkg/home-page/component/Header.tsx:234
+#: nodepkg/home-page/component/Header.tsx:236
 msgid "Name url"
 msgstr "Название адреса"
 
 #: nodepkg/home-page/component/Footer.tsx:177
-#: nodepkg/home-page/component/Header.tsx:239
+#: nodepkg/home-page/component/Header.tsx:241
 msgid "Url"
 msgstr "Имя URL-адреса"
 
@@ -548,28 +536,28 @@ msgstr "Приглашение на сессию"
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/home-page/component/Header.tsx:223
-#: nodepkg/home-page/component/Header.tsx:226
+#: nodepkg/home-page/component/Header.tsx:225
+#: nodepkg/home-page/component/Header.tsx:228
 msgid "Add url"
 msgstr "Добавить URL"
 
-#: nodepkg/home-page/component/Header.tsx:245
+#: nodepkg/home-page/component/Header.tsx:247
 msgid "Delete url"
 msgstr "Удалить URL-адрес"
 
-#: nodepkg/home-page/component/Header.tsx:260
+#: nodepkg/home-page/component/Header.tsx:262
 msgid "First name site"
 msgstr "Имя сайта"
 
-#: nodepkg/home-page/component/Header.tsx:267
+#: nodepkg/home-page/component/Header.tsx:269
 msgid "Additional name"
 msgstr "Дополнительное имя"
 
-#: nodepkg/home-page/component/Header.tsx:288
+#: nodepkg/home-page/component/Header.tsx:290
 msgid "Setting header"
 msgstr ""
 
-#: nodepkg/home-page/component/Header.tsx:311
+#: nodepkg/home-page/component/Header.tsx:313
 msgid "Header setting"
 msgstr "Настройка верхнего колонтитула"
 
@@ -647,7 +635,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:509
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:496
 msgid "Action"
 msgstr "Действие"
 
@@ -687,7 +675,7 @@ msgstr "Все права"
 msgid "Permissions"
 msgstr "Права доступа"
 
-#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:113 view.py:325
+#: nodepkg/resource-section/children/ResourceSectionChildren.tsx:113 view.py:317
 msgid "Type"
 msgstr "Тип"
 
@@ -733,7 +721,7 @@ msgstr "Показать дату создания ресурса"
 
 #: nodepkg/resource-section/children/component/MenuDropdown.tsx:222
 #: nodepkg/resource-section/children/util/createResourceTableItemOptions.ts:8
-#: view.py:552
+#: view.py:539
 msgid "Delete"
 msgstr "Удалить"
 
@@ -786,7 +774,7 @@ msgid "External access"
 msgstr "Внешний доступ"
 
 #: nodepkg/resource-section/main/CreateResourceButton.tsx:7
-#: nodepkg/resource-section/main/CreateResourceModal.tsx:20 view.py:204 view.py:508
+#: nodepkg/resource-section/main/CreateResourceModal.tsx:20 view.py:195 view.py:495
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -883,45 +871,38 @@ msgctxt "permission"
 msgid "Configure service"
 msgstr "Настройка сервиса"
 
-#: view.py:112 view.py:587
-msgid "Groups of digital web maps"
-msgstr "Группы цифровых веб-карт"
-
-#: view.py:146 view.py:561
+#: view.py:137 view.py:548
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:157 view.py:568
+#: view.py:148 view.py:555
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:216 view.py:229
+#: view.py:207 view.py:220
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:240
+#: view.py:231
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:250 view.py:581
+#: view.py:241 view.py:568
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:448
+#: view.py:441
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:510
+#: view.py:497
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:525
+#: view.py:512
 msgid "Update"
 msgstr "Изменить"
 
-#: view.py:539
+#: view.py:526
 msgid "Add/remove public files"
 msgstr "Добавить/удалить публичные файлы"
-
-#~ msgid "Disabled webmap"
-#~ msgstr "Отключенная веб-карта"
