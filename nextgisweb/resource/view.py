@@ -25,7 +25,7 @@ from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
-from .model import Resource, ResourceWebMapGroup, WebMapGroupResource
+from .model import Resource
 from nextgisweb.mapgroup import MapgroupGroup
 from .permission import Permission, Scope
 from .psection import PageSections
@@ -103,15 +103,6 @@ def resource_breadcrumb(obj, request):
             ),
             obj.parent,
         )
-
-
-@react_renderer("@nextgisweb/resource/webmap-group-widget")
-def webmap_group_data(request):
-    request.require_administrator()
-    return dict(
-        title=gettext("Groups of digital web maps"),
-        dynmenu=request.env.pyramid.control_panel,
-    )
 
 
 @react_renderer("@nextgisweb/resource/page/show")
@@ -488,12 +479,6 @@ def setup_pyramid(comp, config):
 
     config.add_route("home_page", "/map-list").add_view(home_page)
 
-    config.add_route(
-        "resource.webmap_group",
-        "/wmgroup",
-        get=webmap_group_data,
-    )
-
     # CRUD
 
     _resource_route("create", r"{id:uint}/create", get=create)
@@ -581,12 +566,6 @@ def setup_pyramid(comp, config):
                 "settings/resource_export",
                 gettext("Resource export"),
                 lambda args: (args.request.route_url("resource.control_panel.resource_export")),
-            )
-        if args.request.user.is_administrator:
-            yield Link(
-                "settings/webmap_group",
-                gettext("Groups of digital web maps"),
-                lambda args: (args.request.route_url("resource.webmap_group")),
             )
     
     if comp.options["home.enabled"]:

@@ -519,6 +519,7 @@ class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
 class RootItemConfig(BaseItem, tag="root", tag_field="type"):
     children: List[Union[GroupItemConfig, LayerItemConfig]]
 
+
 class InfoMapConfig(Struct, kw_only=True):
     resource: str
     link: str
@@ -582,7 +583,6 @@ def display_config(obj, request) -> DisplayConfig:
     mid = MidConfig(adapter=set(), plugin=set())
     checked_items: Set[int] = set()
     expanded_items: Set[int] = set()
-
 
 
     def traverse(item):

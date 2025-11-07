@@ -14,8 +14,6 @@ from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
 from .model import WebMap
 from .util import webmap_items_to_tms_ids_list
 
-from nextgisweb.env import DBSession
-from nextgisweb.resource.model import ResourceWebMapGroup, WebMapGroupResource
 
 class ItemWidget(Widget):
     resource = WebMap
@@ -100,6 +98,16 @@ def clone(request):
     )
 
 
+@react_renderer("@nextgisweb/mapgroup/group-setting")
+def group_setting(request):
+    request.resource_permission(ResourceScope.read)
+    return dict(
+        props=dict(id=request.context.id),
+        obj=request.context,
+        title=gettext("Group setting"),
+    )
+
+
 @react_renderer("@nextgisweb/webmap/preview-embedded")
 def preview_embedded(request):
     iframe = None
@@ -123,25 +131,6 @@ def settings(request):
         dynmenu=request.env.pyramid.control_panel,
     )
 
-@viewargs(renderer="react")
-def wmg_settings(request):
-    request.resource_permission(ResourceScope.update)
-    rwg = DBSession.query(ResourceWebMapGroup)
-    wgr = DBSession.query(WebMapGroupResource).filter(WebMapGroupResource.resource_id == request.context.id)
-
-    result_rwg = list() # список групп
-    result_wgr = list() # установленные группы для цифровых карт
-    for resource_wmg in rwg:
-        result_rwg.append(dict(id=resource_wmg.id, webmap_group_name=resource_wmg.webmap_group_name, action_map=resource_wmg.action_map))
-
-    for wmg_resource in wgr:
-        result_wgr.append(dict(id=wmg_resource.webmap_group_id))
-
-    return dict(
-        entrypoint="@nextgisweb/webmap/wmg-settings",
-        props=dict(id=request.context.id, wmgroup=result_rwg, group=result_wgr),
-        obj=request.context,
-        title=gettext("Setting up a web map group"))
 
 class WebMapTMSLink(TMSLink):
     resource = WebMap
@@ -178,6 +167,13 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
+        "webmap.group-setting",
+        r"/resource/{id:uint}/group-setting",
+        factory=resource_factory,
+        get=group_setting,
+    )
+
+    config.add_route(
         "webmap.preview_embedded",
         "/webmap/embedded-preview",
         get=preview_embedded,
@@ -189,12 +185,6 @@ def setup_pyramid(comp, config):
         "/control-panel/webmap-settings",
         get=settings,
     )
-
-    config.add_route(
-        "wmgroup.settings",
-        r"/wmgroup/{id:uint}/settings",
-        factory=resource_factory,
-    ).add_view(wmg_settings, context=WebMap)
 
 
     icon_display = icon("display")
@@ -226,11 +216,12 @@ def setup_pyramid(comp, config):
                 target="_self",
                 icon=icon_clone,
             )
-        if args.obj.has_permission(ResourceScope.update, args.request.user):
+
+        if args.obj.has_permission(ResourceScope.read, args.request.user):
             yield Link(
-                "wmgroup/settings",
+                "webmap/group-setting",
                 gettext("Group setting"),
-                lambda args: args.request.route_url("wmgroup.settings", id=args.obj.id),
+                lambda args: args.request.route_url("webmap.group-setting", id=args.obj.id),
                 important=False,
                 target="_self",
                 icon="material-edit",

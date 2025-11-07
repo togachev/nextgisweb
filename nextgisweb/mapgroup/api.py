@@ -1,9 +1,9 @@
 from nextgisweb.resource import CompositeSerializer, Resource, ResourceScope, ResourceFactory
 from .model import MapgroupResource, MapgroupGroup
-from msgspec import Meta, Struct, UNSET, UnsetType
+from msgspec import Meta, Struct
 from nextgisweb.pyramid import JSONType
 from nextgisweb.env import DBSession
-from typing import Annotated, Any, Dict, List, Union
+from typing import Annotated, List
 
 
 CompositeRead = CompositeSerializer.types().update
