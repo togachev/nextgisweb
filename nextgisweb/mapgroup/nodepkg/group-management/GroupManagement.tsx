@@ -92,9 +92,6 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
     }, [store.groups]);
 
     return (
-        <>
-            <h2>{gettext("Web Map Groups")}</h2>
-            <Table <GroupDataType>  {...params} />
-        </>
+        <Table <GroupDataType>  {...params} />
     );
 });

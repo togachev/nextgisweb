@@ -102,7 +102,6 @@ def clone(request):
 def group_management(request):
     request.resource_permission(ResourceScope.update)
     return dict(
-        props=dict(id=request.context.id),
         obj=request.context,
         title=gettext("Managing web map groups"),
     )

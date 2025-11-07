@@ -8,9 +8,7 @@ export class Store {
 
     @observable.shallow accessor groups: GroupMapsGridProps[] = [];
 
-    constructor({ id }) {
-        console.log(id);
-
+    constructor() {
         this.groupsMaps();
     };
 
