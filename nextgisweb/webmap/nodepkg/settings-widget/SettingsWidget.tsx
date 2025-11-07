@@ -238,7 +238,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             onChange={(v) => store.update({ selectFeaturePanel: v })}
                         />
                     </Lot>
-                    <Lot span={2} label={false}>
+                    <Lot label={false}>
                         <Collapse style={{ width: "100%", backgroundColor: "transparent" }} size="small" items={items} />
                     </Lot>
                 </Area>

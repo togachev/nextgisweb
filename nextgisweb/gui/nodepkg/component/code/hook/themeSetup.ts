@@ -29,10 +29,18 @@ export function themeSetup({
         },
         ".cm-gutter": { minHeight },
         ...baseTheme,
+
     });
     const fullHeightTheme = EditorView.theme({
         "&": { ...rootElementStyle, height: "100%", width: "100%" },
         ...baseTheme,
+        ".cm-content": {
+            flexShrink: "initial",
+            whiteSpace: "normal!important",
+            wordWrap: "normal!important",
+            overflowWrap: "normal!important",
+            wordBreak: "break-all!important",
+        },
     });
 
     if (autoHeight) {

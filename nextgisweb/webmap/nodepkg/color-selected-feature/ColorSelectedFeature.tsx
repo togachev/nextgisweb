@@ -58,7 +58,7 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
                                         className="color-picker-item"
                                         allowClear={true}
                                         value={store.colorsSelectedFeature?.[key]}
-                                        showText={(color) => <span>{defaultValueColor[key]} ({color.toHexString()})</span>}
+                                        showText={(color) => <span>{color.toHexString()}</span>}
                                     />
                                 </Form.Item>
                             </Col>
