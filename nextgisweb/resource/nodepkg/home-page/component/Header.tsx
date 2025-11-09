@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
-import { Button, Col, Divider, Form, Input, Menu, Row, Space, Typography } from "@nextgisweb/gui/antd";
+import { Button, Col, Form, Input, Menu, Row, Space, Typography } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
@@ -73,14 +73,9 @@ export const Header = observer(({ store }: HeaderProps) => {
     store.valueHeader?.menu?.map((item, index) => {
         items.push({
             key: index,
-            label: (<a style={colorText} href={item?.value} target="_blank" rel="noopener noreferrer">{item?.name}</a>),
+            label: (<a href={item?.value} target="_blank" rel="noopener noreferrer">{item?.name}</a>),
             name: item?.name,
             value: item?.value,
-            className: "menu-label",
-        })
-        items.push({
-            key: "divider" + index,
-            label: (<Divider style={{ borderInlineStart: `1px solid ${colorText.color}` }} size="small" type="vertical" />),
             className: "menu-label",
         })
     });
@@ -88,12 +83,12 @@ export const Header = observer(({ store }: HeaderProps) => {
     itemsUser.push({
         key: "auth",
         label: authenticated ?
-            (<span style={{ color: colorText.color }} className="auth-login"><Account /></span>) :
+            (<span className="auth-login"><Account /></span>) :
             authStore.showLoginModal ?
-                (<a style={{ color: colorText.color }} className="label-sign" onClick={showLoginModal} href={ngwConfig.logoutUrl}>
+                (<a className="label-sign" onClick={showLoginModal} href={ngwConfig.logoutUrl}>
                     <span className="label">{signInText}</span><LoginOutlined />
                 </a>) :
-                (<a style={{ color: colorText.color }} href={ngwConfig.logoutUrl}><span className="label">{signInText}</span></a>),
+                (<a href={ngwConfig.logoutUrl}><span className="label">{signInText}</span></a>),
         children:
             authenticated && [
                 {
@@ -120,17 +115,17 @@ export const Header = observer(({ store }: HeaderProps) => {
                     icon: <AccountCogOutline />,
                     key: "settings",
                 },
-                {
-                    label: (<a onClick={() => authStore.logout()} className="auth-login">{signOutText}</a>),
-                    icon: <LogoutOutlined className="logout-icon" />,
-                    key: "sign_out",
-                },
                 store.update && {
                     label: (<a onClick={() => {
                         store.setEdit(!store.edit)
                     }} className="icon-pensil">{!store.edit ? editPage : disableEditPage}</a>),
                     icon: !store.edit ? <Pencil /> : <PencilOff />,
                     key: "edit_page",
+                },
+                {
+                    label: (<a onClick={() => authStore.logout()} className="auth-login">{signOutText}</a>),
+                    icon: <LogoutOutlined />,
+                    key: "sign_out",
                 },
             ],
     })

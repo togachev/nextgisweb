@@ -52,7 +52,6 @@ export interface FooterProps {
     img: UploadFile[];
     colorBackground: string;
     colorText: string;
-    colorTextMenu: string;
 };
 
 export interface UrlMenuProps {
