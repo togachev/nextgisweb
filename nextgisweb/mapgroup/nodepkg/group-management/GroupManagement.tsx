@@ -5,6 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { observer } from "mobx-react-lite";
 import { Store } from "./Store";
 
+import AddCircle from "@nextgisweb/icon/material/add_circle";
 import CheckboxBlank from "@nextgisweb/icon/mdi/checkbox-blank-circle-outline";
 import CheckboxMarked from "@nextgisweb/icon/mdi/checkbox-marked-circle-outline";
 import Pencil from "@nextgisweb/icon/mdi/pencil";
@@ -24,6 +25,7 @@ interface GroupDataType {
     name: string;
     status: boolean;
     web_maps: string[];
+    maps_add: null;
 }
 
 const ellipsisStyle = {
@@ -39,10 +41,6 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
     const [value, SetValue] = useState<string>("");
 
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
-
-    const deleteMaps = (id: number) => {
-        console.log(id);
-    }
 
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
@@ -71,7 +69,6 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                         {web_maps.map((tag) => (
                             <Tag
                                 closable
-                                onClose={() => deleteMaps(tag.id)}
                                 color={!tag.enabled ? "volcano" : "green"} key={tag.id}
                             >
                                 <span style={ellipsisStyle} title={tag.display_name}>
@@ -86,6 +83,25 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                         ))}
                     </Space>
                 ),
+            },
+            {
+                title: gettext("Controls"),
+                dataIndex: "maps_add",
+                key: "maps_add",
+                width: 100,
+                align: "center",
+                render: (id: number) => {
+                    return (
+                        <Button
+                            title={gettext("Add maps")}
+                            icon={<AddCircle />}
+                            type="text"
+                            onClick={() => {
+                                onMaps(id);
+                            }}
+                        />
+                    )
+                },
             }
         ]
         const data: GroupDataType[] = [];
@@ -96,6 +112,7 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                 name: item.resource.display_name,
                 status: item.mapgroup_resource.enabled,
                 web_maps: item.mapgroup_group.groupmaps,
+                maps_add: item.resource.id,
             })
         })
 
@@ -106,7 +123,7 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
         };
     }, [store.groups]);
 
-    const onGroupMap = useCallback((display_name: string) => {
+    const onGroups = useCallback((display_name: string) => {
         showResourcePicker({
             pickerOptions: {
                 requireClass: "resource_group",
@@ -120,6 +137,20 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
         });
     }, [showResourcePicker]);
 
+    const onMaps = useCallback((id: number) => {
+        showResourcePicker({
+            pickerOptions: {
+                requireClass: "webmap",
+                multiple: true,
+                clsFilter: "mapgroup_group",
+            },
+            onSelect: (resourceIds: number[]) => {
+                store.setMaps(resourceIds);
+                store.addMaps(id, resourceIds);
+                console.log(id, resourceIds);
+            },
+        });
+    }, [showResourcePicker]);
 
     return (
         <div className="mapgroup-component">
@@ -137,7 +168,7 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                     disabled={value !== "" ? false : true}
                     type="primary"
                     onClick={() => {
-                        onGroupMap(value);
+                        onGroups(value);
                     }}
                 >{gettext("Add a new group")}</Button>
             </Space.Compact>

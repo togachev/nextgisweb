@@ -10,12 +10,18 @@ import type {
 export class Store {
     @observable accessor update = false;
 
+    @observable.ref accessor maps: number[] = [];
     @observable.ref accessor parent: number | null = null;
     @observable.shallow accessor groups: GroupMapsGridProps[] = [];
 
     constructor() {
         this.groupsMaps(false);
     };
+
+    @action
+    setMaps(maps: number[]) {
+        this.maps = maps;
+    }
 
     @action
     setParent(parent: number | null) {
@@ -69,5 +75,24 @@ export class Store {
             errorModal(err);
             return;
         }
+    }
+
+    async addMaps(resourceId: number, ids: number[]): Promise<undefined> {
+        let payload = { params: [] };
+        ids.map(item => {
+            payload.params.push({ id: item, position: 0 })
+        })
+        console.log(payload);
+
+        // try {
+        //     await route("mapgroup.maps").post<{
+        //         resourceId: number;
+        //     }>({
+        //         json: payload,
+        //     });
+        // } catch (err) {
+        //     errorModal(err);
+        //     return;
+        // }
     }
 };
