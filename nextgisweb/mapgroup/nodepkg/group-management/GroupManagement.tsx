@@ -1,12 +1,16 @@
-import { Space, Table, Tag } from "@nextgisweb/gui/antd";
+import { useCallback } from "react";
+import { Button, Table, Tag, Space } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 import { Store } from "./Store";
+import AddCircle from "@nextgisweb/icon/material/add_circle";
 import Pencil from "@nextgisweb/icon/mdi/pencil";
 import CheckboxMarked from "@nextgisweb/icon/mdi/checkbox-marked-circle-outline";
 import CheckboxBlank from "@nextgisweb/icon/mdi/checkbox-blank-circle-outline";
+
+import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker";
 
 import type { TableProps } from "@nextgisweb/gui/antd";
 
@@ -31,6 +35,8 @@ const ellipsisStyle = {
 
 export const GroupManagement = observer(({ id }: GroupManagementProps) => {
     const [store] = useState(() => new Store({ id: id }));
+
+    const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
 
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
@@ -91,7 +97,27 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
         };
     }, [store.groups]);
 
+    const onGroupMap = useCallback(() => {
+        showResourcePicker({
+            pickerOptions: {
+                requireClass: "resource_group",
+                initParentId: 0,
+                clsFilter: "resource_group",
+            },
+            onSelect: (resourceIds: number[]) => {
+                console.log(resourceIds);
+            },
+        });
+    }, [showResourcePicker]);
+
     return (
-        <Table <GroupDataType>  {...params} />
+        <>
+            <Button
+                type="text"
+                icon={<AddCircle />}
+                onClick={onGroupMap}
+            />
+            <Table <GroupDataType>  {...params} />
+        </>
     );
 });
