@@ -298,7 +298,21 @@ class Resource(Base, metaclass=ResourceMeta):
                 raise ValidationError(gettext("Resource keyname is not unique."))
 
         return value
+    
+    @orm.validates("display_name")
+    def _validate_group_webmap_name(self, key, value):
+        """Test for key uniqueness"""
 
+        with DBSession.no_autoflush:
+            if (
+                value is not None
+                and self.cls == "mapgroup_resource"
+                and Resource.filter(Resource.display_name == value, Resource.id != self.id).first()
+            ):
+                raise ValidationError(gettext("The name of the card group is not unique."))
+
+        return value
+    
     @orm.validates("owner_user")
     def _validate_owner_user(self, key, value):
         with DBSession.no_autoflush:
