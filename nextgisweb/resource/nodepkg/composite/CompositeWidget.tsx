@@ -65,6 +65,8 @@ export type tabOnOptions = {
 
 const CompositeWidget = observer(({ setup, tab }: CompositeWidgetProps) => {
     const [activeKey, setActiveKey] = useState<string>();
+    console.log(setup);
+    
     const [composite] = useState(() => new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
 

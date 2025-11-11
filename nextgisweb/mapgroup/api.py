@@ -69,8 +69,9 @@ def maps_get(request) -> JSONType:
 
 def maps_post(request, body: MapgroupBody) -> JSONType:
     def update(id, position):
-        resource = MapgroupGroup.query().filter(MapgroupGroup.id==id).one()
-        resource.position = position
+        raise ValueError(position)
+        # resource = MapgroupGroup.query().filter(MapgroupGroup.id==id).one()
+        # resource.position = position
 
     with DBSession.no_autoflush:
         for item in body.params:

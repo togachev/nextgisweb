@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useState } from "react";
 import { EmptyComponent } from ".";
 import { HomeStore } from "../HomeStore";
+
 import AddCircle from "@nextgisweb/icon/material/add_circle";
 import Cancel from "@nextgisweb/icon/mdi/cancel";
 import Save from "@nextgisweb/icon/material/save";
@@ -48,7 +49,6 @@ export const AddGroup = observer((props: StoreProps) => {
             }
             {!showInput &&
                 <Button icon={icon ? <AddCircle /> : undefined} type="text" onClick={() => setShowInput(true)}>{text}</Button>
-
             }
 
             {showInput &&
