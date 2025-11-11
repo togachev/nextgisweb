@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
-import { Button, Input, Space, Table, Tag } from "@nextgisweb/gui/antd";
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { Button, Checkbox, Input, Space, Table, Tag } from "@nextgisweb/gui/antd";
+
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { observer } from "mobx-react-lite";
 import { Store } from "./Store";
@@ -12,7 +13,7 @@ import Pencil from "@nextgisweb/icon/mdi/pencil";
 
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker";
 
-import type { TableProps } from "@nextgisweb/gui/antd";
+import type { CheckboxProps, TableProps } from "@nextgisweb/gui/antd";
 
 import "./GroupManagement.less";
 
@@ -38,9 +39,18 @@ const ellipsisStyle = {
 
 export const GroupManagement = observer(({ id }: GroupManagementProps) => {
     const [store] = useState(() => new Store({ id: id }));
-    const [value, SetValue] = useState<string>("");
+    const [value, setValue] = useState<string>("");
 
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
+
+    const onCloseTag: CheckboxProps["onChange"] = (e) => {
+        store.setDeleteTag(e.target.checked);
+    };
+
+    const onClose = async (key: number) => {
+        await route("resource.item", id = key).delete()
+        store.groupsMaps(false);
+    };
 
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
@@ -48,16 +58,25 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                 title: gettext("Group name"),
                 dataIndex: "name",
                 key: "name",
-                render: (value: string, { key, name, status }: GroupDataType) => (<Tag color={!status ? "volcano" : "green"} key={key}>
-                    <span style={ellipsisStyle} title={name}>
-                        <a href={routeURL("resource.update_mapgroup", key, "group")} target="_blank">
-                            <span style={{ padding: "0 5px" }}>
-                                <Pencil />
-                            </span>
-                            {name}
-                        </a>
-                    </span>
-                </Tag>),
+                render: (value: string, { key, name, status }: GroupDataType) => (
+                    <Tag
+                        className="tag-item"
+                        closeIcon={store.deleteTag ? true : false}
+                        onClose={(e) => {
+                            e.preventDefault();
+                            onClose(key);
+                        }}
+                        color={!status ? "volcano" : "green"} key={key}>
+                        <span style={ellipsisStyle} title={name}>
+                            <a href={routeURL("resource.update_mapgroup", key, "group")} target="_blank">
+                                <span style={{ padding: "0 5px" }}>
+                                    <Pencil />
+                                </span>
+                                {name}
+                            </a>
+                        </span>
+                    </Tag>
+                ),
                 ellipsis: true,
             },
             {
@@ -68,7 +87,8 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                     <Space direction="vertical">
                         {web_maps.map((tag) => (
                             <Tag
-                                closable
+                                className="tag-item"
+                                closeIcon={store.deleteTag ? true : false}
                                 color={!tag.enabled ? "volcano" : "green"} key={tag.id}
                             >
                                 <span style={ellipsisStyle} title={tag.display_name}>
@@ -128,7 +148,7 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
             pickerOptions: {
                 requireClass: "resource_group",
                 initParentId: 0,
-                clsFilter: "resource_group",
+                clsFilter: "add_mapgroup_group",
             },
             onSelect: (resourceId: number) => {
                 store.setParent(resourceId);
@@ -153,14 +173,14 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
     }, [showResourcePicker]);
 
     return (
-        <div className="mapgroup-component">
+        <Space className="mapgroup-component" direction="vertical">
             <Space.Compact align="baseline" block className="create-group">
                 <label style={{ width: "20%" }} htmlFor="display_name">{gettext("Creating a new group")}</label>
                 <Input
                     style={{ width: "60%" }}
                     id="display_name"
                     allowClear
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => SetValue(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
                     placeholder={gettext("Enter the group name")}
                 />
                 <Button
@@ -172,7 +192,13 @@ export const GroupManagement = observer(({ id }: GroupManagementProps) => {
                     }}
                 >{gettext("Add a new group")}</Button>
             </Space.Compact>
+            <Checkbox checked={store.deleteTag} onChange={onCloseTag}>
+                {store.deleteTag ?
+                    gettext("Disable group or web map tag deletion") :
+                    gettext("Enable deletion of a group or web map tag")
+                }
+            </Checkbox>
             <Table <GroupDataType>  {...params} />
-        </div>
+        </Space>
     );
 });

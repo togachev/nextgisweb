@@ -5,11 +5,14 @@ import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
 import SwapVertical from "@nextgisweb/icon/mdi/swap-vertical";
 import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
+import Delete from "@nextgisweb/icon/mdi/delete-outline";
 import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
-import { Button, Radio } from "@nextgisweb/gui/antd";
+import { Button, Radio, Space } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { DragItem } from "./DragItem";
+import { AddGroup } from "./AddGroup";
+
 import {
     DndContext,
     closestCenter,
@@ -82,16 +85,28 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
                 </div>
                 <span className="icon-disable-menu" title={gettext("Disabled group")}>
                     {!store.edit && !enabled ? <DisabledVisible /> : store.edit && (
-                        <Button
-                            title={settingsGroup}
-                            className="button-update"
-                            href={routeURL("resource.update_mapgroup", id, "group")}
-                            icon={<OpenInNew />}
-                            target="_blank"
-                            type="text"
-                            color={!enabled ? "danger" : "default"}
-                            variant="link"
-                        />
+                        <>
+                            <Button
+                                title={settingsGroup}
+                                className="button-update"
+                                href={routeURL("resource.update_mapgroup", id, "group")}
+                                icon={<OpenInNew />}
+                                target="_blank"
+                                type="text"
+                                color={!enabled ? "danger" : "default"}
+                                variant="link"
+                            />
+                            <Button
+                                title={settingsGroup}
+                                className="button-update"
+                                onClick={() => store.deleteGroup(id)}
+                                icon={<Delete />}
+                                target="_blank"
+                                type="text"
+                                color={!enabled ? "danger" : "default"}
+                                variant="link"
+                            />
+                        </>
                     )}
                 </span>
             </Radio.Button>
@@ -135,9 +150,14 @@ export const ContainerMenu = observer((props) => {
 
     return (
         <div className="dnd-container-menu">
-            {store.edit && store.editMap && store.update &&
-                (<ButtonSave icon={<SwapVertical />} className="edit-group-maps" text={gettext("Edit group maps")} staticPosition={store.editGroup} onClickSave={savePositionMap} />)
-            }
+            <Space direction="horizontal">
+                {store.resources.length > 1 && store.edit && store.editMap && store.update &&
+                    <ButtonSave icon={<SwapVertical />} text={gettext("Edit group maps")} staticPosition={store.editGroup} onClickSave={savePositionMap} />
+                }
+                {store.resources.length > 0 && store.edit && store.editMap && store.update &&
+                    <AddGroup store={store} icon />
+                }
+            </Space>
             <div
                 className="menu-group"
                 style={store.editGroup ? {} : { boxShadow: "inset 0 0 3px 0", borderRadius: 3 }}
@@ -156,7 +176,7 @@ export const ContainerMenu = observer((props) => {
                         <Radio.Group defaultValue={store.radioValue}>
                             {store.resources.map((item, key) => {
                                 if (item.mapgroup_resource.enabled === false && store.edit === false) return;
-                                
+
                                 return (
                                     <SortableMenu
                                         key={key}

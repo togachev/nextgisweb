@@ -102,8 +102,8 @@ def mapgroup_collection(
     )
     result = list()
     update = False
+    check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.update, u)
     for mres in query:
-        check_perm = lambda mres, u=request.user: mres.has_permission(ResourceScope.update, u)
         if mres.has_permission(ResourceScope.read, request.user) and mres.enabled == True and len(serializer.serialize(mres, CompositeRead).mapgroup_group["groupmaps"]):
             result.append(serializer.serialize(mres, CompositeRead))
             update=check_perm(mres)
@@ -114,6 +114,7 @@ def mapgroup_collection(
     return dict(
         res=result,
         update=update,
+        isAdministrator=request.user.is_administrator,
     )
 
 

@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ContainerMaps, ContainerMenu, Footer, Header } from "./component";
+import { EmptyComponent, AddGroup, ContainerMaps, ContainerMenu, Footer, Header, msgEmty } from "./component";
 import { HomeStore } from "./HomeStore";
 
 import "./Content.less";
@@ -204,14 +204,14 @@ export const Content = observer(({ config }: ContentProps) => {
                                 </AutoComplete>
                             </div>
                         </div>
-                        <div className="menu-maps">
+                        {store.resources.length > 0 ? <div className="menu-maps">
                             <div className="menu-list">
-                                {store.resources && <ContainerMenu store={store} />}
+                                <ContainerMenu store={store} />
                             </div>
                             <div className="content-maps-grid">
-                                {store.itemsMapsGroup && <ContainerMaps size={size} store={store} />}
+                                {store.itemsMapsGroup.length > 0 ? <ContainerMaps size={size} store={store} /> : <EmptyComponent {...{ text: msgEmty("map") }} />}
                             </div>
-                        </div>
+                        </div> : <AddGroup store={store} empty={true} text={gettext("Create?")} />}
                     </div>
                     <FloatButton.BackTop />
                 </div>

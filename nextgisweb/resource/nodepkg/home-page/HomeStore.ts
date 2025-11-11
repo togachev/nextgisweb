@@ -4,7 +4,11 @@ import { extractError } from "@nextgisweb/gui/error";
 
 import type { UploadFile } from "@nextgisweb/gui/antd";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import type {
+    CompositeCreate,
+    CompositeRead,
+} from "@nextgisweb/resource/type/api";
+import { errorModal } from "@nextgisweb/gui/error";
 
 export interface LayoutProps {
     i: string;
@@ -90,11 +94,11 @@ export class HomeStore {
     @observable accessor sourceGroup = false;
     @observable accessor editGroup = true;
     @observable accessor editMap = true;
-    @observable accessor edit = false;
+    @observable accessor edit = true;
     @observable accessor update = false;
     @observable accessor radioValue: number = 0;
 
-    @observable.shallow accessor resources: CompositeRead[] | null = null;
+    @observable.shallow accessor resources: CompositeRead[] = [];
     @observable.shallow accessor allLoadedResources: Map<
         number,
         CompositeRead
@@ -106,6 +110,7 @@ export class HomeStore {
     > = new Map();
 
     @observable.ref accessor config: ConfigProps;
+    @observable.ref accessor parent: number | null = null;
 
     @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
 
@@ -125,10 +130,20 @@ export class HomeStore {
     constructor({ config }) {
         this.config = config
         this.getWidthMenu();
-        this.mapgroup();
+        this.mapgroup(true);
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
     };
+
+    @action
+    reload() {
+        this.mapgroup(false);
+    }
+
+    @action
+    setParent(parent: number | null) {
+        this.parent = parent;
+    }
 
     @action
     updateLoadedResources(resources: CompositeRead[]) {
@@ -294,6 +309,11 @@ export class HomeStore {
         return resp;
     };
 
+    async deleteGroup(id) {
+        await route("resource.item", id).delete()
+        this.reload()
+    };
+
     @actionHandler
     async getValuesHeader(status: string) {
         this.getFilterSetting("home_page_header", "", "")
@@ -338,17 +358,17 @@ export class HomeStore {
             });
     };
 
-    private async mapgroup() {
+    private async mapgroup(reload: boolean) {
         const resp = await route("mapgroup.collection").get({
             query: {
                 description: false,
             },
-            cache: true,
+            cache: reload ? reload : false,
         });
 
-        const { res, update } = resp;
+        const { res, update, isAdministrator } = resp;
 
-        this.setUpdate(update)
+        this.setUpdate(isAdministrator ? isAdministrator : update)
 
         if (res.length > 0) {
             const activeResource = res
@@ -357,6 +377,9 @@ export class HomeStore {
             this.setRadioValue(activeResource.resource.id);
             this.setItemsMapsGroup(activeResource.mapgroup_group.groupmaps);
             this.setResources(res.sort((a, b) => (a.mapgroup_resource.position - b.mapgroup_resource.position)));
+        } else {
+            this.setResources([])
+            this.setItemsMapsGroup([]);
         }
     };
 
@@ -365,6 +388,32 @@ export class HomeStore {
             json: payload,
         })
     };
+
+    async createNewGroup(name: string): Promise<CompositeRead | undefined> {
+
+        const payload: CompositeCreate = {
+            resource: {
+                display_name: name,
+                keyname: null,
+                parent: {
+                    id: this.parent,
+                },
+                cls: "mapgroup_resource",
+            },
+        };
+
+        try {
+            await route("resource.collection").post<{
+                id: number;
+            }>({
+                json: payload,
+            });
+            this.reload()
+        } catch (err) {
+            errorModal(err);
+            return;
+        }
+    }
 };
 
 export function actionHandler(

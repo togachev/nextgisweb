@@ -382,6 +382,7 @@ export class ResourcePickerStore
             layer: ["vector_layer", "postgis_layer"],
             basemap_layer: ["basemap_layer"],
             mapgroup_group: ["webmap"],
+            add_mapgroup_group: ["mapgroup_resource"],
             wms_service: ["wmsclient_connection"],
             wfs_service: ["wfsclient_connection"],
             tms_service: ["tmsclient_connection"],

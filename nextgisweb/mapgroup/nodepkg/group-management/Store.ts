@@ -8,15 +8,47 @@ import type {
 } from "@nextgisweb/resource/type/api";
 
 export class Store {
-    @observable accessor update = false;
+    @observable accessor deleteTag = false;
 
     @observable.ref accessor maps: number[] = [];
     @observable.ref accessor parent: number | null = null;
     @observable.shallow accessor groups: GroupMapsGridProps[] = [];
 
+    @observable.shallow accessor allLoadedGroups: Map<
+        number,
+        CompositeRead
+    > = new Map();
+
     constructor() {
-        this.groupsMaps(false);
+        this.groupsMaps(true);
     };
+
+    @action
+    reload() {
+        this.groupsMaps(false);
+    }
+
+
+    @action
+    loadedGroups(groups: CompositeRead[]) {
+        const allGroups = new Map(this.allLoadedGroups);
+
+        groups.forEach((group) => {
+            allGroups.set(group.resource.id, group);
+        });
+        this.allLoadedGroups = allGroups;
+    }
+
+    @action
+    setGroups(groups: GroupMapsGridProps[]) {
+        this.groups = groups;
+        this.loadedGroups(groups);
+    }
+
+    @action
+    setDeleteTag(deleteTag: boolean) {
+        this.deleteTag = deleteTag;
+    }
 
     @action
     setMaps(maps: number[]) {
@@ -28,17 +60,7 @@ export class Store {
         this.parent = parent;
     }
 
-    @action
-    setGroups(groups: GroupMapsGridProps[]) {
-        this.groups = groups;
-    }
-
-    @action
-    setUpdate(update: boolean) {
-        this.update = update;
-    };
-
-    private async groupsMaps(reload: boolean) {
+    async groupsMaps(reload: boolean) {
         const resp = await route("mapgroup.collection").get({
             query: {
                 description: false,
@@ -46,9 +68,12 @@ export class Store {
             cache: reload ? reload : false,
         });
 
-        const { res, update } = resp;
-        this.setGroups(res.sort((a, b) => (a.mapgroup_resource.position - b.mapgroup_resource.position)));
-        this.setUpdate(update);
+        const { res } = resp;
+        if (res.length > 0) {
+            this.setGroups(res.sort((a, b) => (a.mapgroup_resource.position - b.mapgroup_resource.position)));
+        } else {
+            this.setGroups([])
+        }
     };
 
     async createNewGroup(name: string): Promise<CompositeRead | undefined> {
@@ -70,7 +95,7 @@ export class Store {
             }>({
                 json: payload,
             });
-            this.groupsMaps(true)
+            this.reload()
         } catch (err) {
             errorModal(err);
             return;
@@ -78,21 +103,10 @@ export class Store {
     }
 
     async addMaps(resourceId: number, ids: number[]): Promise<undefined> {
-        let payload = { params: [] };
+        const payload = { params: [] };
         ids.map(item => {
             payload.params.push({ id: item, position: 0 })
         })
         console.log(payload);
-
-        // try {
-        //     await route("mapgroup.maps").post<{
-        //         resourceId: number;
-        //     }>({
-        //         json: payload,
-        //     });
-        // } catch (err) {
-        //     errorModal(err);
-        //     return;
-        // }
     }
 };

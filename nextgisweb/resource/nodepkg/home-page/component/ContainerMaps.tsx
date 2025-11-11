@@ -127,7 +127,7 @@ export const ContainerMaps = observer((props) => {
 
     return (
         <div className="dnd-container-maps" key={store.radioValue}>
-            {store.edit && store.editGroup && store.update &&
+            {store.itemsMapsGroup.length > 1 && store.edit && store.editGroup && store.update &&
                 (<ButtonSave icon={<SwapVertical />} className="edit-grid-maps" text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />)
             }
             <div
