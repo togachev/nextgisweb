@@ -33,7 +33,7 @@ import {
 const settingsGroup = gettext("Group settings");
 
 export type ItemProps = HTMLAttributes<HTMLDivElement> & {
-    id: string;
+    id: number;
     isDragging?: boolean;
 };
 
@@ -41,7 +41,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
     const { store, item } = props;
     const { id, display_name } = item.resource;
     const { enabled } = item.mapgroup_resource;
-
+    
     const {
         attributes,
         listeners,
@@ -64,8 +64,8 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
         opacity: isDragging ? "0" : "1",
     };
 
-    const onClickGroupMenu = useCallback((id) => {
-        store.setRadioValue(id);
+    const onClickGroupMenu = useCallback((id: number) => {
+        store.setActiveGroupId(id);
         store.setItemsMapsGroup(store.allLoadedResources.get(id).mapgroup_group.groupmaps);
     }, []);
 
@@ -132,8 +132,6 @@ export const ContainerMenu = observer((props) => {
             const value = arrayMove(resourceItems, oldIndex, newIndex);
             store.setResources(value);
         }
-
-        store.setActiveGroupId(null);
     }, []);
 
     const handleDragCancel = useCallback(() => {
@@ -147,7 +145,7 @@ export const ContainerMenu = observer((props) => {
             store.updatePosition({ params: value }, "mapgroup.groups");
         }
     }, []);
-
+    
     return (
         <div className="dnd-container-menu">
             <Space direction="horizontal">
@@ -173,7 +171,7 @@ export const ContainerMenu = observer((props) => {
                         items={store.resources.map((item) => item.resource.id)}
                         strategy={verticalListSortingStrategy}
                     >
-                        <Radio.Group defaultValue={store.radioValue}>
+                        <Radio.Group value={store.activeGroupId}>
                             {store.resources.map((item, key) => {
                                 if (item.mapgroup_resource.enabled === false && store.edit === false) return;
 
@@ -195,7 +193,7 @@ export const ContainerMenu = observer((props) => {
                                 store={store}
                                 width={store.edit ? store.widthMenu - 29 : store.widthMenu}
                                 height={40}
-                                name={store.allLoadedResources.get(store.activeGroupId).resource.display_name}
+                                name={store.activeGroup.resource.display_name}
                                 isDragging
                             /> :
                             null

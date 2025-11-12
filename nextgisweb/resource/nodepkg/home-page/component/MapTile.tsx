@@ -10,6 +10,7 @@ import { ModalComponent } from ".";
 import MapIcon from "@nextgisweb/icon/material/map";
 import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
 import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
+import Delete from "@nextgisweb/icon/mdi/delete-outline";
 import "./MapTile.less";
 
 const openMap = gettext("Open map");
@@ -110,6 +111,18 @@ export const MapTile = observer((props) => {
                                             className="button-update"
                                             href={routeURL("resource.update_mapgroup", webmap_group_id, "maps")}
                                             icon={<OpenInNew />}
+                                            target="_blank"
+                                            type="text"
+                                            color={!enabled ? "danger" : "default"}
+                                            variant="link"
+                                        />
+                                        <Button
+                                            title={gettext("Remove webmap")}
+                                            className="button-update"
+                                            onClick={() => {
+                                                store.deleteMap(webmap_id)
+                                            }}
+                                            icon={<Delete />}
                                             target="_blank"
                                             type="text"
                                             color={!enabled ? "danger" : "default"}

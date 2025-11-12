@@ -7,7 +7,6 @@ from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
-from nextgisweb.pyramid import viewargs
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
 
@@ -98,15 +97,6 @@ def clone(request):
     )
 
 
-@react_renderer("@nextgisweb/mapgroup/group-management")
-def group_management(request):
-    request.resource_permission(ResourceScope.update)
-    return dict(
-        obj=request.context,
-        title=gettext("Managing web map groups"),
-    )
-
-
 @react_renderer("@nextgisweb/webmap/preview-embedded")
 def preview_embedded(request):
     iframe = None
@@ -166,13 +156,6 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "webmap.group-management",
-        r"/resource/{id:uint}/group-management",
-        factory=resource_factory,
-        get=group_management,
-    )
-
-    config.add_route(
         "webmap.preview_embedded",
         "/webmap/embedded-preview",
         get=preview_embedded,
@@ -214,16 +197,6 @@ def setup_pyramid(comp, config):
                 important=False,
                 target="_self",
                 icon=icon_clone,
-            )
-
-        if args.obj.has_permission(ResourceScope.read, args.request.user):
-            yield Link(
-                "webmap/group-management",
-                gettext("Managing web map groups"),
-                lambda args: args.request.route_url("webmap.group-management", id=args.obj.id),
-                important=False,
-                target="_self",
-                icon="material-edit",
             )
 
     @comp.env.pyramid.control_panel.add

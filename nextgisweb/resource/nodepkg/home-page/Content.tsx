@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { EmptyComponent, AddGroup, AddMap, ContainerMaps, ContainerMenu, Footer, Header, msgEmty } from "./component";
+import { AddGroup, AddMap, ContainerMaps, ContainerMenu, Footer, Header } from "./component";
 import { HomeStore } from "./HomeStore";
 
 import "./Content.less";

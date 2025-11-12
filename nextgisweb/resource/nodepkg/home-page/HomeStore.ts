@@ -1,4 +1,4 @@
-import { action, computed, observable, observe } from "mobx";
+import { action, observable } from "mobx";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { extractError } from "@nextgisweb/gui/error";
 
@@ -9,8 +9,7 @@ import type {
     CompositeRead,
 } from "@nextgisweb/resource/type/api";
 import { errorModal } from "@nextgisweb/gui/error";
-import { Groupmap } from "@nextgisweb/mapgroup/group-widget/Groupmap";
-import { CompositeStore } from "@nextgisweb/resource/composite/CompositeStore";
+
 export interface LayoutProps {
     i: string;
     x: number;
@@ -97,7 +96,6 @@ export class HomeStore {
     @observable accessor editMap = true;
     @observable accessor edit = true;
     @observable accessor update = false;
-    @observable accessor radioValue: number = 0;
 
     @observable.shallow accessor resources: CompositeRead[] = [];
     @observable.shallow accessor allLoadedResources: Map<
@@ -116,7 +114,7 @@ export class HomeStore {
     @observable.shallow accessor itemsMapsGroup: ListMapProps[] = [];
 
     @observable.ref accessor activeMapId: string | null = null;
-    @observable.ref accessor activeGroupId: string | null = null;
+    @observable.ref accessor activeGroupId: number | null = 0;
     @observable.shallow accessor activeGroup: CompositeRead | null = null;
     @observable.shallow accessor initialFooter: FooterProps;
     @observable.shallow accessor initialHeader: HeaderProps;
@@ -129,66 +127,13 @@ export class HomeStore {
 
     @observable.shallow accessor ulrImg: ImgUrlKey;
 
-    @observable.ref accessor dirty = false;
-    @observable.ref accessor validate = false;
-
-    readonly groupmaps = observable.array<Groupmap>([], { deep: false });
-    readonly composite: CompositeStore;
     constructor({ config }) {
         this.config = config
-
         this.getWidthMenu();
         this.mapgroup(true);
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
-        observe(this.groupmaps, () => this.markDirty());
     };
-
-    @action
-    load(groupmaps) {
-        console.log(groupmaps);
-
-        this.groupmaps.replace(groupmaps.map((v) => new Groupmap(this, v)));
-        this.dirty = false;
-    }
-
-    dump() {
-        if (!this.dirty) return undefined;
-        return { groupmaps: this.groupmaps.map((i) => i.json()) };
-    }
-
-    @action
-    markDirty() {
-        this.dirty = true;
-    }
-
-    @computed
-    get isValid(): boolean {
-        return this.groupmaps.every((i) => i.error === false);
-    }
-
-    @computed
-    get counter() {
-        return this.groupmaps.length;
-    }
-
-    // FocusTableStore
-
-    getItemChildren(item: Groupmap | null) {
-        return item === null ? this.groupmaps : undefined;
-    }
-
-    getItemContainer(item: Groupmap) {
-        return item && this.groupmaps;
-    }
-
-    getItemParent() {
-        return null;
-    }
-
-    getItemError(item: Groupmap) {
-        return item.error;
-    }
 
     @action
     reload() {
@@ -227,7 +172,7 @@ export class HomeStore {
     }
 
     @action
-    setActiveGroupId(activeGroupId: string | null) {
+    setActiveGroupId(activeGroupId: number | null) {
         this.activeGroupId = activeGroupId;
     }
 
@@ -240,11 +185,6 @@ export class HomeStore {
     setResources(resources: CompositeRead[]) {
         this.resources = resources;
         this.updateLoadedResources(resources);
-    }
-
-    @action
-    setRadioValue(radioValue: number) {
-        this.radioValue = radioValue;
     }
 
     @action
@@ -368,9 +308,26 @@ export class HomeStore {
         return resp;
     };
 
-    async deleteGroup(id) {
-        await route("resource.item", id).delete()
-        this.reload()
+    async deleteGroup(id: number) {
+        try {
+            await route("resource.item", id).delete()
+            this.reload()
+        } catch (err) {
+            errorModal(err);
+            return;
+        }
+    };
+
+    async deleteMap(id: number) {
+        try {
+            await route("mapgroup.item", this.activeGroupId).delete({
+                json: { id: id },
+            })
+            this.reload()
+        } catch (err) {
+            errorModal(err);
+            return;
+        }
     };
 
     @actionHandler
@@ -433,12 +390,10 @@ export class HomeStore {
             const activeResource = res
                 .filter(item => item.mapgroup_resource.enabled)
                 .reduce((min, current) => ((current.mapgroup_resource.position < min.mapgroup_resource.position) ? current : min));
-            this.setRadioValue(activeResource.resource.id);
+            this.setActiveGroupId(activeResource.resource.id);
             this.setItemsMapsGroup(activeResource.mapgroup_group.groupmaps);
             this.setResources(res.sort((a, b) => (a.mapgroup_resource.position - b.mapgroup_resource.position)));
             this.setActiveGroup(activeResource)
-            const setup = { operation: "update", id: this.activeGroup.resource.id }
-            this.composite = new CompositeStore({ setup });
         } else {
             this.setResources([])
             this.setItemsMapsGroup([]);
@@ -466,12 +421,14 @@ export class HomeStore {
         };
 
         try {
-            await route("resource.collection").post<{
+            const res = await route("resource.collection").post<{
                 id: number;
             }>({
                 json: payload,
             });
-            this.reload()
+            this.reload();
+            this.setActiveGroupId(res.id);
+
         } catch (err) {
             errorModal(err);
             return;
@@ -479,15 +436,11 @@ export class HomeStore {
     }
 
     async addMaps(ids: number[]): Promise<undefined> {
-        const payload = { params: [] };
-        ids.map(item => {
-            payload.params.push({ id: item, position: 0 })
-        })
-        console.log(payload);
-
         try {
-            await route("mapgroup.maps").post({
-                body: JSON.stringify(payload),
+            await route("mapgroup.item", this.activeGroupId).put({
+                json: {
+                    ids: ids
+                },
             });
             this.reload()
         } catch (err) {

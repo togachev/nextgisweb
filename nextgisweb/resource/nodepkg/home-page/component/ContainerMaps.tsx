@@ -4,11 +4,12 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
 import SwapVertical from "@nextgisweb/icon/mdi/arrow-all";
-import { Empty } from "@nextgisweb/gui/antd";
+import { Empty, Space } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MapTile } from "./MapTile";
 import { DragItem } from "./DragItem";
+import { AddMap } from "./AddMap";
 
 import {
     DndContext,
@@ -118,7 +119,7 @@ export const ContainerMaps = observer((props) => {
     const savePositionMap = useCallback(() => {
         store.setEditMap(!store.editMap);
         if (store.editMap) {
-            const mapgroup_group = store.allLoadedResources.get(store.radioValue).mapgroup_group;
+            const mapgroup_group = store.allLoadedResources.get(store.activeGroupId).mapgroup_group;
             mapgroup_group.groupmaps = store.itemsMapsGroup;
             const value = store.itemsMapsGroup.map((item, index) => ({ id: item.id, position: index }))
             store.updatePosition({ params: value }, "mapgroup.maps");
@@ -126,10 +127,15 @@ export const ContainerMaps = observer((props) => {
     }, []);
 
     return (
-        <div className="dnd-container-maps" key={store.radioValue}>
-            {store.itemsMapsGroup.length > 1 && store.edit && store.editGroup && store.update &&
-                (<ButtonSave icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />)
-            }
+        <div className="dnd-container-maps" key={store.activeGroupId}>
+            <Space direction="horizontal">
+                {store.itemsMapsGroup.length > 1 && store.edit && store.editGroup && store.update &&
+                    (<ButtonSave icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />)
+                }
+                {store.itemsMapsGroup.length > 0 && store.edit && store.editMap && store.update &&
+                    <AddMap store={store} icon />
+                }
+            </Space>
             <div
                 className="maps-group"
                 style={store.editMap ?
