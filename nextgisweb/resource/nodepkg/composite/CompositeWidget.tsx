@@ -56,6 +56,7 @@ TabsLabel.displayName = "TabsLabel";
 export interface CompositeWidgetProps {
     setup: CompositeSetup;
     tab?: string;
+    location?: string;
 }
 
 export type tabOnOptions = {
@@ -63,17 +64,17 @@ export type tabOnOptions = {
 };
 
 
-const CompositeWidget = observer(({ setup, tab }: CompositeWidgetProps) => {
-    const [activeKey, setActiveKey] = useState<string>();
-    console.log(setup);
+export const CompositeWidget = observer(({ setup, tab, location }: CompositeWidgetProps) => {
+    console.log(setup, tab, location);
     
-    const [composite] = useState(() => new CompositeStore({ setup }));
+    const [activeKey, setActiveKey] = useState<string>();
+    const [composite] = useState(() => new CompositeStore({ setup, location }));
     const [redirecting, setRedirecting] = useState(false);
 
     const { operation } = setup;
     const { members, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
-
+    
     const items = useMemo<TabItem[]>(() => {
         if (!members) return [];
         return members
@@ -128,7 +129,7 @@ const CompositeWidget = observer(({ setup, tab }: CompositeWidgetProps) => {
             }
 
             disableUnsavedChanges();
-            const routeName = edit ? "resource.update" : "resource.show";
+            const routeName = edit ? "resource.update" : location === "true" ? "home_page" : "resource.show";
             window.location.href = route(routeName, { id }).url();
         },
         [composite, disableUnsavedChanges]

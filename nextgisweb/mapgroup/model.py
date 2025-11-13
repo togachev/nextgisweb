@@ -5,10 +5,8 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType, to_builtins
 from sqlalchemy.ext.orderinglist import ordering_list
 from nextgisweb.env import Base, gettext
-from sqlalchemy.schema import UniqueConstraint
 
 from nextgisweb.resource import (
-    DataScope,
     Resource,
     ResourceGroup,
     ResourceScope,

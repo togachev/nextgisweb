@@ -41,13 +41,11 @@ const SortableMaps: FC<ItemProps> = observer((props) => {
         listeners,
         setNodeRef,
         transform,
-        transition,
         isDragging,
     } = useSortable({ id: item.id, disabled: store.editMap });
 
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
         width: store.editMap ? size.maxW : size.minW,
         height: store.editMap ? size.maxH : size.minH,
         zIndex: isDragging ? "100" : "auto",
@@ -181,7 +179,7 @@ export const ContainerMaps = observer((props) => {
                                 store={store}
                                 width={store.editMap ? size.maxW : size.minW}
                                 height={store.editMap ? size.maxH : size.minH}
-                                name={store.allMapsGroup.get(store.activeMapId).display_name}
+                                item={store.allMapsGroup.get(store.activeMapId)}
                                 isDragging
                             /> :
                             null

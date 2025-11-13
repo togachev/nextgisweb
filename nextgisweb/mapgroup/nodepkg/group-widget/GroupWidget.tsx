@@ -51,8 +51,7 @@ export const GroupWidget: EditorWidget<GroupStore> = observer(({ store }) => {
     const { pickToFocusTable } = useFocusTablePicker({
         initParentId: store.composite.parent || undefined,
     });
-    console.log(store);
-    
+
     const { tableActions, itemActions } = useMemo<
         FocusTablePropsActions<Groupmap>
     >(
@@ -88,11 +87,7 @@ export const GroupWidget: EditorWidget<GroupStore> = observer(({ store }) => {
             canDragAndDrop={false}
             tableActions={tableActions}
             itemActions={itemActions}
-                renderDetail={({ item }) => {
-                    console.log(item);
-
-                    return (<GroupmapWidget item={item} />)
-                }}
+            renderDetail={({ item }) => <GroupmapWidget item={item} />}
         />
     );
 });

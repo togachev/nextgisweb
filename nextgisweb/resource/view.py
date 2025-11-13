@@ -213,9 +213,10 @@ def update(request):
 def update_mapgroup(request):
     request.resource_permission(ResourceScope.update)
     tab = str(request.matchdict["tab"])
+    location = str(request.matchdict["location"])
     setup = dict(operation="update", id=request.context.id)
     return dict(
-        props=dict(setup=setup, tab=tab),
+        props=dict(setup=setup, tab=tab, location=location),
         obj=request.context,
         title=gettext("Update resource"),
         maxheight=True,
@@ -487,7 +488,7 @@ def setup_pyramid(comp, config):
     _resource_route("delete", r"{id:uint}/delete", get=delete)
 
     # Mapgroup
-    _resource_route("update_mapgroup", r"{id:uint}/update/{tab:str}", get=update_mapgroup)
+    _resource_route("update_mapgroup", r"{id:uint}/update/{tab:str}/{location:str}", get=update_mapgroup)
 
     # Actions
 

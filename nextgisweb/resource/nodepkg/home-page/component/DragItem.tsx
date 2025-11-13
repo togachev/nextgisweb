@@ -3,7 +3,8 @@ import { forwardRef, CSSProperties } from "react";
 export const DragItem = forwardRef<HTMLDivElement, ItemProps>(
     ({ id, isDragging, style, ...props }, ref) => {
         
-        const { name, width, height } = props
+        const { width, height, item } = props;
+        const { display_name } = item;
         const inlineStyles: CSSProperties = {
             transformOrigin: "50% 50%",
             height: height,
@@ -23,7 +24,7 @@ export const DragItem = forwardRef<HTMLDivElement, ItemProps>(
 
         return (
             <div className="drag-title" ref={ref} style={inlineStyles} {...props}>
-                <span className="title">{name}</span>
+                <span className="title">{display_name}</span>
             </div>
         );
     }

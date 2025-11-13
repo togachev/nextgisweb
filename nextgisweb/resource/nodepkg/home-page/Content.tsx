@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AddGroup, AddMap, ContainerMaps, ContainerMenu, Footer, Header } from "./component";
+import { AddGroup, AddMapGroup, AddMap, ContainerMaps, ContainerMenu, Footer, Header } from "./component";
 import { HomeStore } from "./HomeStore";
 
 import "./Content.less";
@@ -81,7 +81,7 @@ export const Content = observer(({ config }: ContentProps) => {
         }
         return null;
     }, [search]);
-
+    
     const makeSearchRequest = useRef(
         debounce(async ({ query: q }) => {
             try {
@@ -209,9 +209,9 @@ export const Content = observer(({ config }: ContentProps) => {
                                 <ContainerMenu store={store} />
                             </div>
                             <div className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 ? <ContainerMaps size={size} store={store} /> : <AddMap store={store} empty={true} text={gettext("Create?")} />}
+                                {store.itemsMapsGroup.length > 0 ? <ContainerMaps size={size} store={store} /> : <AddMap icon store={store} />}
                             </div>
-                        </div> : <AddGroup store={store} empty={true} text={gettext("Create?")} />}
+                        </div> : <AddMapGroup icon store={store} />}
                     </div>
                     <FloatButton.BackTop />
                 </div>

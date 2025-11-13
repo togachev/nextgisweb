@@ -1,4 +1,5 @@
 export { AddGroup } from "./AddGroup";
+export { AddMapGroup } from "./AddMapGroup";
 export { AddMap } from "./AddMap";
 export { EmptyComponent } from "./EmptyComponent";
 export { ControlForm } from "./ControlForm";

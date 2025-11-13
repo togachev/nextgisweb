@@ -11,7 +11,7 @@ import { Button, Radio, Space } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { DragItem } from "./DragItem";
-import { AddGroup } from "./AddGroup";
+import { AddMapGroup } from "./AddMapGroup";
 
 import {
     DndContext,
@@ -89,7 +89,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
                             <Button
                                 title={settingsGroup}
                                 className="button-update"
-                                href={routeURL("resource.update_mapgroup", id, "group")}
+                                href={routeURL("resource.update_mapgroup", id, "group", "true")}
                                 icon={<OpenInNew />}
                                 target="_blank"
                                 type="text"
@@ -153,7 +153,7 @@ export const ContainerMenu = observer((props) => {
                     <ButtonSave icon={<SwapVertical />} text={gettext("Edit group maps")} staticPosition={store.editGroup} onClickSave={savePositionMap} />
                 }
                 {store.resources.length > 0 && store.edit && store.editMap && store.update &&
-                    <AddGroup store={store} icon />
+                    <AddMapGroup icon />
                 }
             </Space>
             <div
@@ -193,7 +193,7 @@ export const ContainerMenu = observer((props) => {
                                 store={store}
                                 width={store.edit ? store.widthMenu - 29 : store.widthMenu}
                                 height={40}
-                                name={store.activeGroup.resource.display_name}
+                                item={store.allLoadedResources.get(store.activeGroupId)}
                                 isDragging
                             /> :
                             null

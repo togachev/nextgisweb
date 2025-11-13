@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { BaseAPIError, LunkwillParam, route, routeURL } from "@nextgisweb/pyramid/api";
 import { extractError } from "@nextgisweb/gui/error";
 
 import type { UploadFile } from "@nextgisweb/gui/antd";
@@ -81,6 +81,12 @@ interface ImgUrlKey {
     footer: string;
 };
 
+interface SetupProps {
+    operation: string;
+    cls: string;
+    parent: number;
+};
+
 type Action = keyof Pick<HomeStore,
     | "getWidthMenu"
     | "getValuesHeader"
@@ -94,7 +100,7 @@ export class HomeStore {
     @observable accessor sourceGroup = false;
     @observable accessor editGroup = true;
     @observable accessor editMap = true;
-    @observable accessor edit = false;
+    @observable accessor edit = true;
     @observable accessor update = false;
 
     @observable.shallow accessor resources: CompositeRead[] = [];
@@ -124,6 +130,7 @@ export class HomeStore {
 
     @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
     @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
+    @observable.shallow accessor setup: object = {};
 
     @observable.shallow accessor ulrImg: ImgUrlKey;
 
@@ -134,6 +141,11 @@ export class HomeStore {
         this.getValuesHeader("loading");
         this.getValuesFooter("loading");
     };
+
+    @action
+    setSetup(setup: SetupProps) {
+        this.setup = setup;
+    }
 
     @action
     reload() {

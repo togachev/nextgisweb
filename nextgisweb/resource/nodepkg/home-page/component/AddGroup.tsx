@@ -14,13 +14,11 @@ import { msgEmty } from "./msg";
 
 interface StoreProps {
     store: HomeStore;
-    empty?: boolean;
     icon?: boolean;
-    text?: string;
 }
 
 export const AddGroup = observer((props: StoreProps) => {
-    const { store, empty, icon, text } = props;
+    const { store, icon } = props;
 
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
 
@@ -43,12 +41,11 @@ export const AddGroup = observer((props: StoreProps) => {
     }, [showResourcePicker]);
 
     return (
-        <div className={!icon ? "create-group" : "create-group-menu"}>
-            {!showInput && empty &&
-                <EmptyComponent {...{ text: msgEmty("group") }} />
-            }
+        <div className="create-group">
             {!showInput &&
-                <Button icon={icon ? <AddCircle /> : undefined} type="text" onClick={() => setShowInput(true)}>{text}</Button>
+                <Button icon={icon ? <AddCircle /> : undefined} type="text" onClick={() => setShowInput(true)}>
+                    <EmptyComponent {...{ text: msgEmty("group") }} />
+                </Button>
             }
 
             {showInput &&
