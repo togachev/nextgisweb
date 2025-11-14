@@ -3,8 +3,8 @@ import { forwardRef, CSSProperties } from "react";
 export const DragItem = forwardRef<HTMLDivElement, ItemProps>(
     ({ id, isDragging, style, ...props }, ref) => {
         
-        const { width, height, item } = props;
-        const { display_name } = item;
+        const { width, height, display_name } = props;
+        
         const inlineStyles: CSSProperties = {
             transformOrigin: "50% 50%",
             height: height,

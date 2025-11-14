@@ -1,10 +1,15 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-export const msgEmty = (key: string) => {
+export const msg = (type: string, operation: string) => {
     const obj: any = {
-        map: gettext("Create or add a web map to the current group"),
-        group: gettext("Create a new group"),
+        group: {
+            create: gettext("Create a group"),
+            update: gettext("Group settings"),
+        },
+        map: {
+            update: gettext("Configuring a web map in a group"),
+        }
     }
 
-    return obj[key]
+    return obj[type][operation]
 }

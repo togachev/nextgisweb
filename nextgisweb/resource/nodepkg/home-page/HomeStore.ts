@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { BaseAPIError, LunkwillParam, route, routeURL } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { extractError } from "@nextgisweb/gui/error";
 
 import type { UploadFile } from "@nextgisweb/gui/antd";
@@ -184,7 +184,7 @@ export class HomeStore {
     }
 
     @action
-    setActiveGroupId(activeGroupId: number | null) {
+    setActiveGroupId(activeGroupId: number) {
         this.activeGroupId = activeGroupId;
     }
 
@@ -330,18 +330,6 @@ export class HomeStore {
         }
     };
 
-    async deleteMap(id: number) {
-        try {
-            await route("mapgroup.item", this.activeGroupId).delete({
-                json: { id: id },
-            })
-            this.reload()
-        } catch (err) {
-            errorModal(err);
-            return;
-        }
-    };
-
     @actionHandler
     async getValuesHeader(status: string) {
         this.getFilterSetting("home_page_header", "", "")
@@ -441,20 +429,6 @@ export class HomeStore {
             this.reload();
             this.setActiveGroupId(res.id);
 
-        } catch (err) {
-            errorModal(err);
-            return;
-        }
-    }
-
-    async addMaps(ids: number[]): Promise<undefined> {
-        try {
-            await route("mapgroup.item", this.activeGroupId).put({
-                json: {
-                    ids: ids
-                },
-            });
-            this.reload()
         } catch (err) {
             errorModal(err);
             return;

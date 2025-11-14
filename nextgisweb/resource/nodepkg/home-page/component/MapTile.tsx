@@ -7,16 +7,14 @@ import Cogs from "@nextgisweb/icon/mdi/cogs";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
+import { AddMapGroup } from ".";
 import MapIcon from "@nextgisweb/icon/material/map";
-import OpenInNew from "@nextgisweb/icon/mdi/open-in-new";
 import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
-import Delete from "@nextgisweb/icon/mdi/delete-outline";
 import "./MapTile.less";
 
 const openMap = gettext("Open map");
 const descTitle = gettext("Map description");
 const settingsTitle = gettext("Map settings");
-const settingsWebMapsGroup = gettext("Setting up a web map in a group");
 
 const { Meta } = Card;
 const { Text, Link } = Typography;
@@ -53,8 +51,8 @@ export const MapTile = observer((props) => {
         <DescComponent type="home_page" upath_info={upath_info} content={descValue} />
     )
 
-    const TitleMap = ({ className }) => (
-        <div title={display_name} className={className + " grid-card-meta-title grid-card-meta-title-min"} >
+    const TitleMap = () => (
+        <div title={display_name} className="grid-card-meta-title grid-card-meta-title-min" >
             {display_name}
         </div >
     )
@@ -106,33 +104,13 @@ export const MapTile = observer((props) => {
                                 </div>
                                 {!store.edit && !enabled ? <DisabledVisible /> : store.edit && (
                                     <div className="icon-disable">
-                                        <Button
-                                            title={settingsWebMapsGroup}
-                                            className="button-update"
-                                            href={routeURL("resource.update_mapgroup", webmap_group_id, "maps", "true")}
-                                            icon={<OpenInNew />}
-                                            target="_self"
-                                            type="text"
-                                            color={!enabled ? "danger" : "default"}
-                                            variant="link"
-                                        />
-                                        <Button
-                                            title={gettext("Remove webmap")}
-                                            className="button-update"
-                                            onClick={() => {
-                                                store.deleteMap(webmap_id)
-                                            }}
-                                            icon={<Delete />}
-                                            target="_blank"
-                                            type="text"
-                                            color={!enabled ? "danger" : "default"}
-                                            variant="link"
-                                        />
+                                        <AddMapGroup type="map" tab="maps" store={store} id={webmap_group_id} operation="update" icon="open" />
                                     </div>
                                 )}
                             </span>
                             <div className={size.min ? "button-min control-button" : "control-button"} >
                                 <Button
+                                    size="small"
                                     href={urlWebmap}
                                     target="_blank"
                                     type="text"
@@ -142,6 +120,7 @@ export const MapTile = observer((props) => {
                                 </Button>
                                 {store.update && (
                                     <Button
+                                        size="small"
                                         title={settingsTitle}
                                         href={urlWebmapSettings}
                                         target="_blank"
@@ -151,6 +130,7 @@ export const MapTile = observer((props) => {
                                 )}
                                 {description_status === true && (
                                     <Button
+                                        size="small"
                                         title={descTitle}
                                         onClick={showDescription}
                                         type="text"

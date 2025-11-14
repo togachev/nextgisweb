@@ -27,12 +27,16 @@ input {
 		left: 0;
 	}
 
-	.create-group {
+	.add-group {
 		padding: 5px;
+		display: flex;
+		align-items: center
+	}
+
+	.create-group {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		max-width: 500px;
 	}
 
 	.ant-btn-color-link.ant-btn-variant-link {
@@ -58,7 +62,6 @@ input {
 	.button-update {
 		display: flex;
 		align-items: center;
-		width: 24px !important;
 		height: 24px !important;
 		margin: 0;
 	}
@@ -241,6 +244,11 @@ input {
 						flex-direction: column;
 						max-width: 280px;
 
+						.edit-group {
+							display: flex;
+							justify-content: space-between;
+						}
+
 						.menu-group {
 							display: flex;
 							flex-direction: column;
@@ -302,6 +310,11 @@ input {
 						display: flex;
 						flex-direction: column;
 						width: 100%;
+
+						.edit-maps {
+							display: flex;
+							justify-content: flex-end;
+						}
 
 						.maps-group {
 							display: grid;
@@ -644,23 +657,23 @@ div:has(> .upload-footer) {
 
 
 .mapgroup-modal.ant-modal {
-    margin: 1em;
-    padding: 0;
-    width: 60%;
-    min-width: 40em;
-    max-width: 80em;
-    height: 80%;
-    min-height: 40em;
+	margin: 1em;
+	padding: 0;
+	width: 60%;
+	min-width: 40em;
+	max-width: 80em;
+	height: 80%;
+	min-height: 40em;
 
-    > div {
-        height: 100%;
+	>div {
+		height: 100%;
 
-        > .ant-modal-content {
-            height: 100%;
+		>.ant-modal-content {
+			height: 100%;
 
-            > .ant-modal-body {
-                height: 100%;
-            }
-        }
-    }
+			>.ant-modal-body {
+				height: 100%;
+			}
+		}
+	}
 }

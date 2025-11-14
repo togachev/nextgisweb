@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import topic from "@nextgisweb/webmap/compat/topic";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
     ActionToolbarAction,
@@ -65,16 +66,14 @@ export type tabOnOptions = {
 
 
 export const CompositeWidget = observer(({ setup, tab, location }: CompositeWidgetProps) => {
-    console.log(setup, tab, location);
-    
     const [activeKey, setActiveKey] = useState<string>();
-    const [composite] = useState(() => new CompositeStore({ setup, location }));
+    const [composite] = useState(() => new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
 
     const { operation } = setup;
     const { members, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
-    
+
     const items = useMemo<TabItem[]>(() => {
         if (!members) return [];
         return members
@@ -129,8 +128,12 @@ export const CompositeWidget = observer(({ setup, tab, location }: CompositeWidg
             }
 
             disableUnsavedChanges();
-            const routeName = edit ? "resource.update" : location === "true" ? "home_page" : "resource.show";
-            window.location.href = route(routeName, { id }).url();
+            const routeName = edit ? "resource.update" : "resource.show";
+            if (location === "true") {
+                topic.publish("mapgroup.close.modal");
+            } else {
+                window.location.href = route(routeName, { id }).url();
+            }
         },
         [composite, disableUnsavedChanges]
     );

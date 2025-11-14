@@ -1,4 +1,4 @@
-import { AutoComplete, ConfigProvider, FloatButton, Input } from "@nextgisweb/gui/antd";
+import { AutoComplete, ConfigProvider, Empty, FloatButton, Input } from "@nextgisweb/gui/antd";
 import DeleteOffOutline from "@nextgisweb/icon/mdi/magnify";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AddGroup, AddMapGroup, AddMap, ContainerMaps, ContainerMenu, Footer, Header } from "./component";
+import { AddMapGroup, ContainerMaps, ContainerMenu, Footer, Header, msg } from "./component";
 import { HomeStore } from "./HomeStore";
 
 import "./Content.less";
@@ -81,7 +81,7 @@ export const Content = observer(({ config }: ContentProps) => {
         }
         return null;
     }, [search]);
-    
+
     const makeSearchRequest = useRef(
         debounce(async ({ query: q }) => {
             try {
@@ -136,7 +136,7 @@ export const Content = observer(({ config }: ContentProps) => {
                 theme={{
                     token: {
                         fontFamily: "Montserrat",
-                        colorPrimaryBorder: "#106a90",
+                        colorPrimaryBorder: "#2a388c",
                     },
                     components: {
                         Divider: {
@@ -204,14 +204,22 @@ export const Content = observer(({ config }: ContentProps) => {
                                 </AutoComplete>
                             </div>
                         </div>
-                        {store.resources.length > 0 ? <div className="menu-maps">
-                            <div className="menu-list">
-                                <ContainerMenu store={store} />
+                        {store.resources.length > 0 ?
+                            <div className="menu-maps">
+                                <div className="menu-list">
+                                    <ContainerMenu store={store} />
+                                </div>
+                                <div className="content-maps-grid">
+                                    {store.itemsMapsGroup.length > 0 ?
+                                        <ContainerMaps size={size} store={store} /> :
+                                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                                    }
+                                </div>
+                            </div> :
+                            <div className="add-group">
+                                <AddMapGroup store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
                             </div>
-                            <div className="content-maps-grid">
-                                {store.itemsMapsGroup.length > 0 ? <ContainerMaps size={size} store={store} /> : <AddMap icon store={store} />}
-                            </div>
-                        </div> : <AddMapGroup icon store={store} />}
+                        }
                     </div>
                     <FloatButton.BackTop />
                 </div>

@@ -9,7 +9,6 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MapTile } from "./MapTile";
 import { DragItem } from "./DragItem";
-import { AddMap } from "./AddMap";
 
 import {
     DndContext,
@@ -79,7 +78,7 @@ const SortableMaps: FC<ItemProps> = observer((props) => {
                                     background: `url(${preview}) center center / cover no-repeat`,
                                 }}
                             ></div>) :
-                            (<div className="empty-block"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>)
+                            (<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />)
                         }
                     </div>)}
             </div>
@@ -126,12 +125,9 @@ export const ContainerMaps = observer((props) => {
 
     return (
         <div className="dnd-container-maps" key={store.activeGroupId}>
-            <Space direction="horizontal">
-                {store.itemsMapsGroup.length > 1 && store.edit && store.editGroup && store.update &&
-                    (<ButtonSave icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />)
-                }
-                {store.itemsMapsGroup.length > 0 && store.edit && store.editMap && store.update &&
-                    <AddMap store={store} icon />
+            <Space direction="horizontal" className="edit-maps">
+                {store.itemsMapsGroup.length > 1 && store.edit && store.update ?
+                    (<ButtonSave disabled={!store.editGroup} icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />) : store.edit && store.update && (<div style={{ height: 24 }}></div>)
                 }
             </Space>
             <div
@@ -179,7 +175,7 @@ export const ContainerMaps = observer((props) => {
                                 store={store}
                                 width={store.editMap ? size.maxW : size.minW}
                                 height={store.editMap ? size.maxH : size.minH}
-                                item={store.allMapsGroup.get(store.activeMapId)}
+                                display_name={store.allMapsGroup.get(store.activeMapId).display_name}
                                 isDragging
                             /> :
                             null

@@ -72,7 +72,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                                 <Empty
                                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                                     styles={{ image: { height: 24, fontSize: 24 } }}
-                                    description={gettext("Open webmap in new page")}
+                                    description={gettext("Open webmap")}
                                 />
                             </Link>
                         }

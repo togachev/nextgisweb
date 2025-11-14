@@ -37,7 +37,6 @@ export interface WidgetMember<S extends EditorStore = EditorStore> {
 
 export interface CompositeStoreOptions {
     setup: CompositeSetup;
-    location?: string;
 }
 
 export class CompositeStore {
@@ -59,7 +58,7 @@ export class CompositeStore {
     @observable.ref accessor saving = false;
     @observable.shallow accessor error: ErrorInfo | null = null;
 
-    constructor({ setup: request, location: string }: CompositeStoreOptions) {
+    constructor({ setup: request }: CompositeStoreOptions) {
         this.setup = request;
         this.operation = request.operation;
         this.resourceId = request.operation === "update" ? request.id : null;
