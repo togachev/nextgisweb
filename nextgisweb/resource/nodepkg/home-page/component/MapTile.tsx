@@ -102,7 +102,7 @@ export const MapTile = observer((props) => {
                                 <div className="content-title">
                                     {!size.min && display_name}
                                 </div>
-                                {!store.edit && !enabled ? <DisabledVisible /> : store.edit && (
+                                {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.update && (
                                     <div className="icon-disable">
                                         <AddMapGroup type="map" tab="maps" store={store} id={webmap_group_id} operation="update" icon="open" />
                                     </div>

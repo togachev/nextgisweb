@@ -82,7 +82,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
                     {display_name}
                 </div>
                 <span className="icon-disable-menu" title={gettext("Disabled group")}>
-                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.editGroup && (
+                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.editGroup && store.update && (
                         <>
                             <AddMapGroup type="group" tab="maps" store={store} id={id} operation="update" icon="open" />
                             <Button
