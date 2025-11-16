@@ -31,6 +31,7 @@ interface CompositeWidgetProps {
     store?: HomeStore;
     setup?: CompositeSetup;
     tab?: string;
+    type?: string;
 }
 
 export type ModalProps = Parameters<typeof Modal>[0];
@@ -72,6 +73,7 @@ export const AddMapGroup = observer((props: StoreProps) => {
                     store: store,
                     setup: { operation: operation, id: id },
                     tab: tab,
+                    type: type
                 },
             })
         }

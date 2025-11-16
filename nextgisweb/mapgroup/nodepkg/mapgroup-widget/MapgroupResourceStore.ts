@@ -6,7 +6,9 @@ import type {
     MapgroupResourceUpdate,
 } from "@nextgisweb/mapgroup/type/api";
 import { mapper } from "@nextgisweb/gui/arm";
-import type { EditorStore } from "@nextgisweb/resource/type";
+
+import type { CompositeStore } from "@nextgisweb/resource/composite/CompositeStore";
+import type { EditorStore, EditorStoreOptions } from "@nextgisweb/resource/type";
 
 const {
     enabled,
@@ -23,11 +25,16 @@ export class MapgroupResourceStore
         EditorStore<MapgroupResourceRead, MapgroupResourceCreate, MapgroupResourceUpdate>
 {
     readonly identity = "mapgroup_resource";
+    readonly composite: CompositeStore;
 
     readonly enabled = enabled.init(true, this);
 
     @observable.ref accessor loaded = false;
     @observable.ref accessor validate = false;
+
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
+    }
 
     @action
     load(value: MapgroupResourceRead) {

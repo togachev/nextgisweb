@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
-import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
+import { CheckboxValue } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
 import type { FocusTablePropsActions } from "@nextgisweb/gui/focus-table";
@@ -17,17 +17,14 @@ import type { GroupStore } from "./GroupStore";
 const GroupmapWidget = observer<{
     item: Groupmap;
 }>(({ item }) => {
+    const title_enable = item.enabled.value ? gettext("enable") : gettext("disable");
     return (
         <Area pad>
             <LotMV
-                label={gettext("Display name")}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <LotMV
+                label={gettext("Web map in a group")}
                 value={item.enabled}
                 component={CheckboxValue}
-                props={{ children: gettext("Enable webmap") }}
+                props={{ children: title_enable }}
             />
             <LotMV
                 label={gettext("Resource")}

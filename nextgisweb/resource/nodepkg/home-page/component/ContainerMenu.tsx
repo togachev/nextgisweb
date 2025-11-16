@@ -4,9 +4,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ButtonSave } from "./ButtonSave";
 import SwapVertical from "@nextgisweb/icon/mdi/swap-vertical";
-import Delete from "@nextgisweb/icon/mdi/delete-outline";
+
 import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
-import { Button, Radio, Space } from "@nextgisweb/gui/antd";
+import { Radio, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { DragItem } from "./DragItem";
 import { AddMapGroup } from "./AddMapGroup";
@@ -27,8 +27,6 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-
-const deleteGroup = gettext("Delete group");
 
 export type ItemProps = HTMLAttributes<HTMLDivElement> & {
     id: number;
@@ -83,18 +81,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
                 </div>
                 <span className="icon-disable-menu" title={gettext("Disabled group")}>
                     {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.editGroup && store.update && (
-                        <>
-                            <AddMapGroup type="group" tab="maps" store={store} id={id} operation="update" icon="open" />
-                            <Button
-                                size="small"
-                                title={deleteGroup}
-                                className="button-update"
-                                onClick={() => store.deleteGroup(id)}
-                                icon={<Delete />}
-                                target="_blank"
-                                type="text"
-                            />
-                        </>
+                        <AddMapGroup type="group" tab="group" store={store} id={id} operation="update" icon="open" />
                     )}
                 </span>
             </Radio.Button>
