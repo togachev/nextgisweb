@@ -277,7 +277,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                                     </Row>
                                 )
                             })}
-                            <Divider style={{ backgroundColor: store.valueFooter?.colorText }} />
+                            <Divider style={{ backgroundColor: store.valueFooter?.colorText + "80" }} />
                             <Row className="address-content" justify="space-between">
                                 <Col className="address">
                                     {store.valueFooter?.address_name}
@@ -285,7 +285,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                                 <Col className="phone">
                                     {store.valueFooter?.address_phone?.map((item, index) => {
                                         return (
-                                            <Space key={index} className="phone-item" wrap style={{ borderBottom: `1px dotted${store.valueFooter?.colorText}` }}>
+                                            <Space key={index} className="phone-item" wrap style={{ borderBottom: `1px dotted${store.valueFooter?.colorText}` + "40" }}>
                                                 <div className="name">{item?.name}</div>
                                                 <div className="value">{item?.value}</div>
                                             </Space>
