@@ -42,8 +42,6 @@ class MapgroupResource(Base, Resource):
 class MapgroupResourceSerializer(Serializer, resource=MapgroupResource):
     enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     position = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
 
 class MapgroupGroup(Base):

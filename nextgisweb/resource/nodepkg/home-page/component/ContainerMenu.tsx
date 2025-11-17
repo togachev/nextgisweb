@@ -56,7 +56,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
         cursor: store.editGroup ? "pointer" : "move",
         border: store.editGroup ? "none" : "1px solid var(--divider-color)",
         touchAction: store.editGroup ? "auto" : "none",
-        color: enabled ? "var(--primary)" : "var(--danger)",
+        color: !enabled && "var(--danger)",
         opacity: isDragging ? "0" : "1",
     };
 

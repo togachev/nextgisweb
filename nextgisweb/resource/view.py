@@ -26,7 +26,7 @@ from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
 from .model import Resource
-from nextgisweb.mapgroup import MapgroupGroup
+from nextgisweb.mapgroup import MapgroupGroup, MapgroupResource
 from .permission import Permission, Scope
 from .psection import PageSections
 from .scope import ResourceScope
@@ -297,14 +297,16 @@ def resource_section_main(obj, *, request, **kwargs):
 
     result["read"] = request.context.has_permission(ResourceScope.update, request.user)
 
-    column_name = "webmap_id" if obj.cls == "webmap" else ("resource_id" if obj.cls == "mapgroup_resource" else obj.cls)
+    column_name = "webmap_id" if obj.cls == "webmap" else ("id" if obj.cls == "mapgroup_resource" else obj.cls)
     display_name = "webmap_group_name" if obj.cls == "webmap" else ("display_name" if obj.cls == "mapgroup_resource" else "display_name")
-    resource_id = "resource_id" if obj.cls == "webmap" else ("webmap_id" if obj.cls == "mapgroup_resource" else "resource_id")
+    resource_id = "resource_id" if obj.cls == "webmap" else ("id" if obj.cls == "mapgroup_resource" else "resource_id")
 
-    if obj.cls == "webmap" or obj.cls == "mapgroup_resource":
-        mapgroupquery = MapgroupGroup.query().filter_by(**{column_name: request.context.id})
-        mapgroupdata = result["mapgroupdata"] = []
-        for item in mapgroupquery:
+    mapgroupdata = result["mapgroupdata"] = []
+    modelMapgroup = MapgroupGroup.query() if obj.cls == "webmap" else (MapgroupResource.query() if obj.cls == "mapgroup_resource" else None)
+
+    if modelMapgroup:
+        query = modelMapgroup.filter_by(**{column_name: request.context.id})
+        for item in query:
             mapgroupdata.append(
                 dict(
                     display_name=getattr(item, display_name),

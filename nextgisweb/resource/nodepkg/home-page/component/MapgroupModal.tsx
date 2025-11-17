@@ -71,7 +71,12 @@ export const MapgroupModal = ({
                 open={open}
                 destroyOnHidden
                 footer={type === "group" ? [
-                    <Button key="delete" icon={<Delete />} type="text" danger onClick={() => setup?.operation === "update" && store?.deleteGroup(setup.id)}>
+                    <Button key="delete" icon={<Delete />} type="text" danger onClick={() => {
+                        if (setup?.operation === "update") {
+                            store?.deleteGroup(setup.id)
+                            setOpen(false);
+                        }
+                    }}>
                         {gettext("Delete group")}
                     </Button>,
                 ] : []}
