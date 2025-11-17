@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { Alert, Button, Descriptions, Popover } from "@nextgisweb/gui/antd";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import { PanelContainer } from "../component";
+import { ButtonZoomComponent } from "@nextgisweb/webmap/popup/component/ButtonZoomComponent";
 import Close from "@nextgisweb/icon/mdi/close";
 import CloseBoxOutline from "@nextgisweb/icon/mdi/close-box-outline";
 import CloseBoxMultiple from "@nextgisweb/icon/mdi/close-box-multiple";
@@ -23,6 +24,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
         const pstore = display.popupStore;
+        const contentProps = { store: pstore, display: display };
 
         const deleteRow = ({ key, ckey, all }) => {
             pstore?.pointDestroy();
@@ -162,6 +164,9 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                                 {!store.visibleLayerName && <sub className={checked ? "sub-feature-name sub-checked" : "sub-feature-name"}>{cvalue.selected.desc}</sub>}
                                             </div>
                                         </Button>
+                                        {checked && (
+                                            <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>
+                                        )}
                                         <div className="control-item">
                                             <Button
                                                 title={gettext("Deselect Object.")}
