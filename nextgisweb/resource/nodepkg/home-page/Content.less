@@ -313,7 +313,7 @@ input {
 						.maps-group {
 							display: grid;
 							justify-items: center;
-							margin-top: 5px;
+							margin-top: 12px;
 							gap: 50px 4px;
 
 							.drag-item {
@@ -587,20 +587,7 @@ div:has(> .upload-footer) {
 }
 
 // ---modal---
-
 .modal-component {
-	min-width: 340px;
-	max-width: 75%;
-
-	.ant-modal-close {
-		top: 5px;
-		inset-inline-end: 5px;
-	}
-
-	.ant-modal-header {
-		margin-bottom: 0;
-	}
-
 	.modal-title {
 		cursor: move;
 		padding: 5px 40px 5px 16px;
@@ -611,6 +598,15 @@ div:has(> .upload-footer) {
 		-webkit-box-orient: vertical;
 		font-family: var(--ngw-head-font-family);
 		overflow-wrap: anywhere;
+	}
+
+	.ant-modal-close {
+		top: 5px;
+		inset-inline-end: 5px;
+	}
+
+	.ant-modal-header {
+		margin-bottom: 0;
 	}
 }
 
