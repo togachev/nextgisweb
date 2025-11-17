@@ -6,6 +6,7 @@ import DeleteOffOutline from "@nextgisweb/icon/mdi/delete-off-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
 import CardAccountPhone from "@nextgisweb/icon/mdi/card-account-phone";
 import LinkEdit from "@nextgisweb/icon/mdi/link-edit";
+import ChevronRight from "@nextgisweb/icon/mdi/chevron-right";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { UploadComponent, ControlForm, ModalComponent } from ".";
 import { useReload } from "./useReload";
@@ -271,7 +272,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                                     <Row key={index} className="service-list">
                                         <Col className="service-url">
                                             <a href={item?.value} target="_blank" style={{ color: store.valueFooter?.colorText }}>
-                                                {item?.name}
+                                                <ChevronRight />{item?.name}
                                             </a>
                                         </Col>
                                     </Row>
