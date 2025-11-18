@@ -841,6 +841,10 @@ def search(
             "significantly slower. Otherwise, only the `resource` key is serialized."
         ),
     ] = "resource",
+    description: Annotated[
+        bool,
+        Meta(description="Description resources"),
+    ] = False,
     root: Annotated[SearchRootParams, Query(spread=True)],
     attrs: Annotated[SearchAttrParams, Query(spread=True)],
     resmeta: Annotated[SearchResmetaParams, Query(spread=True)],
@@ -852,7 +856,7 @@ def search(
     query = query.order_by(Resource.display_name)
 
     cs_keys = None if serialization == "full" else ("resource",)
-    serializer = CompositeSerializer(keys=cs_keys, user=request.user)
+    serializer = CompositeSerializer(description=description, keys=cs_keys, user=request.user)
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
     return [
         serializer.serialize(res, CompositeRead)
