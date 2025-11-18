@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import topic from "@nextgisweb/webmap/compat/topic";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
     ActionToolbarAction,
@@ -58,6 +57,7 @@ export interface CompositeWidgetProps {
     setup: CompositeSetup;
     tab?: string;
     location?: string;
+    setSave?: (open: boolean) => void;
 }
 
 export type tabOnOptions = {
@@ -65,7 +65,7 @@ export type tabOnOptions = {
 };
 
 
-export const CompositeWidget = observer(({ setup, tab, location }: CompositeWidgetProps) => {
+export const CompositeWidget = observer(({ setup, tab, location, setSave }: CompositeWidgetProps) => {
     const [activeKey, setActiveKey] = useState<string>();
     const [composite] = useState(() => new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
@@ -130,7 +130,7 @@ export const CompositeWidget = observer(({ setup, tab, location }: CompositeWidg
             disableUnsavedChanges();
             const routeName = edit ? "resource.update" : "resource.show";
             if (location === "true") {
-                topic.publish("mapgroup.close.modal");
+                setSave && setSave(true);
             } else {
                 window.location.href = route(routeName, { id }).url();
             }

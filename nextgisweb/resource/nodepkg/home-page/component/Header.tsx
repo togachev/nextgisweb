@@ -207,70 +207,73 @@ export const Header = observer(({ store }: HeaderProps) => {
             clearOnDestroy={true}
             className="form-component"
         >
-            <Space className="content" direction="vertical">
-                <UploadComponent store={store} params={paramsFileHeader} />
-                <Form.List name="menu">
-                    {(fields, { add, remove }) => (
-                        <>
-                            <Space direction="vertical" style={{ width: "100%" }} wrap>
-                                <Button
-                                    className="item-edit"
-                                    onClick={() => add()}
-                                    icon={<LinkEdit />}
-                                    title={gettext("Add url")}
-                                    type="default"
-                                >
-                                    {gettext("Add url")}
-                                </Button>
-                                {fields.map((field, index) => (
-                                    <Space.Compact block key={index} >
-                                        <Form.Item noStyle name={[field.name, "name"]}>
-                                            <Input
-                                                type="text"
-                                                allowClear
-                                                placeholder={gettext("Name url")}
+            <Space className="content-body" direction="vertical">
+                <Space className="content" direction="vertical">
+                    <UploadComponent store={store} params={paramsFileHeader} />
+                    <Form.List name="menu">
+                        {(fields, { add, remove }) => (
+                            <>
+                                <Space direction="vertical" style={{ width: "100%" }} wrap>
+                                    <Button
+                                        className="item-edit"
+                                        onClick={() => add()}
+                                        icon={<LinkEdit />}
+                                        title={gettext("Add url")}
+                                        type="default"
+                                    >
+                                        {gettext("Add url")}
+                                    </Button>
+                                    {fields.map((field, index) => (
+                                        <Space.Compact block key={index} >
+                                            <Form.Item noStyle name={[field.name, "name"]}>
+                                                <Input
+                                                    type="text"
+                                                    allowClear
+                                                    placeholder={gettext("Name url")}
+                                                />
+                                            </Form.Item>
+                                            <Form.Item noStyle name={[field.name, "value"]}>
+                                                <Input
+                                                    placeholder={gettext("Url")}
+                                                    className="first-input"
+                                                    allowClear
+                                                />
+                                            </Form.Item>
+                                            <Button
+                                                title={gettext("Delete url")}
+                                                onClick={() => {
+                                                    remove(field.name);
+                                                }}
+                                                icon={<DeleteOffOutline />}
+                                                type="default"
                                             />
-                                        </Form.Item>
-                                        <Form.Item noStyle name={[field.name, "value"]}>
-                                            <Input
-                                                placeholder={gettext("Url")}
-                                                className="first-input"
-                                                allowClear
-                                            />
-                                        </Form.Item>
-                                        <Button
-                                            title={gettext("Delete url")}
-                                            onClick={() => {
-                                                remove(field.name);
-                                            }}
-                                            icon={<DeleteOffOutline />}
-                                            type="default"
-                                        />
-                                    </Space.Compact>
-                                ))}
-                            </Space>
-                        </>
-                    )}
-                </Form.List>
-                <Form.Item noStyle name={"first_name"}>
-                    <Input
-                        placeholder={gettext("First name site")}
-                        type="text"
-                        allowClear
-                    />
-                </Form.Item>
-                <Form.Item noStyle name={"last_name"}>
-                    <Input
-                        placeholder={gettext("Additional name")}
-                        type="text"
-                        allowClear
-                    />
-                </Form.Item>
+                                        </Space.Compact>
+                                    ))}
+                                </Space>
+                            </>
+                        )}
+                    </Form.List>
+                    <Form.Item noStyle name={"first_name"}>
+                        <Input
+                            placeholder={gettext("First name site")}
+                            type="text"
+                            allowClear
+                        />
+                    </Form.Item>
+                    <Form.Item noStyle name={"last_name"}>
+                        <Input
+                            placeholder={gettext("Additional name")}
+                            type="text"
+                            allowClear
+                        />
+                    </Form.Item>
+
+                </Space>
                 <span className="control-component">
                     <ControlForm handleCancel={handleCancel} resetForm={resetForm} />
                 </span>
             </Space>
-        </Form>
+        </Form >
     )
 
     return (

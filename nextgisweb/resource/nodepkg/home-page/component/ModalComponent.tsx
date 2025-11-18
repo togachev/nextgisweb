@@ -26,12 +26,12 @@ export const ModalComponent = ({ title, form, open, handleCancel }) => {
         <Modal
             transitionName=""
             maskTransitionName=""
-            styles={{ content: { padding: 0 }, body: { padding: 16, height: "calc(100vh - 400px)", overflowY: "auto" } }}
+            styles={{ content: form.props.form ? { padding: "0 0 64px 0" } : { padding: 0 }, body: { padding: "0 16px 16px 16px", height: "calc(100vh - 400px)", overflowY: "auto" } }}
             centered
             footer={null}
             open={open}
             className="modal-component"
-            width="75%"
+            width="70%"
             title={
                 <div
                     className="modal-title"
@@ -43,8 +43,6 @@ export const ModalComponent = ({ title, form, open, handleCancel }) => {
                     onMouseOut={() => {
                         setDisabled(true);
                     }}
-                // onFocus={() => { }}
-                // onBlur={() => { }}
                 >
                     {title}
                 </div>

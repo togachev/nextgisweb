@@ -1,11 +1,10 @@
-import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { Button, Modal } from "@nextgisweb/gui/antd";
+import Delete from "@nextgisweb/icon/mdi/delete-outline";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import topic from "@nextgisweb/webmap/compat/topic";
 import { CompositeWidget } from "@nextgisweb/resource/composite";
 import "@nextgisweb/resource/composite/CompositeWidget.less";
+import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { HomeStore } from "../HomeStore";
-import Delete from "@nextgisweb/icon/mdi/delete-outline";
 
 export type CompositeSetup =
     | { operation: "create"; cls: string; parent: number }
@@ -33,6 +32,7 @@ export const MapgroupModal = ({
     ...modalProps
 }: MapgroupModalProps) => {
     const [open, setOpen] = useState(openProp);
+    const [save, setSave] = useState(false);
     const { store, setup, tab, type } = mapgroupOptions || {};
     const [modal, contextHolder] = Modal.useModal();
 
@@ -51,14 +51,17 @@ export const MapgroupModal = ({
         [modal, onCancel]
     );
 
-    topic.subscribe("mapgroup.close.modal", () => {
-        setOpen(false);
-        store?.reload()
-    });
-
     useEffect(() => {
         setOpen(openProp);
+        setSave(false);
     }, [openProp]);
+
+    useEffect(() => {
+        if (save === true) {
+            setOpen(false);
+            store?.reload();
+        }
+    }, [save]);
 
     return (
         <>
@@ -66,10 +69,11 @@ export const MapgroupModal = ({
                 transitionName=""
                 maskTransitionName=""
                 className="mapgroup-modal"
-                width=""
+                width="70%"
                 centered={true}
                 open={open}
                 destroyOnHidden
+                styles={{ content: { padding: 0 }, body: { padding: 16, height: "calc(100vh - 400px)", overflowY: "auto" } }}
                 footer={type === "group" ? [
                     <Button key="delete" icon={<Delete />} type="text" danger onClick={() => {
                         if (setup?.operation === "update") {
@@ -84,7 +88,7 @@ export const MapgroupModal = ({
                 onCancel={handleClose}
                 {...modalProps}
             >
-                <CompositeWidget setup={setup} tab={tab} location="true" />
+                <CompositeWidget setup={setup} tab={tab} location="true" setSave={setSave} />
             </Modal>
             {contextHolder}
         </>
