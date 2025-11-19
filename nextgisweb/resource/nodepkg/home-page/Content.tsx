@@ -216,7 +216,7 @@ export const Content = observer(({ config }: ContentProps) => {
                                     }
                                 </div>
                             </div> :
-                            store.update ?
+                            store.edit && store.update ?
                             <div className="add-group">
                                 <AddMapGroup store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
                             </div> : <></>

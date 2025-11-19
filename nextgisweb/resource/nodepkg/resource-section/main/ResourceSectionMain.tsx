@@ -125,7 +125,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                     <MapgroupSection />
                 </Col>
                 {cls === "webmap" &&
-                    <Col flex="0 0 116px">
+                    <Col style={{ width: 116, height: 76, }}>
                         {social ? <Link className="preview-link" style={{ background: `url(${preview}) center center / cover no-repeat` }} href={urlWebmap} target="_self" /> :
                             <Link className="preview-link" href={urlWebmap} target="_self">
                                 <Empty

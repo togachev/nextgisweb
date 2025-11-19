@@ -317,6 +317,20 @@ def resource_section_main(obj, *, request, **kwargs):
                         id=getattr(item, resource_id),
                     )
                 )
+        else:
+            query = MapgroupResource.query().filter_by(**{"id": request.context.id}).all()
+            result["includes"] = False
+            for item in query:
+                mapgroupdata.append(
+                    dict(
+                        display_name=getattr(item, "display_name"),
+                        enabled=dict(
+                            mapgroup_resource=item.enabled
+                        ),
+                        position=item.position,
+                        id=getattr(item, "id"),
+                    )
+                )
 
     summary = result["summary"] = []
     summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))

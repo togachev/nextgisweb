@@ -41,6 +41,8 @@ export const MapgroupComponent = ({
     resourceId,
     includes,
 }: MapgroupComponentProps) => {
+    console.log(includes);
+    
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
             {
@@ -77,7 +79,7 @@ export const MapgroupComponent = ({
         ]
         const data: GroupDataType[] = [];
 
-        array.sort((a, b) => a.position - b.position)
+        includes && array.sort((a, b) => a.position - b.position)
             .map((item) => {
                 data.push({
                     key: item.id,
@@ -93,13 +95,15 @@ export const MapgroupComponent = ({
         };
     }, [array]);
 
+    const includesMapsMsg = includes ? gettext("Web maps are included in the group") : gettext("Web maps are not added. Add them?");
+
     return (
         <>
             {cls === "mapgroup_resource" ?
                 <h2>
                     <Button
                         size="small"
-                        title={gettext("Web maps are included in the group")}
+                        title={includesMapsMsg}
                         href={routeURL("resource.update_mapgroup", resourceId, "maps", "false")}
                         target="_blank"
                         type="link"
@@ -110,7 +114,7 @@ export const MapgroupComponent = ({
                             color: "inherit",
                         }}
                     >
-                        {gettext("Web maps are included in the group")}<Pencil />
+                        {includesMapsMsg}<Pencil />
                     </Button>
                 </h2> :
                 !includes ?
