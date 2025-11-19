@@ -9,7 +9,6 @@ import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
 import { AddMapGroup } from ".";
 import MapIcon from "@nextgisweb/icon/material/map";
-import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 import "./MapTile.less";
 
 const openMap = gettext("Open map");

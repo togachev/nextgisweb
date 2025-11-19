@@ -129,7 +129,6 @@ export const Content = observer(({ config }: ContentProps) => {
             onChanges(v, opt);
         }
     };
-    const enabled_group = store.allLoadedResources.get(store.activeGroupId)?.mapgroup_resource.enabled;
 
     return (
         <div className="wrapper-home-page">

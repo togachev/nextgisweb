@@ -65,7 +65,7 @@ export const MapgroupComponent = ({
                 dataIndex: "enabled",
                 key: "enabled",
                 render: (value: string, { enabled }: GroupDataType) => {
-                    let status = cls === "mapgroup_resource" ? enabled["webmap"] : enabled["mapgroup_resource"];
+                    const status = cls === "mapgroup_resource" ? enabled["webmap"] : enabled["mapgroup_resource"];
                     return (
                         <div style={{ color: status ? "inherit" : "var(--danger)" }}>
                             {status ? gettext("enabled") : gettext("disabled")}

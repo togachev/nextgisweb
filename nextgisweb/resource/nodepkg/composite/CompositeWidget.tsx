@@ -129,8 +129,8 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
 
             disableUnsavedChanges();
             const routeName = edit ? "resource.update" : "resource.show";
-            if (location === "true") {
-                setSave && setSave(true);
+            if (setSave && location === "true") {
+                setSave(true);
             } else {
                 window.location.href = route(routeName, { id }).url();
             }
