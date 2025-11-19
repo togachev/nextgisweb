@@ -36,7 +36,7 @@ export function themeSetup({
         ...baseTheme,
         ".cm-content": {
             flexShrink: "initial",
-            whiteSpace: "normal!important",
+            whiteSpace: "break-spaces!important",
             wordWrap: "normal!important",
             overflowWrap: "normal!important",
             wordBreak: "break-all!important",

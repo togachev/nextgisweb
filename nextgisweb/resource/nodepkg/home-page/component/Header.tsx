@@ -101,7 +101,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                     label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
                     icon: <FolderOutline />,
                 },
-                store.edit && store.config.isAdministrator === true && {
+                store.config.isAdministrator === true && {
                     key: "control_panel",
                     icon: <Cog />,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
