@@ -30,14 +30,6 @@ class MapgroupResource(Base, Resource):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def to_dict(self):
-        return dict(
-            id=self.id,
-            position=self.position,
-            enabled=self.enabled,
-            webmap_group_name=self.display_name,
-        )
-
 
 class MapgroupResourceSerializer(Serializer, resource=MapgroupResource):
     enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
@@ -97,22 +89,9 @@ class MapgroupGroup(Base):
     def description_status(self):
         return self.webmap.description_status(self.webmap)
 
-    def to_dict(self):
-        return dict(
-            webmap_id=self.webmap_id,
-            value=self.webmap_id,
-            owner=True,
-            display_name=self.webmap_name,
-            label=self.webmap_name,
-            description_status=self.description_status,
-            webmap_group_name=self.webmap_group_name,
-            webmap_group_id=self.resource_id,
-            id=self.id,
-            position=self.position,
-            enabled=self.enabled,
-            preview_fileobj_id=self.preview_fileobj_id,
-            preview_description=self.preview_description,
-        )
+    @property
+    def enabled_group(self):
+        return self.resource.enabled
 
 
 class MapgroupGroupItemRead(Struct, kw_only=True):

@@ -366,6 +366,29 @@ class Resource(Base, metaclass=ResourceMeta):
             return False
 
 
+class ResourceWebMapGroup(Base):
+    __tablename__ = "resource_wmg"
+
+    identity = "resource_wmg"
+    
+    id = sa.Column(sa.Integer, primary_key=True)
+    webmap_group_name = sa.Column(sa.Unicode, nullable=True, unique=True)
+    action_map = sa.Column(sa.Boolean, default=True, server_default="true", nullable=False)
+    id_pos = sa.Column(sa.Integer, nullable=True)
+    webmap_group_id = orm.relationship("WebMapGroupResource", cascade="all,delete",
+        backref="resource_wmg")
+
+class WebMapGroupResource(Base):
+    __tablename__ = "wmg_resource"
+
+    identity = "wmg_resource"
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    webmap_group_id = sa.Column(sa.ForeignKey(ResourceWebMapGroup.id), nullable=False)
+    id_pos = sa.Column(sa.Integer, nullable=True)
+
+
 @event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):
     # fmt: off

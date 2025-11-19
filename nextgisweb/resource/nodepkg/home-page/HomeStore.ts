@@ -388,7 +388,6 @@ export class HomeStore {
 
         if (res.length > 0) {
             const activeResource = res
-                .filter(item => item.mapgroup_resource.enabled)
                 .reduce((min, current) => ((current.mapgroup_resource.position < min.mapgroup_resource.position) ? current : min));
             this.setActiveGroupId(activeResource.resource.id);
             this.setItemsMapsGroup(activeResource.mapgroup_group.groupmaps);

@@ -1,31 +1,45 @@
 import { useMemo } from "react";
-import { Table } from "@nextgisweb/gui/antd";
+import { Button, Table } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import Pencil from "@nextgisweb/icon/mdi/pencil-outline";
 
 import type { TableProps } from "@nextgisweb/gui/antd";
 
+interface EnabledProps {
+    mapgroup_resource: boolean;
+    webmap: boolean;
+}
+
+type Cls =
+    | "mapgroup_resource"
+    | "webmap";
+
 interface Groupmaps {
     display_name: string;
-    enabled: boolean;
+    enabled: EnabledProps;
     id: number;
     position: number;
 }
 
 interface MapgroupComponentProps {
     array: Groupmaps[];
-    cls?: string;
+    cls?: Cls;
+    resourceId: number;
+    includes: boolean;
 }
 
 interface GroupDataType {
     key: number;
     name: string;
-    status: boolean;
+    enabled: EnabledProps;
 }
 
 export const MapgroupComponent = ({
     array,
-    cls
+    cls,
+    resourceId,
+    includes,
 }: MapgroupComponentProps) => {
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
@@ -33,26 +47,33 @@ export const MapgroupComponent = ({
                 title: cls === "mapgroup_resource" ? gettext("Webmap name") : gettext("Group name"),
                 dataIndex: "name",
                 key: "name",
-                render: (value: string, { key, name, status }: GroupDataType) => (
-                    <a
-                        style={{ color: status ? "var(--primary)" : "var(--danger)" }}
-                        className="ellipsis"
-                        href={routeURL("resource.show", { id: key })}
+                render: (value: string, { key, name }: GroupDataType) => !includes || cls === "mapgroup_resource" ? name :
+                    <Button
+                        size="small"
+                        title={name}
+                        href={routeURL("resource.update_mapgroup", key, "maps", "false")}
                         target="_blank"
+                        type="link"
+                        icon={<Pencil />}
                     >
                         {name}
-                    </a>
-                ),
+                    </Button>,
                 ellipsis: true,
             },
             {
                 title: gettext("Status"),
-                dataIndex: "status",
-                key: "status",
-                render: (value: string, { status }: GroupDataType) =>
-                    <div style={{ color: status ? "var(--primary)" : "var(--danger)" }}>{status ? gettext("enabled") : gettext("disabled")}</div>,
+                dataIndex: "enabled",
+                key: "enabled",
+                render: (value: string, { enabled }: GroupDataType) => {
+                    let status = cls === "mapgroup_resource" ? enabled["webmap"] : enabled["mapgroup_resource"];
+                    return (
+                        <div style={{ color: status ? "inherit" : "var(--danger)" }}>
+                            {status ? gettext("enabled") : gettext("disabled")}
+                        </div>
+                    )
+                },
                 width: 150,
-            }
+            },
         ]
         const data: GroupDataType[] = [];
 
@@ -61,7 +82,7 @@ export const MapgroupComponent = ({
                 data.push({
                     key: item.id,
                     name: item.display_name,
-                    status: item.enabled,
+                    enabled: item.enabled,
                 })
             })
 
@@ -74,7 +95,46 @@ export const MapgroupComponent = ({
 
     return (
         <>
-            <h2>{cls === "webmap" ? gettext("Web Map Groups") : cls === "mapgroup_resource" ? gettext("Web maps") : null}</h2>
+            {cls === "mapgroup_resource" ?
+                <h2>
+                    <Button
+                        size="small"
+                        title={gettext("Web maps are included in the group")}
+                        href={routeURL("resource.update_mapgroup", resourceId, "maps", "false")}
+                        target="_blank"
+                        type="link"
+                        style={{
+                            fontSize: "large",
+                            fontWeight: "bold",
+                            padding: 0,
+                            color: "inherit",
+                        }}
+                    >
+                        {gettext("Web maps are included in the group")}<Pencil />
+                    </Button>
+                </h2> :
+                !includes ?
+                    <h2>
+                        <Button
+                            size="small"
+                            title={gettext("Setting up groups")}
+                            href={routeURL("home_page")}
+                            target="_blank"
+                            type="link"
+                            style={{
+                                fontSize: "large",
+                                fontWeight: "bold",
+                                padding: 0,
+                                color: "inherit",
+                            }}
+                        >
+                            {gettext("Setting up groups")}<Pencil />
+                        </Button>
+                    </h2> :
+                    <h2>
+                        {gettext("The web map is included in groups")}
+                    </h2>
+            }
             <Table <GroupDataType>  {...params} />
         </>
     );

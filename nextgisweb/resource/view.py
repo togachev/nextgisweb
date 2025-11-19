@@ -17,8 +17,8 @@ from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon, jsentry
-from nextgisweb.pyramid import JSONType, viewargs
+from nextgisweb.jsrealm import icon
+from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
 
 from .event import OnChildClasses, OnDeletePrompt
@@ -296,25 +296,27 @@ def resource_section_main(obj, *, request, **kwargs):
     result = {"resourceId": obj.id}
 
     result["read"] = request.context.has_permission(ResourceScope.update, request.user)
-
-    column_name = "webmap_id" if obj.cls == "webmap" else ("id" if obj.cls == "mapgroup_resource" else obj.cls)
-    display_name = "webmap_group_name" if obj.cls == "webmap" else ("display_name" if obj.cls == "mapgroup_resource" else "display_name")
-    resource_id = "resource_id" if obj.cls == "webmap" else ("id" if obj.cls == "mapgroup_resource" else "resource_id")
-
     mapgroupdata = result["mapgroupdata"] = []
-    modelMapgroup = MapgroupGroup.query() if obj.cls == "webmap" else (MapgroupResource.query() if obj.cls == "mapgroup_resource" else None)
+    if obj.cls == "webmap" or obj.cls == "mapgroup_resource":
+        column_name = "webmap_id" if obj.cls == "webmap" else ("resource_id" if obj.cls == "mapgroup_resource" else None)
+        display_name = "webmap_group_name" if obj.cls == "webmap" else ("display_name" if obj.cls == "mapgroup_resource" else None)
+        resource_id = "resource_id" if obj.cls == "webmap" else ("webmap_id" if obj.cls == "mapgroup_resource" else None)
 
-    if modelMapgroup:
-        query = modelMapgroup.filter_by(**{column_name: request.context.id})
-        for item in query:
-            mapgroupdata.append(
-                dict(
-                    display_name=getattr(item, display_name),
-                    enabled=item.enabled,
-                    position=item.position,
-                    id=getattr(item, resource_id),
+        query = MapgroupGroup.query().filter_by(**{column_name: request.context.id}).all()
+        if len(query) > 0:
+            result["includes"] = True
+            for item in query:
+                mapgroupdata.append(
+                    dict(
+                        display_name=getattr(item, display_name),
+                        enabled=dict(
+                            webmap=item.enabled,
+                            mapgroup_resource=item.enabled_group
+                        ),
+                        position=item.position,
+                        id=getattr(item, resource_id),
+                    )
                 )
-            )
 
     summary = result["summary"] = []
     summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
