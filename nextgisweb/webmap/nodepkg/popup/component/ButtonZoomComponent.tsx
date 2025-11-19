@@ -10,7 +10,7 @@ export const ButtonZoomComponent = ({ store }: ContentProps) => {
 
     return store.fixPos === null && store.response.featureCount > 0 && (
         <Button
-            title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer")}
+            title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer pixel")}
             type="text"
             size={store.size}
             onClick={() => {

@@ -164,9 +164,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                                 {!store.visibleLayerName && <sub className={checked ? "sub-feature-name sub-checked" : "sub-feature-name"}>{cvalue.selected.desc}</sub>}
                                             </div>
                                         </Button>
-                                        {checked && (
-                                            <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>
-                                        )}
+                                        <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>
                                         <div className="control-item">
                                             <Button
                                                 title={gettext("Deselect Object.")}
