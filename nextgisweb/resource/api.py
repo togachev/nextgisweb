@@ -1040,7 +1040,28 @@ def getMaplist(request) -> JSONType:
     return dict(scope=is_adm, result=result)
 
 
+def getWebmapGroup(request) -> JSONType:
+    query = DBSession.query(ResourceWebMapGroup)
+    result = list()
+    for resource_wmg in query:
+        result.append(
+            dict(
+                id=resource_wmg.id,
+                webmap_group_name=resource_wmg.webmap_group_name,
+                action_map=resource_wmg.action_map,
+                id_pos=resource_wmg.id_pos
+            )
+        )
+    return result
+
+
 def setup_pyramid(comp, config):
+    config.add_route(
+        "resource.mapgroup",
+        "/api/resource/mapgroup/",
+        get=getWebmapGroup,
+    )
+
     config.add_route(
         "resource.maplist",
         "/api/resource/maplist/",
