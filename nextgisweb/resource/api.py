@@ -48,7 +48,7 @@ from .exception import (
     ResourceNotFound,
     ResourceRootDeleteError,
 )
-from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
+from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity, ResourceWebMapGroup, WebMapGroupResource
 from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
@@ -1015,7 +1015,38 @@ ResourceExport = Annotated[
 csetting("resource_export", ResourceExport, default="data_read")
 
 
+def getMaplist(request) -> JSONType:
+    query = DBSession.query(Resource, ResourceWebMapGroup, WebMapGroupResource, ResourceSocial) \
+        .join(WebMapGroupResource, Resource.id == WebMapGroupResource.resource_id) \
+        .join(ResourceWebMapGroup, ResourceWebMapGroup.id == WebMapGroupResource.webmap_group_id) \
+        .outerjoin(ResourceSocial, Resource.id == ResourceSocial.resource_id)
+
+    result = list()
+    for res, res_wmg, wmg, res_social in query:
+        if res_wmg.id != 0:
+            if res.has_permission(ResourceScope.read, request.user):
+                result.append(dict(id=res.id, value=res.id, owner=True, display_name=res.display_name, label=res.display_name,
+                description_status=False if res.description == None else True,
+                webmap_group_name=res_wmg.webmap_group_name, webmap_group_id=wmg.webmap_group_id,
+                idx=wmg.id,
+                id_pos=wmg.id_pos,
+                action_map=res_wmg.action_map,
+                update=res.has_permission(ResourceScope.update, request.user),
+                preview_fileobj_id=None if res_social == None else res_social.preview_fileobj_id,
+                preview_description=None if res_social == None else res_social.preview_description))
+
+    is_adm = request.user.is_administrator
+
+    return dict(scope=is_adm, result=result)
+
+
 def setup_pyramid(comp, config):
+    config.add_route(
+        "resource.maplist",
+        "/api/resource/maplist/",
+        get=getMaplist,
+    )
+
     config.add_route(
         "resource.blueprint",
         "/api/component/resource/blueprint",

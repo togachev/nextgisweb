@@ -42,7 +42,7 @@ export const MapgroupComponent = ({
     includes,
 }: MapgroupComponentProps) => {
     console.log(includes);
-    
+
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
             {
@@ -79,7 +79,8 @@ export const MapgroupComponent = ({
         ]
         const data: GroupDataType[] = [];
 
-        includes && array.sort((a, b) => a.position - b.position)
+        if (includes) {
+            array.sort((a, b) => a.position - b.position)
             .map((item) => {
                 data.push({
                     key: item.id,
@@ -87,6 +88,7 @@ export const MapgroupComponent = ({
                     enabled: item.enabled,
                 })
             })
+        }
 
         return {
             columns: columns,
