@@ -5,6 +5,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType, to_builtins
 from sqlalchemy.ext.orderinglist import ordering_list
 from nextgisweb.env import Base, gettext
+from nextgisweb.auth import Permission
 
 from nextgisweb.resource import (
     Resource,
@@ -16,6 +17,9 @@ from nextgisweb.resource import (
 )
 from nextgisweb.webmap import WebMap
 
+class permissions:
+    manage = Permission("manage", gettext("Web map groups"), "manage")
+    all = (manage)
 
 class MapgroupResource(Base, Resource):
     identity = "mapgroup_resource"

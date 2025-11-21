@@ -41,8 +41,6 @@ export const MapgroupComponent = ({
     resourceId,
     includes,
 }: MapgroupComponentProps) => {
-    console.log(includes);
-
     const params = useMemo(() => {
         const columns: TableProps<GroupDataType>["columns"] = [
             {
