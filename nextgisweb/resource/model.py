@@ -14,7 +14,7 @@ from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
 
-from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
+from nextgisweb.auth import Group, OnFindReferencesData, Principal, User, Permission
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.jsrealm import TSExport
 
@@ -418,6 +418,11 @@ ResourceScope.read.require(
     attr="parent",
     attr_empty=True,
 )
+
+
+class PermissionsHomePage:
+    manage = Permission("manage", gettext("Edit home page"), "manage")
+    all = (manage)
 
 
 class ResourceACLRule(Base):

@@ -71,7 +71,7 @@ export interface HeaderProps {
 };
 
 interface ConfigProps {
-    isAdministrator: boolean;
+    manage: boolean;
     type: string;
     upath_info: string[];
 };
@@ -307,7 +307,7 @@ export class HomeStore {
             Object.entries(value || {}).filter(([, v]) => v)
         );
 
-        await route("pyramid.csettings").put({
+        await route("pyramid.csettings.home.page").put({
             json: { pyramid: { [key]: payload } },
         });
     };
@@ -381,10 +381,10 @@ export class HomeStore {
             },
             cache: reload ? reload : false,
         });
+        
+        const { res, update, manage } = resp;
 
-        const { res, update, isAdministrator } = resp;
-
-        this.setUpdate(isAdministrator ? isAdministrator : update)
+        this.setUpdate(manage ? manage : update)
 
         if (res.length > 0) {
             const activeResource = res

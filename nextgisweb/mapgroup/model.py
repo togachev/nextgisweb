@@ -17,9 +17,6 @@ from nextgisweb.resource import (
 )
 from nextgisweb.webmap import WebMap
 
-class permissions:
-    manage = Permission("manage", gettext("Web map groups"), "manage")
-    all = (manage)
 
 class MapgroupResource(Base, Resource):
     identity = "mapgroup_resource"

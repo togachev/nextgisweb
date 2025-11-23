@@ -1,4 +1,4 @@
-from nextgisweb.resource import CompositeSerializer, ResourceScope
+from nextgisweb.resource import CompositeSerializer, ResourceScope, PermissionsHomePage
 from .model import MapgroupResource, MapgroupGroup
 from msgspec import Meta, Struct
 from nextgisweb.pyramid import JSONType
@@ -78,10 +78,11 @@ def mapgroup_collection(
             result.append(serializer.serialize(mres, CompositeRead))
             update=check_perm(mres)
 
+    manage = request.user.has_permission(PermissionsHomePage.manage)
     return dict(
         res=result,
         update=update,
-        isAdministrator=request.user.is_administrator,
+        manage=manage
     )
 
 

@@ -25,7 +25,7 @@ from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
-from .model import Resource
+from .model import Resource, PermissionsHomePage
 from nextgisweb.mapgroup import MapgroupGroup, MapgroupResource
 from .permission import Permission, Scope
 from .psection import PageSections
@@ -426,12 +426,13 @@ def resource_section_external_access(obj, *, request, **kwargs):
 
 @react_renderer("@nextgisweb/resource/home-page")
 def home_page(request):
+    manage = request.user.has_permission(PermissionsHomePage.manage)
     return dict(
         layout_mode="nullSpace",
         title=request.env.core.system_full_name(),
         props=dict(
             config=dict(
-                isAdministrator=request.user.is_administrator,
+                manage=manage,
                 upath_info=request.upath_info,
                 type= "home_page",
                 title=request.env.core.system_full_name(),

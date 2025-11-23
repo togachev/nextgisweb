@@ -15,7 +15,7 @@ import type { ParamsOf } from "@nextgisweb/gui/type";
 type AutoProps = ParamsOf<typeof AutoComplete>;
 
 interface ConfigProps {
-    isAdministrator: string;
+    manage: string;
     upath_info: string;
     type: string;
 }

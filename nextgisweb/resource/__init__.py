@@ -9,6 +9,7 @@ from .model import (
     ResourceGroup,
     ResourceInterfaceIdentity,
     ResourceScopeIdentity,
+    PermissionsHomePage,
 )
 from .permission import Permission, Scope
 from .sattribute import ResourceRefWithParent, ResourceRefOptional, CRUTypes, ResourceRef, SColumn, SRelationship, SResource

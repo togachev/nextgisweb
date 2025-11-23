@@ -41,7 +41,7 @@ from nextgisweb.core.exception import NotConfigured, ValidationError
 from nextgisweb.core.fontconfig import FONT_MAX_SIZE, FONT_PATTERN, CustomFont, FontKey, SystemFont
 from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.resource import Resource, ResourceScope
+from nextgisweb.resource import Resource, ResourceScope, PermissionsHomePage
 
 from .component import PyramidComponent
 from .permission import cors_manage, cors_view
@@ -626,11 +626,29 @@ def setup_pyramid_csettings(comp, config):
                                 require_permission(ap)
                         loader(abody)
 
+    def put_home_page(request, *, body: CSettingsUpdate) -> EmptyObject:
+        """Update component settings"""
+
+        manage = request.user.has_permission(PermissionsHomePage.manage)
+
+        for cid, csetters in setters.items():
+            if (cvalue := getattr(body, cid)) is not UNSET:
+                for sid, loader in csetters.items():
+                    if (abody := getattr(cvalue, sid)) is not UNSET:
+                        if manage:
+                            loader(abody)
+
     config.add_route(
         "pyramid.csettings",
         "/api/component/pyramid/csettings",
         get=get,
         put=put,
+    )
+
+    config.add_route(
+        "pyramid.csettings.home.page",
+        "/api/component/pyramid/csettings/home/page",
+        put=put_home_page,
     )
 
 

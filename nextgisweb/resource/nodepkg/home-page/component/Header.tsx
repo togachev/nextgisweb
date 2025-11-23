@@ -101,7 +101,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                     label: (<a href={urlResShow} target="_blank" rel="noopener noreferrer">{gettext("Resources")}</a>),
                     icon: <FolderOutline />,
                 },
-                store.config.isAdministrator === true && {
+                store.config.manage === true && {
                     key: "control_panel",
                     icon: <Cog />,
                     label: (<a href="/control-panel" target="_blank" rel="noopener noreferrer">{gettext("Control panel")}</a>),
@@ -283,7 +283,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                 style={reloading ? null : { backgroundImage: `linear-gradient(to right, rgba(0,0,0,.6), rgba(0,0,0,.6)), url(${store.ulrImg?.header ? store.ulrImg.header : ""})` }}
             >
                 <div className="control-button">
-                    {store.edit && store.config.isAdministrator === true && !open && (<Button
+                    {store.edit && store.config.manage === true && !open && (<Button
                         className="icon-pensil"
                         title={gettext("Setting header")}
                         type="text"
