@@ -3,17 +3,15 @@ import { useState } from "react";
 import { Button, Card, ConfigProvider, Empty, Typography } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import Cogs from "@nextgisweb/icon/mdi/cogs";
 import Info from "@nextgisweb/icon/material/info";
 import { DescComponent } from "@nextgisweb/resource/description";
 import { ModalComponent } from ".";
-import { AddMapGroup } from ".";
+import { ButtonSetting } from ".";
 import MapIcon from "@nextgisweb/icon/material/map";
 import "./MapTile.less";
 
 const openMap = gettext("Open map");
 const descTitle = gettext("Map description");
-const settingsTitle = gettext("Map settings");
 
 const { Meta } = Card;
 const { Text, Link } = Typography;
@@ -22,14 +20,12 @@ export const MapTile = observer((props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
 
-    const { webmap_id, display_name, preview_fileobj_id, description_status, enabled, webmap_group_id } = props.item;
+    const { webmap_id, display_name, preview_fileobj_id, description_status, enabled } = props.item;
     const { store, size } = props;
     const { upath_info } = store.config;
 
     const preview = routeURL("maptile.preview", { id: webmap_id });
     const urlWebmap = routeURL("webmap.display", { id: webmap_id });
-
-    const urlWebmapSettings = routeURL("resource.update", { id: webmap_id });
 
     const showDescription = async () => {
         const value = await route("resource.item", { id: webmap_id }).get({
@@ -101,11 +97,6 @@ export const MapTile = observer((props) => {
                                 <div className="content-title" style={enabled === false ? { color: "var(--danger)" } : { color: "var(--text-base)"}}>
                                     {!size.min && display_name}
                                 </div>
-                                {store.edit && store.update && (
-                                    <div className="icon-disable">
-                                        <AddMapGroup type="map" tab="maps" store={store} id={webmap_group_id} operation="update" icon="open" />
-                                    </div>
-                                )}
                             </span>
                             <div className={size.min ? "button-min control-button" : "control-button"} >
                                 <Button
@@ -118,14 +109,7 @@ export const MapTile = observer((props) => {
                                     {!size.min && <Text >{openMap}</Text>}
                                 </Button>
                                 {store.update && (
-                                    <Button
-                                        size="small"
-                                        title={settingsTitle}
-                                        href={urlWebmapSettings}
-                                        target="_blank"
-                                        type="text"
-                                        icon={<Cogs />}
-                                    />
+                                    <ButtonSetting iconKey="map_edit" type="webmap" store={store} id={webmap_id} operation="update" />
                                 )}
                                 {description_status === true && (
                                     <Button

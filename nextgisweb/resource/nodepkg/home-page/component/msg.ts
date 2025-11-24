@@ -8,6 +8,9 @@ export const msg = (type: string, operation: string) => {
         },
         map: {
             update: gettext("Configuring a web map in a group"),
+        },
+        webmap: {
+            update: gettext("Map settings"),
         }
     }
 

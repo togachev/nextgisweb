@@ -9,7 +9,7 @@ import DisabledVisible from "@nextgisweb/icon/material/disabled_visible";
 import { Radio, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { DragItem } from "./DragItem";
-import { AddMapGroup } from "./AddMapGroup";
+import { ButtonSetting } from "./ButtonSetting";
 
 import {
     DndContext,
@@ -81,7 +81,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
                 </div>
                 <span className="icon-disable-menu" title={gettext("Disabled group")}>
                     {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.editGroup && store.update && (
-                        <AddMapGroup type="group" tab="group" store={store} id={id} operation="update" icon="open" />
+                        <ButtonSetting iconKey="edit" type="group" tab="group" store={store} id={id} operation="update" />
                     )}
                 </span>
             </Radio.Button>
@@ -126,7 +126,7 @@ export const ContainerMenu = observer((props) => {
         <div className="dnd-container-menu">
             <Space direction="horizontal" className="edit-group">
                 {store.resources.length > 0 && store.edit && store.update &&
-                    <AddMapGroup type="group" disabled={!store.editMap || !store.editGroup} store={store} operation="create" icon="add" />
+                    <ButtonSetting iconKey="add"  type="group" disabled={!store.editMap || !store.editGroup} store={store} operation="create"/>
                 }
                 {store.resources.length > 1 && store.edit && store.update ?
                     <ButtonSave icon={<SwapVertical />} text={gettext("Edit group maps")} staticPosition={store.editGroup} disabled={!store.editMap} onClickSave={savePositionMap} /> : <></>

@@ -26,7 +26,7 @@ export const ModalComponent = ({ title, form, open, handleCancel }) => {
         <Modal
             transitionName=""
             maskTransitionName=""
-            styles={{ content: form.props.form ? { padding: "0 0 64px 0" } : { padding: 0 }, body: { padding: "0 16px 16px 16px", height: "calc(100vh - 400px)", overflowY: "auto" } }}
+            styles={{ content: form.props.form ? { padding: "0 0 64px 0" } : { padding: 0 }, body: { padding: "0 16px 16px 16px", height: "calc(100vh - 300px)", overflowY: "auto" } }}
             centered
             footer={null}
             open={open}

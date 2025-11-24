@@ -1,4 +1,4 @@
-export { AddMapGroup } from "./AddMapGroup";
+export { ButtonSetting } from "./ButtonSetting";
 export { ControlForm } from "./ControlForm";
 export { ContainerMaps } from "./ContainerMaps";
 export { ContainerMenu } from "./ContainerMenu";

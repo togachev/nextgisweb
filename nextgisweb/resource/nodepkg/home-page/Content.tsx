@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AddMapGroup, ContainerMaps, ContainerMenu, Footer, Header, msg } from "./component";
+import { ButtonSetting, ContainerMaps, ContainerMenu, Footer, Header, msg } from "./component";
 import { HomeStore } from "./HomeStore";
 
 import "./Content.less";
@@ -218,7 +218,7 @@ export const Content = observer(({ config }: ContentProps) => {
                             </div> :
                             store.edit && store.update ?
                             <div className="add-group">
-                                <AddMapGroup store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
+                                <ButtonSetting store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
                             </div> : <></>
                         }
                     </div>

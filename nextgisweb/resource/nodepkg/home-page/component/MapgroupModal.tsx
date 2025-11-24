@@ -73,7 +73,7 @@ export const MapgroupModal = ({
                 centered={true}
                 open={open}
                 destroyOnHidden
-                styles={{ content: { padding: 0 }, body: { padding: 16, height: "calc(100vh - 400px)", overflowY: "auto" } }}
+                styles={{ content: { padding: 0 }, body: { padding: 16, height: "calc(100vh - 300px)", overflowY: "auto" } }}
                 footer={type === "group" ? [
                     <Button key="delete" icon={<Delete />} type="text" danger onClick={() => {
                         if (setup?.operation === "update") {

@@ -7,6 +7,7 @@ import SwapVertical from "@nextgisweb/icon/mdi/arrow-all";
 import { Empty, Space } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ButtonSetting } from ".";
 import { MapTile } from "./MapTile";
 import { DragItem } from "./DragItem";
 
@@ -60,6 +61,11 @@ const SortableMaps: FC<ItemProps> = observer((props) => {
 
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
+            {store.edit && store.update && (
+                <div className="icon-map-group-edit">
+                    <ButtonSetting iconKey="edit" type="map" tab="maps" store={store} id={item.webmap_group_id} operation="update" />
+                </div>
+            )}
             <div
                 title={item.display_name}
                 style={style}

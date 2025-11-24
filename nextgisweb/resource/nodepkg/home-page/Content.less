@@ -55,13 +55,6 @@ input {
 		height: 24px;
 	}
 
-	.button-update {
-		display: flex;
-		align-items: center;
-		height: 24px !important;
-		margin: 0;
-	}
-
 	.button-edit-save {
 		color: var(--text-base) !important;
 		display: flex;
@@ -73,10 +66,8 @@ input {
 	}
 
 	.button-edit-save,
-	.button-update,
 	.icon-pensil {
 		&:hover {
-			color: #ff0000 !important;
 			background-color: var(--input-border-color) !important;
 		}
 	}
@@ -123,6 +114,17 @@ input {
 		align-items: center;
 		justify-content: center;
 		padding: 0;
+	}
+
+	.icon-map-group-edit {
+		position: absolute;
+		right: 3px;
+		top: 3px;
+		background-color: white;
+		border-radius: 3px;
+		padding: 0;
+		display: block;
+		z-index: 1;
 	}
 
 	a {
@@ -355,7 +357,7 @@ input {
 							.maps-item {
 								display: inline-flex;
 								align-items: center;
-
+								position: relative;
 
 								.ant-card {
 									height: 100%;

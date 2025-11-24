@@ -1,8 +1,9 @@
-import { useCallback } from "react";
+import { ReactElement, useCallback } from "react";
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import showModal from "@nextgisweb/gui/showModal";
 import AddCircle from "@nextgisweb/icon/material/add_circle";
 import Pencil from "@nextgisweb/icon/mdi/pencil-outline";
+import Cog from "@nextgisweb/icon/mdi/cog";
 
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker";
 
@@ -14,7 +15,7 @@ import { MapgroupModal } from "./MapgroupModal";
 
 interface StoreProps {
     store: HomeStore;
-    icon?: string;
+    iconKey?: string;
     operation: string;
     id?: number;
     type: string;
@@ -34,15 +35,19 @@ interface CompositeWidgetProps {
     type?: string;
 }
 
+interface IconCompProps {
+    [key: string]: ReactElement;
+}
+
 export type ModalProps = Parameters<typeof Modal>[0];
 
 export interface MapgroupModalProps extends ModalProps {
     mapgroupOptions?: CompositeWidgetProps;
 }
 
-export const AddMapGroup = observer((props: StoreProps) => {
+export const ButtonSetting = observer((props: StoreProps) => {
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
-    const { id, icon, store, type, operation, tab, text, disabled } = props;
+    const { id, iconKey, store, type, operation, tab, text, disabled } = props;
 
     const onGroups = useCallback(() => {
         if (operation === "create") {
@@ -79,16 +84,24 @@ export const AddMapGroup = observer((props: StoreProps) => {
         }
     }, [showResourcePicker]);
 
+    const iconComp = (key?: string) => {
+        const icon: IconCompProps = {
+            add: <AddCircle />,
+            edit: <Pencil />,
+            map_edit: <Cog />,
+        }
+        return key ? icon[key] : <></>;
+    }
+
     return (
         <div className="create-group">
             <Button
                 disabled={disabled}
                 title={msg(type, operation)}
-                className="button-update"
                 size="small"
                 type="text"
                 onClick={onGroups}
-                icon={icon === "add" ? <AddCircle /> : <Pencil />}
+                icon={iconComp(iconKey)}
             >
                 {text}
             </Button>
