@@ -15,6 +15,7 @@ interface CompositeWidgetProps {
     setup?: CompositeSetup;
     tab?: string;
     type?: string;
+    title?: string;
 }
 
 export type ModalProps = Parameters<typeof Modal>[0];
@@ -22,18 +23,18 @@ export type ModalProps = Parameters<typeof Modal>[0];
 export interface MapgroupModalProps extends ModalProps {
     open?: boolean;
     onCancel?: (e?: any) => void;
-    mapgroupOptions?: CompositeWidgetProps;
+    options?: CompositeWidgetProps;
 }
 
 export const MapgroupModal = ({
     open: openProp,
-    mapgroupOptions,
+    options,
     onCancel,
     ...modalProps
 }: MapgroupModalProps) => {
     const [open, setOpen] = useState(openProp);
     const [save, setSave] = useState(false);
-    const { store, setup, tab, type } = mapgroupOptions || {};
+    const { store, setup, tab, type, title } = options || {};
     const [modal, contextHolder] = Modal.useModal();
 
     const close = () => {
@@ -66,10 +67,13 @@ export const MapgroupModal = ({
     return (
         <>
             <Modal
-                transitionName=""
-                maskTransitionName=""
-                className="mapgroup-modal"
+                className="modal-component"
                 width="70%"
+                title={
+                    <div className="modal-title" >
+                        {title}
+                    </div>
+                }
                 centered={true}
                 open={open}
                 destroyOnHidden

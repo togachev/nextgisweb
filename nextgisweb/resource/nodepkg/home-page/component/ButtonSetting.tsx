@@ -42,7 +42,7 @@ interface IconCompProps {
 export type ModalProps = Parameters<typeof Modal>[0];
 
 export interface MapgroupModalProps extends ModalProps {
-    mapgroupOptions?: CompositeWidgetProps;
+    options?: CompositeWidgetProps;
 }
 
 export const ButtonSetting = observer((props: StoreProps) => {
@@ -62,10 +62,11 @@ export const ButtonSetting = observer((props: StoreProps) => {
                     return showModal(MapgroupModal, {
                         transitionName: "",
                         maskTransitionName: "",
-                        mapgroupOptions: {
+                        options: {
                             store: store,
                             setup: setup,
                             tab: tab,
+                            title: msg(type, operation),
                         },
                     });
                 },
@@ -74,11 +75,12 @@ export const ButtonSetting = observer((props: StoreProps) => {
             showModal(MapgroupModal, {
                 transitionName: "",
                 maskTransitionName: "",
-                mapgroupOptions: {
+                options: {
                     store: store,
                     setup: { operation: operation, id: id },
                     tab: tab,
-                    type: type
+                    type: type,
+                    title: msg(type, operation),
                 },
             })
         }

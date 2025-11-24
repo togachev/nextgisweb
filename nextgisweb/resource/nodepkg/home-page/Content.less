@@ -591,7 +591,6 @@ div:has(> .upload-footer) {
 // ---modal---
 .modal-component {
 	.modal-title {
-		cursor: move;
 		padding: 5px 40px 5px 16px;
 		background-color: rgba(233, 233, 233, 0.2);
 		overflow: hidden;
@@ -609,6 +608,12 @@ div:has(> .upload-footer) {
 
 	.ant-modal-header {
 		margin-bottom: 0;
+	}
+
+	.ant-modal-footer {
+		position: absolute;
+		right: 16px;
+		bottom: 16px;
 	}
 }
 
@@ -645,26 +650,4 @@ div:has(> .upload-footer) {
 
 .content {
 	width: 100%;
-}
-
-
-.mapgroup-modal.ant-modal {
-
-	.ant-modal-footer {
-		position: absolute;
-		right: 24px;
-		bottom: 20px;
-	}
-
-	>div {
-		height: 100%;
-
-		>.ant-modal-content {
-			height: 100%;
-
-			>.ant-modal-body {
-				height: 100%;
-			}
-		}
-	}
 }
