@@ -80,7 +80,7 @@ const SortableMenu: FC<ItemProps> = observer((props) => {
                     {display_name}
                 </div>
                 <span className="icon-disable-menu" title={gettext("Disabled group")}>
-                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.editGroup && store.update && (
+                    {!store.edit && !enabled ? <DisabledVisible /> : store.edit && store.editGroup && store.manage && (
                         <ButtonSetting iconKey="edit" type="group" tab="group" store={store} id={id} operation="update" />
                     )}
                 </span>
@@ -125,10 +125,10 @@ export const ContainerMenu = observer((props) => {
     return (
         <div className="dnd-container-menu">
             <Space direction="horizontal" className="edit-group">
-                {store.resources.length > 0 && store.edit && store.update &&
+                {store.resources.length > 0 && store.edit && store.manage &&
                     <ButtonSetting iconKey="add"  type="group" disabled={!store.editMap || !store.editGroup} store={store} operation="create"/>
                 }
-                {store.resources.length > 1 && store.edit && store.update ?
+                {store.resources.length > 1 && store.edit && store.manage ?
                     <ButtonSave icon={<SwapVertical />} text={gettext("Edit group maps")} staticPosition={store.editGroup} disabled={!store.editMap} onClickSave={savePositionMap} /> : <></>
                 }
             </Space>

@@ -216,7 +216,7 @@ export const Content = observer(({ config }: ContentProps) => {
                                     }
                                 </div>
                             </div> :
-                            store.edit && store.update ?
+                            store.edit && store.manage ?
                             <div className="add-group">
                                 <ButtonSetting store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
                             </div> : <></>

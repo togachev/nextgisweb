@@ -38,7 +38,7 @@ export interface GroupMapsGridProps {
     webmap_group_name: string;
     enabled: boolean;
     position: LayoutProps;
-    update: boolean;
+    manage: boolean;
 };
 
 export interface UrlPhoneProps {
@@ -101,7 +101,7 @@ export class HomeStore {
     @observable accessor editGroup = true;
     @observable accessor editMap = true;
     @observable accessor edit = false;
-    @observable accessor update = false;
+    @observable accessor manage = false;
 
     @observable.shallow accessor resources: CompositeRead[] = [];
     @observable.shallow accessor allLoadedResources: Map<
@@ -205,8 +205,8 @@ export class HomeStore {
     };
 
     @action
-    setUpdate(update: boolean) {
-        this.update = update;
+    setManage(manage: boolean) {
+        this.manage = manage;
     };
 
     @action
@@ -382,9 +382,9 @@ export class HomeStore {
             cache: reload ? reload : false,
         });
         
-        const { res, update, manage } = resp;
-
-        this.setUpdate(manage ? manage : update)
+        const { res, manage } = resp;
+        
+        this.setManage(manage)
 
         if (res.length > 0) {
             const activeResource = res

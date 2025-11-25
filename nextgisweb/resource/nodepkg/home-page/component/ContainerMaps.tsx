@@ -61,7 +61,7 @@ const SortableMaps: FC<ItemProps> = observer((props) => {
 
     return (
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
-            {store.edit && store.update && (
+            {store.edit && store.manage && (
                 <div className="icon-map-group-edit">
                     <ButtonSetting iconKey="edit" type="map" tab="maps" store={store} id={item.webmap_group_id} operation="update" selectedId={item.webmap_id} />
                 </div>
@@ -132,8 +132,8 @@ export const ContainerMaps = observer((props) => {
     return (
         <div className="dnd-container-maps" key={store.activeGroupId}>
             <Space direction="horizontal" className="edit-maps">
-                {store.itemsMapsGroup.length > 1 && store.edit && store.update ?
-                    (<ButtonSave disabled={!store.editGroup} icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />) : store.edit && store.update && (<div style={{ height: 24 }}></div>)
+                {store.itemsMapsGroup.length > 1 && store.edit && store.manage ?
+                    (<ButtonSave disabled={!store.editGroup} icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />) : store.edit && store.manage && (<div style={{ height: 24 }}></div>)
                 }
             </Space>
             <div

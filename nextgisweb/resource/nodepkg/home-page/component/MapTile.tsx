@@ -108,7 +108,7 @@ export const MapTile = observer((props) => {
                                 >
                                     {!size.min && <Text >{openMap}</Text>}
                                 </Button>
-                                {store.update && (
+                                {store.manage && (
                                     <ButtonSetting iconKey="map_edit" type="webmap" store={store} id={webmap_id} operation="update" />
                                 )}
                                 {description_status === true && (

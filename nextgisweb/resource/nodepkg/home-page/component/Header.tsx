@@ -115,7 +115,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                     icon: <AccountCogOutline />,
                     key: "settings",
                 },
-                store.update && {
+                store.manage && {
                     label: (<a onClick={() => {
                         store.setEdit(!store.edit)
                     }} className="icon-pensil">{!store.edit ? editPage : disableEditPage}</a>),
