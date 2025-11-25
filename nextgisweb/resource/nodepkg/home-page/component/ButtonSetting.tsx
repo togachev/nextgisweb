@@ -11,7 +11,7 @@ import "@nextgisweb/resource/composite/CompositeWidget.less";
 import { observer } from "mobx-react-lite";
 import { HomeStore } from "../HomeStore";
 import { msg } from "./msg";
-import { MapgroupModal } from "./MapgroupModal";
+import { ModalMapgroup } from "./ModalMapgroup";
 
 interface StoreProps {
     store: HomeStore;
@@ -22,17 +22,19 @@ interface StoreProps {
     tab?: string;
     text?: string;
     disabled?: boolean;
+    selectedId?: number;
 }
 
 export type CompositeSetup =
     | { operation: "create"; cls: string; parent: number }
-    | { operation: "update"; id: number };
+    | { operation: "update"; id: number; selectedId: number };
 
 interface CompositeWidgetProps {
     store?: HomeStore;
     setup?: CompositeSetup;
     tab?: string;
     type?: string;
+    selectedId?: number;
 }
 
 interface IconCompProps {
@@ -47,7 +49,7 @@ export interface MapgroupModalProps extends ModalProps {
 
 export const ButtonSetting = observer((props: StoreProps) => {
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
-    const { id, iconKey, store, type, operation, tab, text, disabled } = props;
+    const { id, iconKey, store, type, operation, tab, text, disabled, selectedId } = props;
 
     const onGroups = useCallback(() => {
         if (operation === "create") {
@@ -59,7 +61,7 @@ export const ButtonSetting = observer((props: StoreProps) => {
                 },
                 onSelect: (resourceId: number) => {
                     const setup = { operation: operation, cls: "mapgroup_resource", parent: resourceId }
-                    return showModal(MapgroupModal, {
+                    return showModal(ModalMapgroup, {
                         transitionName: "",
                         maskTransitionName: "",
                         options: {
@@ -72,12 +74,12 @@ export const ButtonSetting = observer((props: StoreProps) => {
                 },
             })
         } else {
-            showModal(MapgroupModal, {
+            showModal(ModalMapgroup, {
                 transitionName: "",
                 maskTransitionName: "",
                 options: {
                     store: store,
-                    setup: { operation: operation, id: id },
+                    setup: { operation: operation, id: id, selectedId: selectedId },
                     tab: tab,
                     type: type,
                     title: msg(type, operation),

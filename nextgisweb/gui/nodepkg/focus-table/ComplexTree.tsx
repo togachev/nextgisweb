@@ -429,11 +429,16 @@ export function ComplexTree<
                 : [0, undefined];
             const enabled = storeItem?.enabled?.value;
 
+            const customStyle: CSSProperties = { "--ct-depth": props.depth }
+            if (storeItem?.webmapId && storeItem?.webmapId?.value === store.composite.setup?.selectedId) {
+                Object.assign(customStyle, { fontWeight: "bold", backgroundColor: "var(--divider-color)" })
+            }
+
             return (
                 <tr
                     key={treeItem.index}
                     className={selected ? "selected" : undefined}
-                    style={{ "--ct-depth": props.depth } as CSSProperties}
+                    style={customStyle}
                     {...context.itemContainerWithChildrenProps}
                     {...context.itemContainerWithoutChildrenProps}
                     {...context.interactiveElementProps}
@@ -448,7 +453,7 @@ export function ComplexTree<
                     >
                         <div title={title?.(storeItem)}>
                             {!provider.isFlat && props.arrow}
-                            <div className="title" >
+                            <div className="title" /*style={storeItem.webmapId.value === store.composite.setup.selectedId ? { fontWeight: "bold", color: "var(--primary)" } : {}} */>
                                 {title?.(storeItem) || <>&nbsp;</>}
                             </div>
                             {storeItem.itemType === "group" &&

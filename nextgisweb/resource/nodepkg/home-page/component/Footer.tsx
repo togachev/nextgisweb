@@ -245,7 +245,7 @@ export const Footer = observer(({ store }: FooterProps) => {
     return (
         <div className="footer-home-page" style={{ backgroundColor: store.valueFooter?.colorBackground ? store.valueFooter?.colorBackground : "var(--icon-color)", color: store.valueFooter?.colorText, fontWeight: 500 }}>
             <div className="control-button">
-                {store.edit && store.config.manage === true && !open && (
+                {store.edit && store.config.manage === true && (
                     <Button
                         className="icon-pensil"
                         title={gettext("Setting footer")}

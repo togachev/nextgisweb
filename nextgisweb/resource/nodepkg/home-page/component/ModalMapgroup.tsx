@@ -8,7 +8,7 @@ import { HomeStore } from "../HomeStore";
 
 export type CompositeSetup =
     | { operation: "create"; cls: string; parent: number }
-    | { operation: "update"; id: number };
+    | { operation: "update"; id: number; selectedId: number };
 
 interface CompositeWidgetProps {
     store?: HomeStore;
@@ -26,7 +26,7 @@ export interface MapgroupModalProps extends ModalProps {
     options?: CompositeWidgetProps;
 }
 
-export const MapgroupModal = ({
+export const ModalMapgroup = ({
     open: openProp,
     options,
     onCancel,
@@ -88,7 +88,6 @@ export const MapgroupModal = ({
                         {gettext("Delete group")}
                     </Button>,
                 ] : []}
-                closable={false}
                 onCancel={handleClose}
                 {...modalProps}
             >

@@ -69,7 +69,7 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
     const [activeKey, setActiveKey] = useState<string>();
     const [composite] = useState(() => new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
-
+    
     const { operation } = setup;
     const { members, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
