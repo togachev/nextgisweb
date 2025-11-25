@@ -100,7 +100,7 @@ export class HomeStore {
     @observable accessor sourceGroup = false;
     @observable accessor editGroup = true;
     @observable accessor editMap = true;
-    @observable accessor edit = true;
+    @observable accessor edit = false;
     @observable accessor update = false;
 
     @observable.shallow accessor resources: CompositeRead[] = [];
