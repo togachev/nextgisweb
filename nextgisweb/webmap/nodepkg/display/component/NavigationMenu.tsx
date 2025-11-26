@@ -5,7 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import type { PanelManager } from "../../panel/PanelManager";
-import type { Display } from "../Display";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import Information from "@nextgisweb/icon/mdi/information";
 import Cogs from "@nextgisweb/icon/mdi/cogs";
