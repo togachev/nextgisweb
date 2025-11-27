@@ -497,12 +497,16 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     styleId: int
     visibility: bool
     identifiable: bool
+    layerHighligh: bool
+    editGeom: bool
     transparency: Union[float, None]
     minScaleDenom: Union[float, None]
     maxScaleDenom: Union[float, None]
     drawOrderPosition: Union[int, None]
     legendInfo: LegendInfo
     adapter: str
+    layerCls: str
+    geometryType: str
     plugin: Dict[str, Any]
     minResolution: Union[float, None] = None
     maxResolution: Union[float, None] = None
@@ -531,7 +535,7 @@ class DisplayConfig(Struct, kw_only=True):
     webmapId: int
     webmapTitle: str
     activePanel: str
-    colorsSelectedFeature: Dict[str, Any]
+    colorSF: Dict[str, Any]
     selectFeaturePanel: bool
     infomap: InfoMapConfig
     webmapPlugin: Dict[str, Any]
@@ -743,7 +747,7 @@ def display_config(obj, request) -> DisplayConfig:
         checkedItems=checked_items,
         expandedItems=expanded_items,
         activePanel=obj.active_panel,
-        colorsSelectedFeature=obj.colors_selected_feature,
+        colorSF=obj.colors_selected_feature,
         selectFeaturePanel=obj.select_feature_panel,
         infomap=dict(
             resource=request.route_url("resource.show", id=0),

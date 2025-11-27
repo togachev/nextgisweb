@@ -1,10 +1,11 @@
 import classNames from "classnames";
 import { useEffect } from "react";
 
-import { Modal } from "@nextgisweb/gui/antd";
+import { Modal, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
+import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
 
 import { BreadcrumbComponent } from "./BreadcrumbComponent";
@@ -12,6 +13,13 @@ import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
+
+declare module "@nextgisweb/pyramid/cblock" {
+    interface CBlocks {
+        // Banner at the top of the page above the header
+        "pyramid.banner": undefined;
+    }
+}
 
 interface BaseProps {
     title: string;
@@ -46,6 +54,19 @@ export function Base({
         modalStore: layoutStore.modalStore,
     });
 
+    const { token } = useToken();
+
+    useEffect(() => {
+        let meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "theme-color");
+            document.head.appendChild(meta);
+        }
+
+        meta.setAttribute("content", token.colorPrimary);
+    }, [token.colorBgBase, token.colorPrimary]);
+
     useEffect(() => {
         layoutStore.setModalApi(modalApi);
     }, [modalApi]);
@@ -61,6 +82,8 @@ export function Base({
                 "ngw-pyramid-layout-vstretch": maxheight,
             })}
         >
+            <CBlock slot="pyramid.banner" />
+
             <Header
                 header={header}
                 hideResourceFilter={hideResourceFilter}

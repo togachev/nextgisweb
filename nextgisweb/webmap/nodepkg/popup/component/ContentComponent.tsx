@@ -30,8 +30,12 @@ const LinkToGeometryFeature = ({ store, display }) => {
     const { copyValue, contextHolder } = useCopy();
 
     if (store.selected) {
-        const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === store.selected.styleId)?.[1];
 
+        const item = display.treeStore.filter({
+            type: "layer",
+            layerId: store.selected.layerId,
+        }).find(itm => itm.styleId === store.selected.styleId);
+        
         if (!store.isEditEnabled(display, item)) { return false; }
         return (
             <Button

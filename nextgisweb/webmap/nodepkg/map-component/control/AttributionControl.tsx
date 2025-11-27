@@ -3,7 +3,8 @@ import type { MapEvent } from "ol";
 import type { ViewStateLayerStateExtent } from "ol/View";
 import { equals } from "ol/array";
 import { toPromise } from "ol/functions";
-import { ReactNode, useCallback, useEffect,  useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
 
@@ -144,30 +145,31 @@ export default function AttributionControl({
     }, [isSmall, modal, tipLabel, items]);
 
     return (
-        <MapControl {...mapControlProps}>
-            {contextHolder}
-            <div
-                className={classNames(
-                    className,
-                    "ol-unselectable",
-                    "ol-control",
-                    { "ol-uncollapsible": !isSmall }
-                )}
-                style={{ display: visible ? "" : "none" }}
-            >
-                {isSmall ? (
-                    <div
-                        className={expandCls}
-                        aria-label={tipLabel}
-                        title={tipLabel}
-                        onClick={onClickInfo}
-                    >
-                        {label}
-                    </div>
-                ) : (
-                    <AttributionList items={items} />
-                )}
-            </div>
-        </MapControl>
+        visible && (
+            <MapControl {...mapControlProps}>
+                {contextHolder}
+                <div
+                    className={classNames(
+                        className,
+                        "ol-unselectable",
+                        "ol-control",
+                        { "ol-uncollapsible": !isSmall }
+                    )}
+                >
+                    {isSmall ? (
+                        <div
+                            className={expandCls}
+                            aria-label={tipLabel}
+                            title={tipLabel}
+                            onClick={onClickInfo}
+                        >
+                            {label}
+                        </div>
+                    ) : (
+                        <AttributionList items={items} />
+                    )}
+                </div>
+            </MapControl>
+        )
     );
 }

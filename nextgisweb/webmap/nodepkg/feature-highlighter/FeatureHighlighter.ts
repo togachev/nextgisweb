@@ -26,7 +26,7 @@ export interface HighlightEvent {
     featureId?: number;
     feature?: Feature;
     coordinates?: [number, number];
-    colorsSelectedFeature?: ColorSF;
+    colorSF?: ColorSF;
 }
 
 interface FeatureFilterFn {
@@ -40,7 +40,7 @@ export class FeatureHighlighter {
     private _wkt: WKT;
     private _zIndex = 1000;
 
-    @observable.ref accessor colorsSelectedFeature: ColorSF | null = null;
+    @observable.ref accessor colorSF: ColorSF | null = null;
 
     private _highlightStyle?: Style;
 
@@ -67,17 +67,17 @@ export class FeatureHighlighter {
     }
 
     @action
-    setColorsSelectedFeature(colorsSelectedFeature: ColorSF) {
-        this.colorsSelectedFeature = colorsSelectedFeature;
+    setColorSF(colorSF: ColorSF) {
+        this.colorSF = colorSF;
     }
 
     private _getDefaultStyle(): Style {
         const strokeStyle = new Stroke({
             width: 3,
-            color: this.colorsSelectedFeature?.stroke_primary,
+            color: this.colorSF?.stroke_primary,
         });
         const fill = new Fill({
-            color: this.colorsSelectedFeature?.fill,
+            color: this.colorSF?.fill,
         });
         return new Style({
             stroke: strokeStyle,
@@ -94,7 +94,7 @@ export class FeatureHighlighter {
         const stroke =
             this._highlightStyle?.getStroke() ||
             new Stroke({
-                color: this.colorsSelectedFeature?.stroke_primary,
+                color: this.colorSF?.stroke_primary,
                 width: 3,
             })
 
@@ -112,7 +112,7 @@ export class FeatureHighlighter {
         const stroke =
             this._highlightStyle?.getStroke() ||
             new Stroke({
-                color: this.colorsSelectedFeature?.stroke_secondary,
+                color: this.colorSF?.stroke_secondary,
                 width: 1,
             })
 
@@ -128,7 +128,7 @@ export class FeatureHighlighter {
 
 
     async colorsValue(e) {
-        this.setColorsSelectedFeature(e.colorsSelectedFeature)
+        this.setColorSF(e.colorSF)
         return new Promise<HighlightEvent>((resolve) => resolve(e));
     }
 
@@ -145,8 +145,8 @@ export class FeatureHighlighter {
     }
 
     private _highlightFeature(e: HighlightEvent): Feature {
-        if (e.colorsSelectedFeature) {
-            this.setColorsSelectedFeature(e.colorsSelectedFeature);
+        if (e.colorSF) {
+            this.setColorSF(e.colorSF);
         }
         
         let geometry: Geometry | undefined;
@@ -230,13 +230,13 @@ export class FeatureHighlighter {
     async highlightFeatureById(
         featureId: number,
         layerId: number,
-        colorsSelectedFeature: ColorSF,
+        colorSF: ColorSF,
     ): Promise<Feature> {
         const feature = await route("feature_layer.feature.item", {
             id: layerId,
             fid: featureId,
         }).get({ query: { dt_format: "iso", fields: [], extensions: [] } });
-        this.setColorsSelectedFeature(colorsSelectedFeature);
+        this.setColorSF(colorSF);
         return this._highlightFeature({
             geom: feature.geom,
             featureId: featureId,

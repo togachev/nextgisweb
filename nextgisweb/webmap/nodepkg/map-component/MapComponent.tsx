@@ -38,6 +38,7 @@ export const MapComponent = observer(
         className,
         mapExtent,
         whenCreated,
+        ...restViewOptions
     }: MapComponentProps) => {
         const { mapStore } = useMapAdapter({
             zoom,
@@ -46,6 +47,7 @@ export const MapComponent = observer(
             maxZoom,
             mapStore: mapStoreProp,
             mapExtent,
+            ...restViewOptions,
         });
 
         const mapContainerRef = useRef<HTMLDivElement>(null);

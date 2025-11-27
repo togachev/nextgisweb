@@ -2,7 +2,7 @@ import type { MouseEvent } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { TreeItemConfig } from "../type/TreeItems";
+import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 
 import ChevronDown from "@nextgisweb/icon/mdi/chevron-down";
 import CheckList from "@nextgisweb/icon/material/checklist";
@@ -14,7 +14,7 @@ export function LegendAction({
     nodeData,
     onClick,
 }: {
-    nodeData: TreeItemConfig;
+    nodeData: TreeItemStore;
     onClick: (id: number) => void;
 }) {
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;

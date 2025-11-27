@@ -2,13 +2,6 @@ import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { RasterLayerIdentifyItem } from "@nextgisweb/raster-layer/type/api";
 import type { Display } from "@nextgisweb/webmap/display";
 
-export interface FeatureHighlightEvent<F extends Attrs = Attrs> {
-    geom: string | undefined;
-    featureId: number;
-    layerId: number;
-    featureInfo: FeatureItem<F> & { labelWithLayer: string };
-}
-
 export interface LayerResponse {
     features: FeatureIdentify[];
     featureCount: number;
@@ -67,12 +60,14 @@ export interface FeatureInfo extends BaseFeatureInfo {
     value: string;
     label: string;
     layerId: number;
+    styleId: number;
     type: "feature_layer";
 }
 export interface RasterInfo extends BaseFeatureInfo {
     value: string;
     label: string;
     layerId: number;
+    styleId: number;
     type: "raster_layer";
 }
 

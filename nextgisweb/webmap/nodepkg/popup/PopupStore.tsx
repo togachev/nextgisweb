@@ -107,7 +107,7 @@ export class PopupStore {
 
     @observable.ref accessor controls: ControlUrlProps;
     @observable.ref accessor permalink: string | null = null;
-    @observable.ref accessor activeControlKey: string;
+    @observable.ref accessor activeControlKey: string | null = null;
     @observable.ref accessor mode: string;
     @observable.ref accessor size: SizeType = "default";
     @observable.ref accessor currentUrlParams: string | null = null;
@@ -115,7 +115,7 @@ export class PopupStore {
     constructor({ display }: Display) {
         this.display = display;
 
-        const urlParams = display.getUrlParams()
+        const urlParams = display.urlParams;
         const opts = display.config.options;
         const attrs = opts["webmap.identification_attributes"];
         const geoms = opts["webmap.identification_geometry"];
@@ -279,7 +279,7 @@ export class PopupStore {
     };
 
     @action
-    setActiveFeatureData(activeFeatureData) {
+    setActiveFeatureData(activeFeatureData: string) {
         this.activeFeatureData = activeFeatureData;
     };
 
@@ -378,7 +378,7 @@ export class PopupStore {
     };
 
     pointDestroy() {
-        topic.publish("feature.unhighlight");
+        this.display.highlighter.unhighlight();
         this.overlayPoint.setPosition(undefined);
         this.rootPopup.render();
     };
@@ -411,7 +411,7 @@ export class PopupStore {
                 lonlat: lonlat,
             });
 
-            getPositionContext(e.originalEvent.clientX, e.originalEvent.clientY, this)
+            await getPositionContext(e.originalEvent.clientX, e.originalEvent.clientY, this)
                 .then(val => {
                     this.setPosContext(val);
                 })
@@ -424,7 +424,7 @@ export class PopupStore {
             await this.getResponse()
                 .then(item => {
                     const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
-                    const data = item.data.sort((l, r) => orderObj[l.styleId] - orderObj[r.styleId]);
+                    const data = item.data.sort((r, l) => orderObj[l.styleId] - orderObj[r.styleId]);
                     this.setResponse({ data: data, featureCount: item.featureCount });
                     if (this.mode === "click") {
                         this.setSelected(data[0]);
@@ -470,75 +470,64 @@ export class PopupStore {
         this.setMode(props.type);
 
         if (e.type === "click") {
-            await this.display.getVisibleItems()
-                .then((items) => {
-                    const styles: StylesRequest[] = [];
-                    const itemConfig = this.display.getItemConfig();
-                    const mapResolution = this.olmap.getView().getResolution();
-                    items.map(i => {
-                        const item = itemConfig[i.id];
-                        if (
-                            !item.identifiable ||
-                            mapResolution && mapResolution >= item.maxResolution ||
-                            mapResolution && mapResolution < item.minResolution
-                        ) {
-                            return;
-                        }
-                        if (item.identification) {
-                            styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
-                        }
-                    });
+            const styles: StylesRequest[] = [];
+            const mapResolution = this.olmap.getView().getResolution();
+            const visibleLayers = this.display.treeStore.visibleLayers;
+            visibleLayers.forEach(item => {
+                if (
+                    !item.identifiable ||
+                    mapResolution && mapResolution >= item.maxResolution ||
+                    mapResolution && mapResolution < item.minResolution
+                ) {
+                    return;
+                }
+                if (item.identification) {
+                    styles.push({ id: item.styleId, label: item.label, dop: item.drawOrderPosition });
+                }
+            });
 
-                    this.setParams({
-                        point: e.coordinate,
-                        request: {
-                            srs: this.displaySrid,
-                            geom: this.requestGeomString(e.pixel),
-                            styles: styles,
-                            point: e.coordinate,
-                            status: attr,
-                            p: props.p,
-                        },
-                    });
+            this.setParams({
+                point: e.coordinate,
+                request: {
+                    srs: this.displaySrid,
+                    geom: this.requestGeomString(e.pixel),
+                    styles: styles,
+                    point: e.coordinate,
+                    status: attr,
+                    p: props.p,
+                },
+            });
 
-                    return this.renderPopup(e);
-                })
-        }
-        else if (e.type === "contextmenu") {
             this.renderPopup(e);
         }
+        else if (e.type === "contextmenu") {
+            this.renderPopup(e)
+        }
         else if (e.type === "simulate" || e.type === "selected") {
-            const itemStore = this.display.itemStore;
-            return new Promise((resolve) => {
-                itemStore.fetch({
-                    query: { type: "layer" },
-                    onComplete: (items) => {
-                        const itemConfig = this.display.getItemConfig()
-                        props.p.value.params.map(itm => {
-                            items.some(x => {
-                                if (itemConfig[x.id].styleId === itm.id) {
-                                    const label = items.find(x => itemConfig[x.id].styleId === itm.id).label;
-                                    const dop = items.find(x => itemConfig[x.id].styleId === itm.id).position;
-                                    itm.label = label;
-                                    itm.dop = dop;
-                                }
-                            });
-                        });
-                        this.setParams({
-                            point: e.coordinate,
-                            request: {
-                                srs: this.displaySrid,
-                                geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(props.p.coordinate)),
-                                styles: props.p.value.params,
-                                point: props.p.coordinate,
-                                status: attr,
-                                p: props.p,
-                            },
-                        });
-                        resolve(this.renderPopup(e));
-                    },
+            const items = this.display.treeStore.visibleLayers;
+            props.p.value.params.map(itm => {
+                items.some(x => {
+                    if (x.id.styleId === itm.id) {
+                        const label = items.find(p => p.id.styleId === itm.id).label;
+                        const dop = items.find(p => p.id.styleId === itm.id).position;
+                        itm.label = label;
+                        itm.dop = dop;
+                    }
                 });
             });
+
+            this.setParams({
+                point: e.coordinate,
+                request: {
+                    srs: this.displaySrid,
+                    geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(props.p.coordinate)),
+                    styles: props.p.value.params,
+                    point: props.p.coordinate,
+                    status: attr,
+                    p: props.p,
+                },
+            });
+            this.renderPopup(e);
         }
     };
 
@@ -564,13 +553,13 @@ export class PopupStore {
         const link = paramsUrl.toString();
         this.setLinkToGeometry(decodeURIComponent(link))
     }
+
     async updatePermalink() {
-        const display = this.display
-        await display.getVisibleItems().then((visibleItems) => {
-            const permalink = getPermalink({ display, visibleItems });
-            const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
-            this.setPermalink(decodeURIComponent(permalink + "&panel=" + String(panel)));
-        })
+        const display = this.display;
+        const visibleItems = this.display.treeStore.visibleLayers;
+        const permalink = getPermalink({ display, visibleItems });
+        const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
+        this.setPermalink(decodeURIComponent(permalink + "&panel=" + String(panel)));
     }
 
     updateSelectFeatures(panel, data, res) {
@@ -602,15 +591,13 @@ export class PopupStore {
     @computed
     get propsCoords() {
         const styles: string[] = [];
-        this.display.getVisibleItems()
-            .then((items) => {
-                items.forEach((i) => {
-                    const item = this.display.itemStore.dumpItem(i);
-                    if (item.visibility === true) {
-                        styles.push(item.styleId);
-                    }
-                });
-            })
+        const visibleLayers = this.display.treeStore.visibleLayers;
+        visibleLayers.forEach(item => {
+            if (item.visibility === true) {
+                styles.push(item.styleId);
+            }
+        });
+
         const result = [...new Set(this.response.data.map(a => ({ styleId: a.styleId, desc: a.desc })))].sort();
         const params: ParamsProps[] = [];
         result.map(i => {
@@ -663,7 +650,7 @@ export class PopupStore {
             this.generateUrl({ res: null, st: null, pn: null, disable: false });
             this.setSelected({});
             this.setLinkToGeometry("");
-            topic.publish("feature.unhighlight");
+            this.display.highlighter.unhighlight();
             this.setValueRnd({ ...this.valueRnd, buttonZoom: { [Object.keys(this.valueRnd?.buttonZoom)[0]]: false } });
         }
     }
@@ -689,8 +676,13 @@ export class PopupStore {
         const opts = this.display.config.options;
         const attrs = opts["webmap.identification_attributes"];
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
-        const item = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === res.layerId)?.[1];
-        const geom = item && item.itemConfig.layerHighligh === true ? true : false;
+
+        const item = await this.display.treeStore.filter({
+            type: "layer",
+            layerId: res.layerId,
+        })[0];
+
+        const geom = item && item.layerHighligh === true ? true : false;
         const query = { geom: geom, dt_format: "iso" };
 
         if (attrs === false) {
@@ -735,47 +727,44 @@ export class PopupStore {
             const webmapId = this.display.config.webmapId;
             const zoom = this.olmap.getView().getZoom();
 
-            this.display.getVisibleItems()
-                .then((items) => {
-                    const styles: string[] = [];
-                    items.forEach((i) => {
-                        const item = this.display.itemStore.dumpItem(i);
-                        if (item.visibility === true) {
-                            styles.push(item.styleId);
-                        }
-                    });
+            const styles: string[] = [];
+            const visibleLayers = this.display.treeStore.visibleLayers;
+            visibleLayers.forEach(item => {
+                if (item.visibility === true) {
+                    styles.push(item.styleId);
+                }
+            });
 
-                    const selected = res?.type === "raster" ? [res?.styleId + ":" + res?.layerId + ":" + lon + ":" + lat] : [res?.styleId + ":" + res?.layerId + ":" + res?.id];
-                    const result = [...new Set(st?.map(a => a.styleId))].sort();
+            const selected = res?.type === "raster" ? [res?.styleId + ":" + res?.layerId + ":" + lon + ":" + lat] : [res?.styleId + ":" + res?.layerId + ":" + res?.id];
+            const result = [...new Set(st?.map(a => a.styleId))].sort();
 
-                    const panel = this.display.panelManager.getActivePanelName();
+            const panel = this.display.panelManager.getActivePanelName();
 
-                    let obj;
-                    if (disable) {
-                        obj = { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name };
-                    } else {
-                        if (res) {
-                            obj = { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name };
-                        } else {
-                            obj = { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
-                        }
-                    }
+            let obj;
+            if (disable) {
+                obj = { attribute: false, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name };
+            } else {
+                if (res) {
+                    obj = { attribute: true, lon, lat, zoom, styles: styles, st: result, slf: selected, pn: pn, base: this.display.map.baseLayer?.name };
+                } else {
+                    obj = { attribute: false, lon, lat, zoom, styles: styles, base: this.display.map.baseLayer?.name };
+                }
+            }
 
-                    if (panel !== "share") {
-                        Object.assign(obj, { panel: panel });
-                    }
+            if (panel !== "share") {
+                Object.assign(obj, { panel: panel });
+            }
 
-                    const paramsUrl = new URLSearchParams();
+            const paramsUrl = new URLSearchParams();
 
-                    Object.entries(obj)?.map(([key, value]) => {
-                        paramsUrl.append(key, value);
-                    })
+            Object.entries(obj)?.map(([key, value]) => {
+                paramsUrl.append(key, value);
+            })
 
-                    const url = routeURL("webmap.display", webmapId);
-                    const link = origin + url + "?" + paramsUrl.toString();
+            const url = routeURL("webmap.display", webmapId);
+            const link = origin + url + "?" + paramsUrl.toString();
 
-                    this.setContextUrl(decodeURIComponent(link));
-                })
+            this.setContextUrl(decodeURIComponent(link));
         }
     };
 
@@ -794,17 +783,20 @@ export class PopupStore {
                 this.setAttribute(i);
             });
 
-            const highlights = getEntries(this.display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === val.layerId)?.[1].itemConfig.layerHighligh;
+            const highlights = this.display.treeStore.filter({
+                type: "layer",
+                layerId: val.layerId,
+            }).find(itm => itm.styleId === val.styleId).layerHighligh;
 
             if (highlights === true) {
-                topic.publish("feature.highlight", {
+                this.display.highlighter.highlight({
                     geom: res.feature.geom,
                     featureId: res.feature.id,
                     layerId: res.resourceId,
-                    colorsSelectedFeature: this.display.config.colorsSelectedFeature,
-                })
+                    colorSF: this.display.config.colorSF,
+                });
             } else {
-                topic.publish("feature.unhighlight")
+                this.display.highlighter.unhighlight();
             }
 
             this.generateUrl({ res: val, st: this.response.data, pn: this.fixPanel, disable: false });
@@ -817,7 +809,7 @@ export class PopupStore {
         else if (val.type === "raster") {
             this.setAttribute(val.attr);
             this.generateUrl({ res: val, st: this.response.data, pn: this.fixPanel, disable: false });
-            topic.publish("feature.unhighlight");
+            this.display.highlighter.unhighlight();
             if (key === true) {
                 this.setUpdate(false);
             }
@@ -862,6 +854,8 @@ export class PopupStore {
 
                 this.olmap.once("postrender", function (e) {
                     const pixel = e.map.getPixelFromCoordinate(p.coordinate);
+                    console.log(p.coordinate);
+                    
                     const simulateEvent: any = {
                         coordinate: p && p.coordinate,
                         map: e.map,
@@ -878,10 +872,10 @@ export class PopupStore {
 
     zoomTo(val) {
         if (!val) return;
-        this.display.featureHighlighter
-            .highlightFeatureById(val.id, val.layerId, this.display.config.colorsSelectedFeature)
+        this.display.highlighter
+            .highlightById(val.id, val.layerId, this.display.config.colorSF)
             .then((feature) => {
-                this.display.map.zoomToFeature(feature);
+                this.display.map.zoomToGeom(feature.geom);
             });
     };
 
@@ -914,8 +908,7 @@ export class PopupStore {
         if (display.isTinyMode && !display.isTinyModePlugin(pluginName)) {
             return false;
         }
-
-        const configLayerPlugin = item?.itemConfig.plugin["@nextgisweb/webmap/plugin/feature-layer"];
+        const configLayerPlugin = item?.plugin["@nextgisweb/webmap/plugin/feature-layer"];
         const readOnly = configLayerPlugin?.readonly;
         return !readOnly;
     };

@@ -52,7 +52,7 @@ const IdentifyControl = observer(
                         );
                         evt.preventDefault?.();
                     } else {
-                        topic.publish("feature.unhighlight");
+                        display.highlighter.unhighlight();
                     }
                 }
                 return true;

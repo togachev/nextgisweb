@@ -53,13 +53,14 @@ class SelectedFeatureStore extends PanelStore {
         this.display = props.display;
 
         const obj = {};
-        getEntries(this.display.getItemConfig()).map(([key, value]) => {
-            if (value.type === "layer") {
+        const items = this.display.treeStore.items;
+        items.forEach(item => {
+            if (item.type === "layer") {
                 Object.assign(obj, {
-                    [key]: {
-                        value: value,
-                        styleId: value.styleId,
-                        type: value.layerCls === "raster_layer" ? "raster" : "vector",
+                    [item.id]: {
+                        value: item,
+                        styleId: item.styleId,
+                        type: item.layerCls === "raster_layer" ? "raster" : "vector",
                         items: {},
                     },
                 })

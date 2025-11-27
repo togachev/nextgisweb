@@ -27,7 +27,7 @@ export class SettingStore
     readonly composite: CompositeStore;
 
     @observable accessor activePanel: WebMapRead["active_panel"] = "layers";
-    @observable.ref accessor colorsSelectedFeature: ColorSF = {
+    @observable.ref accessor colorSF: ColorSF = {
         stroke_primary: "rgba(255,255,0,1)",
         stroke_secondary: "rgba(0, 0, 0, 1)",
         fill: "rgba(255,255,255,0.1)",
@@ -87,7 +87,7 @@ export class SettingStore
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
         this.activePanel = value.active_panel;
-        this.colorsSelectedFeature = value.colors_selected_feature;
+        this.colorSF = value.colors_selected_feature;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
         this.initialExtent = extractExtentFromArray(value.initial_extent);
         this.constrainingExtent = extractExtentFromArray(
@@ -106,7 +106,7 @@ export class SettingStore
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
             active_panel: this.activePanel,
-            colors_selected_feature: this.colorsSelectedFeature,
+            colors_selected_feature: this.colorSF,
             select_feature_panel: this.selectFeaturePanel,
             initial_extent: convertExtentToArray(this.initialExtent),
             constraining_extent: convertExtentToArray(this.constrainingExtent),
@@ -156,7 +156,7 @@ export class SettingStore
     }
 
     @action
-    setColorsSelectedFeature(colorsSelectedFeature: ColorSF) {
-        this.colorsSelectedFeature = colorsSelectedFeature;
+    setColorSF(colorSF: ColorSF) {
+        this.colorSF = colorSF;
     }
 }

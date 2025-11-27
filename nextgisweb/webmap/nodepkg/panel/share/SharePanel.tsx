@@ -166,7 +166,7 @@ interface PanelOption {
 
 const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const webmapId = display.config.webmapId;
-    const { panelManager } = display;
+    const { panelManager, treeStore } = display;
     const [mapLink, setMapLink] = useState("");
     const [widthMap, setWidthMap] = useState(800);
     const [heightMap, setHeightMap] = useState(600);
@@ -183,40 +183,40 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const [favLabelValue, setFavlabelValue] = useState("");
 
     const updatePermalinkUrl = useCallback(() => {
-        display.getVisibleItems().then((visibleItems) => {
-            const permalink = getPermalink({ display, visibleItems });
-            setMapLink(decodeURIComponent(permalink));
+        const permalink = getPermalink({
+            display,
+            visibleItems: treeStore.visibleLayers,
         });
-    }, [display]);
+        setMapLink(decodeURIComponent(permalink));
+    }, [display, treeStore.visibleLayers]);
 
     const updateEmbedCode = useCallback(() => {
-        display.getVisibleItems().then((visibleItems) => {
-            const iframeSrc = getPermalink({
-                display,
-                visibleItems,
-                urlWithoutParams:
-                    ngwConfig.applicationUrl +
-                    routeURL("webmap.display.tiny", webmapId),
-                additionalParams: {
-                    linkMainMap: addLinkToMap,
-                    events: generateEvents,
-                    panel: activePanel,
-                    controls,
-                    panels,
-                },
-            });
-            const embedCode = makeIframeTag(iframeSrc, heightMap, widthMap);
-            setEmbedCode(embedCode);
+        const iframeSrc = getPermalink({
+            display,
+            visibleItems: treeStore.visibleLayers,
+            urlWithoutParams:
+                ngwConfig.applicationUrl +
+                routeURL("webmap.display.tiny", webmapId),
+            additionalParams: {
+                linkMainMap: addLinkToMap,
+                events: generateEvents,
+                panel: activePanel,
+                controls,
+                panels,
+            },
         });
+        const embedCode = makeIframeTag(iframeSrc, heightMap, widthMap);
+        setEmbedCode(embedCode);
     }, [
-        activePanel,
-        addLinkToMap,
-        controls,
         display,
-        generateEvents,
-        heightMap,
-        panels,
+        treeStore.visibleLayers,
         webmapId,
+        addLinkToMap,
+        generateEvents,
+        activePanel,
+        controls,
+        panels,
+        heightMap,
         widthMap,
     ]);
 
@@ -224,27 +224,23 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         let isMounted = true;
 
         const updateTexts = debounce(() => {
-            display.mapExtentDeferred.then(() => {
-                if (!isMounted) return;
-                updatePermalinkUrl();
-                updateEmbedCode();
-            });
+            if (!isMounted || !display.map.started) return;
+            updatePermalinkUrl();
+            updateEmbedCode();
         });
 
         const mapView = display.map.olMap.getView();
         mapView.on("change", updateTexts);
-        const listener = display.itemStore.on("Set", updateTexts);
 
         updateTexts();
 
         return () => {
             isMounted = false;
             mapView.un("change", updateTexts);
-            listener.remove();
         };
     }, [
-        display.mapExtentDeferred,
-        display.itemStore,
+        display.map.started,
+        display.treeStore.items,
         display.map.baseLayer,
         display.map.olMap,
         updateEmbedCode,
@@ -252,9 +248,9 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     ]);
 
     useEffect(() => {
-        display.mapExtentDeferred.then(() => {
+        if (display.map.started) {
             updateEmbedCode();
-        });
+        }
     }, [
         widthMap,
         heightMap,
@@ -264,7 +260,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         panels,
         activePanel,
         display.map.baseLayer,
-        display.mapExtentDeferred,
+        display.map.started,
         updateEmbedCode,
     ]);
 
@@ -282,21 +278,18 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }, [panels, activePanel]);
 
     useEffect(() => {
-        if (panelManager.ready) {
-            const panelsForTinyMap = panelManager
-                .sorted()
-                .filter((p) => p.applyToTinyMap === true)
-                .map((p) => {
-                    return {
-                        title: p.title,
-                        label: <PanelTitle panel={p} />,
-                        value: p.name,
-                    };
-                })
-                .sort((a, b) => a.title.localeCompare(b.title));
-            setPanelsOptions(panelsForTinyMap);
-        }
-    }, [panelManager, panelManager.ready]);
+        const panelsForTinyMap = panelManager.sorted
+            .filter((p) => p.applyToTinyMap === true)
+            .map((p) => {
+                return {
+                    title: p.title,
+                    label: <PanelTitle panel={p} />,
+                    value: p.name,
+                };
+            })
+            .sort((a, b) => a.title.localeCompare(b.title));
+        setPanelsOptions(panelsForTinyMap);
+    }, [panelManager]);
 
     const previewUrl = routeURL("webmap.preview_embedded");
 

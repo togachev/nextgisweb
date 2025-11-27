@@ -9,15 +9,12 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import topic from "@nextgisweb/webmap/compat/topic";
-import { GraphPanel } from "@nextgisweb/webmap/popup/component/GraphPanel";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
-import { getEntries } from "@nextgisweb/webmap/popup/util/function";
+import { GraphPanel } from "@nextgisweb/webmap/popup/component/GraphPanel";
 
 import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
 import { FeatureEditButton } from "./FeatureEditButton";
@@ -50,9 +47,9 @@ const loadFeatureItem = async (
 ) => {
     if (display.identify) {
         const featureItem = await executeWithMinDelay(
-            display.identify?.highlightFeature(identifyInfo, featureInfo, opt),
+            display.identify.highlightFeature(identifyInfo, featureInfo, opt),
             {
-                minDelay: 0,
+                minDelay: 250,
                 signal: opt?.signal,
             }
         );
@@ -77,9 +74,10 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
         const { makeSignal, abort } = useAbortController();
 
         const identifyInfo = store.identifyInfo;
+        const item = featureInfo && display.treeStore.filter({ type: "layer", layerId: featureInfo.layerId });
 
-        const highlights = featureInfo && getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.layerId === featureInfo.layerId)?.[1].itemConfig.layerHighligh;
-
+        const highlights = item && item?.length > 0 && item[0].layerHighligh
+        
         const isNotFound =
             identifyInfo && identifyInfo.response.featureCount === 0;
 
@@ -100,13 +98,13 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 if (!featureInfo || featureInfo.type !== "feature_layer") {
                     if (identifyInfo?.point) {
                         const [x, y] = identifyInfo.point;
-                        const highlightEvent: HighlightEvent = {
+
+                        display.highlighter.highlight({
                             coordinates: [x, y],
-                            colorsSelectedFeature: display.config.colorsSelectedFeature,
-                        };
-                        topic.publish("feature.highlight", highlightEvent);
+                            colorSF: display.config.colorSF,
+                        });
                     } else {
-                        topic.publish("feature.unhighlight");
+                        display.highlighter.unhighlight();
                     }
 
                     return;
@@ -121,10 +119,9 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     );
 
                     setFeatureItem(featureItemLoaded);
-                    const layerResponse = identifyInfo.response[featureInfo?.layerId];
+                    const layerResponse = identifyInfo.response[featureInfo?.styleId];
                     const featureResponse = layerResponse?.features[featureInfo.idx];
                     setRelationInfo(featureResponse);
-
                 } catch (err) {
                     if (!isAbortError(err)) {
                         errorModal(err);
@@ -151,10 +148,12 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     identifyInfo,
                     display
                 );
+                
                 if (options.length) {
                     let first;
                     if (identifyInfo.selected) {
                         const selected = identifyInfo.selected;
+                        
                         const value = String(
                             isFloat(selected.fid) ?
                                 "R-" + selected.layerId :
@@ -166,7 +165,8 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     }
                     onFeatureChange(first);
                 }
-
+                console.log(options, display.treeStore);
+                
                 setFeaturesInfoList(options);
             }
         }, [identifyInfo, display, onFeatureChange, abort]);
@@ -214,7 +214,8 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     />
                 );
             }
-            const item = identifyInfo?.response[featureInfo.layerId];
+            const item = identifyInfo?.response[featureInfo?.styleId];
+            
             if (item && "color_interpretation" in item) {
                 rasterInfoSection = <RasterInfoSection item={item} />;
             }

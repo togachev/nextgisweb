@@ -3,11 +3,10 @@ import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import { Button } from "@nextgisweb/gui/antd";
 import topic from "@nextgisweb/webmap/compat/topic";
 
-import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
+import type { HighlightEvent } from "@nextgisweb/webmap/highlight-store/HighlightStore";
 import type { ContentProps } from "../type";
 
 export const ButtonZoomComponent = ({ store }: ContentProps) => {
-
     return store.fixPos === null && store.response.featureCount > 0 && (
         <Button
             title={store.selected?.type === "vector" ? gettext("Zoom to feature") : gettext("Zoom to raster layer pixel")}
@@ -23,9 +22,9 @@ export const ButtonZoomComponent = ({ store }: ContentProps) => {
                     store.zoomToPoint(store.pointPopupClick.coordinate);
                     const highlightEvent: HighlightEvent = {
                         coordinates: store.pointPopupClick.coordinate,
-                        colorsSelectedFeature: store.display.config.colorsSelectedFeature,
+                        colorSF: store.display.config.colorSF,
                     };
-                    topic.publish("feature.highlight", highlightEvent);
+                    store.display.highlighter.highlight(highlightEvent);
                 }
             }}
             icon={<ZoomInMapIcon />}

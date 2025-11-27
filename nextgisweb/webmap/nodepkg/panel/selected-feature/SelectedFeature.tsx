@@ -24,7 +24,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
     ({ display, store }) => {
         const { visibleItems } = useSelected(display, store);
         const pstore = display.popupStore;
-        const contentProps = { store: pstore, display: display };
+
 
         const deleteRow = ({ key, ckey, all }) => {
             pstore?.pointDestroy();
@@ -65,7 +65,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                     visibleItems({ value: [styleId] });
                     pstore?.pointDestroy();
                 } else {
-                    display._zoomToInitialExtent();
+                    display.map.zoomToInitialExtent();
                     visibleItems({ value: undefined });
                 }
             }
@@ -92,7 +92,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                 visibleItems({ value: [acvalue.selected.styleId] });
             } else {
                 pstore?.pointDestroy();
-                display._zoomToInitialExtent();
+                display.map.zoomToInitialExtent();
                 visibleItems({ value: undefined });
             }
         }, [store.activeChecked])
@@ -130,7 +130,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                         onClick={() => {
                                             deleteRow({ key: key, ckey: null, all: true })
                                             pstore?.pointDestroy();
-                                            display._zoomToInitialExtent();
+                                            display.map.zoomToInitialExtent();
                                             visibleItems({ value: undefined });
                                         }}
                                     />
@@ -143,6 +143,8 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 const obj = { ...store.activeChecked };
                                 const ftitle = cvalue.selected.type === "vector" ? cvalue.selected.label : msgValueRaster;
                                 const checked = obj.achecked && obj.ackey === ckey;
+                                const contentProps = { store: pstore, display: display };
+
                                 const ltitle = !store.visibleLayerName ? title : null;
                                 return (
                                     <div key={fidx} className="label-child-element">
@@ -164,7 +166,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                                 {!store.visibleLayerName && <sub className={checked ? "sub-feature-name sub-checked" : "sub-feature-name"}>{cvalue.selected.desc}</sub>}
                                             </div>
                                         </Button>
-                                        <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>
+                                        {checked && <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>}
                                         <div className="control-item">
                                             <Button
                                                 title={gettext("Deselect Object.")}
@@ -240,13 +242,12 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                 visibleItems({ value: undefined });
             }
             else {
-                const itemConfig = display.getItemConfig();
                 const visibleStyles: number[] = [];
-                display.config.checkedItems.forEach(function (key) {
-                    visibleStyles.push(itemConfig[key].id);
+                const items = display.treeStore.items;
+                display.config.checkedItems.forEach((key) => {
+                    visibleStyles.push(items.get(key).id);
                 });
-                display.webmapStore.setChecked(visibleStyles);
-                display.webmapStore._updateLayersVisibility(visibleStyles);
+                display.treeStore.setVisibleIds(visibleStyles)
             }
         }, []);
 
@@ -260,7 +261,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
             const obj = { ...store.selectedFeatures };
             getEntries(obj).map(([_, value]) => value.items = {});
             store.setSelectedFeatures(obj);
-            display._zoomToInitialExtent();
+            display.map.zoomToInitialExtent();
             visibleItems({ value: undefined });
             store.setActiveLayer({
                 ...store.activeLayer,

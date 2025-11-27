@@ -19,6 +19,8 @@ import { getImageURL } from "../util/getImageURL";
 
 import { PanoramaStore } from "./PanoramaStore";
 
+import "./AttachmentPreviewGroup.less";
+
 type PreviewGroupProps = GetProps<typeof Image.PreviewGroup>;
 type PreviewProps = PreviewGroupProps["preview"];
 interface AttachmentPreviewGroupProps extends PreviewGroupProps {
@@ -127,7 +129,14 @@ export function AttachmentPreviewGroup({
                 const key = current.name ?? info.current;
 
                 return current.isPanorama && panoramaMode ? (
-                    <Suspense key={key} fallback={<CentralLoading />}>
+                    <Suspense
+                        key={key}
+                        fallback={
+                            <CentralLoading
+                                indicatorStyle={{ color: "white" }}
+                            />
+                        }
+                    >
                         <PhotospherePreview
                             url={info.image.url}
                             onReady={(viewer) => {
@@ -140,9 +149,12 @@ export function AttachmentPreviewGroup({
                         />
                     </Suspense>
                 ) : (
-                    <div key={key}>{originalNode}</div>
+                    <div key={key} className="ngw-preview-img-wrapper">
+                        {originalNode}
+                    </div>
                 );
             },
+
             onVisibleChange,
         };
     }, [

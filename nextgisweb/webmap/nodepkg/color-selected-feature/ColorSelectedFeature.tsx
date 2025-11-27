@@ -21,13 +21,13 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
     const [form] = Form.useForm();
 
     const onValuesChange = (changedValues: any, values: any) => {
-        store.setColorsSelectedFeature(values);
+        store.setColorSF(values);
     };
 
     const clearColor = useCallback((name: string) => {
         form.setFieldsValue({ [name]: defaultValueColor[name] });
-        store.setColorsSelectedFeature({
-            ...store.colorsSelectedFeature,
+        store.setColorSF({
+            ...store.colorSF,
             [name]: defaultValueColor[name]
         })
     }, []);
@@ -37,12 +37,12 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
             form={form}
             name="ngw_color_feature_highlighter"
             autoComplete="off"
-            initialValues={store.colorsSelectedFeature}
+            initialValues={store.colorSF}
             onValuesChange={onValuesChange}
             clearOnDestroy={true}
             className="form-component"
         >
-            {getEntries(store.colorsSelectedFeature)?.map(([key, value]) => {
+            {getEntries(store.colorSF)?.map(([key, value]) => {
                 return (
                     <div key={key} className="color-item">
                         <Row justify="space-between" wrap={false} className={defaultValueColor[key] !== value ? "change-item" : "default-item"}>
@@ -57,7 +57,7 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
                                     <ColorPicker
                                         className="color-picker-item"
                                         allowClear={true}
-                                        value={store.colorsSelectedFeature?.[key]}
+                                        value={store.colorSF?.[key]}
                                         showText={(color) => <span>{color.toHexString()}</span>}
                                     />
                                 </Form.Item>

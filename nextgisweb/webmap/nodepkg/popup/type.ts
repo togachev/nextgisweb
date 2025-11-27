@@ -54,6 +54,7 @@ export type OptionProps = {
 export type ContentProps = {
     display: Display;
     store: PopupStore;
+    checked?: boolean;
 }
 
 export type SizeWindowProps = {

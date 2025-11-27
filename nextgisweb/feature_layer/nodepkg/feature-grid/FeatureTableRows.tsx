@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { useMemo } from "react";
 import type { Key, ReactNode } from "react";
 
+import { ExpandableText } from "@nextgisweb/gui/component";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
@@ -104,6 +105,10 @@ export function FeatureTableRows({
                             val !== undefined
                                 ? renderFeatureFieldValue(f, val)
                                 : loadingCol();
+
+                        if (typeof renderValue === "string") {
+                            renderValue = <ExpandableText text={renderValue} />;
+                        }
                     }
 
                     return (

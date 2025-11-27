@@ -8,34 +8,29 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
 
     const visibleItems = ({ value }) => {
         const visibleStyles: number[] = [];
-        const itemConfig = display.getItemConfig();
-        const itemStore = display.itemStore;
+        const items = display.treeStore.items;
 
         if (value && store.checked === true) {
-            Object.keys(itemConfig).forEach(function (key) {
-                if (value.includes(itemConfig[key].styleId)) {
-                    visibleStyles.push(itemConfig[key].id);
+            items.forEach(item => {
+                if (value.includes(item.styleId)) {
+                    visibleStyles.push(item.id);
                 }
             });
         } else if (value && store.checked === false) {
             return new Promise(() => {
-                itemStore.fetch({
-                    query: { type: "layer" },
-                    queryOptions: { deep: true },
-                    onItem: (item) => {
-                        if (item.styleId === value[0] && item.visibility === false) {
-                            itemStore.setValue(item, "checked", true);
-                        }
+                items.forEach(item => {
+                    if (item.styleId === value[0] && item.visibility === false) {
+                        visibleStyles.push(item.id);
                     }
                 });
+                
             });
         } else {
-            display.config.checkedItems.forEach(function (key) {
-                visibleStyles.push(itemConfig[key].id);
+            display.config.checkedItems.forEach((key) => {
+                visibleStyles.push(items.get(key).id);
             });
         }
-        display.webmapStore.setChecked(visibleStyles);
-        display.webmapStore._updateLayersVisibility(visibleStyles);
+        display.treeStore.setVisibleIds(visibleStyles)
     };
 
     const render = () => {

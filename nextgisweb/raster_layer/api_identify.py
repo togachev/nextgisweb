@@ -6,7 +6,7 @@ from osgeo import gdal
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Query
 
-from nextgisweb.resource import DataScope, ResourceRef
+from nextgisweb.resource import DataScope, ResourceRef, Resource
 
 from .model import RasterLayer
 from .util import band_color_interp
@@ -36,19 +36,19 @@ def identify(
 ) -> RasterLayerIdentifyResponse:
     """Get raster values at specific point for list of resources"""
 
-    query = DBSession.query(RasterLayer).filter(RasterLayer.id.in_(resources))
-
+    query = DBSession.query(Resource).filter(Resource.id.in_(resources))
     items: list[RasterLayerIdentifyItem] = []
-    for res in query:
-        if res.has_permission(DataScope.read, request.user):
-            ds = res.gdal_dataset()
+    for style in query:
+        layer = style.parent
+        if layer.has_permission(DataScope.read, request.user):
+            ds = layer.gdal_dataset()
             if (values := val_at_coord(ds, point)) is None:
                 continue
 
             color_interpretation = []
             pixel_class = []
 
-            for bidx in range(1, res.band_count + 1):
+            for bidx in range(1, layer.band_count + 1):
                 band = ds.GetRasterBand(bidx)
                 color_interpretation.append(band_color_interp(band))
                 rat = band.GetDefaultRAT()
@@ -62,16 +62,15 @@ def identify(
                     pixel_class.append(pixel_class_value)
                 else:
                     pixel_class.append(None)
-
+            
             items.append(
                 RasterLayerIdentifyItem(
-                    resource=ResourceRef(id=res.id),
+                    resource=ResourceRef(id=style.id),
                     color_interpretation=color_interpretation,
                     pixel_class=pixel_class,
                     values=values.flatten().tolist(),
                 )
             )
-
     return RasterLayerIdentifyResponse(items=items)
 
 

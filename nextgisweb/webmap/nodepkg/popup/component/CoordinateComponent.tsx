@@ -24,22 +24,18 @@ export const CoordinateComponent = observer((props) => {
         let isMounted = true;
 
         const updateTexts = debounce(() => {
-            display.mapExtentDeferred.then(() => {
-                if (!isMounted) return;
-                store.updatePermalink();
-            });
+            if (!isMounted || !display.map.started) return;
+            store.updatePermalink();
         });
 
         const mapView = display.map.olMap.getView();
         mapView.on("change", updateTexts);
-        const listener = display.itemStore.on("Set", updateTexts);
 
         updateTexts();
 
         return () => {
             isMounted = false;
             mapView.un("change", updateTexts);
-            listener.remove();
         };
     }, [
         display.mapExtentDeferred,

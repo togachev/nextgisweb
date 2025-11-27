@@ -55,7 +55,7 @@ def identify(request, *, body: IdentifyBody) -> JSONType:
     result = dict()
     for style in query:
         layer = style.parent
-        layer_id_str = str(layer.id)
+        layer_id_str = str(style.id)
         if not layer.has_permission(DataScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
 
@@ -77,7 +77,7 @@ def identify(request, *, body: IdentifyBody) -> JSONType:
                     styleId=style.id,
                     label=f.label,
                     fields=f.fields,
-                    relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None
+                    relation=dict(external_resource_id=layer.external_resource_id, relation_key=layer.external_field_name,relation_value=f.fields[layer.resource_field_name]) if layer.check_relation(layer) else None,
                 )
                 for f in query()
             ]
@@ -88,7 +88,7 @@ def identify(request, *, body: IdentifyBody) -> JSONType:
 
             if allow:
                 for feature in features:
-                    feature["parent"] = layer.parent.display_name
+                    feature["parent"] = style.parent.display_name
 
             result[layer_id_str] = dict(features=features, featureCount=len(features))
 
@@ -239,7 +239,6 @@ def imodule(request, *, body: IModuleBody) -> JSONType:
                         type="raster",
                         attr=attr,
                         value=str(style.id) + ":" + str(layer.id) + ":" + str(round(point.GetY(), 12)) + ":" + str(round(point.GetX(), 12)),
-                        test=rat,
                     )
                 )
 

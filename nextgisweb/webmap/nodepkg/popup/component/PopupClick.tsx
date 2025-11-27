@@ -3,7 +3,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PointClick } from "@nextgisweb/webmap/icon";
 import topic from "@nextgisweb/webmap/compat/topic";
 
-import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
+import type { HighlightEvent } from "@nextgisweb/webmap/highlight-store/HighlightStore";
 import type { Params, Props } from "../type";
 
 export default function PopupClick({ store, event, params }: Params) {
@@ -49,9 +49,10 @@ export default function PopupClick({ store, event, params }: Params) {
                         store.zoomToPoint(event.coordinate)
                         const highlightEvent: HighlightEvent = {
                             coordinates: event.coordinate,
-                            colorsSelectedFeature: store.display.config.colorsSelectedFeature,
+                            colorSF: store.display.config.colorSF,
                         };
-                        topic.publish("feature.highlight", highlightEvent);
+
+                        store.display.highlighter.highlight(highlightEvent);
                     }
                 }
             }}

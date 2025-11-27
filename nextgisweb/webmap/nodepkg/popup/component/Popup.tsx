@@ -120,20 +120,26 @@ export const Popup = observer(
 
         const reloadLayer = useCallback(async (layerId) => {
             // It is possible to have few webmap layers for one resource id
-            const layers = await display.current?.webmapStore.filterLayers({
-                query: { layerId },
-            });
+
+            const layers = await display.treeStore.filter({
+                type: "layer",
+                layerId: layerId,
+            })
 
             layers?.forEach((item) => {
-                const layer = display.current?.webmapStore.getLayer(item.id);
-                layer?.reload();
+                display.map.getLayer(item.id)?.reload();
             });
         }, [store.selected]);
 
         const editFeature = useMemo(() => {
             if (store.response?.featureCount > 0 && store.selected && store.selected.type === "vector") {
                 const { id, layerId, styleId } = store.selected;
-                const item = getEntries(display.webmapStore._layers).find(([_, itm]) => itm.itemConfig.styleId === styleId)?.[1];
+                const items = display.treeStore.filter({
+                    type: "layer",
+                    layerId: layerId,
+                });
+                const item = items.find(itm => itm.styleId === styleId);
+                
                 const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
                 if (display.isTinyMode && !display.isTinyModePlugin(pluginName)) {
                     return false;

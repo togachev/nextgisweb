@@ -56,6 +56,14 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
+#: nodepkg/component/expandable-text/ExpandableText.tsx:38
+msgid "More"
+msgstr "Ещё"
+
+#: nodepkg/component/expandable-text/ExpandableText.tsx:52
+msgid "Less"
+msgstr "Свернуть"
+
 #: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:110
 msgid "Close"
 msgstr "Закрыть"
@@ -294,5 +302,3 @@ msgstr "Настройка сохранена."
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 
-#~ msgid "From layers"
-#~ msgstr "Из слоев"
