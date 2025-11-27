@@ -173,7 +173,7 @@ export class Identify {
 
         olMap.once("postrender", (e) => {
             const pixel = e.map.getPixelFromCoordinate(selected.coordinate);
-            this.execute(pixel, 10, selected);
+            this.execute(pixel, this.pixelRadius, selected);
         })
 
         return true;
@@ -357,7 +357,7 @@ export class Identify {
             layerLabels,
             selected,
         };
-
+        
         this.identifyInfo = identifyInfo;
         
         const pm = this.display.panelManager;

@@ -81,17 +81,6 @@ export function ResourceSelect<V extends number = number>({
               ]
             : [];
     }, [resource]);
-    
-    const optionRender = useCallback(
-        ({ label, cls, value }: ResourceSelectOption) => (
-            <ResourceLabel
-                label={label}
-                cls={cls}
-                resourceId={hideGoto === true ? undefined : value}
-            />
-        ),
-        [hideGoto]
-    );
 
     return (
         <>
@@ -120,7 +109,11 @@ export function ResourceSelect<V extends number = number>({
                 {options.map(({ label, value, cls }) => {
                     return (
                         <Select.Option key={value} value={value} label={label}>
-                            {optionRender({ label, cls, value })}
+                            <ResourceLabel
+                                label={label}
+                                cls={cls}
+                                resourceId={hideGoto ? undefined : value}
+                            />
                         </Select.Option>
                     );
                 })}

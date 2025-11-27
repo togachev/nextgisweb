@@ -103,7 +103,6 @@ export const LayersTree = observer(
             treeStructureStamp,
             layersWithoutLegendInfo,
         } = store;
-        console.log(visibleLayerIds);
         
         const { onDrop, allowDrop } = useDrag({ store });
 

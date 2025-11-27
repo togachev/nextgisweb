@@ -77,7 +77,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
         const item = featureInfo && display.treeStore.filter({ type: "layer", layerId: featureInfo.layerId });
 
         const highlights = item && item?.length > 0 && item[0].layerHighligh
-        
+
         const isNotFound =
             identifyInfo && identifyInfo.response.featureCount === 0;
 
@@ -148,12 +148,12 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     identifyInfo,
                     display
                 );
-                
+
                 if (options.length) {
                     let first;
                     if (identifyInfo.selected) {
                         const selected = identifyInfo.selected;
-                        
+
                         const value = String(
                             isFloat(selected.fid) ?
                                 "R-" + selected.layerId :
@@ -165,8 +165,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     }
                     onFeatureChange(first);
                 }
-                console.log(options, display.treeStore);
-                
+
                 setFeaturesInfoList(options);
             }
         }, [identifyInfo, display, onFeatureChange, abort]);
@@ -215,7 +214,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 );
             }
             const item = identifyInfo?.response[featureInfo?.styleId];
-            
+
             if (item && "color_interpretation" in item) {
                 rasterInfoSection = <RasterInfoSection item={item} />;
             }

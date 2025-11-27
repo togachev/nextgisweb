@@ -49,6 +49,6 @@ export function identifyInfoToFeaturesInfo(
         }
         layersResponse.splice(layerIdx, 1);
     });
-
-    return featuresInfo;
+    
+    return featuresInfo.reverse();
 }

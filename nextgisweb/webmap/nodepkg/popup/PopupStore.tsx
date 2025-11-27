@@ -423,7 +423,10 @@ export class PopupStore {
         } else {
             await this.getResponse()
                 .then(item => {
+                    
                     const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
+                    console.log(this.params.request?.styles, orderObj);
+
                     const data = item.data.sort((r, l) => orderObj[l.styleId] - orderObj[r.styleId]);
                     this.setResponse({ data: data, featureCount: item.featureCount });
                     if (this.mode === "click") {
