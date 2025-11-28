@@ -1,6 +1,6 @@
 import { action, computed, observable, reaction } from "mobx";
 import { createRoot } from "react-dom/client";
-import { Map as olMap, MapBrowserEvent, Overlay } from "ol";
+import { MapBrowserEvent, Overlay } from "ol";
 
 import settings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -42,12 +42,15 @@ const array_context = [
 const context_item = 34;
 const length = array_context.filter(item => item.visible === true).length
 
+interface PopupOptions {
+    display: Display;
+}
+
 export class PopupStore {
     label = gettext("PopupStore");
-
     map: MapStore;
-
     display: Display;
+
     context_height: number;
     context_width: number;
     displaySrid: number;
@@ -56,7 +59,6 @@ export class PopupStore {
     wgs84: string;
     overlayPoint: Overlay;
     array_context: ContextProps[];
-    olmap: olMap;
 
     offHP: number;
     popup_height: number;
@@ -112,11 +114,36 @@ export class PopupStore {
     @observable.ref accessor size: SizeType = "default";
     @observable.ref accessor currentUrlParams: string | null = null;
 
-    constructor({ display }: Display) {
-        this.display = display;
+    constructor(options: PopupOptions) {
+        this.display = options.display;
+        this.map = this.display.map;
 
-        const urlParams = display.urlParams;
-        const opts = display.config.options;
+        reaction(
+            () => this.control,
+            (ctrl, prev) => {
+                const olMap = this.display.map.olMap;
+                if (prev) {
+                    olMap.removeInteraction(prev);
+                }
+                if (ctrl) {
+                    olMap.addInteraction(ctrl);
+                    ctrl.setActive(this.active);
+                }
+            },
+            { fireImmediately: false }
+        );
+
+        reaction(
+            () => this.active,
+            (isActive) => {
+                if (this.control) {
+                    this.control.setActive(isActive);
+                }
+            }
+        );
+
+        const urlParams = this.display.urlParams;
+        const opts = this.display.config.options;
         const attrs = opts["webmap.identification_attributes"];
         const geoms = opts["webmap.identification_geometry"];
         this.fixPanel = urlParams.pn ? urlParams.pn :
@@ -154,8 +181,6 @@ export class PopupStore {
         this.lonLatSrid = 4326;
         this.wgs84 = "EPSG:4326";
 
-        this.olmap = this.display.map.olMap;
-
         this.pointElement.className = "point-click";
         this.rootPointClick = createRoot(this.pointElement);
         this.popupElement.className = "popup-position";
@@ -173,30 +198,6 @@ export class PopupStore {
         this.fY = -40;
 
         this.addOverlay();
-
-        reaction(
-            () => this.control,
-            (ctrl, prev) => {
-                const olMap = this.display.map.olMap;
-                if (prev) {
-                    olMap.removeInteraction(prev);
-                }
-                if (ctrl) {
-                    olMap.addInteraction(ctrl);
-                    ctrl.setActive(this.active);
-                }
-            },
-            { fireImmediately: false }
-        );
-
-        reaction(
-            () => this.active,
-            (isActive) => {
-                if (this.control) {
-                    this.control.setActive(isActive);
-                }
-            }
-        );
     }
 
     @action.bound
@@ -362,7 +363,7 @@ export class PopupStore {
         this.overlayPoint = new Overlay({
             id: "point-click",
         });
-        this.olmap.addOverlay(this.overlayPoint);
+        this.map.olMap.addOverlay(this.overlayPoint);
         this.overlayPoint.setElement(this.pointElement)
     };
 
@@ -389,15 +390,11 @@ export class PopupStore {
         return new WKT().writeGeometry(
             fromExtent(
                 boundingExtent([
-                    this.olmap.getCoordinateFromPixel([pixel[0] - pixelRadius, pixel[1] - pixelRadius]),
-                    this.olmap.getCoordinateFromPixel([pixel[0] + pixelRadius, pixel[1] + pixelRadius]),
+                    this.map.olMap.getCoordinateFromPixel([pixel[0] - pixelRadius, pixel[1] - pixelRadius]),
+                    this.map.olMap.getCoordinateFromPixel([pixel[0] + pixelRadius, pixel[1] + pixelRadius]),
                 ])
             )
         )
-    };
-
-    async transformCoord(coord, from, to) {
-        return await transform(coord, from, to);
     };
 
     async renderPopup(e) {
@@ -423,10 +420,8 @@ export class PopupStore {
         } else {
             await this.getResponse()
                 .then(item => {
-                    
-                    const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
-                    console.log(this.params.request?.styles, orderObj);
 
+                    const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
                     const data = item.data.sort((r, l) => orderObj[l.styleId] - orderObj[r.styleId]);
                     this.setResponse({ data: data, featureCount: item.featureCount });
                     if (this.mode === "click") {
@@ -467,14 +462,14 @@ export class PopupStore {
         }
     }
 
-    async overlayInfo(e: MapBrowserEvent, props) {
+    overlayInfo(e: MapBrowserEvent, props) {
         const opts = this.display.config.options;
         const attr = opts["webmap.identification_attributes"];
         this.setMode(props.type);
 
         if (e.type === "click") {
             const styles: StylesRequest[] = [];
-            const mapResolution = this.olmap.getView().getResolution();
+            const mapResolution = this.map.olMap.getView().getResolution();
             const visibleLayers = this.display.treeStore.visibleLayers;
             visibleLayers.forEach(item => {
                 if (
@@ -523,7 +518,7 @@ export class PopupStore {
                 point: e.coordinate,
                 request: {
                     srs: this.displaySrid,
-                    geom: this.requestGeomString(this.olmap.getPixelFromCoordinate(props.p.coordinate)),
+                    geom: this.requestGeomString(this.map.olMap.getPixelFromCoordinate(props.p.coordinate)),
                     styles: props.p.value.params,
                     point: props.p.coordinate,
                     status: attr,
@@ -561,8 +556,7 @@ export class PopupStore {
         const display = this.display;
         const visibleItems = this.display.treeStore.visibleLayers;
         const permalink = getPermalink({ display, visibleItems });
-        const panel = this.activePanel === "share" ? "layers" : this.activePanel && this.activePanel !== "share" ? this.activePanel : "none";
-        this.setPermalink(decodeURIComponent(permalink + "&panel=" + String(panel)));
+        this.setPermalink(decodeURIComponent(permalink + "&panel=" + String(this.activePanel)));
     }
 
     updateSelectFeatures(panel, data, res) {
@@ -728,7 +722,7 @@ export class PopupStore {
         if (this.pointPopupClick) {
             const [lon, lat] = this.pointPopupClick.lonlat.map(number => parseFloat(number.toFixed(12)));
             const webmapId = this.display.config.webmapId;
-            const zoom = this.olmap.getView().getZoom();
+            const zoom = this.map.olMap.getView().getZoom();
 
             const styles: string[] = [];
             const visibleLayers = this.display.treeStore.visibleLayers;
@@ -741,7 +735,7 @@ export class PopupStore {
             const selected = res?.type === "raster" ? [res?.styleId + ":" + res?.layerId + ":" + lon + ":" + lat] : [res?.styleId + ":" + res?.layerId + ":" + res?.id];
             const result = [...new Set(st?.map(a => a.styleId))].sort();
 
-            const panel = this.display.panelManager.getActivePanelName();
+            const panel = this.display.panelManager.getActivePanelName() === undefined ? "none" : this.display.panelManager.getActivePanelName();
 
             let obj;
             if (disable) {
@@ -819,58 +813,58 @@ export class PopupStore {
         }
     }
 
-    async pModuleUrlParams({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) {
+    pModuleUrlParams({ lon, lat, attribute, st, slf, pn }: UrlParamsProps) {
         const slf_ = new String(slf);
         if (attribute && attribute === "false") {
-            await this.responseContext({ lon, lat, attribute: false });
+            this.responseContext({ lon, lat, attribute: false });
         } else if (slf_ instanceof String) {
-            await this.responseContext({ lon, lat, attribute: true, st, slf, pn })
+            this.responseContext({ lon, lat, attribute: true, st, slf, pn })
         }
-        return true;
     };
 
-    async responseContext(val: UrlParamsProps) {
-        await this.transformCoord([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator)
-            .then((transformedCoord) => {
-                const display = this.display;
-                const store = display.popupStore;
-                const params: ParamsProps[] = [];
-                val.st?.split(",").map(i => {
-                    params.push({
-                        id: Number(i),
-                        label: "",
-                        dop: null,
-                    });
-                });
 
-                const value = {
-                    attribute: val.attribute,
-                    pn: val.pn,
-                    lon: val.lon,
-                    lat: val.lat,
-                    selected: val.slf,
-                    params,
-                };
 
-                const p = { point: true, value, coordinate: transformedCoord };
-                const panelSize = store.activePanel !== "none" ? (display.isMobile ? 0 : display.panelSize) : 0;
+    responseContext(val: UrlParamsProps) {
+        const store = this;
+        const transformedCoord = transform([Number(val.lon), Number(val.lat)], store.wgs84, store.webMercator);
 
-                this.olmap.once("postrender", function (e) {
-                    const pixel = e.map.getPixelFromCoordinate(p.coordinate);
-                    console.log(p.coordinate);
-                    
-                    const simulateEvent: any = {
-                        coordinate: p && p.coordinate,
-                        map: e.map,
-                        target: "map",
-                        pixel: [
-                            pixel[0] + panelSize + store.offHP, pixel[1] + store.offHP
-                        ],
-                        type: "simulate"
-                    };
-                    store.overlayInfo(simulateEvent, { type: "simulate", p: p });
-                });
+        const params: ParamsProps[] = [];
+        val.st?.split(",").map(i => {
+            params.push({
+                id: Number(i),
+                label: "",
+                dop: null,
             });
+        });
+
+        const value = {
+            attribute: val.attribute,
+            pn: val.pn,
+            lon: val.lon,
+            lat: val.lat,
+            selected: val.slf,
+            params,
+        };
+
+        const p = { point: true, value, coordinate: transformedCoord };
+
+        const panelSize = store.activePanel !== "none" || store.activePanel !== undefined ? (store.display.isMobile ? 0 : 350) : 0;
+
+        setTimeout(function () {
+            const pixel = store.map.olMap.getPixelFromCoordinate(p.coordinate);
+            if (pixel) {
+                const simulateEvent: any = {
+                    coordinate: p && p.coordinate,
+                    map: store.map.olMap,
+                    target: "map",
+                    pixel: [
+                        pixel[0] + panelSize + store.offHP, pixel[1] + store.offHP
+                    ],
+                    type: "simulate"
+                };
+                store.overlayInfo(simulateEvent, { type: "simulate", p: p });
+            }
+        }, 250);
     };
 
     zoomTo(val) {

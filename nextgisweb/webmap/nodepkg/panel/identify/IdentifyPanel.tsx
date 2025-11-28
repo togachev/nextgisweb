@@ -106,7 +106,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     } else {
                         display.highlighter.unhighlight();
                     }
-
+                    setRelationInfo(undefined);
                     return;
                 }
                 const signal = makeSignal();
@@ -153,11 +153,10 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     let first;
                     if (identifyInfo.selected) {
                         const selected = identifyInfo.selected;
-
                         const value = String(
                             isFloat(selected.fid) ?
-                                "R-" + selected.layerId :
-                                selected.layerId + "-" + selected.fid
+                                `${selected.styleId}:${selected.layerId}:${selected.lonlat[0]}:${selected.lonlat[1]}` :
+                                `${selected.styleId}:${selected.layerId}:${selected.fid}`
                         )
                         first = options.find(item => item.value === value);
                     } else {
@@ -183,6 +182,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
 
         let featureInfoSection;
         let rasterInfoSection;
+        let relationElement;
         if (featureInfo) {
             if (featureItem) {
                 const measurementSrid =
@@ -218,11 +218,10 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             if (item && "color_interpretation" in item) {
                 rasterInfoSection = <RasterInfoSection item={item} />;
             }
-        }
 
-        let relationElement;
-        if (relationInfo?.relation) {
-            relationElement = (<GraphPanel item={relationInfo} />);
+            if (relationInfo?.relation) {
+                relationElement = (<GraphPanel item={relationInfo} />);
+            }
         }
 
         return (
@@ -253,6 +252,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                             featureItem={featureItem}
                             featuresInfoList={featuresInfoList}
                             onFeatureChange={onFeatureChange}
+                            identifyInfo={identifyInfo}
                         />
                     )
                 }

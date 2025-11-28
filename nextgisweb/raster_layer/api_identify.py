@@ -1,7 +1,7 @@
 from typing import Annotated, Any
 
 from msgspec import Struct
-from osgeo import gdal
+from osgeo import gdal, ogr, osr
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import Query
@@ -22,6 +22,7 @@ class RasterLayerIdentifyItem(Struct, kw_only=True):
     color_interpretation: list[str]
     pixel_class: list[str]
     values: list[Any]
+    point_select: list[Any]
 
 
 class RasterLayerIdentifyResponse(Struct, kw_only=True):
@@ -62,13 +63,22 @@ def identify(
                     pixel_class.append(pixel_class_value)
                 else:
                     pixel_class.append(None)
-            
+
+            inSRef = ds.GetSpatialRef()
+            outSRef = osr.SpatialReference()
+            outSRef.ImportFromEPSG(4326)
+            point_select = ogr.Geometry(ogr.wkbPoint)
+            point_select.AssignSpatialReference(inSRef) 
+            point_select.AddPoint(point.x, point.y)
+            point_select.TransformTo(outSRef)
+
             items.append(
                 RasterLayerIdentifyItem(
                     resource=ResourceRef(id=style.id),
                     color_interpretation=color_interpretation,
                     pixel_class=pixel_class,
                     values=values.flatten().tolist(),
+                    point_select=[round(point_select.GetY(), 12), round(point_select.GetX(), 12)],
                 )
             )
     return RasterLayerIdentifyResponse(items=items)

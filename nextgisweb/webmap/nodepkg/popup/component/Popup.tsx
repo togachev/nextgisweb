@@ -9,7 +9,6 @@ import { ButtonZoomComponent } from "./ButtonZoomComponent";
 import { ContentComponent } from "./ContentComponent";
 import { CoordinateComponent } from "./CoordinateComponent";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { getEntries } from "../util/function";
 import { PopupStore } from "../PopupStore";
 import showModal from "@nextgisweb/gui/showModal";
 import FeatureEditorModal from "@nextgisweb/feature-layer/feature-editor-modal";

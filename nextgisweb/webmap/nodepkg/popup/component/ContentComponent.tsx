@@ -15,7 +15,6 @@ import { observer } from "mobx-react-lite";
 import { GraphPanel } from "@nextgisweb/webmap/popup/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
-import { getEntries } from "../util/function";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
 
 import type { OptionProps, ContentProps } from "../type";

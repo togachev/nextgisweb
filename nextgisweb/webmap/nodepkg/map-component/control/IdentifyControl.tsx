@@ -13,7 +13,6 @@ import { useToggleGroupItem } from "./toggle-group/useToggleGroupItem";
 
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 import ClearIcon from "@nextgisweb/icon/material/close";
-import topic from "@nextgisweb/webmap/compat/topic";
 
 type IdentifyControlProps = ControlProps<{
     label?: string;

@@ -12,7 +12,6 @@ import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 
 import type { Display } from "@nextgisweb/webmap/display";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
@@ -173,7 +172,7 @@ export class Identify {
 
         olMap.once("postrender", (e) => {
             const pixel = e.map.getPixelFromCoordinate(selected.coordinate);
-            this.execute(pixel, this.pixelRadius, selected);
+            this.execute(pixel, undefined, selected);
         })
 
         return true;

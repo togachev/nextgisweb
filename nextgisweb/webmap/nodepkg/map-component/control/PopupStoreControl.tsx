@@ -8,7 +8,6 @@ import type { ControlProps } from "./MapControl";
 import { useToggleGroupItem } from "./toggle-group/useToggleGroupItem";
 
 import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
-import topic from "@nextgisweb/webmap/compat/topic";
 
 type PopupStoreControlProps = ControlProps<{
     label?: string;
@@ -38,7 +37,7 @@ const PopupStoreControl = observer(
                         display.popupStore.setMode("click");
                         e.preventDefault?.();
                     } else {
-                        topic.publish("feature.unhighlight");
+                        display.highlighter.unhighlight();
                     }
                 } else if (e.type === "contextmenu") {
                     display.popupStore.overlayInfo(e, { type: "contextmenu" });

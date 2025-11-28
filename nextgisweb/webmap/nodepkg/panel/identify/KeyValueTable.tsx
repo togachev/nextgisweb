@@ -23,7 +23,7 @@ export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
         },
     ];
 
-    const dataSource: FieldDataItem[] = data.map(({ key, value, attr }) => ({
+    const dataSource: FieldDataItem[] = filter.map(({ key, value, attr }) => ({
         key,
         value:
             typeof value === "string" ? <ExpandableText text={value} /> : value,

@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 import { Splitter } from "@nextgisweb/gui/antd";
 import { useLayout } from "@nextgisweb/pyramid/layout/useLayout";
@@ -92,9 +93,11 @@ export const DisplayWidget = observer(
 
                 if (requestedPanel && panel.panels.has(requestedPanel)) {
                     panel.setActive(requestedPanel, "init");
-                } else if (display.config.activePanel) {
+                }
+                else if (display.config.activePanel) {
                     panel.setActive(display.config.activePanel, "init");
-                } else {
+                }
+                else {
                     const firstPanelKey = panel.panels.keys().next().value;
                     if (firstPanelKey) {
                         panel.setActive(firstPanelKey, "init");

@@ -233,9 +233,7 @@ export class Display {
         this.setItem(item);
     }
 
-    private async pModuleUrlParams() {
-        console.log(this.panelManager.activePanelName);
-        
+    private pModuleUrlParams() {
         const urlParams = this.urlParams;
         if (
             !(
@@ -253,10 +251,10 @@ export class Display {
             return;
         }
         const { lon, lat, attribute, st, slf, pn } = urlParams;
-        await this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn });
+        this.popupStore?.pModuleUrlParams({ lon, lat, attribute, st, slf, pn });
     }
 
-    private async _identifyFeatureByValuePopup() {
+    private _identifyFeatureByValuePopup() {
         const urlParams = this.urlParams;
         if (
             !this.identify ||

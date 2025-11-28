@@ -14,7 +14,9 @@ export function identifyInfoToFeaturesInfo(
     const layersResponse = Object.keys(response);
     const featuresInfo: (FeatureInfo | RasterInfo)[] = [];
 
-    const items = display.treeStore.filter({ type: "layer" });
+    const items = display.treeStore
+        .filter({ type: "layer" })
+        .sort((a, b) => b.drawOrderPosition - a.drawOrderPosition);
     items.forEach(({ layerId, styleId }) => {
         const layerIdx = layersResponse.indexOf(styleId.toString());
         
@@ -25,7 +27,7 @@ export function identifyInfoToFeaturesInfo(
         if ("features" in layerResponse) {
             layerResponse.features.forEach((f, idx) => {
                 const id = f.id;
-                const value = `${layerId}-${styleId}-${id}`;
+                const value = `${styleId}:${layerId}:${id}`;
                 const label = `${f.label} (${layerLabels[styleId]})`;
                 featuresInfo.push({
                     id,
@@ -39,9 +41,10 @@ export function identifyInfoToFeaturesInfo(
             });
         } else if ("color_interpretation" in layerResponse) {
             const label = `${layerLabels[styleId]}`;
+            const point = response[styleId].point_select
             featuresInfo.push({
                 type: "raster_layer",
-                value: `R-${styleId}`,
+                value: `${styleId}:${layerId}:${point[0]}:${point[1]}`,
                 label,
                 layerId,
                 styleId,
@@ -50,5 +53,5 @@ export function identifyInfoToFeaturesInfo(
         layersResponse.splice(layerIdx, 1);
     });
     
-    return featuresInfo.reverse();
+    return featuresInfo;
 }

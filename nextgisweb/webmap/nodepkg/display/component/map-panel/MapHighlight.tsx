@@ -19,12 +19,6 @@ type Props = {
     strokeColor?: string;
 };
 
-interface ColorSF {
-    stroke_primary: string;
-    stroke_secondary: string;
-    fill: string;
-}
-
 const wkt = new WKT();
 
 function toOlFeature(
@@ -63,7 +57,6 @@ function toOlFeature(
 export const MapHighlight = observer(function MapHighlight({
     mapStore,
     highlightStore,
-    strokeColor = "rgba(255,255,0,1)",
 }: Props) {
     const overlayRef = useRef<Vector | null>(null);
     const sourceRef = useRef<VectorSource | null>(null);

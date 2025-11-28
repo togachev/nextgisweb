@@ -1,5 +1,6 @@
 import { Button, Select, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import OlGeomPoint from "ol/geom/Point";
 
 import type { FeatureSelectorProps, IdentifyInfoItem } from "../identification";
 
@@ -10,6 +11,7 @@ export function FeatureSelector({
     featureInfo,
     featureItem,
     featuresInfoList,
+    identifyInfo,
     onFeatureChange,
 }: FeatureSelectorProps) {
     if (!featureInfo) {
@@ -19,12 +21,17 @@ export function FeatureSelector({
     const zoomTo = () => {
         if (!featureItem) return;
         display.highlighter
-            .highlightById(featureItem.id, featureInfo.layerId)
+            .highlightById(featureItem.id, featureInfo.layerId, display.config.colorSF)
             .then(({ geom }) => {
                 display.map.zoomToGeom(geom);
             });
     };
 
+    const zoomToPoint = () => {
+        const point = new OlGeomPoint(identifyInfo.point);
+        display.map.zoomToExtent(point.getExtent());
+    };
+    
     const onSelectChange = (
         _value: string,
         featureInfoSelected: IdentifyInfoItem | IdentifyInfoItem[] | undefined
@@ -50,12 +57,22 @@ export function FeatureSelector({
                 value={featureInfo.value}
                 options={featuresInfoList}
             />
-            {featureInfo.type === "feature_layer" && (
+            {featureInfo.type === "feature_layer" ? (
                 <Tooltip title={gettext("Zoom to feature")}>
                     <Button
                         type="link"
                         size="small"
                         onClick={zoomTo}
+                        icon={<ZoomInMapIcon />}
+                        style={{ flex: "0 0 auto" }}
+                    />
+                </Tooltip>
+            ) : (
+                <Tooltip title={gettext("Zoom to pixel raster")}>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={zoomToPoint}
                         icon={<ZoomInMapIcon />}
                         style={{ flex: "0 0 auto" }}
                     />

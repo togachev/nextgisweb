@@ -78,6 +78,7 @@ export interface FeatureSelectorProps {
     featureInfo?: IdentifyInfoItem;
     featureItem?: FeatureItem;
     featuresInfoList: IdentifyInfoItem[];
+    identifyInfo: IdentifyInfo;
     onFeatureChange: (
         featureInfoSelected: IdentifyInfoItem | undefined
     ) => void;
