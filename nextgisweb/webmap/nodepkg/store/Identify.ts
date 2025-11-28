@@ -170,10 +170,10 @@ export class Identify {
             fid: _slf[2],
         }
 
-        olMap.once("postrender", (e) => {
-            const pixel = e.map.getPixelFromCoordinate(selected.coordinate);
+        olMap.on("loadend", () => {
+            const pixel = olMap.getPixelFromCoordinate(selected.coordinate);
             this.execute(pixel, undefined, selected);
-        })
+        });
 
         return true;
     }
