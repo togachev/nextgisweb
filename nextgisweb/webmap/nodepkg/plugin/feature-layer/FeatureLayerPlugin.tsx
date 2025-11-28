@@ -8,8 +8,6 @@ import { PluginBase } from "../PluginBase";
 import TableIcon from "@nextgisweb/icon/material/table";
 import OpenInNew from "@nextgisweb/icon/material/open_in_new";
 
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
-
 export class FeatureLayerPlugin extends PluginBase {
     getMenuItem(nodeData: TreeLayerStore) {
         return {

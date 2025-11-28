@@ -27,7 +27,7 @@ export type TreeWebmapItem = TreeNodeData & {
     treeItem: TreeItemStore;
 };
 
-const iconResources = ["wmsclient_layer", "tmsclient_layer", "tileset"]
+// const iconResources = ["wmsclient_layer", "tmsclient_layer", "tileset"]
 
 interface LayersTreeProps {
     store: TreeStore;

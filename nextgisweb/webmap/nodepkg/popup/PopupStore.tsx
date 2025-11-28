@@ -824,9 +824,8 @@ export class PopupStore {
 
 
 
-    responseContext(val: UrlParamsProps) {
-        const store = this;
-        const transformedCoord = transform([Number(val.lon), Number(val.lat)], store.wgs84, store.webMercator);
+    responseContext = (val: UrlParamsProps) => {
+        const transformedCoord = transform([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator);
 
         const params: ParamsProps[] = [];
         val.st?.split(",").map(i => {
@@ -848,21 +847,21 @@ export class PopupStore {
 
         const p = { point: true, value, coordinate: transformedCoord };
 
-        const panelSize = store.activePanel !== "none" || store.activePanel !== undefined ? (store.display.isMobile ? 0 : 350) : 0;
+        const panelSize = this.activePanel !== "none" || this.activePanel !== undefined ? (this.display.isMobile ? 0 : 350) : 0;
 
-        setTimeout(function () {
-            const pixel = store.map.olMap.getPixelFromCoordinate(p.coordinate);
+        setTimeout(() => {
+            const pixel = this.map.olMap.getPixelFromCoordinate(p.coordinate);
             if (pixel) {
                 const simulateEvent: any = {
                     coordinate: p && p.coordinate,
-                    map: store.map.olMap,
+                    map: this.map.olMap,
                     target: "map",
                     pixel: [
-                        pixel[0] + panelSize + store.offHP, pixel[1] + store.offHP
+                        pixel[0] + panelSize + this.offHP, pixel[1] + this.offHP
                     ],
                     type: "simulate"
                 };
-                store.overlayInfo(simulateEvent, { type: "simulate", p: p });
+                this.overlayInfo(simulateEvent, { type: "simulate", p: p });
             }
         }, 250);
     };
