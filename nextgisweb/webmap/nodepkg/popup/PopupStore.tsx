@@ -54,9 +54,7 @@ export class PopupStore {
     context_height: number;
     context_width: number;
     displaySrid: number;
-    webMercator: string;
     lonLatSrid: number;
-    wgs84: string;
     overlayPoint: Overlay;
     array_context: ContextProps[];
 
@@ -177,9 +175,7 @@ export class PopupStore {
         this.context_height = 24 + context_item * length;
         this.context_width = 200;
         this.displaySrid = 3857;
-        this.webMercator = "EPSG:3857";
         this.lonLatSrid = 4326;
-        this.wgs84 = "EPSG:4326";
 
         this.pointElement.className = "point-click";
         this.rootPointClick = createRoot(this.pointElement);
@@ -399,7 +395,7 @@ export class PopupStore {
 
     async renderPopup(e) {
         if (e.type === "contextmenu") {
-            const lonlat = transform(e.coordinate, this.webMercator, this.wgs84);
+            const lonlat = transform(e.coordinate, this.display.displayProjection, this.display.lonlatProjection);
             this.setPointContextClick({
                 typeEvents: "contextmenu",
                 pixel: e.pixel,
@@ -432,7 +428,7 @@ export class PopupStore {
                     }
 
                     const pxy = this.mode === "simulate" || this.mode === "selected" ? e.pixel : [e.originalEvent.clientX, e.originalEvent.clientY];
-                    const lonlat = transform(e.coordinate, this.webMercator, this.wgs84);
+                    const lonlat = transform(e.coordinate, this.display.displayProjection, this.display.lonlatProjection);
                     this.setPointPopupClick({
                         typeEvents: "click",
                         pixel: e.pixel,
@@ -822,10 +818,9 @@ export class PopupStore {
         }
     };
 
-
-
-    responseContext = (val: UrlParamsProps) => {
-        const transformedCoord = transform([Number(val.lon), Number(val.lat)], this.wgs84, this.webMercator);
+    responseContext(val: UrlParamsProps) {
+        const olMap = this.display.map.olMap
+        const transformedCoord = transform([Number(val.lon), Number(val.lat)], this.display.lonlatProjection, this.display.displayProjection);
 
         const params: ParamsProps[] = [];
         val.st?.split(",").map(i => {
@@ -849,21 +844,19 @@ export class PopupStore {
 
         const panelSize = this.activePanel !== "none" || this.activePanel !== undefined ? (this.display.isMobile ? 0 : 350) : 0;
 
-        setTimeout(() => {
-            const pixel = this.map.olMap.getPixelFromCoordinate(p.coordinate);
-            if (pixel) {
-                const simulateEvent: any = {
-                    coordinate: p && p.coordinate,
-                    map: this.map.olMap,
-                    target: "map",
-                    pixel: [
-                        pixel[0] + panelSize + this.offHP, pixel[1] + this.offHP
-                    ],
-                    type: "simulate"
-                };
-                this.overlayInfo(simulateEvent, { type: "simulate", p: p });
-            }
-        }, 250);
+        olMap.on("loadend", () => {
+            const pixel = olMap.getPixelFromCoordinate(p.coordinate);
+            const simulateEvent: any = {
+                coordinate: p && p.coordinate,
+                map: olMap,
+                target: "map",
+                pixel: [
+                    pixel[0] + panelSize + this.offHP, pixel[1] + this.offHP
+                ],
+                type: "simulate"
+            };
+            this.overlayInfo(simulateEvent, { type: "simulate", p: p });
+        });
     };
 
     zoomTo(val) {
