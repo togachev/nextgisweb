@@ -8,6 +8,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 
 import { DropdownActions } from "./DropdownActions";
+import { DropdownFile } from "./DropdownFile";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 
@@ -70,12 +71,19 @@ export const LayerTreeItemTitle = observer(
                     setUpdate={setUpdate}
                 />
             );
+            
+            const dropdownFile = showDropdown && treeItem.fileResourceVisible === true && (
+                <DropdownFile
+                    nodeData={treeItem}
+                />
+            );
             actions = (
                 <Col
                     className="tree-item-action"
                     style={{ alignItems: "center" }}
                 >
                     {legendAction}
+                    {dropdownFile}
                     {dropdownAction}
                 </Col>
             );
@@ -90,7 +98,7 @@ export const LayerTreeItemTitle = observer(
                         })}
                         flex="auto"
                         title={
-                            isOutOfScaleRange ? msgOutOfScaleRange : undefined
+                            isOutOfScaleRange ? msgOutOfScaleRange : treeItem.title
                         }
                     >
                         {treeItem.title}

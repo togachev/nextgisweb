@@ -88,6 +88,9 @@
         .ant-tree-title {
             width: 100%;
             min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             .tree-item-title {
                 min-width: 0;
@@ -214,4 +217,15 @@
     &:hover {
         color: var(--text-base);
     }
+}
+
+.edit-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    color: var(--danger);
 }

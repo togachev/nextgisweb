@@ -5,6 +5,7 @@ import { Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { findNode } from "@nextgisweb/gui/util/tree";
+import { GeometryIcon } from "@nextgisweb/webmap/plugin/layer-editor/LayerEditor";
 
 import type { TreeStore } from "../store";
 import type {
@@ -73,7 +74,7 @@ LegendIcon.displayName = "LegendIcon";
 
 const ItemIcon = observer(({ treeItem }: { treeItem: TreeLayerStore }) => {
     if (treeItem.editable === true) {
-        return <EditIcon />;
+        return <div className="edit-icon"><GeometryIcon type={treeItem.geometryType} /></div>;
     } else {
         return <LegendIcon treeItem={treeItem} />;
     }
@@ -103,7 +104,7 @@ export const LayersTree = observer(
             treeStructureStamp,
             layersWithoutLegendInfo,
         } = store;
-        
+
         const { onDrop, allowDrop } = useDrag({ store });
 
         const onSelect = useCallback(

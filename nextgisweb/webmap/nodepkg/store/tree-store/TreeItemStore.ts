@@ -75,6 +75,7 @@ export class TreeLayerStore
     @observable.ref accessor visibility: boolean;
     @observable.ref accessor identifiable: boolean;
     @observable.ref accessor layerHighligh: boolean;
+    @observable.ref accessor fileResourceVisible: boolean;
     @observable.ref accessor editGeom: boolean;
     @observable.ref accessor transparency: number | null;
     @observable.ref accessor minScaleDenom: number | null;
@@ -94,6 +95,7 @@ export class TreeLayerStore
         this.visibility = !!init.visibility;
         this.identifiable = !!init.identifiable;
         this.layerHighligh = !!init.layerHighligh;
+        this.fileResourceVisible = !!init.fileResourceVisible;
         this.editGeom = !!init.editGeom;
         this.transparency = init.transparency ?? null;
         this.minScaleDenom = init.minScaleDenom ?? null;
@@ -133,6 +135,7 @@ export class TreeLayerStore
             visibility: this.visibility,
             identifiable: this.identifiable,
             layerHighligh: this.layerHighligh,
+            fileResourceVisible: this.fileResourceVisible,
             editGeom: this.editGeom,
             transparency: this.transparency,
             minScaleDenom: this.minScaleDenom,

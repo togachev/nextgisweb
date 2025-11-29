@@ -52,7 +52,7 @@ const DropdownPlugins = observer(
                             const pluginInfo = plugin.getPluginState(nodeData);
                             if (pluginInfo.enabled) {
                                 if (plugin.getMenuItem) {
-                                    const { icon, title, onClick } =
+                                    const { icon, title, onClick, extra } =
                                         plugin.getMenuItem(nodeData);
                                     const onClick_ = async () => {
                                         if (plugin) {
@@ -83,6 +83,7 @@ const DropdownPlugins = observer(
                                                 icon
                                             ),
                                         label: title,
+                                        extra: extra,
                                     });
                                 } else if (render) {
                                     const RenderedPlugin = () =>
