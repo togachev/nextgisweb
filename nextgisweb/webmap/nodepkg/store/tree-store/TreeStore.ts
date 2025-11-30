@@ -461,6 +461,24 @@ export class TreeStore {
     }
 
     @action.bound
+    setVisibleIdsUseStyles(styles: number[]) {
+        const items: number[] = [];
+        styles.map(styleId => {
+            const item = this.filter({
+                type: "layer",
+                styleId: styleId,
+            })
+            if (item.length > 0) {
+                items.push(this.filter({
+                    type: "layer",
+                    styleId: styleId,
+                })[0].id)
+            }
+        })
+        this.setVisibleIds(items);
+    }
+
+    @action.bound
     setExpanded(expanded: number[]) {
         Array.from(this.items.values()).forEach((item) => {
             if (item.isGroup()) {

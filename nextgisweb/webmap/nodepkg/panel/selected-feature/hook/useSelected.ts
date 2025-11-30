@@ -60,7 +60,7 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
             const { value } = store.simulatePointZoom;
             pstore.setPointPopupClick(value.pointPopupClick);
             pstore.setFixPopup(false);
-            pstore.zoomToExtent(value.extent);
+            display.map.zoomToExtent(value.extent);
             pstore.renderPoint({ coordinate: value.pointPopupClick.coordinate });
             render();
             display.map.olMap.renderSync();

@@ -1,12 +1,12 @@
 import parse, { attributesToProps, Element, domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Image, Divider, Space } from "@nextgisweb/gui/antd";
-import topic from "@nextgisweb/webmap/compat/topic";
-import { route } from "@nextgisweb/pyramid/api";
+import { Button, Image, Divider, Space } from "@nextgisweb/gui/antd";
+import { transform } from "ol/proj";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import Info from "@nextgisweb/icon/material/info/outline";
 
 import type { Display } from "@nextgisweb/webmap/display";
+import type { HighlightEvent } from "@nextgisweb/webmap/highlight-store/HighlightStore";
 
 import "./DescComponent.less";
 
@@ -19,6 +19,8 @@ interface GetDataProps {
     fid?: number | string | null;
     styles: number[];
     display: Display;
+    raster?: string | null;
+    zoom?: number | null;
 }
 
 const msgWebmap = gettext("Webmap");
@@ -28,61 +30,62 @@ const msgActiveLink = gettext("Links are active only in the open web map");
 const msgZoomToFeature = gettext("Click to move closer to the object");
 const msgZoomToRaster = gettext("Click to move closer to the raster layer");
 
-const zoomToFeature = (display, layerId, featureId, styles) => {
-    display.featureHighlighter
-        .highlightFeatureById(featureId, layerId, display.config.colorSF)
-        .then((feature) => {
-            const visibleStyles: number[] = [];
-            const itemConfig = display.getItemConfig();
-            Object.keys(itemConfig).forEach(function (key) {
-                if (styles.includes(itemConfig[key].styleId)) {
-                    visibleStyles.push(itemConfig[key].id);
-                }
-            });
-
-            display.map.zoomToFeature(feature);
-            display.webmapStore.setChecked(visibleStyles);
-            display.webmapStore._updateLayersVisibility(visibleStyles);
+const zoomToFeature = (display: Display, layerId: number | string | null, featureId: number | string | null, styles: number[]) => {
+    display.highlighter
+        .highlightById(featureId, layerId, display.config.colorSF)
+        .then(({ geom }: HighlightEvent) => {
+            display.map.zoomToGeom(geom);
+            display.treeStore.setVisibleIdsUseStyles(styles);
         });
 };
 
-const zoomToRasterExtent = async (display, styleId, styles) => {
-    topic.publish("feature.unhighlight");
-
-    const { extent } = await route("layer.extent", {
-        id: styleId,
-    }).get({ cache: true });
-
-    display.map.zoomToNgwExtent(extent, {
-        displayProjection: display.displayProjection,
+const cancelZoomToFeature = (display: Display) => {
+    display.highlighter.unhighlight();
+    const items = display.treeStore.items;
+    const ids: number[] = [];
+    display.config.checkedItems.forEach((key: number) => {
+        ids.push(items.get(key).id);
     });
-
-    const visibleStyles: number[] = [];
-    const itemConfig = display.getItemConfig();
-    Object.keys(itemConfig).forEach(function (key) {
-        if (styles.includes(itemConfig[key].styleId)) {
-            visibleStyles.push(itemConfig[key].id);
-        }
+    display.treeStore.setVisibleIds(ids);
+    display.map.zoomToExtent(display.config.initialExtent, {
+        projection: "EPSG:4326",
     });
-
-    display.webmapStore.setChecked(visibleStyles);
-    display.webmapStore._updateLayersVisibility(visibleStyles);
 };
 
-const GetData = ({ type, item, options, lid, styleId, fid, styles, display }: GetDataProps) => {
+const zoomToRasterExtent = async (display: Display, raster: string | null, styles: number[], zoom: number | null) => {
+    const lonlat = [...raster.split(":")].slice(2, 4);
+    const coordinates = transform(lonlat, display.lonlatProjection, display.displayProjection);
+
+    const highlightEvent: HighlightEvent = {
+        coordinates: coordinates,
+        colorSF: display.config.colorSF,
+    };
+    console.log(highlightEvent);
+    
+    display.highlighter.highlight(highlightEvent);
+
+    display.popupStore.zoomToPoint(coordinates, { maxZoom: zoom });
+
+    display.treeStore.setVisibleIdsUseStyles(styles);
+};
+
+const GetData = ({ type, item, options, lid, fid, styles, display, raster, zoom }: GetDataProps) => {
     if (type === "vector") {
         return (
-            <div
-                className="link-type-active"
-                title={msgZoomToFeature}
-                onClick={() => {
-                    zoomToFeature(display, lid, fid, styles);
-                    if (display.imodule) { display.imodule.popup_destroy(); }
-                }}>
-                <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
-                    <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
-                </Space>
-            </div >
+            <>
+                <div
+                    className="link-type-active"
+                    title={msgZoomToFeature}
+                    onClick={() => {
+                        zoomToFeature(display, lid, fid, styles);
+                        display.popupStore.pointDestroy();
+                    }}>
+                    <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
+                        <SvgIcon icon={`rescls-vector_layer`} />{domToReact(item.children, options)}
+                    </Space>
+                </div >
+                <Button onClick={() => { cancelZoomToFeature(display) }}>cancel</Button>
+            </>
         );
     } else if (type === "raster") {
         return (
@@ -90,8 +93,8 @@ const GetData = ({ type, item, options, lid, styleId, fid, styles, display }: Ge
                 className="link-type-active"
                 title={msgZoomToRaster}
                 onClick={() => {
-                    zoomToRasterExtent(display, styleId, styles);
-                    if (display.imodule) { display.imodule.popup_destroy(); }
+                    zoomToRasterExtent(display, raster, styles, zoom);
+                    display.popupStore.pointDestroy();
                 }}
             >
                 <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
@@ -164,14 +167,16 @@ export const DescComponent = (props) => {
         const request = urlParams.get("request");
         const lid = urlParams.get("lid");
         const fid = urlParams.get("fid");
-        const styleId = urlParams.get("styleId");
+        const zoom = urlParams.get("zoom");
         const styles = urlParams.get("styles");
         const type = urlParams.get("type");
+
+        const raster = urlParams.get("raster");
 
         if (request !== "feature") { return; }
         if (display) {
             const styles_ = Array.from(styles.split(","), Number)
-            return <GetData type={type} item={item} options={options} lid={lid} fid={fid} styleId={styleId} styles={styles_} display={display} />
+            return <GetData type={type} item={item} options={options} lid={lid} fid={fid} zoom={zoom} styles={styles_} display={display} raster={raster} />
         } else if (display === undefined) {
             return <GetData item={item} options={options} lid={lid} />
         }

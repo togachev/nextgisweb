@@ -29,6 +29,7 @@ import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { AttributeProps, ContextProps, ControlUrlProps, DataProps, EventProps, ExtensionsProps, OptionProps, ParamsProps, Position, Response, Rnd, SizeWindowProps, SourceProps, StylesRequest, UrlParamsProps } from "./type";
 import type { SizeType } from "@nextgisweb/gui/antd";
+import type { FitOptions } from "ol/View";
 
 const forbidden = gettext("The data is not available for reading");
 
@@ -503,6 +504,8 @@ export class PopupStore {
                 items.some(x => {
                     if (x.id.styleId === itm.id) {
                         const label = items.find(p => p.id.styleId === itm.id).label;
+                        console.log(label);
+
                         const dop = items.find(p => p.id.styleId === itm.id).position;
                         itm.label = label;
                         itm.dop = dop;
@@ -528,6 +531,7 @@ export class PopupStore {
     async LinkToGeometry(value: DataProps) {
         const styles: number[] = [];
         const items = await this.display.getVisibleItems();
+        const zoom = this.display.map.olMap.getView().getZoom();
         items.map(i => {
             styles.push(i.styleId);
         });
@@ -538,7 +542,7 @@ export class PopupStore {
         if (value.type === "vector") {
             Object.assign(obj, { fid: value.id, type: "vector" })
         } else if (value.type === "raster") {
-            Object.assign(obj, { styleId: value.styleId, type: "raster" })
+            Object.assign(obj, { styleId: value.styleId, raster: value.value, type: "raster", zoom: zoom })
         }
 
         getEntries(obj)?.map(([key, value]) => {
@@ -842,9 +846,8 @@ export class PopupStore {
 
         const p = { point: true, value, coordinate: transformedCoord };
 
-        const panelSize = this.activePanel !== "none" || this.activePanel !== undefined ? (this.display.isMobile ? 0 : 350) : 0;
-
-        olMap.on("loadend", () => {
+        olMap.once("loadend", () => {
+            const panelSize = this.activePanel === "none" || this.activePanel === undefined ? 0 : 350;
             const pixel = olMap.getPixelFromCoordinate(p.coordinate);
             const simulateEvent: any = {
                 coordinate: p && p.coordinate,
@@ -868,9 +871,14 @@ export class PopupStore {
             });
     };
 
-    zoomToExtent(extent) {
+    zoomToExtent(extent: number[], {
+        ...fitOpts
+    }): void {
+        console.log(fitOpts);
+        
         this.display.map.zoomToExtent(extent, {
             displayProjection: this.display.displayProjection,
+            ...fitOpts
         });
     };
 
@@ -885,10 +893,11 @@ export class PopupStore {
         topic.publish("update.point", false);
     };
 
-    zoomToPoint(val) {
-        if (!val) return;
-        const point = new OlGeomPoint(val);
-        this.display.map.zoomToExtent(point.getExtent());
+    zoomToPoint(coordinates: number[], fitOpts?: FitOptions): void {
+        const view = this.map.olMap.getView();
+        if (!coordinates) return;
+        const point = new OlGeomPoint(coordinates);
+        view.fit(point.getExtent(), fitOpts);
     };
 
     isEditEnabled(display: Display, item) {

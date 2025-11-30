@@ -25,7 +25,6 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         const { visibleItems } = useSelected(display, store);
         const pstore = display.popupStore;
 
-
         const deleteRow = ({ key, ckey, all }) => {
             pstore?.pointDestroy();
             pstore?.setFixPopup(false);
@@ -144,7 +143,6 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 const ftitle = cvalue.selected.type === "vector" ? cvalue.selected.label : msgValueRaster;
                                 const checked = obj.achecked && obj.ackey === ckey;
                                 const contentProps = { store: pstore, display: display };
-
                                 const ltitle = !store.visibleLayerName ? title : null;
                                 return (
                                     <div key={fidx} className="label-child-element">
@@ -163,7 +161,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                         >
                                             <div className={!store.visibleLayerName ? "label-group label" : "label-group"}>
                                                 <div className={checked ? "feature-name checked" : "feature-name"} >{ftitle}</div>
-                                                {!store.visibleLayerName && <sub className={checked ? "sub-feature-name sub-checked" : "sub-feature-name"}>{cvalue.selected.desc}</sub>}
+                                                {!store.visibleLayerName && <sub className={checked ? "sub-feature-name sub-checked" : "sub-feature-name"}>{ltitle}</sub>}
                                             </div>
                                         </Button>
                                         {checked && <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>}

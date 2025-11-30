@@ -53,6 +53,7 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
 ];
 
 const activePanelOptions: { value: ActivePanelType; label: string }[] = [
+    { value: "none", label: gettext("Panel disabled") },
     { value: "layers", label: gettext("Layers") },
     { value: "selected-feature", label: msgSelectFeaturePanel },
     { value: "search", label: gettext("Search") },
@@ -62,7 +63,6 @@ const activePanelOptions: { value: ActivePanelType; label: string }[] = [
     { value: "info", label: gettext("Description") },
     { value: "share", label: gettext("Share") },
     { value: "annotation", label: gettext("Annotations") },
-    { value: "none", label: gettext("Panel disabled") }
 ];
 
 

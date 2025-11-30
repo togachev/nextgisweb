@@ -43,6 +43,7 @@ export class HighlightStore {
             return;
         }
         this.highlighted = this.highlighted.filter((x) => !filter(x));
+        return filter;
     }
 
     @action.bound
