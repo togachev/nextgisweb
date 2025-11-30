@@ -537,12 +537,12 @@ export class PopupStore {
         });
 
         const paramsUrl = new URLSearchParams();
-        const obj = { request: "feature", lid: value.layerId, styles: styles };
+        const obj = { request: "feature", lid: value.layerId, styleId: value.styleId, styles: styles };
 
         if (value.type === "vector") {
             Object.assign(obj, { fid: value.id, type: "vector" })
         } else if (value.type === "raster") {
-            Object.assign(obj, { styleId: value.styleId, raster: value.value, type: "raster", zoom: zoom })
+            Object.assign(obj, { raster: value.value, type: "raster", zoom: zoom })
         }
 
         getEntries(obj)?.map(([key, value]) => {
