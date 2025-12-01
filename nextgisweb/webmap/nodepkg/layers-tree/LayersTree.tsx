@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ReactNode } from "react";
 import { Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
-import { EditIcon } from "@nextgisweb/gui/icon";
 import { findNode } from "@nextgisweb/gui/util/tree";
 import { GeometryIcon } from "@nextgisweb/webmap/plugin/layer-editor/LayerEditor";
 

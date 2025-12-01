@@ -4,12 +4,10 @@
 }
 
 .desc-component {
-	.link-type-active {
-		color: var(--text-base);
+	.link-type-wrap {
+		white-space: normal;
+		overflow-wrap: break-word;
 		cursor: pointer;
-		font-weight: 500;
-		padding: 3px;
-		border-radius: 4px;
 
 		&:hover {
 			color: var(--primary);
@@ -18,8 +16,9 @@
 
 	.link-type {
 		color: var(--text-secondary);
+		white-space: normal;
+		overflow-wrap: break-word;
 		cursor: pointer;
-		font-weight: 500;
 
 		&:hover {
 			color: var(--primary);

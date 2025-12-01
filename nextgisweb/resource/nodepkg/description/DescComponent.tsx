@@ -1,9 +1,8 @@
 import parse, { attributesToProps, Element, domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Button, Image, Divider, Space } from "@nextgisweb/gui/antd";
+import { Image, Divider, Space } from "@nextgisweb/gui/antd";
 import { transform } from "ol/proj";
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import Info from "@nextgisweb/icon/material/info/outline";
 
 import type { Display } from "@nextgisweb/webmap/display";
@@ -15,9 +14,9 @@ interface GetDataProps {
     type: string | null;
     item: Element;
     options: HTMLReactParserOptions;
-    lid: number | string | null;
+    layerId: number | string | null;
     styleId?: number | string | null;
-    fid?: number | string | null;
+    featureId?: number | string | null;
     styles: number[];
     display: Display;
     raster?: string | null;
@@ -25,7 +24,6 @@ interface GetDataProps {
     reset: boolean;
     setReset: (reset: boolean) => void;
 }
-
 
 export interface ResetProps {
     [key: number]: boolean;
@@ -36,9 +34,10 @@ const msgLayer = gettext("Layer");
 const msgStyle = gettext("Style");
 const msgActiveLink = gettext("Links are active only in the open web map");
 const msgZoomToFeature = gettext("Click to move closer to the object");
+const msgToHome = gettext("Click to return to the original web map coverage");
 const msgZoomToRaster = gettext("Click to move closer to the raster layer");
 
-const zoomToFeature = async (display: Display, layerId: number | string | null, styleId: number | string | null, featureId: number | string | null, styles: number[]) => {
+const zoomToFeature = async (display: Display, layerId: number | string | null, featureId: number | string | null, styles: number[], styleId: number | string | null) => {
     await display.highlighter
         .highlightById(featureId, layerId, display.config.colorSF)
         .then(({ geom }: HighlightEvent) => {
@@ -79,50 +78,60 @@ const zoomToRasterExtent = async (display: Display, raster: string | null, style
     return { styleId, value: true };
 };
 
-const GetData = ({ type, item, options, lid, fid, styles, display, raster, zoom, reset, setReset, styleId }: GetDataProps) => {
-    const opt = Object.fromEntries(Object.entries(reset).filter(([_, value]) => {
-        return value.styleId === styleId;
-    }))
-
-
+const GetData = ({ type, item, options, layerId, featureId, styles, display, raster, zoom, reset, setReset, styleId }: GetDataProps) => {
+    const enabled = reset && Object.keys(reset)[0] === styleId && Object.values(reset)[0] === true;
     if (type === "vector") {
         return (
-            <Button
-                className="link-type-active"
-                type="text"
-                title={msgZoomToFeature}
+            <span
+                className="link-type-wrap"
+                title={enabled ? msgToHome : msgZoomToFeature}
+                style={enabled ? { color: "red" } : { color: "var(--primary)" }}
                 onClick={() => {
-                    opt.value ? cancelZoomToFeature(display, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } })) : zoomToFeature(display, lid, fid, styles, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }));
+                    if (Object.keys(reset).length === 0) {
+                        zoomToFeature(display, layerId, featureId, styles, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                    } else {
+                        if (enabled) {
+                            cancelZoomToFeature(display, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                        } else if (Object.keys(reset)[0] === styleId && Object.values(reset)[0] === false) {
+                            zoomToFeature(display, layerId, featureId, styles, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                        } else if (Object.keys(reset)[0] !== styleId) {
+                            zoomToFeature(display, layerId, featureId, styles, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                        }
+                    }
                 }}>
-                <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
-                    <SvgIcon icon={`rescls-vector_layer`} /><span className="title">{domToReact(item.children, options)}</span>
-                </Space>
-            </Button >
+                {domToReact(item.children, options)}
+            </span >
         );
     } else if (type === "raster") {
         return (
-            <Button
-                className="link-type-active"
-                title={msgZoomToRaster}
-                type="text"
-                color="default" variant={opt.value ? "filled" : "text"}
+            <span
+                className="link-type-wrap"
+                title={enabled ? msgToHome : msgZoomToRaster}
+                style={enabled ? { color: "red" } : { color: "var(--primary)" }}
                 onClick={() => {
-                    opt.value ? cancelZoomToFeature(display, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } })) : zoomToRasterExtent(display, raster, styles, zoom, styleId)
-                        .then(i => {
-                            setReset({ ...{ [i.styleId]: i.value } })
-                            console.log(i);
-                            
-                        })
+                    if (Object.keys(reset).length === 0) {
+                        zoomToRasterExtent(display, raster, styles, zoom, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                    } else {
+                        if (enabled) {
+                            cancelZoomToFeature(display, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                        } else if (Object.keys(reset)[0] === styleId && Object.values(reset)[0] === false) {
+                            zoomToRasterExtent(display, raster, styles, zoom, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                        } else if (Object.keys(reset)[0] !== styleId) {
+                            zoomToRasterExtent(display, raster, styles, zoom, styleId).then(i => setReset({ ...{ [i.styleId]: i.value } }))
+                        }
+                    }
                 }}
             >
-                <Space direction="horizontal" style={{ display: "flex", alignItems: "flex-start" }}>
-                    <SvgIcon icon={`rescls-raster_layer`} /><span className="title">{domToReact(item.children, options)}</span>
-                </Space>
-            </Button>
-
+                {domToReact(item.children, options)}
+            </span>
         );
     } else {
-        return (<Space className="link-type" title={msgActiveLink} direction="horizontal">{domToReact(item.children, options)}<Info /></Space>);
+        return (
+            <span className="link-type" title={msgActiveLink} direction="horizontal">
+                {domToReact(item.children, options)}
+                <span style={{ padding: "0 2px" }}><Info /></span>
+            </span>
+        );
     }
 }
 
@@ -184,8 +193,8 @@ export const DescComponent = (props) => {
         const urlParams = new URLSearchParams(item.attribs.href);
 
         const request = urlParams.get("request");
-        const lid = urlParams.get("lid");
-        const fid = urlParams.get("fid");
+        const layerId = urlParams.get("lid");
+        const featureId = urlParams.get("fid");
         const zoom = urlParams.get("zoom");
         const styles = urlParams.get("styles");
         const type = urlParams.get("type");
@@ -195,13 +204,11 @@ export const DescComponent = (props) => {
         if (request !== "feature") { return; }
         if (display) {
             const styles_ = Array.from(styles.split(","), Number)
-            return <div key={styleId}>
-                <GetData
-                    reset={reset} setReset={setReset} type={type} item={item} options={options} lid={lid} fid={fid} zoom={zoom} styles={styles_} display={display} raster={raster} styleId={styleId}
-                />
-            </div>
+            return <GetData
+                reset={reset} setReset={setReset} type={type} item={item} options={options} layerId={layerId} featureId={featureId} zoom={zoom} styles={styles_} display={display} raster={raster} styleId={styleId}
+            />
         } else if (display === undefined) {
-            return <GetData item={item} options={options} lid={lid} />
+            return <GetData item={item} options={options} layerId={layerId} />
         }
     };
 
