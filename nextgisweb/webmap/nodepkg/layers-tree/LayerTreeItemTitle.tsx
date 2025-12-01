@@ -41,8 +41,9 @@ export const LayerTreeItemTitle = observer(
 
         let actions;
         let isOutOfScaleRange = false;
+        let legendAction;
         if (shouldActions) {
-            let legendAction;
+            
             if (treeItem.isLayer()) {
                 const treeLayer = treeItem;
 
@@ -82,7 +83,7 @@ export const LayerTreeItemTitle = observer(
                     className="tree-item-action"
                     style={{ alignItems: "center" }}
                 >
-                    {legendAction}
+                    
                     {dropdownFile}
                     {dropdownAction}
                 </Col>
@@ -92,6 +93,7 @@ export const LayerTreeItemTitle = observer(
         return (
             <>
                 <Row wrap={false}>
+                    {legendAction}
                     <Col
                         className={classNames("tree-item-title", {
                             "out-of-scale-range": isOutOfScaleRange,
