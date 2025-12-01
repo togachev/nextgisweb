@@ -35,6 +35,10 @@ const LinkToGeometryFeature = ({ store, display }) => {
             layerId: store.selected.layerId,
         }).find(itm => itm.styleId === store.selected.styleId);
         
+        const label = store.selected.type === "vector" ?
+        store.selected.label + `(${Array.from(store.selected.value.split(":"), Number).slice(2, 3)})` :
+        store.selected.label + `(${Array.from(store.selected.value.split(":"), Number).map(num => Math.round(num * 10000) / 10000).slice(2, 4).join(",")})` 
+            
         if (!store.isEditEnabled(display, item)) { return false; }
         return (
             <Button
@@ -43,7 +47,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
                 type="text"
                 size="small"
                 onClick={() => {
-                    const linkToGeometryString = `<a href="${store.linkToGeometry}">${store.selected.label}</a>`
+                    const linkToGeometryString = `<a href="${store.linkToGeometry}">${label}</a>`
                     copyValue(linkToGeometryString, gettext("HTML code copied"));
                 }}
             >

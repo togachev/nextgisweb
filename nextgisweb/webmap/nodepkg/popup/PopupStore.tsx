@@ -540,7 +540,7 @@ export class PopupStore {
         const obj = { request: "feature", lid: value.layerId, styleId: value.styleId, styles: styles };
 
         if (value.type === "vector") {
-            Object.assign(obj, { fid: value.id, type: "vector" })
+            Object.assign(obj, { vector: value.value, fid: value.id, type: "vector" })
         } else if (value.type === "raster") {
             Object.assign(obj, { raster: value.value, type: "raster", zoom: zoom })
         }
