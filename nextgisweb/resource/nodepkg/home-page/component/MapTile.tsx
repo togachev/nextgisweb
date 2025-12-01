@@ -94,31 +94,35 @@ export const MapTile = observer((props) => {
                     title={
                         <div className="title-map">
                             <span title={display_name} className="title">
-                                <div className="content-title" style={enabled === false ? { color: "var(--danger)" } : { color: "var(--text-base)"}}>
+                                <div className="content-title" style={enabled === false ? { color: "var(--danger)" } : { color: "var(--text-base)" }}>
                                     {!size.min && display_name}
                                 </div>
                             </span>
                             <div className={size.min ? "button-min control-button" : "control-button"} >
-                                <Button
-                                    size="small"
-                                    href={urlWebmap}
-                                    target="_blank"
-                                    type="text"
-                                    icon={<MapIcon />}
-                                >
-                                    {!size.min && <Text >{openMap}</Text>}
-                                </Button>
-                                {store.manage && (
-                                    <ButtonSetting iconKey="map_edit" type="webmap" store={store} id={webmap_id} operation="update" />
-                                )}
-                                {description_status === true && (
+                                <div className="block">
                                     <Button
                                         size="small"
-                                        title={descTitle}
-                                        onClick={showDescription}
+                                        href={urlWebmap}
+                                        target="_blank"
                                         type="text"
-                                        icon={<Info />}
-                                    />)}
+                                        icon={<MapIcon />}
+                                    >
+                                        {!size.min && <Text >{openMap}</Text>}
+                                    </Button>
+                                    <div className="edit-block">
+                                        {store.manage && (
+                                            <ButtonSetting iconKey="map_edit" type="webmap" store={store} id={webmap_id} operation="update" webmap_name={display_name}/>
+                                        )}
+                                        {description_status === true && (
+                                            <Button
+                                                size="small"
+                                                title={descTitle}
+                                                onClick={showDescription}
+                                                type="text"
+                                                icon={<Info />}
+                                            />)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     }

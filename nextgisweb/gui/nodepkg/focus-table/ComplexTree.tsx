@@ -431,7 +431,7 @@ export function ComplexTree<
 
             const customStyle: CSSProperties = { "--ct-depth": props.depth }
             if (storeItem?.webmapId && storeItem?.webmapId?.value === store.composite.setup?.selectedId) {
-                Object.assign(customStyle, { fontWeight: "bold", backgroundColor: "var(--divider-color)" })
+                Object.assign(customStyle, { fontWeight: "bold" })
             }
 
             return (

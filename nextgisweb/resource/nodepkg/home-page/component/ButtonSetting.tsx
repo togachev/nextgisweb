@@ -23,6 +23,7 @@ interface StoreProps {
     text?: string;
     disabled?: boolean;
     selectedId?: number;
+    webmap_name?: string;
 }
 
 export type CompositeSetup =
@@ -49,7 +50,7 @@ export interface MapgroupModalProps extends ModalProps {
 
 export const ButtonSetting = observer((props: StoreProps) => {
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
-    const { id, iconKey, store, type, operation, tab, text, disabled, selectedId } = props;
+    const { id, iconKey, store, type, operation, tab, text, disabled, selectedId, webmap_name } = props;
 
     const onGroups = useCallback(() => {
         if (operation === "create") {
@@ -82,7 +83,7 @@ export const ButtonSetting = observer((props: StoreProps) => {
                     setup: { operation: operation, id: id, selectedId: selectedId },
                     tab: tab,
                     type: type,
-                    title: msg(type, operation),
+                    title: type === "group" ? store.allLoadedResources.get(id).resource.display_name : webmap_name,
                 },
             })
         }

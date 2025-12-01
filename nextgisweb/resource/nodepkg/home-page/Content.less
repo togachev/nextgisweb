@@ -21,6 +21,20 @@ input {
 	.control-button {
 		position: absolute;
 		left: 0;
+
+		.block {
+			display: flex;
+			width: 100%;
+			height: inherit;
+			justify-content: space-between;
+			align-items: center;
+
+			.edit-block {
+				display: inline-flex;
+				height: inherit;
+				align-items: center;
+			}
+		}
 	}
 
 	.add-group {
@@ -485,6 +499,7 @@ input {
 														font-size: 24px;
 														margin: 0px 10px;
 														padding: 0;
+														height: inherit;
 
 														span {
 															display: flex;
