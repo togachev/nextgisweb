@@ -94,7 +94,7 @@ const GetData = ({ type, item, options, styles, display, reset, setReset, layerI
             <span
                 className="link-type-wrap"
                 title={enabled ? msgToHome : msgZoomToFeature}
-                style={enabled ? { color: "red" } : { color: "var(--primary)" }}
+                style={enabled ? { color: "var(--text-base)", fontWeight: "bold" } : { color: "var(--primary)" }}
                 onClick={() => {
                     if (Object.keys(reset).length === 0) {
                         zoomToFeature(display, layerId, featureId, styles, styleId).then(i => vector && setReset({ ...{ [vector]: i.value } }))
@@ -118,7 +118,7 @@ const GetData = ({ type, item, options, styles, display, reset, setReset, layerI
             <span
                 className="link-type-wrap"
                 title={enabled ? msgToHome : msgZoomToRaster}
-                style={enabled ? { color: "red" } : { color: "var(--primary)" }}
+                style={enabled ? { color: "var(--text-base)", fontWeight: "bold" } : { color: "var(--primary)" }}
                 onClick={() => {
                     if (Object.keys(reset).length === 0) {
                         zoomToRasterExtent(display, raster, styles, zoom, styleId).then(i => raster && setReset({ ...{ [raster]: i.value } }))
