@@ -70,7 +70,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                 }),
                 className: "component",
                 icon: <Cogs />,
-                type: "component",
+                type: "button",
             }
         ]
 
@@ -83,7 +83,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                             return (
                                 <a key={key} title={title} target={target} href={href} className={className}>{icon}</a>
                             )
-                        } else if (type === "component") {
+                        } else if (type === "button") {
                             return <Button title={title} key={key} type="text" className={className} onClick={onClick} icon={icon} />
                         }
                     })}
