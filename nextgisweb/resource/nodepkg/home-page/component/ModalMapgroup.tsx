@@ -16,6 +16,7 @@ interface CompositeWidgetProps {
     tab?: string;
     type?: string;
     title?: string;
+    location?: string;
 }
 
 export type ModalProps = Parameters<typeof Modal>[0];
@@ -34,7 +35,7 @@ export const ModalMapgroup = ({
 }: MapgroupModalProps) => {
     const [open, setOpen] = useState(openProp);
     const [save, setSave] = useState(false);
-    const { store, setup, tab, type, title } = options || {};
+    const { store, setup, tab, type, title, location } = options || {};
     const [modal, contextHolder] = Modal.useModal();
 
     const close = () => {
@@ -91,7 +92,7 @@ export const ModalMapgroup = ({
                 onCancel={handleClose}
                 {...modalProps}
             >
-                <CompositeWidget setup={setup} tab={tab} location="true" setSave={setSave} />
+                <CompositeWidget setup={setup} tab={tab} location={location} setSave={setSave} />
             </Modal>
             {contextHolder}
         </>

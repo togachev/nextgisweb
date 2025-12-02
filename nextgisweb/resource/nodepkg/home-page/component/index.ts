@@ -7,4 +7,5 @@ export { Header } from "./Header";
 export { Footer } from "./Footer";
 export { UploadComponent } from "./UploadComponent";
 export { ModalComponent } from "./ModalComponent";
+export { ModalMapgroup } from "./ModalMapgroup";
 export { msg } from "./msg";

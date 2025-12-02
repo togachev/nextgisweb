@@ -3,7 +3,9 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
-
+import { ModalMapgroup } from "@nextgisweb/resource/home-page/component";
+import showModal from "@nextgisweb/gui/showModal";
+import { Button } from "@nextgisweb/gui/antd";
 import type { PanelManager } from "../../panel/PanelManager";
 import type { Display } from "@nextgisweb/webmap/display";
 
@@ -34,28 +36,41 @@ export const NavigationMenu = observer<NavigationMenuProps>(
 
         const infomap = display.config.infomap;
         const active = store.activePanel;
-        
+
         const customMenu = [
             {
                 title: gettext("Resources"),
+                key: gettext("Resources"),
                 target: "_blank",
                 href: infomap.resource,
                 className: "item",
                 icon: <Home />,
+                type: "link",
             },
             {
                 title: gettext("Map properties"),
+                key: gettext("Map properties"),
                 target: "_blank",
                 href: infomap.link,
                 className: "item",
                 icon: <Information />,
+                type: "link",
             },
             infomap.scope && {
                 title: gettext("Map settings"),
+                key: gettext("Map settings"),
                 target: "_blank",
-                href: infomap.update,
-                className: "item",
+                onClick: () => showModal(ModalMapgroup, {
+                    transitionName: "",
+                    maskTransitionName: "",
+                    options: {
+                        setup: { operation: "update", id: infomap.update.id },
+                        location: "reload",
+                    },
+                }),
+                className: "component",
                 icon: <Cogs />,
+                type: "component",
             }
         ]
 
@@ -63,9 +78,15 @@ export const NavigationMenu = observer<NavigationMenuProps>(
             if (display.tinyConfig && !infomap.scope) return;
             return (
                 <div className={classNames("info-block", layout)}>
-                    {customMenu.map(({ title, target, href, className, icon }, index) => (
-                        <a key={index} title={title} target={target} href={href} className={className}>{icon}</a>
-                    ))}
+                    {customMenu.map(({ title, key, target, href, onClick, className, icon, type }) => {
+                        if (type === "link") {
+                            return (
+                                <a key={key} title={title} target={target} href={href} className={className}>{icon}</a>
+                            )
+                        } else if (type === "component") {
+                            return <Button title={title} key={key} type="text" className={className} onClick={onClick} icon={icon} />
+                        }
+                    })}
                 </div>
             )
         }

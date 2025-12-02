@@ -84,6 +84,7 @@ export const ButtonSetting = observer((props: StoreProps) => {
                     tab: tab,
                     type: type,
                     title: type === "group" ? store.allLoadedResources.get(id).resource.display_name : webmap_name,
+                    location: "true",
                 },
             })
         }

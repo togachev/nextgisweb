@@ -527,7 +527,7 @@ class RootItemConfig(BaseItem, tag="root", tag_field="type"):
 class InfoMapConfig(Struct, kw_only=True):
     resource: str
     link: str
-    update: bool
+    update: Dict[str, Any]
     scope: bool
 
 
@@ -752,7 +752,7 @@ def display_config(obj, request) -> DisplayConfig:
         infomap=dict(
             resource=request.route_url("resource.show", id=0),
             link=request.route_url("resource.show", id=obj.id),
-            update=request.route_url("resource.update", id=obj.id),
+            update=dict(id=obj.id),
             scope=obj.has_permission(ResourceScope.update, request.user)
         ),
         mid=mid,

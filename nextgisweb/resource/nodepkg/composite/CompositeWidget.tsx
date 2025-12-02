@@ -69,7 +69,7 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
     const [activeKey, setActiveKey] = useState<string>();
     const [composite] = useState(() => new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
-    
+
     const { operation } = setup;
     const { members, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
@@ -131,6 +131,9 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
             const routeName = edit ? "resource.update" : "resource.show";
             if (setSave && location === "true") {
                 setSave(true);
+            } else if (setSave && location === "reload") {
+                setSave(true);
+                window.location.reload();
             } else {
                 window.location.href = route(routeName, { id }).url();
             }
