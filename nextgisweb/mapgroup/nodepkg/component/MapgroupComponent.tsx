@@ -79,13 +79,13 @@ export const MapgroupComponent = ({
 
         if (includes) {
             array.sort((a, b) => a.position - b.position)
-            .map((item) => {
-                data.push({
-                    key: item.id,
-                    name: item.display_name,
-                    enabled: item.enabled,
+                .map((item) => {
+                    data.push({
+                        key: item.id,
+                        name: item.display_name,
+                        enabled: item.enabled,
+                    })
                 })
-            })
         }
 
         return {
@@ -109,7 +109,6 @@ export const MapgroupComponent = ({
                         type="link"
                         style={{
                             fontSize: "large",
-                            fontWeight: "bold",
                             padding: 0,
                             color: "inherit",
                         }}
@@ -117,27 +116,10 @@ export const MapgroupComponent = ({
                         {includesMapsMsg}<Pencil />
                     </Button>
                 </h2> :
-                !includes ?
-                    <h2>
-                        <Button
-                            size="small"
-                            title={gettext("Setting up groups")}
-                            href={routeURL("home_page")}
-                            target="_blank"
-                            type="link"
-                            style={{
-                                fontSize: "large",
-                                fontWeight: "bold",
-                                padding: 0,
-                                color: "inherit",
-                            }}
-                        >
-                            {gettext("Setting up groups")}<Pencil />
-                        </Button>
-                    </h2> :
-                    <h2>
-                        {gettext("The web map is included in group")}
-                    </h2>
+                includes &&
+                <h2>
+                    {gettext("The web map is included in group")}
+                </h2>
             }
             <Table <GroupDataType>  {...params} />
         </>

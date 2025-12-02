@@ -30,12 +30,7 @@ msgstr "Веб-карты включены в группу"
 msgid "Web maps are not added. Add them?"
 msgstr "Веб-карты не добавлены. Добавить?"
 
-#: nodepkg/component/MapgroupComponent.tsx:124
-#: nodepkg/component/MapgroupComponent.tsx:135
-msgid "Setting up groups"
-msgstr "Настройка групп"
-
-#: nodepkg/component/MapgroupComponent.tsx:139
+#: nodepkg/component/MapgroupComponent.tsx:121
 msgid "The web map is included in group"
 msgstr "Веб-карта включена в группу"
 
@@ -66,3 +61,6 @@ msgstr "Включить группу"
 #: nodepkg/mapgroup-widget/MapgroupResourceWidget.tsx:40
 msgid "Group"
 msgstr "Группа"
+
+#~ msgid "Setting up groups"
+#~ msgstr "Настройка групп"
