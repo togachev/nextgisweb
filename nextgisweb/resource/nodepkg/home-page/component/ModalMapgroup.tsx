@@ -17,6 +17,8 @@ interface CompositeWidgetProps {
     type?: string;
     title?: string;
     location?: string;
+    height?: string;
+    padding?: string;
 }
 
 export type ModalProps = Parameters<typeof Modal>[0];
@@ -35,7 +37,7 @@ export const ModalMapgroup = ({
 }: MapgroupModalProps) => {
     const [open, setOpen] = useState(openProp);
     const [save, setSave] = useState(false);
-    const { store, setup, tab, type, title, location } = options || {};
+    const { store, setup, tab, type, title, location, height, padding } = options || {};
     const [modal, contextHolder] = Modal.useModal();
 
     const close = () => {
@@ -69,7 +71,6 @@ export const ModalMapgroup = ({
         <>
             <Modal
                 className="modal-component"
-                width="70%"
                 title={
                     <div className="modal-title" >
                         {title}
@@ -78,7 +79,7 @@ export const ModalMapgroup = ({
                 centered={true}
                 open={open}
                 destroyOnHidden
-                styles={{ content: { padding: 0 }, body: { padding: 16, height: "calc(100vh - 300px)", overflowY: "auto" } }}
+                styles={{ content: { padding: 0 }, body: { padding: padding ? padding : 16, height: height, overflowY: "auto" } }}
                 footer={type === "group" ? [
                     <Button key="delete" icon={<Delete />} type="text" danger onClick={() => {
                         if (setup?.operation === "update") {

@@ -524,20 +524,13 @@ class RootItemConfig(BaseItem, tag="root", tag_field="type"):
     children: List[Union[GroupItemConfig, LayerItemConfig]]
 
 
-class InfoMapConfig(Struct, kw_only=True):
-    resource: str
-    link: str
-    update: Dict[str, Any]
-    scope: bool
-
-
 class DisplayConfig(Struct, kw_only=True):
     webmapId: int
     webmapTitle: str
     activePanel: str
     colorSF: Dict[str, Any]
     selectFeaturePanel: bool
-    infomap: InfoMapConfig
+    scope: bool
     webmapPlugin: Dict[str, Any]
     initialExtent: ExtentWSEN
     constrainingExtent: Union[ExtentWSEN, None]
@@ -749,12 +742,7 @@ def display_config(obj, request) -> DisplayConfig:
         activePanel=obj.active_panel,
         colorSF=obj.colors_selected_feature,
         selectFeaturePanel=obj.select_feature_panel,
-        infomap=dict(
-            resource=request.route_url("resource.show", id=0),
-            link=request.route_url("resource.show", id=obj.id),
-            update=dict(id=obj.id),
-            scope=obj.has_permission(ResourceScope.update, request.user)
-        ),
+        scope=obj.has_permission(ResourceScope.update, request.user),
         mid=mid,
         annotations=AnnotationsConfig(
             enabled=obj.annotation_enabled and request.env.webmap.options["annotation"],

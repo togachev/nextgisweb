@@ -91,15 +91,7 @@ msgstr "Объект не найден"
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: nodepkg/display/component/NavigationMenu.tsx:40
-msgid "Resources"
-msgstr "Ресурсы"
-
-#: nodepkg/display/component/NavigationMenu.tsx:47
-msgid "Map properties"
-msgstr "Свойства карты"
-
-#: nodepkg/display/component/NavigationMenu.tsx:54
+#: nodepkg/display/component/NavigationMenu.tsx:52
 msgid "Map settings"
 msgstr "Настройки карты"
 
@@ -832,8 +824,12 @@ msgid "Examples of supported formats"
 msgstr "Примеры поддерживаемых форматов"
 
 #: nodepkg/panel/search/SearchPanel.tsx:32
-msgid "The separator of the integer and fractional parts is a dot, the separator of coordinates is a space or a comma"
-msgstr "Разделитель целой и дробной частей — точка, разделитель координат — пробел или запятая"
+msgid ""
+"The separator of the integer and fractional parts is a dot, the separator of "
+"coordinates is a space or a comma"
+msgstr ""
+"Разделитель целой и дробной частей — точка, разделитель координат — пробел "
+"или запятая"
 
 #: nodepkg/panel/search/SearchPanel.tsx:38 nodepkg/panel/search/SearchPanel.tsx:39
 msgid "Decimal degrees:"

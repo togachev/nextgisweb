@@ -4,6 +4,7 @@ import showModal from "@nextgisweb/gui/showModal";
 import AddCircle from "@nextgisweb/icon/material/add_circle";
 import Pencil from "@nextgisweb/icon/mdi/pencil-outline";
 import Cog from "@nextgisweb/icon/mdi/cog";
+import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker";
 
@@ -65,11 +66,14 @@ export const ButtonSetting = observer((props: StoreProps) => {
                     return showModal(ModalMapgroup, {
                         transitionName: "",
                         maskTransitionName: "",
+                        width: isM ? "100%" : "75%",
                         options: {
                             store: store,
                             setup: setup,
                             tab: tab,
                             title: msg(type, operation),
+                            height: isM ? "90vh" : "70vh",
+                            padding: isM && "32px 6px 6px 6px"
                         },
                     });
                 },
@@ -78,6 +82,7 @@ export const ButtonSetting = observer((props: StoreProps) => {
             showModal(ModalMapgroup, {
                 transitionName: "",
                 maskTransitionName: "",
+                width: isM ? "100%" : "75%",
                 options: {
                     store: store,
                     setup: { operation: operation, id: id, selectedId: selectedId },
@@ -85,6 +90,8 @@ export const ButtonSetting = observer((props: StoreProps) => {
                     type: type,
                     title: type === "group" ? store.allLoadedResources.get(id).resource.display_name : webmap_name,
                     location: "true",
+                    height: isM ? "90vh" : "70vh",
+                    padding: isM && "32px 6px 6px 6px"
                 },
             })
         }
