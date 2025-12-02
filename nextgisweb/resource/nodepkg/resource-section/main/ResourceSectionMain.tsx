@@ -61,7 +61,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                     <Fragment>
                         <dt>{gettext("Status group")}</dt>
                         <dd style={group_style}>{
-                            mapgroup_resource ? gettext("Enabled") : gettext("Disabled")
+                            mapgroup_resource ? gettext("On") : gettext("Off")
                         }</dd>
                     </Fragment>
                 </dl>
@@ -91,8 +91,8 @@ const ResourceSectionMain: ResourceSection<ResourceSectionMainProps> = ({
                 return (
                     <dl className="ngw-resource-main-section-summary">
                         <Fragment>
-                            <dt>{gettext("Status webmaps")}</dt>
-                            <dd style={maps_style}>{gettext("Included in groups")}</dd>
+                            <dt>{gettext("Status webmap")}</dt>
+                            <dd style={maps_style}>{gettext("Included in group")}</dd>
                         </Fragment>
                     </dl>
                 )

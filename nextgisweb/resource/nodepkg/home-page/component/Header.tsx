@@ -229,7 +229,7 @@ export const Header = observer(({ store }: HeaderProps) => {
                                                 <Input
                                                     type="text"
                                                     allowClear
-                                                    placeholder={gettext("Name url")}
+                                                    placeholder={gettext("Link name")}
                                                 />
                                             </Form.Item>
                                             <Form.Item noStyle name={[field.name, "value"]}>

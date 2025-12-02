@@ -22,7 +22,7 @@ import type { OptionProps, ContentProps } from "../type";
 const { Link } = Typography;
 const settings = webmapSettings;
 
-const msgHTMLFeature = gettext("HTML code of the geometry link, for insertion into the description");
+const msgHTMLFeature = gettext("HTML code of the link, for insertion into the description");
 const msgHTMLRaster = gettext("HTML code link of the raster layer extent, for insertion into the description");
 
 const LinkToGeometryFeature = ({ store, display }) => {

@@ -136,7 +136,7 @@ export const MapgroupComponent = ({
                         </Button>
                     </h2> :
                     <h2>
-                        {gettext("The web map is included in groups")}
+                        {gettext("The web map is included in group")}
                     </h2>
             }
             <Table <GroupDataType>  {...params} />

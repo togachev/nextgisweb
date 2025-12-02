@@ -1,48 +1,61 @@
-#: model.py:24
+#: model.py:23
 msgid "Web Map Group"
 msgstr "Группа веб-карты"
 
-#: nodepkg/component/MapgroupComponent.tsx:32
+#: nodepkg/component/MapgroupComponent.tsx:47
 msgid "Webmap name"
 msgstr "Имя веб-карты"
 
-#: nodepkg/component/MapgroupComponent.tsx:32
+#: nodepkg/component/MapgroupComponent.tsx:47
 msgid "Group name"
 msgstr "Название группы"
 
-#: nodepkg/component/MapgroupComponent.tsx:48
+#: nodepkg/component/MapgroupComponent.tsx:64
 msgid "Status"
 msgstr "Статус"
 
-#: nodepkg/component/MapgroupComponent.tsx:52
+#: nodepkg/component/MapgroupComponent.tsx:71
 msgid "enabled"
 msgstr "включено"
 
-#: nodepkg/component/MapgroupComponent.tsx:52
+#: nodepkg/component/MapgroupComponent.tsx:71
 msgid "disabled"
 msgstr "отключено"
 
-#: nodepkg/component/MapgroupComponent.tsx:76
-msgid "Web Map Groups"
-msgstr "Группы веб-карты"
+#: nodepkg/component/MapgroupComponent.tsx:98
+msgid "Web maps are included in the group"
+msgstr "Веб-карты включены в группу"
 
-#: nodepkg/component/MapgroupComponent.tsx:76
-msgid "Web maps"
-msgstr "Веб-карты"
+#: nodepkg/component/MapgroupComponent.tsx:98
+msgid "Web maps are not added. Add them?"
+msgstr "Веб-карты не добавлены. Добавить?"
 
-#: nodepkg/group-widget/GroupWidget.tsx:23
-msgid "Display name"
-msgstr "Наименование"
+#: nodepkg/component/MapgroupComponent.tsx:124
+#: nodepkg/component/MapgroupComponent.tsx:135
+msgid "Setting up groups"
+msgstr "Настройка групп"
+
+#: nodepkg/component/MapgroupComponent.tsx:139
+msgid "The web map is included in group"
+msgstr "Веб-карта включена в группу"
+
+#: nodepkg/group-widget/GroupWidget.tsx:20
+msgid "enable"
+msgstr "включить"
+
+#: nodepkg/group-widget/GroupWidget.tsx:20
+msgid "disable"
+msgstr "отключить"
+
+#: nodepkg/group-widget/GroupWidget.tsx:24
+msgid "Web map in a group"
+msgstr "Веб-карта в группе"
 
 #: nodepkg/group-widget/GroupWidget.tsx:30
-msgid "Enable webmap"
-msgstr "Включить веб-карту"
-
-#: nodepkg/group-widget/GroupWidget.tsx:33
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/group-widget/GroupWidget.tsx:96
+#: nodepkg/group-widget/GroupWidget.tsx:93
 msgid "Webmaps"
 msgstr "Веб-карты"
 

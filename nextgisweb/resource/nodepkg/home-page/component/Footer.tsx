@@ -164,15 +164,15 @@ export const Footer = observer(({ store }: FooterProps) => {
                                     className="item-edit"
                                     onClick={() => add()}
                                     icon={<LinkEdit />}
-                                    title={gettext("Add url menu")}
+                                    title={gettext("Add url")}
                                     type="default"
                                 >
-                                    {gettext("Add url menu")}
+                                    {gettext("Add url")}
                                 </Button>
                                 {fields.map((field, index) => (
                                     <Space.Compact block key={index} >
                                         <Form.Item noStyle name={[field.name, "name"]}>
-                                            <Input type="text" allowClear placeholder={gettext("Name url")} />
+                                            <Input type="text" allowClear placeholder={gettext("Link name")} />
                                         </Form.Item>
                                         <Form.Item noStyle name={[field.name, "value"]}>
                                             <Input type="text" allowClear placeholder={gettext("Url")} />
@@ -183,7 +183,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                                             }}
                                             icon={<DeleteOffOutline />}
                                             type="default"
-                                            title={gettext("Remove url menu")}
+                                            title={gettext("Remove url")}
                                         />
                                     </Space.Compact>
                                 ))}
@@ -254,7 +254,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                         onClick={openForm}
                     />)}
             </div>
-            <ModalComponent title={gettext("Footer setting")} form={formFooter} open={open} handleCancel={handleCancel} />
+            <ModalComponent title={gettext("Footer settings")} form={formFooter} open={open} handleCancel={handleCancel} />
             <div className="footer-block">
                 <Row className="footer-info">
                     <Col className="logo-col" flex={1}>

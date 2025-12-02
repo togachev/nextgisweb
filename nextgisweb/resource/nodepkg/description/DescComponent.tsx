@@ -42,7 +42,7 @@ const msgLayer = gettext("Layer");
 const msgStyle = gettext("Style");
 const msgActiveLink = gettext("Links are active only in the open web map");
 const msgZoomToFeature = gettext("Click to move closer to the object");
-const msgToHome = gettext("Click to return to the original web map coverage");
+const msgToHome = gettext("Return to the original web map coverage");
 const msgZoomToRaster = gettext("Click to move closer to the raster layer");
 
 const zoomToFeature = async (display: Display, layerId: number | string | null, featureId: number | string | null, styles: number[], styleId: number | string | null) => {
