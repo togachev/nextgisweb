@@ -26,7 +26,7 @@ import { useResource } from "@nextgisweb/resource/hook/useResource";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
-import FilteredCount from "../filtered-count/FilteredCount";
+// import FilteredCount from "../filtered-count/FilteredCount";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
@@ -314,7 +314,7 @@ export const FeatureGridActions = observer(
         }
 
         const rightActions: ActionToolbarAction<ActionProps>[] = [
-            <FilteredCount store={store} key="filtered-count" />,
+            // <FilteredCount store={store} key="filtered-count" />,
             <div key="search">
                 <Space.Compact>
                     <Input

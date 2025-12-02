@@ -15,7 +15,7 @@ import FeatureTable from "./FeatureTable";
 import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID } from "./constant";
 import type { FeatureGridProps } from "./type";
-
+import FilteredObjectsCount from "../filtered-objects-count/FilteredObjectsCount";
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
@@ -142,6 +142,7 @@ export const FeatureGrid = observer(
                             size={size}
                         />
                     </Tooltip>
+                    <FilteredObjectsCount store={store} />
                 </FeatureGridActions>
 
                 <FeatureTable
