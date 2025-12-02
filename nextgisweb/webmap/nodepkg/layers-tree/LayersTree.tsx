@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { findNode } from "@nextgisweb/gui/util/tree";
@@ -26,8 +26,6 @@ export type TreeWebmapItem = TreeNodeData & {
     legendIcon?: ReactNode;
     treeItem: TreeItemStore;
 };
-
-// const iconResources = ["wmsclient_layer", "tmsclient_layer", "tileset"]
 
 interface LayersTreeProps {
     store: TreeStore;

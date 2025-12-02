@@ -4,40 +4,30 @@
     flex-direction: column;
 
     &.checkable {
-        margin-left: -15px;
+        margin-left: 0px;
     }
 
     &.uncheckable {
         margin-left: 0px;
     }
 
-    >.legend-symbol {
+    > .legend-symbol {
         display: flex;
-        column-gap: 6px;
+        column-gap: 4px;
         align-items: center;
         min-height: 20px;
         font-size: 13px;
         line-height: 20px;
 
-        >.ant-checkbox-wrapper {
+        > .ant-checkbox-wrapper {
             align-self: start;
+            scale: 0.75;
         }
 
-        >.legend-title {
+        > .legend-title {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            padding: 0 4px;
-        }
-
-        .ant-checkbox-checked .ant-checkbox-inner {
-            border-color: #d9d9d9;
-            border: dotted #d9d9d9 0.005em;
-        }
-
-        .ant-checkbox .ant-checkbox-inner {
-            border-color: #d9d9d9;
-            border: dotted #d9d9d9 0.005em;
         }
     }
 }

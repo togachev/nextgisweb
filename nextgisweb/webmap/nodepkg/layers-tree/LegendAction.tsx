@@ -33,7 +33,7 @@ export function LegendAction({
 
     return (
         <span
-            className="legend legend-list"
+            className="legend"
             onClick={click}
             title={open ? msgHideLegend : msgShowLegend}
         >
