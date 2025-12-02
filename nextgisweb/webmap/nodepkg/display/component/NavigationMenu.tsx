@@ -47,6 +47,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                         {plugin.icon}
                     </div>
                 ))}
+                <div className="empty-block"></div>
                 {display.config.scope &&
                     <div
                         title={gettext("Map settings")}
