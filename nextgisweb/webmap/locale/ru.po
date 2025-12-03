@@ -53,7 +53,19 @@ msgstr "Группа ресурсов"
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:68
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:24
+msgid "Color fill"
+msgstr "Цвет заливки"
+
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:25
+msgid "Stroke primary"
+msgstr "Основная обводка"
+
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:26
+msgid "Stroke secondary"
+msgstr "Дополнительная обводка"
+
+#: nodepkg/color-selected-feature/ColorSelectedFeature.tsx:76
 msgid "Set default value"
 msgstr "Установить значение по умолчанию"
 
@@ -91,7 +103,7 @@ msgstr "Объект не найден"
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: nodepkg/display/component/NavigationMenu.tsx:52
+#: nodepkg/display/component/NavigationMenu.tsx:53
 msgid "Map settings"
 msgstr "Настройки карты"
 

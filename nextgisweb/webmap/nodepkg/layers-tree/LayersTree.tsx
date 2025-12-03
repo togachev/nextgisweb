@@ -16,6 +16,9 @@ import { LayerTreeItemTitle } from "./LayerTreeItemTitle";
 import { useDrag } from "./hook/useDrag";
 import { updateKeysForGroup } from "./util/treeItems";
 
+import Folder from "./icon/folder-outline-thin.svg";
+import FolderOpen from "./icon/folder-open-outline-thin.svg";
+
 import "./LayersTree.less";
 
 type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
@@ -157,6 +160,10 @@ export const LayersTree = observer(
                             children.push(handleWebMapItem(it));
                         }
                     });
+                    item.icon = ({ expanded }) =>
+                    (<span className="legend">
+                        {expanded ? <FolderOpen /> : <Folder />}
+                    </span>)
                     item.children = children;
                 }
                 return item;

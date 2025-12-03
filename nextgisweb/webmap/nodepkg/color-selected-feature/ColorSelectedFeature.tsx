@@ -1,4 +1,4 @@
-import { Button, Col, ColorPicker, Form, Row } from "@nextgisweb/gui/antd";
+import { Button, ColorPicker, Form } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getEntries } from "@nextgisweb/webmap/popup/util/function";
 import { observer } from "mobx-react-lite";
@@ -15,6 +15,16 @@ const defaultValueColor: ColorSF = {
     stroke_secondary: "rgba(0, 0, 0, 1)",
     fill: "rgba(255,255,255,0.1)",
 }
+
+interface ControlProps {
+    label: string;
+}
+
+const colorProps: { [key: string]: ControlProps } = {
+    fill: { label: gettext("Color fill") },
+    stroke_primary: { label: gettext("Stroke primary") },
+    stroke_secondary: { label: gettext("Stroke secondary") },
+};
 
 const ColorSelectedFeature = observer(({ store }: SettingStore) => {
 
@@ -42,37 +52,34 @@ const ColorSelectedFeature = observer(({ store }: SettingStore) => {
             clearOnDestroy={true}
             className="form-component"
         >
-            {getEntries(store.colorSF)?.map(([key, value]) => {
-                return (
-                    <div key={key} className="color-item">
-                        <Row justify="space-between" wrap={false} className={defaultValueColor[key] !== value ? "change-item" : "default-item"}>
-                            <Col flex="auto">
-                                <Form.Item
-                                    noStyle
-                                    name={key}
-                                    getValueFromEvent={(color) => {
-                                        return "#" + color.toHex();
-                                    }}
-                                >
-                                    <ColorPicker
-                                        className="color-picker-item"
-                                        allowClear={true}
-                                        value={store.colorSF?.[key]}
-                                        showText={(color) => <span>{color.toHexString()}</span>}
-                                    />
-                                </Form.Item>
-                            </Col>
+            <div className="color-item">
+                {getEntries(store.colorSF)?.map(([key, value]) => {
+                    return (
+                        <div key={key} className="change-item">
+                            <div className="item-label">{colorProps[key].label}</div>
+                            <Form.Item
+                                noStyle
+                                name={key}
+                                getValueFromEvent={(color) => {
+                                    return "#" + color.toHex();
+                                }}
+                            >
+                                <ColorPicker
+                                    className="color-picker-item"
+                                    allowClear={true}
+                                    value={store.colorSF?.[key]}
+                                    showText={(color) => <span>{color.toHexString()}</span>}
+                                />
+                            </Form.Item>
                             {defaultValueColor[key] !== value &&
-                                <Col flex="none">
-                                    <Form.Item noStyle>
-                                        <Button type="default" icon={<BackspaceOutline />} title={gettext("Set default value")} onClick={() => clearColor(key)}>{gettext("Set default value")}</Button>
-                                    </Form.Item>
-                                </Col>
+                                <Form.Item noStyle>
+                                    <Button type="text" icon={<BackspaceOutline />} title={gettext("Set default value")} onClick={() => clearColor(key)} />
+                                </Form.Item>
                             }
-                        </Row>
-                    </div>
-                )
-            })}
+                        </div>
+                    )
+                })}
+            </div>
         </Form >
     )
 

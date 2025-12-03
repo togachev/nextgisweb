@@ -29,8 +29,8 @@ import type {
     FocusTableStore,
 } from "./type";
 
-import Folder from "@nextgisweb/icon/mdi/folder-outline";
-import FolderOpen from "@nextgisweb/icon/mdi/folder-open-outline";
+import Folder from "@nextgisweb/webmap/layers-tree/icon/folder-outline-thin.svg";
+import FolderOpen from "@nextgisweb/webmap/layers-tree/icon/folder-open-outline-thin.svg";
 import PlusBox from "@nextgisweb/icon/mdi/plus-box-outline";
 import MinusBox from "@nextgisweb/icon/mdi/minus-box-outline";
 import File from "@nextgisweb/icon/mdi/file-outline";

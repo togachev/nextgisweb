@@ -83,7 +83,13 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                     <ColorSelectedFeature store={store} />
                 </Suspense>,
                 showArrow: false,
-                styles: { header: { padding: "4px 12px" }, body: { padding: 0 } },
+                styles: {
+                    header: {
+                        padding: "4px 16px",
+                        borderRadius: "3px",
+                        border: "1px solid #d9d9d9",
+                    }, body: { padding: "8px 0 0 0" }
+                },
             },
         ];
 
@@ -238,10 +244,10 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             onChange={(v) => store.update({ selectFeaturePanel: v })}
                         />
                     </Lot>
-                    <Lot label={false}>
-                        <Collapse style={{ width: "100%", backgroundColor: "transparent" }} size="small" items={items} />
+                    <Lot label={false} span={2}>
+                        <Collapse ghost size="small" items={items} />
                     </Lot>
-                </Area>
+                </Area >
                 <Modal
                     transitionName=""
                     maskTransitionName=""
