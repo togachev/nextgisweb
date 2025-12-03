@@ -1,6 +1,6 @@
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -226,9 +226,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                         title: msgGroup,
                     }
                 ),
-                (
-                    context: ItemObject | null
-                ): FocusTableAction<ItemObject | null>[] => {
+                (context: ItemObject | null): FocusTableAction<ItemObject | null>[] => {
                     if (context) return [];
                     return [
                         {
@@ -237,8 +235,11 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                                 ? msgDrawOrderEdit
                                 : msgDrawOrderCustomize,
                             icon: <ReorderIcon />,
-                            placement: "left",
-                            callback: () => setDrawOrderEdit(true),
+                            placement: "right",
+                            callback: () => {
+                                setDrawOrderEdit(true);
+                                setExpanded(false)
+                            },
                         },
                     ];
                 },

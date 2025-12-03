@@ -218,6 +218,7 @@ export interface ComplexTreeProps<
     onSelect?: (item: I | null) => void;
     onPrimaryAction?: (item: I) => void;
     rootClassName?: string;
+    expanded?: boolean;
 }
 
 interface GroupControlProps {
@@ -290,6 +291,7 @@ export function ComplexTree<
     onSelect,
     onPrimaryAction,
     rootClassName,
+    expanded,
 }: ComplexTreeProps<I, C, S>) {
     type EnvType = typeof UncontrolledTreeEnvironment<I | typeof ROOT_DATA>;
     type EnvProps = Required<Parameters<EnvType>[0]>;
@@ -297,6 +299,7 @@ export function ComplexTree<
 
     const provider = useDataProvider<I>({ store, rootItem: root });
     const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
+    const tree = useRef(null);
 
     const environmentMergeRefs = useCallback(
         (value: TreeEnvironmentRef<I> | null) => {
@@ -543,6 +546,16 @@ export function ComplexTree<
         []
     );
 
+    useEffect(() => {
+        if (tree.current) {
+            if (expanded) {
+                tree.current.expandAll();
+            } else {
+                tree.current.collapseAll();
+            }
+        }
+    }, [expanded]);
+
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
             ref={environmentMergeRefs as never}
@@ -565,7 +578,7 @@ export function ComplexTree<
             renderItemArrow={renderItemArrow}
             renderDragBetweenLine={renderDragBetweenLine}
         >
-            <Tree treeId={TREE_ID} rootItem={root} />
+            <Tree treeId={TREE_ID} rootItem={root} ref={tree} />
         </UncontrolledTreeEnvironment>
     );
 }

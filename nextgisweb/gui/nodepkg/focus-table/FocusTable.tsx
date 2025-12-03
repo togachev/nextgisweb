@@ -60,21 +60,11 @@ export function FocusTable<
     itemActions,
     renderDetail: Detail,
     rootClassName,
-    expanded
+    expanded,
 }: FocusTableProps<I, C, S>) {
     const environmentRef = useRef<ComplexTreeEnvironment<I>>(null!);
     const [selected, setSelected] = useState<I | null>(null);
     const [showDetails, setShowDetails] = useState(false);
-
-    useEffect(() => {
-        if (environmentRef.current && environmentRef.current.target.treeIds.length > 0) {
-            if (expanded) {
-                environmentRef.current.target.expandAll("main");
-            } else {
-                environmentRef.current.target.collapseAll("main");
-            }
-        }
-    }, [expanded]);
 
     const hideDetail = useMemo((): FocusTableAction<
         I | null,
@@ -120,6 +110,7 @@ export function FocusTable<
                         showErrors={true}
                         onSelect={setSelected}
                         onPrimaryAction={() => setShowDetails(true)}
+                        expanded={expanded}
                     />
                 </div>
             </Splitter.Panel>
