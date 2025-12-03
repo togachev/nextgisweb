@@ -1,11 +1,19 @@
 import { action, observable } from "mobx";
+import type { CompositeStore } from "../composite/CompositeStore";
+import type { EditorStoreOptions } from "../type";
 
 export class DescriptionEditorStore {
     readonly identity = "resource.description";
+    readonly composite: CompositeStore;
 
     @observable.ref accessor value: string | null = null;
     @observable.ref accessor loaded: string | null = null;
     @observable.ref accessor dirty: boolean = false;
+
+
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
+    }
 
     @action
     setValue(value: string | null) {
