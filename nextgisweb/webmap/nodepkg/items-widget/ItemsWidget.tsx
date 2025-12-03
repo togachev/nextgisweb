@@ -183,6 +183,13 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
     const { tableActions, itemActions } = useMemo(
         () => ({
             tableActions: [
+                {
+                    key: "expand_tree",
+                    title: expanded ? gettext("Collapse") : gettext("Expand"),
+                    icon: expanded ? <CollapseAll /> : <ExpandAll />,
+                    placement: "left",
+                    callback: () => setExpanded(!expanded),
+                },
                 pickToFocusTable<ItemObject>(
                     async (res) => {
                         const resourceId = res.resource.id;
@@ -240,20 +247,6 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
         }),
         [drawOrderEnabled, makeSignal, pickToFocusTable, store, expanded]
     );
-
-    if (store.items.length > 0) {
-        tableActions.unshift(() => {
-            return [
-                {
-                    key: "expand_tree",
-                    title: expanded ? gettext("Collapse") : gettext("Expand"),
-                    icon: expanded ? <CollapseAll /> : <ExpandAll />,
-                    placement: "left",
-                    callback: () => setExpanded(!expanded),
-                },
-            ];
-        })
-    }
 
     return drawOrderEdit ? (
         <DrawOrderTable store={store} close={() => setDrawOrderEdit(false)} />

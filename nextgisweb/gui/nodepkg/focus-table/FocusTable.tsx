@@ -67,7 +67,7 @@ export function FocusTable<
     const [showDetails, setShowDetails] = useState(false);
 
     useEffect(() => {
-        if (environmentRef.current) {
+        if (environmentRef.current && environmentRef.current.target.treeIds.length > 0) {
             if (expanded) {
                 environmentRef.current.target.expandAll("main");
             } else {

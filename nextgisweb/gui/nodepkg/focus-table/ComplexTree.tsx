@@ -453,7 +453,7 @@ export function ComplexTree<
                     >
                         <div title={title?.(storeItem)}>
                             {!provider.isFlat && props.arrow}
-                            <div className="title" /*style={storeItem.webmapId.value === store.composite.setup.selectedId ? { fontWeight: "bold", color: "var(--primary)" } : {}} */>
+                            <div className="title">
                                 {title?.(storeItem) || <>&nbsp;</>}
                             </div>
                             {storeItem.itemType === "group" &&
