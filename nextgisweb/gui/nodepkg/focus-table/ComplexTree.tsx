@@ -218,16 +218,16 @@ export interface ComplexTreeProps<
     onSelect?: (item: I | null) => void;
     onPrimaryAction?: (item: I) => void;
     rootClassName?: string;
-    expanded?: boolean;
 }
 
 interface GroupControlProps {
     item: any;
     actions: boolean;
     type: string;
+    treeItem?: any;
 }
 
-const GroupControl = observer(({ item, actions, type }: GroupControlProps) => {
+const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlProps) => {
     const value = type === "expand" ? item.groupExpanded.value : item.groupExclusive.value
     const titleExpanded = value ? gettext("Collapse") : gettext("Expand")
     const titleGroupExclusive = value ? gettext("Turn off mutual exclusion") : gettext("Turn on mutual exclusion")
@@ -258,7 +258,13 @@ const GroupControl = observer(({ item, actions, type }: GroupControlProps) => {
                             }
                             onClick={() => {
                                 if (type === "expand") {
+                                    console.log(treeItem.index, value);
                                     item.groupExpanded.value = !value
+                                    if (!value) {
+                                        item.groupExpandedIndex.value = treeItem.index
+                                    } else {
+                                        item.groupExpandedIndex.value = null
+                                    }
                                 } else {
                                     item.groupExclusive.value = !value
                                 }
@@ -291,15 +297,12 @@ export function ComplexTree<
     onSelect,
     onPrimaryAction,
     rootClassName,
-    expanded,
 }: ComplexTreeProps<I, C, S>) {
     type EnvType = typeof UncontrolledTreeEnvironment<I | typeof ROOT_DATA>;
     type EnvProps = Required<Parameters<EnvType>[0]>;
     type CTE = ComplexTreeEnvironment<I>;
-
     const provider = useDataProvider<I>({ store, rootItem: root });
     const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
-    const tree = useRef(null);
 
     const environmentMergeRefs = useCallback(
         (value: TreeEnvironmentRef<I> | null) => {
@@ -461,7 +464,7 @@ export function ComplexTree<
                             </div>
                             {storeItem.itemType === "group" &&
                                 <>
-                                    <GroupControl item={storeItem} actions={props.showActions} type="expand" />
+                                    <GroupControl treeItem={treeItem} item={storeItem} actions={props.showActions} type="expand" />
                                     <GroupControl item={storeItem} actions={props.showActions} type="mutually" />
                                 </>
                             }
@@ -545,16 +548,7 @@ export function ComplexTree<
             ),
         []
     );
-
-    useEffect(() => {
-        if (tree.current) {
-            if (expanded) {
-                tree.current.expandAll();
-            } else {
-                tree.current.collapseAll();
-            }
-        }
-    }, [expanded]);
+    console.log(provider);
 
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
@@ -565,7 +559,11 @@ export function ComplexTree<
             canInvokePrimaryActionOnItemContainer={true}
             onSelectItems={onSelectItems}
             onPrimaryAction={onPrimaryActionCallback}
-            viewState={{}}
+            viewState={{
+                [TREE_ID]: {
+                    expandedItems: provider.expandedItems,
+                },
+            }}
             canDragAndDrop
             canDropOnFolder
             canReorderItems
@@ -578,7 +576,7 @@ export function ComplexTree<
             renderItemArrow={renderItemArrow}
             renderDragBetweenLine={renderDragBetweenLine}
         >
-            <Tree treeId={TREE_ID} rootItem={root} ref={tree} />
+            <Tree treeId={TREE_ID} rootItem={root} />
         </UncontrolledTreeEnvironment>
     );
 }

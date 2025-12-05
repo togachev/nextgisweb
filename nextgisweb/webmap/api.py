@@ -763,9 +763,31 @@ def display_config(obj, request) -> DisplayConfig:
         options=options,
     )
 
+def get_webmap_item(resource, request) -> JSONType:
+    """Calculate webmap layers' extent"""
+    request.resource_permission(ResourceScope.read)
+    list = []
+    def traverse(item):
+        
+        if item.item_type in ("root", "group"):
+            if item.group_expanded_index != None:
+                list.append(item.group_expanded_index)
+            if item.children:
+                for child in item.children:
+                    traverse(child)
+        return list
+
+    return traverse(resource.root_item)
 
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
+
+    config.add_route(
+        "webmap.item",
+        "/api/resource/{id}/webmap/item",
+        factory=webmap_factory,
+        get=get_webmap_item,
+    )
 
     config.add_route(
         "webmap.annotation.collection",

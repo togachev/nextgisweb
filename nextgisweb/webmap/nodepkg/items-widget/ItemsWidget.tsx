@@ -1,6 +1,6 @@
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -25,8 +25,6 @@ import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
-import ExpandAll from "@nextgisweb/icon/mdi/expand-all";
-import CollapseAll from "@nextgisweb/icon/mdi/collapse-all";
 
 const { adapters } = settings;
 
@@ -173,7 +171,6 @@ LayerWidget.displayName = "LayerWidget";
 export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
     const { makeSignal } = useAbortController();
     const [drawOrderEdit, setDrawOrderEdit] = useState(false);
-    const [expanded, setExpanded] = useState(false)
 
     const { pickToFocusTable } = useFocusTablePicker({
         initParentId: store.composite.parent || undefined,
@@ -183,13 +180,6 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
     const { tableActions, itemActions } = useMemo(
         () => ({
             tableActions: [
-                {
-                    key: "expand_tree",
-                    title: expanded ? gettext("Collapse") : gettext("Expand"),
-                    icon: expanded ? <CollapseAll /> : <ExpandAll />,
-                    placement: "left",
-                    callback: () => setExpanded(!expanded),
-                },
                 pickToFocusTable<ItemObject>(
                     async (res) => {
                         const resourceId = res.resource.id;
@@ -238,7 +228,6 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                             placement: "right",
                             callback: () => {
                                 setDrawOrderEdit(true);
-                                setExpanded(false)
                             },
                         },
                     ];
@@ -246,7 +235,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             ],
             itemActions: [action.deleteItem<ItemObject>()],
         }),
-        [drawOrderEnabled, makeSignal, pickToFocusTable, store, expanded]
+        [drawOrderEnabled, makeSignal, pickToFocusTable, store]
     );
 
     return drawOrderEdit ? (
@@ -257,7 +246,6 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             title={(item) => item.displayName.value}
             tableActions={tableActions}
             itemActions={itemActions}
-            expanded={expanded}
             renderDetail={({ item }) =>
                 item instanceof Group ? (
                     <GroupWidget item={item} />

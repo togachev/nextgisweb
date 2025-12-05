@@ -59,6 +59,7 @@ abstract class BaseItem<
 
 const {
     group_expanded: groupExpanded,
+    group_expanded_index: groupExpandedIndex,
     group_exclusive: groupExclusive,
     $load: groupLoad,
     $error: groupError,
@@ -68,6 +69,7 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
     readonly itemType = "group" as const;
 
     readonly groupExpanded = groupExpanded.init(false, this);
+    readonly groupExpandedIndex = groupExpandedIndex.init(null, this);
     readonly groupExclusive = groupExclusive.init(false, this);
     readonly children = observableChildren<ItemObject>(this, "parent", () => {
         this.store.markDirty();
@@ -90,6 +92,7 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
         return {
             ...super.dump(),
             ...this.groupExpanded.jsonPart(),
+            ...this.groupExpandedIndex.jsonPart(),
             ...this.groupExclusive.jsonPart(),
             children: this.children.map((item) => item.dump()),
         };

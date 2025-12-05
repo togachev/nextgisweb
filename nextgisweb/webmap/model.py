@@ -169,6 +169,7 @@ class WebMapItem(Base):
     position = sa.Column(sa.Integer, nullable=True)
     display_name = sa.Column(sa.Unicode, nullable=True)
     group_expanded = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
+    group_expanded_index = sa.Column(sa.Integer, nullable=True, default=_item_default("group", None))
     group_exclusive = sa.Column(sa.Boolean, nullable=True, default=_item_default("group", False))
     layer_style_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
     layer_enabled = sa.Column(sa.Boolean, nullable=True, default=_item_default("layer", False))
@@ -214,6 +215,7 @@ class WebMapItem(Base):
 
         if self.item_type == "group":
             data["group_expanded"] = self.group_expanded
+            data["group_expanded_index"] = self.group_expanded_index
             data["group_exclusive"] = self.group_exclusive
 
         if self.item_type in ("root", "group"):
@@ -411,6 +413,7 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
 class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_type"):
     display_name: str
     group_expanded: bool
+    group_expanded_index: Union[int, None] = None
     group_exclusive: bool
     children: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
 
@@ -419,6 +422,7 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
         return WebMapItemGroupRead(
             display_name=obj.display_name,
             group_expanded=bool(obj.group_expanded),
+            group_expanded_index=obj.group_expanded_index,
             group_exclusive=bool(obj.group_exclusive),
             children=_children_from_model(obj),
         )
@@ -440,6 +444,7 @@ def enable_exclusive(group, _disable=False):
 class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_type"):
     display_name: str
     group_expanded: bool = False
+    group_expanded_index: Union[int, None] = None
     group_exclusive: bool = False
     children: List[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
 

@@ -28,11 +28,11 @@ const { draw_order_enabled: drawOrderEnabled, $load: mapperLoad } = mapper<
 
 export class ItemsStore
     implements
-        EditorStore<PickMy<WebMapRead>, PickMy<WebMapUpdate>>,
-        FocusTableStore<ItemObject>
-{
+    EditorStore<PickMy<WebMapRead>, PickMy<WebMapUpdate>>,
+    FocusTableStore<ItemObject> {
     readonly identity = "webmap";
     readonly composite: CompositeStore;
+
 
     readonly drawOrderEnabled = drawOrderEnabled.init(false, this);
     readonly items = observableChildren<ItemObject>(null, "parent", () => {
@@ -46,7 +46,10 @@ export class ItemsStore
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
+
     }
+
+
 
     @action
     load(value: PickMy<WebMapRead>) {
@@ -103,8 +106,8 @@ export class ItemsStore
         return item === null
             ? this.items
             : item instanceof Group
-              ? item.children
-              : undefined;
+                ? item.children
+                : undefined;
     }
 
     getItemContainer(item: ItemObject): IObservableArray<ItemObject> {
