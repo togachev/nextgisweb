@@ -236,14 +236,14 @@ const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlPr
         <span
             className="custom-detail"
         >
-            {!actions ?
+            {/* {!actions ?
                 <Tooltip
                     title={type === "expand" ?
                         value ? gettext("expanded") : gettext("collapsed") :
                         value ? gettext("mutually exclusive") : gettext("not mutually exclusive")}
                 >
                     {value ? <span className="color"><Circle /></span> : <RadioboxBlank />}
-                </Tooltip> :
+                </Tooltip> : */}
                 <Tooltip
                     title={type === "expand" ? titleExpanded : titleGroupExclusive}
                 >
@@ -275,7 +275,7 @@ const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlPr
                         />
                     </span>
                 </Tooltip>
-            }
+            {/* } */}
         </span >
     )
 })
@@ -548,7 +548,10 @@ export function ComplexTree<
             ),
         []
     );
-    console.log(provider);
+    
+    useEffect(()=> {
+        console.log(store);
+    }, [store,actions])
 
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>

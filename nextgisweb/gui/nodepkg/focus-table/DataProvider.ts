@@ -84,24 +84,53 @@ export class DataProvider<I extends FocusTableItem>
         this.store = props.store;
         this.rootItem = props.rootItem;
 
-        this.getIndex(this.store.composite.resourceId)
+        this.store.composite && this.getIndex(this.store.composite.resourceId)
             .then(item => {
                 this.setExpanded(item)
             })
-
     }
+
+
+    getExpandedTreeItems(item: ProviderTreeItem<I>, groups: ProviderTreeItem<I>[]) {
+        if (item.index === "root") {
+            if (item.childrenCache && item.childrenCache.length > 0) {
+                item.childrenCache.map(id => {
+                    this.getTreeItem(id)
+                        .then(item => {
+                            this.getExpandedTreeItems(item, groups);
+                        })
+                })
+            }
+        } else {
+            if (item.isFolder) {
+                groups.push(item);
+                if (item.childrenCache && item.childrenCache.length > 0) {
+                    item.childrenCache.map(id => {
+                        this.getTreeItem(id)
+                            .then(item => {
+                                this.getExpandedTreeItems(item, groups);
+                            })
+                    })
+                }
+            }
+        }
+    }
+
     @computed
     get expandedItems() {
         return this.expanded
     }
+
     @action
     setExpanded(expanded: number[]) {
         this.expanded = expanded;
     };
+
     async getIndex(id) {
         const resp = await route("webmap.item", { id: id }).get();
         return resp;
     };
+
     startup() {
         this.cleanupReaction = autorun(() => {
             const collected = this.updated.get();
@@ -203,6 +232,11 @@ export class DataProvider<I extends FocusTableItem>
     @computed
     get isFlat(): boolean {
         const rootItem = this.treeItems.get(this.rootItem);
+
+        let groups: I[] = [];
+        this.getExpandedTreeItems(rootItem, groups);
+        console.log(groups);
+
         if (rootItem === undefined) return false;
         const isChildfree = (i: I) => !this.store.getItemChildren(i);
         return !!rootItem.childrenObservable!.reduce(

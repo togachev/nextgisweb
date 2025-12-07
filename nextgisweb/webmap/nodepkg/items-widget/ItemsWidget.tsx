@@ -1,6 +1,6 @@
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -46,7 +46,16 @@ const msgGroup = gettext("Group");
 const msgDrawOrderEdit = gettext("Edit draw order");
 const msgDrawOrderCustomize = gettext("Customize draw order");
 
-const GroupWidget = observer(({ item }: { item: Group }) => {
+const GroupWidget = observer(({ item, index }: { item: Group, index: number }) => {
+
+    useEffect(() => {
+        if (item.groupExpanded.value) {
+            item.groupExpandedIndex.value = index
+        } else {
+            item.groupExpandedIndex.value = null
+        }
+    }, [item.groupExpanded.value])
+
     return (
         <Area pad>
             <LotMV
@@ -246,9 +255,9 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             title={(item) => item.displayName.value}
             tableActions={tableActions}
             itemActions={itemActions}
-            renderDetail={({ item }) =>
+            renderDetail={({ item, index }) =>
                 item instanceof Group ? (
-                    <GroupWidget item={item} />
+                    <GroupWidget item={item} index={index} />
                 ) : (
                     <LayerWidget item={item} />
                 )

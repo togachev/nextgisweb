@@ -120,7 +120,7 @@ export function FocusTable<
                         hideEmpty
                     />
                     <Fragment key={environmentRef.current.indexFor(selected)}>
-                        <Detail item={selected} />
+                        <Detail item={selected} index={environmentRef.current.indexFor(selected)} />
                     </Fragment>
                 </Splitter.Panel>
             )}
