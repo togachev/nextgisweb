@@ -653,7 +653,7 @@ def display_config(obj, request) -> DisplayConfig:
             data.update(
                 identification=dict(
                     mode=identification_mode,
-                    resource=ResourceRef(id=layer.id),
+                    resource=ResourceRef(id=style.id),
                 )
                 if identification_mode is not None
                 else None
