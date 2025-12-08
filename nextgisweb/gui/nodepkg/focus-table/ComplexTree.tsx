@@ -563,9 +563,9 @@ export function ComplexTree<
             onSelectItems={onSelectItems}
             onPrimaryAction={onPrimaryActionCallback}
             viewState={{
-                [TREE_ID]: {
-                    expandedItems: provider.expandedItems,
-                },
+                // [TREE_ID]: {
+                //     expandedItems: provider.expandedItems,
+                // },
             }}
             canDragAndDrop
             canDropOnFolder

@@ -77,54 +77,10 @@ export class DataProvider<I extends FocusTableItem>
     cleanupReaction: (() => void) | undefined = undefined;
     cleanupItem = new Map<TreeItemIndex, () => void>();
 
-    @observable.ref accessor expanded: number[] = [];
-
-
     constructor(props: DataProviderOpts<I>) {
         this.store = props.store;
         this.rootItem = props.rootItem;
-
-        this.store.composite && this.getIndex(this.store.composite.resourceId)
-            .then(item => {
-                this.setExpanded(item)
-            })
     }
-
-
-    getExpandedTreeItems(item: ProviderTreeItem<I>, groups: ProviderTreeItem<I>[]) {
-        if (item.index === "root") {
-            if (item.childrenCache && item.childrenCache.length > 0) {
-                item.childrenCache.map(id => {
-                    this.getTreeItem(id)
-                        .then(item => {
-                            this.getExpandedTreeItems(item, groups);
-                        })
-                })
-            }
-        } else {
-            if (item.isFolder) {
-                groups.push(item);
-                if (item.childrenCache && item.childrenCache.length > 0) {
-                    item.childrenCache.map(id => {
-                        this.getTreeItem(id)
-                            .then(item => {
-                                this.getExpandedTreeItems(item, groups);
-                            })
-                    })
-                }
-            }
-        }
-    }
-
-    @computed
-    get expandedItems() {
-        return this.expanded
-    }
-
-    @action
-    setExpanded(expanded: number[]) {
-        this.expanded = expanded;
-    };
 
     async getIndex(id) {
         const resp = await route("webmap.item", { id: id }).get();
@@ -187,6 +143,66 @@ export class DataProvider<I extends FocusTableItem>
         return { dispose: () => pull(this.listeners, listener) };
     }
 
+    setExpandedIndex(splice: ProviderTreeItem<I>[], next, children, childrenIds) {
+
+        console.log(splice, next, children, childrenIds);
+        
+
+        // const mappedArray = indices.map((key, index) => ({ [key]: data[index] }));
+            // childrenIds.map((key, index) => {
+            //     if (next[index].itemType === "group" && next[index].groupExpanded === true) {
+
+            //     }
+            //     // ({ [key]: next[index] })
+            // });
+
+
+        // items.map((item, index) => {
+        //     if (item.itemType === "group") {
+        //         const idx = index + 1
+        //         if (item.groupExpanded.value === true) {
+        //             item.groupExpandedIndex.value = idx
+        //         } else {
+        //             item.groupExpandedIndex.value = null
+        //         }
+        //         if (item.children && item.children.length > 0) {
+        //             const parentItem = this.treeItems.get(idx)!;
+        //             const children = parentItem.childrenObservable!;
+        //             console.log(parentItem.childrenCache);
+        //             if (parentItem.childrenCache && parentItem.childrenCache.length > 0) {
+        //                 const childrenIds = parentItem.childrenCache
+        //                 const next = childrenIds.map((i) => this.indexer.lookup(i)!);
+        //                 const splice = children.splice(0, children.length, ...(next as I[]));
+        //                 this.setExpandedIndex(splice);
+        //             }
+        //         }
+        //     }
+        // });
+
+        // if (item.index === "root") {
+        //     if (item.childrenCache && item.childrenCache.length > 0) {
+        //         item.childrenCache.map(id => {
+        //             this.getTreeItem(id)
+        //                 .then(item => {
+        //                     this.getExpandedTreeItems(item, groups);
+        //                 })
+        //         })
+        //     }
+        // } else {
+        //     if (item.isFolder) {
+        //         groups.push(item);
+        //         if (item.childrenCache && item.childrenCache.length > 0) {
+        //             item.childrenCache.map(id => {
+        //                 this.getTreeItem(id)
+        //                     .then(item => {
+        //                         this.getExpandedTreeItems(item, groups);
+        //                     })
+        //             })
+        //         }
+        //     }
+        // }
+    }
+
     async onChangeItemChildren(
         parentId: TreeItemIndex,
         childrenIds: TreeItemIndex[]
@@ -196,7 +212,19 @@ export class DataProvider<I extends FocusTableItem>
 
         runInAction(() => {
             const next = childrenIds.map((i) => this.indexer.lookup(i)!);
-            children.splice(0, children.length, ...(next as I[]));
+            const splice = children.splice(0, children.length, ...(next as I[]));
+            this.setExpandedIndex(splice, next, childrenIds, children);
+
+            // splice.map((item, index) => {
+            //     if (item.itemType === "group") {
+            //         if (item.groupExpanded.value === true) {
+            //             item.groupExpandedIndex.value = index + 1
+            //         } else {
+            //             item.groupExpandedIndex.value = null
+            //         }
+            //         if (item.children)
+            //     }
+            // });
         });
     }
 
@@ -232,11 +260,6 @@ export class DataProvider<I extends FocusTableItem>
     @computed
     get isFlat(): boolean {
         const rootItem = this.treeItems.get(this.rootItem);
-
-        let groups: I[] = [];
-        this.getExpandedTreeItems(rootItem, groups);
-        console.log(groups);
-
         if (rootItem === undefined) return false;
         const isChildfree = (i: I) => !this.store.getItemChildren(i);
         return !!rootItem.childrenObservable!.reduce(

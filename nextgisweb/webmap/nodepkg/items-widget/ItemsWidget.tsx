@@ -48,13 +48,13 @@ const msgDrawOrderCustomize = gettext("Customize draw order");
 
 const GroupWidget = observer(({ item, index }: { item: Group, index: number }) => {
 
-    useEffect(() => {
-        if (item.groupExpanded.value) {
-            item.groupExpandedIndex.value = index
-        } else {
-            item.groupExpandedIndex.value = null
-        }
-    }, [item.groupExpanded.value])
+    // useEffect(() => {
+    //     if (item.groupExpanded.value) {
+    //         item.groupExpandedIndex.value = index
+    //     } else {
+    //         item.groupExpandedIndex.value = null
+    //     }
+    // }, [item.groupExpanded.value])
 
     return (
         <Area pad>
