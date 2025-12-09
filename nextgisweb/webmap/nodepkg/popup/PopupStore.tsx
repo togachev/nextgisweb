@@ -417,7 +417,6 @@ export class PopupStore {
         } else {
             await this.getResponse()
                 .then(item => {
-
                     const orderObj = this.params.request?.styles.reduce((a, c, i) => { a[c.id] = i; return a; }, {});
                     const data = item.data.sort((r, l) => orderObj[l.styleId] - orderObj[r.styleId]);
                     this.setResponse({ data: data, featureCount: item.featureCount });
@@ -504,8 +503,6 @@ export class PopupStore {
                 items.some(x => {
                     if (x.id.styleId === itm.id) {
                         const label = items.find(p => p.id.styleId === itm.id).label;
-                        console.log(label);
-
                         const dop = items.find(p => p.id.styleId === itm.id).position;
                         itm.label = label;
                         itm.dop = dop;
@@ -674,12 +671,12 @@ export class PopupStore {
         const attrs = opts["webmap.identification_attributes"];
         const resourceId = res.permission !== "Forbidden" ? res.layerId : -1;
 
-        const item = await this.display.treeStore.filter({
+        const highlights = this.display.treeStore.filter({
             type: "layer",
             layerId: res.layerId,
-        })[0];
+        }).find(itm => itm.styleId === res.styleId).layerHighligh;
 
-        const geom = item && item.layerHighligh === true ? true : false;
+        const geom = highlights === true ? true : false;
         const query = { geom: geom, dt_format: "iso" };
 
         if (attrs === false) {
@@ -874,8 +871,6 @@ export class PopupStore {
     zoomToExtent(extent: number[], {
         ...fitOpts
     }): void {
-        console.log(fitOpts);
-        
         this.display.map.zoomToExtent(extent, {
             displayProjection: this.display.displayProjection,
             ...fitOpts

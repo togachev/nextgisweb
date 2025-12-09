@@ -526,6 +526,7 @@ class RootItemConfig(BaseItem, tag="root", tag_field="type"):
 
 class DisplayConfig(Struct, kw_only=True):
     webmapId: int
+    expandedIndexes: List[int]
     webmapTitle: str
     activePanel: str
     colorSF: Dict[str, Any]
@@ -732,6 +733,7 @@ def display_config(obj, request) -> DisplayConfig:
 
     return DisplayConfig(
         webmapId=obj.id,
+        expandedIndexes=obj.expanded_indexes,
         webmapTitle=obj.display_name if obj.title is None else obj.title,
         webmapPlugin=plugin,
         initialExtent=initial_extent,

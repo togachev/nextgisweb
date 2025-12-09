@@ -1,5 +1,5 @@
 import { difference, pull } from "lodash-es";
-import { action, autorun, computed, observable, observe, runInAction } from "mobx";
+import { autorun, computed, observable, observe, runInAction } from "mobx";
 import { useEffect, useMemo } from "react";
 import type {
     TreeDataProvider,
@@ -143,66 +143,6 @@ export class DataProvider<I extends FocusTableItem>
         return { dispose: () => pull(this.listeners, listener) };
     }
 
-    setExpandedIndex(splice: ProviderTreeItem<I>[], next, children, childrenIds) {
-
-        console.log(splice, next, children, childrenIds);
-        
-
-        // const mappedArray = indices.map((key, index) => ({ [key]: data[index] }));
-            // childrenIds.map((key, index) => {
-            //     if (next[index].itemType === "group" && next[index].groupExpanded === true) {
-
-            //     }
-            //     // ({ [key]: next[index] })
-            // });
-
-
-        // items.map((item, index) => {
-        //     if (item.itemType === "group") {
-        //         const idx = index + 1
-        //         if (item.groupExpanded.value === true) {
-        //             item.groupExpandedIndex.value = idx
-        //         } else {
-        //             item.groupExpandedIndex.value = null
-        //         }
-        //         if (item.children && item.children.length > 0) {
-        //             const parentItem = this.treeItems.get(idx)!;
-        //             const children = parentItem.childrenObservable!;
-        //             console.log(parentItem.childrenCache);
-        //             if (parentItem.childrenCache && parentItem.childrenCache.length > 0) {
-        //                 const childrenIds = parentItem.childrenCache
-        //                 const next = childrenIds.map((i) => this.indexer.lookup(i)!);
-        //                 const splice = children.splice(0, children.length, ...(next as I[]));
-        //                 this.setExpandedIndex(splice);
-        //             }
-        //         }
-        //     }
-        // });
-
-        // if (item.index === "root") {
-        //     if (item.childrenCache && item.childrenCache.length > 0) {
-        //         item.childrenCache.map(id => {
-        //             this.getTreeItem(id)
-        //                 .then(item => {
-        //                     this.getExpandedTreeItems(item, groups);
-        //                 })
-        //         })
-        //     }
-        // } else {
-        //     if (item.isFolder) {
-        //         groups.push(item);
-        //         if (item.childrenCache && item.childrenCache.length > 0) {
-        //             item.childrenCache.map(id => {
-        //                 this.getTreeItem(id)
-        //                     .then(item => {
-        //                         this.getExpandedTreeItems(item, groups);
-        //                     })
-        //             })
-        //         }
-        //     }
-        // }
-    }
-
     async onChangeItemChildren(
         parentId: TreeItemIndex,
         childrenIds: TreeItemIndex[]
@@ -212,19 +152,18 @@ export class DataProvider<I extends FocusTableItem>
 
         runInAction(() => {
             const next = childrenIds.map((i) => this.indexer.lookup(i)!);
-            const splice = children.splice(0, children.length, ...(next as I[]));
-            this.setExpandedIndex(splice, next, childrenIds, children);
+            children.splice(0, children.length, ...(next as I[]));
 
-            // splice.map((item, index) => {
-            //     if (item.itemType === "group") {
-            //         if (item.groupExpanded.value === true) {
-            //             item.groupExpandedIndex.value = index + 1
-            //         } else {
-            //             item.groupExpandedIndex.value = null
-            //         }
-            //         if (item.children)
-            //     }
-            // });
+            const sorted = [...childrenIds].sort()
+            sorted.map((key, index) => {
+                if (next[index].itemType === "group") {
+                    if (next[index].groupExpanded.value === true) {
+                        next[index].groupExpandedIndex.value = key
+                    } else {
+                        next[index].groupExpandedIndex.value = null
+                    }
+                }
+            });
         });
     }
 

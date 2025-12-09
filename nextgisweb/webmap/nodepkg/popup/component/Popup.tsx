@@ -309,8 +309,6 @@ export const Popup = observer(
                             )}
                             <span
                                 className="title-name"
-                                // size={store.size}
-                                // type="text"
                                 onClick={(e) => {
                                     if (store.response.featureCount > 0 && e.detail === 2) {
                                         setTimeout(() => {

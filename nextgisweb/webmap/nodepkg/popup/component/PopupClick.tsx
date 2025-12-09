@@ -44,7 +44,11 @@ export default function PopupClick({ store, event, params }: Params) {
                     setVisible(false);
                     topic.publish("update.point", false);
                     if (selected?.type === "vector") {
-                        store.zoomTo(selected);
+                        const highlights = store.display.treeStore.filter({
+                            type: "layer",
+                            layerId: selected.layerId,
+                        }).find(itm => itm.styleId === selected.styleId).layerHighligh;
+                        if (highlights) { store.zoomTo(selected); }
                     } else if (selected?.type === "raster") {
                         store.zoomToPoint(event.coordinate)
                         const highlightEvent: HighlightEvent = {

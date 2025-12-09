@@ -58,8 +58,8 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                             width: isM ? "100%" : "75%",
                             closeIcon: isM ? true : false,
                             options: {
-                                setup: { operation: "update", id: display.config.webmapId },
-                                location: "reload",
+                                setup: { operation: "update", id: display.config.webmapId, expanded_indexes: display.config.expandedIndexes },
+                                location: "true",
                                 height: isM ? "90vh" : "70vh",
                                 padding: isM && "32px 6px 6px 6px",
                             },

@@ -17,7 +17,11 @@ export const ButtonZoomComponent = ({ store }: ContentProps) => {
                 topic.publish("unvisible.point");
                 topic.publish("update.point", false);
                 if (store.selected?.type === "vector") {
-                    store.zoomTo(store.selected);
+                    const highlights = store.display.treeStore.filter({
+                        type: "layer",
+                        layerId: store.selected.layerId,
+                    }).find(itm => itm.styleId === store.selected.styleId).layerHighligh;
+                    if (highlights) { store.zoomTo(store.selected); }
                 } else if (store.selected?.type === "raster") {
                     store.zoomToPoint(store.pointPopupClick.coordinate);
                     const highlightEvent: HighlightEvent = {

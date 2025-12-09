@@ -236,14 +236,14 @@ const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlPr
         <span
             className="custom-detail"
         >
-            {/* {!actions ?
+            {!actions ?
                 <Tooltip
                     title={type === "expand" ?
                         value ? gettext("expanded") : gettext("collapsed") :
                         value ? gettext("mutually exclusive") : gettext("not mutually exclusive")}
                 >
                     {value ? <span className="color"><Circle /></span> : <RadioboxBlank />}
-                </Tooltip> : */}
+                </Tooltip> :
                 <Tooltip
                     title={type === "expand" ? titleExpanded : titleGroupExclusive}
                 >
@@ -258,7 +258,6 @@ const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlPr
                             }
                             onClick={() => {
                                 if (type === "expand") {
-                                    console.log(treeItem.index, value);
                                     item.groupExpanded.value = !value
                                     if (!value) {
                                         item.groupExpandedIndex.value = treeItem.index
@@ -275,7 +274,7 @@ const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlPr
                         />
                     </span>
                 </Tooltip>
-            {/* } */}
+            }
         </span >
     )
 })
@@ -548,11 +547,8 @@ export function ComplexTree<
             ),
         []
     );
+    console.log(store.composite.setup);
     
-    useEffect(()=> {
-        console.log(store);
-    }, [store,actions])
-
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
             ref={environmentMergeRefs as never}
@@ -563,9 +559,9 @@ export function ComplexTree<
             onSelectItems={onSelectItems}
             onPrimaryAction={onPrimaryActionCallback}
             viewState={{
-                // [TREE_ID]: {
-                //     expandedItems: provider.expandedItems,
-                // },
+                [TREE_ID]: {
+                    expandedItems: store.composite.setup.expanded_indexes,
+                },
             }}
             canDragAndDrop
             canDropOnFolder

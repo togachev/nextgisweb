@@ -152,6 +152,19 @@ class WebMap(Base, Resource):
             ),
         )
 
+    @property
+    def expanded_indexes(self):
+        list = []
+        def traverse(item):
+            for i in item:
+                if i["item_type"] == "group":
+                    if i["group_expanded_index"]:
+                        list.append(i["group_expanded_index"])
+                    if i["children"]:
+                        traverse(i["children"])
+            return list
+        return traverse(self.to_dict()["root_item"]["children"])
+
 
 def _item_default(item_type, default):
     def _default(context):
@@ -567,7 +580,13 @@ class OptionsAttr(SAttribute):
         super().set(srlzr, value, create=create)
 
 
+class ExpandedIndexes(SAttribute):
+    def get(self, srlzr: Serializer) -> Union[ExtentWSEN, None]:
+        return srlzr.obj.expanded_indexes
+
+
 class WebMapSerializer(Serializer, resource=WebMap):
+    expanded_indexes = ExpandedIndexes(read=ResourceScope.read, write=None)
     initial_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
     constraining_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
     title = SColumn(read=ResourceScope.read, write=ResourceScope.update)

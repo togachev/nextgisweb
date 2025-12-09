@@ -131,8 +131,6 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
             const routeName = edit ? "resource.update" : "resource.show";
             if (setSave && location === "true") {
                 setSave(true);
-            } else if (setSave && location === "reload") {
-                setSave(true);
                 window.location.reload();
             } else {
                 window.location.href = route(routeName, { id }).url();

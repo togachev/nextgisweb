@@ -20,7 +20,8 @@ export const MapTile = observer((props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [descValue, setDescValue] = useState(null);
 
-    const { webmap_id, display_name, preview_fileobj_id, description_status, enabled } = props.item;
+    const { webmap_id, display_name, preview_fileobj_id, description_status, enabled, expanded_indexes } = props.item;
+
     const { store, size } = props;
     const { upath_info } = store.config;
 
@@ -111,7 +112,7 @@ export const MapTile = observer((props) => {
                                     </Button>
                                     <div className="edit-block">
                                         {store.manage && (
-                                            <ButtonSetting iconKey="map_edit" type="webmap" store={store} id={webmap_id} operation="update" webmap_name={display_name}/>
+                                            <ButtonSetting iconKey="map_edit" type="webmap" store={store} id={webmap_id} operation="update" webmap_name={display_name} expanded_indexes={expanded_indexes} />
                                         )}
                                         {description_status === true && (
                                             <Button
