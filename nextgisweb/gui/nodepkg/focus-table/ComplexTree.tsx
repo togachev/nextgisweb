@@ -547,7 +547,6 @@ export function ComplexTree<
             ),
         []
     );
-    console.log(store.composite.setup);
     
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
@@ -560,7 +559,7 @@ export function ComplexTree<
             onPrimaryAction={onPrimaryActionCallback}
             viewState={{
                 [TREE_ID]: {
-                    expandedItems: store.composite.setup.expanded_indexes,
+                    expandedItems: store.composite?.setup.expanded_indexes,
                 },
             }}
             canDragAndDrop
