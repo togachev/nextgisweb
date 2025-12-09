@@ -169,10 +169,32 @@ export class DataProvider<I extends FocusTableItem>
 
     // Helpers
 
+    private updateGroupIndex(item, id) {
+        if (id === "root") { return }
+        if (item.isFolder) {
+            if (item.data.groupExpanded.value === true) {
+                if (item.data.groupExpandedIndex.value === null) {
+                    item.data.groupExpandedIndex.value = item.index
+                }
+            } else {
+                item.data.groupExpandedIndex.value = null
+            }
+            if (item.children && item.children.length > 0) {
+                item.children.map(i => {
+                    this.getTreeItem(i)
+                        .then(itm => {
+                            this.updateGroupIndex(itm, i)
+                        })
+                })
+            }
+        }
+    }
+
     private registerTreeItem(id: TreeItemIndex, item: ProviderTreeItem<I>) {
         const children = item.childrenObservable;
         this.treeItems.set(id, item);
         if (!children) return;
+        this.updateGroupIndex(item, id);
 
         const itemCleanup = observe(children, (change) => {
             const updated = new Map(this.updated.get());
