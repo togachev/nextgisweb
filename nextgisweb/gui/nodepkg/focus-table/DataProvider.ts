@@ -173,9 +173,7 @@ export class DataProvider<I extends FocusTableItem>
         if (id === "root") { return }
         if (item.isFolder) {
             if (item.data.groupExpanded.value === true) {
-                if (item.data.groupExpandedIndex.value === null) {
-                    item.data.groupExpandedIndex.value = item.index
-                }
+                item.data.groupExpandedIndex.value = item.index
             } else {
                 item.data.groupExpandedIndex.value = null
             }

@@ -63,7 +63,7 @@ const SortableMaps: FC<ItemProps> = observer((props) => {
         <div className="maps-item" {...listeners} {...attributes} ref={setNodeRef}>
             {store.edit && store.manage && (
                 <div className="icon-map-group-edit">
-                    <ButtonSetting iconKey="edit" type="map" tab="maps" store={store} id={item.webmap_group_id} operation="update" selectedId={item.webmap_id} webmap_name={item.display_name} />
+                    <ButtonSetting iconKey="edit" type="map" tab="maps" store={store} id={item.webmap_group_id} operation="update" mapprops={item} />
                 </div>
             )}
             <div

@@ -13,6 +13,7 @@ import { observer } from "mobx-react-lite";
 import { HomeStore } from "../HomeStore";
 import { msg } from "./msg";
 import { ModalMapgroup } from "./ModalMapgroup";
+import type { ListMapProps } from "../HomeStore";
 
 interface StoreProps {
     store: HomeStore;
@@ -23,9 +24,7 @@ interface StoreProps {
     tab?: string;
     text?: string;
     disabled?: boolean;
-    selectedId?: number;
-    webmap_name?: string;
-    expanded_indexes?: number[];
+    mapprops?: ListMapProps
 }
 
 export type CompositeSetup =
@@ -52,7 +51,7 @@ export interface MapgroupModalProps extends ModalProps {
 
 export const ButtonSetting = observer((props: StoreProps) => {
     const { showResourcePicker } = useResourcePicker({ initParentId: 0 });
-    const { id, iconKey, store, type, operation, tab, text, disabled, selectedId, webmap_name, expanded_indexes } = props;
+    const { id, iconKey, store, type, operation, tab, text, disabled, mapprops } = props;
     
     const onGroups = useCallback(() => {
         if (operation === "create") {
@@ -86,17 +85,17 @@ export const ButtonSetting = observer((props: StoreProps) => {
                 width: isM ? "100%" : "75%",
                 options: {
                     store: store,
-                    setup: { operation: operation, expanded_indexes: expanded_indexes, id: id, selectedId: selectedId },
+                    setup: { operation: operation, expanded_indexes: mapprops?.expanded_indexes, id: id, selectedId: mapprops?.id },
                     tab: tab,
                     type: type,
-                    title: type === "group" ? store.allLoadedResources.get(id).resource.display_name : webmap_name,
+                    title: type === "group" ? store.allLoadedResources.get(id).resource.display_name : mapprops?.display_name,
                     location: "true",
                     height: isM ? "90vh" : "70vh",
                     padding: isM && "32px 6px 6px 6px"
                 },
             })
         }
-    }, [showResourcePicker]);
+    }, [showResourcePicker, mapprops]);
 
     const iconComp = (key?: string) => {
         const icon: IconCompProps = {
