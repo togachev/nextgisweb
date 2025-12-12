@@ -6,7 +6,6 @@ import type {
     TreeItem,
     TreeItemIndex,
 } from "react-complex-tree";
-import { route } from "@nextgisweb/pyramid/api";
 
 import { scalarSequnceIndexer } from "@nextgisweb/gui/util";
 
@@ -18,7 +17,8 @@ export const ROOT_ITEM = "root";
 const SHALLOW = { deep: false };
 
 class ProviderTreeItem<I extends FocusTableItem>
-    implements TreeItem<I | typeof ROOT_DATA> {
+    implements TreeItem<I | typeof ROOT_DATA>
+{
     index: TreeItemIndex;
     data: I | typeof ROOT_DATA;
     store: FocusTableStore<I>;
@@ -65,7 +65,8 @@ interface DataProviderOpts<I extends FocusTableItem> {
 }
 
 export class DataProvider<I extends FocusTableItem>
-    implements TreeDataProvider<I | typeof ROOT_DATA> {
+    implements TreeDataProvider<I | typeof ROOT_DATA>
+{
     store: FocusTableStore<I>;
     indexer = scalarSequnceIndexer<I, TreeItemIndex>();
     rootItem: TreeItemIndex;
@@ -81,11 +82,6 @@ export class DataProvider<I extends FocusTableItem>
         this.store = props.store;
         this.rootItem = props.rootItem;
     }
-
-    async getIndex(id) {
-        const resp = await route("webmap.item", { id: id }).get();
-        return resp;
-    };
 
     startup() {
         this.cleanupReaction = autorun(() => {
@@ -169,7 +165,7 @@ export class DataProvider<I extends FocusTableItem>
 
     // Helpers
 
-    private updateGroupIndex(item, id) {
+    private updateGroupIndex(item: ProviderTreeItem<I>, id: TreeItemIndex) {
         if (id === "root") { return }
         if (item.isFolder) {
             if (item.data.groupExpanded.value === true) {
