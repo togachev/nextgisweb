@@ -1,5 +1,5 @@
 import { difference, pull } from "lodash-es";
-import { autorun, computed, observable, observe, runInAction } from "mobx";
+import { action, autorun, computed, observable, observe, runInAction } from "mobx";
 import { useEffect, useMemo } from "react";
 import type {
     TreeDataProvider,
@@ -17,8 +17,7 @@ export const ROOT_ITEM = "root";
 const SHALLOW = { deep: false };
 
 class ProviderTreeItem<I extends FocusTableItem>
-    implements TreeItem<I | typeof ROOT_DATA>
-{
+    implements TreeItem<I | typeof ROOT_DATA> {
     index: TreeItemIndex;
     data: I | typeof ROOT_DATA;
     store: FocusTableStore<I>;
@@ -65,8 +64,7 @@ interface DataProviderOpts<I extends FocusTableItem> {
 }
 
 export class DataProvider<I extends FocusTableItem>
-    implements TreeDataProvider<I | typeof ROOT_DATA>
-{
+    implements TreeDataProvider<I | typeof ROOT_DATA> {
     store: FocusTableStore<I>;
     indexer = scalarSequnceIndexer<I, TreeItemIndex>();
     rootItem: TreeItemIndex;
@@ -74,6 +72,7 @@ export class DataProvider<I extends FocusTableItem>
     private treeItems = observable.map<TreeItemIndex, ProviderTreeItem<I>>();
     private updated = observable.box(new Map<TreeItemIndex, number>(), SHALLOW);
     private listeners: ((ids: TreeItemIndex[]) => void)[] = [];
+    public expandedItems = observable.map<TreeItemIndex>();
 
     cleanupReaction: (() => void) | undefined = undefined;
     cleanupItem = new Map<TreeItemIndex, () => void>();
@@ -95,7 +94,10 @@ export class DataProvider<I extends FocusTableItem>
             }
 
             if (updated.length > 0) {
-                updated.forEach((id) => this.getTreeItem(id));
+                updated.forEach((id) => {
+                    this.updateGroupIndex(id)
+                    return this.getTreeItem(id)
+                });
                 this.listeners.forEach((i) => i(updated));
             }
 
@@ -149,37 +151,32 @@ export class DataProvider<I extends FocusTableItem>
         runInAction(() => {
             const next = childrenIds.map((i) => this.indexer.lookup(i)!);
             children.splice(0, children.length, ...(next as I[]));
-
-            const sorted = [...childrenIds].sort()
-            sorted.map((key, index) => {
-                if (next[index].itemType === "group") {
-                    if (next[index].groupExpanded.value === true) {
-                        next[index].groupExpandedIndex.value = key
-                    } else {
-                        next[index].groupExpandedIndex.value = null
-                    }
-                }
-            });
         });
     }
 
     // Helpers
 
-    private updateGroupIndex(item: ProviderTreeItem<I>, id: TreeItemIndex) {
+    updateGroupIndex(id: TreeItemIndex) {
+        const existing = this.treeItems.get(id);
+        if (existing !== undefined) return existing;
+
+        let treeItem: ProviderTreeItem<I>;
         if (id === "root") { return }
-        if (item.isFolder) {
-            if (item.data.groupExpanded.value === true) {
-                item.data.groupExpandedIndex.value = item.index
-            } else {
-                item.data.groupExpandedIndex.value = null
-            }
-            if (item.children && item.children.length > 0) {
-                item.children.map(i => {
-                    this.getTreeItem(i)
-                        .then(itm => {
-                            this.updateGroupIndex(itm, i)
-                        })
+        else {
+            const data = this.indexer.lookup(id)!;
+            treeItem = new ProviderTreeItem(id, data, this);
+
+            if (treeItem.childrenObservable) {
+                treeItem.childrenObservable.map(item => {
+                    const childId = this.indexer.index(item);
+                    this.updateGroupIndex(childId)
                 })
+            }
+
+            if (treeItem.isFolder) {
+                if (treeItem.data.groupExpanded.value === true) {
+                    this.expandedItems.set(id);
+                }
             }
         }
     }
@@ -188,7 +185,6 @@ export class DataProvider<I extends FocusTableItem>
         const children = item.childrenObservable;
         this.treeItems.set(id, item);
         if (!children) return;
-        this.updateGroupIndex(item, id);
 
         const itemCleanup = observe(children, (change) => {
             const updated = new Map(this.updated.get());

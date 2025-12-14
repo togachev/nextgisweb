@@ -1,7 +1,6 @@
 import { action, computed, observable } from "mobx";
 import type { IObservableArray } from "mobx";
 
-// import { route } from "@nextgisweb/pyramid/api";
 import { mapper } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import { observableChildren } from "@nextgisweb/gui/focus-table";
@@ -49,12 +48,6 @@ export class ItemsStore
         this.composite = composite;
 
     }
-
-    // @action.bound
-    // expandedItems() {
-    //     const resp = route("webmap.item", { id: this.composite.resourceId }).get();
-    //     return resp
-    // }
 
     @action
     load(value: PickMy<WebMapRead>) {

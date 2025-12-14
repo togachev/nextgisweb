@@ -547,7 +547,11 @@ export function ComplexTree<
             ),
         []
     );
-    
+
+    useEffect(() => {
+        console.log(provider.expandedItems.data_);
+    }, [provider])
+
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
             ref={environmentMergeRefs as never}
@@ -558,9 +562,9 @@ export function ComplexTree<
             onSelectItems={onSelectItems}
             onPrimaryAction={onPrimaryActionCallback}
             viewState={{
-                [TREE_ID]: {
-                    expandedItems: store.composite?.setup.expanded_indexes,
-                },
+                // [TREE_ID]: {
+                //     expandedItems: store.composite?.setup.expanded_indexes,
+                // },
             }}
             canDragAndDrop
             canDropOnFolder
