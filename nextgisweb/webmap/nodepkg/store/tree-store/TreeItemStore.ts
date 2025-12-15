@@ -87,8 +87,16 @@ export class TreeLayerStore
 
     @observable.ref accessor isOutOfScaleRange = false;
 
-    constructor(init: LayerItemConfig, parentId: number | null) {
+    @observable.ref accessor drawOrderEnabled: boolean;
+
+    constructor(
+        init: LayerItemConfig,
+        parentId: number | null,
+        drawOrderEnabled = false
+    ) {
         super(init, parentId);
+
+        this.drawOrderEnabled = drawOrderEnabled;
 
         this.layerId = init.layerId;
         this.styleId = init.styleId;
@@ -100,7 +108,10 @@ export class TreeLayerStore
         this.transparency = init.transparency ?? null;
         this.minScaleDenom = init.minScaleDenom ?? null;
         this.maxScaleDenom = init.maxScaleDenom ?? null;
-        this.drawOrderPosition = init.drawOrderPosition ?? order++;
+        this.drawOrderPosition =
+            this.drawOrderEnabled && typeof init.drawOrderPosition === "number"
+                ? init.drawOrderPosition
+                : order++;
         this.legendInfo = init.legendInfo;
         this.adapter = init.adapter;
         this.layerCls = init.layerCls;
@@ -254,10 +265,11 @@ export type TreeItemStore = TreeGroupStore | TreeLayerStore;
 
 export function createTreeItemStore(
     init: TreeChildrenItemConfig,
-    parentId: number | null
+    parentId: number | null,
+    drawOrderEnabled: boolean
 ): TreeItemStore {
     if (init.type === "layer") {
-        return new TreeLayerStore(init, parentId);
+        return new TreeLayerStore(init, parentId, drawOrderEnabled);
     }
 
     return new TreeGroupStore(init, parentId);
