@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode, Ref, RefObject } from "react";
 import {
     InteractionMode,
@@ -297,6 +297,8 @@ export function ComplexTree<
 
     const provider = useDataProvider<I>({ store, rootItem: root });
     const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
+    const tree = useRef(null);
+    const [expand, setExpand] = useState<boolean>(false)
 
     const environmentMergeRefs = useCallback(
         (value: TreeEnvironmentRef<I> | null) => {
@@ -543,6 +545,13 @@ export function ComplexTree<
         []
     );
 
+    useEffect(() => {
+        if (tree.current) {
+            if (expand) { tree.current.expandAll() }
+            else { tree.current.collapseAll() }
+        }
+    }, [expand]);
+
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
             ref={environmentMergeRefs as never}
@@ -565,7 +574,10 @@ export function ComplexTree<
             renderItemArrow={renderItemArrow}
             renderDragBetweenLine={renderDragBetweenLine}
         >
-            <Tree treeId={TREE_ID} rootItem={root} />
+            {store.composite &&
+                <Button className="expand-all" type="text" onClick={() => { setExpand(!expand) }}>{expand ? gettext("Collapse") : gettext("Expand")}</Button>
+            }
+            <Tree treeId={TREE_ID} rootItem={root} ref={tree} />
         </UncontrolledTreeEnvironment>
     );
 }
