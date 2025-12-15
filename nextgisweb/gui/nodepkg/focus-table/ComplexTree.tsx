@@ -228,7 +228,7 @@ interface GroupControlProps {
 
 const GroupControl = observer(({ item, actions, type }: GroupControlProps) => {
     const value = type === "expand" ? item.groupExpanded.value : item.groupExclusive.value
-    const titleExpanded = value ? gettext("Collapse") : gettext("Expand")
+    const titleExpanded = value ? gettext("Expanded") : gettext("Collapsed")
     const titleGroupExclusive = value ? gettext("Turn off mutual exclusion") : gettext("Turn on mutual exclusion")
 
     return (

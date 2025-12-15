@@ -56,19 +56,19 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/component/expandable-text/ExpandableText.tsx:38
-msgid "More"
-msgstr "Ещё"
-
-#: nodepkg/component/expandable-text/ExpandableText.tsx:52
+#: nodepkg/component/expandable-text/ExpandableText.tsx:22
 msgid "Less"
 msgstr "Свернуть"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:110
+#: nodepkg/component/expandable-text/ExpandableText.tsx:22
+msgid "More"
+msgstr "Ещё"
+
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:154
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:119
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:163
 msgid "Apply"
 msgstr "Применить"
 
@@ -179,12 +179,12 @@ msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
 #: nodepkg/focus-table/ComplexTree.tsx:231
-msgid "Collapse"
-msgstr "Свернуть"
+msgid "Expanded"
+msgstr "Развернута"
 
 #: nodepkg/focus-table/ComplexTree.tsx:231
-msgid "Expand"
-msgstr "Развернуть"
+msgid "Collapsed"
+msgstr "Свернута"
 
 #: nodepkg/focus-table/ComplexTree.tsx:232
 msgid "Turn off mutual exclusion"
@@ -210,11 +210,19 @@ msgstr "взаимоисключающая"
 msgid "not mutually exclusive"
 msgstr "не взаимоисключающая"
 
-#: nodepkg/focus-table/ComplexTree.tsx:468
+#: nodepkg/focus-table/ComplexTree.tsx:475
 msgid "Disabled webmap"
 msgstr ""
 
-#: nodepkg/focus-table/FocusTable.tsx:24
+#: nodepkg/focus-table/ComplexTree.tsx:578
+msgid "Collapse"
+msgstr "Свернуть"
+
+#: nodepkg/focus-table/ComplexTree.tsx:578
+msgid "Expand"
+msgstr "Развернуть"
+
+#: nodepkg/focus-table/FocusTable.tsx:23
 msgid "Hide details"
 msgstr "Скрыть детали"
 
@@ -301,4 +309,3 @@ msgstr "Настройка сохранена."
 #: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
-
