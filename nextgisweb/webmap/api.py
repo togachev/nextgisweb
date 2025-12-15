@@ -526,7 +526,6 @@ class RootItemConfig(BaseItem, tag="root", tag_field="type"):
 
 class DisplayConfig(Struct, kw_only=True):
     webmapId: int
-    expandedIndexes: List[int]
     webmapTitle: str
     activePanel: str
     colorSF: Dict[str, Any]
@@ -733,7 +732,6 @@ def display_config(obj, request) -> DisplayConfig:
 
     return DisplayConfig(
         webmapId=obj.id,
-        expandedIndexes=obj.expanded_indexes,
         webmapTitle=obj.display_name if obj.title is None else obj.title,
         webmapPlugin=plugin,
         initialExtent=initial_extent,
@@ -772,8 +770,6 @@ def get_webmap_item(resource, request) -> JSONType:
     def traverse(item):
         
         if item.item_type in ("root", "group"):
-            if item.group_expanded_index != None:
-                list.append(item.group_expanded_index)
             if item.children:
                 for child in item.children:
                     traverse(child)

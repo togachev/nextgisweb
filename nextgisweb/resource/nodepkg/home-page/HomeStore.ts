@@ -31,7 +31,6 @@ export interface ListMapProps {
     value: number;
     webmap_group_id: number;
     webmap_group_name: string;
-    expanded_indexes: number[];
 };
 
 export interface GroupMapsGridProps {

@@ -224,10 +224,9 @@ interface GroupControlProps {
     item: any;
     actions: boolean;
     type: string;
-    treeItem?: any;
 }
 
-const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlProps) => {
+const GroupControl = observer(({ item, actions, type }: GroupControlProps) => {
     const value = type === "expand" ? item.groupExpanded.value : item.groupExclusive.value
     const titleExpanded = value ? gettext("Collapse") : gettext("Expand")
     const titleGroupExclusive = value ? gettext("Turn off mutual exclusion") : gettext("Turn on mutual exclusion")
@@ -259,11 +258,6 @@ const GroupControl = observer(({ item, actions, type, treeItem }: GroupControlPr
                             onClick={() => {
                                 if (type === "expand") {
                                     item.groupExpanded.value = !value
-                                    if (!value) {
-                                        item.groupExpandedIndex.value = treeItem.index
-                                    } else {
-                                        item.groupExpandedIndex.value = null
-                                    }
                                 } else {
                                     item.groupExclusive.value = !value
                                 }
@@ -300,6 +294,7 @@ export function ComplexTree<
     type EnvType = typeof UncontrolledTreeEnvironment<I | typeof ROOT_DATA>;
     type EnvProps = Required<Parameters<EnvType>[0]>;
     type CTE = ComplexTreeEnvironment<I>;
+
     const provider = useDataProvider<I>({ store, rootItem: root });
     const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
 
@@ -548,10 +543,6 @@ export function ComplexTree<
         []
     );
 
-    useEffect(() => {
-        console.log(provider.expandedItems.data_);
-    }, [provider])
-
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
             ref={environmentMergeRefs as never}
@@ -561,11 +552,7 @@ export function ComplexTree<
             canInvokePrimaryActionOnItemContainer={true}
             onSelectItems={onSelectItems}
             onPrimaryAction={onPrimaryActionCallback}
-            viewState={{
-                // [TREE_ID]: {
-                //     expandedItems: store.composite?.setup.expanded_indexes,
-                // },
-            }}
+            viewState={{}}
             canDragAndDrop
             canDropOnFolder
             canReorderItems

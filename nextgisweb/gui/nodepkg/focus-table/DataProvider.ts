@@ -1,5 +1,5 @@
 import { difference, pull } from "lodash-es";
-import { action, autorun, computed, observable, observe, runInAction } from "mobx";
+import { autorun, computed, observable, observe, runInAction } from "mobx";
 import { useEffect, useMemo } from "react";
 import type {
     TreeDataProvider,
@@ -72,7 +72,6 @@ export class DataProvider<I extends FocusTableItem>
     private treeItems = observable.map<TreeItemIndex, ProviderTreeItem<I>>();
     private updated = observable.box(new Map<TreeItemIndex, number>(), SHALLOW);
     private listeners: ((ids: TreeItemIndex[]) => void)[] = [];
-    public expandedItems = observable.map<TreeItemIndex>();
 
     cleanupReaction: (() => void) | undefined = undefined;
     cleanupItem = new Map<TreeItemIndex, () => void>();
@@ -94,10 +93,7 @@ export class DataProvider<I extends FocusTableItem>
             }
 
             if (updated.length > 0) {
-                updated.forEach((id) => {
-                    this.updateGroupIndex(id)
-                    return this.getTreeItem(id)
-                });
+                updated.forEach((id) => this.getTreeItem(id));
                 this.listeners.forEach((i) => i(updated));
             }
 
@@ -155,31 +151,6 @@ export class DataProvider<I extends FocusTableItem>
     }
 
     // Helpers
-
-    updateGroupIndex(id: TreeItemIndex) {
-        const existing = this.treeItems.get(id);
-        if (existing !== undefined) return existing;
-
-        let treeItem: ProviderTreeItem<I>;
-        if (id === "root") { return }
-        else {
-            const data = this.indexer.lookup(id)!;
-            treeItem = new ProviderTreeItem(id, data, this);
-
-            if (treeItem.childrenObservable) {
-                treeItem.childrenObservable.map(item => {
-                    const childId = this.indexer.index(item);
-                    this.updateGroupIndex(childId)
-                })
-            }
-
-            if (treeItem.isFolder) {
-                if (treeItem.data.groupExpanded.value === true) {
-                    this.expandedItems.set(id);
-                }
-            }
-        }
-    }
 
     private registerTreeItem(id: TreeItemIndex, item: ProviderTreeItem<I>) {
         const children = item.childrenObservable;

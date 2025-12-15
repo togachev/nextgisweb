@@ -94,19 +94,6 @@ class MapgroupGroup(Base):
     def enabled_group(self):
         return self.resource.enabled
 
-    @property
-    def expanded_indexes(self):
-        list = []
-        def traverse(item):
-            for i in item:
-                if i["item_type"] == "group":
-                    if i["group_expanded_index"]:
-                        list.append(i["group_expanded_index"])
-                    if i["children"]:
-                        traverse(i["children"])
-            return list
-        return traverse(self.webmap.to_dict()["root_item"]["children"])
-
 
 class MapgroupGroupItemRead(Struct, kw_only=True):
     webmap_id: int
@@ -121,7 +108,6 @@ class MapgroupGroupItemRead(Struct, kw_only=True):
     enabled: Union[bool, UnsetType] = UNSET
     preview_fileobj_id: int
     preview_description: Annotated[str, Meta(min_length=1)]
-    expanded_indexes: List[int]
 
 
 class MapgroupGroupItemWrite(Struct, kw_only=True):
@@ -146,7 +132,6 @@ class GroupmapsAttr(SAttribute):
                 enabled=i.enabled,
                 preview_fileobj_id=i.preview_fileobj_id,
                 preview_description=i.preview_description,
-                expanded_indexes=i.expanded_indexes,
             )
 
         result = list()

@@ -85,7 +85,7 @@ export const ButtonSetting = observer((props: StoreProps) => {
                 width: isM ? "100%" : "75%",
                 options: {
                     store: store,
-                    setup: { operation: operation, expanded_indexes: mapprops?.expanded_indexes, id: id, selectedId: mapprops?.id },
+                    setup: { operation: operation, id: id, selectedId: mapprops?.id },
                     tab: tab,
                     type: type,
                     title: type === "group" ? store.allLoadedResources.get(id).resource.display_name : mapprops?.display_name,
