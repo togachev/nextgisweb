@@ -575,7 +575,8 @@ export function ComplexTree<
             renderDragBetweenLine={renderDragBetweenLine}
         >
             {store.composite &&
-                <Button className="expand-all" type="text" onClick={() => { setExpand(!expand) }}>{expand ? gettext("Collapse") : gettext("Expand")}</Button>
+                <Button color={expand && "primary"}
+                    variant="filled" className="expand-all" type="text" onClick={() => { setExpand(!expand) }}>{expand ? gettext("Collapse") : gettext("Expand")}</Button>
             }
             <Tree treeId={TREE_ID} rootItem={root} ref={tree} />
         </UncontrolledTreeEnvironment>
