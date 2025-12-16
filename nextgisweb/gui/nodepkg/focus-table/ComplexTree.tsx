@@ -15,7 +15,7 @@ import type {
     TreeItemRenderContext,
 } from "react-complex-tree";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Button, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Space, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { ErrorIcon } from "@nextgisweb/gui/icon";
@@ -433,7 +433,7 @@ export function ComplexTree<
 
             const customStyle: CSSProperties = { "--ct-depth": props.depth }
             if (storeItem?.webmapId && storeItem?.webmapId?.value === store.composite.setup?.selectedId) {
-                Object.assign(customStyle, { fontWeight: "bold" })
+                Object.assign(customStyle, { fontWeight: "bold", color: "var(--primary)" })
             }
 
             return (
@@ -574,9 +574,11 @@ export function ComplexTree<
             renderItemArrow={renderItemArrow}
             renderDragBetweenLine={renderDragBetweenLine}
         >
-            {store.composite &&
-                <Button color={expand && "primary"}
-                    variant="filled" className="expand-all" type="text" onClick={() => { setExpand(!expand) }}>{expand ? gettext("Collapse") : gettext("Expand")}</Button>
+            {store.composite && store.identity === "webmap" &&
+                <Space width="100%">
+                    <Button color={expand && "primary"}
+                        variant="filled" className="expand-all" type="text" onClick={() => { setExpand(!expand) }}>{expand ? gettext("Collapse") : gettext("Expand")}</Button>
+                </Space>
             }
             <Tree treeId={TREE_ID} rootItem={root} ref={tree} />
         </UncontrolledTreeEnvironment>

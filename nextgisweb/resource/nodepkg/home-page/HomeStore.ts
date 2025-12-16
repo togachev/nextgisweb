@@ -23,6 +23,7 @@ export interface ListMapProps {
     enabled: boolean;
     display_name: string;
     id: number;
+    webmap_id: number;
     label: string;
     owner: boolean;
     position: LayoutProps;
