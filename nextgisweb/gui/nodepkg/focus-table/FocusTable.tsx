@@ -33,6 +33,7 @@ export interface FocusTablePropsActions<I extends FocusTableItem> {
         ComplexTreeEnvironment<I>,
         "detail" | "tree"
     >;
+    expanded?: boolean;
 }
 
 export interface FocusTableProps<I extends FocusTableItem, C extends string, S>
@@ -58,6 +59,7 @@ export function FocusTable<
     itemActions,
     renderDetail: Detail,
     rootClassName,
+    expanded,
 }: FocusTableProps<I, C, S>) {
     const environmentRef = useRef<ComplexTreeEnvironment<I>>(null!);
     const [selected, setSelected] = useState<I | null>(null);
@@ -107,6 +109,7 @@ export function FocusTable<
                         showErrors={true}
                         onSelect={setSelected}
                         onPrimaryAction={() => setShowDetails(true)}
+                        expanded={expanded}
                     />
                 </div>
             </Splitter.Panel>

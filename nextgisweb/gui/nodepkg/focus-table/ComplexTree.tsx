@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { CSSProperties, ReactNode, Ref, RefObject } from "react";
 import {
     InteractionMode,
@@ -15,7 +15,7 @@ import type {
     TreeItemRenderContext,
 } from "react-complex-tree";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Button, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { ErrorIcon } from "@nextgisweb/gui/icon";
@@ -218,6 +218,7 @@ export interface ComplexTreeProps<
     onSelect?: (item: I | null) => void;
     onPrimaryAction?: (item: I) => void;
     rootClassName?: string;
+    expanded?: boolean;
 }
 
 interface GroupControlProps {
@@ -290,6 +291,7 @@ export function ComplexTree<
     onSelect,
     onPrimaryAction,
     rootClassName,
+    expanded,
 }: ComplexTreeProps<I, C, S>) {
     type EnvType = typeof UncontrolledTreeEnvironment<I | typeof ROOT_DATA>;
     type EnvProps = Required<Parameters<EnvType>[0]>;
@@ -298,7 +300,6 @@ export function ComplexTree<
     const provider = useDataProvider<I>({ store, rootItem: root });
     const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
     const tree = useRef(null);
-    const [expand, setExpand] = useState<boolean>(false)
 
     const environmentMergeRefs = useCallback(
         (value: TreeEnvironmentRef<I> | null) => {
@@ -547,10 +548,13 @@ export function ComplexTree<
 
     useEffect(() => {
         if (tree.current) {
-            if (expand) { tree.current.expandAll() }
-            else { tree.current.collapseAll() }
+            if (expanded) {
+                tree.current.expandAll();
+            } else {
+                tree.current.collapseAll();
+            }
         }
-    }, [expand]);
+    }, [expanded]);
 
     return (
         <UncontrolledTreeEnvironment<I | typeof ROOT_DATA>
@@ -574,12 +578,6 @@ export function ComplexTree<
             renderItemArrow={renderItemArrow}
             renderDragBetweenLine={renderDragBetweenLine}
         >
-            {store.composite && store.identity === "webmap" &&
-                <Space width="100%">
-                    <Button color={expand && "primary"}
-                        variant="filled" className="expand-all" type="text" onClick={() => { setExpand(!expand) }}>{expand ? gettext("Collapse") : gettext("Expand")}</Button>
-                </Space>
-            }
             <Tree treeId={TREE_ID} rootItem={root} ref={tree} />
         </UncontrolledTreeEnvironment>
     );

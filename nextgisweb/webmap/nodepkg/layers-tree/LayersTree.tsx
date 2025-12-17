@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+
 import { Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { findNode } from "@nextgisweb/gui/util/tree";
@@ -26,7 +26,6 @@ type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
 export type TreeWebmapItem = TreeNodeData & {
     key: number;
     children?: TreeWebmapItem[];
-    legendIcon?: ReactNode;
     treeItem: TreeItemStore;
 };
 

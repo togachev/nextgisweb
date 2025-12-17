@@ -25,6 +25,8 @@ import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
+import ExpandAll from "@nextgisweb/icon/mdi/expand-all-outline";
+import CollapseAll from "@nextgisweb/icon/mdi/collapse-all-outline";
 
 const { adapters } = settings;
 
@@ -170,7 +172,8 @@ LayerWidget.displayName = "LayerWidget";
 
 export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
     const { makeSignal } = useAbortController();
-    const [drawOrderEdit, setDrawOrderEdit] = useState(false);
+    const [drawOrderEdit, setDrawOrderEdit] = useState<boolean>(false);
+    const [expanded, setExpanded] = useState<boolean>(false);
 
     const { pickToFocusTable } = useFocusTablePicker({
         initParentId: store.composite.parent || undefined,
@@ -232,10 +235,17 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
                         },
                     ];
                 },
+                {
+                    key: "expand_tree",
+                    title: expanded ? gettext("Collapse") : gettext("Expand"),
+                    icon: expanded ? <CollapseAll /> : <ExpandAll />,
+                    placement: "right",
+                    callback: () => setExpanded(!expanded),
+                },
             ],
             itemActions: [action.deleteItem<ItemObject>()],
         }),
-        [drawOrderEnabled, makeSignal, pickToFocusTable, store]
+        [drawOrderEnabled, makeSignal, pickToFocusTable, store, expanded]
     );
 
     return drawOrderEdit ? (
@@ -246,6 +256,7 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             title={(item) => item.displayName.value}
             tableActions={tableActions}
             itemActions={itemActions}
+            expanded={expanded}
             renderDetail={({ item }) =>
                 item instanceof Group ? (
                     <GroupWidget item={item} />

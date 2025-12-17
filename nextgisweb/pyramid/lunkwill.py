@@ -32,7 +32,7 @@ class LunkwillIntercepionExpected(NotConfigured):
 
 
 @inject()
-def ensure_proxy(*, comp: PyramidComponent):
+def ensure_interception(*, comp: PyramidComponent):
     if not comp.options["lunkwill.enabled"]:
         raise LunkwillNotConfigured
     if not comp.options["lunkwill.proxy"]:
@@ -99,6 +99,12 @@ def setup_pyramid(comp, config):
         get=proxy,
     )
 
+    config.add_route(
+        "lunkwill.hmux",
+        "/api/lunkwill/hmux",
+        get=hmux,
+    )
+
     opts = comp.options.with_prefix("lunkwill")
 
     if opts["enabled"] and opts["proxy"]:
@@ -160,7 +166,7 @@ def tween_factory(handler, registry):
 
 
 def proxy(request):
-    ensure_proxy()
+    ensure_interception()
 
     lw_request_id = None
     if crypto := request.registry.settings.get("lunkwill.crypto"):
@@ -190,3 +196,8 @@ def proxy(request):
     else:
         resp_kw = dict(app_iter=resp.stream())
     return Response(status=resp.status, headerlist=resp.headers.items(), **resp_kw)
+
+
+def hmux(request):
+    ensure_interception()
+    assert False, "Unreachable"
