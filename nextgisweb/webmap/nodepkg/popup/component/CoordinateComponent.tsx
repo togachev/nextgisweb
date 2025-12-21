@@ -143,7 +143,7 @@ export const CoordinateComponent = observer((props) => {
                 >
                     {coordsVisible}
                 </Button>
-                {!display.tinyConfig && store.contextUrl !== null && (
+                {!display.isTinyMode && store.contextUrl !== null && (
                     <div className="link-block">
                         {
                             store.controls &&

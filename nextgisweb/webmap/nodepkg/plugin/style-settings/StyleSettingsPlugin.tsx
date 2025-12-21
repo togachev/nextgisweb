@@ -15,7 +15,7 @@ export class StyleSettingsPlugin extends PluginBase {
         
         return {
             ...state,
-            enabled: !!(state.enabled && !this.display.tinyConfig && typeLayer.includes(nodeData.layerCls)),
+            enabled: !!(state.enabled && !this.display.isTinyMode && typeLayer.includes(nodeData.layerCls)),
         };
     }
 

@@ -185,14 +185,14 @@ export class PopupStore {
         this.contextElement.className = "context-position";
         this.rootContext = createRoot(this.contextElement);
 
-        this.offHP = !this.display.tinyConfig ? 40 : 0;
+        this.offHP = !this.display.isTinyMode ? 40 : 0;
         this.popup_height = settings.popup_size.height;
         this.popup_width = settings.popup_size.width;
         this.offset = settings.offset_point;
         this.coords_not_count_w = 270;
         this.coords_not_count_h = 51;
         this.fX = 0;
-        this.fY = this.display.tinyConfig ? 0 : -40;
+        this.fY = this.display.isTinyMode ? 0 : -40;
 
         this.addOverlay();
     }

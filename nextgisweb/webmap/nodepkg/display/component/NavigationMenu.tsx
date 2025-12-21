@@ -48,7 +48,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                     </div>
                 ))}
                 <div className="empty-block"></div>
-                {display.config.scope &&
+                {display.config.scope && !display.isTinyMode &&
                     <div
                         title={gettext("Map settings")}
                         className="item"
