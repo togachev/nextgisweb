@@ -141,7 +141,7 @@ msgid "Clone"
 msgstr "Клонировать"
 
 #: nodepkg/edi-table/RowAction.tsx:79 nodepkg/focus-table/action.tsx:27
-#: nodepkg/hook/useConfirm.tsx:52 nodepkg/model-browse/ModelBrowse.tsx:264
+#: nodepkg/hook/useConfirm.tsx:54 nodepkg/model-browse/ModelBrowse.tsx:264
 #: nodepkg/model-browse/ModelBrowse.tsx:334 nodepkg/model-form/ModelForm.tsx:47
 msgid "Delete"
 msgstr "Удалить"
@@ -178,49 +178,41 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/ComplexTree.tsx:231
+#: nodepkg/focus-table/ComplexTree.tsx:232
 msgid "Expanded"
 msgstr "Развернута"
 
-#: nodepkg/focus-table/ComplexTree.tsx:231
+#: nodepkg/focus-table/ComplexTree.tsx:232
 msgid "Collapsed"
 msgstr "Свернута"
 
-#: nodepkg/focus-table/ComplexTree.tsx:232
+#: nodepkg/focus-table/ComplexTree.tsx:233
 msgid "Turn off mutual exclusion"
 msgstr "Выключить взаимоисключение"
 
-#: nodepkg/focus-table/ComplexTree.tsx:232
+#: nodepkg/focus-table/ComplexTree.tsx:233
 msgid "Turn on mutual exclusion"
 msgstr "Включить взаимоисключение"
 
-#: nodepkg/focus-table/ComplexTree.tsx:241
+#: nodepkg/focus-table/ComplexTree.tsx:242
 msgid "expanded"
 msgstr "развернута"
 
-#: nodepkg/focus-table/ComplexTree.tsx:241
+#: nodepkg/focus-table/ComplexTree.tsx:242
 msgid "collapsed"
 msgstr "свернута"
 
-#: nodepkg/focus-table/ComplexTree.tsx:242
+#: nodepkg/focus-table/ComplexTree.tsx:243
 msgid "mutually exclusive"
 msgstr "взаимоисключающая"
 
-#: nodepkg/focus-table/ComplexTree.tsx:242
+#: nodepkg/focus-table/ComplexTree.tsx:243
 msgid "not mutually exclusive"
 msgstr "не взаимоисключающая"
 
-#: nodepkg/focus-table/ComplexTree.tsx:475
+#: nodepkg/focus-table/ComplexTree.tsx:476
 msgid "Disabled webmap"
 msgstr ""
-
-#: nodepkg/focus-table/ComplexTree.tsx:578
-msgid "Collapse"
-msgstr "Свернуть"
-
-#: nodepkg/focus-table/ComplexTree.tsx:578
-msgid "Expand"
-msgstr "Развернуть"
 
 #: nodepkg/focus-table/FocusTable.tsx:23
 msgid "Hide details"
@@ -238,11 +230,11 @@ msgstr "Требуется подтверждение"
 msgid "Please confirm this action."
 msgstr "Пожалуйста, подтвердите это действие."
 
-#: nodepkg/hook/useConfirm.tsx:51
+#: nodepkg/hook/useConfirm.tsx:53
 msgid "Please confirm the deletion."
 msgstr "Пожалуйста, подтвердите удаление."
 
-#: nodepkg/hook/useConfirm.tsx:53
+#: nodepkg/hook/useConfirm.tsx:55
 msgid "Failed to delete."
 msgstr "Не удалось удалить."
 
@@ -309,3 +301,9 @@ msgstr "Настройка сохранена."
 #: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
+
+#~ msgid "Collapse"
+#~ msgstr "Свернуть"
+
+#~ msgid "Expand"
+#~ msgstr "Развернуть"

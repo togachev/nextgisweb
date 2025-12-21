@@ -68,7 +68,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:40
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:29 view.py:41
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -478,12 +478,12 @@ msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
 #: nodepkg/feature-grid/FeatureTable.tsx:89
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:53
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:56
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:83 view.py:107
-#: view.py:211
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:97 view.py:121
+#: view.py:233
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -548,6 +548,16 @@ msgstr "Удаление этого поля навсегда сотрёт вс�
 msgid "Field"
 msgstr "Поле"
 
+#: nodepkg/fields-widget/FieldsWidget.tsx:160
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:36
+msgid "Formatted value"
+msgstr ""
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:163
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:32
+msgid "Reference book added"
+msgstr ""
+
 #: nodepkg/fields-widget/FormattedDecimalForm.tsx:18
 msgid "Setting up value formatting"
 msgstr "Настройка форматирования значений"
@@ -569,11 +579,13 @@ msgid "Value prefix"
 msgstr "Префикс значения"
 
 #: nodepkg/filtered-count/FilteredCount.tsx:66
+#: nodepkg/filtered-objects-count/FilteredObjectsCount.tsx:66
 msgid "{filtered_count} of {total_count}"
 msgstr "{filtered_count} из {total_count}"
 
 #: nodepkg/filtered-count/FilteredCount.tsx:72
 #: nodepkg/filtered-count/FilteredCount.tsx:103
+#: nodepkg/filtered-objects-count/FilteredObjectsCount.tsx:75
 msgid "Feature count"
 msgstr "Количество объектов"
 
@@ -634,6 +646,22 @@ msgstr "Длина"
 #: nodepkg/geometry-info/component/GeometryInfoTable.tsx:79
 msgid "Area"
 msgstr "Площадь"
+
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
+msgid "Yes"
+msgstr ""
+
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
+msgid "No"
+msgstr ""
+
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:78
+msgid "Visibility in the table"
+msgstr ""
+
+#: nodepkg/resource-section/FeatureLayerResourceSection.tsx:85
+msgid "Additional properties"
+msgstr ""
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:106
 msgid "Feature versioning"
@@ -732,7 +760,7 @@ msgstr "Дата и время"
 msgid "User"
 msgstr "Пользователь"
 
-#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:188
+#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:209
 msgid "Features"
 msgstr "Объекты"
 
@@ -821,19 +849,19 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:56 view.py:71
+#: view.py:57 view.py:72
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:96 view.py:203
+#: view.py:110 view.py:224
 msgid "Version history"
 msgstr "История изменений"
 
-#: view.py:114
+#: view.py:128
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:116
+#: view.py:130
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -841,6 +869,6 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:193
+#: view.py:214
 msgid "Table"
 msgstr "Таблица"

@@ -192,7 +192,7 @@ export class PopupStore {
         this.coords_not_count_w = 270;
         this.coords_not_count_h = 51;
         this.fX = 0;
-        this.fY = -40;
+        this.fY = this.display.tinyConfig ? 0 : -40;
 
         this.addOverlay();
     }

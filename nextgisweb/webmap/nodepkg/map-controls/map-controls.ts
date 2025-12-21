@@ -130,6 +130,7 @@ if (!settings.imodule) {
                 isDefaultGroupId: true,
                 groupId: "popupStore",
             },
+            label: gettext("Identification"),
             embeddedShowMode: "customize",
             component: () => import("../map-component/control/PopupStoreControl"),
         });
