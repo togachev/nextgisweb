@@ -1,4 +1,4 @@
-from typing import Any, Dict, NamedTuple, Optional, Union, overload
+from typing import Any, NamedTuple, Union, overload
 
 from zope.interface import Attribute, Interface, classImplements, implementer
 from zope.interface.interface import adapter_hooks
@@ -19,8 +19,8 @@ class UserExceptionObject(NamedTuple):
     title: TranslatableOrStr
     message: Union[TranslatableOrStr, None]
     detail: Union[TranslatableOrStr, None]
-    data: Dict[str, Any]
-    http_status_code: Optional[int]
+    data: dict[str, Any]
+    http_status_code: int | None
 
 
 classImplements(UserExceptionObject, IUserException)
@@ -32,7 +32,7 @@ def user_exception(
     title: TranslatableOrStr,
     message: Union[TranslatableOrStr, None] = None,
     detail: Union[TranslatableOrStr, None] = None,
-    data: Union[Dict[str, Any], None] = None,
+    data: Union[dict[str, Any], None] = None,
     http_status_code: Union[int, None] = None,
 ):
     exc.__user_exception__ = UserExceptionObject(
@@ -56,8 +56,8 @@ class UserException(Exception):
     title: TranslatableOrStr
     message: Union[TranslatableOrStr, None]
     detail: Union[TranslatableOrStr, None]
-    data: Dict[str, Any]
-    http_status_code: Optional[int]
+    data: dict[str, Any]
+    http_status_code: int | None
 
     @overload
     def __init__(
@@ -66,7 +66,7 @@ class UserException(Exception):
         /,
         title: Union[TranslatableOrStr, None] = None,
         detail: Union[TranslatableOrStr, None] = None,
-        data: Union[Dict[str, Any], None] = None,
+        data: Union[dict[str, Any], None] = None,
         http_status_code: Union[int, None] = None,
     ): ...
 
@@ -77,7 +77,7 @@ class UserException(Exception):
         title: Union[TranslatableOrStr, None] = None,
         message: Union[TranslatableOrStr, None] = None,
         detail: Union[TranslatableOrStr, None] = None,
-        data: Union[Dict[str, Any], None] = None,
+        data: Union[dict[str, Any], None] = None,
         http_status_code: Union[int, None] = None,
     ): ...
 

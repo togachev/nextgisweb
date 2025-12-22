@@ -2,19 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
@@ -187,18 +175,18 @@ SettingsComponentGap = Annotated[
 ]
 
 
-def settings(request, *, component: SettingsComponentGap) -> AsJSON[Dict[str, Any]]:
+def settings(request, *, component: SettingsComponentGap) -> AsJSON[dict[str, Any]]:
     """Read component settings"""
     comp = request.env.components[component]
     return comp.client_settings(request)
 
 
-def route(request) -> AsJSON[Dict[str, Annotated[List[str], Meta(min_length=1)]]]:
+def route(request) -> AsJSON[dict[str, Annotated[list[str], Meta(min_length=1)]]]:
     """Read route metadata"""
     return request.env.pyramid.route_meta
 
 
-def pkg_version(request) -> AsJSON[Dict[str, str]]:
+def pkg_version(request) -> AsJSON[dict[str, str]]:
     """Read packages versions"""
     return {pn: p.version for pn, p in request.env.packages.items()}
 
@@ -218,7 +206,7 @@ def ping(request) -> PingResponse:
 
 class HealthcheckResponse(Struct, kw_only=True):
     success: bool
-    component: Dict[str, Any]
+    component: dict[str, Any]
 
 
 def healthcheck(
@@ -241,7 +229,7 @@ def healthcheck(
     return result
 
 
-def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
+def statistics(request) -> AsJSON[dict[str, dict[str, Any]]]:
     """Compute and provide per-component statistics"""
     request.require_administrator()
 
@@ -297,8 +285,8 @@ StorageResponse = Gap("StorageResponse", Type[Struct])
 
 
 class StorageValue(Struct, kw_only=True):
-    estimated: Optional[Annotated[datetime, Meta(tz=False)]]
-    updated: Optional[Annotated[datetime, Meta(tz=False)]]
+    estimated: Annotated[datetime, Meta(tz=False)] | None
+    updated: Annotated[datetime, Meta(tz=False)] | None
     data_volume: Annotated[int, Meta(gt=0)]
 
 
@@ -315,7 +303,7 @@ def storage(request, *, core: CoreComponent) -> StorageResponse:
     return StorageResponse(**{k: StorageValue(**v) for k, v in data.items()})
 
 
-def font_cread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
+def font_cread(request) -> AsJSON[list[Union[SystemFont, CustomFont]]]:
     """Get information about available fonts"""
     request.require_administrator()
     unordered = request.env.core.fontconfig.enumerate()
@@ -323,8 +311,8 @@ def font_cread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
 
 
 class FontCUpdateBody(Struct, kw_only=True):
-    add: List[FileUploadRef] = field(default_factory=list)
-    remove: List[FontKey] = field(default_factory=list)
+    add: list[FileUploadRef] = field(default_factory=list)
+    remove: list[FontKey] = field(default_factory=list)
 
 
 class FontCUpdateResponse(Struct, kw_only=True):
@@ -399,23 +387,23 @@ class csetting:
     gtype: SType
     stype: SType
     default: SValue
-    read: Optional[Permission]
-    write: Optional[Permission]
-    skey: Tuple[str, str]
-    ckey: Union[bool, Tuple[str, str]]
+    read: Permission | None
+    write: Permission | None
+    skey: tuple[str, str]
+    ckey: Union[bool, tuple[str, str]]
 
-    registry: ClassVar[Dict[str, Dict[str, "csetting"]]] = dict()
+    registry: ClassVar[dict[str, dict[str, "csetting"]]] = dict()
 
     def __init__(
         self,
         name: str,
-        type: Union[Any, Tuple[Any, Any]],
+        type: Union[Any, tuple[Any, Any]],
         *,
         default: Any = None,
-        read: Optional[Permission] = None,
-        write: Optional[Permission] = None,
-        skey: Optional[Tuple[str, str]] = None,
-        ckey: Optional[Union[bool, Tuple[str, str]]] = None,
+        read: Permission | None = None,
+        write: Permission | None = None,
+        skey: tuple[str, str] | None = None,
+        ckey: Union[bool, tuple[str, str]] | None = None,
         register: bool = True,
         stacklevel: int = 0,
     ):
@@ -457,7 +445,7 @@ class csetting:
 
         cls(name, type, default=default, stacklevel=1)
 
-    def normalize(self, value: SValue) -> Optional[SValue]:
+    def normalize(self, value: SValue) -> SValue | None:
         return value
 
     @inject()
@@ -469,7 +457,7 @@ class csetting:
         return convert(value, self.gtype)
 
     @inject()
-    def setter(self, value: Optional[SValue], *, core: CoreComponent):
+    def setter(self, value: SValue | None, *, core: CoreComponent):
         if value is not None:
             value = self.normalize(value)
 
@@ -520,7 +508,7 @@ def setup_pyramid_csettings(comp, config):
 
         cslit = Literal[("all",) + tuple(stngs)]  # type: ignore
         cstype = Annotated[
-            List[Annotated[cslit, TSExport(f"{basename}CSetting", component=cid)]],
+            list[Annotated[cslit, TSExport(f"{basename}CSetting", component=cid)]],
             Meta(description=f"{basename} component settings to read"),
         ]
         get_parameters.append(
@@ -665,7 +653,7 @@ ORIGIN_RE = (
 )
 
 AllowOrigin = Annotated[
-    List[Annotated[str, Meta(pattern=ORIGIN_RE)]],
+    list[Annotated[str, Meta(pattern=ORIGIN_RE)]],
     Meta(
         description="Origins are composed of a scheme, domain, and an optional "
         "port if it differs from the default (80 for HTTP and 443 for HTTPS). "
@@ -689,7 +677,7 @@ class allow_origin(csetting):
     write = cors_manage
     skey = (COMP_ID, "cors_allow_origin")
 
-    def normalize(self, value: AllowOrigin) -> Optional[AllowOrigin]:
+    def normalize(self, value: AllowOrigin) -> AllowOrigin | None:
         value = [itm.rstrip("/").lower() for itm in value]
         result = list()
         for itm in value:
@@ -707,7 +695,7 @@ class custom_css(csetting):
     default = ""
     ckey = True
 
-    def normalize(self, value: str) -> Optional[str]:
+    def normalize(self, value: str) -> str | None:
         if re.match(r"^\s*$", value, re.MULTILINE):
             return None
         return value
@@ -719,11 +707,11 @@ class LogoMimeType(Enum):
 
 
 class header_logo(csetting):
-    vtype = (Tuple[LogoMimeType, bytes], FileUploadRef)
+    vtype = (tuple[LogoMimeType, bytes], FileUploadRef)
     skey = (COMP_ID, "logo")
     ckey = True
 
-    def normalize(self, value: FileUploadRef) -> Optional[Tuple[LogoMimeType, bytes]]:
+    def normalize(self, value: FileUploadRef) -> tuple[LogoMimeType, bytes] | None:
         fupload = value()
         try:
             mime_type = LogoMimeType(fupload.mime_type)
@@ -752,23 +740,24 @@ class Metrics(Struct):
 class HomePageHeaders(Struct):
     first_name: str = UNSET
     last_name: str = UNSET
-    menu: List[Dict[str, Any]] = UNSET
-    img: List[Dict[str, Any]] = UNSET
+    menu: list[dict[str, Any]] = UNSET
+    img: list[dict[str, Any]] = UNSET
 
 
 class HomePageFooters(Struct):
-    service: List[Dict[str, Any]] = UNSET
+    service: list[dict[str, Any]] = UNSET
     service_name: str = UNSET
-    address_phone: List[Dict[str, Any]] = UNSET
+    address_phone: list[dict[str, Any]] = UNSET
     address_name: str = UNSET
     footer_name: str = UNSET
     base_year: str = UNSET
-    img: List[Dict[str, Any]] = UNSET
+    img: list[dict[str, Any]] = UNSET
     colorBackground: str = UNSET
     colorText: str = UNSET
 
-csetting("full_name", Optional[str], skey=("core", "system.full_name"))
-csetting("home_path", Optional[str])
+csetting("full_name", str | None, skey=("core", "system.full_name"))
+csetting("home_path", str | None)
+
 csetting("metrics", Metrics, default={})
 csetting("home_page_header", HomePageHeaders, default={})
 csetting("home_page_footer", HomePageFooters, default={})

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable
 
 from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
 from pyramid.predicates import as_sorted_tuple  # type: ignore
@@ -41,9 +42,9 @@ class ViewMeta(MetaPredicateBase):
     openapi: bool
     path_params: Mapping[str, PathParam]
     query_params: Mapping[str, QueryParam]
-    body_type: Optional[type]
-    return_type: Optional[type]
-    react_renderer: Optional[str]
+    body_type: type | None
+    return_type: type | None
+    react_renderer: str | None
 
 
 @dataclass
@@ -55,8 +56,8 @@ class RouteMeta(MetaPredicateBase):
     itemplate: str
     ktemplate: str
     path_params: Mapping[str, PathParam]
-    path_decoders: Sequence[Tuple[str, Callable[[str], Any]]]
-    cors_headers: Optional[Tuple[str, ...]]
+    path_decoders: Sequence[tuple[str, Callable[[str], Any]]]
+    cors_headers: tuple[str, ...] | None
 
 
 class ErrorRendererPredicate:

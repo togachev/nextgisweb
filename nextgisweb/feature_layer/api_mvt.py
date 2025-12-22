@@ -1,5 +1,5 @@
 from packaging import version
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 from uuid import uuid4
 
 from msgspec import UNSET, Meta, UnsetType
@@ -40,7 +40,7 @@ MAKE_VALID = version.parse(gdal.__version__.split("-")[0]) < version.parse("3.5.
 def mvt(
     request,
     *,
-    resource: Annotated[List[int], Meta(min_length=1)],
+    resource: Annotated[list[int], Meta(min_length=1)],
     z: TileZ,
     x: TileX,
     y: TileY,
@@ -136,7 +136,7 @@ def mvt(
 def feature_mvt(
     request,
     *,
-    resource: Annotated[List[int], Meta(min_length=1)],
+    resource: Annotated[list[int], Meta(min_length=1)],
     z: TileZ,
     x: TileX,
     y: TileY,

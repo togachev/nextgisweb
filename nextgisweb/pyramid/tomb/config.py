@@ -1,9 +1,10 @@
 import re
+from collections.abc import Mapping
 from inspect import signature
 from pathlib import Path
 from sys import _getframe
-from typing import Annotated, Any, Dict, Mapping, Optional, Tuple
-from warnings import warn, warn_explicit
+from typing import Annotated, Any
+from warnings import warn
 
 from msgspec import NODEFAULT, Meta
 from msgspec import DecodeError as MsgspecDecodeError
@@ -11,13 +12,14 @@ from msgspec import ValidationError as MsgSpecValidationError
 from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
+from pyramid.exceptions import ConfigurationError
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
 from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
 from nextgisweb.lib.apitype.schema import _AnyOfRuntime
-from nextgisweb.lib.apitype.util import disannotate, is_struct
+from nextgisweb.lib.apitype.util import disannotate, is_struct_type
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
@@ -50,7 +52,7 @@ def _view_driver_factory(
     *,
     path_params: Mapping[str, PathParam],
     query_params: Mapping[str, QueryParam],
-    body: Optional[Tuple[str, Any]],
+    body: tuple[str, Any] | None,
     result: Any,
 ):
     extract = list()
@@ -137,7 +139,7 @@ def find_template(name, func=None, stack_level=1):
 
 
 PATH_TYPE_UNKNOWN = Annotated[str, Meta(description="Undocumented")]
-PATH_TYPES: Dict[str, Any] = dict(
+PATH_TYPES = dict[str, Any](
     # Basic types
     str=Annotated[str, Meta(extra=dict(route_pattern=r"[^/]+"))],
     any=Annotated[str, Meta(extra=dict(route_pattern=r".+"))],
@@ -301,13 +303,12 @@ class Configurator(PyramidConfigurator):
 
             sig = signature(view)
 
-            body_type = None
-            return_type = None
+            body_type = return_type = None
+            has_request = has_context = False
+            path_params = dict[str, PathParam]()
+            query_params = dict[str, QueryParam]()
+            body: tuple[str, Any] | None = None
 
-            has_request, has_context = False, False
-            path_params: Dict[str, PathParam] = dict()
-            query_params: Dict[str, QueryParam] = dict()
-            body: Optional[Tuple[str, Any]] = None
             for idx, (name, p) in enumerate(sig.parameters.items()):
                 if name == "request":
                     has_request = True
@@ -325,7 +326,7 @@ class Configurator(PyramidConfigurator):
                     assert p.annotation is not p.empty, f"Type hint required for {name}"
                     body_type = p.annotation
                     body_base, body_extras = disannotate(body_type)
-                    if is_struct(body_base) or (ContentType.JSON in body_extras):
+                    if is_struct_type(body_base) or (ContentType.JSON in body_extras):
                         bextract = _json_msgspec_factory(body_type)
                     else:
                         err = f"Body type not supported: {body_base}"
@@ -351,7 +352,7 @@ class Configurator(PyramidConfigurator):
                 return_concrete, return_extras = disannotate(return_type, supertype=True)
                 if (
                     return_concrete is EmptyObject
-                    or is_struct(return_concrete)
+                    or is_struct_type(return_concrete)
                     or ContentType.JSON in return_extras
                     or _AnyOfRuntime in return_extras
                 ):
@@ -407,19 +408,15 @@ class Configurator(PyramidConfigurator):
             methods = set()
             for view in route.views:
                 if is_api and not isinstance(view.method, str):
-                    _warn_from_info(
-                        f"View for route '{route.name}' has invalid or missing "
-                        f"request method ({view.method}), which is required "
-                        f"for API routes since 4.5.0.dev16.",
-                        view.info,
+                    raise ConfigurationError(
+                        f"View {view.func} for route '{route.name}' must have "
+                        f"a request method specified."
                     )
 
                 if is_api and not route.overloaded and view.method in methods:
-                    _warn_from_info(
-                        f"Route '{route.name}' seems to be overloaded. Route "
-                        f"predicate 'overloaded' is required for such routes "
-                        f"since 4.5.0.dev17.",
-                        view.info,
+                    raise ConfigurationError(
+                        f"Route '{route.name}' appears to be overloaded and "
+                        "requires the overloaded=True predicate."
                     )
 
                 methods.add(view.method)
@@ -451,13 +448,3 @@ class Configurator(PyramidConfigurator):
 def _request_path_param(request):
     matchdict = request.matchdict
     return {k: v(matchdict[k]) for k, v in request.path_param_decoders}
-
-
-def _warn_from_info(message, info):
-    warn_explicit(
-        message,
-        category=DeprecationWarning,
-        filename=info.file,
-        lineno=info.line,
-        module=__name__,
-    )

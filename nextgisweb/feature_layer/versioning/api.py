@@ -1,7 +1,7 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime, timedelta
 from itertools import islice
-from typing import TYPE_CHECKING, Annotated, Generator, List, Literal, Union
+from typing import TYPE_CHECKING, Annotated, Generator, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct
@@ -10,7 +10,7 @@ from msgspec.msgpack import encode as msgspec_encode
 from pyramid.response import Response
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, DatetimeNaive, StatusCode
 
 from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
 from nextgisweb.resource import DataScope, resource_factory
@@ -41,10 +41,6 @@ Epoch = Annotated[int, Meta(gt=0, description="Versioning epoch")]
 VersionID = Annotated[int, Meta(ge=0, description="Version ID")]
 VersionTstamp = Annotated[datetime, Meta(tz=False, description="Version timestamp")]
 
-# TODO: Switch to datetime type when it will be supported for query parameters
-TIMESTAMP_PATTERN = r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?$"
-TimestampParam = Annotated[str, Meta(pattern=TIMESTAMP_PATTERN)]
-
 
 class FieldSummary(Struct, kw_only=True):
     id: int
@@ -63,13 +59,13 @@ class ChangesCheckResponse(Struct, kw_only=True):
     tstamp: datetime
     geometry_type: FeaureLayerGeometryType
     srs: SRSReference
-    fields: List[FieldSummary]
+    fields: list[FieldSummary]
     fetch: Annotated[str, Meta(description="URL to start fetching changes")]
 
 
 class ChangesCursor(Struct, kw_only=True, array_like=True):
-    fields: List[int]
-    extensions: List[str]
+    fields: list[int]
+    extensions: list[str]
     fid_last: Union[int, None] = None
 
     def encode(self):
@@ -98,7 +94,7 @@ def change_check(
     initial: VersionID = 0,
     target: VersionID | None = None,
     epoch: Epoch | None = None,
-    extensions: List[Extension] = [],
+    extensions: list[Extension] = [],
 ) -> AnyOf[
     ChangesCheckResponse,
     Annotated[None, StatusCode(204)],
@@ -191,7 +187,7 @@ def change_fetch(
     initial: VersionID,
     target: VersionID,
     cursor: str,
-) -> AsJSON[List[Union[ChangesContinue, ChangeTypes]]]:
+) -> AsJSON[list[Union[ChangesContinue, ChangeTypes]]]:
     """Fetch changes incrementally
 
     :param initial: Initial version
@@ -317,7 +313,7 @@ VersionCGetItem = VersionCGetVersion | VersionCGetGroup
 
 class VersionCGetResponse(Struct, kw_only=True):
     cursor: VersionCGetCursor | None
-    items: List[VersionCGetItem]
+    items: list[VersionCGetItem]
 
     @classmethod
     def from_generator(
@@ -343,11 +339,11 @@ def version_cget(
         Meta(description="Group consecutive versions by the same user"),
     ] = False,
     tstamp_ge: Annotated[
-        TimestampParam | None,
+        DatetimeNaive | None,
         Meta(description="Minimum timestamp (inclusive)"),
     ] = None,
     tstamp_lt: Annotated[
-        TimestampParam | None,
+        DatetimeNaive | None,
         Meta(description="Maximum timestamp (exclusive)"),
     ] = None,
     limit: Annotated[
@@ -370,9 +366,9 @@ def version_cget(
 
         query = FVersioningObj.filter_by(resource_id=resource.id).order_by(ord)
         if tstamp_ge is not None:
-            query = query.filter(FVersioningObj.tstamp >= datetime.fromisoformat(tstamp_ge))
+            query = query.filter(FVersioningObj.tstamp >= tstamp_ge)
         if tstamp_lt is not None:
-            query = query.filter(FVersioningObj.tstamp < datetime.fromisoformat(tstamp_lt))
+            query = query.filter(FVersioningObj.tstamp < tstamp_lt)
 
         last_id = int(cursor) if cursor else None
 

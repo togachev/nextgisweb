@@ -1,7 +1,7 @@
 from collections import defaultdict
 from inspect import isclass
 from itertools import chain
-from typing import Any, Dict
+from typing import Any
 
 from msgspec import NODEFAULT, UNSET
 from msgspec.inspect import Metadata, type_info
@@ -17,7 +17,7 @@ from nextgisweb.lib.apitype.util import decompose_union
 
 from ..component import PyramidComponent
 from ..tomb import is_json_type, iter_routes
-from .docstring import Doctring
+from .docstring import Docstring
 
 
 def _apply_json_content_type(ct, tdef):
@@ -73,7 +73,7 @@ def _context_param(value):
 
 @inject()
 def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
-    doc: Dict[str, Any] = dict(openapi="3.1.0")
+    doc: dict[str, Any] = dict(openapi="3.1.0")
 
     info = doc["info"] = dict()
     distr = comp.env.options.with_prefix("distribution")
@@ -152,7 +152,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
                 o_param("context", **_context_param(oper_context))
 
             # Create operation object
-            oper: Dict[str, Any] = dict(
+            oper: dict[str, Any] = dict(
                 tags=[_ctag(view.component)],
                 deprecated=view.deprecated,
             )
@@ -161,7 +161,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
             paths[oper_pattern][view.method.lower()] = oper
 
             # Parse function docstring
-            dstr = Doctring(view.func)
+            dstr = Docstring(view.func)
             oper["summary"] = dstr.short
             oper["description"] = dstr.long
 

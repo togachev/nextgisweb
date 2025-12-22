@@ -1,6 +1,6 @@
 from collections import namedtuple
 from types import MappingProxyType
-from typing import Any, Annotated, ClassVar, List, Literal, Tuple, Type, Union
+from typing import Any, Annotated, ClassVar, Literal, Type, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -88,7 +88,7 @@ class ResourceMeta(orm.DeclarativeMeta):
         resource_registry.register(cls)
 
 
-ResourceScopeType = Union[Tuple[Type[Scope], ...], Type[Scope]]
+ResourceScopeType = Union[tuple[Type[Scope], ...], Type[Scope]]
 
 
 class Resource(Base, metaclass=ResourceMeta):
@@ -150,7 +150,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     @classmethod
     def implemented_interfaces(cls):
-        """List resource interfaces implemented by class"""
+        """list resource interfaces implemented by class"""
         return [
             i
             for i in interface_registry
@@ -170,12 +170,12 @@ class Resource(Base, metaclass=ResourceMeta):
         return None
 
     def provided_interfaces(self):
-        """List resource interfaces provided by instance"""
+        """list resource interfaces provided by instance"""
         return [i for i in interface_registry if self.lookup_interface(i)]
 
     @property
     def parents(self):
-        """List of all parents from root to current parent"""
+        """list of all parents from root to current parent"""
         result = []
         current = self
         while current.parent:
@@ -377,6 +377,7 @@ class ResourceWebMapGroup(Base):
     id_pos = sa.Column(sa.Integer, nullable=True)
     webmap_group_id = orm.relationship("WebMapGroupResource", cascade="all,delete",
         backref="resource_wmg")
+
 
 class WebMapGroupResource(Base):
     __tablename__ = "wmg_resource"
@@ -584,10 +585,10 @@ class ACLRule(Struct, kw_only=True):
 
 
 class ACLAttr(SAttribute):
-    def get(self, srlzr) -> List[ACLRule]:
+    def get(self, srlzr) -> list[ACLRule]:
         return [ACLRule.from_model(itm) for itm in srlzr.obj.acl]
 
-    def set(self, srlzr, value: List[ACLRule], *, create: bool):
+    def set(self, srlzr, value: list[ACLRule], *, create: bool):
         for r in list(srlzr.obj.acl):
             srlzr.obj.acl.remove(r)
 
@@ -639,12 +640,12 @@ class ChildrenAttr(SAttribute):
 
 
 class InterfacesAttr(SAttribute):
-    def get(self, srlzr) -> List[ResourceInterfaceIdentity]:
+    def get(self, srlzr) -> list[ResourceInterfaceIdentity]:
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
 class ScopesAttr(SAttribute):
-    def get(self, srlzr) -> List[ResourceScopeIdentity]:
+    def get(self, srlzr) -> list[ResourceScopeIdentity]:
         return list(srlzr.obj.scope.keys())
     
 

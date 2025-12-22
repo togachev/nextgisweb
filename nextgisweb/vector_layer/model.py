@@ -2,7 +2,7 @@ import re
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -901,7 +901,7 @@ class GeometryTypeAttr(SAttribute):
 
 
 class FieldsAttr(SAttribute):
-    def set(self, srlzr: Serializer, value: List[Dict[str, Any]], *, create: bool):
+    def set(self, srlzr: Serializer, value: list[dict[str, Any]], *, create: bool):
         # TODO: Improve typing, use types from feature layer APIs
         srlzr.obj.setup_from_fields(value)
 
@@ -929,7 +929,7 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer):
     cast_is_multi = LoaderAttr(CastAutoYesNo)
     cast_has_z = LoaderAttr(CastAutoYesNo)
     fid_source = LoaderAttr(FidSource)
-    fid_field = LoaderAttr(Union[List[str], str])
+    fid_field = LoaderAttr(Union[list[str], str])
 
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
     geometry_type_parent = GeometryTypeParent(read=ResourceScope.read, write=None)

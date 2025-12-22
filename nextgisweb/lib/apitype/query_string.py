@@ -1,6 +1,7 @@
+from collections.abc import Mapping, Sequence
 from functools import cached_property
 from itertools import groupby
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable
 
 from msgspec import NODEFAULT, ValidationError
 
@@ -12,7 +13,7 @@ class QueryString:
         self.value = value
 
     @cached_property
-    def params(self) -> Sequence[Tuple[str, str]]:
+    def params(self) -> Sequence[tuple[str, str]]:
         return [
             (unquote_strict(nv[0]), nv[1])
             for nv in [p.split("=", maxsplit=1) for p in self.value.split("&")]
@@ -30,7 +31,7 @@ class QueryString:
             )
         }
 
-    def last(self, name: str) -> Optional[str]:
+    def last(self, name: str) -> str | None:
         return None if (v := self.grouped.get(name)) is None else v[-1]
 
 

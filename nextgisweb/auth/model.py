@@ -1,8 +1,9 @@
 from collections import namedtuple
+from collections.abc import Mapping
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
-from typing import Callable, ClassVar, FrozenSet, Iterable, Mapping, Union, overload
+from typing import Callable, ClassVar, Iterable, Union, overload
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -163,7 +164,7 @@ class User(Principal):
         return cls.filter(sa.func.lower(User.keyname) == keyname.lower()).one()
 
     @cached_property
-    def effective_permissions(self) -> FrozenSet[Permission]:
+    def effective_permissions(self) -> frozenset[Permission]:
         registry = Permission.registry
         return frozenset(
             registry[identity]

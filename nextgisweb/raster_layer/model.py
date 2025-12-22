@@ -4,8 +4,7 @@ import subprocess
 from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Literal, Union
-from warnings import warn
+from typing import Literal, Union
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -90,7 +89,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def load_file(self, filename, env_arg=None, *, cog=False):
+    def load_file(self, filename, *, cog=False):
         if isinstance(filename, Path):
             filename = str(filename)
 
@@ -120,12 +119,6 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 )
             filename = f"{zip_filename}/{supported_zip_items[0]}"
 
-        if env_arg is not None:
-            warn(
-                "RasterLayer.load_file's env_arg is deprecated since 4.7.0.dev7.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
         comp = env.raster_layer
 
         ds = gdal.OpenEx(filename, gdalconst.GA_ReadOnly, allowed_drivers=SUPPORTED_DRIVERS)
@@ -515,9 +508,9 @@ class CogAttr(SColumn):
 
 
 class GeoTransform(SAttribute):
-    ctypes = CRUTypes(List[str], List[str], List[str])
+    ctypes = CRUTypes(list[str], list[str], list[str])
 
-    def get(self, srlzr: Serializer) -> List[str]:
+    def get(self, srlzr: Serializer) -> list[str]:
         return (
             srlzr.obj.geo_transform
             if srlzr.obj.geo_transform is not None
@@ -526,16 +519,16 @@ class GeoTransform(SAttribute):
 
 
 class Bands(SAttribute):
-    ctypes = CRUTypes(List[str], List[str], List[str])
+    ctypes = CRUTypes(list[str], list[str], list[str])
 
-    def get(self, srlzr: Serializer) -> List[str]:
+    def get(self, srlzr: Serializer) -> list[str]:
         return srlzr.obj.meta.bands if srlzr.obj.meta is not None else []
 
 
 class ColorInterpretation(SAttribute):
-    ctypes = CRUTypes(List[str], List[str], List[str])
+    ctypes = CRUTypes(list[str], list[str], list[str])
 
-    def get(self, srlzr: Serializer) -> List[str]:
+    def get(self, srlzr: Serializer) -> list[str]:
         return (
             [band.color_interp for band in srlzr.obj.meta.bands]
             if srlzr.obj.meta is not None

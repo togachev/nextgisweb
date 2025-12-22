@@ -71,6 +71,7 @@ export const ButtonSetting = observer((props: StoreProps) => {
                             store: store,
                             setup: setup,
                             tab: tab,
+                            location: "true",
                             title: msg(type, operation),
                             height: isM ? "90vh" : "70vh",
                             padding: isM && "32px 6px 6px 6px"

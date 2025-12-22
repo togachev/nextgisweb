@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Tuple, Type, Union
+from typing import Type, Union
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
 
@@ -12,18 +12,11 @@ from .serialize import CRUTypes, Serializer
 
 
 class CompositeSerializer:
-    def __init__(
-            self,
-            *,
-            keys: Union[Tuple[str, ...], None] = None,
-            description: bool = True,
-            mapgroup: bool = True,
-            user: User
-    ):
+    def __init__(self, *, keys: Union[tuple[str, ...], None] = None, user: User, description: bool = True, mapgroup: bool = True):
         self.user = user
         self.description = description
         self.mapgroup = mapgroup
-        self.members: Tuple[Tuple[str, Type[Serializer]], ...] = tuple(
+        self.members: tuple[tuple[str, Type[Serializer]], ...] = tuple(
             (identity, srlzrcls)
             for identity, srlzrcls in Serializer.registry.items()
             if (keys is None or identity in keys)

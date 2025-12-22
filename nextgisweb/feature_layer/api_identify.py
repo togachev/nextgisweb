@@ -1,5 +1,4 @@
-from typing import Any, List
-
+from typing import Any
 from msgspec import Struct
 from osgeo import gdal, ogr, osr
 
@@ -29,15 +28,15 @@ class RasterLayerIdentifyItem(Struct, kw_only=True):
 class IdentifyBody(Struct, kw_only=True):
     geom: str
     srs: int
-    styles: List[int]
+    styles: list[int]
 
 
 class IModuleBody(Struct, kw_only=True):
     geom: str
     srs: int
-    styles: List[object]
+    styles: list[object]
     status: bool
-    point: List[float]
+    point: list[float]
 
 
 def identify(request, *, body: IdentifyBody) -> JSONType:

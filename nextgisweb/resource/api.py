@@ -1,20 +1,9 @@
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Mapping,
-    Union,
-    cast,
-)
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Union, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import zope.event
-import zope.event.classhandler
 from msgspec import UNSET, DecodeError, Meta, Struct, UnsetType, defstruct, field, to_builtins
 from msgspec import ValidationError as MsgspecValidationError
 from msgspec.json import Decoder
@@ -25,8 +14,6 @@ from sqlalchemy.sql import exists
 from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op
 from sqlalchemy.sql.operators import ilike_op, in_op, like_op
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from ..postgis.exception import ExternalDatabaseError
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
@@ -60,9 +47,9 @@ from .widget import CompositeWidget
 class BlueprintResource(Struct):
     identity: ResourceCls
     label: str
-    base_classes: List[ResourceCls]
-    interfaces: List[ResourceInterfaceIdentity]
-    scopes: List[ResourceScopeIdentity]
+    base_classes: list[ResourceCls]
+    interfaces: list[ResourceInterfaceIdentity]
+    scopes: list[ResourceScopeIdentity]
     category: ResourceCategoryIdentity
     order: int
 
@@ -75,7 +62,7 @@ class BlueprintPermission(Struct):
 class BlueprintScope(Struct):
     identity: ResourceScopeIdentity
     label: str
-    permissions: Dict[str, BlueprintPermission]
+    permissions: dict[str, BlueprintPermission]
 
 
 class BlueprintCategory(Struct):
@@ -85,9 +72,9 @@ class BlueprintCategory(Struct):
 
 
 class Blueprint(Struct):
-    resources: Dict[ResourceCls, BlueprintResource]
-    scopes: Dict[ResourceScopeIdentity, BlueprintScope]
-    categories: Dict[ResourceCategoryIdentity, BlueprintCategory]
+    resources: dict[ResourceCls, BlueprintResource]
+    scopes: dict[ResourceScopeIdentity, BlueprintScope]
+    categories: dict[ResourceCategoryIdentity, BlueprintCategory]
 
 
 def blueprint(request) -> Blueprint:
@@ -229,12 +216,12 @@ def collection_get(
             "significantly slower. Otherwise, only the `resource` key is serialized."
         ),
     ] = "full",
-    cls: Annotated[List[ResourceCls], Meta(description="List cls")] = [],
+    cls: Annotated[list[ResourceCls], Meta(description="List cls")] = [],
     description: Annotated[
         bool,
         Meta(description="Description resources"),
     ] = True,
-) -> AsJSON[List[CompositeRead]]:
+) -> AsJSON[list[CompositeRead]]:
     """Read children resources"""
     if len(cls) == 0:
         query = (
@@ -293,12 +280,12 @@ def collection_post(
     return ResourceRefWithParent(id=resource.id, parent=parent_ref)
 
 
-DeleteResources = Annotated[List[ResourceID], Meta(description="Resource IDs to delete")]
+DeleteResources = Annotated[list[ResourceID], Meta(description="Resource IDs to delete")]
 
 
 class ResourceDeleteSummary(Struct, kw_only=True):
     count: Annotated[int, Meta(description="Total number of resources")]
-    resources: Annotated[Dict[ResourceCls, int], Meta(description="Number of resources by class")]
+    resources: Annotated[dict[ResourceCls, int], Meta(description="Number of resources by class")]
 
     @classmethod
     def from_resources(cls, resources):
@@ -596,7 +583,7 @@ class SearchAttrParams(Struct, kw_only=True):
     ] = UNSET
 
     id__in: Annotated[
-        Union[List[ResourceID], UnsetType],
+        Union[list[ResourceID], UnsetType],
         Meta(description="Filter by list of IDs"),
     ] = UNSET
 
@@ -624,34 +611,34 @@ class SearchAttrParams(Struct, kw_only=True):
     ] = UNSET
 
     cls__in: Annotated[
-        Union[List[str], UnsetType],
+        Union[list[str], UnsetType],
         Meta(description="Filter by list of types"),
     ] = UNSET
 
     parent: Annotated[
-        Union["ResourceID", UnsetType],
+        Union[ResourceID, UnsetType],
         Meta(description="Filter by exact parent ID"),
     ] = UNSET
 
     parent__in: Annotated[
-        Union[List["ResourceID"], UnsetType],
+        Union[list[ResourceID], UnsetType],
         Meta(description="Filter by list of parent IDs"),
     ] = UNSET
 
     parent_id: Annotated[
-        Union["ResourceID", UnsetType],
+        Union[ResourceID, UnsetType],
         Meta(description="Use `parent` instead"),
         DEPRECATED,
     ] = UNSET
 
     parent_id__eq: Annotated[
-        Union["ResourceID", UnsetType],
+        Union[ResourceID, UnsetType],
         Meta(description="Use `parent` instead"),
         DEPRECATED,
     ] = UNSET
 
     parent_id__in: Annotated[
-        Union[List["ResourceID"], UnsetType],
+        Union[list[ResourceID], UnsetType],
         Meta(description="Use `parent__in` instead"),
         DEPRECATED,
     ] = UNSET
@@ -668,7 +655,7 @@ class SearchAttrParams(Struct, kw_only=True):
     ] = UNSET
 
     keyname__in: Annotated[
-        Union[List[str], UnsetType],
+        Union[list[str], UnsetType],
         Meta(description="Filter by list of keynames"),
     ] = UNSET
 
@@ -694,7 +681,7 @@ class SearchAttrParams(Struct, kw_only=True):
     ] = UNSET
 
     display_name__in: Annotated[
-        Union[List[str], UnsetType],
+        Union[list[str], UnsetType],
         Meta(description="Filter by list of display names"),
     ] = UNSET
 
@@ -704,7 +691,7 @@ class SearchAttrParams(Struct, kw_only=True):
     ] = UNSET
 
     owner_user__in: Annotated[
-        Union[List[UserID], UnsetType],
+        Union[list[UserID], UnsetType],
         Meta(description="Filter by list of owner user IDs"),
     ] = UNSET
 
@@ -721,12 +708,12 @@ class SearchAttrParams(Struct, kw_only=True):
     ] = UNSET
 
     owner_user_id__in: Annotated[
-        Union[List[UserID], UnsetType],
+        Union[list[UserID], UnsetType],
         Meta(description="Use `owner_user__in` instead"),
         DEPRECATED,
     ] = UNSET
 
-    ats: ClassVar[Dict[str, Any]] = {
+    ats: ClassVar[dict[str, Any]] = {
         "id": Resource.id,
         "cls": Resource.cls,
         "parent": Resource.parent_id,
@@ -738,7 +725,7 @@ class SearchAttrParams(Struct, kw_only=True):
         "owner_user_id": Resource.owner_user_id,
     }
 
-    ops: ClassVar[Dict[str, Any]] = {
+    ops: ClassVar[dict[str, Any]] = {
         "": eq_op,
         "eq": eq_op,
         "like": like_op,
@@ -758,7 +745,7 @@ class SearchAttrParams(Struct, kw_only=True):
 
 class SearchResmetaParams(Struct, kw_only=True):
     has: Annotated[
-        Dict[str, bool],
+        dict[str, bool],
         Meta(
             description="Filter by the presence of metadata keys\n\n"
             "If `true`, only resources that include the specified metadata key "
@@ -769,7 +756,7 @@ class SearchResmetaParams(Struct, kw_only=True):
     ] = field(name="resmeta__has")
 
     json: Annotated[
-        Dict[str, str],
+        dict[str, str],
         Meta(
             description="Filter by metadata values\n\n"
             'Values should be JSON-encoded, e.g., `"foo"` for a string '
@@ -779,7 +766,7 @@ class SearchResmetaParams(Struct, kw_only=True):
     ] = field(name="resmeta__json")
 
     like: Annotated[
-        Dict[str, str],
+        dict[str, str],
         Meta(
             description="Filter by metadata value pattern with case sensitivity",
             examples=[dict()],  # Just to stop Swagger UI make crazy defaults
@@ -787,7 +774,7 @@ class SearchResmetaParams(Struct, kw_only=True):
     ] = field(name="resmeta__like")
 
     ilike: Annotated[
-        Dict[str, str],
+        dict[str, str],
         Meta(
             description="Filter by metadata value pattern without case sensitivity",
             examples=[dict()],  # Just to stop Swagger UI make crazy defaults
@@ -848,7 +835,7 @@ def search(
     root: Annotated[SearchRootParams, Query(spread=True)],
     attrs: Annotated[SearchAttrParams, Query(spread=True)],
     resmeta: Annotated[SearchResmetaParams, Query(spread=True)],
-) -> AsJSON[List[CompositeRead]]:
+) -> AsJSON[list[CompositeRead]]:
     """Search resources"""
 
     query = root.query()
@@ -898,7 +885,7 @@ def resource_volume(
 
 
 QuotaCheckBody = Annotated[
-    Dict[
+    dict[
         Annotated[ResourceCls, Meta(examples=["webmap"])],
         Annotated[int, Meta(ge=0, examples=[1])],
     ],
@@ -939,7 +926,7 @@ CompositeWidgetOperation = Annotated[
 ]
 
 CompositeMembersConfig = Annotated[
-    Dict[str, Any],
+    dict[str, Any],
     TSExport("CompositeMembersConfig"),
 ]
 

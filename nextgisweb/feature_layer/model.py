@@ -1,4 +1,4 @@
-from typing import Any, List, Union
+from typing import Any, Union
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -143,7 +143,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
 
 
 class FieldsAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> List[FeatureLayerFieldRead]:
+    def get(self, srlzr: Serializer) -> list[FeatureLayerFieldRead]:
         return [
             FeatureLayerFieldRead(
                 id=f.id,
@@ -160,7 +160,7 @@ class FieldsAttr(SAttribute):
             for f in srlzr.obj.fields
         ]
 
-    def set(self, srlzr: Serializer, value: List[FeatureLayerFieldWrite], *, create: bool):
+    def set(self, srlzr: Serializer, value: list[FeatureLayerFieldWrite], *, create: bool):
         obj = srlzr.obj
 
         fldmap = dict()

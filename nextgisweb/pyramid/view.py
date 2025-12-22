@@ -8,7 +8,6 @@ from pathlib import Path
 from secrets import token_hex
 from time import sleep
 from types import SimpleNamespace
-from typing import Optional
 
 from markupsafe import Markup
 from psutil import Process
@@ -98,7 +97,7 @@ def asset_favicon(request, *, pyramid: PyramidComponent):
 
 
 @inject()
-def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
+def asset_css(request, *, ckey: str | None = None, core: CoreComponent):
     response = Response(
         core.settings_get("pyramid", "custom_css", ""),
         content_type="text/css",
@@ -113,6 +112,7 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
 
 
 @inject()
+
 def asset_home_page_img(request, *, core: CoreComponent):
 
     ikey = request.matchdict["ikey"]
@@ -126,7 +126,7 @@ def asset_home_page_img(request, *, core: CoreComponent):
 
 
 @inject()
-def asset_hlogo(request, *, ckey: Optional[str] = None, core: CoreComponent):
+def asset_hlogo(request, *, ckey: str | None = None, core: CoreComponent):
     if (data := core.settings_get("pyramid", "logo", None)) is None:
         raise HTTPNotFound()
     mime_type, file = data
@@ -143,7 +143,7 @@ def asset_hlogo(request, *, ckey: Optional[str] = None, core: CoreComponent):
 def asset_blogo(
     request,
     *,
-    ckey: Optional[str] = None,
+    ckey: str | None = None,
     core: CoreComponent,
     pyramid: PyramidComponent,
 ):
