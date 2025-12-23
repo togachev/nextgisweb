@@ -105,7 +105,7 @@ export const LayerTreeItemTitle = observer(
                     </Col>
                     {actions}
                 </Row>
-                {showLegend && (
+                {showLegend && treeItem.type === "layer" && (
                     <Legend checkable={checkable} nodeData={treeItem} />
                 )}
             </>
