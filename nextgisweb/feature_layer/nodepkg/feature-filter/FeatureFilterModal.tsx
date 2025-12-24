@@ -50,6 +50,8 @@ export const FeatureFilterModal = observer(
 
         return (
             <Modal
+                transitionName=""
+                maskTransitionName=""
                 className="ngw-feature-filter-modal"
                 width="" // Do not set the default (520px) width
                 open={open}
