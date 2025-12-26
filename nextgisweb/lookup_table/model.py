@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Literal, Union
+from typing import Literal
 
 import sqlalchemy as sa
 from msgspec import UNSET, UnsetType
@@ -68,7 +68,7 @@ def sort_items(items, sort, order):
     return sorted(items, key=lambda p: p[idx], reverse=reverse)
 
 
-Sort = Union[tuple(Literal[i.value] for i in SortEnum)]
+Sort = Literal[tuple(i.value for i in SortEnum)]
 
 
 class SortAttr(SColumn):
@@ -93,7 +93,7 @@ class OrderAttr(SAttribute):
     def get(self, srlzr) -> list[str]:
         return [k for k, v in srlzr.obj.value]
 
-    def set(self, srlzr, value: Union[list[str], UnsetType], *, create: bool):
+    def set(self, srlzr, value: list[str] | UnsetType, *, create: bool):
         pass
 
 

@@ -2,7 +2,7 @@ import re
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -929,7 +929,7 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer):
     cast_is_multi = LoaderAttr(CastAutoYesNo)
     cast_has_z = LoaderAttr(CastAutoYesNo)
     fid_source = LoaderAttr(FidSource)
-    fid_field = LoaderAttr(Union[list[str], str])
+    fid_field = LoaderAttr(list[str] | str)
 
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
     geometry_type_parent = GeometryTypeParent(read=ResourceScope.read, write=None)

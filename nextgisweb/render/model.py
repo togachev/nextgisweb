@@ -8,7 +8,7 @@ from pathlib import Path
 from queue import Empty, Full, Queue
 from threading import Lock, Thread
 from time import time
-from typing import Any, Union
+from typing import Any
 from uuid import uuid4
 
 import sqlalchemy as sa
@@ -460,7 +460,7 @@ sa_event.listen(
 
 
 class TileCacheFlushAttr(SAttribute):
-    def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
+    def set(self, srlzr: Serializer, value: bool | None, *, create: bool):
         if value and srlzr.obj.tile_cache is not None:
             srlzr.obj.tile_cache.clear()
 
@@ -479,7 +479,7 @@ class TileCacheAttr(SAttribute):
             type = self.column.type.python_type
             assert type in (int, bool)
             if self.column.nullable:
-                type = Union[type, None]
+                type = type | None
             self.types = CRUTypes(type, type, type)
 
     def get(self, srlzr: Serializer) -> Any:
@@ -505,10 +505,9 @@ class TileCacheSerializer(Serializer, resource=Resource):
     max_z = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
     ttl = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
 
-    def is_applicable(self):
-        return IRenderableStyle.providedBy(self.obj) and not IRenderableNonCached.providedBy(
-            self.obj
-        )
+    @classmethod
+    def is_applicable(cls, obj):
+        return IRenderableStyle.providedBy(obj) and not IRenderableNonCached.providedBy(obj)
 
     def deserialize(self):
         super().deserialize()

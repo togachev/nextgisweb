@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Annotated, Any, Literal, Union
+from typing import Annotated, Any, Literal
 
 import sqlalchemy as sa
 from msgspec import Struct
@@ -30,10 +30,10 @@ class SColumn(SAttribute):
 
                 col_type = self.column.type
                 if isinstance(col_type, sa.Enum):
-                    type = Union[tuple(Literal[i] for i in col_type.enums)]  # type: ignore
+                    type = Literal[tuple(col_type.enums)]
 
             if self.column.nullable:
-                type = Union[type, None]
+                type = type | None
 
             self.types = CRUTypes(type, type, type)
 
@@ -59,7 +59,7 @@ class SRelationship(SAttribute):
     def setup_types(self):
         vtype = RelationshipRef
         if self.column.nullable:
-            vtype = Union[vtype, None]
+            vtype = vtype | None
         self.types = CRUTypes(vtype, vtype, vtype)
 
     def get(self, srlzr) -> Any:
@@ -79,7 +79,7 @@ class ResourceRef(RelationshipRef, kw_only=True):
 
 
 class ResourceRefOptional(Struct, kw_only=True):
-    id: Union[int, None]
+    id: int | None
 
 
 class ResourceRefWithParent(ResourceRef, kw_only=True):
@@ -90,10 +90,10 @@ class SResource(SRelationship):
     def setup_types(self):
         types = (ResourceRef, ResourceRefWithParent, ResourceRef)
         if self.column.nullable:
-            types = tuple(Union[type, None] for type in types)
+            types = tuple(type | None for type in types)
         self.types = CRUTypes(*types)
 
-    def get(self, srlzr) -> Union[ResourceRefWithParent, None]:
+    def get(self, srlzr) -> ResourceRefWithParent | None:
         if (value := SAttribute.get(self, srlzr)) is None:
             return None
         parent = ResourceRefOptional(id=value.parent_id)
