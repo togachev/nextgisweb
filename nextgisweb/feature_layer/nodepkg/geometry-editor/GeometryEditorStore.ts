@@ -18,7 +18,7 @@ import type {
     EditorStoreConstructorOptions,
     FeatureItem,
 } from "@nextgisweb/feature-layer/type";
-import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
+import type { FeatureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { assert } from "@nextgisweb/jsrealm/error";
 import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
 
@@ -26,7 +26,7 @@ import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { featuresToWkt } from "../util/featuresToWKT";
 
 export type FeatureGeometry = FeatureItem["geom"];
-type NonMultiGeometryType = Exclude<FeaureLayerGeometryType, `MULTI${string}`>;
+type NonMultiGeometryType = Exclude<FeatureLayerGeometryType, `MULTI${string}`>;
 
 class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
     readonly _parentStore?: FeatureEditorStore;
@@ -44,14 +44,14 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
 
     @action
     load(value: FeatureGeometry | null) {
-        this.value = value;
-        this._initValue = value;
+        const geom = this.wkt.readGeometry(value) as Geometry;
+        const norm = value ? this.wkt.writeGeometry(geom) : null;
+        this.value = norm;
+        this._initValue = norm;
         this.source.clear();
         if (!value) {
             return;
         }
-
-        const geom = this.wkt.readGeometry(value) as Geometry;
 
         const makeFeature = (g: Geometry) => new Feature({ geometry: g });
 
@@ -96,9 +96,9 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
         return true;
     }
     @computed
-    get vectorLayerGeometryType(): FeaureLayerGeometryType | undefined {
+    get vectorLayerGeometryType(): FeatureLayerGeometryType | undefined {
         if (this._parentStore) {
-            return this._parentStore.vectorLayer?.geometry_type;
+            return this._parentStore.featureLayer?.geometry_type;
         }
     }
 

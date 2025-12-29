@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -8,6 +8,7 @@ from typing_extensions import Annotated
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
+from typing_extensions import Self
 
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext
@@ -17,12 +18,13 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.lookup_table import LookupTable
 from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 from nextgisweb.resource.model import ResourceRef
-from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys import SRS, SRSRef
 
 from .interface import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     FeatureLayerFieldDatatype,
+    FeatureLayerGeometryType,
     IVersionableFeatureLayer,
 )
 
@@ -65,6 +67,17 @@ class LayerField(Base):
 
     def __str__(self):
         return self.display_name
+
+    @classmethod
+    def copy_from(cls, source: "LayerField") -> Self:
+        return cls(
+            keyname=source.keyname,
+            datatype=source.datatype,
+            display_name=source.display_name,
+            grid_visibility=source.grid_visibility,
+            text_search=source.text_search,
+            lookup_table=source.lookup_table,
+        )
 
 
 class LayerFieldsMixin:
@@ -140,6 +153,16 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     text_search: bool | UnsetType = UNSET
     format_field: Any | UnsetType = UNSET
     lookup_table: ResourceRef | None | UnsetType = UNSET
+
+
+class SrsAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> SRSRef:
+        return SRSRef(id=srlzr.obj.srs.id)
+
+
+class GeometryTypeAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> FeatureLayerGeometryType:
+        return cast(FeatureLayerGeometryType, srlzr.obj.geometry_type)
 
 
 class FieldsAttr(SAttribute):
@@ -265,6 +288,8 @@ class FVersioningAttr(SAttribute):
 class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin, force_create=True):
     identity = "feature_layer"
 
+    srs = SrsAttr(read=ResourceScope.read)
+    geometry_type = GeometryTypeAttr(read=ResourceScope.read)
     fields = FieldsAttr(read=ResourceScope.read, write=ResourceScope.update)
     versioning = FVersioningAttr(read=ResourceScope.read, write=ResourceScope.update)
 

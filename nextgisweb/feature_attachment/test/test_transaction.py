@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import pytest
 import transaction
 
@@ -5,7 +7,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
-from nextgisweb.feature_layer.test import FeatureLayerAPI
+from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -34,13 +36,7 @@ def files(ngw_file_upload, ngw_data_path):
     )
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="versioning_disabled"),
-        pytest.param(True, id="versioning_enabled"),
-    ],
-)
+@parametrize_versioning()
 def test_workflow(versioning, files, mkres, ngw_webtest_app):
     web = ngw_webtest_app
     res = mkres(versioning)
@@ -187,6 +183,23 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
     ]
 
     assert fapi.changes(initial=3, target=5) == []
+
+    with fapi.transaction() as txn:  # Version 6
+        txn.put(1, dict(action="feature.create"))
+        txn.put(
+            2,
+            dict(
+                action="attachment.create",
+                fid=dict(sn=1),
+                source=dict(type="file_upload", **panorama_jpg),
+            ),
+        )
+
+        txn.commit()
+        assert txn.results() == [
+            [1, dict(action="feature.create", fid=4)],
+            [2, dict(action="attachment.create", aid=ANY, fileobj=ANY)],
+        ]
 
     def _normalize(data: list):
         result = []

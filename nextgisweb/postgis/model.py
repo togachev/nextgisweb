@@ -26,9 +26,9 @@ from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
     Feature,
+    FeatureLayerGeometryType,
     FeatureQueryIntersectsMixin,
     FeatureSet,
-    FeaureLayerGeometryType,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -225,7 +225,8 @@ class PostgisConnection(Base, Resource):
             raise ValidationError(gettext("Cannot connect to the database!"))
 
         try:
-            yield conn
+            with conn.begin():
+                yield conn
         except SQLAlchemyError as exc:
             raise ExternalDatabaseError(sa_error=exc)
         finally:
@@ -573,9 +574,9 @@ DataScope.read.require(ConnectionScope.connect, attr="connection", cls=PostgisLa
 
 class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(
-        FeaureLayerGeometryType | None,
-        FeaureLayerGeometryType,
-        FeaureLayerGeometryType | None,
+        FeatureLayerGeometryType | None,
+        FeatureLayerGeometryType,
+        FeatureLayerGeometryType | None,
     )
 
 

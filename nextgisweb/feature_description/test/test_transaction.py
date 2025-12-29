@@ -5,7 +5,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
-from nextgisweb.feature_layer.test import FeatureLayerAPI
+from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -26,13 +26,7 @@ def mkres():
     yield _mkres
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="versioning_disabled"),
-        pytest.param(True, id="versioning_enabled"),
-    ],
-)
+@parametrize_versioning()
 def test_workflow(versioning, mkres, ngw_webtest_app):
     web = ngw_webtest_app
     res = mkres(versioning)
@@ -140,6 +134,22 @@ def test_workflow(versioning, mkres, ngw_webtest_app):
     assert changes == [
         {"action": "description.put", "fid": 2, "vid": 3, "value": "Qux"},
         {"action": "description.put", "fid": 3, "vid": 3, "value": "Ham"},
+    ]
+
+    with fapi.transaction() as txn:  # Version 5
+        txn.put(1, dict(action="feature.create"))
+        txn.put(2, dict(action="description.put", fid=dict(sn=1), value="New"))
+        txn.commit()
+
+        assert txn.results() == [
+            [1, dict(action="feature.create", fid=4)],
+            [2, dict(action="description.put")],
+        ]
+
+    changes = fapi.changes(initial=4)
+    assert changes == [
+        {"action": "feature.create", "fid": 4, "vid": 5, "fields": []},
+        {"action": "description.put", "fid": 4, "vid": 5, "value": "New"},
     ]
 
     def _vstrip(data: list):

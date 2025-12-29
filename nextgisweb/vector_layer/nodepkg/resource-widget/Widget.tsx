@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
+import type { FeatureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import {
@@ -15,6 +15,7 @@ import type { RadioGroupProps, SelectProps } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { Mode, Store } from "./Store";
@@ -156,6 +157,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
             result.push({ label, value });
         if (operation === "create") {
             add("file", gettext("Load features from file"));
+            add("copy", gettext("Copy features from layer"));
             add("empty", gettext("Create empty layer"));
         } else {
             add("keep", gettext("Keep existing features"));
@@ -168,13 +170,13 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
     }, [operation]);
 
     const gtypeOpts = useMemo(() => {
-        const result: Option<FeaureLayerGeometryType>[] = [];
+        const result: Option<FeatureLayerGeometryType>[] = [];
         const gti = geometryTypeInitial;
         const btype =
             mode === "gtype"
                 ? gti && gti.replace(/^(?:MULTI)?(.*?)Z?$/, "$1")
                 : undefined;
-        const add = (value: FeaureLayerGeometryType, label: string) => {
+        const add = (value: FeatureLayerGeometryType, label: string) => {
             if (btype) {
                 if (!value.includes(btype)) return;
                 if (value === gti) label += " (" + gettext("current") + ")";
@@ -278,6 +280,19 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                             />
                         </>
                     )}
+                </>
+            )}
+            {mode === "copy" && (
+                <>
+                    <label>{gettext("Source layer")}</label>
+                    <ResourceSelectRef
+                        className="row"
+                        pickerOptions={{
+                            requireInterface: "IFeatureLayer",
+                            initParentId: store.composite.parent,
+                        }}
+                        {...bval("copyResource")}
+                    />
                 </>
             )}
             {["empty", "gtype"].includes(mode || "") && (

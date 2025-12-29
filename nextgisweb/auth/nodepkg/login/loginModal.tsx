@@ -9,7 +9,10 @@ const LoginModal = (props: ShowModalOptions) => {
         <Modal
             transitionName=""
             maskTransitionName=""
-            footer={null} width="350px" {...props}>
+            footer={null}
+            width="350px"
+            {...props}
+        >
             <LoginForm reloadAfterLogin />
         </Modal>
     );

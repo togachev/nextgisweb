@@ -1,3 +1,5 @@
+import re
+
 import nh3
 from lxml.html import document_fromstring
 
@@ -31,6 +33,14 @@ ALLOWED_INLINE_TAGS = {
     "var",
     "wbr",
 }
+
+URL_SCHEMES = nh3.ALLOWED_URL_SCHEMES | {"e1c"}
+URL_PATTERN = r"^(?:(?:(?:{})\:)|\/)(?:[^\s].*|)$".format(
+    "|".join(re.escape(s) for s in sorted(URL_SCHEMES))
+)
+
+# Let "data" scheme pass inner filter, then handle on attribute_filter
+URL_SCHEMES_WITH_DATA = URL_SCHEMES | {"data"}
 
 ALLOWED_MEDIA_TAGS = {
     "audio",

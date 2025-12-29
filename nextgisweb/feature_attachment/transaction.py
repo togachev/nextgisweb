@@ -6,8 +6,10 @@ from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.feature_layer.transaction import (
     FeatureID,
+    FeatureIDOrSeqNum,
     OperationError,
     OperationExecutor,
+    SeqNum,
     VIDCompare,
 )
 from nextgisweb.file_storage import FileObj
@@ -38,10 +40,10 @@ class SourceFileUploadRef(FileUploadRef, kw_only=True, tag="file_upload"):
     pass
 
 
-class AttachmentCreate(Struct, CopyToMixin, kw_only=True, **action_tag("create")):
+class AttachmentCreateOperation(Struct, CopyToMixin, kw_only=True, **action_tag("create")):
     """Create attachment"""
 
-    fid: FeatureID
+    fid: FeatureIDOrSeqNum
     source: SourceFileUploadRef
     keyname: str | None | UnsetType = UNSET
     name: str | None | UnsetType = UNSET
@@ -54,7 +56,7 @@ class AttachmentCreateResult(Struct, kw_only=True, **action_tag("create")):
     fileobj: int
 
 
-class AttachmentUpdate(Struct, CopyToMixin, kw_only=True, **action_tag("update")):
+class AttachmentUpdateOperation(Struct, CopyToMixin, kw_only=True, **action_tag("update")):
     """Update attachment"""
 
     fid: FeatureID
@@ -71,7 +73,7 @@ class AttachmentUpdateResult(Struct, kw_only=True, **action_tag("update")):
     fileobj: int | UnsetType = UNSET
 
 
-class AttachmentDelete(Struct, kw_only=True, **action_tag("delete")):
+class AttachmentDeleteOperation(Struct, kw_only=True, **action_tag("delete")):
     """Delete attachment"""
 
     fid: FeatureID
@@ -83,7 +85,7 @@ class AttachmentDeleteResult(Struct, kw_only=True, **action_tag("delete")):
     pass
 
 
-class AttachmentRestore(Struct, CopyToMixin, kw_only=True, **action_tag("restore")):
+class AttachmentRestoreOperation(Struct, CopyToMixin, kw_only=True, **action_tag("restore")):
     """Restore attachment"""
 
     fid: FeatureID
@@ -100,15 +102,23 @@ class AttachmentRestoreResult(Struct, kw_only=True, **action_tag("restore")):
     pass
 
 
-OperationUnion = AttachmentCreate | AttachmentUpdate | AttachmentDelete | AttachmentRestore
+OperationUnion = (
+    AttachmentCreateOperation
+    | AttachmentUpdateOperation
+    | AttachmentDeleteOperation
+    | AttachmentRestoreOperation
+)
 
 
 class AttachmentExecutor(OperationExecutor):
-    def prepare(self, operation: OperationUnion):
-        self.require_feature(operation.fid)
-        if isinstance(operation, (AttachmentUpdate, AttachmentDelete)):
+    def prepare(self, seqnum: SeqNum, operation: OperationUnion):
+        self.require_feature(operation.fid, seqnum=seqnum)
+        if isinstance(operation, (AttachmentUpdateOperation, AttachmentDeleteOperation)):
             self.require_attachment(operation.fid, operation.aid)
-        if isinstance(operation, (AttachmentUpdate, AttachmentDelete, AttachmentRestore)):
+        if isinstance(
+            operation,
+            (AttachmentUpdateOperation, AttachmentDeleteOperation, AttachmentRestoreOperation),
+        ):
             if (vid := operation.vid) is not UNSET:
                 self.require_versioning()
                 if (
@@ -116,15 +126,16 @@ class AttachmentExecutor(OperationExecutor):
                 ) != vid:
                     raise OperationError(AttachmentConflict())
 
-    def execute(self, operation: OperationUnion):
-        if isinstance(operation, (AttachmentUpdate, AttachmentDelete)):
+    def execute(self, seqnum: SeqNum, operation: OperationUnion):
+        if isinstance(operation, (AttachmentUpdateOperation, AttachmentDeleteOperation)):
             obj = self.require_attachment(operation.fid, operation.aid)
-        elif isinstance(operation, AttachmentCreate):
+        elif isinstance(operation, AttachmentCreateOperation):
+            fid = self.get_feature_id(operation.fid, seqnum=seqnum)
             obj = Attachment(
                 resource=self.resource,
-                feature_id=operation.fid,
+                feature_id=fid,
             ).persist()
-        elif isinstance(operation, AttachmentRestore):
+        elif isinstance(operation, AttachmentRestoreOperation):
             obj = Attachment.restore(self.resource, operation.fid, operation.aid)
             with sa.inspect(obj).session.no_autoflush:
                 obj.fileobj = FileObj.filter_by(id=obj.fileobj_id).one()
@@ -133,33 +144,36 @@ class AttachmentExecutor(OperationExecutor):
 
         updated_fileobj = False
 
-        if isinstance(operation, (AttachmentCreate, AttachmentUpdate, AttachmentRestore)):
+        if isinstance(
+            operation,
+            (AttachmentCreateOperation, AttachmentUpdateOperation, AttachmentRestoreOperation),
+        ):
             if (value := operation.source) is not UNSET:
                 obj.load_file_upload(value())
                 updated_fileobj = True
-            elif isinstance(operation, AttachmentRestore):
+            elif isinstance(operation, AttachmentRestoreOperation):
                 obj.size = obj.fileobj.size
                 obj.extract_meta()
             operation.copy_to(obj)
-        elif isinstance(operation, AttachmentDelete):
+        elif isinstance(operation, AttachmentDeleteOperation):
             obj.delete()
         else:
             raise NotImplementedError
 
         sa.inspect(obj).session.flush()
 
-        if isinstance(operation, AttachmentCreate):
+        if isinstance(operation, AttachmentCreateOperation):
             result = AttachmentCreateResult(
                 aid=obj.id,
                 fileobj=obj.fileobj.id,
             )
-        elif isinstance(operation, AttachmentUpdate):
+        elif isinstance(operation, AttachmentUpdateOperation):
             result = AttachmentUpdateResult(
                 fileobj=obj.fileobj.id if updated_fileobj else UNSET,
             )
-        elif isinstance(operation, AttachmentDelete):
+        elif isinstance(operation, AttachmentDeleteOperation):
             result = AttachmentDeleteResult()
-        elif isinstance(operation, AttachmentRestore):
+        elif isinstance(operation, AttachmentRestoreOperation):
             return AttachmentRestoreResult()
         else:
             raise NotImplementedError
@@ -189,7 +203,7 @@ class AttachmentConflict(Struct, tag="attachment.conflict", tag_field="error"):
     message: str = "Attachment version conflict"
 
 
-AttachmentExecutor.register(AttachmentCreate, AttachmentCreateResult)
-AttachmentExecutor.register(AttachmentUpdate, AttachmentUpdateResult)
-AttachmentExecutor.register(AttachmentDelete, AttachmentDeleteResult)
-AttachmentExecutor.register(AttachmentRestore, AttachmentRestoreResult)
+AttachmentExecutor.register(AttachmentCreateOperation, AttachmentCreateResult)
+AttachmentExecutor.register(AttachmentUpdateOperation, AttachmentUpdateResult)
+AttachmentExecutor.register(AttachmentDeleteOperation, AttachmentDeleteResult)
+AttachmentExecutor.register(AttachmentRestoreOperation, AttachmentRestoreResult)
