@@ -16,6 +16,7 @@ import { GraphPanel } from "@nextgisweb/webmap/popup/component/GraphPanel";
 import { LineChartOutlined } from "@ant-design/icons";
 import Identifier from "@nextgisweb/icon/mdi/identifier";
 import { formattedFields } from "@nextgisweb/feature-layer/feature-grid/util/formattedFields";
+import { ExpandableText } from "@nextgisweb/gui/component";
 
 import type { OptionProps, ContentProps } from "../type";
 
@@ -91,7 +92,8 @@ export const ContentComponent = observer((props) => {
                 copyValue(value, gettext("Email address copied"));
             }} >{value}</div>)
         } else {
-            return getNumberValue(attribute);
+            const value = getNumberValue(attribute);
+            return typeof value === "string" ? <ExpandableText text={value} /> : value;
         }
     };
 
