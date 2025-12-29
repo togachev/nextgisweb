@@ -157,12 +157,14 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
 
 class SrsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> SRSRef:
-        return SRSRef(id=srlzr.obj.srs.id)
+        if srlzr.obj.cls != "tablenogeom_layer":
+            return SRSRef(id=srlzr.obj.srs.id)
 
 
 class GeometryTypeAttr(SAttribute):
     def get(self, srlzr: Serializer) -> FeatureLayerGeometryType:
-        return cast(FeatureLayerGeometryType, srlzr.obj.geometry_type)
+        if srlzr.obj.cls != "tablenogeom_layer":
+            return cast(FeatureLayerGeometryType, srlzr.obj.geometry_type)
 
 
 class FieldsAttr(SAttribute):
