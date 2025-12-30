@@ -174,6 +174,7 @@ class AuthComponent(Component):
     def query_stat(self):
         return dict(
             user_count=_ucnt(),
+            local_count=_ucnt(User.password_hash.is_not(None)),
             oauth_count=_ucnt(User.oauth_subject.is_not(None)),
             last_activity=dict(
                 everyone=_ula(),
@@ -248,14 +249,13 @@ class AuthComponent(Component):
         url = result.scheme + "://" + result.netloc + "/session-invite?" + urlencode(query)
         return url
 
-    def check_user_limit(self, exclude_id=None):
+    def check_user_limit(self, *, add=None):
         if (limit := self.options["user_limit"]) is not None:
-            fc = []
-            if exclude_id is not None:
-                fc.append(User.id != exclude_id)
-            uc = _ucnt(*fc)
+            uc = _ucnt()
+            if add is not None:
+                uc += add
 
-            if uc >= limit:
+            if uc > limit:
                 raise ValidationError(
                     message=gettext(
                         "Maximum number of users is reached. Your current plan user number limit is %d."
@@ -263,14 +263,12 @@ class AuthComponent(Component):
                     % limit
                 )
 
-    def check_user_limit_local(self, exclude_id=None):
+    def check_user_limit_local(self):
         if (limit := self.options["user_limit_local"]) is not None:
             fc = [User.password_hash.is_not(None)]
-            if exclude_id is not None:
-                fc.append(User.id != exclude_id)
             uc_local = _ucnt(*fc)
 
-            if uc_local >= limit:
+            if uc_local > limit:
                 raise ValidationError(
                     message=gettextf(
                         "Maximum number of local users is reached. Your current plan local user number limit is {}."
