@@ -4,11 +4,14 @@ import { useCallback } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { isMobile as isM } from "@nextgisweb/webmap/mobile/selectors";
 import { ModalMapgroup } from "@nextgisweb/resource/home-page/component";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import showModal from "@nextgisweb/gui/showModal";
+
 import type { PanelManager } from "../../panel/PanelManager";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import Cogs from "@nextgisweb/icon/mdi/cogs";
+import Information from "@nextgisweb/icon/mdi/information";
 
 import "./NavigationMenu.less";
 
@@ -32,6 +35,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
         );
 
         const active = store.activePanel;
+        const information = routeURL("resource.show", display.config.webmapId)
 
         return (
             <div className={classNames("ngw-webmap-display-navigation-menu", layout)}>
@@ -49,24 +53,33 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                 ))}
                 <div className="empty-block"></div>
                 {display.config.scope && !display.isTinyMode &&
-                    <div
-                        title={gettext("Map settings")}
-                        className="item"
-                        onClick={() => showModal(ModalMapgroup, {
-                            transitionName: "",
-                            maskTransitionName: "",
-                            width: isM ? "100%" : "75%",
-                            closeIcon: isM ? true : false,
-                            options: {
-                                setup: { operation: "update", id: display.config.webmapId },
-                                location: "reload",
-                                height: isM ? "90vh" : "70vh",
-                                padding: isM && "32px 6px 6px 6px",
-                            },
-                        })}
-                    >
-                        <Cogs />
-                    </div>
+                    <>
+                        <div
+                            title={gettext("Web Map Properties")}
+                            className="item"
+                            onClick={() => window.open(information, "_blank")}
+                        >
+                            <Information />
+                        </div>
+                        <div
+                            title={gettext("Map settings")}
+                            className="item"
+                            onClick={() => showModal(ModalMapgroup, {
+                                transitionName: "",
+                                maskTransitionName: "",
+                                width: isM ? "100%" : "75%",
+                                closeIcon: isM ? true : false,
+                                options: {
+                                    setup: { operation: "update", id: display.config.webmapId },
+                                    location: "reload",
+                                    height: isM ? "90vh" : "70vh",
+                                    padding: isM && "32px 6px 6px 6px",
+                                },
+                            })}
+                        >
+                            <Cogs />
+                        </div>
+                    </>
                 }
             </div>
         );
