@@ -101,7 +101,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
 
         return (<div>{
             getEntries(store.selectedFeatures).map(([key, value], lidx) => {
-                const { title, styleId } = value.value;
+                const { title, styleId, layerHighligh } = value.value;
                 const objLayer = { ...store.activeLayer };
                 const lchecked = objLayer.lchecked && objLayer.lckey === key;
 
@@ -117,6 +117,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                     onClick={() => lOnChecked(key, styleId)}
                                     color={objLayer.lchecked && objLayer.lckey === key && "primary"}
                                     variant="filled"
+                                    disabled={!layerHighligh}
                                 >
                                     <div className="label-group label-layer" >{title}</div>
                                 </Button>
@@ -164,7 +165,7 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                                 {!store.visibleLayerName && <sub className={checked ? "sub-feature-name sub-checked" : "sub-feature-name"}>{ltitle}</sub>}
                                             </div>
                                         </Button>
-                                        {checked && <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>}
+                                        {checked && layerHighligh && <div className="control-item"><ButtonZoomComponent {...contentProps} /></div>}
                                         <div className="control-item">
                                             <Button
                                                 title={gettext("Deselect Object.")}
