@@ -1,6 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
+import type { PluginState } from "@nextgisweb/webmap/type";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 
 import { PluginBase } from "../PluginBase";
@@ -9,6 +10,15 @@ import TableIcon from "@nextgisweb/icon/material/table";
 import OpenInNew from "@nextgisweb/icon/material/open_in_new";
 
 export class FeatureLayerPlugin extends PluginBase {
+    getPluginState(nodeData: TreeLayerStore): PluginState {
+        const state = super.getPluginState(nodeData);
+
+        return {
+            ...state,
+            enabled: !!(nodeData.layerHighligh),
+        };
+    }
+
     getMenuItem(nodeData: TreeLayerStore) {
         return {
             icon: <TableIcon />,
@@ -33,7 +43,8 @@ export class FeatureLayerPlugin extends PluginBase {
     private openFeatureGrid(item: TreeLayerStore) {
         if (item?.isLayer()) {
             const layerId = item.layerId;
-            
+            const styleId = item.layerId;
+
             this.display.tabsManager.addTab({
                 key: String(layerId),
                 label: item.label,
@@ -42,6 +53,7 @@ export class FeatureLayerPlugin extends PluginBase {
                 props: {
                     topic,
                     layerId: layerId,
+                    styleId: styleId,
                     plugin: this,
                 },
             });
