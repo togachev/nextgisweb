@@ -1,6 +1,6 @@
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -79,6 +79,13 @@ const adapterOptions = sortBy(
 );
 
 const LayerWidget = observer(({ item }: { item: Layer }) => {
+
+    useEffect(() => {
+        if (!item.layerHighligh.value) {
+            item.editGeom.value = false
+        }
+    }, [item.layerHighligh.cprops()]);
+
     return (
         <>
             <Area pad cols={2}>
@@ -104,7 +111,7 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                             <CheckboxValue {...item.layerHighligh.cprops()}>
                                 {msgLayerHighligh}
                             </CheckboxValue>
-                            <CheckboxValue {...item.editGeom.cprops()}>
+                            <CheckboxValue disabled={!item.layerHighligh.value} {...item.editGeom.cprops()}>
                                 {msgEditGeom}
                             </CheckboxValue>
                         </Space>

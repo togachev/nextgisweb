@@ -50,7 +50,7 @@ export class LayerEditor extends PluginBase {
             enabled:
                 !this.disabled &&
                 nodeData.type === "layer" &&
-                nodeData.layerCls === "vector_layer" &&
+                nodeData.layerHighligh &&
                 nodeData.editGeom === true &&
                 (
                     nodeData.plugin[
