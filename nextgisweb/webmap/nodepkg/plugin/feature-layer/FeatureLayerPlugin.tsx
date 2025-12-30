@@ -12,13 +12,13 @@ import OpenInNew from "@nextgisweb/icon/material/open_in_new";
 export class FeatureLayerPlugin extends PluginBase {
     getPluginState(nodeData: TreeLayerStore): PluginState {
         const state = super.getPluginState(nodeData);
+        const typeLayer = ["postgis_layer", "vector_layer"];
 
         return {
             ...state,
-            enabled: !!(nodeData.layerHighligh),
+            enabled: !!(state.enabled && !this.display.isTinyMode && typeLayer.includes(nodeData.layerCls) && nodeData.layerHighligh),
         };
     }
-
     getMenuItem(nodeData: TreeLayerStore) {
         return {
             icon: <TableIcon />,
@@ -43,7 +43,6 @@ export class FeatureLayerPlugin extends PluginBase {
     private openFeatureGrid(item: TreeLayerStore) {
         if (item?.isLayer()) {
             const layerId = item.layerId;
-            const styleId = item.layerId;
 
             this.display.tabsManager.addTab({
                 key: String(layerId),
@@ -53,7 +52,6 @@ export class FeatureLayerPlugin extends PluginBase {
                 props: {
                     topic,
                     layerId: layerId,
-                    styleId: styleId,
                     plugin: this,
                 },
             });
