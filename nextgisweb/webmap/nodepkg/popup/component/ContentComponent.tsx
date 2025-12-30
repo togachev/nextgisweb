@@ -40,7 +40,7 @@ const LinkToGeometryFeature = ({ store, display }) => {
         store.selected.label + `(${Array.from(store.selected.value.split(":"), Number).slice(2, 3)})` :
         store.selected.label + `(${Array.from(store.selected.value.split(":"), Number).map(num => Math.round(num * 10000) / 10000).slice(2, 4).join(",")})` 
             
-        if (!store.isEditEnabled(display, item)) { return false; }
+        if (!store.isEditEnabled(display, item) || item.layerHighligh === false) { return false; }
         return (
             <Button
                 title={store.selected.type === "vector" ? msgHTMLFeature : msgHTMLRaster}

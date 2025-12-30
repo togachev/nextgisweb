@@ -204,7 +204,7 @@ def get_webmap_extent(resource, request) -> JSONType:
     request.resource_permission(ResourceScope.read)
 
     def traverse(item, extent):
-        if item.item_type == "layer":
+        if item.item_type == "layer" and item.layer_highligh == True:
             if res := item.style.lookup_interface(IBboxLayer):
                 if not res.has_permission(DataScope.read, request.user):
                     return extent
