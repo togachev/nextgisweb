@@ -20,7 +20,7 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
 
     useLayoutEffect(() => {
         // Delete existing header if it isn't replaced
-        titleRef.current?.remove();
+        titleRef.current?.parentElement?.remove();
     }, []);
 
     return (
@@ -33,16 +33,18 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
                     },
                 },
             }}>
-            <h1
+            <div
                 className={classNames("ngw-pyramid-layout-title", {
                     "pull-right": pullRight,
                 })}
             >
-                <Tooltip style={{ pointerEvents: "none" }} title={ititle}>
-                    <div title={ititle} className="title-class">{ititle}</div>
-                </Tooltip>
+                <h1>
+                    <Tooltip style={{ pointerEvents: "none" }} title={ititle}>
+                        <div title={ititle} className="title-class">{ititle}</div>
+                    </Tooltip>
+                </h1>
                 {children}
-            </h1>
+            </div>
         </ConfigProvider>
     );
 }

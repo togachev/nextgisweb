@@ -78,24 +78,21 @@ body > .ngw-gui-react-boot {
                 padding: 12px;
                 max-width: 1000px;
 
-                h1.ngw-pyramid-layout-title {
-                    align-items: center;
+                .ngw-pyramid-layout-title {
                     display: flex;
-                    gap: 8px;
-                    margin: 0 0 12px;
+                    align-items: center;
+                    gap: 12px;
+                    margin-block-end: 8px;
                     min-height: 40px;
 
-                    .title-class {
-                        overflow-wrap: anywhere;
-                        overflow: hidden;
-                        -webkit-line-clamp: 2;
-                        display: -webkit-box;
-                        -webkit-box-orient: vertical;
-                        font-size: 21px;
+                    > h1 {
+                        margin-inline: 0 8px;
+                        margin-block: 0;
+                        line-height: 32px;
                     }
 
-                    &.pull-right>*:first-child {
-                        margin-right: auto;
+                    &.pull-right > h1 {
+                        margin-inline-end: auto;
                     }
                 }
             }

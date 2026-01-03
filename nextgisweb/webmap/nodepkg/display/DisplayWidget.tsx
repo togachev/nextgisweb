@@ -91,13 +91,16 @@ export const DisplayWidget = observer(
                 }
                 if (canceled) return;
 
-                if (requestedPanel && panel.panels.has(requestedPanel)) {
+                const hasRequested =
+                    requestedPanel && panel.panels.has(requestedPanel);
+                const isEmptyMode = requestedPanel === emptyModeURLValue;
+
+                if (hasRequested) {
                     panel.setActive(requestedPanel, "init");
-                }
-                else if (display.config.activePanel) {
+
+                } else if (display.config.activePanel) {
                     panel.setActive(display.config.activePanel, "init");
-                }
-                else {
+                } else if (!isEmptyMode) {
                     const firstPanelKey = panel.panels.keys().next().value;
                     if (firstPanelKey) {
                         panel.setActive(firstPanelKey, "init");
