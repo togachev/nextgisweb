@@ -77,7 +77,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
         ];
 
         useEffect(() => {
-            if (!store.selectFeaturePanel) {
+            if (!store.selectFeaturePanel && store.activePanel === "selected-feature") {
                 store.update({ activePanel: "none" });
             }
         }, [store.selectFeaturePanel])
