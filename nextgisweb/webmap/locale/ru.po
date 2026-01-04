@@ -1326,8 +1326,8 @@ msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:56
-msgid "Panel disabled"
-msgstr "Панель отключена"
+msgid "Default value"
+msgstr "Значение по умолчанию"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:71
 #: nodepkg/settings/SettingsForm.tsx:279

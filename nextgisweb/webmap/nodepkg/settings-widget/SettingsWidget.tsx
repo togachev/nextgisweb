@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Badge, Button, CheckboxValue, Collapse, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
@@ -52,18 +52,6 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
     { value: "messages", label: gettext("Show with messages") },
 ];
 
-const activePanelOptions: { value: ActivePanelType; label: string }[] = [
-    { value: "none", label: gettext("Panel disabled") },
-    { value: "layers", label: gettext("Layers") },
-    { value: "selected-feature", label: msgSelectFeaturePanel },
-    { value: "search", label: gettext("Search") },
-    { value: "custom-layer", label: gettext("Custom layers") },
-    { value: "print", label: gettext("Print map") },
-    { value: "bookmark", label: gettext("Bookmarks") },
-    { value: "info", label: gettext("Description") },
-    { value: "share", label: gettext("Share") },
-    { value: "annotation", label: gettext("Annotations") },
-];
 
 
 const editingOptions = [
@@ -74,6 +62,25 @@ const editingOptions = [
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
     ({ store }) => {
         const [optionsModal, setOptionsModal] = useState(false);
+
+        const activePanelOptions: { value: ActivePanelType; label: string; disabled: boolean }[] = [
+            { value: "none", label: gettext("Default value") },
+            { value: "layers", label: gettext("Layers") },
+            { value: "selected-feature", label: msgSelectFeaturePanel, disabled: !store.selectFeaturePanel },
+            { value: "search", label: gettext("Search") },
+            { value: "custom-layer", label: gettext("Custom layers") },
+            { value: "print", label: gettext("Print map") },
+            { value: "bookmark", label: gettext("Bookmarks") },
+            { value: "info", label: gettext("Description") },
+            { value: "share", label: gettext("Share") },
+            { value: "annotation", label: gettext("Annotations") },
+        ];
+
+        useEffect(() => {
+            if (!store.selectFeaturePanel) {
+                store.update({ activePanel: "none" });
+            }
+        }, [store.selectFeaturePanel])
 
         const items: CollapseProps["items"] = [
             {
@@ -232,7 +239,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             style={{ width: "100%" }}
                             value={store.activePanel}
                             onChange={(activePanel) => {
-                                store.update(activePanel ? { activePanel: activePanel } : { activePanel: "layers" });
+                                store.update(activePanel ? { activePanel: activePanel } : { activePanel: "none" });
                             }}
                             options={activePanelOptions}
                             allowClear

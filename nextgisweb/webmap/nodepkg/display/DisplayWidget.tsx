@@ -95,15 +95,23 @@ export const DisplayWidget = observer(
                     requestedPanel && panel.panels.has(requestedPanel);
                 const isEmptyMode = requestedPanel === emptyModeURLValue;
 
-                if (hasRequested) {
-                    panel.setActive(requestedPanel, "init");
-
-                } else if (display.config.activePanel) {
-                    panel.setActive(display.config.activePanel, "init");
-                } else if (!isEmptyMode) {
-                    const firstPanelKey = panel.panels.keys().next().value;
-                    if (firstPanelKey) {
-                        panel.setActive(firstPanelKey, "init");
+                if (hasRequested && display.config.activePanel !== "none") {
+                    if (hasRequested) {
+                        panel.setActive(display.config.activePanel, "init");
+                    } else if (!isEmptyMode) {
+                        const firstPanelKey = panel.panels.keys().next().value;
+                        if (firstPanelKey) {
+                            panel.setActive(firstPanelKey, "init");
+                        }
+                    }
+                } else if (hasRequested && display.config.activePanel === "none") {
+                    if (hasRequested) {
+                        panel.setActive(requestedPanel, "init");
+                    } else if (!isEmptyMode) {
+                        const firstPanelKey = panel.panels.keys().next().value;
+                        if (firstPanelKey) {
+                            panel.setActive(firstPanelKey, "init");
+                        }
                     }
                 }
                 setMounted(true);
