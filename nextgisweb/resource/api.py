@@ -15,7 +15,7 @@ from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op
 from sqlalchemy.sql.operators import ilike_op, in_op, like_op
 
-from nextgisweb.env import DBSession, gettext
+from nextgisweb.env import COMP_ID, DBSession, gettext
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
 from nextgisweb.lib.msext import DEPRECATED
 
@@ -23,10 +23,11 @@ from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
 from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.pyramid import AsJSON, JSONType
+from nextgisweb.pyramid import AsJSON, JSONType, client_setting
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .category import ResourceCategory, ResourceCategoryIdentity
+from .component import ResourceComponent
 from .composite import CompositeSerializer
 from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
 from .exception import (
@@ -35,12 +36,20 @@ from .exception import (
     ResourceNotFound,
     ResourceRootDeleteError,
 )
-from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity, ResourceWebMapGroup, WebMapGroupResource
+from .model import (
+    Resource,
+    ResourceCls,
+    ResourceID,
+    ResourceInterfaceIdentity,
+    ResourceScopeIdentity,
+    ResourceWebMapGroup,
+    WebMapGroupResource,
+)
 from ..social.model import ResourceSocial
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
-from .view import ResourceID, resource_factory
+from .view import resource_factory
 from .widget import CompositeWidget
 
 
@@ -966,16 +975,20 @@ def widget(
             raise HTTPBadRequest()
 
         parent_obj = with_polymorphic(Resource, "*").filter_by(id=parent).one()
-
         tr = request.localizer.translate
-        obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
-        composite = CompositeWidget(operation=operation, obj=obj, request=request)
-        suggested_dn = obj.suggest_display_name(tr)
+
+        with DBSession.no_autoflush:
+            obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
+            composite = CompositeWidget(operation=operation, obj=obj, request=request)
+            suggested_dn = obj.suggest_display_name(tr)
+            members = composite.config()
+            obj.parent = None
+
         return CompositeOperationCreate(
             cls=cls,
             parent=parent_obj.id,
             owner_user=request.user.id,
-            members=composite.config(),
+            members=members,
             suggested_display_name=suggested_dn,
         )
 
@@ -1002,6 +1015,7 @@ ResourceExport = Annotated[
     Literal["data_read", "data_write", "administrators"],
     TSExport("ResourceExport"),
 ]
+
 csetting("resource_export", ResourceExport, default="data_read")
 
 
@@ -1043,6 +1057,11 @@ def getWebmapGroup(request) -> JSONType:
             )
         )
     return result
+
+
+@client_setting("resourceExport")
+def cs_resource_export(comp: ResourceComponent, request) -> ResourceExport:
+    return csetting.registry[COMP_ID]["resource_export"].getter()
 
 
 def setup_pyramid(comp, config):

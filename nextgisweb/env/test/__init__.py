@@ -1,79 +1,25 @@
+import warnings
 from collections.abc import Sequence
+from contextvars import ContextVar
 from functools import cache, partial
 from importlib.util import find_spec
+from pathlib import Path
+from typing import Generator
 
 import pytest
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import BindParameter
 
-from nextgisweb.env.package import pkginfo
-
-from ..environment import Env, env
+current_request = ContextVar("current_request")
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--ngw-update-refs",
-        action="store_true",
-        default=False,
-        help="Update reference data, like SQL queries",
-    )
-
-
-@pytest.fixture(autouse=True)
-def ngw_skip_disabled_component(request):
-    if "ngw_env" in request.fixturenames:
-        ngw_env = request.getfixturevalue("ngw_env")
-        comp = pkginfo.component_by_module(request.module.__name__)
-        if comp and comp not in ngw_env.components:
-            pytest.skip(f"{comp} disabled")
-
-
-@cache
-def _env() -> Env:
-    result = env() or Env(set_global=True)
-    result.running_tests = True
-    return result
-
-
-@cache
-def genereate_components() -> Sequence[str]:
-    """Return a sequence of enabled component IDs in the test environment. This
-    can be used during the test generation stage, for example, to generate
-    per-component tests:
-
-    .. code-block:: python
-
-        @pytest.mark.parametrize("component", genereate_components()) def
-        test_component(component):
-            ...
-    """
-
-    return tuple(c.identity for c in _env().chain("initialize"))
-
-
-@pytest.fixture(scope="session")
-def ngw_env():
-    env = _env()
-    if not env.initialized:
-        env.initialize()
-    return env
-
-
-@pytest.fixture(scope="module")
-def ngw_data_path(request):
-    parent = request.path.parent
-    assert parent.name == "test"
-    result = parent / "data"
-    assert result.is_dir()
-    yield result
-
-
-@pytest.fixture(scope="session", autouse=True)
-def ngw_sql_compare(request):
-    update_refs = request.config.getoption("--ngw-update-refs")
-    setattr(sql_compare, "update", update_refs)
+def fixture_value(name: str, *alt: str):
+    names = (name, *alt)
+    request = current_request.get()
+    for name in names:
+        return request.getfixturevalue(name)
+    raise ValueError(f"No fixture found for names: {names}")
 
 
 def sql_compare(sql, file):
@@ -122,3 +68,17 @@ def _compile_sql(expr):
         return str(expr.compile(dialect=pg_dialect))
     finally:
         setattr(_compile_bindparam, "enabled", False)
+
+
+def __getattr__(name: str):
+    match name:
+        case "_env":
+            from nextgisweb.pytest.env import _env as v
+        case _:
+            raise AttributeError
+    warnings.warn(
+        f"Importing '{name}' from {__name__} is deprecated",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return v

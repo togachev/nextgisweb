@@ -1,15 +1,17 @@
 import Overlay from "ol/Overlay";
 import type { Options as OverlayOptions } from "ol/Overlay";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { CloseIcon } from "@nextgisweb/gui/icon";
 
 import { useMapContext } from "../../context/useMapContext";
 
-export interface MeasureTooltipProps
-    extends Pick<OverlayOptions, "position" | "offset"> {
-    children?: ReactNode;
+export interface MeasureTooltipProps extends Pick<
+    OverlayOptions,
+    "position" | "offset"
+> {
+    children?: React.ReactNode;
     staticMode?: boolean;
     onClose: () => void;
 }

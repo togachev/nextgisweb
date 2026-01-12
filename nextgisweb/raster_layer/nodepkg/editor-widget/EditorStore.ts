@@ -11,15 +11,16 @@ import type {
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
-export class EditorStore
-    implements IEditorStore<apitype.RasterLayerRead, apitype.RasterLayerUpdate>
-{
+export class EditorStore implements IEditorStore<
+    apitype.RasterLayerRead,
+    apitype.RasterLayerUpdate
+> {
     readonly identity = "raster_layer";
     readonly composite: CompositeStore;
 
     @observable.ref accessor source: FileUploadObject | undefined = undefined;
     @observable.ref accessor uploading = false;
-    @observable.ref accessor cog = settings.cog_enabled;
+    @observable.ref accessor cog = settings.cogDefault;
     @observable.ref accessor cogInitial: boolean | undefined = undefined;
 
     @observable.ref accessor dirty = false;

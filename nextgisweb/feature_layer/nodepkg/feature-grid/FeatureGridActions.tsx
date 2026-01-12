@@ -212,9 +212,7 @@ export const FeatureGridActions = observer(
                                         onClick={() => {
                                             lazyModal(
                                                 () =>
-                                                    import(
-                                                        "../feature-editor-modal"
-                                                    ),
+                                                    import("../feature-editor-modal"),
                                                 {
                                                     editorOptions: {
                                                         resourceId: id,
@@ -239,9 +237,7 @@ export const FeatureGridActions = observer(
                                             const featureId = selectedIds[0];
                                             lazyModal(
                                                 () =>
-                                                    import(
-                                                        "../feature-editor-modal"
-                                                    ),
+                                                    import("../feature-editor-modal"),
                                                 {
                                                     editorOptions: {
                                                         featureId,

@@ -21,8 +21,10 @@ export interface ColorSF {
     fill?: string;
 }
 
-export class SettingStore
-    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>> {
+export class SettingStore implements EditorStore<
+    WebMapRead,
+    WithoutItems<WebMapUpdate>
+> {
     readonly identity = "webmap";
     readonly composite: CompositeStore;
 

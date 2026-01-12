@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import type { Options as OlRotateOptions } from "ol/control/Rotate";
 import { easeOut } from "ol/easing";
-import { CSSProperties, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -14,9 +14,11 @@ import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
 
 import "./RotateControl.less";
 
-interface RotateControlOptions
-    extends Pick<OlRotateOptions, "tipLabel" | "duration" | "autoHide"> {
-    style?: CSSProperties;
+interface RotateControlOptions extends Pick<
+    OlRotateOptions,
+    "tipLabel" | "duration" | "autoHide"
+> {
+    style?: React.CSSProperties;
     className?: string;
 }
 

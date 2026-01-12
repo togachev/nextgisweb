@@ -1,7 +1,6 @@
 import re
 from collections.abc import Mapping
 from inspect import signature
-from pathlib import Path
 from sys import _getframe
 from typing import Annotated, Any
 from warnings import warn
@@ -130,7 +129,7 @@ def find_template(name, func=None, stack_level=1):
                     logger.debug(
                         "Template %s found in %s",
                         name,
-                        fn.relative_to(Path().resolve()),
+                        fn,
                     )
                     return str(fn)
             parts.pop(-1)
@@ -263,13 +262,11 @@ class Configurator(PyramidConfigurator):
             path_decoders = [(k, v.decoder) for k, v in path_params.items()]
 
             overloaded = kwargs.pop("overloaded", False)
-            load_types = kwargs.pop("load_types", False)
             kwargs["meta"] = RouteMeta(
                 component=component,
                 itemplate=itemplate,
                 overloaded=overloaded,
                 client=client,
-                load_types=load_types,
                 ktemplate=ktemplate,
                 path_params=path_params,
                 path_decoders=path_decoders,

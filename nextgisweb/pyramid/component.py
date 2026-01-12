@@ -1,16 +1,14 @@
 from datetime import timedelta
 from os import getenv
+from typing import Any
 
 import transaction
-from babel import Locale
-from babel.core import UnknownLocaleError
 
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
-from nextgisweb.lib.safehtml import URL_PATTERN
 
 from . import uacompat
 from .model import Session, SessionStore
@@ -19,6 +17,10 @@ from .util import StaticMap, gensecret
 
 
 class PyramidComponent(Component):
+    def __init__(self, env, settings):
+        self.client_types: list[Any] = list()
+        super().__init__(env, settings)
+
     def make_app(self, settings={}):
         settings = dict(self._settings, **settings)
         settings["pyramid.started"] = utcnow_naive().timestamp()
@@ -30,9 +32,10 @@ class PyramidComponent(Component):
         for comp in chain:
             comp.setup_pyramid(config)
 
-        from .api import setup_pyramid_csettings
+        from . import api
 
-        setup_pyramid_csettings(self, config)
+        api.setup_pyramid_client_settings(self, config)
+        api.setup_pyramid_csettings(self, config)
 
         config.commit()
 
@@ -121,47 +124,17 @@ class PyramidComponent(Component):
         if rt_not_set and (ev := self.options["request_timeout"]):
             logger.debug("Request timeout %s detected from uWSGI", str(ev))
 
-    def client_settings(self, request):
-        from .api import LOGO_MAX_SIZE
-
-        result = dict()
-        result["logoMaxSize"] = LOGO_MAX_SIZE
-        result["safe_url_pattern"] = URL_PATTERN
-        result["support_url"] = self.env.core.support_url_view(request)
-        result["help_page_url"] = self.env.pyramid.help_page_url_view(request)
-        result["company_logo"] = dict(
-            enabled=self.company_logo_enabled(request),
-            ckey=self.env.core.settings_get("pyramid", "company_logo.ckey"),
-            link=self.company_url_view(request),
-        )
-
-        result["languages"] = []
-        for locale in self.env.core.locale_available:
-            try:
-                babel_locale = Locale.parse(locale, sep="-")
-            except UnknownLocaleError:
-                display_name = locale
-            else:
-                display_name = babel_locale.get_display_name().title()
-            result["languages"].append(dict(display_name=display_name, value=locale))
-        result["language_contribute_url"] = self.env.core.options["locale.contribute_url"]
-
-        result["storage_enabled"] = self.env.core.options["storage.enabled"]
-        result["storage_limit"] = self.env.core.options["storage.limit"]
-        result["lunkwill_enabled"] = self.options["lunkwill.enabled"]
-        result["lunkwill_hmux"] = result["lunkwill_enabled"] and self.options["lunkwill.hmux"]
-        result["instance_id"] = self.env.core.instance_id
-
-        return result
-
     def client_codegen(self):
         from . import codegen as m
 
         nodepkg = self.root_path / "nodepkg"
         config = self.make_app(settings=dict())
-        (nodepkg / "api/type.inc.d.ts").write_text(m.api_type_module(config))
-        (nodepkg / "api/route.inc.ts").write_text(m.route(self))
-        (nodepkg / "layout/dynmenu/type.inc.d.ts").write_text(m.dynmenu(self))
+        (nodepkg / "api/type.inc.d.ts").write_text(m.api_type(self, config))
+        (nodepkg / "api/route.inc.ts").write_text(m.route(self, config))
+        (nodepkg / "layout/dynmenu/type.inc.d.ts").write_text(m.dynmenu(self, config))
+
+    def client_type(self, tdef: Any):
+        self.client_types.append(tdef)
 
     @property
     def template_include(self):

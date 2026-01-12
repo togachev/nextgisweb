@@ -7,17 +7,15 @@ from .model import (
     ResourceACLRule,
     ResourceCls,
     ResourceGroup,
+    ResourceID,
     ResourceInterfaceIdentity,
     ResourceScopeIdentity,
     PermissionsHomePage,
 )
 from .permission import Permission, Scope
-from .sattribute import ResourceRefWithParent, ResourceRefOptional, CRUTypes, ResourceRef, SColumn, SRelationship, SResource
-from .sattribute import SRelationship as SerializedRelationship
-from .sattribute import SResource as SerializedResourceRelationship
+from .sattribute import CRUTypes, ResourceRef, SColumn, SRelationship, SResource
 from .scope import ConnectionScope, DataScope, ResourceScope, ServiceScope
 from .serialize import SAttribute, Serializer
-from .serialize import SAttribute as SerializedProperty
 from .view import ResourceFactory, resource_factory
 from .widget import Widget
 from .composite import CompositeSerializer

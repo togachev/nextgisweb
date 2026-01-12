@@ -73,32 +73,23 @@ extras_require = dict(
     development=[
         "bump2version",
         "coverage",
-        "flake8-future-import",
-        "flake8",
         "freezegun",
+        "json5",
         "mapbox-vector-tile",
         "pre-commit",
         "pyramid-debugtoolbar==4.10",
-        "pytest-flake8",
-        "pytest-watch",
-        "pytest==7.3.*",
+        "pytest-cov",
+        "pytest==9.0.*",
         "ruff>=0.12.12",
         "sqlglot==26.30.0",
+        "ty",
         "webtest",
     ]
 )
 
 entry_points = {
     "paste.app_factory": ["main = nextgisweb:main"],
-    "pytest11": [
-        "nextgisweb.env = nextgisweb.env.test",
-        "nextgisweb.auth = nextgisweb.auth.test",
-        "nextgisweb.core = nextgisweb.core.test",
-        "nextgisweb.feature_layer = nextgisweb.feature_layer.test",
-        "nextgisweb.file_upload = nextgisweb.file_upload.test",
-        "nextgisweb.pyramid = nextgisweb.pyramid.test",
-        "nextgisweb.resource = nextgisweb.resource.test",
-    ],
+    "pytest11": ["nextgisweb.pytest = nextgisweb.pytest"],
     "nextgisweb.packages": [
         "nextgisweb = nextgisweb:pkginfo",
     ],

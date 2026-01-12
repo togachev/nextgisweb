@@ -2,10 +2,9 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Type
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NewType, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
-from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
 
 from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, gettextf, inject
@@ -31,144 +30,14 @@ from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope, PermissionsHomePage
 
+from . import client
+from .client import client_setting
 from .component import PyramidComponent
 from .permission import cors_manage, cors_view
-from .tomb.predicate import RouteMeta
 from .tomb.response import UnsafeFileResponse
-from .util import gensecret, parse_origin, restart_delayed
+from .util import gensecret, restart_delayed
 
 LOGO_MAX_SIZE = 128 * (1 << 10)  # 128 KB
-
-
-def _get_cors_olist():
-    try:
-        return env.core.settings_get("pyramid", "cors_allow_origin")
-    except KeyError:
-        return None
-
-
-def check_origin(request, origin):
-    if origin is None:
-        raise ValueError("Agument origin must have a value")
-
-    olist = _get_cors_olist()
-
-    if not olist:
-        return False
-
-    for url in olist:
-        if origin == url:
-            return True
-        if "*" in url:
-            o_scheme, o_domain, o_port = parse_origin(origin)[1:]
-            scheme, domain, port = parse_origin(url)[1:]
-            if o_scheme != scheme or o_port != port:
-                continue
-            wildcard_level = domain.count(".") + 1
-            level_cmp = wildcard_level - 1
-            upper = domain.rsplit(".", level_cmp)[-level_cmp:]
-            o_upper = o_domain.rsplit(".", level_cmp)[-level_cmp:]
-            if upper == o_upper:
-                return True
-    return False
-
-
-def cors_tween_factory(handler, registry):
-    """Tween adds Access-Control-* headers for simple and preflighted
-    CORS requests"""
-
-    def cors_tween(request):
-        origin = request.headers.get("Origin")
-
-        # Only request under /api/ are handled
-        is_api = request.path_info.startswith("/api/")
-
-        # If the Origin header is not present terminate this set of
-        # steps. The request is outside the scope of this specification.
-        # https://www.w3.org/TR/cors/#resource-preflight-requests
-
-        # If there is no Access-Control-Request-Method header
-        # or if parsing failed, do not set any additional headers
-        # and terminate this set of steps. The request is outside
-        # the scope of this specification.
-        # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-        if is_api and origin is not None and request.check_origin(origin):
-            # If the value of the Origin header is not a
-            # case-sensitive match for any of the values
-            # in list of origins do not set any additional
-            # headers and terminate this set of steps.
-            # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-            # The Origin header can only contain a single origin as
-            # the user agent will not follow redirects.
-            # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-            cors_headerlist = [
-                ("Access-Control-Allow-Origin", origin),
-                ("Access-Control-Allow-Credentials", "true"),
-            ]
-
-            if (
-                (route := registry.getUtility(IRoutesMapper)(request)["route"])
-                and (meta := RouteMeta.select(route.predicates))
-                and (ch := meta.cors_headers)
-            ):
-                route_cors_headers = ch
-            else:
-                route_cors_headers = dict()
-
-            # Access-Control-Request-Method header of preflight request
-            method = request.headers.get("Access-Control-Request-Method")
-
-            if method is not None and request.method == "OPTIONS":
-                response = Response(content_type="text/plain")
-
-                # Add one or more Access-Control-Allow-Methods headers
-                # consisting of (a subset of) the list of methods.
-                # Since the list of methods can be unbounded,
-                # simply returning the method indicated by
-                # Access-Control-Request-Method (if supported) can be enough.
-                # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-                cors_headerlist.append(("Access-Control-Allow-Methods", method))
-
-                # Authorization + CORS-safeist headers are allowed by default,
-                # additional route-specific headers may be extracted from route
-                # metadata.
-
-                allowed_headers = {
-                    "Authorization",
-                    "Accept",
-                    "Accept-Language",
-                    "Content-Language",
-                    "Content-Type",
-                    "Range",
-                }
-                if req_ch := route_cors_headers.get("request"):
-                    allowed_headers.update(req_ch)
-
-                cors_headerlist.append(
-                    ("Access-Control-Allow-Headers", ", ".join(allowed_headers))
-                )
-
-                response.headerlist.extend(cors_headerlist)
-
-                return response
-
-            else:
-                if resp_ch := route_cors_headers.get("response"):
-                    cors_headerlist.append(("Access-Control-Expose-Headers", ", ".join(resp_ch)))
-
-                def set_cors_headers(request, response):
-                    response.headerlist.extend(cors_headerlist)
-
-                request.add_response_callback(set_cors_headers)
-
-        # Run default request handler
-        return handler(request)
-
-    return cors_tween
 
 
 SettingsComponentGap = Annotated[
@@ -176,11 +45,54 @@ SettingsComponentGap = Annotated[
     Meta(description="Component identity"),
 ]
 
+SettingsResponseTypedGap = Gap("SettingsResponseTypedGap", Type[Struct])
+SettingsResponseUntyped = NewType("SettingsResponseUntyped", dict[str, Any])
 
-def settings(request, *, component: SettingsComponentGap) -> AsJSON[dict[str, Any]]:
+
+def settings(
+    request,
+    *,
+    component: SettingsComponentGap,
+) -> AsJSON[AnyOf[SettingsResponseTypedGap, SettingsResponseUntyped]]:
     """Read component settings"""
     comp = request.env.components[component]
+    if st := request.env.pyramid._client_settings_struct_types.get(component):
+        comp = request.env.components[component]
+        return client.evaluate(comp, request, struct_type=st)
     return comp.client_settings(request)
+
+
+def setup_pyramid_client_settings(comp, config):
+    struct_types = dict[str, Any]()
+    comp_ids = tuple[str]()
+    for comp_id, comp_obj in comp.env.components.items():
+        if comp_struct_type := client.struct_type(comp_obj):
+            struct_types[comp_id] = comp_struct_type
+            assert not hasattr(comp_obj, "client_settings")
+        elif not hasattr(comp_obj, "client_settings"):
+            continue
+        comp_ids = (*comp_ids, comp_id)
+
+    fillgap(
+        SettingsComponentGap,
+        Literal[comp_ids],
+    )
+
+    fillgap(
+        SettingsResponseTypedGap,
+        Annotated[
+            Union[tuple(struct_types.values())],
+            TSExport("PyramidSettingsResponseTyped"),
+        ],
+    )
+
+    comp._client_settings_struct_types = struct_types
+
+    config.add_route(
+        "pyramid.settings",
+        "/api/component/pyramid/settings",
+        get=settings,
+    )
 
 
 def route(request) -> AsJSON[dict[str, Annotated[list[str], Meta(min_length=1)]]]:
@@ -765,23 +677,15 @@ csetting("metrics", Metrics, default={})
 csetting("home_page_header", HomePageHeaders, default={})
 csetting("home_page_footer", HomePageFooters, default={})
 
+@client_setting("logoMaxSize")
+def cs_logo_max_size(comp: PyramidComponent, request) -> int:
+    return LOGO_MAX_SIZE
+
+
 def setup_pyramid(comp, config):
-    config.add_request_method(check_origin)
+    from . import api_cors
 
-    config.add_tween(
-        "nextgisweb.pyramid.api.cors_tween_factory",
-        under=("nextgisweb.pyramid.exception.handled_exception_tween_factory", "INGRESS"),
-    )
-
-    comps = comp.env.components.values()
-    comp_ids = [comp.identity for comp in comps if hasattr(comp, "client_settings")]
-    fillgap(SettingsComponentGap, Literal[tuple(comp_ids)])
-
-    config.add_route(
-        "pyramid.settings",
-        "/api/component/pyramid/settings",
-        get=settings,
-    )
+    config.include(api_cors)
 
     config.add_route(
         "pyramid.route",

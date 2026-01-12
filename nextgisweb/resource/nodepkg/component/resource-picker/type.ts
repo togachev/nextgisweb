@@ -78,8 +78,9 @@ export interface UsePickerModalProps {
     cardFooterHeight?: number;
 }
 
-export interface ResourcePickerModalProps<V extends SelectValue = SelectValue>
-    extends UsePickerModalProps {
+export interface ResourcePickerModalProps<
+    V extends SelectValue = SelectValue,
+> extends UsePickerModalProps {
     open?: boolean;
     modalStore?: ModalStore;
     store?: ResourcePickerStore;

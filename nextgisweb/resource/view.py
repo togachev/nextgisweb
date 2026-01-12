@@ -17,7 +17,7 @@ from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
 
@@ -25,13 +25,13 @@ from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
-from .model import Resource, PermissionsHomePage
+from .model import Resource, ResourceID, PermissionsHomePage
 from nextgisweb.mapgroup import MapgroupGroup, MapgroupResource
 from .permission import Permission, Scope
 from .psection import PageSections
 from .scope import ResourceScope
 
-ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
+RESOURCE_FILTER_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
 
 
 class ResourceFactory:

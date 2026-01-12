@@ -2,7 +2,6 @@ from collections import defaultdict
 from collections.abc import Sequence
 from itertools import chain, count
 from json import dumps as json_dumps
-from textwrap import dedent
 from typing import Any, Literal, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
@@ -13,7 +12,8 @@ from nextgisweb.lib.apitype import unannotate
 
 from nextgisweb.jsrealm.tsgen import TSGenerator
 
-from .tomb import iter_routes
+from .component import PyramidComponent
+from .tomb import Configurator, iter_routes
 
 counter = lambda c=count(1): next(c)
 
@@ -99,7 +99,7 @@ def eslint_disable(rules: Sequence[str] | bool) -> list[str]:
     return result
 
 
-def api_type_module(config) -> str:
+def api_type(comp: PyramidComponent, config: Configurator) -> str:
     routes: dict[str, Route] = defaultdict(Route)
     for iroute in iter_routes(config.registry.introspector):
         is_api = iroute.itemplate.startswith("/api/")
@@ -134,45 +134,15 @@ def api_type_module(config) -> str:
     route_tsmodule = "@nextgisweb/pyramid/type/route"
     tsgen.add(routes_struct, export=(route_tsmodule, "Routes"))
     tsgen.add(routes_struct, export=(route_tsmodule, "default"))
+    for tdef in comp.client_types:
+        tsgen.add(tdef)
 
-    eslint = eslint_disable(
-        (
-            "prettier/prettier",
-            "import/newline-after-import",
-            "import/order",
-        )
-    )
+    eslint = eslint_disable(("prettier/prettier",))
 
     return "\n".join(eslint + [m.code for m in tsgen.compile()] + [""])
 
 
-def api_load_module(config) -> str:
-    code = [*eslint_disable(("import/newline-after-import",))]
-
-    template = """
-        declare module "@nextgisweb/pyramid/api/load!{path}" {{
-            import type route from "@nextgisweb/pyramid/type/route";
-            const value: route["{name}"]["get"]["response"];
-            export = value;
-        }}
-    """
-    template = dedent(template).strip("\n") + "\n"
-
-    for iroute in iter_routes(config.registry.introspector):
-        if not iroute.load_types:
-            continue
-
-        code.append(
-            template.format(
-                path=iroute.itemplate,
-                name=iroute.name,
-            )
-        )
-
-    return "\n".join(code)
-
-
-def dynmenu(config) -> str:
+def dynmenu(comp: PyramidComponent, config: Configurator) -> str:
     tsgen = TSGenerator()
     route_tsmodule = "@nextgisweb/pyramid/layout/dynmenu/type"
     tsgen.add(dm.Label.JSON, export=(route_tsmodule, "DynMenuLabel"))
@@ -186,7 +156,7 @@ def dynmenu(config) -> str:
     return "\n".join(eslint + [m.code for m in tsgen.compile()] + [""])
 
 
-def route(comp) -> str:
+def route(comp: PyramidComponent, config: Configurator) -> str:
     data = json_dumps(comp.route_meta, ensure_ascii=False, indent=4)
 
     code = [
