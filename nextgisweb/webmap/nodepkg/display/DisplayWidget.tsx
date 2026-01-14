@@ -94,15 +94,12 @@ export const DisplayWidget = observer(
                 const hasRequested =
                     requestedPanel && panel.panels.has(requestedPanel);
                 const isEmptyMode = requestedPanel === emptyModeURLValue;
-                
+
                 if (display.config.activePanel !== "none") {
-                    if (hasRequested) {
-                        panel.setActive(display.config.activePanel, "init");
+                    if (requestedPanel === "none") {
+                        panel.setActive("none", "init");
                     } else if (!isEmptyMode) {
-                        const firstPanelKey = panel.panels.keys().next().value;
-                        if (firstPanelKey) {
-                            panel.setActive(firstPanelKey, "init");
-                        }
+                        panel.setActive(display.config.activePanel, "init");
                     }
                 } else if (display.config.activePanel === "none") {
                     if (hasRequested) {
