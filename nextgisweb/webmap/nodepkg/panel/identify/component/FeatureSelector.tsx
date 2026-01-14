@@ -18,6 +18,9 @@ export function FeatureSelector({
         return null;
     }
 
+    const item = featureInfo && display.treeStore.filter({ type: "layer", layerId: featureInfo.layerId });
+    const highlights = item && item?.length > 0 && item[0].layerHighligh
+    
     const zoomTo = () => {
         if (!featureItem) return;
         display.highlighter
@@ -62,6 +65,7 @@ export function FeatureSelector({
                     <Button
                         type="link"
                         size="small"
+                        disabled={!highlights}
                         onClick={zoomTo}
                         icon={<ZoomInMapIcon />}
                         style={{ flex: "0 0 auto" }}
@@ -72,6 +76,7 @@ export function FeatureSelector({
                     <Button
                         type="link"
                         size="small"
+                        disabled={!highlights}
                         onClick={zoomToPoint}
                         icon={<ZoomInMapIcon />}
                         style={{ flex: "0 0 auto" }}
