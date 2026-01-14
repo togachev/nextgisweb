@@ -98,8 +98,14 @@ export const DisplayWidget = observer(
                 if (display.config.activePanel !== "none") {
                     if (requestedPanel === "none") {
                         panel.setActive("none", "init");
-                    } else if (!isEmptyMode) {
-                        panel.setActive(display.config.activePanel, "init");
+                    } else if (!isEmptyMode && !display.urlParams.attribute) {
+                        if (hasRequested) {
+                            panel.setActive(requestedPanel, "init");
+                        } else {
+                            panel.setActive(display.config.activePanel, "init");
+                        }
+                    } else if (display.urlParams.attribute === "true") {
+                        panel.setActive(display.urlParams.panel, "init");
                     }
                 } else if (display.config.activePanel === "none") {
                     if (hasRequested) {
