@@ -304,12 +304,9 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 onClick={onVisibleLayerName}
                                 color={!store.visibleLayerName && "primary"}
                                 variant="filled"
-                                disabled={
-                                    store.countItems === 0
-                                    || store.activeLayer.lchecked === true
-                                }
+                                disabled={store.countItems === 0}
                             />
-                            <Popover overlayClassName="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
+                            <Popover className="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
                                 <Button
                                     title={msgDescription}
                                     type="text"

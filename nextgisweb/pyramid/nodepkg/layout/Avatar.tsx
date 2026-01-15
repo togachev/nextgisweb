@@ -51,7 +51,7 @@ export const Avatar = observer(() => {
                     trigger="click"
                     title={userDisplayName}
                     content={content}
-                    overlayClassName="ngw-pyramid-avatar-popover"
+                    className="ngw-pyramid-avatar-popover"
                     arrow={{ pointAtCenter: true }}
                 >
                     <span className="ngw-pyramid-menu-icon">
