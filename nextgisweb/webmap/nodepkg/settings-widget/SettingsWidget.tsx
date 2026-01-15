@@ -65,7 +65,6 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
 
         const activePanelOptions: { value: ActivePanelType; label: string; disabled: boolean }[] = [
             { value: "none", label: gettext("Default value") },
-            { value: "layers", label: gettext("Layers") },
             { value: "selected-feature", label: msgSelectFeaturePanel, disabled: !store.selectFeaturePanel },
             { value: "search", label: gettext("Search") },
             { value: "custom-layer", label: gettext("Custom layers") },
