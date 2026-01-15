@@ -197,6 +197,12 @@ export class TreeStore {
             .map((l) => l.id);
     }
     @computed
+    get visibleStyleIds(): number[] {
+        return this.visibleLayers
+            .filter((l) => !l.isOutOfScaleRange)
+            .map((l) => l.styleId);
+    }
+    @computed
     get hasExclusiveGroup(): boolean {
         for (const n of this.items.values()) {
             if (n.isGroup() && n.exclusive) {

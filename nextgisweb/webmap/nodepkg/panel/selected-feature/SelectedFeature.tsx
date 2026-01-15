@@ -99,9 +99,17 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
         const msgZoomToLayer = gettext("Zoom to layer");
         const msgValueRaster = gettext("Value raster layer");
 
+        const lOnCheckedVisibility = useCallback((styleId, visibility) => {
+            const visibleStyles: number[] = display.treeStore.visibleStyleIds;
+            visibleStyles.push(styleId)
+            if (visibility === false && store.checked === false) {
+                display.treeStore.setVisibleIdsUseStyles(visibleStyles);
+            }
+        }, [store.activeChecked]);
+
         return (<div>{
             getEntries(store.selectedFeatures).map(([key, value], lidx) => {
-                const { title, styleId, layerHighligh } = value.value;
+                const { title, styleId, layerHighligh, visibility } = value.value;
                 const objLayer = { ...store.activeLayer };
                 const lchecked = objLayer.lchecked && objLayer.lckey === key;
 
@@ -111,10 +119,13 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                             <div className="label-child-element">
                                 <Button
                                     title={objLayer.lchecked ? [title, gettext("Initial extent")].join(" \n") : [title, msgZoomToLayer].join(" \n")}
-                                    className={lchecked ? "checked label-child" : "label-child"}
+                                    className={lchecked ? "checked label-child" : !visibility ? "label-child label-child-color-not-visible" : "label-child"}
                                     size="small"
                                     type="text"
-                                    onClick={() => lOnChecked(key, styleId)}
+                                    onClick={() => {
+                                        lOnChecked(key, styleId);
+                                        lOnCheckedVisibility(styleId, visibility);
+                                    }}
                                     color={objLayer.lchecked && objLayer.lckey === key && "primary"}
                                     variant="filled"
                                     disabled={!layerHighligh}
@@ -152,8 +163,11 @@ const ItemSelectValue = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                             title={checked ?
                                                 [ftitle, gettext("Initial extent"), ltitle].join(" \n") :
                                                 [ftitle, gettext("View information about the object"), ltitle].join(" \n")}
-                                            onClick={() => acOnChecked(ckey, cvalue)}
-                                            className="label-child"
+                                            onClick={() => {
+                                                acOnChecked(ckey, cvalue);
+                                                lOnCheckedVisibility(styleId, visibility);
+                                            }}
+                                            className={!visibility ? "label-child label-child-color-not-visible" : "label-child"}
                                             style={!store.visibleLayerName && { height: 40, padding: "2px 5px" }}
                                             type="text"
                                             size="small"

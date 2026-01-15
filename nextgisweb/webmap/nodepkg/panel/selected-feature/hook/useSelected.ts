@@ -23,7 +23,6 @@ export const useSelected = (display: Display, store: SelectedFeatureStore) => {
                         visibleStyles.push(item.id);
                     }
                 });
-                
             });
         } else {
             display.config.checkedItems.forEach((key) => {
