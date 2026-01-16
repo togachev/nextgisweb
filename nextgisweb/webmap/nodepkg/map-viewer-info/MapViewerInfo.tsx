@@ -120,13 +120,13 @@ export function MapViewerInfo({ map }: MapViewerInfoProps) {
             <div className={`coordinates type-${type} round-${roundDecPlaces}`}>
                 <DisplayPosition />
             </div>
-            <Button
-                className="switch"
-                type="primary"
-                icon={icon}
+            <button
+                type="button"
                 title={title}
                 onClick={changeType}
-            />
+            >
+                {icon}
+            </button>
         </div>
     );
 }

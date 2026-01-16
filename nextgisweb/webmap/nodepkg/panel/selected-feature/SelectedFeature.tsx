@@ -320,7 +320,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                                 variant="filled"
                                 disabled={store.countItems === 0}
                             />
-                            <Popover className="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
+                            <Popover overlayClassName="popover-class" content={<InfoSelect count={store.countItems} />} title={msgFunction} trigger="click">
                                 <Button
                                     title={msgDescription}
                                     type="text"
