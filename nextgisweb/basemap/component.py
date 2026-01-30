@@ -40,7 +40,7 @@ class BasemapComponent(Component):
             return [
                 BasemapConfig(
                     keyname="2gis",
-                    display_name="2GIS",
+                    display_name="2ГИС",
                     url="https://tile2.maps.2gis.com/tiles?x={x}&y={y}&z={z}&v=1.1",
                     copyright_text="© 2GIS",
                     copyright_url="https://law.2gis.ru/copyright",
