@@ -1,23 +1,30 @@
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+export type FilterExpressionString = string & {
+    readonly __brand: "FilterExpressionString";
+};
+
 export interface FeatureFilterEditorProps {
     fields: FeatureLayerFieldRead[];
-    value?: string | undefined;
-    onChange?: (value: string | undefined) => void;
+    value?: FilterExpressionString | undefined;
+    onChange?: (value: FilterExpressionString | undefined) => void;
     onValidityChange?: (isValid: boolean) => void;
     showFooter?: boolean;
-    onApply?: (value: string | undefined) => void;
-    onCancel?: (value: string | undefined) => void;
+    onApply?: (value: FilterExpressionString | undefined) => void;
+    onCancel?: (value: FilterExpressionString | undefined) => void;
 }
 
 export interface FilterState {
     rootGroup: FilterGroup;
 }
 
+export type ActiveTab = "constructor" | "json";
+
 export interface FilterGroup {
     id: number;
-    operator: "all" | "any";
+    type: "group";
+    operator: LogicalOp;
     conditions: FilterCondition[];
     groups: FilterGroup[];
     childrenOrder: FilterGroupChild[];
@@ -27,20 +34,13 @@ export type FilterGroupChild =
     | { type: "condition"; id: number }
     | { type: "group"; id: number };
 
-export type FilterCondition =
-    | {
-          id: number;
-          field: string;
-          operator: EqNeOp | CmpOp;
-          value: ConditionValue;
-      }
-    | {
-          id: number;
-          field: string;
-          operator: InOp;
-          value: Array<string | number>;
-      }
-    | { id: number; field: string; operator: HasOp; value: undefined };
+export type FilterCondition<O extends Operator = Operator> = {
+    id: number;
+    type: "condition";
+    field: string;
+    operator: O;
+    value: OperatorValueMap[Operator];
+};
 
 export type GetExpr = ["get", string];
 
@@ -73,9 +73,22 @@ export const ValidOperators = [
     "!in",
     "has",
     "!has",
-];
+] as const;
 
 export type Operator = (typeof ValidOperators)[number];
+
+export type OperatorValueMap = {
+    "==": ConditionValue;
+    "!=": ConditionValue;
+    ">": number;
+    "<": number;
+    ">=": number;
+    "<=": number;
+    "in": Array<string | number>;
+    "!in": Array<string | number>;
+    "has": undefined;
+    "!has": undefined;
+};
 
 export interface OperatorOption {
     value: Operator;

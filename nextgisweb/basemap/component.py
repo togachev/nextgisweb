@@ -39,11 +39,11 @@ class BasemapComponent(Component):
         if len(keys) == 0:
             return [
                 BasemapConfig(
-                    keyname="2gis",
-                    display_name="2ГИС",
-                    url="https://tile2.maps.2gis.com/tiles?x={x}&y={y}&z={z}&v=1.1",
-                    copyright_text="© 2GIS",
-                    copyright_url="https://law.2gis.ru/copyright",
+                    keyname="osm-mapnik",
+                    display_name="OpenStreetMap",
+                    url="https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    copyright_text="© OpenStreetMap contributors",
+                    copyright_url="https://www.openstreetmap.org/copyright",
                     enabled=True,
                     z_max=24,
                 )

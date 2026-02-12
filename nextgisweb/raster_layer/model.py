@@ -38,7 +38,7 @@ from nextgisweb.resource import (
 )
 
 from .kind_of_data import RasterLayerData
-from .util import band_color_interp, calc_overviews_levels, raster_size
+from .util import band_color_interp, calc_overviews_levels, is_rgb, raster_size
 
 Base.depends_on("resource")
 
@@ -217,7 +217,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
         add_alpha = reproject and not has_nodata and alpha_band is None
 
         if reproject or not rectilinear:
-            cmd = ["gdalwarp", "-of", "GTiff", "-t_srs", "EPSG:%d" % self.srs.id]
+            cmd = ["gdalwarp", "-t_srs", "EPSG:%d" % self.srs.id]
             if add_alpha:
                 cmd.append("-dstalpha")
             ds_measure = gdal.AutoCreateWarpedVRT(ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
@@ -230,7 +230,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
                     message += " " + gettext("GDAL error message: %s") % gdal_err
                 raise ValidationError(message=message)
         else:
-            cmd = ["gdal_translate", "-of", "GTiff"]
+            cmd = ["gdal_translate"]
             ds_measure = ds
 
         size_expected = raster_size(
@@ -252,40 +252,39 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 )
             )
 
-        cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
-
         fobj = FileObj(component="raster_layer")
         dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
         self.fileobj = fobj
 
         self.cog = cog
-        if not cog:
-            subprocess.check_call(cmd + [dst_file])
-            self.build_overview()
+        if cog:
+            cmd_opts = (
+                "-of",
+                "COG",
+                "-co",
+                "BLOCKSIZE=256",
+                "-co",
+                "RESAMPLING=NEAREST",
+                "-co",
+                f"OVERVIEW_COMPRESS={'JPEG' if is_rgb(ds) else 'DEFLATE'}",
+            )
         else:
-            # TODO: COG driver
-            with NamedTemporaryFile() as tf:
-                tmp_file = tf.name
-                subprocess.check_call(cmd + [tmp_file])
-                self.build_overview(fn=tmp_file)
+            cmd_opts = (
+                "-of",
+                "GTiff",
+                "-co",
+                "TILED=YES",
+                "-co",
+                "BLOCKXSIZE=256",
+                "-co",
+                "BLOCKYSIZE=256",
+            )
 
-                cmd = ["gdal_translate", "-of", "Gtiff"]
-                cmd.extend(
-                    (
-                        "-co",
-                        "COMPRESS=DEFLATE",
-                        "-co",
-                        "TILED=YES",
-                        "-co",
-                        "BIGTIFF=YES",
-                        "-co",
-                        "COPY_SRC_OVERVIEWS=YES",
-                        tmp_file,
-                        dst_file,
-                    )
-                )
-                subprocess.check_call(cmd)
-                os.unlink(tmp_file + ".ovr")
+        cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "BIGTIFF=YES", filename))
+        cmd.extend(cmd_opts)
+
+        subprocess.check_call(cmd + [dst_file])
+        self.build_overview()
 
         # GDAL Persistent Auxiliary Metadata (PAM)
         if os.path.exists(aux_xml_file := dst_file + ".aux.xml"):
@@ -355,6 +354,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
         ds = gdal.Open(str(fn), gdalconst.GA_ReadOnly)
         levels = list(map(str, calc_overviews_levels(ds)))
 
+        use_jpeg_compression = is_rgb(ds)
+
         cmd = ["gdaladdo", "-q", "-clean", str(fn)]
 
         logger.debug("Removing existing overviews with command: " + " ".join(cmd))
@@ -369,6 +370,10 @@ class RasterLayer(Resource, SpatialLayerMixin):
         # resampling method. For now, using "nearest" is the safest option to
         # avoid altering pixel values.
         resampling = "nearest"
+
+        compression = "JPEG" if use_jpeg_compression else "DEFLATE"
+
+        band_count = ds.RasterCount
         ds = None
 
         cmd = [
@@ -379,15 +384,22 @@ class RasterLayer(Resource, SpatialLayerMixin):
             resampling,
             "--config",
             "COMPRESS_OVERVIEW",
-            "DEFLATE",
+            compression,
             "--config",
             "INTERLEAVE_OVERVIEW",
             "PIXEL",
             "--config",
             "BIGTIFF_OVERVIEW",
             "YES",
-            str(fn),
-        ] + levels
+        ]
+
+        # Use YCBCR photometric for 3-band RGB to align with COG driver behavior
+        if use_jpeg_compression and band_count == 3:
+            cmd.extend(["--config", "PHOTOMETRIC_OVERVIEW", "YCBCR"])
+
+        cmd.append(str(fn))
+
+        cmd.extend(levels)
 
         logger.debug("Building raster overview with command: " + " ".join(cmd))
         subprocess.check_call(cmd)

@@ -192,7 +192,8 @@ msgstr "Взаимоисключающая"
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:37
+#: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/plugin/layer-identifiable/LayerIdentifiablePlugin.tsx:19
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
@@ -267,13 +268,10 @@ msgstr "Публичная аннотация"
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
-#: nodepkg/layers-tree/DropdownFile.tsx:14
-msgid "Download attached files"
-msgstr "Загрузить прикрепленные файлы"
-
-#: nodepkg/layers-tree/DropdownFile.tsx:66
-msgid "Download"
-msgstr "Скачать"
+#: nodepkg/layers-tree/FilterAction.tsx:12
+#: nodepkg/plugin/layer-filter/LayerFilterPlugin.tsx:28
+msgid "Filter"
+msgstr "Фильтр"
 
 #: nodepkg/layers-tree/LayerTreeItemTitle.tsx:17
 msgid ""
@@ -708,7 +706,7 @@ msgstr "Масштабировать до значения растра"
 msgid "Band {}"
 msgstr "Канал {}"
 
-#: nodepkg/panel/identify/component/RasterInfoSection.tsx:27
+#: nodepkg/panel/identify/component/RasterInfoSection.tsx:29
 msgid "Raster"
 msgstr "Растр"
 
@@ -1600,7 +1598,7 @@ msgstr "Коллекция геометрий"
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:161
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:156
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 

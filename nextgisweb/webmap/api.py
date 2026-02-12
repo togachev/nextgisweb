@@ -15,7 +15,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype.util import EmptyObject
 from nextgisweb.lib.safehtml import sanitize
 
-from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer import IFeatureLayer, IFilterableFeatureLayer
 from nextgisweb.feature_layer.interface import GEOM_TYPE
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
@@ -334,7 +334,7 @@ def print(request, *, body: PrintBody) -> Response:
         index_html = temp_dir / "index.html"
         index_html.write_text(
             render(
-                "template/print.mako",
+                "nextgisweb:webmap/template/print.mako",
                 {
                     "width": int(body.width),
                     "height": int(body.height),
@@ -495,6 +495,7 @@ class LayerIdentification(Struct, kw_only=True):
 class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     layerId: int
     styleId: int
+    filterable: bool
     visibility: bool
     identifiable: bool
     layerHighligh: bool
@@ -593,16 +594,17 @@ def display_config(obj, request) -> DisplayConfig:
 
         if item.item_type == "layer":
             style = item.style
-            layer = style.parent if style.cls.endswith("_style") else style
 
-            geometry_type = None
-            if hasattr(layer, "geometry_type"):
-                geometry_type = layer.geometry_type
+            # geometry_type = None
+            # if hasattr(layer, "geometry_type"):
+            #     geometry_type = layer.geometry_type
 
             if not style.has_permission(DataScope.read, request.user):
                 # Skip webmap item if there are no necessary permissions, so it
                 # won't be shown in the tree.
                 return None
+
+            layer = style.parent if style.cls.endswith("_style") else style
 
             layer_enabled = bool(item.layer_enabled)
             if layer_enabled:
@@ -620,9 +622,10 @@ def display_config(obj, request) -> DisplayConfig:
                 styleId=style.id,
                 cls=style.cls,
                 layerCls=layer.cls,
-                geometryType=GEOM_TYPE.check_geometry_type(geometry_type),
+                # geometryType=GEOM_TYPE.check_geometry_type(geometry_type),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
+                filterable=IFilterableFeatureLayer.providedBy(layer),
                 transparency=item.layer_transparency,
                 minScaleDenom=scale_range[0],
                 maxScaleDenom=scale_range[1],

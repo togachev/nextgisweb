@@ -1,6 +1,5 @@
 import warnings
 from dataclasses import dataclass
-from types import SimpleNamespace
 from typing import Annotated
 
 import zope.event
@@ -10,8 +9,7 @@ from pyramid.httpexceptions import HTTPFound
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload, with_polymorphic
 
-from nextgisweb.env import DBSession, env, gettext
-from nextgisweb.lib import dynmenu as dm
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
@@ -21,7 +19,7 @@ from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
 
-from .event import OnChildClasses, OnDeletePrompt
+from .event import OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
@@ -244,165 +242,18 @@ def resource_export(request):
     )
 
 
-def creatable_resources(parent, *, user):
-    result = []
-
-    permissions = parent.permissions(user)
-    if parent.cls != "tablenogeom_layer":
-        if ResourceScope.manage_children not in permissions:
-            return result
-
-        disabled_resource_cls = env.resource.disabled_resource_cls
-
-        classes = set(
-            cls
-            for cls in Resource.registry.values()
-            if (cls.identity not in disabled_resource_cls and cls.check_parent(parent))
-        )
-
-        if len(classes) == 0:
-            return result
-
-        classes = OnChildClasses.apply(parent=parent, classes=classes)
-
-        for cls in classes:
-            # Create a temporary resource to perform the remaining checks
-            # TODO: It shouldn't be added to a session! Double-check it.
-            child = cls(parent=parent, owner_user=user)
-
-            if not parent.check_child(child):
-                continue
-
-            if not child.has_permission(ResourceScope.create, user):
-                continue
-
-            # Workaround SAWarning: Object of type ... not in session,
-            # add operation along 'Resource.children' will not proceed
-            child.parent = None
-
-            result.append(cls)
-
-    return result
-
-
 # Sections
 
 resource_sections = PageSections("resource_section")
 
 @resource_sections("@nextgisweb/resource/resource-section/main", order=-100)
 def resource_section_main(obj, *, request, **kwargs):
-    tr = request.localizer.translate
-
-    result = {"resourceId": obj.id}
-
-    result["read"] = request.context.has_permission(ResourceScope.update, request.user)
-    mapgroupdata = result["mapgroupdata"] = []
-    if obj.cls == "webmap" or obj.cls == "mapgroup_resource":
-        column_name = "webmap_id" if obj.cls == "webmap" else ("resource_id" if obj.cls == "mapgroup_resource" else None)
-        display_name = "webmap_group_name" if obj.cls == "webmap" else ("display_name" if obj.cls == "mapgroup_resource" else None)
-        resource_id = "resource_id" if obj.cls == "webmap" else ("webmap_id" if obj.cls == "mapgroup_resource" else None)
-
-        query = MapgroupGroup.query().filter_by(**{column_name: request.context.id}).all()
-        if len(query) > 0:
-            result["includes"] = True
-            for item in query:
-                mapgroupdata.append(
-                    dict(
-                        display_name=getattr(item, display_name),
-                        enabled=dict(
-                            webmap=item.enabled,
-                            mapgroup_resource=item.enabled_group
-                        ),
-                        position=item.position,
-                        id=getattr(item, resource_id),
-                    )
-                )
-        else:
-            query = MapgroupResource.query().filter_by(**{"id": request.context.id}).all()
-            result["includes"] = False
-            for item in query:
-                mapgroupdata.append(
-                    dict(
-                        display_name=getattr(item, "display_name"),
-                        enabled=dict(
-                            mapgroup_resource=item.enabled
-                        ),
-                        position=item.position,
-                        id=getattr(item, "id"),
-                    )
-                )
-
-    summary = result["summary"] = []
-
-    if obj.id != 0:
-        summary.append((tr(gettext("Resource ID")), str(obj.id)))
-
-    summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
-
-    if keyname := obj.keyname:
-        summary.append((tr(gettext("Keyname")), keyname))
-
-    if get_info := getattr(obj, "get_info", None):
-        for key, value in get_info():
-            if isinstance(value, bool):
-                value = gettext("Yes") if value else gettext("No")
-            summary.append((tr(key), str(tr(value))))
-
-    summary.append((tr(gettext("Owner")), tr(obj.owner_user.display_name_i18n)))
-
-    result["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
-    result["cls"] = obj.cls
-    result["social"] = obj.social is not None and obj.social.preview_fileobj_id is not None
-    return result
+    return {"resourceId": obj.id}
 
 
 @resource_sections("@nextgisweb/resource/resource-section/children", order=-50)
 def resource_section_children(obj, *, request, **kwargs):
-    if len(obj.children) == 0:
-        return
-
-    tr = request.localizer.translate
-
-    resources = [
-        resource
-        for resource in obj.children
-        if (ResourceScope.read in resource.permissions(request.user))
-    ]
-
-    resources.sort(key=lambda res: (res.cls_order, res.display_name))
-
-    payload = list()
-    for item in resources:
-        idata = dict(
-            id=item.id,
-            displayName=item.display_name,
-            cls=item.cls,
-            clsDisplayName=tr(item.cls_display_name),
-            creationDate=item.creation_date,
-            ownerUserDisplayName=tr(item.owner_user.display_name_i18n),
-        )
-
-        iacts = idata["actions"] = list()
-        args = SimpleNamespace(obj=item, request=request)
-        for menu_item in item.__dynmenu__.build(args):
-            if (
-                isinstance(menu_item, dm.Link)
-                and menu_item.important
-                and menu_item.icon is not None
-            ):
-                iacts.append(
-                    dict(
-                        href=menu_item.url(args),
-                        target=menu_item.target,
-                        title=tr(menu_item.label),
-                        icon=menu_item.icon,
-                        key=menu_item.key,
-                    )
-                )
-
-        payload.append(idata)
-
-    return {"resourceChildren": payload}
+    return {"resourceId": obj.id}
 
 
 @resource_sections("@nextgisweb/resource/resource-section/description", order=-60)

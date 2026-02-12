@@ -364,12 +364,14 @@ export class ResourcePickerStore implements Omit<
             signal: abort.signal,
             cache: true,
         });
-        this.setParentItem(
-            await route("resource.item", parent).get({
-                signal: abort.signal,
-                cache: true,
-            })
-        );
+
+        const parentItem = await route("resource.item", parent).get({
+            signal: abort.signal,
+            cache: true,
+        });
+
+        this.setParentItem(parentItem);
+        this.updateLoadedResources([parentItem]);
         const childrenResources = await this.fetchChildrenResources(parent, {
             signal: abort.signal,
         });
@@ -425,7 +427,6 @@ export class ResourcePickerStore implements Omit<
             },
             signal,
         });
-        this.updateLoadedResources(resp);
         return resp.filter((x: CompositeRead) =>
             this._resourceVisible(x.resource)
         );

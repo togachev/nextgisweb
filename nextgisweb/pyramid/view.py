@@ -26,7 +26,6 @@ from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.apitype import JSONType, QueryString
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import trstr_factory
-from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.safehtml import URL_PATTERN
@@ -540,9 +539,7 @@ def setup_pyramid(comp, config):
     config.set_session_factory(WebSession)
 
     _setup_static(comp, config)
-    _setup_pyramid_debugtoolbar(comp, config)
     _setup_pyramid_tm(comp, config)
-    _setup_pyramid_mako(comp, config)
 
     # COMMON REQUEST'S ATTRIBUTES
 
@@ -637,6 +634,7 @@ def setup_pyramid(comp, config):
 
     config.add_renderer("json", renderer.JSON())
     config.add_renderer("msgspec", renderer.MsgSpec())
+    _setup_pyramid_mako(comp, config)
 
     # Filter for quick translation. Defines function tr, which we can use
     # instead of request.localizer.translate in mako templates.
@@ -883,33 +881,6 @@ def _setup_static(comp, config):
             config.add_static_path(f"asset/{cid}", asset_path)
 
 
-def _setup_pyramid_debugtoolbar(comp, config):
-    dt_opt = comp.options.with_prefix("debugtoolbar")
-    if not dt_opt.get("enabled", comp.env.core.debug):
-        return
-
-    try:
-        import pyramid_debugtoolbar
-    except ModuleNotFoundError:
-        if dt_opt.get("enabled", None) is True:
-            raise
-        logger.warning("Unable to load pyramid_debugtoolbar")
-        return
-
-    settings = config.registry.settings
-    if hosts := dt_opt.get("hosts", "0.0.0.0/0" if comp.env.core.debug else None):
-        settings["debugtoolbar.hosts"] = hosts
-    settings["debugtoolbar.exclude_prefixes"] = ["/static/", "/favicon.ico"]
-    settings["debugtoolbar.show_on_exc_only"] = True
-    settings["debugtoolbar.max_visible_requests"] = 25
-    config.include(pyramid_debugtoolbar)
-
-    config.add_static_path(
-        "pyramid_debugtoolbar:static",
-        module_path("pyramid_debugtoolbar") / "static",
-    )
-
-
 def _setup_pyramid_tm(comp, config):
     import pyramid_tm
 
@@ -919,7 +890,6 @@ def _setup_pyramid_tm(comp, config):
         "/static/",
         "/favicon.ico",
         "/api/component/pyramid/route",
-        "/_debug_toolbar/",
     )
 
     def activate_hook(request):
@@ -969,10 +939,7 @@ def _m_gettext(_template_filename):
 
 
 def _setup_pyramid_mako(comp, config):
-    settings = config.registry.settings
-
-    settings["pyramid.reload_templates"] = comp.env.core.debug
-    settings["mako.imports"] = [
+    mako_imports = [
         "from markupsafe import Markup",
         "from nextgisweb.pyramid.view import json_js",
         "from nextgisweb.pyramid.view import _m_gettext",
@@ -991,16 +958,10 @@ def _setup_pyramid_mako(comp, config):
         ),
         "del _m, _m_gettext",
     ]
-    settings["mako.default_filters"] = ["h"]
 
-    import pyramid_mako
-
-    config.include(pyramid_mako)
-
-    def mako_cache_control(event):
-        if (ri := event.get("renderer_info")) and (ri.type in (".mako", ".mak")):
-            cache_control = event["request"].response.cache_control
-            cache_control.no_store = True
-            cache_control.must_revalidate = True
-
-    config.add_subscriber(mako_cache_control, BeforeRender)
+    opts = dict(
+        filesystem_checks=comp.env.core.debug,
+        default_filters=["h"],
+        imports=mako_imports,
+    )
+    config.add_renderer(".mako", renderer.Mako(opts))

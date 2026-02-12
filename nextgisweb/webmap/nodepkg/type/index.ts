@@ -57,7 +57,7 @@ export interface PluginMenuItem {
     icon: React.ReactNode;
     extra?: React.ReactNode;
     title: string;
-    onClick: () => void;
+    onClick?: () => void;
 }
 
 export interface PluginParams {

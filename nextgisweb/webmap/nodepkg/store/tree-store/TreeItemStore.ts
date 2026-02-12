@@ -1,5 +1,6 @@
 import { action, computed, observable } from "mobx";
 
+import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import type { LegendSymbol } from "@nextgisweb/render/type/api";
 import type { CompositeMembersConfig } from "@nextgisweb/resource/type/api";
 import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
@@ -107,6 +108,7 @@ export class TreeLayerStore
     @observable.ref accessor styleId: number;
     @observable.ref accessor symbols: LayerSymbols | null = null;
     @observable.ref accessor editable: boolean | null;
+    @observable.ref accessor filterable: boolean;
     @observable.ref accessor legendInfo: LegendInfoStore;
     @observable.ref accessor visibility: boolean;
     @observable.ref accessor identifiable: boolean;
@@ -124,6 +126,7 @@ export class TreeLayerStore
     @observable.ref accessor isOutOfScaleRange = false;
 
     @observable.ref accessor drawOrderEnabled: boolean;
+    @observable.ref accessor filter: FilterExpressionString | null = null;
 
     constructor(
         init: LayerItemConfig,
@@ -148,6 +151,7 @@ export class TreeLayerStore
             this.drawOrderEnabled && typeof init.drawOrderPosition === "number"
                 ? init.drawOrderPosition
                 : order++;
+        this.filterable = init.filterable;
         this.legendInfo = new LegendInfoStore(init.legendInfo);
         this.adapter = init.adapter;
         this.layerCls = init.layerCls;
@@ -174,6 +178,7 @@ export class TreeLayerStore
 
             layerId: this.layerId,
             styleId: this.styleId,
+            filterable: this.filterable,
             visibility: this.visibility,
             identifiable: this.identifiable,
             layerHighligh: this.layerHighligh,

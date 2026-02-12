@@ -37,14 +37,18 @@ export const LayerTreeItemTitle = observer(
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
 
-        const shouldActions = showLegend || showDropdown;
+        const isLayer = treeItem.isLayer();
+        const hasFilter = isLayer && treeItem.filter;
+
+        const shouldActions = showLegend || showDropdown || hasFilter;
 
         let actions;
         let isOutOfScaleRange = false;
         let legendAction;
         if (shouldActions) {
-            
-            if (treeItem.isLayer()) {
+            let legendAction;
+            let filterAction;
+            if (isLayer) {
                 const treeLayer = treeItem;
                 isOutOfScaleRange = treeItem.isOutOfScaleRange;
                 legendAction = treeLayer.legendInfo.symbols &&
@@ -55,6 +59,13 @@ export const LayerTreeItemTitle = observer(
                             onClick={() => setUpdate((prev) => !prev)}
                         />
                     );
+
+                filterAction = hasFilter && (
+                    <FilterAction
+                        nodeData={treeItem}
+                        onClick={() => setUpdate((prev) => !prev)}
+                    />
+                );
             }
 
             const dropdownAction = showDropdown && (
