@@ -595,10 +595,6 @@ def display_config(obj, request) -> DisplayConfig:
         if item.item_type == "layer":
             style = item.style
 
-            # geometry_type = None
-            # if hasattr(layer, "geometry_type"):
-            #     geometry_type = layer.geometry_type
-
             if not style.has_permission(DataScope.read, request.user):
                 # Skip webmap item if there are no necessary permissions, so it
                 # won't be shown in the tree.
@@ -616,13 +612,17 @@ def display_config(obj, request) -> DisplayConfig:
 
             legend_info = _legend(item, style)
 
+            geometry_type = None
+            if hasattr(layer, "geometry_type"):
+                geometry_type = layer.geometry_type
+
             # Main element parameters
             data.update(
                 layerId=style.parent_id,
                 styleId=style.id,
                 cls=style.cls,
                 layerCls=layer.cls,
-                # geometryType=GEOM_TYPE.check_geometry_type(geometry_type),
+                geometryType=GEOM_TYPE.check_geometry_type(geometry_type),
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 filterable=IFilterableFeatureLayer.providedBy(layer),

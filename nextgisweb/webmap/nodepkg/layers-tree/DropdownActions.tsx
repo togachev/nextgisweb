@@ -177,7 +177,7 @@ export function DropdownActions(props: DropdownActionsProps) {
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <Button
-                className="more"
+                className="more action-btn"
                 size="small"
                 type="text"
                 icon={<MoreVertIcon />}

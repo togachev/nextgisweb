@@ -111,64 +111,113 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
     }
 
     return (
-        <Table
-            className="ngw-resource-resource-section-children"
-            size="middle"
-            card={true}
-            loading={{
-                spinning: isDataLoading,
-                indicator: <LoadingOutlined />,
-            }}
-            dataSource={items}
-            rowKey="id"
-            rowSelection={rowSelection}
-        >
-            <Column<ChildrenResource>
-                title={gettext("Display name")}
-                className="displayName"
-                dataIndex="displayName"
-                sorter={sorterFactory("displayName")}
-                render={(value, record) => (
-                    <SvgIconLink
-                        href={routeURL("resource.show", record.id)}
-                        icon={`rescls-${record.cls}`}
-                    >
-                        {value}
-                    </SvgIconLink>
-                )}
-            />
-            <Column<ChildrenResource>
-                title={gettext("Type")}
-                responsive={["md"]}
-                className="cls"
-                dataIndex="clsDisplayName"
-                sorter={sorterFactory("clsDisplayName")}
-            />
-            <Column<ChildrenResource>
-                title={gettext("Owner")}
-                responsive={["xl"]}
-                className="ownerUser"
-                dataIndex="ownerUserDisplayName"
-                sorter={sorterFactory("ownerUserDisplayName")}
-            />
-            {creationDateVisible && (
+        <ConfigProvider
+            theme={{
+                components: {
+                    Tooltip: {
+                        colorBgSpotlight: "var(--on-primary-text)",
+                        colorTextLightSolid: "var(--text-base)",
+                    },
+                },
+            }}><Table
+                className="ngw-resource-resource-section-children"
+                size="middle"
+                card={true}
+                loading={{
+                    spinning: isDataLoading,
+                    indicator: <LoadingOutlined />,
+                }}
+                dataSource={items}
+                rowKey="id"
+                rowSelection={rowSelection}
+            >
                 <Column<ChildrenResource>
-                    title={gettext("Created")}
-                    className="creationDate"
-                    dataIndex="creationDate"
-                    sorter={sorterFactory("creationDate")}
-                    render={(text) => {
-                        if (text && !text.startsWith("1970")) {
-                            return (
-                                <div style={{ whiteSpace: "nowrap" }}>
-                                    {utc(text).local().format("L LTS")}
-                                </div>
-                            );
-                        }
-                        return "";
-                    }}
+                    title={gettext("Display name")}
+                    className="displayName"
+                    dataIndex="displayName"
+                    sorter={sorterFactory("displayName")}
+                    render={(value, record) => (
+                        <SvgIconLink
+                            href={routeURL("resource.show", record.id)}
+                            icon={`rescls-${record.cls}`}
+                        >
+                            <Tooltip style={{ pointerEvents: "none" }} key={value} title={value}>
+                                <span className="name-style">{value}</span>
+                            </Tooltip>
+                        </SvgIconLink>
+                    )}
                 />
-            )}
-        </Table>
+                <Column<ChildrenResource>
+                    title={gettext("Type")}
+                    responsive={["md"]}
+                    className="cls"
+                    dataIndex="clsDisplayName"
+                    sorter={sorterFactory("clsDisplayName")}
+                />
+                <Column<ChildrenResource>
+                    title={gettext("Owner")}
+                    responsive={["xl"]}
+                    className="ownerUser"
+                    dataIndex="ownerUserDisplayName"
+                    sorter={sorterFactory("ownerUserDisplayName")}
+                />
+                {creationDateVisible && (
+                    <Column<ChildrenResource>
+                        title={gettext("Created")}
+                        className="creationDate"
+                        dataIndex="creationDate"
+                        sorter={sorterFactory("creationDate")}
+                        render={(text) => {
+                            if (text && !text.startsWith("1970")) {
+                                return (
+                                    <div style={{ whiteSpace: "nowrap" }}>
+                                        {utc(text).local().format("L LTS")}
+                                    </div>
+                                );
+                            }
+                            return "";
+                        }}
+                    />
+                )}
+                {storageEnabled && volumeVisible && (
+                    <Column<ChildrenResource>
+                        title={gettext("Volume")}
+                        className="volume"
+                        sorter={(a, b) => volumeValues[a.id] - volumeValues[b.id]}
+                        render={(_, record) => {
+                            if (volumeValues[record.id] !== undefined) {
+                                return formatSize(volumeValues[record.id]);
+                            } else {
+                                return "";
+                            }
+                        }}
+                    />
+                )}
+                <Column<ChildrenResource>
+                    title={
+                        <MenuDropdown
+                            items={items}
+                            selected={selected}
+                            allowBatch={allowBatch}
+                            resourceId={resourceId}
+                            volumeVisible={volumeVisible}
+                            storageEnabled={storageEnabled}
+                            creationDateVisible={creationDateVisible}
+                            setBatchDeletingInProgress={setBatchDeletingInProgress}
+                            setCreationDateVisible={setCreationDateVisible}
+                            setVolumeVisible={setVolumeVisible}
+                            setVolumeValues={setVolumeValues}
+                            setAllowBatch={setAllowBatch}
+                            setSelected={setSelected}
+                            setItems={setItems}
+                        />
+                    }
+                    className="actions"
+                    render={(_, record) => (
+                        <RenderActions record={record} setTableItems={setItems} />
+                    )}
+                />
+            </Table>
+        </ConfigProvider>
     );
 }

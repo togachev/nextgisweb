@@ -27,7 +27,6 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
 import type { FilterExpressionString } from "../feature-filter/type";
-import FilteredCount from "../filtered-count/FilteredCount";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
@@ -152,7 +151,6 @@ export const FeatureGridActions = observer(
         const handleFilterApply = useCallback(
             (filter: FilterExpressionString | undefined) => {
                 store.setFilterExpression(filter);
-
                 store.bumpVersion();
             },
             [store]

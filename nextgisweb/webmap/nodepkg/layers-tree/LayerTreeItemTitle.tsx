@@ -8,6 +8,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 
 import { DropdownActions } from "./DropdownActions";
+import { FilterAction } from "./FilterAction";
 import { DropdownFile } from "./DropdownFile";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
@@ -94,6 +95,8 @@ export const LayerTreeItemTitle = observer(
                     style={{ alignItems: "center" }}
                 >
                     {dropdownFile}
+                    {filterAction}
+                    {legendAction}
                     {dropdownAction}
                 </Col>
             );

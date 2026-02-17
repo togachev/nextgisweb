@@ -23,6 +23,13 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
         titleRef.current?.parentElement?.remove();
     }, []);
 
+    const titleEllipsis: React.CSSProperties = {
+        display: "-webkit-box",
+        WebkitLineClamp: 3,
+        WebkitBoxOrient: "vertical",
+        overflow: "hidden",
+    }
+
     return (
         <ConfigProvider
             theme={{
@@ -40,7 +47,7 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
             >
                 <h1>
                     <Tooltip style={{ pointerEvents: "none" }} title={ititle}>
-                        <div title={ititle} className="title-class">{ititle}</div>
+                        <div title={ititle} className="title-class" style={titleEllipsis}>{ititle}</div>
                     </Tooltip>
                 </h1>
                 {children}
