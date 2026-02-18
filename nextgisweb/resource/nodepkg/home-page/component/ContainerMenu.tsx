@@ -124,7 +124,7 @@ export const ContainerMenu = observer((props) => {
 
     return (
         <div className="dnd-container-menu">
-            <Space direction="horizontal" className="edit-group">
+            <Space orientation="horizontal" className="edit-group">
                 {store.resources.length > 0 && store.edit && store.manage &&
                     <ButtonSetting iconKey="add"  type="group" disabled={!store.editMap || !store.editGroup} store={store} operation="create"/>
                 }

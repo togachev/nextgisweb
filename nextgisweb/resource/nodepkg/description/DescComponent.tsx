@@ -138,7 +138,7 @@ const GetData = ({ type, item, options, styles, display, reset, setReset, layerI
         );
     } else {
         return (
-            <span className="link-type" title={msgActiveLink} direction="horizontal">
+            <span className="link-type" title={msgActiveLink} orientation="horizontal">
                 {domToReact(item.children, options)}
                 <span style={{ padding: "0 2px" }}><Info /></span>
             </span>

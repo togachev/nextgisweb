@@ -14,13 +14,13 @@ export const FormattedDecimalForm = ({ value, onChange }) => {
             onValuesChange={onValuesChange}
             className="format-component"
         >
-            <Space className="title-formatting" direction="horizontal" size="middle">
+            <Space className="title-formatting" orientation="horizontal" size="middle">
                 <span>{gettext("Setting up value formatting")}</span>
                 <Form.Item noStyle name="checked" valuePropName="checked">
                     <Switch checkedChildren={gettext("Disable")} unCheckedChildren={gettext("Enable")} checked={value?.checked} />
                 </Form.Item>
             </Space>
-            <Space style={{ width: "100%", color: !value?.checked && "var(--icon-color)" }} direction="vertical" size="middle">
+            <Space style={{ width: "100%", color: !value?.checked && "var(--icon-color)" }} orientation="vertical" size="middle">
                 <Row gutter={[16, 16]} wrap={false} justify="space-between" align="middle">
                     <Col >
                         {gettext("Rounding off a number")}

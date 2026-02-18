@@ -131,7 +131,7 @@ export const ContainerMaps = observer((props) => {
 
     return (
         <div className="dnd-container-maps" key={store.activeGroupId}>
-            <Space direction="horizontal" className="edit-maps">
+            <Space orientation="horizontal" className="edit-maps">
                 {store.itemsMapsGroup.length > 1 && store.edit && store.manage ?
                     (<ButtonSave disabled={!store.editGroup} icon={<SwapVertical />} text={gettext("Edit grid maps")} staticPosition={store.editMap} onClickSave={savePositionMap} />) : store.edit && store.manage && (<div style={{ height: 24 }}></div>)
                 }

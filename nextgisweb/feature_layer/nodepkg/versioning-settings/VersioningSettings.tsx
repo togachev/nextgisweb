@@ -56,14 +56,14 @@ export function VersioningSettings() {
     }
 
     return (
-        <Space direction="vertical" size="middle">
+        <Space orientation="vertical" size="middle">
             {contextHolder}
             <div style={{ maxWidth: "50em" }}>{msg.info}</div>
             <Radio.Group
                 value={String(value)}
                 onChange={(e) => setValue(eval(e.target.value))}
             >
-                <Space direction="vertical">
+                <Space orientation="vertical">
                     <Radio value="null">{msg.auto}</Radio>
                     <Radio value="true">{msg.true}</Radio>
                     <Radio value="false">{msg.false}</Radio>

@@ -262,7 +262,7 @@ export const ContentComponent = observer((props) => {
                                     value={store.fixContentItem?.value}
                                     className="radio-component"
                                 >
-                                    <Space direction="vertical"
+                                    <Space orientation="vertical"
                                         style={{ rowGap: 2, padding: 2 }}
                                     >
                                         {

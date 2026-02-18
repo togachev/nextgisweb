@@ -145,7 +145,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
-                    <Space direction="horizontal">
+                    <Space orientation="horizontal">
                         <Form.Item
                             noStyle
                             name="imodule"

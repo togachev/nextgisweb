@@ -41,7 +41,7 @@ export const ControlForm = ({ handleCancel, minVal = 500, resetForm }) => {
     };
 
     return (
-        <Space direction="horizontal">
+        <Space orientation="horizontal">
             <Form.Item noStyle label={null}>
                 <Button
                     title={gettext("Cancel")}

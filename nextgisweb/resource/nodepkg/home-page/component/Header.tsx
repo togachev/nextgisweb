@@ -207,13 +207,13 @@ export const Header = observer(({ store }: HeaderProps) => {
             clearOnDestroy={true}
             className="form-component"
         >
-            <Space className="content-body" direction="vertical">
-                <Space className="content" direction="vertical">
+            <Space className="content-body" orientation="vertical">
+                <Space className="content" orientation="vertical">
                     <UploadComponent store={store} params={paramsFileHeader} />
                     <Form.List name="menu">
                         {(fields, { add, remove }) => (
                             <>
-                                <Space direction="vertical" style={{ width: "100%" }} wrap>
+                                <Space orientation="vertical" style={{ width: "100%" }} wrap>
                                     <Button
                                         className="item-edit"
                                         onClick={() => add()}

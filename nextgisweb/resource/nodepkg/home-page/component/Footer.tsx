@@ -23,8 +23,8 @@ const ColorComponent = observer(({ store }: FooterProps) => {
     const colorsFooter = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#FFFFFF", "#000000", "#106A90"];
 
     return (
-        <Space direction="horizontal" wrap>
-            <Space direction="horizontal" wrap={false}>
+        <Space orientation="horizontal" wrap>
+            <Space orientation="horizontal" wrap={false}>
                 {gettext("Color background")}
                 <Form.Item
                     noStyle
@@ -48,7 +48,7 @@ const ColorComponent = observer(({ store }: FooterProps) => {
                     />
                 </Form.Item>
             </Space>
-            <Space direction="horizontal" wrap={false}>
+            <Space orientation="horizontal" wrap={false}>
                 {gettext("Color text")}
                 <Form.Item
                     noStyle
@@ -150,7 +150,7 @@ export const Footer = observer(({ store }: FooterProps) => {
             clearOnDestroy={true}
             className="form-component"
         >
-            <Space className="content" direction="vertical">
+            <Space className="content" orientation="vertical">
                 <UploadComponent store={store} params={paramsFileFooter} />
                 <ColorComponent store={store} />
                 <Form.Item noStyle name={"service_name"}>
@@ -159,7 +159,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                 <Form.List name={"service"}>
                     {(fields, { add, remove }) => (
                         <>
-                            <Space direction="vertical" style={{ width: "100%" }} wrap>
+                            <Space orientation="vertical" style={{ width: "100%" }} wrap>
                                 <Button
                                     className="item-edit"
                                     onClick={() => add()}
@@ -196,7 +196,7 @@ export const Footer = observer(({ store }: FooterProps) => {
                 </Form.Item>
                 <Form.List name={"address_phone"}>
                     {(fields, { add, remove }) => (
-                        <Space direction="vertical" style={{ width: "100%" }} wrap>
+                        <Space orientation="vertical" style={{ width: "100%" }} wrap>
                             <Button
                                 className="item-edit"
                                 onClick={() => add()}
