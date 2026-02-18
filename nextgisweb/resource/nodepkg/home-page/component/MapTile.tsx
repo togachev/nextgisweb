@@ -65,6 +65,7 @@ export const MapTile = observer((props) => {
                         marginXL: 0,
                     }
                 },
+                token: { motion: false },
             }}
         >
             <Card

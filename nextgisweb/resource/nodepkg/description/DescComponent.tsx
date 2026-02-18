@@ -1,7 +1,7 @@
 import parse, { attributesToProps, Element, domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Image, Divider, Space } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Image, Divider, Space } from "@nextgisweb/gui/antd";
 import { transform } from "ol/proj";
 import Info from "@nextgisweb/icon/material/info/outline";
 
@@ -168,7 +168,7 @@ export const DescComponent = (props) => {
                 return (
                     <Space key={index} orientation="vertical" style={{ width: "100%" }}>
                         {content.length > 1 && (
-                            <Divider variant="dotted" style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} orientationMargin={0} orientation="right" plain>{title}</Divider>
+                            <Divider variant="dotted" style={{ margin: 0, fontSize: "12px", color: "var(--text-secondary)" }} styles={{ content: { margin: 0 } }} titlePlacement="right" plain>{title}</Divider>
                         )}
                         {parse(item.description, options)}
                     </Space>
@@ -181,13 +181,23 @@ export const DescComponent = (props) => {
         replace: item => {
             const props = attributesToProps(item.attribs);
             if (item instanceof Element && item.attribs && item.name === "img") {
-                return (<Image
-                    preview={Number(props.width) < 350 ? false : {
-                        transitionName: "",
-                        maskTransitionName: "",
-                    }}
-                    {...props}
-                />);
+                return (
+                    <ConfigProvider
+                        theme={{
+                            token: {
+                                motion: true,
+                            },
+                        }}
+                    >
+                        <Image
+                            preview={Number(props.width) < 350 ? false : {
+                                transitionName: "",
+                                maskTransitionName: "",
+                            }}
+                            {...props}
+                        />
+                    </ConfigProvider>
+                );
             }
 
             if (item instanceof Element && item.attribs && item.name === "p") {

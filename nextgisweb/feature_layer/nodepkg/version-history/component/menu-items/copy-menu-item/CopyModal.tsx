@@ -23,6 +23,8 @@ export default function CopyModal({
             footer={null}
             destroyOnHidden
             width={740}
+            transitionName=""
+            maskTransitionName=""
             {...props}
         >
             <CopyForm

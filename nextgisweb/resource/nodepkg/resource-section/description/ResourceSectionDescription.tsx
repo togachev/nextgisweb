@@ -62,7 +62,7 @@ export const ResourceSectionDescription: ResourceSection = ({
 
     return (
         <div className="description-panel">
-            <Divider orientation="left" orientationMargin="0">{gettext("Description")}</Divider>
+            <Divider titlePlacement="left" styles={{ content: { margin: 0 } }}>{gettext("Description")}</Divider>
             <Collapse
                 defaultActiveKey={!descValue ? [] : ["description"]}
                 expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}

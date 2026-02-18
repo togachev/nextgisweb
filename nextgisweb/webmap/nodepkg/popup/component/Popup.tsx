@@ -204,6 +204,7 @@ export const Popup = observer(
                 theme={{
                     token: {
                         colorPrimary: "#106a90",
+                        motion: false,
                     },
                     components: {
                         Dropdown: {

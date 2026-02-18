@@ -17,6 +17,8 @@ export function PreviewMapModal({
             className="map-preview-modal"
             {...props}
             onCancel={onCancel}
+            transitionName=""
+            maskTransitionName=""
             closeIcon={false}
             footer={null}
             width={"60vw"}

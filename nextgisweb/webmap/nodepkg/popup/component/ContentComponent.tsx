@@ -248,6 +248,7 @@ export const ContentComponent = observer((props) => {
                     borderRadiusLG: 0,
                     padding: 5,
                     paddingXS: 2,
+                    motion: false,
                 },
             }}
         >

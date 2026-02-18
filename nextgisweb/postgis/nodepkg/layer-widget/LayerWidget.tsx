@@ -261,7 +261,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                     }}
                 />
             </Area>
-            <Divider orientation="left" orientationMargin="16" plain>{msgResRelSettings}</Divider>
+            <Divider titlePlacement="left" styles={{ content: { margin: 16 } }} plain>{msgResRelSettings}</Divider>
             <Area pad cols={["1fr", "1fr"]}>
                 <LotMV
                     row
