@@ -72,7 +72,7 @@ msgstr "Невозможно восстановить объект #{} поск�
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: filter.py:33
+#: filter.py:32
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
@@ -242,7 +242,7 @@ msgstr "Некорректное значение фильтра"
 msgid "Invalid JSON or filter structure"
 msgstr "Некорректный JSON или структура фильтра"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:636
+#: nodepkg/feature-filter/FilterEditorStore.ts:640
 msgid "Validation failed"
 msgstr "Ошибка валидации"
 
@@ -322,11 +322,11 @@ msgstr "Условие"
 msgid "Group"
 msgstr "Группа"
 
-#: nodepkg/feature-filter/testentry.tsx:117
+#: nodepkg/feature-filter/testentry.tsx:124
 msgid "Output JSON"
 msgstr "Вывод JSON"
 
-#: nodepkg/feature-filter/testentry.tsx:118
+#: nodepkg/feature-filter/testentry.tsx:125
 msgid "Current Filter State"
 msgstr "Текущее состояние фильтра"
 
@@ -393,51 +393,59 @@ msgid "Invalid operator: '{operator}'"
 msgstr "Некорректный оператор: '{operator}'"
 
 #: nodepkg/feature-filter/util/validator.ts:101
-#: nodepkg/feature-filter/util/validator.ts:109
+#: nodepkg/feature-filter/util/validator.ts:118
 msgid "Operator '{operator}' expects 1 argument, but got '{length}'"
 msgstr "Оператор '{operator}' ожидает 1 аргумент, но получено '{length}'"
 
-#: nodepkg/feature-filter/util/validator.ts:117
+#: nodepkg/feature-filter/util/validator.ts:110
+msgid "Operator '{operator}' expects at least {min} value argument"
+msgstr "Оператор '{operator}' ожидает хотя бы {min} аргумент"
+
+#: nodepkg/feature-filter/util/validator.ts:126
 msgid "Field expression must be ['get', fieldName]"
 msgstr "Выражение поля должно быть ['get', fieldName]"
 
-#: nodepkg/feature-filter/util/validator.ts:121
+#: nodepkg/feature-filter/util/validator.ts:130
 msgid "Field name must be a string"
 msgstr "Имя поля должно быть строкой"
 
-#: nodepkg/feature-filter/util/validator.ts:128
+#: nodepkg/feature-filter/util/validator.ts:137
 msgid "Unknown field: '{fieldName}'"
 msgstr "Неизвестное поле: '{fieldName}'"
 
-#: nodepkg/feature-filter/util/validator.ts:139
+#: nodepkg/feature-filter/util/validator.ts:148
 msgid "Operator '{operator}' is not supported for field type '{fieldType}'"
 msgstr "Оператор '{operator}' не поддерживается для типа поля '{fieldType}'"
 
-#: nodepkg/feature-filter/util/validator.ts:148
-msgid "Value for operator '{operator}' must be an array."
-msgstr "Значение для оператора '{operator}' должно быть массивом."
+#: nodepkg/feature-filter/util/validator.ts:159
+msgid ""
+"Values for 'in' operator cannot be arrays (must be flattened) or property "
+"references."
+msgstr ""
+"Значения для оператора 'in' не могут быть массивами (должны быть "
+"развернутыми) или ссылками на свойства."
 
-#: nodepkg/feature-filter/util/validator.ts:172
+#: nodepkg/feature-filter/util/validator.ts:184
 msgid "Field '{fieldName}' expects a number, but got '{valueType}'"
 msgstr "Поле '{fieldName}' ожидает число, но получено '{valueType}'"
 
-#: nodepkg/feature-filter/util/validator.ts:179
+#: nodepkg/feature-filter/util/validator.ts:191
 msgid "Field '{fieldName}' expects a string, but got '{valueType}'"
 msgstr "Поле '{fieldName}' ожидает строку, но получено '{valueType}'"
 
-#: nodepkg/feature-filter/util/validator.ts:196
+#: nodepkg/feature-filter/util/validator.ts:208
 msgid "Expression must be an array"
 msgstr "Выражение должно быть массивом"
 
-#: nodepkg/feature-filter/util/validator.ts:208
+#: nodepkg/feature-filter/util/validator.ts:220
 msgid "Group operator must have at least one argument"
 msgstr "Групповой оператор должен иметь хотя бы один аргумент"
 
-#: nodepkg/feature-filter/util/validator.ts:214
+#: nodepkg/feature-filter/util/validator.ts:226
 msgid "All arguments to group operator must be arrays"
 msgstr "Все аргументы группового оператора должны быть массивами"
 
-#: nodepkg/feature-filter/util/validator.ts:228
+#: nodepkg/feature-filter/util/validator.ts:240
 msgid "Unknown or invalid root operator: '{operator}'"
 msgstr "Неизвестный или некорректный корневой оператор: '{operator}'"
 
@@ -927,9 +935,3 @@ msgid ""
 msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
-
-#~ msgid "Enable by default"
-#~ msgstr "Включить по умолчанию"
-
-#~ msgid "Settings saved"
-#~ msgstr "Настройки сохранены"

@@ -187,7 +187,7 @@ export const DisplayWidget = observer(
                         style={{ flexGrow: 0, flexShrink: 0 }}
                     >
                         <NavigationMenu
-                            layout={isPortrait ? "horizontal" : "vertical"}
+                            orientation={isPortrait ? "horizontal" : "vertical"}
                             store={display.panelManager}
                             display={display}
                         />
@@ -204,7 +204,7 @@ export const DisplayWidget = observer(
             }
             showPanels.push(
                 <Panel key="main" min={200} resizable={!!activePanel}>
-                    <Splitter layout="vertical">
+                    <Splitter orientation="vertical">
                         <Panel key="map" min={200}>
                             <MapPane display={display}>{mapChildren}</MapPane>
                         </Panel>
@@ -238,7 +238,7 @@ export const DisplayWidget = observer(
             <DisplayContext value={{ display }}>
                 <div className={classNames("ngw-webmap-display", className)}>
                     <Splitter
-                        layout={isPortrait ? "vertical" : "horizontal"}
+                        orientation={isPortrait ? "vertical" : "horizontal"}
                         onResize={onResize}
                         onResizeEnd={onResizeEnd}
                     >

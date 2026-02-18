@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Checkbox, Radio, ConfigProvider, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
+import { Checkbox, Radio, ConfigProvider, Button, Dropdown, message, Input, Modal, Select, Space, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
@@ -16,7 +16,7 @@ import ModifyIcon from "@nextgisweb/icon/mdi/vector-polyline-edit";
 import AutoMode from "@nextgisweb/icon/mdi/auto-mode";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { useDraw } from "./hook/useDraw";
-
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import { TYPE_FILE } from "./constant";
 import "./DrawFeatures.less";
 
@@ -226,11 +226,12 @@ export const DrawFeatures = observer(({ display }: Display) => {
     };
 
     const DropdownType = () => (
-        <Dropdown.Button size="small" trigger={["hover"]} menu={geomTypesMenuItems} onClick={onDefaultType} >
-            <Space>
-                {geomTypeFilterIcon(geomTypeDefault, "create")}
-            </Space>
-        </Dropdown.Button>
+        <Space.Compact style={{ width: '100%' }} >
+            <Button size="small" style={{ flex: 1 }} onClick={onDefaultType}>{geomTypeFilterIcon(geomTypeDefault, "create")}</Button>
+            <Dropdown menu={geomTypesMenuItems} placement="bottomRight">
+                <Button size="small" icon={<MoreVertIcon />} />
+            </Dropdown>
+        </Space.Compact>
     );
 
     const geomTypeFilterIcon = (geomType: string, value: string) => {

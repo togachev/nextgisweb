@@ -347,7 +347,7 @@ const SelectedFeature = observer<PanelPluginWidgetProps<SelectedFeatureStore>>(
                 }}
             >
                 {store.countItems === 0 && <Alert
-                    message={msgSelectFeature}
+                    title={msgSelectFeature}
                     banner
                     showIcon={false}
                 />}

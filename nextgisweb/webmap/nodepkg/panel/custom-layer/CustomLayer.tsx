@@ -39,7 +39,7 @@ const CustomLayer = observer<PanelPluginWidgetProps>(({ store, display }) => {
     if (disableIModule) {
         info = (
             <Alert
-                message={disableIModule}
+                title={disableIModule}
                 type="warning"
                 closable
             />
@@ -61,6 +61,7 @@ const CustomLayer = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 items={items}
                 defaultActiveKey="1"
                 type="card"
+                size="small"
             />
         </PanelContainer>
     );

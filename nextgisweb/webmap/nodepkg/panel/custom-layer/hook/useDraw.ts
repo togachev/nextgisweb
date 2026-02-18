@@ -232,7 +232,9 @@ export const useDraw = (display: DojoDisplay) => {
     const removeItem = (key: number) => {
         const layer = getLayer(key);
         olmap.removeLayer(layer);
-        olmap.getView().fit(display._extent, olmap.getSize());
+        if (display.map.initialExtent) {
+            display.map.olMap.getView().fit(display.map.initialExtent);
+        }
     }
 
     const removeItems = () => {
@@ -242,7 +244,9 @@ export const useDraw = (display: DojoDisplay) => {
                 olmap.removeLayer(layer);
             }
         })
-        olmap.getView().fit(display._extent, olmap.getSize());
+        if (display.map.initialExtent) {
+            display.map.olMap.getView().fit(display.map.initialExtent);
+        }
     };
 
     const features = useCallback((key) => {

@@ -427,6 +427,9 @@ export class ResourcePickerStore implements Omit<
             },
             signal,
         });
+
+        this.updateLoadedResources(resp);
+
         return resp.filter((x: CompositeRead) =>
             this._resourceVisible(x.resource)
         );

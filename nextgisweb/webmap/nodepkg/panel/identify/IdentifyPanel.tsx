@@ -233,14 +233,14 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     !identifyInfo ? (
                         <Alert
                             className="alert"
-                            message={msgTipIdent}
+                            title={msgTipIdent}
                             showIcon={false}
                             type="info"
                             banner
                         />
                     ) : isNotFound ? (
                         <Alert
-                            message={msgNotFound}
+                            title={msgNotFound}
                             type="warning"
                             showIcon
                             banner

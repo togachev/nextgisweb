@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 
 import oauth from "@nextgisweb/auth/oauth";
@@ -39,11 +40,10 @@ export const Avatar = observer(() => {
 
     return (
         <div
-            className={
-                "ngw-pyramid-avatar" +
-                (authenticated ? " ngw-pyramid-avatar-authenticated" : "") +
-                (invitationSession ? " ngw-pyramid-avatar-danger" : "")
-            }
+            className={classNames("ngw-pyramid-avatar", {
+                "ngw-pyramid-avatar-authenticated": authenticated,
+                "ngw-pyramid-avatar-danger": invitationSession,
+            })}
         >
             {authenticated ? (
                 <Popover
@@ -51,7 +51,7 @@ export const Avatar = observer(() => {
                     trigger="click"
                     title={userDisplayName}
                     content={content}
-                    overlayClassName="ngw-pyramid-avatar-popover"
+                    classNames={{ root: "ngw-pyramid-avatar-popover" }}
                     arrow={{ pointAtCenter: true }}
                 >
                     <span className="ngw-pyramid-menu-icon">

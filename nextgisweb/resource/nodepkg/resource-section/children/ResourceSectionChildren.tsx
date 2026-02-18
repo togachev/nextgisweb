@@ -13,16 +13,14 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
-
+import { LoadingOutlined } from "@ant-design/icons";
+import { registry } from "../registry";
 import type { ResourceSectionProps } from "../type";
 
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RenderActions";
-import { registry } from "../registry";
 import type { ChildrenResource } from "./type";
 import { prepareResourceChildren } from "./util/prepareResourceChildren";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 import "./ResourceSectionChildren.less";
 
@@ -119,7 +117,8 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
                         colorTextLightSolid: "var(--text-base)",
                     },
                 },
-            }}><Table
+            }}>
+            <Table
                 className="ngw-resource-resource-section-children"
                 size="middle"
                 card={true}

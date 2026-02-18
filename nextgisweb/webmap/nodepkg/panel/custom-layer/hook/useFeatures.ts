@@ -102,7 +102,10 @@ export const useFeatures = (display: Display) => {
                 olmap.removeLayer(layer);
             }
         });
-        olmap.getView().fit(display._extent, olmap.getSize());
+
+        if (display.map.initialExtent) {
+            display.map.olMap.getView().fit(display.map.initialExtent);
+        }
     }
 
     const removeItems = () => {
@@ -113,7 +116,9 @@ export const useFeatures = (display: Display) => {
                 olmap.removeLayer(layer);
             }
         });
-        olmap.getView().fit(display._extent, olmap.getSize());
+        if (display.map.initialExtent) {
+            display.map.olMap.getView().fit(display.map.initialExtent);
+        }
     };
 
     return { displayFeatureInfo, olmap, removeItem, removeItems, setCustomStyle, visibleLayer, zoomfeature, zoomToLayer, addLayerMap };

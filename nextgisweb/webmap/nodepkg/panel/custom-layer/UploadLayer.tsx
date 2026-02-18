@@ -222,7 +222,7 @@ export function UploadLayer({ display }: Display) {
             </div>
             <div key={uploadkey}>
                 <Dragger {...props} accept=".gpx,.geojson,.kml">
-                    <Space direction="vertical">
+                    <Space orientation="vertical">
                         <Text>{areaUpload}</Text>
                     </Space>
                 </Dragger>

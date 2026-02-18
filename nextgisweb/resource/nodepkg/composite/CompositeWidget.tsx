@@ -6,7 +6,7 @@ import type {
     ActionToolbarAction,
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Dropdown, Spin, Tabs } from "@nextgisweb/gui/antd";
+import { Button, Dropdown, Space, Spin, Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { SaveButton, TabsLabelBadge } from "@nextgisweb/gui/component";
 import { ErrorModal, errorModal } from "@nextgisweb/gui/error";
@@ -20,7 +20,7 @@ import type { ActiveOnOptions, EditorStore } from "../type";
 import { CompositeStore } from "./CompositeStore";
 import type { CompositeSetup } from "./CompositeStore";
 
-import { LoadingOutlined } from "@ant-design/icons";
+import { EllipsisOutlined } from "@ant-design/icons";
 
 import "./CompositeWidget.less";
 
@@ -148,24 +148,31 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
 
         if (operation === "create") {
             actions.push(
-                <Dropdown.Button
-                    key="create"
-                    type="primary"
-                    menu={{
-                        items: [
-                            {
-                                key: "create_edit",
-                                label: msgCreateEdit,
-                                icon: <EditIcon />,
-                                onClick: () => submit(true),
-                            },
-                        ],
-                    }}
-                    disabled={inProgress}
-                    onClick={() => submit(false)}
-                >
-                    {msgCreate}
-                </Dropdown.Button>
+                <Space.Compact key="create">
+                    <Button
+                        type="primary"
+                        disabled={inProgress}
+                        onClick={() => submit(false)}
+                    >
+                        {msgCreate}
+                    </Button>
+
+                    <Dropdown
+                        menu={{
+                            items: [
+                                {
+                                    key: "create_edit",
+                                    label: msgCreateEdit,
+                                    icon: <EditIcon />,
+                                    onClick: () => submit(true),
+                                },
+                            ],
+                        }}
+                        disabled={inProgress}
+                    >
+                        <Button type="primary" icon={<EllipsisOutlined />} />
+                    </Dropdown>
+                </Space.Compact>
             );
         } else if (operation === "update") {
             actions.push(
@@ -198,8 +205,9 @@ export const CompositeWidget = observer(({ setup, tab, location, setSave }: Comp
             >
                 <Spin
                     size="large"
-                    indicator={<LoadingOutlined spin />}
-                    tip={composite.saving || redirecting ? msgSaving : ""}
+                    description={
+                        composite.saving || redirecting ? msgSaving : ""
+                    }
                 >
                     <div />
                 </Spin>
