@@ -10,7 +10,7 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:230
+#: favorite.py:6 nodepkg/display/resource-action-plugin.tsx:10 view.py:230
 msgid "Display"
 msgstr "Открыть"
 
@@ -91,7 +91,7 @@ msgstr "Свернуть"
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/display-tiny/DisplayTinyPage.tsx:61
+#: nodepkg/display-tiny/DisplayTinyPage.tsx:59
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -103,11 +103,11 @@ msgstr "Объект не найден"
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: nodepkg/display/component/NavigationMenu.tsx:58
+#: nodepkg/display/component/NavigationMenu.tsx:63
 msgid "Web Map Properties"
 msgstr "Свойства веб-карты"
 
-#: nodepkg/display/component/NavigationMenu.tsx:65
+#: nodepkg/display/component/NavigationMenu.tsx:70
 msgid "Map settings"
 msgstr "Настройки карты"
 
@@ -192,7 +192,7 @@ msgstr "Взаимоисключающая"
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/items-widget/ItemsWidget.tsx:37
 #: nodepkg/plugin/layer-identifiable/LayerIdentifiablePlugin.tsx:19
 msgid "Identifiable"
 msgstr "Идентифицируемый"
@@ -268,12 +268,20 @@ msgstr "Публичная аннотация"
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
+#: nodepkg/layers-tree/DropdownFile.tsx:14
+msgid "Download attached files"
+msgstr ""
+
+#: nodepkg/layers-tree/DropdownFile.tsx:66
+msgid "Download"
+msgstr ""
+
 #: nodepkg/layers-tree/FilterAction.tsx:12
 #: nodepkg/plugin/layer-filter/LayerFilterPlugin.tsx:28
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:17
+#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:18
 msgid ""
 "This layer is not visible at the current map scale. Zoom to make the layer "
 "visible."
@@ -420,11 +428,11 @@ msgstr "Координаты курсора / охвата"
 msgid "Editor"
 msgstr "Редактор"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:87
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:89
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
@@ -719,15 +727,15 @@ msgstr "Данные недоступны для чтения"
 msgid "Identify"
 msgstr "Идентификация"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:49
+#: nodepkg/panel/layers/LayersDropdown.tsx:44
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:55
+#: nodepkg/panel/layers/LayersDropdown.tsx:50
 msgid "Hide all layers"
 msgstr "Скрыть все слои"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:62
+#: nodepkg/panel/layers/LayersDropdown.tsx:57
 msgid "Reset layers"
 msgstr "Восстановить исходное состояние"
 
@@ -789,7 +797,7 @@ msgstr "Значение масштаба"
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/component/ScalesSelect.tsx:67
+#: nodepkg/panel/print/component/ScalesSelect.tsx:68
 msgid "Custom scale"
 msgstr "Произвольный масштаб"
 
@@ -825,15 +833,15 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:30
+#: nodepkg/panel/search/SearchPanel.tsx:29
 msgid "To search, enter coordinates in decimal format"
 msgstr "Для поиска введите координаты в десятичном формате"
 
-#: nodepkg/panel/search/SearchPanel.tsx:31
+#: nodepkg/panel/search/SearchPanel.tsx:30
 msgid "Examples of supported formats"
 msgstr "Примеры поддерживаемых форматов"
 
-#: nodepkg/panel/search/SearchPanel.tsx:32
+#: nodepkg/panel/search/SearchPanel.tsx:31
 msgid ""
 "The separator of the integer and fractional parts is a dot, the separator of "
 "coordinates is a space or a comma"
@@ -841,39 +849,39 @@ msgstr ""
 "Разделитель целой и дробной частей — точка, разделитель координат — пробел "
 "или запятая"
 
-#: nodepkg/panel/search/SearchPanel.tsx:38 nodepkg/panel/search/SearchPanel.tsx:39
+#: nodepkg/panel/search/SearchPanel.tsx:37 nodepkg/panel/search/SearchPanel.tsx:38
 msgid "Decimal degrees:"
 msgstr "Десятичные градусы:"
 
-#: nodepkg/panel/search/SearchPanel.tsx:43 nodepkg/panel/search/SearchPanel.tsx:44
+#: nodepkg/panel/search/SearchPanel.tsx:42 nodepkg/panel/search/SearchPanel.tsx:43
 msgid "Degrees, minutes and seconds:"
 msgstr "Градусы, минуты и секунды:"
 
-#: nodepkg/panel/search/SearchPanel.tsx:48 nodepkg/panel/search/SearchPanel.tsx:49
+#: nodepkg/panel/search/SearchPanel.tsx:47 nodepkg/panel/search/SearchPanel.tsx:48
 msgid "Degrees and decimal minutes:"
 msgstr "Градусы и десятичные минуты:"
 
-#: nodepkg/panel/search/SearchPanel.tsx:53 nodepkg/panel/search/SearchPanel.tsx:54
+#: nodepkg/panel/search/SearchPanel.tsx:52 nodepkg/panel/search/SearchPanel.tsx:53
 msgid "Decimal degrees (coordinate labels):"
 msgstr "Десятичные градусы (метки координат):"
 
-#: nodepkg/panel/search/SearchPanel.tsx:58 nodepkg/panel/search/SearchPanel.tsx:59
+#: nodepkg/panel/search/SearchPanel.tsx:57 nodepkg/panel/search/SearchPanel.tsx:58
 msgid "Degrees, minutes and seconds (coordinate labels):"
 msgstr "Градусы, минуты и секунды (метки координат):"
 
-#: nodepkg/panel/search/SearchPanel.tsx:62 nodepkg/panel/search/SearchPanel.tsx:63
+#: nodepkg/panel/search/SearchPanel.tsx:61 nodepkg/panel/search/SearchPanel.tsx:62
 msgid "Degrees and decimal minutes (coordinate captions):"
 msgstr "Градусы и десятичные минуты (подписи к координатам):"
 
-#: nodepkg/panel/search/SearchPanel.tsx:416
+#: nodepkg/panel/search/SearchPanel.tsx:415
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:517
+#: nodepkg/panel/search/SearchPanel.tsx:515
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:522
+#: nodepkg/panel/search/SearchPanel.tsx:519
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -1598,7 +1606,7 @@ msgstr "Коллекция геометрий"
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:156
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:164
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
