@@ -131,53 +131,53 @@ export const Content = observer(({ config }: ContentProps) => {
     };
 
     return (
-        <div className="wrapper-home-page">
-            <ConfigProvider
-                theme={{
-                    token: {
-                        fontFamily: "Montserrat",
-                        colorPrimaryBorder: "#2a388c",
+        <ConfigProvider
+            theme={{
+                token: {
+                    fontFamily: "Montserrat",
+                    colorPrimaryBorder: "#2a388c",
+                },
+                components: {
+                    Divider: {
+                        marginXS: 0,
                     },
-                    components: {
-                        Divider: {
-                            marginXS: 0,
-                        },
-                        Modal: {
-                            colorBgMask: "var(--divider-color)",
-                        },
-                        Image: {
-                            colorBgMask: "var(--divider-color)",
-                        },
-                        Menu: {
-                            lineWidth: 1,
-                            itemBg: "transparent",
-                            horizontalItemSelectedColor: "transparent",
-                            itemColor: `${store.valueFooter?.colorText}`,
-                            groupTitleColor: `${store.valueFooter?.colorText}`,
-                            itemHoverBg: `${store.valueFooter?.colorText}`,
-                            itemHoverColor: `${store.valueFooter?.colorBackground}`,
-                            popupBg: `${store.valueFooter?.colorBackground}`,
-                            itemPaddingInline: 16,
-                        },
-                        Segmented: {
-                            trackBg: "transparent",
-                            trackPadding: 0,
-                        },
-                        Tooltip: {
-                            colorBgSpotlight: "#fff",
-                            colorTextLightSolid: "#000",
-                            borderRadius: 3,
-                        },
-                        Radio: {
-                            colorBgContainer: "#ffffff00",
-                            buttonCheckedBg: "#2a398c0d",
-                        },
-                        Button: {
-                            defaultBg: "#ffffff20",
-                        },
+                    Modal: {
+                        colorBgMask: "var(--divider-color)",
                     },
-                }}
-            >
+                    Image: {
+                        colorBgMask: "var(--divider-color)",
+                    },
+                    Menu: {
+                        lineWidth: 1,
+                        itemBg: "transparent",
+                        horizontalItemSelectedColor: "transparent",
+                        itemColor: `${store.valueFooter?.colorText}`,
+                        groupTitleColor: `${store.valueFooter?.colorText}`,
+                        itemHoverBg: `${store.valueFooter?.colorText}`,
+                        itemHoverColor: `${store.valueFooter?.colorBackground}`,
+                        popupBg: `${store.valueFooter?.colorBackground}`,
+                        itemPaddingInline: 16,
+                    },
+                    Segmented: {
+                        trackBg: "transparent",
+                        trackPadding: 0,
+                    },
+                    Tooltip: {
+                        colorBgSpotlight: "#fff",
+                        colorTextLightSolid: "#000",
+                        borderRadius: 3,
+                    },
+                    Radio: {
+                        colorBgContainer: "#ffffff00",
+                        buttonCheckedBg: "#2a398c0d",
+                    },
+                    Button: {
+                        defaultBg: "#ffffff20",
+                    },
+                },
+            }}
+        >
+            <div className="wrapper-home-page">
                 <Header store={store} />
                 <div className="main">
                     <div className="content">
@@ -217,15 +217,15 @@ export const Content = observer(({ config }: ContentProps) => {
                                 </div>
                             </div> :
                             store.edit && store.manage ?
-                            <div className="add-group">
-                                <ButtonSetting store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
-                            </div> : <></>
+                                <div className="add-group">
+                                    <ButtonSetting store={store} operation="create" icon="add" type="group" text={msg("group", "create")} />
+                                </div> : <></>
                         }
                     </div>
                     <FloatButton.BackTop />
                 </div>
                 <Footer store={store} />
-            </ConfigProvider >
-        </div>
+            </div>
+        </ConfigProvider >
     )
 });
