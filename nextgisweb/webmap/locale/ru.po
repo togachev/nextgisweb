@@ -380,12 +380,12 @@ msgstr "Вертикальная шторка"
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
-#: nodepkg/map-controls/map-controls.ts:11
-msgid "Attibution Toolbar"
+#: nodepkg/map-controls/map-controls.ts:9
+msgid "Attribution toolbar"
 msgstr "Панель атрибутов"
 
-#: nodepkg/map-controls/map-controls.ts:26
-msgid "Map Toolbar"
+#: nodepkg/map-controls/map-controls.ts:24
+msgid "Map toolbar"
 msgstr "Панель инструментов карты"
 
 #: nodepkg/map-controls/map-controls.ts:62
@@ -770,7 +770,7 @@ msgid "Map title text"
 msgstr "Текст заголовка карты"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:70
-msgid "North Arrow"
+msgid "North arrow"
 msgstr "Указатель севера"
 
 #: nodepkg/panel/print/component/PrintPaperSettings.tsx:82

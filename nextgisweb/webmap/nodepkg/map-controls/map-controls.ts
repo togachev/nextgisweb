@@ -8,7 +8,7 @@ import settings from "@nextgisweb/webmap/client-settings";
 mapControlRegistry(COMP_ID, {
     key: "at",
     order: 1000,
-    label: gettext("Attibution Toolbar"),
+    label: gettext("Attribution toolbar"),
     props: {
         id: "attribution-toolbar",
         direction: "horizontal",
@@ -23,7 +23,7 @@ mapControlRegistry(COMP_ID, {
 
 mapControlRegistry(COMP_ID, {
     key: "mt",
-    label: gettext("Map Toolbar"),
+    label: gettext("Map toolbar"),
     props: { id: "map-toolbar", direction: "horizontal" },
     position: "bottom-left",
     showOnPreview: true,
