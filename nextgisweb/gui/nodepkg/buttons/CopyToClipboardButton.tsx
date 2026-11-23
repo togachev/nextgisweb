@@ -41,7 +41,7 @@ const IsTouchDevice = typeof window !== "undefined" && "ontouchstart" in window;
 
 export function CopyToClipboardButton({
     children,
-    messageInfo: text,
+    messageInfo,
     getTextToCopy,
     iconOnly,
     ...restParams
